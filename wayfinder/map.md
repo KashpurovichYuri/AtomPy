@@ -33,6 +33,11 @@ green, reports written.
   active orbitals = raw 2p shell AO columns (exactly rotation-closed), core
   folded with the spherically averaged density; CASSCF stages analyzed on
   their optimized orbitals (symmetry breaking is a result, not a bug).
+- [Second quantization](tickets/05-second-quantization.md):
+  second independent construction via explicit a+/a application
+  (`secondquant.py`), wired as `build_operators(method=...)`; validated on
+  Carbon in three tiers (elementwise, core-explicit CAS(6,5) vs PySCF
+  ncore=0, fixed-core block vs folded+ecore).
 
 ## Not yet specified
 

@@ -35,10 +35,12 @@ __all__ = [
     "spin_block_one_body",
     "spin_block_two_body",
     "active_space_integrals",
+    "full_space_integrals",
     "lz_operator",
     "l2_operator_parts",
     "s2_operator_parts",
     "number_operator",
+    "build_operator_parts",
     "build_operators",
 ]
 
@@ -192,10 +194,32 @@ def number_operator(norb: int) -> np.ndarray:
     return spin_block_one_body(np.eye(norb))
 
 
-def build_operators(mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int) -> dict:
-    """All analysis operators as full matrices in the determinant basis."""
-    h1, g = active_space_integrals(mol, mf, c_act, ncore)
+def full_space_integrals(mol, mf, w: np.ndarray):
+    """(h1, g) over the given orbital columns with NO core folding.
 
+    Raw one-electron h_core and raw two-electron ERIs (detbasis physicist
+    convention) in the orbital basis ``w`` -- for core-explicit (all-electron
+    active space) second-quantized Hamiltonians.
+    """
+    h1 = _mo_transform(mf.get_hcore(), w)
+    eri = mol.intor("int2e", aosym="s1")
+    g = np.einsum(
+        "up,vq,wr,xs,uvwx->pqrs",
+        w.conj(),
+        w.conj(),
+        w,
+        w,
+        eri,
+        optimize=True,
+    ).transpose(0, 2, 1, 3)
+    return h1, g
+
+
+def build_operator_parts(mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int) -> dict:
+    """Operator content of build_operators as raw parts, evaluation-agnostic:
+    ``{name: (one_body, two_body)}`` plus the determinant basis and integrals.
+    """
+    h1, g = active_space_integrals(mol, mf, c_act, ncore)
     dets = determinant_basis(c_act.shape[1], na, nb)
     s2_one, s2_two = s2_operator_parts(c_act.shape[1])
     l2_one, l2_two = l2_operator_parts(mol, c_act)
@@ -203,11 +227,42 @@ def build_operators(mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int) ->
         "dets": dets,
         "h1": h1,
         "g": g,
-        "H": slater_condon_matrix(
-            dets, one_body=spin_block_one_body(h1), two_body=spin_block_two_body(g)
-        ),
-        "Lz": slater_condon_matrix(dets, one_body=lz_operator(mol, c_act)),
-        "L2": slater_condon_matrix(dets, one_body=l2_one, two_body=l2_two),
-        "S2": slater_condon_matrix(dets, one_body=s2_one, two_body=s2_two),
-        "N": slater_condon_matrix(dets, one_body=number_operator(c_act.shape[1])),
+        "H": (spin_block_one_body(h1), spin_block_two_body(g)),
+        "Lz": (lz_operator(mol, c_act), None),
+        "L2": (l2_one, l2_two),
+        "S2": (s2_one, s2_two),
+        "N": (number_operator(c_act.shape[1]), None),
     }
+
+
+def build_operators(
+    mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int, method: str = "slater_condon"
+) -> dict:
+    """All analysis operators as full matrices in the determinant basis.
+
+    method: "slater_condon" (first quantization, explicit excitation rules)
+    or "secondquant" (fermionic a+/a strings applied to occupation vectors).
+    Both consume identical operator parts and produce elementwise identical
+    matrices (pinned by tests).
+    """
+    parts = build_operator_parts(mol, mf, c_act, ncore, na, nb)
+    dets = parts.pop("dets")
+    integrals = (parts.pop("h1"), parts.pop("g"))
+
+    if method == "slater_condon":
+        from atomterm.detbasis import slater_condon_matrix
+
+        def build(ob, tb):
+            return slater_condon_matrix(dets, one_body=ob, two_body=tb)
+    elif method == "secondquant":
+        from atomterm.secondquant import secondquant_matrix
+
+        def build(ob, tb):
+            return secondquant_matrix(dets, one_body=ob, two_body=tb)
+    else:
+        raise ValueError(f"unknown method: {method!r}")
+
+    out = {"dets": dets, "h1": integrals[0], "g": integrals[1]}
+    for name, (ob, tb) in parts.items():
+        out[name] = build(ob, tb)
+    return out

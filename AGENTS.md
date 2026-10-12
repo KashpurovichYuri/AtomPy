@@ -30,7 +30,8 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/system.py` | `AtomConfig`, `build_mol` | validates: single atom at origin, spherical basis |
 | `src/atomterm/angular.py` | `l_matrices`, `l2_matrix`, `l_matrices_analytic` | one-electron `Lx/Ly/Lz` AO matrices. Primary: libcint `int1e_irp` (decoded layout in the docstring). Cross-check: exact tesseral algebra via overlaps. |
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
-| `src/atomterm/operators.py` | `build_operators` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged) |
+| `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
+| `src/atomterm/operators.py` | `build_operators`, `full_space_integrals` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation |
 | `src/atomterm/drivers.py` | `run_rohf`, `run_casci`, `run_casscf`, `run_sa_casscf` | all checkpointed (`.chk`); active space = raw shell AO columns placed at `[ncore:ncore+ncas]` |
 | `src/atomterm/analysis.py` | `analyze`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms |
 | `src/atomterm/pipeline.py` | `run_carbon` | end-to-end orchestration, writes `results/` |
@@ -64,6 +65,15 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
    (`<L^2>` ≈ 1.67, `||[H, Lz]||` ≈ 0.02); SA-CASSCF over the 3 M_L components
    restores it (⟨L²⟩ = 2.000000). Textbook 2p²: ³P(×3) < ¹D(×5) < ¹S(×1),
    `<L^2>` = 2, 6, 0.
+9. **Second-quantized two-body convention**: `O2 = ½ Σ G[p,q,r,s] a+_p a+_q
+   a_s a_r` with G in the detbasis (physicist) arrangement; annihilators run
+   in reverse order (s before r). Elementwise identical to the Slater–Condon
+   matrices (tests/test_secondquant.py, tier 1). For core-explicit tests use
+   **pure s AOs** (Lowdin-orthogonalized pair) as core columns, not canonical
+   MOs: SCF p-contamination (~1e-3 amplitudes) breaks orthonormality and the
+   [H, Lz] commutator at the 1e-4 level. Matrix products of the folded
+   (active-space) Hamiltonian + explicit core energy == the fixed-core block
+   of the full-space H (tier 3, machine precision).
 
 ## Conventions
 
@@ -76,9 +86,12 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 21 tests in a few seconds (chkfile caching; ROHF computed once
+`pytest` runs 31 tests in a few seconds (chkfile caching; ROHF computed once
 per session). The critical invariants: `test_hamiltonian_matches_pyscf_fci`
-(Slater–Condon vs PySCF FCI), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
+(Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
+(second quantization ≡ first quantization, elementwise),
+`test_full_space_vs_pyscf_casci_core_explicit` (core-explicit CAS(6,5) vs
+PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
 `test_analytic_matches_libcint` (two independent L constructions).
 
