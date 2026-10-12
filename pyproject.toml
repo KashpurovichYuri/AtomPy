@@ -1,0 +1,12 @@
+[project]
+name = "atomterm"
+version = "0.1.0"
+description = "Atomic term-symbol (L-multiplicity) analysis on top of PySCF: ROHF -> CASCI -> CASSCF -> SA-CASSCF with exact Lz / L2 operator matrices."
+requires-python = ">=3.10"
+dependencies = ["numpy", "pyscf>=2.3"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
