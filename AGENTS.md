@@ -32,9 +32,9 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation |
-| `src/atomterm/drivers.py` | `run_rohf`, `run_casci`, `run_casscf`, `run_sa_casscf`, `purified_s_core` | all checkpointed (`.chk`); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core` |
+| `src/atomterm/drivers.py` | `run_rohf`, `run_casci`, `run_casscf`, `run_sa_casscf`, `select_valence_ao`, `select_shell_ao`, `purified_s_core` | all checkpointed (`.chk`); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core` |
 | `src/atomterm/analysis.py` | `analyze`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms |
-| `src/atomterm/pipeline.py` | `run_carbon` | end-to-end orchestration, writes `results/` |
+| `src/atomterm/pipeline.py` | `run_atom`, `run_carbon` | generic end-to-end orchestration for any atom (Ms sectors derived from spin + active-electron count); `run_carbon` = carbon wrapper; writes `results/` |
 
 ## Hard-won facts (do not re-derive)
 
@@ -77,6 +77,19 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
    MO s-weight lives in the AO metric (`c†Sc = 1`), not the Euclidean norm.
    Folded (active-space) H + explicit core energy == the fixed-core block
    of the full-space H (tier 3, machine precision).
+10. **From-scratch runs are not bit-reproducible**: threaded BLAS makes the
+   SCF converge to last-digit-different MOs, and orbital-optimized stages
+   (CASSCF/SA) amplify that chaotically (CASSCF root splittings wobble
+   ~1e-2 Eh between identical reruns). Behavior-equivalence checks MUST pin
+   the same ROHF chkfile as input — CASCI-stage reports are then
+   byte-identical (residual: signed zeros `0.0`/-`0.0` on noise-level Lz
+   eigenvalues). Never judge a refactor by diffing two from-scratch runs.
+11. **Generic pipeline** (`pipeline.run_atom`): Ms sectors derive from
+   `cfg.spin = 2S` + active-electron parity — primary `(na, nb) =
+   ((n+2S)/2, (n−2S)/2)`, plus `(n/2, n/2)` when n is even and S > 0.
+   Sector chkfile tags label M_S = (na−nb)/2 (`casci_ms1`, `casci_ms0`,
+   `casci_ms0p5` for a doublet) — na−nb itself would collide. New atoms =
+   a new row in `tests/test_atoms.py` `CASES`, no new code.
 
 ## Conventions
 
@@ -89,14 +102,15 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 32 tests in a few seconds (chkfile caching; ROHF computed once
+`pytest` runs 33 tests in a few seconds (chkfile caching; ROHF computed once
 per session). The critical invariants: `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
 (second quantization ≡ first quantization, elementwise),
 `test_full_space_vs_pyscf_casci_core_explicit` (core-explicit CAS(6,5) vs
 PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
-`test_analytic_matches_libcint` (two independent L constructions).
+`test_analytic_matches_libcint` (two independent L constructions),
+`test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows).
 
 ## Planning
 

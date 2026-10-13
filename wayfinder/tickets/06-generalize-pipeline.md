@@ -1,6 +1,6 @@
 # Ticket 06: Generalize selection & pipeline for arbitrary atoms
 
-Status: open
+Status: resolved
 
 ## Question
 
@@ -61,3 +61,34 @@ stay (they validate against PySCF FCI); only duplicative ones migrate.
 
 - All 32 existing tests green, run_carbon output byte-identical.
 - New test_atoms.py runs C through the generic path.
+
+## Resolution (closed)
+
+Implemented as specified, with three deviations/notes:
+
+1. `nroots_primary` is **clamped to the sector size** (`min(9, ndet)`):
+   carbon's primary sector has 3 determinants, so the default 9 would be
+   illegal; clamping reproduces the historic `nroots=3` exactly while Sc/Ti
+   get the full 9. The Ms=0 sector always diagonalizes the whole space.
+2. Sector chkfile tags derive from M_S = (na−nb)/2 (`_ms_label`): "1", "0"
+   for the historic carbon names, "0p5" for a doublet primary sector (Sc) —
+   plain na−nb would collide ("casci_ms0" meaning both Ms=0 singlet and
+   Ms=1/2 doublet sectors).
+3. The `run_casscf` flag parameter shadows the imported driver function of
+   the same name; the import is aliased `casscf_stage` inside pipeline.py
+   (public parameter name kept as specced, callers unchanged).
+
+`run_atom` also records `n_dev = max|diag(N) − (na+nb)|` per stage in its
+result dict (not in the reports), so tests can pin the particle number.
+
+**Equivalence evidence**: with the SAME ROHF chkfile as input, old and new
+code produce byte-identical reports except signed zeros (`0.0` vs `-0.0`)
+on two noise-level Lz eigenvalues of the orbital-optimized stages. Two
+from-scratch runs of the *unchanged* old code differ far more (CASSCF root
+splittings ~1e-2 Eh): threaded BLAS makes SCF nondeterministic in the last
+digits, and orbital optimization amplifies that chaotically. Recorded as an
+AGENTS.md fact — equivalence checks must pin the chkfile input.
+
+Tests: 33 green (32 + `test_atoms.py::test_atom_term_tables[C]`, the
+table-driven generic-path test; Si/Sc/Ti land as new CASES rows in
+tickets 07–09).

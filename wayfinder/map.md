@@ -38,6 +38,12 @@ green, reports written.
   (`secondquant.py`), wired as `build_operators(method=...)`; validated on
   Carbon in three tiers (elementwise, core-explicit CAS(6,5) vs PySCF
   ncore=0, fixed-core block vs folded+ecore).
+- [Generalize pipeline](tickets/06-generalize-pipeline.md):
+  `run_atom(cfg, shell_patterns, nelec_act, ...)` drives any atom; Ms
+  sectors derived from spin + active-electron parity; sector tags label
+  M_S = (na−nb)/2 ("0p5" for doublets); `run_carbon` is a thin wrapper;
+  table-driven `tests/test_atoms.py` (new atoms = new data rows).
+  Equivalence vs the carbon code proven with pinned ROHF input.
 
 ## Not yet specified
 
@@ -46,16 +52,18 @@ green, reports written.
   coupling, transition moments, g-factors).
 - Non-spherical/many-center generalization of the L operators (molecules):
   the current construction assumes a single atom at the origin.
+- Cosmetic: the per-stage report line prints `Ms={na−nb}` (i.e. 2·M_S —
+  "Ms=+2" for the carbon triplet sector). Found during ticket 06; left
+  untouched for output stability, fix belongs in its own decision since it
+  changes every report.
 
 ## Live tickets (the current wave)
 
-- [06: generalize pipeline](tickets/06-generalize-pipeline.md) — data-driven
-  atoms, run_atom, select_valence_ao; C stays green, unchanged output.
-- [07: Si](tickets/07-si.md) — 3p² ³P; first p-type core (blocked by 06).
+- [07: Si](tickets/07-si.md) — 3p² ³P; first p-type core (data row only).
 - [08: Sc](tickets/08-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
-  occupation risks documented (blocked by 06).
+  occupation risks documented.
 - [09: Ti](tickets/09-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
-  (blocked by 06; apply 08's learnings).
+  (apply 08's learnings).
 - [10: purified_core_orbitals](tickets/10-purify-general.md) — optional,
   per-shell core purification for future core-explicit TM tests.
 - [11: review protocol](tickets/11-review-protocol.md) — /code-review after

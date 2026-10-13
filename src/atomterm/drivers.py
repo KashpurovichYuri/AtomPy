@@ -21,6 +21,7 @@ from pyscf import lib, mcscf, scf
 __all__ = [
     "run_rohf",
     "select_shell_ao",
+    "select_valence_ao",
     "purified_s_core",
     "complete_orthonormal",
     "build_full_mo",
@@ -65,6 +66,25 @@ def select_shell_ao(mol, pattern: str) -> list[int]:
     """
     labels = [line.split()[-1] for line in mol.ao_labels()]
     return [i for i, lbl in enumerate(labels) if lbl.startswith(pattern)]
+
+
+def select_valence_ao(mol, patterns: list[str]) -> list[int]:
+    """AO indices of several valence shells, concatenated in pattern order,
+    e.g. ``["3d", "4s"]`` -> the five 3d AOs followed by the 4s AO.
+
+    The concatenation defines the active space; it is rotation-closed when
+    each pattern contributes a complete m-set of one (n, l) shell.
+    """
+    idx: list[int] = []
+    for pattern in patterns:
+        matches = select_shell_ao(mol, pattern)
+        if not matches:
+            raise ValueError(
+                f"shell pattern {pattern!r} matched no AO labels; "
+                f"available: {[line.split()[-1] for line in mol.ao_labels()]}"
+            )
+        idx += matches
+    return idx
 
 
 def purified_s_core(mol, mf, n_core: int):
