@@ -41,11 +41,25 @@ green, reports written.
 
 ## Not yet specified
 
-- User's announced follow-up tasks ("next tasks") — unknown content; expected
-  to build on the operator algebra (candidates: spin–orbit coupling, other
-  atoms/term schemes, transition moments, g-factors).
+- Post-atoms follow-ups from the user ("next tasks" beyond Si/Sc/Ti) —
+  expected to build on the operator algebra (candidates: spin–orbit
+  coupling, transition moments, g-factors).
 - Non-spherical/many-center generalization of the L operators (molecules):
   the current construction assumes a single atom at the origin.
+
+## Live tickets (the current wave)
+
+- [06: generalize pipeline](tickets/06-generalize-pipeline.md) — data-driven
+  atoms, run_atom, select_valence_ao; C stays green, unchanged output.
+- [07: Si](tickets/07-si.md) — 3p² ³P; first p-type core (blocked by 06).
+- [08: Sc](tickets/08-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
+  occupation risks documented (blocked by 06).
+- [09: Ti](tickets/09-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
+  (blocked by 06; apply 08's learnings).
+- [10: purified_core_orbitals](tickets/10-purify-general.md) — optional,
+  per-shell core purification for future core-explicit TM tests.
+- [11: review protocol](tickets/11-review-protocol.md) — /code-review after
+  the wave (fixed point 507b796), then /improve-codebase-architecture.
 
 ## Out of scope
 

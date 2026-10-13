@@ -70,16 +70,33 @@ def select_shell_ao(mol, pattern: str) -> list[int]:
 def purified_s_core(mol, mf, n_core: int):
     """Canonical core MOs projected onto the s-AO subspace (l = 0 exactly).
 
-    Numerically converged SCF orbitals of an open-shell atom carry a small
-    p/d tail (amplitudes ~1e-3) because the reference density is not exactly
-    spherical. Projection onto the s-AO subspace removes that tail, and a
-    Loewdin orthonormalization inside the remaining pair restores
-    orthonormality. Both steps stay inside the l = 0 subspace, so the
-    purified orbitals remain exactly rotation-closed (Lz c = 0, L^2 c = 0).
+    Why this is needed (causal chain):
+
+    1. Numerically converged SCF orbitals of an open-shell atom are NOT exact
+       symmetry eigenfunctions: the reference density (e.g. |px py| for C) is
+       anisotropic, the converged Fock inherits that anisotropy, and the
+       canonical "s" MOs carry a small p/d tail (measured on C/cc-pVDZ:
+       1s 1.9e-7, 2s 6.3e-6 weight deficit). The tail is numerical noise,
+       not physics -- the core of a central-field atom is spherical.
+    2. That tail breaks two preconditions at once:
+       - orthonormality: <MO_1 | 2p_AO> ~ 1e-3 != 0, so a W built from such
+         columns is not orthonormal, and second quantization (which assumes
+         an orthonormal one-particle basis) is ill-defined on it;
+       - rotational closure: L maps a pure solid harmonic within its (n,l)
+         shell only; L acting on the p-tail leaves the span, so [H, Lz]
+         fails at the ~1e-4 level instead of machine precision.
+    3. Projection onto the s-AO subspace is the orbital-space analog of the
+       spherically averaged density used in the folded path: it takes the
+       l = 0 component exactly. The energy shifts only at second order in
+       the tail amplitude (~1e-10 Eh) -- noise repair, not a model change.
+    4. A Loewdin orthonormalization inside the remaining pair then restores
+       orthonormality while staying inside the l = 0 subspace (rotations
+       within l = 0 preserve purity).
 
     Returns ``(C, contamination)``: full-length (nao, n_core) orthonormal
-    columns and the fraction ``1 - <c_s|c_s>`` of each canonical MO that was
-    dropped (the SCF symmetry-breaking diagnostic).
+    columns and the fraction ``1 - <c_s|S|c>`` of each canonical MO that was
+    dropped (the SCF symmetry-breaking diagnostic). Note the MO s-weight
+    lives in the AO metric (c^dag S c = 1), not the Euclidean norm.
     """
     import re
 

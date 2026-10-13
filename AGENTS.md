@@ -100,5 +100,11 @@ PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 
 ## Planning
 
-`wayfinder/map.md` holds the effort map (destination, decisions, fog).
-Update it when a decision is made; keep tickets one-session sized.
+`wayfinder/map.md` holds the effort map (destination, decisions, fog) and
+lists the live tickets. Update it when a decision is made; keep tickets
+one-session sized. The live wave (06–09: pipeline generalization + Si/Sc/Ti,
+then 10 optional, 11 review protocol) is fully specified in
+`wayfinder/tickets/` — each ticket is self-contained (no conversation
+context needed). Review protocol: `/code-review` (two axes, parallel
+sub-agents) after each ticket wave, then `/improve-codebase-architecture`
+survey; see ticket 11.
