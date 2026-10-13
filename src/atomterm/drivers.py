@@ -21,6 +21,7 @@ from pyscf import lib, mcscf, scf
 __all__ = [
     "run_rohf",
     "select_shell_ao",
+    "purified_s_core",
     "complete_orthonormal",
     "build_full_mo",
     "run_casci",
@@ -64,6 +65,43 @@ def select_shell_ao(mol, pattern: str) -> list[int]:
     """
     labels = [line.split()[-1] for line in mol.ao_labels()]
     return [i for i, lbl in enumerate(labels) if lbl.startswith(pattern)]
+
+
+def purified_s_core(mol, mf, n_core: int):
+    """Canonical core MOs projected onto the s-AO subspace (l = 0 exactly).
+
+    Numerically converged SCF orbitals of an open-shell atom carry a small
+    p/d tail (amplitudes ~1e-3) because the reference density is not exactly
+    spherical. Projection onto the s-AO subspace removes that tail, and a
+    Loewdin orthonormalization inside the remaining pair restores
+    orthonormality. Both steps stay inside the l = 0 subspace, so the
+    purified orbitals remain exactly rotation-closed (Lz c = 0, L^2 c = 0).
+
+    Returns ``(C, contamination)``: full-length (nao, n_core) orthonormal
+    columns and the fraction ``1 - <c_s|c_s>`` of each canonical MO that was
+    dropped (the SCF symmetry-breaking diagnostic).
+    """
+    import re
+
+    labels = [line.split()[-1] for line in mol.ao_labels()]
+    s_idx = [i for i, lbl in enumerate(labels) if re.fullmatch(r"\d+s", lbl)]
+
+    c_can = mf.mo_coeff[:, :n_core]
+    c_s = c_can[s_idx, :]                                # drop the p/d tail
+    # MO normalization lives in the AO metric (c^dag S c = 1), so the
+    # s-subspace weight is c_s^dag S_ss c_s -- not the Euclidean norm.
+    s_ov = mf.get_ovlp()[np.ix_(s_idx, s_idx)]
+    weight = np.einsum("ij,ij->j", c_s, s_ov @ c_s)
+    contamination = np.clip(1.0 - weight, 0.0, None)     # fp noise can dip < 0
+    c_s = c_s / np.sqrt(weight)                          # renormalize the rest
+
+    gram = c_s.conj().T @ s_ov @ c_s                     # Loewdin in S metric
+    ev, u = np.linalg.eigh(gram)
+    c_s = c_s @ (u / np.sqrt(ev)) @ u.T
+
+    c = np.zeros((mol.nao_nr(), n_core), dtype=c_s.dtype)
+    c[s_idx, :] = c_s
+    return c, contamination
 
 
 def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:

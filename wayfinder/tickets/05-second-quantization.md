@@ -25,8 +25,11 @@ Validation on the carbon CAS(2,3) tests, three tiers:
    active-space Hamiltonian + explicit core energy (1e-10 against the
    first-quant folded path, 1e-8 against PySCF).
 
-Implementation notes: core columns for the full space are pure s AOs
-(Löwdin-orthogonalized pair) — canonical MOs carry ~1e-3 SCF p-contamination
-that breaks orthonormality and shows up in the commutators at 1e-4.
-`build_operators(..., method="slater_condon"|"secondquant")` dispatches the
-many-body evaluation; `full_space_integrals` provides unfolded integrals.
+Implementation notes: core columns for the full space are the canonical core
+MOs **purified to exact l = 0** (`drivers.purified_s_core`: project onto the
+s-AO subspace, drop the SCF p/d tail — measured 1s 1.9e-7 / 2s 6.3e-6 — then
+Löwdin-reorthonormalize in the AO metric). Raw s AOs are an equivalent
+fallback; unpurified canonical MOs break orthonormality and show up in the
+commutators at 1e-4. `build_operators(..., method="slater_condon"|"secondquant")`
+dispatches the many-body evaluation; `full_space_integrals` provides
+unfolded integrals.

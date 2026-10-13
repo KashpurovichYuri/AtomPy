@@ -32,7 +32,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation |
-| `src/atomterm/drivers.py` | `run_rohf`, `run_casci`, `run_casscf`, `run_sa_casscf` | all checkpointed (`.chk`); active space = raw shell AO columns placed at `[ncore:ncore+ncas]` |
+| `src/atomterm/drivers.py` | `run_rohf`, `run_casci`, `run_casscf`, `run_sa_casscf`, `purified_s_core` | all checkpointed (`.chk`); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core` |
 | `src/atomterm/analysis.py` | `analyze`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms |
 | `src/atomterm/pipeline.py` | `run_carbon` | end-to-end orchestration, writes `results/` |
 
@@ -69,10 +69,13 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
    a_s a_r` with G in the detbasis (physicist) arrangement; annihilators run
    in reverse order (s before r). Elementwise identical to the Slater–Condon
    matrices (tests/test_secondquant.py, tier 1). For core-explicit tests use
-   **pure s AOs** (Lowdin-orthogonalized pair) as core columns, not canonical
-   MOs: SCF p-contamination (~1e-3 amplitudes) breaks orthonormality and the
-   [H, Lz] commutator at the 1e-4 level. Matrix products of the folded
-   (active-space) Hamiltonian + explicit core energy == the fixed-core block
+   `drivers.purified_s_core`: canonical core MOs projected onto the s-AO
+   subspace (dropping the SCF p/d tail) and Löwdin-reorthonormalized —
+   close to the SCF solution yet exactly l = 0. Raw s AOs work equally well;
+   unpurified canonical MOs break orthonormality and the [H, Lz] commutator
+   at the 1e-4 level (measured contamination: 1s 1.9e-7, 2s 6.3e-6). The
+   MO s-weight lives in the AO metric (`c†Sc = 1`), not the Euclidean norm.
+   Folded (active-space) H + explicit core energy == the fixed-core block
    of the full-space H (tier 3, machine precision).
 
 ## Conventions
@@ -86,7 +89,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 31 tests in a few seconds (chkfile caching; ROHF computed once
+`pytest` runs 32 tests in a few seconds (chkfile caching; ROHF computed once
 per session). The critical invariants: `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
 (second quantization ≡ first quantization, elementwise),

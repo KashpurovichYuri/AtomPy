@@ -113,22 +113,20 @@ def test_textbook_spectra_through_secondquant(carbon, na, nb):
 
 @pytest.fixture(scope="module")
 def full_space(carbon):
-    """(h1, g, w, dets) for the all-electron CAS(6,5) space.
+    """(h1, g, w) for the all-electron CAS(6,5) space.
 
-    Core columns are the raw s AOs of the first contracted shell,
-    Lowdin-orthogonalized within the pair: pure solid harmonics, exactly
-    orthonormal against the 2p shell AOs (canonical MOs carry ~1e-3 p
-    contamination from the SCF, which would break exact rotational closure).
+    Core columns are the canonical core MOs *purified* to exact l = 0
+    (p/d tail dropped, pair Loewdin-orthonormalized): close to the SCF
+    solution yet exactly orthonormal against the 2p shell AOs and exactly
+    rotation-closed. (Raw s AOs work equally well; see wayfinder ticket 05.)
     """
+    from atomterm.drivers import purified_s_core
+
     _, mol, mf, act_idx = carbon
-    n = mol.nao_nr()
-    s_ao = np.eye(n)[:, [0, 1]]
-    s_ov = mf.get_ovlp()
-    ss = s_ao.conj().T @ s_ov @ s_ao
-    ev, u = np.linalg.eigh(ss)
-    s_core = s_ao @ (u / np.sqrt(ev)) @ u.T
-    w = np.hstack([s_core, np.eye(n)[:, act_idx]])
-    assert np.allclose(w.conj().T @ s_ov @ w, np.eye(5), atol=1e-12)
+    core, contamination = purified_s_core(mol, mf, 2)
+    assert np.all(contamination < 1e-3)  # SCF noise, not physical mixing
+    w = np.hstack([core, np.eye(mol.nao_nr())[:, act_idx]])
+    assert np.allclose(w.conj().T @ mf.get_ovlp() @ w, np.eye(5), atol=1e-12)
     h1, g = full_space_integrals(mol, mf, w)
     return mol, mf, w, h1, g
 
@@ -182,6 +180,29 @@ def test_full_space_vs_pyscf_casci_core_explicit(full_space, carbon, na, nb):
 
 
 # ------------------------------------------------------- tier 3: folded core
+
+def test_purified_core_is_pure(carbon):
+    """The purified core orbitals are exactly l = 0 (L^2 kills them),
+    orthonormal, and numerically almost identical to the canonical MOs.
+    The dropped contamination quantifies the SCF symmetry breaking.
+    """
+    from atomterm.angular import l2_matrix
+    from atomterm.drivers import purified_s_core
+
+    _, mol, mf, _ = carbon
+    core, contamination = purified_s_core(mol, mf, 2)
+
+    # exact l = 0: L^2 annihilates pure s functions
+    assert np.abs(l2_matrix(mol) @ core).max() < 1e-12
+    # orthonormal in the AO metric
+    s = mf.get_ovlp()
+    assert np.allclose(core.conj().T @ s @ core, np.eye(2), atol=1e-12)
+    # numerically close to the canonical core (overlap ~ 1)
+    overlap = np.diag(mf.mo_coeff[:, :2].conj().T @ s @ core)
+    assert np.allclose(np.abs(overlap), 1.0, atol=1e-4)
+    # dropped tail: nonzero (SCF noise is real) but tiny
+    assert np.all(contamination > 0) and np.all(contamination < 1e-3)
+    print(f"\ncore MO contamination (1 - s weight): {contamination}")
 
 def test_fixed_core_sector_matches_folded(full_space, carbon):
     """The doubly-occupied-core block of the full-space H equals the folded
