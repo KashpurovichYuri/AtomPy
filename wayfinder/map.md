@@ -44,6 +44,10 @@ green, reports written.
   M_S = (na−nb)/2 ("0p5" for doublets); `run_carbon` is a thin wrapper;
   table-driven `tests/test_atoms.py` (new atoms = new data rows).
   Equivalence vs the carbon code proven with pinned ROHF input.
+- [Si](tickets/07-si.md): 3p² works identically to 2p² through CASCI — first
+  p-type core ([Ne] + 3s) folds exactly (textbook ³P/¹D/¹S, commutators
+  ~1e-14). CASSCF/SA disabled for Si: the orbital optimizer escapes the 3p
+  shell (³S-like well) — the multi-solution class is not TM-only (fact 12).
 
 ## Not yet specified
 
@@ -52,6 +56,10 @@ green, reports written.
   coupling, transition moments, g-factors).
 - Non-spherical/many-center generalization of the L operators (molecules):
   the current construction assumes a single atom at the origin.
+- CASSCF stability beyond carbon: Si's optimizer escapes the 3p shell
+  (ticket 07, fact 12). If orbital optimization matters beyond carbon, a
+  dedicated ticket decides between a CASCI-seeded start and inter-shell
+  frozen rotations.
 - Cosmetic: the per-stage report line prints `Ms={na−nb}` (i.e. 2·M_S —
   "Ms=+2" for the carbon triplet sector). Found during ticket 06; left
   untouched for output stability, fix belongs in its own decision since it
@@ -59,9 +67,9 @@ green, reports written.
 
 ## Live tickets (the current wave)
 
-- [07: Si](tickets/07-si.md) — 3p² ³P; first p-type core (data row only).
 - [08: Sc](tickets/08-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
-  occupation risks documented.
+  occupation risks documented. Note: ticket 07 showed CASSCF instability
+  already at Si, so the "skip CASSCF for TMs" default is expected to hold.
 - [09: Ti](tickets/09-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
   (apply 08's learnings).
 - [10: purified_core_orbitals](tickets/10-purify-general.md) — optional,

@@ -32,6 +32,24 @@ CASES = {
         ms0_tag="casci_ms0",
         ms0={"1S": 1, "1D": 5, "3P": 3},
     ),
+    # ticket 07: same p^2 structure as carbon, one row further down the
+    # periodic table -- first p-type core ([Ne] incl. 2p^6) under the
+    # spherically averaged folded density. CASSCF/SA disabled: the orbital
+    # optimizer escapes the 3p shell (3s mixing pulls it into an ³S-like
+    # well -- the CASSCF multi-solution class, see AGENTS.md fact 12).
+    # CASCI stages carry the physics assertions and are exact.
+    "Si": dict(
+        cfg=AtomConfig("Si", "ccpvdz", spin=2),
+        patterns=["3p"],
+        nelec_act=2,
+        run_casscf=False,
+        sa_weights=None,
+        ground=("3P", 1, 1),
+        primary_tag="casci_ms1",
+        primary={"3P": 3},
+        ms0_tag="casci_ms0",
+        ms0={"1S": 1, "1D": 5, "3P": 3},
+    ),
 }
 
 

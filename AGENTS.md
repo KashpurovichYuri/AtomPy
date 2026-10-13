@@ -90,6 +90,13 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
    Sector chkfile tags label M_S = (na−nb)/2 (`casci_ms1`, `casci_ms0`,
    `casci_ms0p5` for a doublet) — na−nb itself would collide. New atoms =
    a new row in `tests/test_atoms.py` `CASES`, no new code.
+12. **CASSCF multi-solution is not TM-only**: for Si 3s²3p² the single-root
+   CASSCF optimizer escapes the 3p shell (pulls 3s in, lands in an
+   ³S-like well) and the ³P-weighted SA collapses too — so orbital
+   optimization beyond carbon needs a stability strategy (CASCI-seeded
+   start or frozen inter-shell rotations); Si/TM rows run CASCI only.
+   Also: folded-core vs PySCF max|dE| scales with core size (Si 3.1e-4 Eh
+   vs C ~1e-7) — same spherical-average cause as fact 5, harmless.
 
 ## Conventions
 
