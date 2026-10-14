@@ -6,7 +6,7 @@ import pytest
 from atomterm.detbasis import commutator, frobenius_norm
 from atomterm.drivers import build_full_mo
 from atomterm.operators import build_operators
-from atomterm.analysis import analyze, quantum_number, term_symbol
+from atomterm.analysis import analyze, term_symbol
 
 
 @pytest.fixture(scope="module")
@@ -121,12 +121,3 @@ def test_lz_spectrum_ms0(shell_ops):
     vals = np.sort(np.real(np.linalg.eigvals(ops0["Lz"])))
     expected = np.sort([0.0, -2, -1, 0, 1, 2, -1, 0, 1])
     assert np.allclose(vals, expected, atol=1e-8)
-
-
-def test_quantum_number_and_term_helpers():
-    assert quantum_number(2.0) == 1
-    assert quantum_number(6.0) == 2
-    assert quantum_number(0.0) == 0
-    assert quantum_number(2.0 + 1e-9) == 1
-    assert term_symbol(2.0, 2.0) == "3P"
-    assert term_symbol(0.0, 6.0) == "1D"

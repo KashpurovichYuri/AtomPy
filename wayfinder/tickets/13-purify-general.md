@@ -1,4 +1,4 @@
-# Ticket 12 (optional): generalized core purification
+# Ticket 13 (optional): generalized core purification
 
 Status: open (not blocking 07–09; needed only for core-explicit TM tests)
 

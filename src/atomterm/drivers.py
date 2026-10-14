@@ -127,20 +127,6 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int):
     from atomterm.system import build_mol
 
     mol = build_mol(dataclasses.replace(cfg, spin=0))
-    try:
-        _, rec = scf.chkfile.load_scf(chkfile)
-        mf = scf.RHF(mol)
-        mf.__dict__.update(rec)
-        mf.converged = True
-        mf.verbose = cfg.verbose
-        return mol, mf
-    except (OSError, KeyError, ValueError):
-        pass
-
-    mf = scf.RHF(mol)
-    mf.conv_tol = 1e-12
-    mf.chkfile = chkfile
-    mf.verbose = cfg.verbose
 
     def _frac_occ(mo_energy, mo_coeff=None):
         occ = np.zeros(mo_energy.size)
@@ -149,7 +135,21 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int):
         occ[n_closed : n_closed + n_open] = nelec_open / n_open
         return occ
 
+    mf = scf.RHF(mol)
+    mf.conv_tol = 1e-12
+    mf.verbose = cfg.verbose
+    # the occupation hook is part of the object's identity: set it BEFORE
+    # the cache branch so a cache hit returns the same behavior
     mf.get_occ = _frac_occ
+    try:
+        _, rec = scf.chkfile.load_scf(chkfile)
+        mf.__dict__.update(rec)
+        mf.converged = True
+        return mol, mf
+    except (OSError, KeyError, ValueError):
+        pass
+
+    mf.chkfile = chkfile
     mf.run()
     return mol, mf
 

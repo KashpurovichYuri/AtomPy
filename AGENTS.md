@@ -144,8 +144,9 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 45 tests in ~30 s (chkfile caching; ROHF computed once per
-session). The critical invariants: `test_hamiltonian_matches_pyscf_fci`
+`pytest` runs 51 tests in ~30 s (chkfile caching; ROHF computed once per
+session). Test files map 1:1 to src modules; tests are named for the
+invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
 (second quantization ≡ first quantization, elementwise),
 `test_full_space_vs_pyscf_casci_core_explicit` (core-explicit CAS(6,5) vs
@@ -153,15 +154,17 @@ PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
 `test_analytic_matches_libcint` (two independent L constructions),
 `test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows),
-`test_ladder.py` / `test_ladder_si.py` (per-rung symmetry fingerprints,
-ortho_err divergence guard, configuration labels).
+`test_ladder.py` (per-rung fingerprints, parameterized C/Si),
+`test_drivers.py` (build_full_mo block properties — the ticket-09 regression
+guard — shell_weights partition, frac-occ ordering), `test_analysis.py`
+(configuration labels), `test_system.py` (validation).
 
 ## Planning
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and
 lists the live tickets. Update it when a decision is made; keep tickets
-one-session sized. The live wave (08: carbon ladder, 09: Si analysis,
-10: Sc, 11: Ti, then 12 optional, 13 review protocol) is fully specified
+one-session sized. The live wave (10: test alignment, 11: Sc, 12: Ti,
+13 optional, 14 start-variants, 15 review protocol) is fully specified
 in `wayfinder/tickets/` — each ticket
 is self-contained (no conversation context needed). Review protocol:
 `/code-review` (two axes, parallel sub-agents) after each ticket wave, then

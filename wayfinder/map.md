@@ -76,14 +76,20 @@ green, reports written.
 
 ## Live tickets (the current wave)
 
-- [10: Sc](tickets/10-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
+- [10: test-suite alignment](tickets/10-test-alignment.md): test files 1:1
+  with src modules, invariant-named tests; test_drivers/test_analysis/
+  test_system created; frac-occ cache-path hook bug found and fixed.
+- [11: Sc](tickets/11-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
   occupation risks documented. Full ladder via the ticket-09 machinery.
-- [11: Ti](tickets/11-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
-  (apply 10's learnings).
-- [12: purified_core_orbitals](tickets/12-purify-general.md) — optional,
+- [12: Ti](tickets/12-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
+  (apply 11's learnings).
+- [13: purified_core_orbitals](tickets/13-purify-general.md) — optional,
   per-shell core purification for future core-explicit TM tests.
-- [13: review protocol](tickets/13-review-protocol.md) — /code-review after
-  the wave (fixed point 507b796), then /improve-codebase-architecture.
+- [14: start-variant axis](tickets/14-start-variants.md) — window
+  provenance study (shell/canonical/shell+virtual/avas) + orthonormality
+  negative control (ecosystem precedent: PySCF AVAS).
+- [15: review protocol](tickets/15-review-protocol.md) — /code-review after
+  the wave (fixed point f5cfb6f), then /improve-codebase-architecture.
 
 ## Out of scope
 
