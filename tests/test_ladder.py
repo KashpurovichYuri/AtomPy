@@ -28,7 +28,9 @@ from collections import Counter
 import numpy as np
 import pytest
 
-from atomterm.ladder import run_carbon_ladder, run_ladder
+from conftest import SC_EXACT_TERMS
+
+from atomterm.ladder import run_ladder
 from atomterm.system import AtomConfig
 
 LADDER_CASES = {
@@ -42,7 +44,17 @@ LADDER_CASES = {
             avg_dE=(1e-6, 1e-3),        # |E_avg - E_raw|
             frac_dE=(1e-6, 1e-1),       # |E_frac - E_avg|, observed 6.6e-3
             corr_gain=(-0.3, -0.1),     # free CASSCF vs casci_avg: -0.251
-            relax_offset=1e-9,          # same window definition: monotone
+            relax_window_offset=1e-9,   # same window definition: monotone
+            # tightened bands restored post-review (ticket 15 step 1): the
+            # ticket-10 merge had unified them to the loosest atom
+            exact_comm=1e-9,            # avg/frac commutators, carbon-exact
+            relax_comm=1e-9,
+            relax_l2_abs=1e-6,
+            relax_purity=0.999,
+            sa_comm=1e-9,
+            sa_l2=1.99999,
+            sa_nroots=True,             # assert len(energies_pyscf) == 3
+            basin_tol=1e-4,
         ),
     ),
     "Si": dict(
@@ -59,7 +71,15 @@ LADDER_CASES = {
             # differ physically (~0.3 overlap): the relax rung optimizes
             # the latter, so its total sits ABOVE the raw-shell casci_avg
             # by the window-definition offset (fact 14)
-            relax_offset=0.2,
+            relax_window_offset=0.2,
+            exact_comm=1e-8,            # avg/frac commutators
+            relax_comm=1e-3,
+            relax_l2_abs=1e-4,
+            relax_purity=0.95,
+            sa_comm=1e-7,
+            sa_l2=1.9999,
+            sa_nroots=False,
+            basin_tol=1e-3,
         ),
     ),
 }
@@ -70,13 +90,10 @@ def ladders(tmp_path_factory):
     out = {}
     for name, case in LADDER_CASES.items():
         workdir = tmp_path_factory.mktemp(f"ladder_{name}")
-        if name == "C":
-            out[name] = run_carbon_ladder(case["cfg"], workdir=str(workdir))
-        else:
-            out[name] = run_ladder(
-                case["cfg"], case["patterns"], case["nelec_act"],
-                workdir=str(workdir), sa_weights=[1 / 3] * 3,
-                frac_nelec_open=2, frac_n_open=3)
+        out[name] = run_ladder(
+            case["cfg"], case["patterns"], case["nelec_act"],
+            workdir=str(workdir), sa_weights=[1 / 3] * 3,
+            frac_nelec_open=2, frac_n_open=3)
     return out
 
 
@@ -84,10 +101,11 @@ def ladders(tmp_path_factory):
 def test_casci_fingerprints(name, ladders):
     """Raw core: split + [H, Lz] present and bounded; avg/frac: exact."""
     case, r = LADDER_CASES[name], ladders[name]
-    lo, hi = case["bands"]["raw_comm"]
+    b = case["bands"]
+    lo, hi = b["raw_comm"]
     for tag, comm_bound in [("casci_raw", (lo, hi)),
-                            ("casci_avg", (0.0, 1e-8)),
-                            ("casci_frac", (0.0, 1e-8))]:
+                            ("casci_avg", (0.0, b["exact_comm"])),
+                            ("casci_frac", (0.0, b["exact_comm"]))]:
         rung = r[tag]
         assert rung["terms"] == {"3P": 3}, (name, tag)
         assert rung["ortho_err"] < 1e-10, (name, tag)
@@ -114,17 +132,25 @@ def test_casci_fingerprints(name, ladders):
 def test_core_relaxation(name, ladders):
     """Frozen window + relaxed core: real physics, zero escape, exact symmetry."""
     case, r = LADDER_CASES[name], ladders[name]
+    b = case["bands"]
     relax = r["casscf_relax"]
-    assert relax["comm_norm_h_lz"] < 1e-3, name
+    assert relax["comm_norm_h_lz"] < b["relax_comm"], name
     assert relax["ortho_err"] < 1e-10, name
-    assert relax["ground_l2"] == pytest.approx(2.0, abs=1e-4), name
+    assert relax["ground_l2"] == pytest.approx(2.0, abs=b["relax_l2_abs"]), name
     assert relax["terms"] == {"3P": 3}, name
-    assert relax["window"]["p"] > 0.95, name
+    assert relax["window"]["p"] > b["relax_purity"], name
     assert relax["configurations"][0].startswith("p^2.00"), name
     # monotone within one window definition; on Si the window-definition
     # offset (fact 14) dominates, bounded per case
     assert relax["e_ground"] <= \
-        r["casci_avg"]["e_ground"] + case["bands"]["relax_offset"], name
+        r["casci_avg"]["e_ground"] + b["relax_window_offset"], name
+
+
+def _assert_same_basin(rungs: dict, tags: tuple, r, ref: str, tol: float):
+    """All ``tags`` land in one optimizer basin (|E - E_ref| < tol each)."""
+    e_ref = rungs[ref]["e_ground"]
+    for tag in tags:
+        assert abs(rungs[tag]["e_ground"] - e_ref) < tol, tag
 
 
 @pytest.mark.parametrize("name", list(LADDER_CASES))
@@ -134,8 +160,8 @@ def test_free_casscf_and_virtmix(name, ladders):
     in the same basin as free CASSCF (same-basin assertion is the
     regression guard for the ticket-09 bug class)."""
     case, r = LADDER_CASES[name], ladders[name]
-    lo, hi = case["bands"]["corr_gain"]
-    e_ref = None
+    b = case["bands"]
+    lo, hi = b["corr_gain"]
     for tag in ("casscf_shell", "casscf_virtmix", "casscf_pyscf"):
         rung = r[tag]
         assert rung["ground_term"] == "3P", (name, tag)
@@ -145,23 +171,25 @@ def test_free_casscf_and_virtmix(name, ladders):
         assert rung["window"]["p"] > 0.9, (name, tag)
         d_e = rung["e_ground"] - r["casci_avg"]["e_ground"]
         assert lo < d_e < hi, (name, tag)
-        if e_ref is None:
-            e_ref = rung["e_ground"]
-        assert abs(rung["e_ground"] - e_ref) < 1e-2, (name, tag)
+    _assert_same_basin(r, ("casscf_shell", "casscf_virtmix", "casscf_pyscf"),
+                       r, "casscf_shell", b["basin_tol"])
 
 
 @pytest.mark.parametrize("name", list(LADDER_CASES))
 def test_sa_restoration(name, ladders):
     """SA over the term's M_L components restores L to machine precision."""
-    _, r = LADDER_CASES[name], ladders[name]
+    case, r = LADDER_CASES[name], ladders[name]
+    b = case["bands"]
     for tag in ("sa", "sa_pyscf"):
         if tag not in r:
             continue
         sa = r[tag]
         assert sa["ortho_err"] < 1e-10, (name, tag)
-        assert sa["comm_norm_h_lz"] < 1e-7, (name, tag)
-        assert sa["ground_l2"] > 1.9999, (name, tag)
+        assert sa["comm_norm_h_lz"] < b["sa_comm"], (name, tag)
+        assert sa["ground_l2"] > b["sa_l2"], (name, tag)
         assert sa["terms"] == {"3P": 3}, (name, tag)
+        if b["sa_nroots"]:
+            assert len(sa["energies_pyscf"]) == 3, (name, tag)
 
 
 # --------------------------------------------------------------------------
@@ -169,10 +197,6 @@ def test_sa_restoration(name, ladders):
 # physics -- every assertion below is the measured Sc pattern across three
 # independent cold runs (see AGENTS.md fact 15).
 # --------------------------------------------------------------------------
-
-SC_EXACT_TERMS = {"2D": 20, "4F": 14, "2F": 14, "4P": 6, "2G": 18,
-                  "2P": 6, "2S": 1, "2H": 11}
-
 
 @pytest.fixture(scope="session")
 def sc_ladder(tmp_path_factory):
@@ -236,13 +260,13 @@ def test_sc_relax_keeps_window_exact(sc_ladder):
 
 
 def test_sc_free_casscf_escapes_the_shell(sc_ladder):
-    """All three free-CASSCF starts land in one 2S-like basin ~52 mEh above
-    casci_avg: the window borrows p character massively (s/p/d mix), L
-    breaks at the 0.3 level -- but the optimizer stays orthonormal and
-    variational (the ticket-09 guard holds; this is a real multi-solution,
-    not a construction bug)."""
+    """All three free-CASSCF starts land in one dominantly-L=0 basin
+    (~52 mEh above casci_avg, 2S-CHARACTER state of the escaped window --
+    an optimizer artifact, not a physical Sc term): the window borrows p
+    character massively (s/p/d mix), L breaks at the 0.3 level -- but the
+    optimizer stays orthonormal and variational (the ticket-09 guard
+    holds; this is a real multi-solution, not a construction bug)."""
     r = sc_ladder
-    e_ref = None
     for tag in ("casscf_virtmix", "casscf_shell", "casscf_pyscf"):
         rung = r[tag]
         assert rung["ortho_err"] < 1e-10, tag
@@ -253,9 +277,8 @@ def test_sc_free_casscf_escapes_the_shell(sc_ladder):
         assert not rung["diverged"], tag
         d_e = rung["e_ground"] - r["casci_avg"]["e_ground"]
         assert 0.03 < d_e < 0.08, tag
-        if e_ref is None:
-            e_ref = rung["e_ground"]
-        assert abs(rung["e_ground"] - e_ref) < 5e-3, tag
+    _assert_same_basin(r, ("casscf_virtmix", "casscf_shell", "casscf_pyscf"),
+                       r, "casscf_virtmix", 5e-3)
 
 
 def test_sc_sa_restores_l2_not_lz(sc_ladder):

@@ -65,6 +65,8 @@ CASES = {
                  "2P": 6, "2S": 1, "2H": 11},
         ms0_tag=None,
         ms0=None,
+        # the (2,1) sector carries exactly S = 1/2 and S = 3/2
+        s_values={0.75, 3.75},
     ),
 }
 
@@ -110,6 +112,12 @@ def test_atom_term_tables(name, atom_results):
     # ground state of the primary sector carries the Hund-rule term (L, S)
     ground = results[case["primary_tag"]]["analysis"].states[0]
     assert (ground.term, ground.l, ground.s) == case["ground"], (name, ground)
+
+    # S^2 sharpness: the sector's spin content (ticket 11: "S^2 spectrum
+    # contains 0.75" -- pinned as the full S content of the sector)
+    if "s_values" in case:
+        s2_set = {round(st.s2, 6) for st in results[case["primary_tag"]]["analysis"].states}
+        assert s2_set == case["s_values"], (name, sorted(s2_set))
 
     # optimized-orbital stages keep the same ground term (their residual
     # symmetry breaking is physical output, asserted in test_pipeline)

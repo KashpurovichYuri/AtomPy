@@ -57,3 +57,13 @@ Done as specified, 51 tests green (stable across repeated runs):
   band needed `<=` (carbon's averaged commutator is exactly 0.0);
   configuration labels threshold vs amplitude-squared weights (0.1
   admixture = 0.01 weight).
+
+## Post-review correction (ticket 15, step 1)
+
+The spec-axis review found the merge had silently UNIFIED per-atom bands
+to the loosest atom, violating "every existing assertion preserved":
+carbon's SA comm 1e-9 -> 1e-7, relax comm 1e-9 -> 1e-3, relax <L^2>
+abs 1e-6 -> 1e-4, window purity 0.999 -> 0.95, same-basin 1e-4 -> 1e-2,
+and the SA-roots count was dropped. All restored as per-case band data
+(`exact_comm`, `relax_comm`, `relax_l2_abs`, `relax_purity`, `sa_comm`,
+`sa_l2`, `sa_nroots`, `basin_tol`) in the merged parameterized tests.

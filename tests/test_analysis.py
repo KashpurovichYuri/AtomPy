@@ -11,7 +11,8 @@ from atomterm.analysis import (
 from atomterm.detbasis import determinant_basis
 
 
-def test_quantum_number_and_term_helpers():
+def test_quantum_number_round_trips_measured_momenta():
+    """quantum_number inverts l(l+1) and term_symbol encodes (2S+1)L."""
     assert quantum_number(2.0) == 1
     assert quantum_number(6.0) == 2
     assert quantum_number(0.0) == 0
@@ -64,7 +65,5 @@ def test_configuration_summary_reads_shell_configurations(carbon):
     # an s-admixed window column shows up as s-mass in the label
     c_pol = c_win.copy()
     c_pol[:, 0] = 0.9 * c_win[:, 0] + 0.3 * mf.mo_coeff[:, 1]  # 2s admixture
-    from atomterm.drivers import complete_orthonormal  # noqa: F401  (sanity import)
-
     labels = configuration_summary(mol, s, [ci], c_pol, na=2, nb=0)
     assert "s^" in labels[0]

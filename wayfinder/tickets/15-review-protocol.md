@@ -12,7 +12,22 @@ Skills already installed in `.opencode/skill/`: `code-review`
 (model-invoked, registered), `improve-codebase-architecture`
 (user-invoked; follow its SKILL.md + HTML-REPORT.md manually).
 
-**Step 1 — /code-review** (review everything through ticket 11):
+**Step 1 — /code-review** (review everything through ticket 11): DONE
+
+- Fixed point `f5cfb6f`; both axes run as parallel sub-agents.
+- Standards: 0 hard violations; fixed in the follow-up commit: invariant
+  naming (`test_quantum_number_round_trips_measured_momenta`,
+  `test_build_mol_yields_origin_centered_spherical_atom`), dead import,
+  `_s_ortho_err` signature, /tmp chk paths -> session tmp fixtures,
+  SC_EXACT_TERMS shared via conftest, same-basin helper, the `if name ==
+  "C"` fixture special-case dropped (run_ladder for all cases).
+- Spec: the loosened-assertion finding above (fixed, disclosed in ticket
+  10); the missing S^2-spectrum and [Ar]-core pins added
+  (`s_values` case key; `test_sc_rohf_reference_is_3d1_4s2_with_argon_core`);
+  README/.gitignore/wave-reorder confirmed user-directed, not creep.
+- New physics-coverage test: `test_sc_frac_occ_selects_open_shell_by_projection`
+  pins BOTH the projection-selected {3d,4s} block and the energy-ordered
+  failure mode (p-containing ensemble) -- the fact-15(c) mechanism.
 
 - Fixed point: commit `f5cfb6f` (review the tickets 10-11 delta; the
   earlier waves were continuously test-validated during pairing).
@@ -23,6 +38,10 @@ Skills already installed in `.opencode/skill/`: `code-review`
   - *Spec*: faithfulness to wayfinder tickets 10-11 (every promised
     behavior present, no scope creep beyond tickets).
 - Findings -> fix immediately or file as tickets; re-run until clean.
+  (Known findings folded in pre-emptively: the "2S-like" wording — now
+  "dominantly-L=0 basin of the escaped window, optimizer artifact" — and
+  the README refresh; the relax-rung comm attribution remains OPEN, filed
+  under ticket 14 pre-items.)
   Known findings to fold in: the "2S-like" wording (say "dominantly-L=0
   basin of the escaped window, optimizer artifact, not a physical term"),
   the relax-rung comm (~1e-3) attribution, README staleness.

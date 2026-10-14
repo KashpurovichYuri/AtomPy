@@ -1,10 +1,18 @@
-"""Shared fixtures: expensive carbon ROHF computed once per test session."""
+"""Shared fixtures: expensive reference computations once per test session."""
 
 import numpy as np
 import pytest
 
 from atomterm.system import AtomConfig
-from atomterm.drivers import run_rohf, select_shell_ao
+from atomterm.drivers import run_rohf, select_shell_ao, select_valence_ao
+
+# Shared per-atom data (import from conftest in test modules -- pytest puts
+# the tests dir on sys.path; no __init__.py by design).
+
+# Sc CAS(3,6)/{3d,4s}, Ms=1/2 sector: the complete free-ion term table of
+# 3d1 4s2 + 3d2 4s1 + 3d3 over the 90 determinants (ticket 11).
+SC_EXACT_TERMS = {"2D": 20, "4F": 14, "2F": 14, "4P": 6, "2G": 18,
+                  "2P": 6, "2S": 1, "2H": 11}
 
 
 @pytest.fixture(scope="session")
@@ -14,6 +22,16 @@ def carbon(tmp_path_factory):
     chk = str(tmp_path_factory.mktemp("carbon") / "rohf.chk")
     mol, mf = run_rohf(cfg, chk)
     return cfg, mol, mf, select_shell_ao(mol, "2p")
+
+
+@pytest.fixture(scope="session")
+def sc_rohf(tmp_path_factory):
+    """(cfg, mol, mf, act_idx) for Sc/cc-pVDZ doublet ROHF: the TM
+    reference (3d1 4s2 occupation, canonical [:9] = [Ar])."""
+    cfg = AtomConfig("Sc", "ccpvdz", spin=1)
+    chk = str(tmp_path_factory.mktemp("sc_rohf") / "rohf.chk")
+    mol, mf = run_rohf(cfg, chk)
+    return cfg, mol, mf, select_valence_ao(mol, ["3d", "4s"])
 
 
 @pytest.fixture(scope="session")
