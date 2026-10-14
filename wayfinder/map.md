@@ -83,17 +83,24 @@ green, reports written.
   untouched for output stability, fix belongs in its own decision since it
   changes every report.
 
-## Live tickets (the current wave)
+## Live tickets (the current wave, reordered after ticket 11)
 
-- [12: Ti](tickets/12-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
-  (apply 11's learnings: projection-selected frac block, TM ladder bands).
+Wave order decision (post-Sc): run the review and the constraint axis
+BEFORE Ti -- Ti would only repeat Sc's phenomenology on unsettled
+machinery; tickets 14/15 answer the open machinery questions first.
+
+- [15: review protocol](tickets/15-review-protocol.md) — runs FIRST:
+  /code-review over f5cfb6f..HEAD (tickets 10-11), then the architecture
+  survey; findings fixed before the experiment axis lands on them.
+- [14: constrained-optimization & start-variant axis](tickets/14-start-variants.md) —
+  closure-preserving optimizer rungs (same-(l,m) radial constraint),
+  imposed-symmetry SA, CAS(3,11) complete-window reference, AVAS
+  cross-validation, guard negative control; pre-items: rung registry,
+  declarative constraint spec, fold-dedupe.
+- [12: Ti](tickets/12-ti.md) — 3d² ³F; a data-row exercise on the
+  settled machinery (projection-selected frac block, TM bands from Sc).
 - [13: purified_core_orbitals](tickets/13-purify-general.md) — optional,
   per-shell core purification for future core-explicit TM tests.
-- [14: start-variant axis](tickets/14-start-variants.md) — window
-  provenance study (shell/canonical/shell+virtual/avas) + orthonormality
-  negative control (ecosystem precedent: PySCF AVAS).
-- [15: review protocol](tickets/15-review-protocol.md) — /code-review after
-  the wave (fixed point f5cfb6f), then /improve-codebase-architecture.
 
 ## Out of scope
 
