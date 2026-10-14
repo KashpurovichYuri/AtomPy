@@ -9,6 +9,7 @@ diverged to sub-variational energies).
 """
 
 import dataclasses
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -91,18 +92,28 @@ def test_build_full_mo_blocks_orthonormal_and_span_preserving():
 def test_frac_occ_scf_open_block_ordering():
     """Average-of-configuration reference for Si: the fractional block must
     land on the 3p shell -- closed [Ne]+3s below (the ordering assumption
-    of run_frac_occ_scf, first nontrivial atom after carbon)."""
+    of run_frac_occ_scf, first nontrivial atom after carbon).
+
+    Runs twice deliberately: first call = fresh SCF, second = chkfile cache
+    hit. Both returned objects must carry the ensemble occupation hook --
+    re-deriving occupations from energies must reproduce the stored mo_occ
+    (the ticket-10 finding: the hook used to be missing on cache hits).
+    """
     cfg = AtomConfig("Si", "ccpvdz", spin=2)
-    mol_f, mf_f = run_frac_occ_scf(
-        dataclasses.replace(cfg, spin=0),
-        "/tmp/opencode/test_drivers_Si_frac.chk", nelec_open=2, n_open=3)
-    assert mf_f.converged
-    occ = np.asarray(mf_f.mo_occ)  # the occupations the SCF converged with
-    n_closed = (mol_f.nelectron - 2) // 2
-    assert np.allclose(occ[:n_closed], 2.0)
-    assert np.allclose(occ[n_closed : n_closed + 3], 2.0 / 3.0)
-    assert np.allclose(occ[n_closed + 3 :], 0.0)
-    # the fractional block sits on the 3p AOs (l-purity of the open shell)
-    s = mf_f.get_ovlp()
-    names, w = shell_weights(mol_f, mf_f.mo_coeff[:, n_closed : n_closed + 3], s)
-    assert w[:, names.index("p")].min() > 0.99
+    path = "/tmp/opencode/test_drivers_Si_frac.chk"
+    Path(path).unlink(missing_ok=True)
+    for k in range(2):  # 1st pass: fresh; 2nd pass: cache hit
+        mol_f, mf_f = run_frac_occ_scf(
+            dataclasses.replace(cfg, spin=0), path, nelec_open=2, n_open=3)
+        assert mf_f.converged, k
+        occ = np.asarray(mf_f.mo_occ)  # the occupations the SCF converged with
+        n_closed = (mol_f.nelectron - 2) // 2
+        assert np.allclose(occ[:n_closed], 2.0), k
+        assert np.allclose(occ[n_closed : n_closed + 3], 2.0 / 3.0), k
+        assert np.allclose(occ[n_closed + 3 :], 0.0), k
+        # the hook is part of the object's identity on BOTH paths
+        assert np.allclose(mf_f.get_occ(mf_f.mo_energy), occ), k
+        # the fractional block sits on the 3p AOs (l-purity of the open shell)
+        s = mf_f.get_ovlp()
+        names, w = shell_weights(mol_f, mf_f.mo_coeff[:, n_closed : n_closed + 3], s)
+        assert w[:, names.index("p")].min() > 0.99, k
