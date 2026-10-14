@@ -47,7 +47,14 @@ green, reports written.
 - [Si](tickets/07-si.md): 3p² works identically to 2p² through CASCI — first
   p-type core ([Ne] + 3s) folds exactly (textbook ³P/¹D/¹S, commutators
   ~1e-14). CASSCF/SA disabled for Si: the orbital optimizer escapes the 3p
-  shell (³S-like well) — the multi-solution class is not TM-only (fact 12).
+  shell (³S-like well) — the multi-solution class is not TM-only (fact 13).
+- [Carbon ladder](tickets/08-carbon-ladder.md): all orbital-treatment rungs
+  verified on carbon with an all-vs-all matrix. Raw core breaks symmetry
+  measurably ({0}/{±1} split 4.4e-5 Eh, [H,Lz] 5.6e-6); averaged and
+  fractional-occupation cores are exactly invariant (but differ by 6.6 mEh —
+  different references); core relaxation gains −8.8 mEh at exact symmetry;
+  free CASSCF breaking refined to m-incompleteness (window l-pure, fact 8);
+  SA restores ⟨L²⟩ = 2.000000. Optimized stages fold with their own core.
 
 ## Not yet specified
 
@@ -57,7 +64,7 @@ green, reports written.
 - Non-spherical/many-center generalization of the L operators (molecules):
   the current construction assumes a single atom at the origin.
 - CASSCF stability beyond carbon: Si's optimizer escapes the 3p shell
-  (ticket 07, fact 12). If orbital optimization matters beyond carbon, a
+  (ticket 07, fact 13). If orbital optimization matters beyond carbon, a
   dedicated ticket decides between a CASCI-seeded start and inter-shell
   frozen rotations.
 - Cosmetic: the per-stage report line prints `Ms={na−nb}` (i.e. 2·M_S —
@@ -67,14 +74,13 @@ green, reports written.
 
 ## Live tickets (the current wave)
 
-- [08: Sc](tickets/08-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
-  occupation risks documented. Note: ticket 07 showed CASSCF instability
-  already at Si, so the "skip CASSCF for TMs" default is expected to hold.
-- [09: Ti](tickets/09-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
-  (apply 08's learnings).
-- [10: purified_core_orbitals](tickets/10-purify-general.md) — optional,
+- [09: Sc](tickets/09-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
+  occupation risks documented. Rungs analyzed via the ticket-08 machinery.
+- [10: Ti](tickets/10-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
+  (apply 09's learnings).
+- [11: purified_core_orbitals](tickets/11-purify-general.md) — optional,
   per-shell core purification for future core-explicit TM tests.
-- [11: review protocol](tickets/11-review-protocol.md) — /code-review after
+- [12: review protocol](tickets/12-review-protocol.md) — /code-review after
   the wave (fixed point 507b796), then /improve-codebase-architecture.
 
 ## Out of scope

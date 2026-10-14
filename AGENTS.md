@@ -32,9 +32,10 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation |
-| `src/atomterm/drivers.py` | `run_rohf`, `run_casci`, `run_casscf`, `run_sa_casscf`, `select_valence_ao`, `select_shell_ao`, `purified_s_core` | all checkpointed (`.chk`); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core` |
+| `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `run_casscf`, `run_sa_casscf`, `run_casscf_core_relax`, `run_casscf_pyscf_start`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core` | all checkpointed (`.chk`); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core` |
 | `src/atomterm/analysis.py` | `analyze`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms |
 | `src/atomterm/pipeline.py` | `run_atom`, `run_carbon` | generic end-to-end orchestration for any atom (Ms sectors derived from spin + active-electron count); `run_carbon` = carbon wrapper; writes `results/` |
+| `src/atomterm/ladder.py` | `run_carbon_ladder` | ticket-08 rung comparison (raw/avg/frac-occ core, core relax, CASSCF starts, SA), all-vs-all matrix |
 
 ## Hard-won facts (do not re-derive)
 
@@ -62,9 +63,13 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 7. **CASCI/CASSCF take the FULL MO matrix** and slice `[ncore:ncore+ncas]`;
    a truncated matrix fails `nvir >= 0` in `check_sanity`.
 8. **Known physics, not bugs**: single-root CASSCF breaks rotational symmetry
-   (`<L^2>` ≈ 1.67, `||[H, Lz]||` ≈ 0.02); SA-CASSCF over the 3 M_L components
-   restores it (⟨L²⟩ = 2.000000). Textbook 2p²: ³P(×3) < ¹D(×5) < ¹S(×1),
-   `<L^2>` = 2, 6, 0.
+   (`<L^2>` ≈ 1.67, `||[H, Lz]||` ≈ 1e-2..1e-1 across reruns); SA-CASSCF over
+   the 3 M_L components restores it (⟨L²⟩ = 2.000000). Textbook 2p²: ³P(×3) <
+   ¹D(×5) < ¹S(×1), `<L^2>` = 2, 6, 0. Refined (ticket 08): the CASSCF
+   breaking is m-incompleteness of the optimized window — it stays l=1-pure
+   (p-weight > 0.95), i.e. radial p mixtures lacking the full m-set, NOT s/d
+   leakage. l-purity is necessary but not sufficient for closure; only the
+   commutators measure closure itself.
 9. **Second-quantized two-body convention**: `O2 = ½ Σ G[p,q,r,s] a+_p a+_q
    a_s a_r` with G in the detbasis (physicist) arrangement; annihilators run
    in reverse order (s before r). Elementwise identical to the Slater–Condon
@@ -90,7 +95,23 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
    Sector chkfile tags label M_S = (na−nb)/2 (`casci_ms1`, `casci_ms0`,
    `casci_ms0p5` for a doublet) — na−nb itself would collide. New atoms =
    a new row in `tests/test_atoms.py` `CASES`, no new code.
-12. **CASSCF multi-solution is not TM-only**: for Si 3s²3p² the single-root
+12. **Carbon ladder facts** (ticket 08, `ladder.py`): raw (un-averaged) core
+   field → [H, Lz] ≈ 5.6e-6 and the ³P multiplet split 4.4e-5 Eh in the
+   {M_L=0} vs {±1} pattern (quadrupole k=2, m=0; dipole excluded by parity);
+   core-density anisotropy norm ≈ 2.4e-3 relative. In a sector that is a
+   complete single irrep (3-det Ms=1), L² = L(L+1)·Id identically, so
+   [H, L²] = 0 trivially — use [H, Lz] and the splitting as fingerprints
+   there. Averaged core: exact zeros. Fractional-occupation (average-of-
+   configuration) core: invariant by construction but its energy differs
+   from averaged-ROHF by 6.6 mEh — average-of-configuration is a DIFFERENT
+   reference (open-shell exchange with smeared vs localized valence), not
+   the ε→0 limit. Core relaxation (window frozen via `uniq_var_indices`
+   mask, inactive↔virtual only) gains −8.8 mEh with exact symmetry.
+   SA kernels return only the ensemble energy; per-root energies come from
+   a CASCI pass in the converged window (`run_sa_casscf` does this).
+   Optimized stages must fold with their OWN inactive columns
+   (`build_operators(..., c_core=...)`), else E-bookkeeping breaks at O(Eh).
+13. **CASSCF multi-solution is not TM-only**: for Si 3s²3p² the single-root
    CASSCF optimizer escapes the 3p shell (pulls 3s in, lands in an
    ³S-like well) and the ³P-weighted SA collapses too — so orbital
    optimization beyond carbon needs a stability strategy (CASCI-seeded
@@ -109,23 +130,23 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 33 tests in a few seconds (chkfile caching; ROHF computed once
-per session). The critical invariants: `test_hamiltonian_matches_pyscf_fci`
+`pytest` runs 40 tests in ~15 s (chkfile caching; ROHF computed once per
+session). The critical invariants: `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
 (second quantization ≡ first quantization, elementwise),
 `test_full_space_vs_pyscf_casci_core_explicit` (core-explicit CAS(6,5) vs
 PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
 `test_analytic_matches_libcint` (two independent L constructions),
-`test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows).
+`test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows),
+`test_ladder.py` (per-rung symmetry fingerprints of ticket 08).
 
 ## Planning
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and
 lists the live tickets. Update it when a decision is made; keep tickets
-one-session sized. The live wave (06–09: pipeline generalization + Si/Sc/Ti,
-then 10 optional, 11 review protocol) is fully specified in
-`wayfinder/tickets/` — each ticket is self-contained (no conversation
-context needed). Review protocol: `/code-review` (two axes, parallel
-sub-agents) after each ticket wave, then `/improve-codebase-architecture`
-survey; see ticket 11.
+one-session sized. The live wave (08: carbon ladder, 09: Sc, 10: Ti, then 11 optional, 12
+review protocol) is fully specified in `wayfinder/tickets/` — each ticket
+is self-contained (no conversation context needed). Review protocol:
+`/code-review` (two axes, parallel sub-agents) after each ticket wave, then
+`/improve-codebase-architecture` survey; see ticket 12.

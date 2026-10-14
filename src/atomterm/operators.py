@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from atomterm.detbasis import determinant_basis, slater_condon_matrix
+from atomterm.detbasis import determinant_basis, frobenius_norm, slater_condon_matrix
 from atomterm.angular import l_matrices
 
 __all__ = [
@@ -105,7 +105,10 @@ def _spherical_average_density(mol, p: np.ndarray) -> np.ndarray:
     return ps
 
 
-def active_space_integrals(mol, mf, c_act: np.ndarray, ncore: int):
+def active_space_integrals(
+    mol, mf, c_act: np.ndarray, ncore: int, spherical_core: bool = True,
+    c_core: np.ndarray = None,
+):
     """(h1, g) of the active space, core contributions folded into h1.
 
     mcscf convention: ``h1 = C^dag (h_core + V_eff(core)) C`` with the
@@ -113,12 +116,31 @@ def active_space_integrals(mol, mf, c_act: np.ndarray, ncore: int):
     physical density of closed s shells in a central field) and
     ``V_eff[m,n] = sum_ls P[l,s] (mn|ls) - 0.5 (ml|ns)``.
 
+    ``c_core`` overrides the folded core columns (default ``mf.mo_coeff[:,
+    :ncore]``). Orbital-optimized stages (CASSCF/SA) must pass their OWN
+    converged inactive columns: the optimizer may legally reorganize the
+    core span (core-active swaps), and folding a different core than the
+    one the energies were computed with breaks the identity
+    ``E_tot = E_core + e_cas`` (observed as O(Eh) nonsense, not small drift).
+
+    ``spherical_core=False`` skips the density averaging: this reproduces
+    the raw SCF core field, which carries the reference's anisotropy (the
+    core is polarized by ONE member of the degenerate open-shell manifold,
+    e.g. the |px py> mean field). Formally ``H_eff = H0 + eps*W`` with
+    H0 rotationally invariant and W the anisotropic core field of weight
+    eps ~ 1e-5: commutators [H, Lz], [H, L^2] = O(eps), and the 3P
+    multiplet splits as {M_L=+-1}/{0} (a k=2, m=0 field couples dM_L = 0,
+    +-2; the dipole k=1 is excluded exactly by inversion symmetry). The
+    averaged density is the ensemble average over the degenerate manifold
+    -- the scalar projection -- so it restores exact invariance.
+
     ``g`` follows the atomterm.detbasis convention (physicist arrangement):
     ``g[p,q,r,s] = <pq|rs> = int p(1) q(2) r(1) s(2)`` = chemist ``(pr|qs)``.
     CI eigenvalues of (h1, g) equal ``mc.e_cas``.
     """
-    c_core = mf.mo_coeff[:, :ncore]
-    d_core = _spherical_average_density(mol, 2.0 * c_core @ c_core.conj().T)
+    c_core = mf.mo_coeff[:, :ncore] if c_core is None else c_core
+    d_raw = 2.0 * c_core @ c_core.conj().T
+    d_core = _spherical_average_density(mol, d_raw) if spherical_core else d_raw
 
     eri = mol.intor("int2e", aosym="s1")  # chemist (mu nu | la si)
     veff_core = (
@@ -194,6 +216,17 @@ def number_operator(norb: int) -> np.ndarray:
     return spin_block_one_body(np.eye(norb))
 
 
+def core_anisotropy(mol, mf, ncore: int, c_core: np.ndarray = None) -> float:
+    """Relative Frobenius norm of the discarded core-density anisotropy
+    ``||rho - rho_sph||_F / ||rho_sph||_F`` -- the ``eps`` weight of the
+    internal-field term in ``H_eff = H0 + eps*W`` (see
+    :func:`active_space_integrals`)."""
+    c_core = mf.mo_coeff[:, :ncore] if c_core is None else c_core
+    d = 2.0 * c_core @ c_core.conj().T
+    d_sph = _spherical_average_density(mol, d)
+    return float(frobenius_norm(d - d_sph) / frobenius_norm(d_sph))
+
+
 def full_space_integrals(mol, mf, w: np.ndarray):
     """(h1, g) over the given orbital columns with NO core folding.
 
@@ -215,11 +248,14 @@ def full_space_integrals(mol, mf, w: np.ndarray):
     return h1, g
 
 
-def build_operator_parts(mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int) -> dict:
+def build_operator_parts(
+    mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int,
+    spherical_core: bool = True, c_core: np.ndarray = None,
+) -> dict:
     """Operator content of build_operators as raw parts, evaluation-agnostic:
     ``{name: (one_body, two_body)}`` plus the determinant basis and integrals.
     """
-    h1, g = active_space_integrals(mol, mf, c_act, ncore)
+    h1, g = active_space_integrals(mol, mf, c_act, ncore, spherical_core, c_core)
     dets = determinant_basis(c_act.shape[1], na, nb)
     s2_one, s2_two = s2_operator_parts(c_act.shape[1])
     l2_one, l2_two = l2_operator_parts(mol, c_act)
@@ -236,16 +272,20 @@ def build_operator_parts(mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: in
 
 
 def build_operators(
-    mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int, method: str = "slater_condon"
+    mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int,
+    method: str = "slater_condon", spherical_core: bool = True,
+    c_core: np.ndarray = None,
 ) -> dict:
     """All analysis operators as full matrices in the determinant basis.
 
     method: "slater_condon" (first quantization, explicit excitation rules)
     or "secondquant" (fermionic a+/a strings applied to occupation vectors).
     Both consume identical operator parts and produce elementwise identical
-    matrices (pinned by tests).
+    matrices (pinned by tests). ``spherical_core``/``c_core``: see
+    :func:`active_space_integrals`.
     """
-    parts = build_operator_parts(mol, mf, c_act, ncore, na, nb)
+    parts = build_operator_parts(mol, mf, c_act, ncore, na, nb,
+                                 spherical_core, c_core)
     dets = parts.pop("dets")
     integrals = (parts.pop("h1"), parts.pop("g"))
 

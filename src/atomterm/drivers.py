@@ -20,14 +20,18 @@ from pyscf import lib, mcscf, scf
 
 __all__ = [
     "run_rohf",
+    "run_frac_occ_scf",
     "select_shell_ao",
     "select_valence_ao",
+    "shell_weights",
     "purified_s_core",
     "complete_orthonormal",
     "build_full_mo",
     "run_casci",
     "run_casscf",
     "run_sa_casscf",
+    "run_casscf_core_relax",
+    "run_casscf_pyscf_start",
     "CASResult",
 ]
 
@@ -85,6 +89,88 @@ def select_valence_ao(mol, patterns: list[str]) -> list[int]:
             )
         idx += matches
     return idx
+
+
+def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int):
+    """Average-of-configuration (fractional-occupation) HF, chkfile-cached.
+
+    The open shell is occupied fractionally (``nelec_open / n_open`` per
+    orbital, e.g. 2/3 per 2p AO for the carbon 2p^2 configuration), which
+    makes the Fock operator exactly spherical. Unlike a symmetry-broken
+    ROHF (whose core is polarized by the one occupied open-shell member),
+    the converged core orbitals are pure l-eigenfunctions: this IS the
+    rotationally invariant "scalar core" that spherically averaging a
+    symmetry-broken core density reproduces to O(eps^2) in the tiny
+    polarization weight eps.
+
+    Closed-shell RHF formalism with custom occupations; spin in ``cfg`` is
+    ignored (the configuration average is an S = ensemble object).
+    Returns ``(mol, mf)``.
+    """
+    import dataclasses
+
+    from atomterm.system import build_mol
+
+    mol = build_mol(dataclasses.replace(cfg, spin=0))
+    try:
+        _, rec = scf.chkfile.load_scf(chkfile)
+        mf = scf.RHF(mol)
+        mf.__dict__.update(rec)
+        mf.converged = True
+        mf.verbose = cfg.verbose
+        return mol, mf
+    except (OSError, KeyError, ValueError):
+        pass
+
+    mf = scf.RHF(mol)
+    mf.conv_tol = 1e-12
+    mf.chkfile = chkfile
+    mf.verbose = cfg.verbose
+
+    def _frac_occ(mo_energy, mo_coeff=None):
+        occ = np.zeros(mo_energy.size)
+        n_closed = (mol.nelectron - nelec_open) // 2
+        occ[:n_closed] = 2.0
+        occ[n_closed : n_closed + n_open] = nelec_open / n_open
+        return occ
+
+    mf.get_occ = _frac_occ
+    mf.run()
+    return mol, mf
+
+
+def shell_weights(mol, c: np.ndarray, s: np.ndarray):
+    """S-metric projection norms of columns onto angular (l) AO subspaces.
+
+    ``w[i, k] = c[:, i]^dag S_l c[:, i]`` over ALL AOs of angular momentum
+    l_k (S_l = S[np.ix_(rows_k, rows_k)]). S-orthonormal columns make every
+    row of ``w`` sum to 1 -- this partition is valid because different-l
+    subspaces are exactly orthogonal; grouping by (n, l) instead would NOT
+    partition (2p and 3p AO subspaces overlap, weights double-count).
+
+    Interpretation hierarchy: l-purity is NECESSARY but not SUFFICIENT for
+    rotational closure -- a pure-p window can still be m-incomplete (radial
+    mixtures lacking the full m-set), and only the commutator norms
+    ||[H, Lz]||, ||[H, L^2]|| measure closure itself. Same metric quantity
+    as the ``contamination`` of :func:`purified_s_core`: orbital weights
+    live in the AO metric, not the Euclidean norm.
+    Returns ``(names, w)`` with ``names = ['s', 'p', 'd', ...]``.
+    """
+    import re
+
+    labels = [line.split()[-1] for line in mol.ao_labels()]
+    groups: dict[str, list[int]] = {}
+    for i, lbl in enumerate(labels):
+        m = re.match(r"\d+([spdfgh])", lbl)
+        groups.setdefault(m.group(1) if m else lbl, []).append(i)
+
+    names = list(groups)
+    w = np.zeros((c.shape[1], len(names)))
+    for k, name in enumerate(names):
+        idx = groups[name]
+        ss = s[np.ix_(idx, idx)]
+        w[:, k] = np.einsum("ij,ij->j", c[idx, :], ss @ c[idx, :]).real
+    return names, w
 
 
 def purified_s_core(mol, mf, n_core: int):
@@ -153,17 +239,19 @@ def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
     return np.hstack([v, c])
 
 
-def build_full_mo(mf, core_idx: list[int], act_idx: list[int]) -> np.ndarray:
+def build_full_mo(mf, core_idx: list[int], act_idx: list[int], c_core: np.ndarray = None) -> np.ndarray:
     """Full orthonormal MO matrix with chosen core and active columns placed
     so that CASCI/CASSCF's window ``[ncore : ncore+ncas]`` selects the active
     space.
 
-    Core columns are canonical SCF MOs; active columns are the RAW AO
-    functions of the target shell (columns of the identity), which are exactly
-    rotation-closed -- essential for the L-quantum-number analysis.
+    Core columns are canonical SCF MOs by default; ``c_core`` supplies
+    alternative columns (e.g. fractional-occupation core, rung 3 of the
+    carbon ladder). Active columns are the RAW AO functions of the target
+    shell (columns of the identity), which are exactly rotation-closed --
+    essential for the L-quantum-number analysis.
     """
     n = mf.mo_coeff.shape[0]
-    core = mf.mo_coeff[:, core_idx]
+    core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
     act = np.eye(n)[:, act_idx]
     v = np.hstack([core, act])
     if v.shape[1] == n:
@@ -235,7 +323,61 @@ def run_casscf(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
 
 
 def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0) -> CASResult:
+    """SA-CASSCF over the given state weights (primary sector).
+
+    Note: PySCF's state-average kernel returns only the ENSEMBLE energy
+    (scalar e_cas = the weighted mean). The per-root energies reported in
+    the result come from a CASCI pass in the converged window -- the SA
+    solution's own orbitals, diagonalizing the same active Hamiltonian the
+    ensemble was built from.
+    """
     mc = mcscf.CASSCF(mf, ncas, nelecas)
     mc.mo_coeff = mo_full
     mc.state_average_(list(weights))
-    return _run(mc, len(weights), chkfile, "sa_casscf", verbose)
+    res = _run(mc, len(weights), chkfile, "sa_casscf", verbose)
+    roots = mcscf.CASCI(mf, ncas, nelecas)
+    roots.mo_coeff = mc.mo_coeff
+    roots.canonicalization = False  # report the SA window exactly as converged
+    rr = _run(roots, len(weights), chkfile, "sa_casscf_roots", verbose)
+    res.energies = rr.energies
+    res.core_energy = rr.core_energy
+    return res
+
+
+def _core_virtual_only(self, nmo, ncore, ncas, frozen):
+    """Orbital-rotation mask for :func:`run_casscf_core_relax`: ONLY
+    inactive<->virtual rotations are allowed."""
+    mask = np.zeros((nmo, nmo), dtype=bool)
+    mask[ncore + ncas :, :ncore] = True
+    return mask
+
+
+def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
+    """CASSCF with the active-window span frozen ("CASCI + core relaxation").
+
+    The orbital mask (:func:`_core_virtual_only`) permits only
+    inactive<->virtual rotations, so the core polarizes in response to the
+    correlated active CI density but no orbital ever enters or leaves the
+    active window: the state's identity (and the window's rotation closure)
+    is preserved by construction, while real physics (core relaxation,
+    typically ~mEh) is added on top of plain CASCI.
+
+    Peculiarity: the relaxed core is slightly anisotropic. The analysis
+    fold spherically averages it, so the rung's ``max|dE|`` vs PySCF is a
+    measure of that anisotropy -- reported, not hidden.
+    """
+    import types
+
+    mc = mcscf.CASSCF(mf, ncas, nelecas)
+    mc.mo_coeff = mo_full
+    mc.uniq_var_indices = types.MethodType(_core_virtual_only, mc)
+    return _run(mc, 1, chkfile, "casscf_relax", verbose)
+
+
+def run_casscf_pyscf_start(mf, ncas, nelecas, chkfile, verbose=0) -> CASResult:
+    """CASSCF from PySCF's own default guess (canonical ROHF MOs, active =
+    the canonical window ``[ncore:ncore+ncas]``), NOT the raw shell columns.
+    Isolates the start-dependence of the optimizer basin (compare with
+    :func:`run_casscf` on the same system)."""
+    mc = mcscf.CASSCF(mf, ncas, nelecas)
+    return _run(mc, 1, chkfile, "casscf_pyscf", verbose)

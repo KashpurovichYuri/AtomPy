@@ -36,7 +36,7 @@ CASES = {
     # periodic table -- first p-type core ([Ne] incl. 2p^6) under the
     # spherically averaged folded density. CASSCF/SA disabled: the orbital
     # optimizer escapes the 3p shell (3s mixing pulls it into an ³S-like
-    # well -- the CASSCF multi-solution class, see AGENTS.md fact 12).
+    # well -- the CASSCF multi-solution class, see AGENTS.md fact 13).
     # CASCI stages carry the physics assertions and are exact.
     "Si": dict(
         cfg=AtomConfig("Si", "ccpvdz", spin=2),
