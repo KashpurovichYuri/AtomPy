@@ -46,8 +46,8 @@ green, reports written.
   Equivalence vs the carbon code proven with pinned ROHF input.
 - [Si](tickets/07-si.md): 3p² works identically to 2p² through CASCI — first
   p-type core ([Ne] + 3s) folds exactly (textbook ³P/¹D/¹S, commutators
-  ~1e-14). CASSCF/SA disabled for Si: the orbital optimizer escapes the 3p
-  shell (³S-like well) — the multi-solution class is not TM-only (fact 13).
+  ~1e-14). (Its "CASSCF/SA disabled" caveat was later retired — see
+  ticket 09.)
 - [Carbon ladder](tickets/08-carbon-ladder.md): all orbital-treatment rungs
   verified on carbon with an all-vs-all matrix. Raw core breaks symmetry
   measurably ({0}/{±1} split 4.4e-5 Eh, [H,Lz] 5.6e-6); averaged and
@@ -55,6 +55,12 @@ green, reports written.
   different references); core relaxation gains −8.8 mEh at exact symmetry;
   free CASSCF breaking refined to m-incompleteness (window l-pure, fact 8);
   SA restores ⟨L²⟩ = 2.000000. Optimized stages fold with their own core.
+- [Si analysis](tickets/09-si-analysis.md): the "³S multi-solution well"
+  was a build_full_mo construction bug (non-orthonormal MO matrix from
+  core↔window overlap, fact 13) — fixed block-safe (fact 14); Si now
+  behaves like carbon end to end (CASSCF ³P −0.127 Eh, SA ⟨L²⟩ = 2.000000).
+  Machinery generalized: run_ladder for any atom, virtmix rung, ΔE column,
+  configuration labels, ortho_err divergence guard.
 
 ## Not yet specified
 
@@ -63,10 +69,6 @@ green, reports written.
   coupling, transition moments, g-factors).
 - Non-spherical/many-center generalization of the L operators (molecules):
   the current construction assumes a single atom at the origin.
-- CASSCF stability beyond carbon: Si's optimizer escapes the 3p shell
-  (ticket 07, fact 13). If orbital optimization matters beyond carbon, a
-  dedicated ticket decides between a CASCI-seeded start and inter-shell
-  frozen rotations.
 - Cosmetic: the per-stage report line prints `Ms={na−nb}` (i.e. 2·M_S —
   "Ms=+2" for the carbon triplet sector). Found during ticket 06; left
   untouched for output stability, fix belongs in its own decision since it
@@ -74,13 +76,13 @@ green, reports written.
 
 ## Live tickets (the current wave)
 
-- [09: Sc](tickets/09-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
-  occupation risks documented. Rungs analyzed via the ticket-08 machinery.
-- [10: Ti](tickets/10-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
-  (apply 09's learnings).
-- [11: purified_core_orbitals](tickets/11-purify-general.md) — optional,
+- [10: Sc](tickets/10-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
+  occupation risks documented. Full ladder via the ticket-09 machinery.
+- [11: Ti](tickets/11-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
+  (apply 10's learnings).
+- [12: purified_core_orbitals](tickets/12-purify-general.md) — optional,
   per-shell core purification for future core-explicit TM tests.
-- [12: review protocol](tickets/12-review-protocol.md) — /code-review after
+- [13: review protocol](tickets/13-review-protocol.md) — /code-review after
   the wave (fixed point 507b796), then /improve-codebase-architecture.
 
 ## Out of scope

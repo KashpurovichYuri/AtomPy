@@ -32,10 +32,10 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation |
-| `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `run_casscf`, `run_sa_casscf`, `run_casscf_core_relax`, `run_casscf_pyscf_start`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core` | all checkpointed (`.chk`); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core` |
-| `src/atomterm/analysis.py` | `analyze`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms |
+| `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `run_casscf`, `run_sa_casscf`, `run_casscf_core_relax`, `run_casscf_virtual_mix`, `run_casscf_pyscf_start`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core` | all checkpointed (`.chk`); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core` |
+| `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
 | `src/atomterm/pipeline.py` | `run_atom`, `run_carbon` | generic end-to-end orchestration for any atom (Ms sectors derived from spin + active-electron count); `run_carbon` = carbon wrapper; writes `results/` |
-| `src/atomterm/ladder.py` | `run_carbon_ladder` | ticket-08 rung comparison (raw/avg/frac-occ core, core relax, CASSCF starts, SA), all-vs-all matrix |
+| `src/atomterm/ladder.py` | `run_ladder`, `run_carbon_ladder` | orbital-treatment rungs per atom (raw/avg/frac-occ core, core relax, virtmix, CASSCF starts, SA), all-vs-all matrix, ortho_err divergence guard |
 
 ## Hard-won facts (do not re-derive)
 
@@ -111,13 +111,27 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
    a CASCI pass in the converged window (`run_sa_casscf` does this).
    Optimized stages must fold with their OWN inactive columns
    (`build_operators(..., c_core=...)`), else E-bookkeeping breaks at O(Eh).
-13. **CASSCF multi-solution is not TM-only**: for Si 3s²3p² the single-root
-   CASSCF optimizer escapes the 3p shell (pulls 3s in, lands in an
-   ³S-like well) and the ³P-weighted SA collapses too — so orbital
-   optimization beyond carbon needs a stability strategy (CASCI-seeded
-   start or frozen inter-shell rotations); Si/TM rows run CASCI only.
-   Also: folded-core vs PySCF max|dE| scales with core size (Si 3.1e-4 Eh
-   vs C ~1e-7) — same spherical-average cause as fact 5, harmless.
+13. **The Si "multi-solution well" was a construction bug** (ticket 09;
+    retires the ticket-07 interpretation): Si's CASSCF/SA did NOT escape to
+    an ³S-like basin — `build_full_mo` silently returned a NON-orthonormal
+    MO matrix (raw 3p AOs overlap the canonical 2p core MOs by ~0.3, so the
+    complement projector `I − P` was inexact and extra junk columns
+    appeared) and the optimizer diverged on it (energies below the
+    variational bound, C†SC − I ~ 1). With the block-safe construction Si
+    behaves exactly like carbon: CASSCF ³P with −0.127 Eh correlation, SA
+    restores ⟨L²⟩ = 2.000000. Lesson: check C†SC − I of anything fed to an
+    optimizer — every ladder rung carries `ortho_err`.
+14. **`build_full_mo` is block-safe** (ticket 09): core block Löwdin'd
+    within its own span (span- and density-preserving); active raw AOs
+    projected against the core span and renormalized. The correction is
+    same-l and m-diagonal (different-l blocks are exactly S-orthogonal),
+    so window l-purity and the m-set structure survive. Two consequences:
+    (a) naive complement filters (`sv > 1e-8`) admit spurious directions
+    when v is not S-orthonormal — silently wrong shapes; (b) on Si,
+    max|dE| for CASCI rungs ≈ 9.5e-2 measures the raw-vs-orthogonalized
+    window-definition difference, NOT fold anisotropy — max|dE| has up to
+    three contributions: core-field anisotropy, window definition,
+    bookkeeping (the last must be 0).
 
 ## Conventions
 
@@ -130,7 +144,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 40 tests in ~15 s (chkfile caching; ROHF computed once per
+`pytest` runs 45 tests in ~30 s (chkfile caching; ROHF computed once per
 session). The critical invariants: `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
 (second quantization ≡ first quantization, elementwise),
@@ -139,14 +153,16 @@ PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
 `test_analytic_matches_libcint` (two independent L constructions),
 `test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows),
-`test_ladder.py` (per-rung symmetry fingerprints of ticket 08).
+`test_ladder.py` / `test_ladder_si.py` (per-rung symmetry fingerprints,
+ortho_err divergence guard, configuration labels).
 
 ## Planning
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and
 lists the live tickets. Update it when a decision is made; keep tickets
-one-session sized. The live wave (08: carbon ladder, 09: Sc, 10: Ti, then 11 optional, 12
-review protocol) is fully specified in `wayfinder/tickets/` — each ticket
+one-session sized. The live wave (08: carbon ladder, 09: Si analysis,
+10: Sc, 11: Ti, then 12 optional, 13 review protocol) is fully specified
+in `wayfinder/tickets/` — each ticket
 is self-contained (no conversation context needed). Review protocol:
 `/code-review` (two axes, parallel sub-agents) after each ticket wave, then
-`/improve-codebase-architecture` survey; see ticket 12.
+`/improve-codebase-architecture` survey; see ticket 13.

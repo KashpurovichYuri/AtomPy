@@ -26,6 +26,7 @@ __all__ = [
     "term_symbol",
     "AnalysisResult",
     "analyze",
+    "configuration_summary",
     "format_report",
     "save_report",
 ]
@@ -134,3 +135,46 @@ def save_report(res: AnalysisResult, path: str) -> None:
     payload = asdict(res)
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(payload, fh, indent=2)
+
+
+def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
+                          top: int = 2) -> list[str]:
+    """Approximate valence-configuration label of each CI root in a window.
+
+    Method-agnostic: works for ANY window and CI vectors. Each window
+    column's l-character comes from the S-metric projection
+    (:func:`atomterm.drivers.shell_weights`); a determinant's configuration
+    is the l-mass of its occupied columns; each root is labeled by its
+    ``top`` dominant determinants.
+
+    Approximation level: exact when the window columns are raw shell AOs
+    (determinants ARE AO occupations, e.g. "p^2.00"); approximate for
+    optimized windows, whose columns are delocalized over radials/l -- the
+    label then reports the dominant character (enough to tell a 3p^2 state
+    from an escaped 3s^2 one). Returns one string per root, e.g.
+    ``"p^2.00 (|c|=0.98)"``.
+    """
+    from atomterm.drivers import shell_weights
+    from atomterm.detbasis import determinant_basis
+
+    names, wl = shell_weights(mol, c_win, s)  # (ncas, n_l)
+    norb = c_win.shape[1]
+    dets = determinant_basis(norb, na, nb)
+
+    labels = []
+    for v in ci_list:
+        v = np.asarray(v).ravel()
+        order = np.argsort(-np.abs(v))[:top]
+        parts = []
+        for i in order:
+            occ_cols = sorted(d % norb for d in dets[i])
+            mass = {n: 0.0 for n in names}
+            for col in occ_cols:
+                for k, n in enumerate(names):
+                    mass[n] += wl[col, k]
+            label = "".join(
+                f"{n}^{mass[n]:.2f}" for n in names if mass[n] > 0.01
+            )
+            parts.append(f"{label} (|c|={abs(v[i]):.2f})")
+        labels.append("; ".join(parts))
+    return labels

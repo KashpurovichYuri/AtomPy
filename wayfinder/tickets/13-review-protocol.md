@@ -1,4 +1,4 @@
-# Ticket 12: review protocol (/code-review, /improve-codebase-architecture)
+# Ticket 13: review protocol (/code-review, /improve-codebase-architecture)
 
 Status: open (run after the atoms wave 06–09 lands)
 
@@ -12,7 +12,7 @@ Skills already installed in `.opencode/skill/`: `code-review`
 (model-invoked, registered), `improve-codebase-architecture`
 (user-invoked; follow its SKILL.md + HTML-REPORT.md manually).
 
-**Step 1 — /code-review** (after tickets 06–10 merged):
+**Step 1 — /code-review** (after tickets 06–11 merged):
 
 - Fixed point: commit `507b796` (review the atoms wave only; the earlier
   wave 0a36d56..507b796 was continuously test-validated during pairing).
@@ -20,7 +20,7 @@ Skills already installed in `.opencode/skill/`: `code-review`
   - *Standards*: AGENTS.md conventions (module table accuracy, hard-won
     facts, docstring/comment discipline, test naming) + Fowler smell
     baseline (duplication, long parameter lists, shallow modules).
-  - *Spec*: faithfulness to wayfinder tickets 06–10 (every promised
+  - *Spec*: faithfulness to wayfinder tickets 06–11 (every promised
     behavior present, no scope creep beyond tickets).
 - Findings → fix immediately or file as tickets; re-run until clean.
 

@@ -31,6 +31,7 @@ __all__ = [
     "run_casscf",
     "run_sa_casscf",
     "run_casscf_core_relax",
+    "run_casscf_virtual_mix",
     "run_casscf_pyscf_start",
     "CASResult",
 ]
@@ -101,10 +102,24 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int):
     the converged core orbitals are pure l-eigenfunctions: this IS the
     rotationally invariant "scalar core" that spherically averaging a
     symmetry-broken core density reproduces to O(eps^2) in the tiny
-    polarization weight eps.
+    polarization weight eps -- while remaining a DIFFERENT physical
+    reference (open-shell exchange with a smeared vs a localized valence),
+    which is why the two cores' energies differ at the mEh scale.
+
+    Control mechanism: ``get_occ`` is PySCF's occupation hook, called every
+    SCF cycle to map canonical orbital energies to occupation numbers; the
+    density and Fock are built from whatever it returns, so the SCF
+    converges self-consistently in the ensemble density. The returned
+    ``e_tot`` is the ensemble energy of the averaged configuration -- use
+    this object as a CORE PROVIDER, never as a term energy.
+
+    Ordering assumption (asserted by convention, check per atom): the
+    fractional block is the HOMO block -- closed shells occupy the first
+    ``(nelectron - nelec_open) // 2`` canonical orbitals. True for
+    C/Si ([Ne]+ns below the np shell) and Sc ([Ar] below 3d/4s).
 
     Closed-shell RHF formalism with custom occupations; spin in ``cfg`` is
-    ignored (the configuration average is an S = ensemble object).
+    ignored (the configuration average is an S-ensemble object).
     Returns ``(mol, mf)``.
     """
     import dataclasses
@@ -245,18 +260,41 @@ def build_full_mo(mf, core_idx: list[int], act_idx: list[int], c_core: np.ndarra
     space.
 
     Core columns are canonical SCF MOs by default; ``c_core`` supplies
-    alternative columns (e.g. fractional-occupation core, rung 3 of the
-    carbon ladder). Active columns are the RAW AO functions of the target
-    shell (columns of the identity), which are exactly rotation-closed --
+    alternative columns (e.g. fractional-occupation core). Active columns
+    are the RAW AO functions of the target shell -- exactly rotation-closed,
     essential for the L-quantum-number analysis.
+
+    Construction is block-safe in the AO metric S: (1) the core block is
+    Loewdin-orthonormalized within its own span (span- and density-preserving
+    -- the folded core density cannot change); (2) the active columns are
+    projected against the core span and renormalized, because raw valence
+    AOs overlap the canonical core's same-l members (adjacent radial shells:
+    <2p_MO|3p_AO> can reach ~0.3). That correction is same-l and m-diagonal,
+    so an m-complete shell window keeps both its l-purity and its m-set
+    structure. (3) the S-orthonormal complement is appended through an exact
+    projector -- the naive `I - P` filter is only exact when v is already
+    S-orthonormal, and silently returns extra columns otherwise (observed:
+    (nao, nao+6) on Si).
     """
     n = mf.mo_coeff.shape[0]
+    s = mf.get_ovlp()
     core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
     act = np.eye(n)[:, act_idx]
+
+    gram = core.conj().T @ s @ core
+    ev, u = np.linalg.eigh(gram)
+    core = core @ (u / np.sqrt(ev)) @ u.T
+
+    p_core = core @ core.conj().T @ s
+    act = act - p_core @ act
+    gram_a = act.conj().T @ s @ act
+    ev_a, u_a = np.linalg.eigh(gram_a)
+    act = act @ (u_a / np.sqrt(ev_a)) @ u_a
+
     v = np.hstack([core, act])
     if v.shape[1] == n:
         return v
-    return complete_orthonormal(v, mf.get_ovlp())
+    return complete_orthonormal(v, s)
 
 
 @dataclass
@@ -310,10 +348,13 @@ def _run(mc, nroots: int, chkfile: str, name: str, verbose: int) -> CASResult:
     return CASResult(name, energies, ci, mc.mo_coeff, mc, _core_energy(mc))
 
 
-def run_casci(mf, ncas, nelecas, mo_full, chkfile, nroots=1, verbose=0) -> CASResult:
+def run_casci(mf, ncas, nelecas, mo_full, chkfile, nroots=1, verbose=0,
+              name="casci") -> CASResult:
+    """CASCI in the given window. ``name`` is the chkfile store key -- keep
+    it distinct per variation so differently-folded runs never collide."""
     mc = mcscf.CASCI(mf, ncas, nelecas)
     mc.mo_coeff = mo_full
-    return _run(mc, nroots, chkfile, "casci", verbose)
+    return _run(mc, nroots, chkfile, name, verbose)
 
 
 def run_casscf(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
@@ -352,6 +393,15 @@ def _core_virtual_only(self, nmo, ncore, ncas, frozen):
     return mask
 
 
+def _no_core_window_exchange(self, nmo, ncore, ncas, frozen):
+    """Orbital-rotation mask for :func:`run_casscf_virtual_mix`: everything
+    EXCEPT active<->inactive rotations (no orbital ever trades places
+    between the core and the active window)."""
+    mask = np.zeros((nmo, nmo), dtype=bool)
+    mask[ncore + ncas :, : ncore + ncas] = True
+    return mask
+
+
 def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
     """CASSCF with the active-window span frozen ("CASCI + core relaxation").
 
@@ -372,6 +422,31 @@ def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CAS
     mc.mo_coeff = mo_full
     mc.uniq_var_indices = types.MethodType(_core_virtual_only, mc)
     return _run(mc, 1, chkfile, "casscf_relax", verbose)
+
+
+def run_casscf_virtual_mix(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
+    """CASSCF with core<->window exchange blocked ("virtmix" rung).
+
+    Mask (:func:`_no_core_window_exchange`): active<->virtual AND
+    inactive<->virtual rotations allowed, active<->inactive blocked. The
+    window may borrow radial/polarization character from the virtual space
+    -- real dynamic correlation of the active pair (radial separation is
+    energetically favorable) -- but no orbital ever trades places between
+    core and window, so the state's identity cannot change.
+
+    Physics note: within the enlarged window the CI re-solves, so the
+    effect appears as radial correlation (natural occupations spread below
+    closed-shell values, natural orbitals delocalized over radials) -- the
+    active-side analog of the core's first-order polarization by virtuals.
+    Compare: rung4 (core-relax) < virtmix < free CASSCF brackets the three
+    contributions.
+    """
+    import types
+
+    mc = mcscf.CASSCF(mf, ncas, nelecas)
+    mc.mo_coeff = mo_full
+    mc.uniq_var_indices = types.MethodType(_no_core_window_exchange, mc)
+    return _run(mc, 1, chkfile, "casscf_virtmix", verbose)
 
 
 def run_casscf_pyscf_start(mf, ncas, nelecas, chkfile, verbose=0) -> CASResult:

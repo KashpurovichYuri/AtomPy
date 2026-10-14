@@ -53,6 +53,19 @@ def test_casci_raw_core_fingerprint(ladder):
     assert 1e-4 < raw["core_anisotropy"] < 1e-1
 
 
+def test_casscf_virtual_mix(ladder):
+    """Virtmix rung: window<->virtual correlation without core<->window
+    exchange lands in the same basin as free CASSCF (the Si lesson: that
+    exchange, not virtual borrowing, was the identity-changer -- once the
+    window construction bug was fixed, even that vanished)."""
+    _, r = ladder
+    vm = r["casscf_virtmix"]
+    assert vm["ortho_err"] < 1e-10
+    assert vm["ground_term"] == "3P"
+    assert abs(vm["e_ground"] - r["casscf_shell"]["e_ground"]) < 1e-3
+    assert 1e-4 < vm["comm_norm_h_lz"] < 1.0
+
+
 def test_casci_avg_core_exact(ladder):
     """Spherical averaging restores exact invariance."""
     _, r = ladder
@@ -86,6 +99,7 @@ def test_casscf_core_relaxation(ladder):
     _, r = ladder
     relax = r["casscf_relax"]
     assert relax["comm_norm_h_lz"] < 1e-9
+    assert relax["ortho_err"] < 1e-10
     assert relax["ground_l2"] == pytest.approx(2.0, abs=1e-6)
     assert relax["terms"] == {"3P": 3}
     # relaxation lowers the energy vs frozen-core CASCI ...
@@ -106,11 +120,12 @@ def test_casscf_free_symmetry_breaking(ladder):
     for tag in ("casscf_shell", "casscf_pyscf"):
         rung = r[tag]
         assert rung["ground_term"] == "3P"
-        # measured 1.3e-2 .. 1.4e-1 across reruns (chaotic gauge, fact 10):
+        # measured 1e-3..1e-1 across reruns (chaotic gauge, fact 10):
         # the band asserts "real but not catastrophic" breaking
         assert 1e-4 < rung["comm_norm_h_lz"] < 1.0
         assert 1.4 < rung["ground_l2"] < 2.0
         assert rung["window"]["p"] > 0.95
+        assert rung["ortho_err"] < 1e-10
     # both starts land in the same basin (same energy within chaos noise)
     assert abs(r["casscf_shell"]["e_ground"] - r["casscf_pyscf"]["e_ground"]) < 1e-4
 
@@ -118,7 +133,7 @@ def test_casscf_free_symmetry_breaking(ladder):
 def test_sa_restoration(ladder):
     """SA over the three 3P M_L components restores L to machine precision."""
     _, r = ladder
-    sa = r["sa3"]
+    sa = r["sa"]
     assert sa["comm_norm_h_lz"] < 1e-9
     assert sa["ground_l2"] > 1.99999
     assert len(sa["energies_pyscf"]) == 3
