@@ -14,6 +14,13 @@ bands -- never assumed exactness:
 CASSCF gauges are chaotic across identical reruns (fact 10): <L^2> was
 observed 0.99..1.92 on carbon -- bands assert "real but not catastrophic",
 with the precisely measured values living in the tickets.
+
+The Sc tests (ticket 11) pin the TRANSITION-METAL departures from that
+story: a TM core polarizes at the percent level, the free-CASSCF window
+escapes into p (an 2S-like basin, still orthonormal/variational), and the
+shell-start SA restores <L^2> only -- the window's s member swaps with a
+core p, so [H, Lz] stays large (m-incomplete window), while the
+canonical-start SA collapses outright (start dependence).
 """
 
 from collections import Counter
@@ -155,3 +162,119 @@ def test_sa_restoration(name, ladders):
         assert sa["comm_norm_h_lz"] < 1e-7, (name, tag)
         assert sa["ground_l2"] > 1.9999, (name, tag)
         assert sa["terms"] == {"3P": 3}, (name, tag)
+
+
+# --------------------------------------------------------------------------
+# Sc (ticket 11): the transition-metal ladder. Same machinery, different
+# physics -- every assertion below is the measured Sc pattern across three
+# independent cold runs (see AGENTS.md fact 15).
+# --------------------------------------------------------------------------
+
+SC_EXACT_TERMS = {"2D": 20, "4F": 14, "2F": 14, "4P": 6, "2G": 18,
+                  "2P": 6, "2S": 1, "2H": 11}
+
+
+@pytest.fixture(scope="session")
+def sc_ladder(tmp_path_factory):
+    return run_ladder(
+        AtomConfig("Sc", "ccpvdz", spin=1), ["3d", "4s"], 3,
+        workdir=str(tmp_path_factory.mktemp("ladder_Sc")),
+        sa_weights=[1 / 5] * 5, frac_nelec_open=3, frac_n_open=6)
+
+
+def test_sc_casci_exact_closure_and_term_table(sc_ladder):
+    """Raw-shell CAS(3,6) over {3d, 4s} is exactly rotation-closed (a
+    complete d m-set + one s): averaged/frac cores commute at 1e-13 and
+    the full 90-state sector reproduces the free-ion term tables of
+    3d1 4s2, 3d2 4s1 and 3d3. The RAW core field is percent-level on a
+    TM (vs 1e-5 on C/Si) but still a bounded perturbation."""
+    r = sc_ladder
+    for tag in ("casci_avg", "casci_frac"):
+        assert r[tag]["comm_norm_h_lz"] < 1e-10, tag
+        assert r[tag]["comm_norm_h_l2"] < 1e-10, tag
+        assert r[tag]["terms"] == SC_EXACT_TERMS, tag
+        assert r[tag]["ground_term"] == "2D", tag
+        assert r[tag]["ground_l2"] == pytest.approx(6.0, abs=1e-8), tag
+        w = r[tag]["window"]
+        assert abs(w.get("s", 0.0) - 1 / 6) < 1e-4, tag
+        assert abs(w.get("d", 0.0) - 5 / 6) < 1e-4, tag
+
+    raw = r["casci_raw"]
+    assert 1e-3 < raw["comm_norm_h_lz"] < 1e-1
+    assert 1e-2 < raw["comm_norm_h_l2"] < 0.5
+    assert 6.0001 < raw["ground_l2"] < 6.001
+    assert raw["ground_term"] == "2D"
+    assert 1e-3 < raw["core_anisotropy"] < 1e-1
+    # PySCF's own (unaveraged) fold splits the 2D quintet at the mEh scale
+    e = np.sort(np.asarray(raw["energies_pyscf"]))
+    assert 1e-4 < e[4] - e[0] < 1e-2
+
+    # frac core: exactly invariant (PySCF's quintet degenerate to 1e-10),
+    # a DIFFERENT reference (+30 mEh) whose softer field reshuffles the low
+    # spectrum: the 2D terms of 3d3 / 3d1 4s2 / 3d2 4s1 become
+    # quasi-degenerate at the bottom and their ORDERING flips across SCF
+    # chaos (measured: d^3 vs s d^2 ground between identical reruns)
+    frac = r["casci_frac"]
+    ef = np.sort(np.asarray(frac["energies_pyscf"]))
+    assert ef[4] - ef[0] < 1e-10
+    assert 1e-3 < abs(frac["e_ground"] - r["casci_avg"]["e_ground"]) < 1e-1
+
+
+def test_sc_relax_keeps_window_exact(sc_ladder):
+    """Frozen window + relaxed core: the rung that stays honest on a TM --
+    s+d window purity preserved exactly, sharp term table, only the core's
+    own polarization remains (bounded commutator)."""
+    relax = sc_ladder["casscf_relax"]
+    assert relax["ortho_err"] < 1e-10
+    assert relax["ground_term"] == "2D"
+    assert 5.9990 < relax["ground_l2"] < 6.0002
+    assert relax["terms"] == SC_EXACT_TERMS
+    w = relax["window"]
+    assert w.get("s", 0.0) + w.get("d", 0.0) > 0.999
+    assert 1e-4 < relax["comm_norm_h_lz"] < 1e-2
+    assert relax["max_de_vs_pyscf"] < 5e-3
+
+
+def test_sc_free_casscf_escapes_the_shell(sc_ladder):
+    """All three free-CASSCF starts land in one 2S-like basin ~52 mEh above
+    casci_avg: the window borrows p character massively (s/p/d mix), L
+    breaks at the 0.3 level -- but the optimizer stays orthonormal and
+    variational (the ticket-09 guard holds; this is a real multi-solution,
+    not a construction bug)."""
+    r = sc_ladder
+    e_ref = None
+    for tag in ("casscf_virtmix", "casscf_shell", "casscf_pyscf"):
+        rung = r[tag]
+        assert rung["ortho_err"] < 1e-10, tag
+        assert rung["ground_l2"] < 0.5, tag
+        assert 0.1 < rung["comm_norm_h_lz"] < 1.0, tag
+        assert rung["window"].get("p", 0.0) > 0.3, tag
+        assert rung["max_de_vs_pyscf"] < 5e-3, tag
+        assert not rung["diverged"], tag
+        d_e = rung["e_ground"] - r["casci_avg"]["e_ground"]
+        assert 0.03 < d_e < 0.08, tag
+        if e_ref is None:
+            e_ref = rung["e_ground"]
+        assert abs(rung["e_ground"] - e_ref) < 5e-3, tag
+
+
+def test_sc_sa_restores_l2_not_lz(sc_ladder):
+    """Shell-start SA over the five 2D M_L components restores <L^2> = 6 --
+    but NOT [H, Lz]: the optimizer swaps the window's 4s member for a core
+    3p (window p-weight exactly 1/6, core reorganized 4s+5p, anisotropy
+    0.30): an m-INCOMPLETE window. Our averaged fold of that strongly
+    polarized core vs PySCF's raw one shows as max|dE| ~ 0.8 (the
+    polarized-core detector at Eh scale). The canonical-start SA collapses
+    outright -- the start dependence is real on a TM."""
+    r = sc_ladder
+    sa = r["sa"]
+    assert sa["ortho_err"] < 1e-10
+    assert 5.99 < sa["ground_l2"] < 6.02
+    assert sa["comm_norm_h_lz"] > 0.1
+    assert 0.1 < sa["window"].get("p", 0.0) < 0.25
+    assert 0.7 < sa["window"].get("d", 0.0) < 0.9
+    assert 0.1 < sa["max_de_vs_pyscf"] < 5.0
+
+    sa_p = r["sa_pyscf"]
+    assert sa_p["ground_l2"] < 0.5
+    assert sa_p["ortho_err"] < 1e-10

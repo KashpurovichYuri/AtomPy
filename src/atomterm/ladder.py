@@ -117,12 +117,15 @@ def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
 
     mol, mf = run_rohf(cfg, str(out / f"{label}_rohf.chk"))
     s = mf.get_ovlp()
+    act_idx = select_valence_ao(mol, shell_patterns)
     mol_f = mf_f = None
     if frac_nelec_open is not None:
+        # open_idx: select the fractional block by CHARACTER (the active
+        # shell AOs). Energy-ordered filling is fine for C/Si but runs away
+        # on TMs where 3d/4p quasi-degenerate (Sc: p-containing ensemble).
         mol_f, mf_f = run_frac_occ_scf(
-            cfg, str(out / f"{label}_fracocc.chk"), frac_nelec_open, frac_n_open)
-
-    act_idx = select_valence_ao(mol, shell_patterns)
+            cfg, str(out / f"{label}_fracocc.chk"), frac_nelec_open, frac_n_open,
+            open_idx=act_idx)
     ncas = len(act_idx)
     spin = cfg.spin
     na, nb = (nelec_act + spin) // 2, (nelec_act - spin) // 2
@@ -187,7 +190,8 @@ def run_carbon_ladder(cfg: AtomConfig | None = None, workdir: str = "results") -
 def _report(rungs: dict, out: Path, label: str, mf) -> None:
     """Print and persist the all-vs-all comparison matrix."""
     order = ["casci_raw", "casci_avg", "casci_frac", "casscf_relax",
-             "casscf_virtmix", "casscf_shell", "casscf_pyscf", "sa"]
+             "casscf_virtmix", "casscf_shell", "casscf_pyscf", "sa",
+             "sa_pyscf"]
     tags = [t for t in order if t in rungs]
     rungs = {t: rungs[t] for t in tags}
     ref = rungs.get("casci_avg")

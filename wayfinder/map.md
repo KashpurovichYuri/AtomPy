@@ -61,6 +61,15 @@ green, reports written.
   behaves like carbon end to end (CASSCF ³P −0.127 Eh, SA ⟨L²⟩ = 2.000000).
   Machinery generalized: run_ladder for any atom, virtmix rung, ΔE column,
   configuration labels, ortho_err divergence guard.
+- [Sc](tickets/11-sc.md): first doublet, first TM. Two real bugs found and
+  fixed (half-integer S labeling; frac-occ must select its block by AO
+  projection, not energy order — the aufbau block runs away to 4p). The
+  machinery itself held: CAS(3,6)/{3d,4s} is exactly closed (1e-13) and
+  reproduces the full 90-state free-ion term table. TM phenomenology
+  mapped (fact 15): percent-level raw-core polarization; free CASSCF
+  collapses to an ²S-like basin (variational, not a bug); shell-start SA
+  restores ⟨L²⟩ but not [H,Lz] (window 4s ↔ core 3p swap, m-incomplete);
+  relax is the honest TM rung.
 
 ## Not yet specified
 
@@ -76,13 +85,8 @@ green, reports written.
 
 ## Live tickets (the current wave)
 
-- [10: test-suite alignment](tickets/10-test-alignment.md): test files 1:1
-  with src modules, invariant-named tests; test_drivers/test_analysis/
-  test_system created; frac-occ cache-path hook bug found and fixed.
-- [11: Sc](tickets/11-sc.md) — 3d¹4s² ²D; first doublet, first TM, ROHF
-  occupation risks documented. Full ladder via the ticket-09 machinery.
 - [12: Ti](tickets/12-ti.md) — 3d² ³F; L = 3/4 terms, core = [Ar]+4s²
-  (apply 11's learnings).
+  (apply 11's learnings: projection-selected frac block, TM ladder bands).
 - [13: purified_core_orbitals](tickets/13-purify-general.md) — optional,
   per-shell core purification for future core-explicit TM tests.
 - [14: start-variant axis](tickets/14-start-variants.md) — window

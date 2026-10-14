@@ -92,7 +92,8 @@ def select_valence_ao(mol, patterns: list[str]) -> list[int]:
     return idx
 
 
-def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int):
+def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
+                     open_idx: list[int] | None = None):
     """Average-of-configuration (fractional-occupation) HF, chkfile-cached.
 
     The open shell is occupied fractionally (``nelec_open / n_open`` per
@@ -113,26 +114,50 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int):
     ``e_tot`` is the ensemble energy of the averaged configuration -- use
     this object as a CORE PROVIDER, never as a term energy.
 
-    Ordering assumption (asserted by convention, check per atom): the
-    fractional block is the HOMO block -- closed shells occupy the first
-    ``(nelectron - nelec_open) // 2`` canonical orbitals. True for
-    C/Si ([Ne]+ns below the np shell) and Sc ([Ar] below 3d/4s).
+    ``open_idx`` selects the fractional block by CHARACTER (the AO indices
+    of the open shell): the ``n_open`` non-core orbitals with the largest
+    weight on that shell's AOs (S metric) get the fractional occupation.
+    This matters for transition metals: energy-ordered filling is
+    unstable where 3d/4p quasi-degenerate -- on Sc the aufbau block runs
+    away to {4s, 4p, ~2d} (a p-containing ensemble, not 3d1 4s2). Without
+    ``open_idx`` the block is the HOMO block (energy order; fine for
+    C/Si, where it selects the same orbitals as the projection would).
 
     Closed-shell RHF formalism with custom occupations; spin in ``cfg`` is
-    ignored (the configuration average is an S-ensemble object).
+    ignored (the configuration average is an S-ensemble object — only the
+    nelectron/spin PARITY of ``cfg`` is used, and it matches the atom).
     Returns ``(mol, mf)``.
     """
-    import dataclasses
-
     from atomterm.system import build_mol
 
-    mol = build_mol(dataclasses.replace(cfg, spin=0))
+    # The caller's cfg is parity-consistent by construction (its ROHF ran
+    # on it); any such spin works here because the fractional occupations
+    # below define the density -- the RHF formalism never sees mol.spin.
+    mol = build_mol(cfg)
+    s_mat = None
+    g_inv = None
+    if open_idx is not None:
+        assert len(open_idx) == n_open, (
+            f"open_idx has {len(open_idx)} AOs but n_open={n_open}")
+        s_mat = mol.intor_symmetric("int1e_ovlp")
+        # AO-subspace projector metric: weight of MO i on the open shell =
+        # (S c)_o^dag  S_oo^{-1}  (S c)_o  -- bounded by 1 for S-orthonormal
+        # MOs (an S-projector), unlike a bare quadratic form c_o^dag S_oo c_o.
+        g_inv = np.linalg.inv(s_mat[np.ix_(open_idx, open_idx)])
 
     def _frac_occ(mo_energy, mo_coeff=None):
         occ = np.zeros(mo_energy.size)
         n_closed = (mol.nelectron - nelec_open) // 2
         occ[:n_closed] = 2.0
-        occ[n_closed : n_closed + n_open] = nelec_open / n_open
+        if open_idx is None:
+            occ[n_closed : n_closed + n_open] = nelec_open / n_open
+        else:
+            # valence weight of each MO: projection onto the open shell's
+            # AO span (rotation-invariant gauge for the fractional block)
+            r = s_mat[open_idx, :] @ np.asarray(mo_coeff)
+            w_v = np.einsum("ai,ab,bi->i", r.conj(), g_inv, r).real
+            pick = np.argsort(w_v[n_closed:])[::-1][:n_open] + n_closed
+            occ[pick] = nelec_open / n_open
         return occ
 
     mf = scf.RHF(mol)

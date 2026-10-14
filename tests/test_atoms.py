@@ -47,6 +47,25 @@ CASES = {
         ms0_tag="casci_ms0",
         ms0={"1S": 1, "1D": 5, "3P": 3},
     ),
+    # ticket 11: first doublet, first transition metal. The primary sector
+    # (2,1) is the ONLY Ms sector (odd active count) and holds the complete
+    # free-ion term table of 3d1 4s2 + 3d2 4s1 + 3d3. Single-root CASSCF is
+    # off: on a TM it collapses to an 2S-like basin with the window escaped
+    # into p -- the full rung-by-rung story lives in test_ladder.py.
+    "Sc": dict(
+        cfg=AtomConfig("Sc", "ccpvdz", spin=1),
+        patterns=["3d", "4s"],
+        nelec_act=3,
+        run_casscf=False,
+        sa_weights=None,
+        nroots_primary=90,
+        ground=("2D", 2, 0.5),
+        primary_tag="casci_ms0p5",
+        primary={"2D": 20, "4F": 14, "2F": 14, "4P": 6, "2G": 18,
+                 "2P": 6, "2S": 1, "2H": 11},
+        ms0_tag=None,
+        ms0=None,
+    ),
 }
 
 
@@ -61,6 +80,7 @@ def atom_results(tmp_path_factory):
             workdir=str(tmp_path_factory.mktemp(f"atom_{name}")),
             sa_weights=case["sa_weights"],
             run_casscf=case["run_casscf"],
+            nroots_primary=case.get("nroots_primary", 9),
         )
         for name, case in CASES.items()
     }

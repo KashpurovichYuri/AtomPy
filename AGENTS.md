@@ -132,6 +132,36 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     window-definition difference, NOT fold anisotropy — max|dE| has up to
     three contributions: core-field anisotropy, window definition,
     bookkeeping (the last must be 0).
+15. **Sc / transition metals** (ticket 11): same machinery, new physics.
+    (a) Basis: ccpvdz (Balabanov–Peterson) ships for Sc; AO labels are
+    clean (3d = exactly 5 AOs, 4s = 1; the fused d shell labels its two
+    contractions 4d/5d, so prefix matching has no traps). (b) S can be
+    HALF-integer: `spin_quantum_number` snaps S to the half-grid;
+    integer rounding relabeled doublets/quartets as singlets/triplets
+    with 1e-8 <S^2> noise deciding which (first doublet = Sc). (c) The
+    average-of-configuration SCF must select its fractional block by
+    CHARACTER (AO projection), not energy order: on Sc the aufbau block
+    runs away to {4s, 4p, ~2d} — a converged but p-containing ensemble,
+    not 3d1 4s2. The projection weight must be the S-projector
+    (Sc)_o† S_oo^{-1} (Sc)_o (a bare quadratic form c_o†S_oo c_o is
+    unbounded for diffuse bases). (d) TM ladder fingerprints: the raw
+    [Ar] core polarizes at the PERCENT level (anisotropy 1.3e-2 rel,
+    [H,Lz] 2.7e-2, 2D quintet split 1.9e-3 in PySCF's raw fold); free
+    CASSCF from every start collapses to an 2S-like basin +52 mEh with a
+    {s,p,d}-mixed window — orthonormal and variational (a real
+    multi-solution, NOT the ticket-09 bug class); the shell-start SA
+    restores <L^2> = 6.002 but NOT [H,Lz] (0.83): the optimizer swaps the
+    window's 4s for a core 3p (window p = 1/6 exactly, core = 4s+5p,
+    anisotropy 0.30) — an m-INCOMPLETE window; the canonical-start SA
+    collapses outright (start dependence). The relax rung (window frozen)
+    is the honest TM rung: sharp 90-state free-ion term table
+    (3d1 4s2 + 3d2 4s1 + 3d3), commutators ~1e-3 from core polarization
+    alone. (e) New max|dE| class ~0.8 Eh: our averaged fold of a strongly
+    polarized SA core vs PySCF's raw one — the Eh-scale version of the
+    1e-5 polarized-core detector. (f) The frac-occ reference (+30 mEh vs
+    avg) softens the field so the 2D terms of 3d3/3d1 4s2/3d2 4s1 are
+    quasi-degenerate at the bottom — their ordering flips across SCF
+    chaos (never pin it in tests).
 
 ## Conventions
 
@@ -144,8 +174,9 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 51 tests in ~30 s (chkfile caching; ROHF computed once per
-session). Test files map 1:1 to src modules; tests are named for the
+`pytest` runs 57 tests in ~2 min (chkfile caching; ROHF computed once per
+session; the Sc ladder is the slowest block, ~100 s cold). Test files map
+1:1 to src modules; tests are named for the
 invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
 (second quantization ≡ first quantization, elementwise),
@@ -154,17 +185,19 @@ PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
 `test_analytic_matches_libcint` (two independent L constructions),
 `test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows),
-`test_ladder.py` (per-rung fingerprints, parameterized C/Si),
-`test_drivers.py` (build_full_mo block properties — the ticket-09 regression
-guard — shell_weights partition, frac-occ ordering), `test_analysis.py`
-(configuration labels), `test_system.py` (validation).
+`test_ladder.py` (per-rung fingerprints, parameterized C/Si; Sc TM block:
+exact closure + free-ion tables, relax honesty, S-basin escape, SA
+L²-without-Lz restoration), `test_half_integer_spin_labels` (doublet
+labeling), `test_drivers.py` (build_full_mo block properties — the
+ticket-09 regression guard — shell_weights partition, frac-occ ordering),
+`test_analysis.py` (configuration labels), `test_system.py` (validation).
 
 ## Planning
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and
 lists the live tickets. Update it when a decision is made; keep tickets
-one-session sized. The live wave (10: test alignment, 11: Sc, 12: Ti,
-13 optional, 14 start-variants, 15 review protocol) is fully specified
+one-session sized. The live wave (12: Ti, 13 optional purify,
+14: start-variants, 15: review protocol) is fully specified
 in `wayfinder/tickets/` — each ticket
 is self-contained (no conversation context needed). Review protocol:
 `/code-review` (two axes, parallel sub-agents) after each ticket wave, then

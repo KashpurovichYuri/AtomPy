@@ -23,6 +23,7 @@ from atomterm.detbasis import commutator, frobenius_norm
 
 __all__ = [
     "quantum_number",
+    "spin_quantum_number",
     "term_symbol",
     "AnalysisResult",
     "analyze",
@@ -35,16 +36,28 @@ _L_LETTERS = "SPDFGHI"
 
 
 def quantum_number(observed: float) -> int:
-    """Quantum number N with N(N+1) closest to ``observed``."""
+    """Quantum number N with N(N+1) closest to ``observed`` (integer grid)."""
     n_real = (np.sqrt(1.0 + 4.0 * observed) - 1.0) / 2.0
     return int(round(n_real))
 
 
+def spin_quantum_number(s2: float) -> float:
+    """Spin S with S(S+1) closest to ``s2``, on the HALF-integer grid.
+
+    Orbital L is always an integer, but S of an odd-electron state is a
+    half-integer (S^2 = 0.75 -> S = 1/2 -> multiplicity 2): rounding S to
+    the integer grid silently relabels doublets/quartets as singlets/
+    triplets (first exposed by Sc, the project's first doublet).
+    """
+    s_real = (np.sqrt(1.0 + 4.0 * s2) - 1.0) / 2.0
+    return round(2.0 * s_real) / 2.0
+
+
 def term_symbol(s2: float, l2: float) -> str:
     """Term symbol ^(2S+1)L from expectation values of S^2 and L^2."""
-    s = quantum_number(s2)
+    s = spin_quantum_number(s2)
     l = quantum_number(l2)
-    return f"{2 * s + 1}{_L_LETTERS[l]}"
+    return f"{int(round(2 * s + 1))}{_L_LETTERS[l]}"
 
 
 @dataclass
@@ -54,7 +67,7 @@ class StateSummary:
     l2: float
     l: int
     s2: float
-    s: int
+    s: float  # half-integer allowed (odd-electron states)
     term: str
 
 
@@ -91,7 +104,7 @@ def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, secto
             l2=float(l2_exp[i]),
             l=quantum_number(l2_exp[i]),
             s2=float(s2_exp[i]),
-            s=quantum_number(s2_exp[i]),
+            s=spin_quantum_number(s2_exp[i]),
             term=term_symbol(s2_exp[i], l2_exp[i]),
         )
         for i in range(len(evals))
@@ -115,11 +128,11 @@ def format_report(res: AnalysisResult, title: str) -> str:
     lines.append(f"sector: {res.sector}   ({res.n_det} determinants)")
     lines.append("")
     lines.append(f"{'#':>2} {'E (Eh)':>16} {'<L^2>':>10} {'L':>2} {'<S^2>':>10} "
-                  f"{'S':>2} {'term':>5}")
+                  f"{'S':>4} {'term':>5}")
     for st in res.states:
         lines.append(
             f"{st.index:2d} {st.energy:16.8f} {st.l2:10.6f} {st.l:2d} "
-            f"{st.s2:10.6f} {st.s:2d} {st.term:>5}"
+            f"{st.s2:10.6f} {st.s:4g} {st.term:>5}"
         )
     lines.append("")
     lines.append(f"Lz eigenvalues (M_L content): "
