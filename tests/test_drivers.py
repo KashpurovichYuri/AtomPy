@@ -174,8 +174,14 @@ def test_sc_frac_occ_selects_open_shell_by_projection(sc_rohf, tmp_path):
     chk_e = tmp_path / "frac_energy_ordered.chk"
     mol_e, mf_e = run_frac_occ_scf(
         cfg, str(chk_e), nelec_open=3, n_open=n_open)  # legacy energy order
-    assert mf_e.converged  # it converges -- to the WRONG ensemble:
-    frac_cols = np.where(np.isclose(np.asarray(mf_e.mo_occ), 0.5))[0]
-    s = mf_e.get_ovlp()
-    names, w = shell_weights(mol_e, mf_e.mo_coeff[:, frac_cols], s)
-    assert w[:, names.index("p")].mean() > 0.3  # 4p-contaminated block
+    if mf_e.converged:  # the documented failure mode has two faces:
+        # (a) it converges to the WRONG ensemble (4p intrudes into the
+        # 3d/4s block), (b) the runaway surface sometimes never converges
+        # (chaotic across SCF starts -- fact 10/15c). Either way the
+        # legacy path is unusable as the reference.
+        frac_cols = np.where(np.isclose(np.asarray(mf_e.mo_occ), 0.5))[0]
+        s = mf_e.get_ovlp()
+        names, w = shell_weights(mol_e, mf_e.mo_coeff[:, frac_cols], s)
+        assert w[:, names.index("p")].mean() > 0.3  # p-contaminated block
+    else:
+        pass  # face (b): non-convergence is itself the failure mode

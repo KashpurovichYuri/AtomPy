@@ -70,6 +70,15 @@ green, reports written.
   collapses to an ²S-like basin (variational, not a bug); shell-start SA
   restores ⟨L²⟩ but not [H,Lz] (window 4s ↔ core 3p swap, m-incomplete);
   relax is the honest TM rung.
+- [Review protocol](tickets/15-review-protocol.md): two-axis /code-review
+  (fixed point f5cfb6f) caught the silently loosened ticket-10 merge bands
+  (restored per-case) and added the missing Sc pins. Architecture survey
+  (sub-agent + HTML report) confirmed three deepening candidates; user
+  approved order 2→1→3, executed as ticket 14's pre-item commit:
+  `stages.stage_facts` (one fold-and-analyze owner), `drivers.
+  constrained_casscf(mo_full=, mask=, weights=)` over public
+  `uniq_var_indices` masks, `ladder.Rung` registry (report iterates it —
+  the drop-a-rung bug class is gone).
 
 ## Not yet specified
 
@@ -89,14 +98,15 @@ Wave order decision (post-Sc): run the review and the constraint axis
 BEFORE Ti -- Ti would only repeat Sc's phenomenology on unsettled
 machinery; tickets 14/15 answer the open machinery questions first.
 
-- [15: review protocol](tickets/15-review-protocol.md) — runs FIRST:
-  /code-review over f5cfb6f..HEAD (tickets 10-11), then the architecture
-  survey; findings fixed before the experiment axis lands on them.
+- [15: review protocol](tickets/15-review-protocol.md) — RESOLVED: step 1
+  (two-axis review, findings fixed at 26cbd25), step 2 (survey, candidates
+  2→1→3 approved and executed as ticket 14's pre-item), step 3 (protocol
+  recorded in AGENTS.md Planning).
 - [14: constrained-optimization & start-variant axis](tickets/14-start-variants.md) —
-  closure-preserving optimizer rungs (same-(l,m) radial constraint),
-  imposed-symmetry SA, CAS(3,11) complete-window reference, AVAS
-  cross-validation, guard negative control; pre-items: rung registry,
-  declarative constraint spec, fold-dedupe.
+  IN PROGRESS: pre-item refactor landed (stage_facts, constrained_casscf +
+  masks, Rung registry, report comparison columns); remaining: radial
+  rungs, CAS(3,11) complete-window reference, AVAS cross-validation,
+  guard negative control, facts + bands.
 - [12: Ti](tickets/12-ti.md) — 3d² ³F; a data-row exercise on the
   settled machinery (projection-selected frac block, TM bands from Sc).
 - [13: purified_core_orbitals](tickets/13-purify-general.md) — optional,

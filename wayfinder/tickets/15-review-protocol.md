@@ -1,6 +1,6 @@
 # Ticket 15: review protocol (/code-review, /improve-codebase-architecture)
 
-Status: open (runs FIRST in the reordered wave: before 14 and Ti)
+Status: RESOLVED (all three steps executed; see Resolution notes below)
 
 ## Question
 
@@ -63,3 +63,21 @@ Skills already installed in `.opencode/skill/`: `code-review`
 
 **Step 3**: record the protocol (fixed point convention, cadence: review
 after each ticket wave) in AGENTS.md so future sessions apply it.
+
+## Resolution notes
+
+- Step 1: fixed point `f5cfb6f`, both axes as parallel sub-agents; findings
+  fixed and pushed (`26cbd25`) — see the Step 1 block above.
+- Step 2: survey run as a sub-agent walk of the hot spots + HTML report
+  (`/tmp/opencode/architecture-review-20261014.html`, may not survive);
+  candidates ranked #2 stage_facts > #1 constrained_casscf > #3 Rung
+  registry, with WindowSpec deferred to the CAS(3,11)/AVAS step and the
+  comparison view judged columns-not-a-module. User approved the 2->1->3
+  order (grilling pass collapsed to a go-ahead on the recommendation).
+  No GLOSSARY.md existed; created lazily with the new-module names.
+- Step 3: AGENTS.md Planning section already carries the protocol
+  (/code-review after each ticket wave, then the survey); confirmed.
+- All three pre-item refactors executed as ticket 14's pre-item commit
+  (stage_facts / constrained_casscf+public masks / Rung registry +
+  report-over-registry with comparison columns); 59 tests green.
+

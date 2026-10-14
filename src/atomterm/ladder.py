@@ -24,6 +24,11 @@ Rungs, in order of increasing orbital freedom:
 8. sa / sa_pyscf -- SA-CASSCF over the given weights, from the raw-shell and
                    the canonical start (restoration + start dependence).
 
+Adding a rung = appending one :class:`Rung` to :func:`_registry` (data, not
+code): the runner executes it through :func:`stage_facts` and the report
+iterates the registry, so a new rung can never silently vanish from the
+report (that once happened to ``sa_pyscf``).
+
 Divergence guard: every rung reports ``ortho_err`` = max|C^dag S C - I|.
 Energies from rungs with ortho_err > 1e-6 are meaningless (the orbital
 optimizer lost orthonormality -- observed on Si from raw-shell starts,
@@ -33,10 +38,10 @@ physics.
 
 max|dE| dictionary (our reconstruction vs PySCF's own energies):
   0.0          -- identical folds (raw/frac rungs), or a spherical core
-                  (SA: the ensemble density is a rotational scalar);
+                   (SA: the ensemble density is a rotational scalar);
   ~1e-5..5e-5  -- the energy footprint of a POLARIZED core that we average
-                  and PySCF uses raw (avg, optimized rungs). A polarization
-                  detector, not an error.
+                   and PySCF uses raw (avg, optimized rungs). A polarization
+                   detector, not an error.
 
 Sector subtlety: in a maximal-Ms sector that is a complete single irrep
 (carbon/Si 3-det Ms=1), [H, L^2] = 0 for ANY H -- only [H, Lz] and the
@@ -48,8 +53,9 @@ from __future__ import annotations
 
 import json
 import math
-from collections import Counter
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 
@@ -65,58 +71,151 @@ from atomterm.drivers import (
     run_rohf,
     run_sa_casscf,
     select_valence_ao,
-    shell_weights,
 )
-from atomterm.operators import build_operators, core_anisotropy
-from atomterm.analysis import analyze, configuration_summary
+from atomterm.stages import StageFacts, stage_facts
 
-__all__ = ["run_carbon_ladder", "run_ladder"]
+__all__ = ["Rung", "run_carbon_ladder", "run_ladder"]
 
 
-def _rung(tag: str, kind: str, cas, mol, mf, c_act: np.ndarray, ncore: int,
-          na: int, nb: int, spherical_core: bool, s: np.ndarray) -> dict:
-    """One analysis pass over a finished stage (shared by all rungs)."""
-    ops = build_operators(mol, mf, c_act, ncore, na, nb,
-                          spherical_core=spherical_core,
-                          c_core=cas.mo_coeff[:, :ncore])
-    res = analyze(ops["H"], ops["Lz"], ops["L2"], ops["S2"], tag)
-    e_mine = np.linalg.eigvalsh(ops["H"]) + cas.core_energy
-    e_pyscf = np.sort(np.atleast_1d(np.asarray(cas.energies)))[: len(e_mine)]
-    w_names, w = shell_weights(mol, c_act, s)
-    ground = res.states[0]
-    mo = cas.mo_coeff
-    ortho_err = float(np.abs(mo.conj().T @ s @ mo - np.eye(mo.shape[1])).max())
-    return {
-        "tag": tag,
-        "kind": kind,
-        "n_det": res.n_det,
-        "diverged": ortho_err > 1e-6,
-        "ortho_err": ortho_err,
-        "e_ground": float(e_mine[0]),
-        "energies_pyscf": np.asarray(cas.energies).tolist(),
-        "max_de_vs_pyscf": float(np.max(np.abs(e_mine[: len(e_pyscf)] - e_pyscf))),
-        "ground_term": ground.term,
-        "ground_l2": ground.l2,
-        "terms": dict(Counter(s_.term for s_ in res.states)),
-        "comm_norm_h_lz": res.comm_norm_h_lz,
-        "comm_norm_h_l2": res.comm_norm_h_l2,
-        "window": {n: round(float(v), 6) for n, v in zip(w_names, w.mean(axis=0))},
-        "configurations": configuration_summary(
-            mol, s, cas.ci[: len(e_mine)], c_act, na, nb),
-    }
+@dataclass(frozen=True)
+class Rung:
+    """One ladder rung: a stage to run plus how to fold-and-report it.
+
+    tag : rung name (report row, chkfile suffix, payload key).
+    kind : reporting kind ("casci" / "casscf") -- CASCI rungs also report
+        ``core_anisotropy`` of their reference core.
+    run : executes the stage, returns a CASResult (chkfile-cached).
+    window : active columns to fold on -- raw shell AOs for CASCI rungs,
+        the converged ``mo_coeff`` window for optimized rungs.
+    fold_mf : reference mf object used in the fold (the fractional rung
+        folds on its own mf_f; integrals are geometry-defined anyway).
+    spherical_core : fold with the averaged core (True) or raw (False).
+    anisotropy_ref : ``(mf_ref, c_core_or_None)`` for CASCI reference rungs;
+        ``None`` skips the anisotropy column.
+    """
+
+    tag: str
+    kind: str
+    run: Callable[[], object]
+    window: Callable[[object], np.ndarray]
+    fold_mf: Callable[[], object]
+    spherical_core: bool = True
+    anisotropy_ref: Callable[[], tuple] | None = None
+
+
+def _rung_payload(rung: Rung, cas, mol, ncore: int, na: int, nb: int) -> dict:
+    """Execute one rung's analysis pass: run -> fold -> facts -> payload."""
+    facts: StageFacts = stage_facts(
+        mol, rung.fold_mf(), cas, rung.window(cas), ncore, na, nb,
+        tag=rung.tag, spherical_core=rung.spherical_core,
+        anisotropy_ref=(rung.anisotropy_ref() if rung.anisotropy_ref else None),
+    )
+    return facts.payload(rung.kind)
+
+
+def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
+              act_idx: list[int], ndet: int, sa_weights, chk) -> list[Rung]:
+    """The ladder as data. ``chk`` maps a rung tag to its chkfile."""
+    n_open = len(act_idx)
+    c_shell = lambda cas: np.eye(mf.mo_coeff.shape[0])[:, act_idx]  # noqa: E731
+    c_win = lambda cas: cas.mo_coeff[:, ncore : ncore + ncas]  # noqa: E731
+    mo_of = lambda mf_ref, c_core=None: build_full_mo(  # noqa: E731
+        mf_ref, list(range(ncore)), act_idx, c_core=c_core)
+    nroots = min(9, ndet)
+
+    rungs = [
+        Rung(
+            "casci_raw", "casci",
+            lambda: run_casci(mf, ncas, nelecas, mo_of(mf), chk("casci_raw"),
+                              nroots=nroots, name="casci_raw"),
+            c_shell, lambda: mf, spherical_core=False,
+            anisotropy_ref=lambda: (mf, None),
+        ),
+        Rung(
+            "casci_avg", "casci",
+            lambda: run_casci(mf, ncas, nelecas, mo_of(mf), chk("casci_avg"),
+                              nroots=nroots, name="casci_avg"),
+            c_shell, lambda: mf,
+            anisotropy_ref=lambda: (mf, None),
+        ),
+    ]
+    if mf_f is not None:
+        c_frac = lambda: mf_f.mo_coeff[:, :ncore]  # noqa: E731
+        rungs.append(
+            Rung(
+                "casci_frac", "casci",
+                lambda: run_casci(mf_f, ncas, nelecas, mo_of(mf_f, c_frac()),
+                                  chk("casci_frac"), nroots=nroots,
+                                  name="casci_frac"),
+                c_shell, lambda: mf_f,
+                anisotropy_ref=lambda: (mf_f, c_frac()),
+            )
+        )
+
+    mo_shell = mo_of(mf)
+    rungs += [
+        Rung(
+            "casscf_relax", "casscf",
+            lambda: run_casscf_core_relax(
+                mf, ncas, nelecas, mo_shell, chk("casscf_relax")),
+            c_win, lambda: mf,
+        ),
+        Rung(
+            "casscf_virtmix", "casscf",
+            lambda: run_casscf_virtual_mix(
+                mf, ncas, nelecas, mo_shell, chk("casscf_virtmix")),
+            c_win, lambda: mf,
+        ),
+        Rung(
+            "casscf_shell", "casscf",
+            lambda: run_casscf(
+                mf, ncas, nelecas, mo_shell, chk("casscf_shell")),
+            c_win, lambda: mf,
+        ),
+        Rung(
+            "casscf_pyscf", "casscf",
+            lambda: run_casscf_pyscf_start(
+                mf, ncas, nelecas, chk("casscf_pyscf")),
+            c_win, lambda: mf,
+        ),
+    ]
+    if sa_weights:
+        rungs += [
+            Rung(
+                "sa", "casscf",
+                lambda: run_sa_casscf(
+                    mf, ncas, nelecas, mo_shell, list(sa_weights), chk("sa")),
+                c_win, lambda: mf,
+            ),
+            # canonical-start variant: isolates the optimizer's start
+            # dependence (Si's raw-shell start diverges; the canonical
+            # one converges)
+            Rung(
+                "sa_pyscf", "casscf",
+                lambda: run_sa_casscf(
+                    mf, ncas, nelecas, mf.mo_coeff, list(sa_weights),
+                    chk("sa_pyscf")),
+                c_win, lambda: mf,
+            ),
+        ]
+    return rungs
 
 
 def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
                workdir: str = "results", sa_weights: list[float] | None = None,
-               frac_nelec_open: int | None = None, frac_n_open: int | None = None) -> dict:
-    """Run all ladder rungs for one atom's primary Ms sector, print and
-    persist the all-vs-all comparison. Returns ``{rung_tag: payload}``."""
+               frac_nelec_open: int | None = None, frac_n_open: int | None = None,
+               rung_tags: list[str] | None = None) -> dict:
+    """Run ladder rungs for one atom's primary Ms sector, print and persist
+    the all-vs-all comparison. Returns ``{rung_tag: payload}``.
+
+    rung_tags : optional subset of rung tags to run (e.g. window studies
+        that only need the CASCI + free-CASSCF rungs); ``None`` = all.
+    """
     out = Path(workdir)
     out.mkdir(parents=True, exist_ok=True)
     label = cfg.label
 
     mol, mf = run_rohf(cfg, str(out / f"{label}_rohf.chk"))
-    s = mf.get_ovlp()
     act_idx = select_valence_ao(mol, shell_patterns)
     mol_f = mf_f = None
     if frac_nelec_open is not None:
@@ -130,52 +229,23 @@ def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
     spin = cfg.spin
     na, nb = (nelec_act + spin) // 2, (nelec_act - spin) // 2
     ncore = (mol.nelectron - nelec_act) // 2
-    c_shell = np.eye(mol.nao_nr())[:, act_idx]
     chk = lambda name: str(out / f"{label}_{name}.chk")  # noqa: E731
+    ndet = math.comb(ncas, na) * math.comb(ncas, nb)
+
+    registry = _registry(mf, mf_f, ncore, ncas, (na, nb), act_idx, ndet,
+                         sa_weights, chk)
+    if rung_tags is not None:
+        wanted = set(rung_tags)
+        unknown = wanted - {r.tag for r in registry}
+        if unknown:
+            raise ValueError(
+                f"unknown rung tags {sorted(unknown)}; available: "
+                f"{[r.tag for r in registry]}")
+        registry = [r for r in registry if r.tag in wanted]
 
     rungs: dict[str, dict] = {}
-    ndet = (math.comb(ncas, na) * math.comb(ncas, nb))
-
-    # -- CASCI rungs: identical window, core treatments ----------------------
-    casci_specs = [
-        ("casci_raw", mf, None, False),
-        ("casci_avg", mf, None, True),
-    ]
-    if mf_f is not None:
-        casci_specs.append(("casci_frac", mf_f, mf_f.mo_coeff[:, :ncore], False))
-    for tag, mf_ref, c_core, sph in casci_specs:
-        mo = build_full_mo(mf_ref, list(range(ncore)), act_idx, c_core=c_core)
-        cas = run_casci(mf_ref, ncas, (na, nb), mo, chk(tag),
-                        nroots=min(9, ndet), name=tag)
-        rungs[tag] = _rung(tag, "casci", cas, mol, mf_ref, c_shell, ncore,
-                           na, nb, spherical_core=sph, s=s)
-        rungs[tag]["core_anisotropy"] = round(core_anisotropy(
-            mol, mf_ref, ncore, c_core=c_core), 12)
-
-    # -- CASSCF rungs ---------------------------------------------------------
-    mo_shell = build_full_mo(mf, list(range(ncore)), act_idx)
-    casscf_specs = [
-        ("casscf_relax", lambda: run_casscf_core_relax(
-            mf, ncas, (na, nb), mo_shell, chk("casscf_relax"))),
-        ("casscf_virtmix", lambda: run_casscf_virtual_mix(
-            mf, ncas, (na, nb), mo_shell, chk("casscf_virtmix"))),
-        ("casscf_shell", lambda: run_casscf(
-            mf, ncas, (na, nb), mo_shell, chk("casscf_shell"))),
-        ("casscf_pyscf", lambda: run_casscf_pyscf_start(
-            mf, ncas, (na, nb), chk("casscf_pyscf"))),
-    ]
-    if sa_weights:
-        casscf_specs.append(("sa", lambda: run_sa_casscf(
-            mf, ncas, (na, nb), mo_shell, list(sa_weights), chk("sa"))))
-        # canonical-start variant: isolates the optimizer's start dependence
-        # (Si's raw-shell start diverges; the canonical one converges)
-        casscf_specs.append(("sa_pyscf", lambda: run_sa_casscf(
-            mf, ncas, (na, nb), mf.mo_coeff, list(sa_weights), chk("sa_pyscf"))))
-    for tag, run in casscf_specs:
-        cas = run()
-        c_act = cas.mo_coeff[:, ncore : ncore + ncas]
-        rungs[tag] = _rung(tag, "casscf", cas, mol, mf, c_act, ncore,
-                           na, nb, spherical_core=True, s=s)
+    for rung in registry:
+        rungs[rung.tag] = _rung_payload(rung, rung.run(), mol, ncore, na, nb)
 
     _report(rungs, out, label, mf)
     return rungs
@@ -188,25 +258,27 @@ def run_carbon_ladder(cfg: AtomConfig | None = None, workdir: str = "results") -
 
 
 def _report(rungs: dict, out: Path, label: str, mf) -> None:
-    """Print and persist the all-vs-all comparison matrix."""
-    order = ["casci_raw", "casci_avg", "casci_frac", "casscf_relax",
-             "casscf_virtmix", "casscf_shell", "casscf_pyscf", "sa",
-             "sa_pyscf"]
-    tags = [t for t in order if t in rungs]
-    rungs = {t: rungs[t] for t in tags}
+    """Print and persist the per-rung comparison table + all-vs-all matrix."""
+    # the report follows the registry (= insertion) order, so it can never
+    # drop a rung that ran
+    tags = list(rungs)
     ref = rungs.get("casci_avg")
 
     lines = [f"# Orbital-treatment ladder: {label}", "",
              f"ROHF reference energy: {mf.e_tot:.8f} Eh", "",
              f"{'rung':<14} {'E_ground':>16} {'dE_vs_avg':>10} {'<L^2>':>9} "
-             f"{'|[H,Lz]|':>10} {'|[H,L2]|':>10} {'max|dE|':>9} {'ortho':>9}  ground config"]
+             f"{'|[H,Lz]|':>10} {'|[H,L2]|':>10} {'win_l':>6} {'aniso':>9} "
+             f"{'max|dE|':>9} {'ortho':>9}  ground config"]
     for tag in tags:
         r = rungs[tag]
         d_e = r["e_ground"] - ref["e_ground"] if ref else 0.0
+        purity = max(r["window"].values())
+        aniso = r.get("core_anisotropy")
         flag = " DIVERGED" if r["diverged"] else ""
         lines.append(
             f"{tag:<14} {r['e_ground']:>16.8f} {d_e:>10.3e} {r['ground_l2']:>9.5f} "
             f"{r['comm_norm_h_lz']:>10.2e} {r['comm_norm_h_l2']:>10.2e} "
+            f"{purity:>6.3f} {aniso if aniso is not None else float('nan'):>9.1e} "
             f"{r['max_de_vs_pyscf']:>9.1e} {r['ortho_err']:>9.1e}  "
             f"{r['configurations'][0]}{flag}"
         )

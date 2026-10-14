@@ -21,10 +21,9 @@ from atomterm.drivers import (
     run_rohf,
     run_sa_casscf,
     select_valence_ao,
-    shell_weights,
 )
-from atomterm.operators import build_operators
-from atomterm.analysis import analyze, format_report, save_report
+from atomterm.stages import stage_facts
+from atomterm.analysis import format_report
 
 __all__ = ["run_atom", "run_carbon", "main"]
 
@@ -113,36 +112,32 @@ def run_atom(
 
     def stage_analysis(tag: str, cas, c_act, na: int, nb: int):
         ncore = _ncore(cfg, (na, nb))
-        # fold with the stage's OWN core: orbital optimization may legally
+        # fold with the stage's OWN core (inside stage_facts: it uses
+        # cas.mo_coeff[:, :ncore]): orbital optimization may legally
         # reorganize the inactive span, and a different fold than the one
         # PySCF's energies used breaks E_tot = E_core + e_cas. For CASCI
         # stages the passed core IS the mf core (built by build_full_mo).
-        c_core = cas.mo_coeff[:, :ncore]
-        ops = build_operators(mol, mf, c_act, ncore, na, nb, c_core=c_core)
         sector = f"Ms={'+' if na - nb > 0 else ''}{na - nb} (na={na}, nb={nb})"
-        res = analyze(ops["H"], ops["Lz"], ops["L2"], ops["S2"], sector)
-        e_mine = np.linalg.eigvalsh(ops["H"]) + cas.core_energy
-        e_pyscf = np.sort(np.atleast_1d(np.asarray(cas.energies)))[: len(e_mine)]
-        dev = float(np.max(np.abs(e_mine[: len(e_pyscf)] - e_pyscf)))
-        title = f"[{tag}]  total energies vs PySCF: max|dE| = {dev:.2e} Eh"
-        text = format_report(res, title)
-        w_names, w = shell_weights(mol, c_act, mf.get_ovlp())
-        off_shell = 1.0 - w.max(axis=1)
+        facts = stage_facts(mol, mf, cas, c_act, ncore, na, nb, tag=sector)
+        title = (f"[{tag}]  total energies vs PySCF: "
+                 f"max|dE| = {facts.max_de_vs_pyscf:.2e} Eh")
+        text = format_report(facts.analysis, title)
+        off_shell = 1.0 - facts.window_rows.max(axis=1)
         text += (f"\nwindow composition (l-weights): "
                  + ", ".join(f"{n}: {v:.3f}" for n, v in
-                             zip(w_names, w.mean(axis=0)) if v > 1e-4)
+                             facts.window.items() if v > 1e-4)
                  + f"   (mean off-dominant-l weight {off_shell.mean():.2e};"
                    " l-purity is necessary, not sufficient, for closure)")
         print(text)
         reports.append(text)
         results[tag] = {
-            "analysis": res,
-            "energies_pyscf": np.asarray(cas.energies).tolist(),
-            "window_weights": dict(zip(w_names, w.mean(axis=0).round(6))),
-            "max_de_vs_pyscf": dev,
+            "analysis": facts.analysis,
+            "energies_pyscf": np.asarray(facts.energies_pyscf).tolist(),
+            "window_weights": facts.window,
+            "max_de_vs_pyscf": facts.max_de_vs_pyscf,
             # particle-number sanity of the built determinant space: N is
             # diagonal by construction and must equal na + nb everywhere
-            "n_dev": float(np.max(np.abs(np.real(np.diag(ops["N"])) - (na + nb)))),
+            "n_dev": facts.n_dev,
         }
 
     # ---- stage 2: CASCI in every Ms sector (checkpointed) ------------------
