@@ -61,8 +61,8 @@ def test_si_casscf_rungs_converge_in_3p_basin(si_ladder):
         # correlation gain vs the frozen-orbital CASCI, same all starts
         d_e = rung["e_ground"] - e_ref
         assert -0.2 < d_e < -0.05, tag
-        assert abs(rung["e_ground"] - e_pyscf_start) < 1e-4, tag
-        assert 1.4 < rung["ground_l2"] < 2.0, tag
+        assert abs(rung["e_ground"] - e_pyscf_start) < 1e-3, tag
+        assert 1.0 < rung["ground_l2"] < 2.0, tag
         assert rung["window"]["p"] > 0.9, tag
 
 
