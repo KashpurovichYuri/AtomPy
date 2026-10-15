@@ -265,6 +265,98 @@ def test_casscf_input_window_orthogonalization_defect(sc_rohf):
             assert 1e-4 < res.comm_norm_h_lz < 3e-2, name
 
 
+# --------------------------------------------------------------------------
+# The purified core (ticket 13 / fact 20): the exactly L-closed core span.
+# --------------------------------------------------------------------------
+
+
+def _pur_cases(build_full_mo_refs, sc_rohf):
+    """(symbol, mol, mf, patterns, ncore_add) rows for C / Si / Sc."""
+    out = []
+    for cfg, mol, mf, patterns in build_full_mo_refs:
+        out.append((cfg.symbol, mol, mf, patterns, 2))
+    cfg, mol, mf, act_idx = sc_rohf
+    out.append((cfg.symbol, mol, mf, ["3d", "4s"], 3))
+    return out
+
+
+def test_purified_core_orbitals_exact_closed_span(build_full_mo_refs, sc_rohf):
+    """Fact 20: the purified core span is EXACTLY rotation-closed on every
+    atom class (s core C, p core Si, p+d core Sc) -- the fix for the
+    fact-17 input-window baseline. Pinned: S-orthonormality, one-l purity
+    per column, the one-particle closure certificate (lz AND lperp, no
+    blind spots), the m-scalar density (shared radial: equal member
+    blocks, zero cross-member coherences, zero anisotropy) and the tiny
+    contamination / averaged-density-change scales."""
+    from atomterm.drivers import purified_core_orbitals
+    from atomterm.operators import core_anisotropy, window_closure
+
+    # measured 2026-10-15 (cold chkfiles): max contamination
+    # C 6.3e-6, Si 9.8e-6, Sc 5.4e-5; spherically averaged density change
+    # C 4.2e-6, Si 3.6e-6, Sc 1.05e-4 (tail^2 of the core polarization)
+    dens_band = {"C": 5e-5, "Si": 5e-5, "Sc": 5e-4}
+    for sym, mol, mf, patterns, nelec in _pur_cases(build_full_mo_refs, sc_rohf):
+        s = mf.get_ovlp()
+        ncore = (mol.nelectron - nelec) // 2
+        c_pur, contam = purified_core_orbitals(mol, mf, ncore)
+
+        assert np.abs(c_pur.conj().T @ s @ c_pur - np.eye(ncore)).max() < 1e-12, sym
+        names, w = shell_weights(mol, c_pur, s)
+        assert (w.max(axis=1) > 1 - 1e-12).all(), sym        # one l per column
+        clo = window_closure(mol, c_pur)
+        assert clo["lz"] < 1e-12 and clo["lperp"] < 1e-12, (sym, clo)
+        assert contam.max() < 3e-4, (sym, contam)
+
+        # m-scalar density: shared radial made visible -- the member
+        # diagonal blocks of one l are IDENTICAL, cross-member coherences
+        # vanish, so the core needs no spherical averaging at all
+        sec = lm_sectors(mol)
+        d = c_pur @ c_pur.conj().T
+        for l in range(4):
+            members = sorted(m for (ll, m) in sec if ll == l)
+            if len(members) < 2:
+                continue
+            base = d[np.ix_(sec[(l, members[0])], sec[(l, members[0])])]
+            for m in members:
+                blk = d[np.ix_(sec[(l, m)], sec[(l, m)])]
+                assert np.abs(blk - base).max() < 1e-12, (sym, l)
+            for i, mi in enumerate(members):
+                for mj in members[i + 1:]:
+                    cross = d[np.ix_(sec[(l, mi)], sec[(l, mj)])]
+                    assert np.abs(cross).max() < 1e-12, (sym, l, mi, mj)
+        assert core_anisotropy(mol, mf, ncore, c_core=c_pur) < 1e-12, sym
+
+        # the reference moved only at the tail^2 level of the fold's own
+        # scalar core (spherically averaged densities compared)
+        from atomterm.operators import _spherical_average_density
+        d_can = _spherical_average_density(
+            mol, 2.0 * mf.mo_coeff[:, :ncore] @ mf.mo_coeff[:, :ncore].conj().T)
+        d_new = _spherical_average_density(mol, 2.0 * d)
+        rel = (np.linalg.norm(d_new - d_can) / np.linalg.norm(d_can))
+        assert rel < dens_band[sym], (sym, rel)
+
+
+def test_purified_substrate_closes_the_input_windows(build_full_mo_refs, sc_rohf):
+    """Gate (b), the headline: windows orthogonalized against the purified
+    core span are exactly rotation-closed (canonical core: Si 3.4e-3,
+    Sc 5.7e-3 / 2.1e-2 -- the fact-17 baseline every CASSCF rung starts
+    from; purified: machine precision, because the projector onto
+    E (x) members commutes with L for ANY radial subspace E)."""
+    from atomterm.drivers import purified_core_orbitals
+    from atomterm.operators import window_closure
+
+    for sym, mol, mf, patterns, nelec in _pur_cases(build_full_mo_refs, sc_rohf):
+        ncore = (mol.nelectron - nelec) // 2
+        act_idx = select_valence_ao(mol, patterns)
+        ncas = len(act_idx)
+        c_pur, _ = purified_core_orbitals(mol, mf, ncore)
+        core_idx = list(range(ncore))
+        for mo in (build_full_mo(mf, core_idx, act_idx, c_core=c_pur),
+                   radial_basis(mf, core_idx, act_idx, c_core=c_pur)[0]):
+            clo = window_closure(mol, mo[:, ncore:ncore + ncas])
+            assert clo["lz"] < 1e-12 and clo["lperp"] < 1e-12, (sym, clo)
+
+
 def test_avas_cross_validates_the_shell_window(sc_rohf, carbon):
     """AVAS (an independent ecosystem window selector) picks exactly our
     shell window's size and electron count, with a span overlapping the raw

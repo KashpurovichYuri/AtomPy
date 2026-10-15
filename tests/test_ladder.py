@@ -62,6 +62,11 @@ LADDER_CASES = {
             sa_radial_l2=1.99999,
             radial_free_tol=1e-5,       # radial == free minimum (measured 2e-8)
             sa_radial_dE=1e-4,          # vs the free SA (measured 2.7e-5)
+            # purified-substrate rungs (fact 20): everything closes at
+            # machine precision -- free SA included (measured 0.0)
+            pur_comm=1e-10,
+            pur_sa_comm=1e-8,
+            pur_core_dE=2e-5,           # gate (d): measured 3.0e-6
         ),
     ),
     "Si": dict(
@@ -93,6 +98,12 @@ LADDER_CASES = {
             radial_free_tol=1e-3,       # radial == free (measured 3e-7; the
                                         # free rung's own basin wobbles)
             sa_radial_dE=5e-4,          # vs the free SA (measured 3.4e-5)
+            # purified-substrate rungs (fact 20): machine precision here
+            # too -- the free SA heals BELOW its canonical 4e-6 (fact 19b)
+            # all the way to the certificate (measured 3.3e-16)
+            pur_comm=1e-10,
+            pur_sa_comm=1e-8,
+            pur_core_dE=5e-4,           # gate (d): measured 1.28e-4
         ),
     ),
 }
@@ -106,7 +117,7 @@ def ladders(tmp_path_factory):
         out[name] = run_ladder(
             case["cfg"], case["patterns"], case["nelec_act"],
             workdir=str(workdir), sa_weights=[1 / 3] * 3,
-            frac_nelec_open=2, frac_n_open=3)
+            frac_nelec_open=2, frac_n_open=3, purified=True)
     return out
 
 
@@ -234,6 +245,53 @@ def test_radial_rung_full_gain_without_l_leakage(name, ladders):
     assert abs(sar["e_ground"] - r["sa"]["e_ground"]) < b["sa_radial_dE"], name
 
 
+@pytest.mark.parametrize("name", list(LADDER_CASES))
+def test_purified_rungs_exact_closure(name, ladders):
+    """Fact 20 (C/Si): on the purified core substrate EVERY optimized rung
+    that keeps the window closed does so at machine precision -- the
+    fact-17 input baseline (Si 3.4e-3) is gone. The FREE SA closes too:
+    on p2 atoms the radial direction has a restoring force (fact 18a), so
+    SA's stationary point is the symmetric window. casci_avg_pur
+    additionally shows max|dE| = 0 (the purified core needs no averaging:
+    PySCF's own fold and ours coincide) and gate (d): the purification
+    shifts the reference by the discarded core polarization only."""
+    case, r = LADDER_CASES[name], ladders[name]
+    b = case["bands"]
+    ci = r["casci_avg_pur"]
+    assert ci["comm_norm_h_lz"] < b["pur_comm"], name
+    assert ci["max_de_vs_pyscf"] < 1e-8, name          # measured 0.0
+    assert ci["core_anisotropy"] < 1e-12, name          # m-scalar by build
+    assert ci["terms"] == {"3P": 3}, name
+    assert ci["ground_l2"] == pytest.approx(2.0, abs=1e-9), name
+    for tag, comm_b in [("casscf_relax_pur", b["pur_comm"]),
+                        ("sa_relax_pur", b["pur_comm"]),
+                        ("sa_pur", b["pur_sa_comm"]),
+                        ("sa_radial_pur", b["pur_sa_comm"])]:
+        rung = r[tag]
+        assert rung["comm_norm_h_lz"] < comm_b, (name, tag)
+        assert rung["ground_term"] == "3P", (name, tag)
+        assert rung["ground_l2"] == pytest.approx(2.0, abs=1e-6), (name, tag)
+        assert rung["ortho_err"] < 1e-10 and not rung["diverged"], (name, tag)
+        assert rung["window"]["p"] > 0.999, (name, tag)
+    # the SA family reaches the full correlation gain (fact 18a optimum)
+    lo, hi = b["corr_gain"]
+    for tag in ("sa_pur", "sa_radial_pur"):
+        assert lo < r[tag]["e_ground"] - r["casci_avg"]["e_ground"] < hi, \
+            (name, tag)
+    # single-root radial pur twin: same flat member gauge as the canonical
+    # rung (fact 16a) -- purity and gain are structural, commutators not
+    rad = r["casscf_radial_pur"]
+    assert rad["ground_term"] == "3P", (name, rad["ground_term"])
+    assert rad["window"]["p"] > 0.999, name
+    assert rad["ortho_err"] < 1e-10 and not rad["diverged"], name
+    assert lo < rad["e_ground"] - r["casci_avg"]["e_ground"] < hi, name
+    # gate (d): same window, canonical vs purified core -- the reference
+    # moved by the core polarization energy only (not a model change)
+    d_e = r["casci_avg_pur"]["energies_pyscf"][0] \
+        - r["casci_avg"]["energies_pyscf"][0]
+    assert 0.0 < d_e < b["pur_core_dE"], (name, d_e)
+
+
 def test_divergence_guard_fires_on_broken_orthonormality(carbon, tmp_path):
     """Negative control for the ortho_err guard (ticket 14): a deliberately
     non-S-orthonormal MO matrix (pre-fix-style) must be flagged DIVERGED --
@@ -262,7 +320,8 @@ def sc_ladder(tmp_path_factory):
     return run_ladder(
         AtomConfig("Sc", "ccpvdz", spin=1), ["3d", "4s"], 3,
         workdir=str(tmp_path_factory.mktemp("ladder_Sc")),
-        sa_weights=[1 / 5] * 5, frac_nelec_open=3, frac_n_open=6)
+        sa_weights=[1 / 5] * 5, frac_nelec_open=3, frac_n_open=6,
+        purified=True)
 
 
 def test_sc_casci_exact_closure_and_term_table(sc_ladder):
@@ -316,6 +375,72 @@ def test_sc_relax_keeps_window_exact(sc_ladder):
     assert w.get("s", 0.0) + w.get("d", 0.0) > 0.999
     assert 1e-4 < relax["comm_norm_h_lz"] < 1e-2
     assert relax["max_de_vs_pyscf"] < 5e-3
+
+
+def test_sc_purified_rungs_unbroken_lz_and_l2(sc_ladder):
+    """Fact 20, the ticket-13 deliverable: Sc CASSCF and SA-CASSCF with
+    UNBROKEN Lz and L^2. On the purified substrate the input-window
+    baseline (5.7e-3 / 2.1e-2, fact 17) vanishes, so:
+
+    - relax_pur / sa_relax_pur (window frozen): commutators at MACHINE
+      precision (measured 1.3e-13 / 6.7e-14, 3.6e-13) with the full
+      90-state free-ion term table and max|dE| ~ 0 -- the rung pair that
+      answers "SA-CASSCF with exact rotational symmetry on a TM";
+    - sa_radial_pur: the flat member gauge of fact 18d has NO restoring
+      force (m-symmetric radial rotation gains nothing), so the optimizer
+      stops at a ~1e-6 window tilt (measured comm 5.7e-7 / 1.8e-5,
+      convergence-tolerance-independent -- an optimizer floor, not a
+      baseline);
+    - sa_pur (free): the 4s<->3p swap ATTRACTOR persists on the purified
+      substrate -- it is an optimizer basin, not a core-span artifact
+      (bimodal across SCF chaos: branch on the window p-weight, as
+      always)."""
+    r = sc_ladder
+    ci = r["casci_avg_pur"]
+    assert ci["comm_norm_h_lz"] < 1e-10 and ci["comm_norm_h_l2"] < 1e-10
+    assert ci["terms"] == SC_EXACT_TERMS
+    assert ci["max_de_vs_pyscf"] < 1e-8          # measured 0.0
+    assert ci["core_anisotropy"] < 1e-12         # m-scalar by construction
+    # gate (d) on Sc: +0.67 mEh = the [Ar] percent-polarization energy
+    d_e = ci["energies_pyscf"][0] - r["casci_avg"]["energies_pyscf"][0]
+    assert 0.0 < d_e < 2e-3, d_e
+
+    for tag, comm_b in [("casscf_relax_pur", 1e-10),
+                        ("sa_relax_pur", 1e-10)]:
+        rung = r[tag]
+        assert rung["comm_norm_h_lz"] < comm_b, tag
+        assert rung["comm_norm_h_l2"] < comm_b, tag
+        assert rung["ground_l2"] == pytest.approx(6.0, abs=1e-6), tag
+        assert rung["terms"] == SC_EXACT_TERMS, tag
+        assert rung["ground_term"] == "2D", tag
+        assert rung["ortho_err"] < 1e-10 and not rung["diverged"], tag
+        w = rung["window"]
+        assert abs(w.get("s", 0.0) - 1 / 6) < 1e-6, tag
+        assert abs(w.get("d", 0.0) - 5 / 6) < 1e-6, tag
+    # relaxation moves the energy by the core-polarization scale, but its
+    # SIGN in our bookkeeping is not physics: the optimizer buys
+    # polarization energy in PySCF's RAW fold (measured relax +0.47 mEh,
+    # sa_relax -0.09 mEh vs the CASCI in our averaged fold) -- the
+    # max|dE| ~ 1e-3 column is precisely that detector. Bound, don't pin.
+    for tag in ("casscf_relax_pur", "sa_relax_pur"):
+        assert abs(r[tag]["e_ground"] - ci["e_ground"]) < 5e-3, tag
+    assert r["sa_relax_pur"]["max_de_vs_pyscf"] < 1e-5  # measured 4.8e-8
+
+    sar = r["sa_radial_pur"]
+    assert sar["comm_norm_h_lz"] < 1e-4, sar["comm_norm_h_lz"]  # meas 5.7e-7
+    assert sar["comm_norm_h_l2"] < 1e-3, sar["comm_norm_h_l2"]  # meas 1.8e-5
+    assert sar["ground_l2"] == pytest.approx(6.0, abs=1e-4), sar
+    assert sar["terms"] == SC_EXACT_TERMS, sar
+    assert sar["ortho_err"] < 1e-10 and not sar["diverged"], sar
+
+    sa = r["sa_pur"]
+    assert sa["ortho_err"] < 1e-10
+    assert 5.99 < sa["ground_l2"] < 6.02
+    if sa["window"].get("p", 0.0) > 0.05:  # the swap basin (measured p=1/6)
+        assert sa["comm_norm_h_lz"] > 0.1, sa
+        assert abs(sa["window"].get("p", 0.0) - 1 / 6) < 1e-2, sa["window"]
+    else:  # the healthy basin
+        assert sa["comm_norm_h_lz"] < 1e-3, sa
 
 
 def test_sc_free_casscf_escapes_the_shell(sc_ladder):

@@ -25,6 +25,7 @@ __all__ = [
     "select_valence_ao",
     "shell_weights",
     "purified_s_core",
+    "purified_core_orbitals",
     "complete_orthonormal",
     "build_full_mo",
     "lm_sectors",
@@ -312,6 +313,108 @@ def purified_s_core(mol, mf, n_core: int):
     return c, contamination
 
 
+def purified_core_orbitals(mol, mf, n_core: int):
+    """Canonical core MOs replaced by an exactly rotation-closed core span.
+
+    Generalizes :func:`purified_s_core` to p/d cores (Si [Ne]+3s, Sc [Ar]).
+    The canonical core MOs of an open-shell atom carry (i) foreign-l tails
+    and (ii) m-ASYMMETRIC same-l content (each MO of a closed shell is
+    polarized differently by the open shell); both break the L-closure of
+    the core SPAN, and every window orthogonalized against that span
+    inherits the defect (the fact-17 input-window baseline, ~1e-3 Si /
+    ~1e-2 Sc). This construction removes both at once.
+
+    Mechanism. For one angular momentum l the AO rows decompose into m
+    MEMBER sectors of identical radial chains (S = I_m x S_rad exactly,
+    :func:`lm_sectors`). L acts ONLY on the member index, so a subspace
+    E (x) members is L-invariant for ANY radial subspace E: shared radial
+    vectors are what closure requires, and they come free -- no full AO
+    shell subspaces, no m-averaging gauge choices beyond E itself. For a
+    closed-shell core the occupied m-set of each shell shares ONE radial,
+    so the whole core is k_l copies of (radial x members) per l, with
+    k_l = number of core MOs of dominant l. Construction per l:
+
+    1. member-resolved radial blocks ``R = [r_{i,m}]`` (each column =
+       MO i's coefficients on member m's radial chain; the arbitrary
+       member rotation of the canonical MOs only mixes R's columns, and
+       each ideal shared-radial shell contributes one direction of
+       multiplicity 2l+1);
+    2. E_l = the span of the top-k_l eigenvectors of the column Gram
+       ``R^T S_rad R`` (S-orthonormalized) -- the occupied radial space;
+       its eigenvalues count S-weight x member multiplicity (~2l+1 per
+       occupied radial), so the beyond-k spectrum is the tail content --
+       asserted tail-level, a measured invariant;
+    3. purified columns: every radial of E_l replicated on ALL member
+       sectors of l (k_l x (2l+1) columns -- m-complete by construction,
+       the shared-radial structure).
+
+    One global Loewdin in the S metric then orthonormalizes the set
+    (S = 0 between different l keeps every column l-pure; mixing within
+    l is span-preserving). The resulting core DENSITY is the spherical
+    average of the canonical one restricted to its dominant radials --
+    the orbital realization of the scalar reference the analysis fold
+    already uses, so the purified reference is physically the SAME
+    scalar core, not a new one. For l = 0 the construction reduces
+    exactly to :func:`purified_s_core` (truncation to the s chain).
+
+    Returns ``(C, contamination)``: (nao, n_core) S-orthonormal columns
+    and per-MO ``1 - own-l weight`` (the foreign-l SCF tail diagnostic).
+    """
+    s = mf.get_ovlp()
+    c_can = np.asarray(mf.mo_coeff[:, :n_core])
+    sectors = lm_sectors(mol)
+
+    # dominant l per core MO (lumped-l weights partition unity exactly;
+    # the foreign-l weight is the tiny numerical tail, fact 9)
+    l_names, w_l = shell_weights(mol, c_can, s)
+    dom_l = [l_names[i] for i in w_l.argmax(axis=1)]
+    for i, wmax in enumerate(w_l.max(axis=1)):
+        assert wmax > 0.95, (i, wmax)  # a mixed-l core MO = wrong core
+
+    c_pur = np.zeros((mol.nao_nr(), n_core), dtype=c_can.dtype)
+    contamination = np.zeros(n_core)
+    col = 0
+    for k_col, l_name in enumerate(l_names):
+        l_val = "spdfgh".index(l_name)
+        mos = [i for i, d in enumerate(dom_l) if d == l_name]
+        if not mos:
+            continue
+        members = sorted(m for (ll, m) in sectors if ll == l_val)
+        k = len(mos) // len(members)   # radial copies (n_mos / m-multiplicity)
+        assert k * len(members) == len(mos), (
+            f"core MOs of l={l_name} do not form complete m-sets: {len(mos)}")
+        chain = sectors[(l_val, members[0])]
+        s_rad = s[np.ix_(chain, chain)]
+
+        # foreign-l contamination diagnostic
+        for i in mos:
+            contamination[i] = 1.0 - w_l[i, k_col]
+
+        # dominant radial subspace E_l: top-k of the S-metric column Gram
+        # of the member-resolved radial blocks
+        rr = np.hstack([c_can[sectors[(l_val, m)], :][:, mos]
+                        for m in members])
+        ev, q = np.linalg.eigh(rr.conj().T @ s_rad @ rr)
+        order = np.argsort(ev)[::-1]
+        top = order[:k]
+        assert ev[top[-1]] > 1e-8, (l_name, ev)
+        if len(ev) > k:  # discarded directions are tails, not radials
+            assert ev[order[k]] < 1e-2 * ev[top[-1]], (l_name, ev)
+        v_all = rr @ q[:, top] @ np.diag(ev[top] ** -0.5)  # S-orthonormal
+        for j in range(k):
+            for m in members:  # shared radial on EVERY member (m-complete)
+                c_pur[sectors[(l_val, m)], col] = v_all[:, j]
+                col += 1
+    assert col == n_core
+
+    # one global Loewdin (S = 0 between different l -> l-purity survives;
+    # within-l mixing is span-preserving)
+    gram = c_pur.conj().T @ s @ c_pur
+    ev, u = np.linalg.eigh(gram)
+    c_pur = c_pur @ (u / np.sqrt(ev)) @ u.T
+    return c_pur, contamination
+
+
 def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
     """Append an orthonormal-in-metric-``s`` complement to the columns of ``v``."""
     ev, u = np.linalg.eigh(s)
@@ -398,9 +501,14 @@ def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
     return sectors
 
 
-def radial_basis(mf, core_idx: list[int], act_idx: list[int]):
+def radial_basis(mf, core_idx: list[int], act_idx: list[int],
+                 c_core: np.ndarray = None):
     """Full MO matrix plus per-slot (l, member) labels -- the substrate for
     :func:`radial_mask`.
+
+    ``c_core`` overrides the core block (default ``mf.mo_coeff[:, core_idx]``);
+    pass :func:`purified_core_orbitals` output for the exactly-closed
+    substrate (the fact-17 fix).
 
     Everything non-core is built in a MEMBER-PRESERVING gauge (sequential
     S-metric Gram-Schmidt, not a symmetric Loewdin): the projected window
@@ -424,7 +532,7 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int]):
     sec = lm_sectors(mol)
     row_sector = {row: key for key, rows in sec.items() for row in rows}
 
-    core = mf.mo_coeff[:, core_idx]
+    core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
     gram = core.conj().T @ s @ core
     ev, u = np.linalg.eigh(gram)
     core = core @ (u / np.sqrt(ev)) @ u.T

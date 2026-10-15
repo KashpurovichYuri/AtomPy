@@ -1,5 +1,5 @@
 """SA-deviation decomposition + AVAS comparison + Sc tilt-follow curves
-(ticket 16, Phase 2).
++ purified-core before/after (ticket 16 Phase 2, ticket 13).
 
 Renders, per atom (C / Si / Sc):
 1. the SA-family ladder rows with the four-way deviation attribution:
@@ -9,8 +9,11 @@ Renders, per atom (C / Si / Sc):
    - span overlap vs the raw shell span (the identity change gauge),
    - the core-fold witness: refold the rung's converged core with the RAW
      shell window (attributes the deviation to core/fold vs window).
-2. the AVAS window rows (independent ecosystem selector).
-3. Sc only: frozen tilt-follow curves with <L^2> tracking -- the
+2. the purified-core verdict (ticket 13): the input baselines before
+   (canonical core) and after (purified core) -- machine precision -- and
+   the *_pur rung rows through the same attribution.
+3. the AVAS window rows (independent ecosystem selector).
+4. Sc only: frozen tilt-follow curves with <L^2> tracking -- the
    deterministic anatomy of the member-asymmetric descent (fact 18d).
 
 Usage:
@@ -27,6 +30,7 @@ from atomterm.detbasis import commutator, frobenius_norm
 from atomterm.drivers import (
     avas_window,
     build_full_mo,
+    purified_core_orbitals,
     radial_basis,
     run_rohf,
     select_valence_ao,
@@ -50,6 +54,8 @@ SPECS = {
 }
 RUNGS = ["casci_avg", "casscf_relax", "casscf_radial",
          "sa", "sa_radial", "sa_pyscf"]
+PUR_RUNGS = ["casci_avg_pur", "casscf_relax_pur", "casscf_radial_pur",
+             "sa_relax_pur", "sa_pur", "sa_radial_pur"]
 
 
 def _refold_comm(mol, mf, c_shell, ncore, na, nb, c_core):
@@ -68,7 +74,8 @@ def decompose(sym: str, workdir: Path) -> list[str]:
     rungs = run_ladder(cfg, spec["patterns"], spec["nelec_act"],
                        workdir=str(out), sa_weights=spec["sa_weights"],
                        frac_nelec_open=spec["frac"][0],
-                       frac_n_open=spec["frac"][1], rung_tags=RUNGS)
+                       frac_n_open=spec["frac"][1], purified=True,
+                       rung_tags=RUNGS + PUR_RUNGS)
 
     label = cfg.label
     mol, mf = run_rohf(cfg, str(out / f"{label}_rohf.chk"))
@@ -82,14 +89,24 @@ def decompose(sym: str, workdir: Path) -> list[str]:
     c_shell = eye[:, act_idx]
     s = mf.get_ovlp()
 
-    # input windows of the SA family (fact 17 baselines)
+    # input windows of the SA family (fact 17 baselines) + the purified
+    # substrate before/after (ticket 13: the baseline IS the core span)
     mo_shell = build_full_mo(mf, list(range(ncore)), act_idx)
     mo_rad, _ = radial_basis(mf, list(range(ncore)), act_idx)
+    c_pur, contam = purified_core_orbitals(mol, mf, ncore)
+    mo_shell_p = build_full_mo(mf, list(range(ncore)), act_idx, c_core=c_pur)
+    mo_rad_p, _ = radial_basis(mf, list(range(ncore)), act_idx, c_core=c_pur)
     inputs = {
         "shell-start": window_closure(mol, mo_shell[:, ncore:ncore + ncas]),
         "radial-start": window_closure(mol, mo_rad[:, ncore:ncore + ncas]),
         "canonical-start": window_closure(
             mol, mf.mo_coeff[:, ncore:ncore + ncas]),
+    }
+    pur_inputs = {
+        "pur shell-start": window_closure(
+            mol, mo_shell_p[:, ncore:ncore + ncas]),
+        "pur radial-start": window_closure(
+            mol, mo_rad_p[:, ncore:ncore + ncas]),
     }
 
     lines = [f"# SA-deviation decomposition: {sym}", "",
@@ -97,12 +114,19 @@ def decompose(sym: str, workdir: Path) -> list[str]:
     for name, c in inputs.items():
         lines.append(f"  {name:<16} |[P,Lz]| = {c['lz']:9.2e}   "
                      f"|[P,Lp]| = {c['lperp']:9.2e}")
-    lines += ["",
-              f"{'rung':<14} {'|[H,Lz]|':>9} {'|[H,L2]|':>9} "
+    lines += ["  purified core substrate (ticket 13; the fact-17 fix):"]
+    for name, c in pur_inputs.items():
+        lines.append(f"  {name:<16} |[P,Lz]| = {c['lz']:9.2e}   "
+                     f"|[P,Lp]| = {c['lperp']:9.2e}")
+    lines += [f"  core-span closure: "
+              f"|[P,Lz]| {window_closure(mol, c_pur)['lz']:.1e}  "
+              f"|[P,Lp]| {window_closure(mol, c_pur)['lperp']:.1e}  "
+              f"(max foreign-l contamination {contam.max():.1e})", "",
+              f"{'rung':<20} {'|[H,Lz]|':>9} {'|[H,L2]|':>9} "
               f"{'|[P,Lz]|':>9} {'|[P,Lp]|':>9} {'sv_min':>7} "
               f"{'refold_lz':>9}  attribution"]
     shell_purity = max(rungs["casci_avg"]["window"].values())
-    for tag in RUNGS:
+    for tag in RUNGS + PUR_RUNGS:
         if tag not in rungs:
             continue
         r = rungs[tag]
@@ -110,10 +134,13 @@ def decompose(sym: str, workdir: Path) -> list[str]:
         mo = lib.chkfile.load(chk, "mcscf/mo_coeff")
         if mo is None:
             # CASCI stages do not persist mo_coeff: the window actually
-            # folded is the raw shell AOs (one-particle columns must
-            # describe THAT window, not the projected PySCF input); the
-            # core block is the stage's Löwdin-rotated one (same span)
-            mo = np.hstack([mo_shell[:, :ncore], c_shell])
+            # folded is the rung's INPUT window (raw shell AOs for the
+            # canonical rungs, the projected pur window for *_pur); the
+            # core block is the stage's Loewdin-rotated one (same span)
+            if tag.endswith("_pur"):
+                mo = mo_shell_p[:, :ncore + ncas]
+            else:
+                mo = np.hstack([mo_shell[:, :ncore], c_shell])
         w = mo[:, ncore:ncore + ncas]
         clo = window_closure(mol, w)
         sv = span_overlap(c_shell, w, s)
@@ -144,7 +171,7 @@ def decompose(sym: str, workdir: Path) -> list[str]:
         if rf_lz > 1e-8:
             notes.append(f"core/fold {rf_lz:.1e}")
         lines.append(
-            f"{tag:<14} {r['comm_norm_h_lz']:>9.2e} {r['comm_norm_h_l2']:>9.2e} "
+            f"{tag:<20} {r['comm_norm_h_lz']:>9.2e} {r['comm_norm_h_l2']:>9.2e} "
             f"{clo['lz']:>9.2e} {clo['lperp']:>9.2e} {sv:>7.4f} "
             f"{rf_lz:>9.1e}  " + "; ".join(notes))
 

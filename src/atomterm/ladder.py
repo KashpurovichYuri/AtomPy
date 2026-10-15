@@ -33,6 +33,15 @@ Rungs, in order of increasing orbital freedom:
                    the raw-shell start; constrained to radial rotations
                    (imposed symmetry -- does SA + the constraint drive BOTH
                    commutators to zero?); free from the canonical start.
+10. *_pur rungs (optional, ``run_ladder(..., purified=True)``) -- the same
+                   treatments on the PURIFIED core substrate
+                   (:func:`purified_core_orbitals`: an exactly L-closed
+                   core span): the fact-17 input-window baseline is gone,
+                   so frozen-window rungs (relax, sa_relax) close at
+                   machine precision on every atom, and free SA closes
+                   exactly wherever the optimizer has a restoring force
+                   (C/Si: yes; Sc: the flat member gauge leaves a ~1e-6
+                   residual; the free-sa 4s<->3p swap attractor persists).
 
 Adding a rung = appending one :class:`Rung` to :func:`_registry` (data, not
 code): the runner executes it through :func:`stage_facts` and the report
@@ -80,6 +89,8 @@ from atomterm.system import AtomConfig
 from atomterm.drivers import (
     build_full_mo,
     constrained_casscf,
+    core_virtual_only_mask,
+    purified_core_orbitals,
     radial_basis,
     radial_mask,
     run_casci,
@@ -134,8 +145,14 @@ def _rung_payload(rung: Rung, cas, mol, ncore: int, na: int, nb: int) -> dict:
 
 
 def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
-              act_idx: list[int], ndet: int, sa_weights, chk) -> list[Rung]:
-    """The ladder as data. ``chk`` maps a rung tag to its chkfile."""
+              act_idx: list[int], ndet: int, sa_weights, chk,
+              c_pur: np.ndarray = None) -> list[Rung]:
+    """The ladder as data. ``chk`` maps a rung tag to its chkfile.
+
+    ``c_pur`` (optional): purified core columns
+    (:func:`purified_core_orbitals`) -- appends the ``*_pur`` rungs, the
+    same orbital treatments on the exactly-closed substrate (the fact-17
+    input-window baseline removed; ticket 13)."""
     n_open = len(act_idx)
     c_shell = lambda cas: np.eye(mf.mo_coeff.shape[0])[:, act_idx]  # noqa: E731
     c_win = lambda cas: cas.mo_coeff[:, ncore : ncore + ncas]  # noqa: E731
@@ -237,18 +254,83 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
                 c_win, lambda: mf,
             ),
         ]
+    if c_pur is not None:
+        # the purified-substrate twins (ticket 13): same treatments, core
+        # span exactly L-closed -> input windows exactly closed. The CASCI
+        # rung folds the window PySCF actually diagonalized (c_win, not
+        # the raw AOs) AND its purified core density is m-symmetric by
+        # construction, so raw fold == averaged fold: max|dE| drops to
+        # machine precision (the fact-14 window-definition offset and the
+        # anisotropy detector both vanish on this substrate).
+        mo_shell_p = mo_of(mf, c_pur)
+        mo_rad_p, lab_rad_p = radial_basis(
+            mf, list(range(ncore)), act_idx, c_core=c_pur)
+        mask_rad_p = radial_mask(lab_rad_p, ncore, ncas)
+        rungs += [
+            Rung(
+                "casci_avg_pur", "casci",
+                lambda: run_casci(mf, ncas, nelecas, mo_shell_p,
+                                  chk("casci_avg_pur"), nroots=nroots,
+                                  name="casci_avg_pur"),
+                c_win, lambda: mf,
+                anisotropy_ref=lambda: (mf, c_pur),
+            ),
+            Rung(
+                "casscf_relax_pur", "casscf",
+                lambda: run_casscf_core_relax(
+                    mf, ncas, nelecas, mo_shell_p, chk("casscf_relax_pur")),
+                c_win, lambda: mf,
+            ),
+            Rung(
+                "casscf_radial_pur", "casscf",
+                lambda: constrained_casscf(
+                    mf, ncas, nelecas, chk("casscf_radial_pur"),
+                    mo_full=mo_rad_p, mask=mask_rad_p,
+                    name="casscf_radial_pur"),
+                c_win, lambda: mf,
+            ),
+        ]
+        if sa_weights:
+            rungs += [
+                # THE exact-symmetry SA rung: window frozen (closure exact
+                # by construction), core relaxed under the ensemble
+                Rung(
+                    "sa_relax_pur", "casscf",
+                    lambda: run_sa_casscf(
+                        mf, ncas, nelecas, mo_shell_p, list(sa_weights),
+                        chk("sa_relax_pur"), mask=core_virtual_only_mask),
+                    c_win, lambda: mf,
+                ),
+                Rung(
+                    "sa_pur", "casscf",
+                    lambda: run_sa_casscf(
+                        mf, ncas, nelecas, mo_shell_p, list(sa_weights),
+                        chk("sa_pur")),
+                    c_win, lambda: mf,
+                ),
+                Rung(
+                    "sa_radial_pur", "casscf",
+                    lambda: run_sa_casscf(
+                        mf, ncas, nelecas, mo_rad_p, list(sa_weights),
+                        chk("sa_radial_pur"), mask=mask_rad_p),
+                    c_win, lambda: mf,
+                ),
+            ]
     return rungs
 
 
 def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
                workdir: str = "results", sa_weights: list[float] | None = None,
                frac_nelec_open: int | None = None, frac_n_open: int | None = None,
-               rung_tags: list[str] | None = None) -> dict:
+               rung_tags: list[str] | None = None,
+               purified: bool = False) -> dict:
     """Run ladder rungs for one atom's primary Ms sector, print and persist
     the all-vs-all comparison. Returns ``{rung_tag: payload}``.
 
     rung_tags : optional subset of rung tags to run (e.g. window studies
         that only need the CASCI + free-CASSCF rungs); ``None`` = all.
+    purified : append the ``*_pur`` rungs (the same treatments on the
+        exactly-closed purified core substrate, ticket 13 / fact 17).
     """
     out = Path(workdir)
     out.mkdir(parents=True, exist_ok=True)
@@ -271,8 +353,12 @@ def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
     chk = lambda name: str(out / f"{label}_{name}.chk")  # noqa: E731
     ndet = math.comb(ncas, na) * math.comb(ncas, nb)
 
+    c_pur = None
+    if purified:
+        c_pur, _ = purified_core_orbitals(mol, mf, ncore)
+
     registry = _registry(mf, mf_f, ncore, ncas, (na, nb), act_idx, ndet,
-                         sa_weights, chk)
+                         sa_weights, chk, c_pur=c_pur)
     if rung_tags is not None:
         wanted = set(rung_tags)
         unknown = wanted - {r.tag for r in registry}
