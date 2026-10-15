@@ -74,6 +74,35 @@ zero?* (C: yes, 8e-11. Sc: down to the input-window baseline, ~1e-3.)
 **sa_pyscf — "state-averaged from the canonical start".** *Question: is
 SA's outcome start-dependent?* (Very much so on Sc.)
 
+## The purified-substrate rungs (optional: `run_ladder(..., purified=True)`)
+
+The core every CASSCF rung must orthogonalize its window against is NOT
+rotationally closed (fact 17): the canonical core MOs carry small
+m-asymmetric tails, so the *input window* already carries a closure
+defect (Si 3.4e-3, Sc 2.1e-2) that every optimized rung inherits as a
+commutator baseline. The `*_pur` rungs redo the same treatments on a
+**purified core** — the canonical core replaced by the closest exactly
+rotation-closed span (one shared radial per closed shell, replicated on
+every m member; `purified_core_orbitals`). The physical reference is the
+same scalar core the analysis fold already uses; the purification costs
+only the discarded core polarization (C +3 µEh, Si +0.13 mEh,
+Sc +0.67 mEh).
+
+**casci_avg_pur / casscf_relax_pur / sa_relax_pur — "exact by
+construction or by frozen window".** *Question: with the baseline gone,
+which optimized rungs close at machine precision?* (Answer: all of the
+frozen-window ones, on every atom — including **Sc SA-CASSCF with
+unbroken Lz and L² at 1e-13** via sa_relax_pur.)
+
+**sa_pur / sa_radial_pur — "free SA / radial SA on the closed
+substrate".** (C/Si: machine-exact — the radial direction has a
+restoring force, so SA's stationary point IS the symmetric window.
+Sc: the member gauge is exactly flat — m-symmetric radial rotation gains
+nothing, fact 18d — so the optimizer stops at a ~1e-6 tilt that no
+convergence tightening removes; an optimizer floor, not a baseline. The
+free-sa 4s↔3p swap attractor survives the purification: it is an
+optimizer basin, not a core-span artifact.)
+
 ## Reading the report
 
 - `E_ground`, `dE_vs_avg` — ground energy and its change vs casci_avg.

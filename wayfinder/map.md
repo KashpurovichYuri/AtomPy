@@ -123,12 +123,19 @@ machinery; tickets 14/15 answer the open machinery questions first.
   + one-particle closure meter + AVAS verdict (fact 19: deviations are
   100% window; free SA heals below baseline on Si; span overlap ≠
   closure; AVAS inherits the mean-field relaxation — bad on Sc).
-- [12: Ti](tickets/12-ti.md) — 3d² ³F; a data-row exercise on the
-  settled machinery (projection-selected frac block, TM bands from Sc).
 - [13: purified core / closed core span](tickets/13-purify-general.md) —
-  NEXT: promoted by fact 17 + the measured input baselines (Si 3.4e-3,
-  Sc 5.7e-2 one-particle): the shared-radial purified core span should
-  remove them (Phase 3 of the deep-understanding plan).
+  RESOLVED (fact 20): `purified_core_orbitals` (shared radial per closed
+  shell, E ⊗ members L-closed for ANY radial E — the ticket's own-shell
+  premise was wrong, corrected in implementation); input windows close
+  at machine precision (Si 3.4e-3 → 1e-15, Sc 2.1e-2 → 9e-15); THE
+  DELIVERABLE: Sc CASSCF/SA-CASSCF with unbroken Lz and L² — relax_pur
+  1.3e-13, sa_relax_pur 6.7e-14/3.6e-13 (90-state term table intact);
+  free SA machine-exact on C/Si; Sc's residual sa_radial_pur gauge
+  floor (~1e-6, no restoring force) and the surviving 4s↔3p swap
+  attractor close the attribution questions. Phase 4 not needed.
+- [12: Ti](tickets/12-ti.md) — NEXT: 3d² ³F; a data-row exercise on the
+  settled machinery (projection-selected frac block, TM bands from Sc,
+  pur rungs for the exact-symmetry stages).
 
 ## Out of scope
 

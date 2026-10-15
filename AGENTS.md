@@ -32,12 +32,12 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19a) |
-| `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `constrained_casscf`, `core_virtual_only_mask`, `no_core_window_exchange_mask`, `lm_sectors`, `radial_basis`, `radial_mask`, `run_sa_casscf`, `run_casscf_*`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core`, `avas_window`, `span_overlap` | all checkpointed (`.chk`); `constrained_casscf(mo_full=, mask=, weights=)` is the one deep CASSCF driver — a mask is any `uniq_var_indices`-shaped callable, and the `run_casscf_*` names are one-line adapters over it; `lm_sectors`/`radial_basis`/`radial_mask` build the (l, member)-labeled substrate for same-sector (radial) constraints (facts 16e/17); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core`; `avas_window`/`span_overlap` = the ecosystem window probe (fact 19c/d) |
+| `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `constrained_casscf`, `core_virtual_only_mask`, `no_core_window_exchange_mask`, `lm_sectors`, `radial_basis`, `radial_mask`, `run_sa_casscf`, `run_casscf_*`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core`, `purified_core_orbitals`, `avas_window`, `span_overlap` | all checkpointed (`.chk`); `constrained_casscf(mo_full=, mask=, weights=)` is the one deep CASSCF driver — a mask is any `uniq_var_indices`-shaped callable, and the `run_casscf_*` names are one-line adapters over it; `lm_sectors`/`radial_basis(c_core=)`/`radial_mask` build the (l, member)-labeled substrate for same-sector (radial) constraints (facts 16e/17); `purified_core_orbitals` = the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members closure theorem); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core`; `avas_window`/`span_overlap` = the ecosystem window probe (fact 19c/d) |
 | `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and ladder share — callers only render (report text / flat json payload) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
 | `src/atomterm/pipeline.py` | `run_atom`, `run_carbon` | generic end-to-end orchestration for any atom (Ms sectors derived from spin + active-electron count); `run_carbon` = carbon wrapper; writes `results/` |
-| `src/atomterm/ladder.py` | `Rung`, `run_ladder`, `run_carbon_ladder` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
+| `src/atomterm/ladder.py` | `Rung`, `run_ladder`, `run_carbon_ladder` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); `purified=True` appends the `*_pur` rungs (same treatments on the exactly-closed purified core substrate, fact 20 — incl. `sa_relax_pur`, the exact-symmetry SA rung); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
 
 ## Hard-won facts (do not re-derive)
 
@@ -294,6 +294,59 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     NOT built (decision): the member gauge is exactly flat on p²
     (fact 18b) and sa_radial already realizes the m-symmetric optimum
     reproducibly — there is nothing to gain.
+20. **The closed core span, realized** (ticket 13; `purified_core_orbitals`,
+    the `*_pur` ladder rungs; fact 17's fix, verified on C/Si/Sc):
+    (a) PREMISE CORRECTION: canonical core MOs are NOT confined to their
+    own (n,l) AO shells (C's 2s MO has 66% of its S-weight on other
+    radials — same-l radial mixing is physical), so "project each core
+    MO onto its own shell" is WRONG (gate (a) failed at density 0.77).
+    The correct closure theorem is sharper: for one-center bases the
+    l-chain rows decompose into MEMBER sectors with identical radial
+    chains (S = I_m ⊗ S_rad exactly), and L acts ONLY on the member
+    index — so E ⊗ members is L-invariant for ANY radial subspace E.
+    Shared radial comes free; full AO shell subspaces are unnecessary.
+    Construction: per l, the member-resolved radial blocks R = [r_{i,m}]
+    of the core MOs; E_l = top-k span of the S-metric column Gram RᵀSR
+    (eigenvalues count S-weight × m-multiplicity — ~2l+1 per occupied
+    radial, tail-level beyond: the selection AND the certificate);
+    replicate every radial on ALL members; one global Löwdin (S = 0
+    between different l keeps l-purity). Beware the metric trap: the
+    S-generalized eigenproblem of RRᵀ returns S⁻¹-warped radials — the
+    COLUMN Gram is the correct object. (b) Verified gates: input windows
+    (build_full_mo AND radial_basis) close at machine precision —
+    Si 3.4e-3/4.5e-3 → 1.1e-15/1.8e-15, Sc 5.7e-3/2.1e-2 →
+    6.6e-15/8.7e-15; the purified core's density is m-scalar EXACTLY
+    (equal member-diagonal blocks, zero cross-member coherences,
+    anisotropy 1e-16, raw fold == averaged fold → casci_avg_pur's
+    max|dE| = 0.0) — it is the orbital realization of the scalar core
+    the fold already uses. Reference shift = the discarded core
+    polarization only (spherically averaged density change C 4.2e-6,
+    Si 3.6e-6, Sc 1.05e-4; energy C +3.0 µEh, Si +128 µEh, Sc
+    +674 µEh — C's equals the fact-12 avg-vs-raw shift exactly).
+    (c) THE DELIVERABLE: Sc CASSCF/SA-CASSCF with unbroken Lz and L².
+    Frozen-window rungs close at machine precision on every atom:
+    Sc relax_pur 1.3e-13, sa_relax_pur (SA + core-relax mask, window
+    frozen) 6.7e-14/3.6e-13 with the full 90-state term table and
+    max|dE| 5e-8. FREE SA closes exactly where the optimizer has a
+    restoring force: C sa_pur/sa_radial_pur = 0.0 exactly, Si 3.3e-16
+    (vs 4e-6 healing on the canonical substrate) with the full θ*
+    gains. On Sc the member gauge is exactly FLAT (fact 18d), so
+    sa_radial_pur stops at a ~1e-6 window tilt (comm 5.7e-7/1.8e-5)
+    that NO convergence tightening removes (conv_tol 1e-7→1e-12: [P,Lp]
+    3.8e-6→1.0e-6, energy identical) — an optimizer floor with no
+    restoring force, not a baseline. The free-sa 4s↔3p swap attractor
+    SURVIVES the purified substrate (window p = 1/6 exactly again) —
+    it is an optimizer basin, closing the fact-17 attribution question.
+    Single-root casscf_radial_pur keeps the flat member-gauge chaos of
+    fact 16 (C [P,Lp] 1.1 with [H,Lz] 0.0 — the blind-spot demo again).
+    (d) Phase 4 (post-hoc window repair) NOT needed — free SA is
+    machine-exact on p² atoms on this substrate. Bookkeeping note:
+    pur-rung energies carry the same fact-14 window-definition offset
+    vs raw-fold CASCI rows (Sc +88.7 mEh; the projected window is the
+    honest common definition *within* the pur family); relax-family
+    energy SIGNS vs the unpolarized CASCI are fold bookkeeping (our
+    averaged fold discards the polarization the optimizer bought:
+    max|dE| ~ 1e-3 is the detector), not physics — bound, don't pin.
 
 ## Conventions
 
@@ -306,7 +359,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 78 tests in ~4 min (chkfile caching; ROHF computed once per
+`pytest` runs 83 tests in ~4.5 min (chkfile caching; ROHF computed once per
 session; the Sc ladders are the slowest block, ~2.5 min cold). Test files map
 1:1 to src modules; tests are named for the
 invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci`
@@ -319,7 +372,14 @@ PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows),
 `test_ladder.py` (per-rung fingerprints, parameterized C/Si; Sc TM block:
 exact closure + free-ion tables, relax honesty, S-basin escape, the bimodal
-SA basins, radial ceiling vs escape, complete-window still-escapes),
+SA basins, radial ceiling vs escape, complete-window still-escapes, and the
+purified-substrate block: machine-exact closure on C/Si, Sc's
+`sa_relax_pur`/`relax_pur` at 1e-13 with unbroken Lz/L², the flat-gauge
+floor, the surviving swap attractor — branched on window weights),
+`test_purified_core_orbitals_exact_closed_span` +
+`test_purified_substrate_closes_the_input_windows` (fact 20: the closure
+certificate on the core span and both input windows, m-scalar density,
+contamination/density-shift scales — the gate-(a)/(b) pins),
 `test_radial_rung_full_gain_without_l_leakage` (fact 16a: radial == free
 gain, zero l-leakage), `test_divergence_guard_fires_on_broken_orthonormality`
 (the ticket-09 guard's negative control),
@@ -344,9 +404,9 @@ ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and
 lists the live tickets. Update it when a decision is made; keep tickets
-one-session sized. The live wave (13 NEXT: the closed core span,
-motivated by fact 17 + fact 19's measured input baselines; then 12: Ti,
-a data-row exercise — ticket 16 RESOLVED at the facts-18/19 level)
+one-session sized. The live wave (12 NEXT: Ti 3d², a data-row exercise on
+the settled machinery — tickets 13/16 RESOLVED, facts 18/19/20; run the
+`*_pur` rungs on Ti for the exact-symmetry stages)
 is fully specified
 in `wayfinder/tickets/` — each ticket
 is self-contained (no conversation context needed). Review protocol:
