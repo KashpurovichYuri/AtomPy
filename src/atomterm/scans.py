@@ -38,23 +38,28 @@ from atomterm.detbasis import (
 )
 from atomterm.operators import (
     active_space_integrals,
+    l2_operator_parts,
     lz_operator,
     spin_block_one_body,
     spin_block_two_body,
 )
 
-__all__ = ["ScanPoint", "scan_window", "scan_state", "radial_scan"]
+__all__ = ["ScanPoint", "scan_window", "scan_state", "radial_scan",
+           "member_tilt_map"]
 
 
 @dataclass
 class ScanPoint:
-    """Ground state of one frozen window: energy parts + the Lz meter."""
+    """Ground state of one frozen window: energy parts + symmetry meters."""
 
     theta: float                 # the scan variable (radians)
     e_active: float              # ground eigenvalue of the folded H
     e_one: float                 # <H1> (nucleus + core field)
     e_two: float                 # <H2> (active-active repulsion)
     comm_h_lz: float             # ||[H, Lz]||_F in this window
+    ground_l2: float | None = None   # <L^2> of the ground state (with_l2)
+    comm_h_l2: float | None = None   # ||[H, L^2]||_F (with_l2; TRIVIAL=0 in
+                                     # maximal-Ms single-irrep sectors)
 
     @property
     def e_total_minus_one_two(self) -> float:
@@ -86,13 +91,15 @@ def scan_window(mol, mf, thetas, fam_a, fam_b) -> np.ndarray:
 
 
 def scan_state(mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int,
-               theta: float = 0.0) -> ScanPoint:
+               theta: float = 0.0, with_l2: bool = False) -> ScanPoint:
     """Diagonalize the folded H over one frozen window; decompose the
     ground state into one-body and two-body expectations.
 
     The one-body part is the FOLDED h1 (nucleus + averaged core field),
     so e_one rising / e_two falling along the scan is exactly the in-out
-    correlation mechanism.
+    correlation mechanism. ``with_l2=True`` additionally tracks <L^2> of
+    the ground state and ||[H, L^2]|| (the term-identity tracker of the
+    Sc tilt curves; costs the L^2 composite integrals).
     """
     h1, g = active_space_integrals(mol, mf, c_act, ncore, spherical_core=True)
     dets = determinant_basis(c_act.shape[1], na, nb)
@@ -103,12 +110,19 @@ def scan_state(mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int,
     v0 = evecs[:, 0]
     lz = slater_condon_matrix(
         dets, one_body=spin_block_one_body(np.asarray(lz_operator(mol, c_act))))
+    ground_l2 = comm_h_l2 = None
+    if with_l2:
+        l2 = slater_condon_matrix(dets, *l2_operator_parts(mol, c_act))
+        ground_l2 = float(np.real(v0.conj().T @ l2 @ v0))
+        comm_h_l2 = float(frobenius_norm(commutator(h, l2)))
     return ScanPoint(
         theta=float(theta),
         e_active=float(evals[0]),
         e_one=float(np.real(v0.conj().T @ h1m @ v0)),
         e_two=float(np.real(v0.conj().T @ h2m @ v0)),
         comm_h_lz=float(frobenius_norm(commutator(h, lz))),
+        ground_l2=ground_l2,
+        comm_h_l2=comm_h_l2,
     )
 
 

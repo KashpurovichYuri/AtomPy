@@ -1,7 +1,11 @@
 # Ticket 16: Deep understanding of C/Si/Sc orbital effects (Phases 0-2)
 
-Status: open -- Phase 0 DONE (RUNGS.md + GLOSSARY, 13a1b15), Phase 1 DONE (scans.py + fact 18); remaining: Phase 2 (SA decomposition + AVAS), then ticket 13 = Phase 3.
-Plan: /home/kashpur/.opencode/plan/deep-understanding-pre-ti.md
+Status: RESOLVED (Phase 0: 13a1b15; Phase 1: b1c3c52; Phase 2: fact 19 —
+`window_closure` / `avas_window` / `span_overlap`, StageFacts + ladder
+carry the one-particle columns, `scripts/sa_decomposition.py` artifacts
+in `results/*_sa_decomposition.md`). The m-scalar-constraint rung is
+DECIDED AGAINST (fact 19e: the member gauge is exactly flat on p² and
+sa_radial already realizes the m-symmetric optimum reproducibly).
 
 ## Question
 
@@ -13,7 +17,36 @@ exactly each SA deviation is made of, and whether an independent window
 constructor (AVAS) agrees with ours. No Ti until this lands (user
 decision 2026-10-15).
 
-## Resolution (to implement)
+## Resolution (measured)
+
+Phase 0 (13a1b15): RUNGS.md + GLOSSARY.md plain-language rewrite.
+
+Phase 1 (b1c3c52, fact 18): frozen scans -- C/Si gain is a
+one-parameter m-symmetric radial rotation at exact symmetry (theta* =
+0.61/0.85 rad, -0.2508/-0.1267 Eh); single-member tilts cost EXACTLY 0
+(M_L degeneracy dodge); [H,Lz] blind spots (m=0 member, equal +-pairs);
+Sc inverts (symmetric gains nothing, member-asymmetric descends).
+
+Phase 2 (fact 19): (a) one-particle closure meter ||[P,Lz]||/||[P,Lp]||
+-- complete certificate, closes the blind spots; carried by every
+ladder row; exposes C's radial-rung member tilt ([P,Lp] ~ 1) invisible
+to sector commutators. (b) SA-deviation decomposition: core-fold witness
+<= 1e-13 everywhere (deviations are 100% window); free SA HEALS below
+the input baseline on Si (4e-6 vs 3.4e-3), only constrained sa_radial
+sits at it; Sc sa = swap basin (sv 0.00) / sa_radial = baseline /
+sa_pyscf = collapse; canonical-start baselines huge (0.24-3.7). (c)
+span overlap != closure (AVAS-Sc: 0.9855 overlap, 0.5 defects). (d)
+AVAS = mean-field-inherited relaxation: C/Si exactly the theta* optimum
+(-250.8/-126.7 mEh, near m-symmetric); Sc +80.8 mEh WORSE with
+masquerade <L^2> 5.90 -- raw shells strictly dominate. (e) Sc
+tilt-follow to delta=0.35: descent to -2.7/-3.6 mEh with L drifting
+2.00 -> 1.84 (the 2D->2P relabeling anatomy); an Lz-BLIND descent
+family caught only by [H,L^2].
+
+Next: ticket 13 (= Phase 3, the closed core span) on the strength of
+fact 17 + the measured input baselines.
+
+## Resolution (the original spec, superseded by "measured" above)
 
 Phase 0 -- plain-language docs:
 - RUNGS.md: every ladder rung explained in plain physics (what is held
@@ -48,10 +81,13 @@ Phase 2 -- SA-deviation decomposition + AVAS comparison:
 - Optional m-scalar-constraint probe -- decide after Phase 1 quantifies
   what the per-member gauge buys (expected: nothing).
 
-## Acceptance
+## Acceptance (met)
 
-RUNGS.md/GLOSSARY readable without prior context; scans reproduce
-E(casci_avg) at th=0 exactly and bracket the CASSCF gains; the flatness
-is measured, not inferred; the decomposition table covers every SA rung
-on C/Si/Sc; AVAS comparison done with numbers; facts/tests land with
-each phase; 70-test suite stays green.
+RUNGS.md/GLOSSARY readable without prior context ✓; scans reproduce
+E(casci_avg) at th=0 exactly and bracket the CASSCF gains ✓ (fact 18);
+the flatness is measured, not inferred ✓ (exactly 0 to 1e-12); the
+decomposition table covers every SA rung on C/Si/Sc ✓ (artifacts in
+results/*_sa_decomposition.md); AVAS comparison done with numbers ✓
+(fact 19d, verified rather than assumed -- the same-span guess was
+refuted); facts/tests land with each phase ✓; suite green throughout
+(78 tests).

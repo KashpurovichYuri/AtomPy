@@ -22,7 +22,7 @@ import numpy as np
 
 from atomterm.analysis import analyze, configuration_summary
 from atomterm.drivers import shell_weights
-from atomterm.operators import build_operators, core_anisotropy
+from atomterm.operators import build_operators, core_anisotropy, window_closure
 
 __all__ = ["StageFacts", "stage_facts"]
 
@@ -45,6 +45,8 @@ class StageFacts:
     ortho_err: float  # max |C^dag S C - I| over the stage's full MO matrix
     window_names: list[str]
     window_rows: np.ndarray  # per-orbital l-weights (rows sum to 1)
+    win_lz: float   # one-particle closure defects of the window SPAN
+    win_lperp: float  # (operators.window_closure; 0 = exact certificate)
     configurations: list[str]
     core_anisotropy: float | None = None  # CASCI reference rungs only
 
@@ -90,6 +92,8 @@ class StageFacts:
             "terms": self.terms,
             "comm_norm_h_lz": self.analysis.comm_norm_h_lz,
             "comm_norm_h_l2": self.analysis.comm_norm_h_l2,
+            "win_lz": self.win_lz,
+            "win_lperp": self.win_lperp,
             "window": self.window,
             "n_dev": self.n_dev,
             "configurations": self.configurations,
@@ -123,6 +127,7 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     e_mine = np.linalg.eigvalsh(ops["H"]) + cas.core_energy
     e_pyscf = np.sort(np.atleast_1d(np.asarray(cas.energies)))[: len(e_mine)]
     w_names, w = shell_weights(mol, c_act, mf.get_ovlp())
+    closure = window_closure(mol, c_act)
     mo = cas.mo_coeff
     aniso = None
     if anisotropy_ref is not None:
@@ -139,6 +144,8 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
                                - np.eye(mo.shape[1])).max()),
         window_names=w_names,
         window_rows=w,
+        win_lz=closure["lz"],
+        win_lperp=closure["lperp"],
         configurations=configuration_summary(
             mol, mf.get_ovlp(), cas.ci[: len(e_mine)], c_act, na, nb),
         core_anisotropy=aniso,

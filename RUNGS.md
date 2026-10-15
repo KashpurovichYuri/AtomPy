@@ -81,6 +81,10 @@ SA's outcome start-dependent?* (Very much so on Sc.)
 - `|[H,Lz]|`, `|[H,L2]|` — the symmetry meters (see above).
 - `win_l` — the window's l-purity (1.000 = no s/d leakage; necessary but
   NOT sufficient for symmetry — the m-members must also stay complete).
+- `|[P,Lz]|`, `|[P,Lp]|` — the one-particle closure defects of the window
+  span itself (see GLOSSARY): what the many-body commutators can and
+  cannot see, with no core fold and no CI. Both ~0 = the window span is
+  certified rotation-closed.
 - `aniso` — the core density's discarded anisotropy (casci rungs).
 - `max|dE|` — our reconstructed energies vs PySCF's own: a bookkeeping
   check with known physical offsets (a polarized core we average but

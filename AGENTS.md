@@ -31,8 +31,8 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/angular.py` | `l_matrices`, `l2_matrix`, `l_matrices_analytic` | one-electron `Lx/Ly/Lz` AO matrices. Primary: libcint `int1e_irp` (decoded layout in the docstring). Cross-check: exact tesseral algebra via overlaps. |
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
-| `src/atomterm/operators.py` | `build_operators`, `full_space_integrals` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation |
-| `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `constrained_casscf`, `core_virtual_only_mask`, `no_core_window_exchange_mask`, `lm_sectors`, `radial_basis`, `radial_mask`, `run_sa_casscf`, `run_casscf_*`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core` | all checkpointed (`.chk`); `constrained_casscf(mo_full=, mask=, weights=)` is the one deep CASSCF driver — a mask is any `uniq_var_indices`-shaped callable, and the `run_casscf_*` names are one-line adapters over it; `lm_sectors`/`radial_basis`/`radial_mask` build the (l, member)-labeled substrate for same-sector (radial) constraints (facts 16e/17); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core` |
+| `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19a) |
+| `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `constrained_casscf`, `core_virtual_only_mask`, `no_core_window_exchange_mask`, `lm_sectors`, `radial_basis`, `radial_mask`, `run_sa_casscf`, `run_casscf_*`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core`, `avas_window`, `span_overlap` | all checkpointed (`.chk`); `constrained_casscf(mo_full=, mask=, weights=)` is the one deep CASSCF driver — a mask is any `uniq_var_indices`-shaped callable, and the `run_casscf_*` names are one-line adapters over it; `lm_sectors`/`radial_basis`/`radial_mask` build the (l, member)-labeled substrate for same-sector (radial) constraints (facts 16e/17); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core`; `avas_window`/`span_overlap` = the ecosystem window probe (fact 19c/d) |
 | `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and ladder share — callers only render (report text / flat json payload) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
@@ -248,6 +248,52 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     single-root radial solutions; SA over the quintet averages the
     instability away (sa_radial stays symmetric). Scan numbers are
     DETERMINISTIC (no optimizer, no basin chaos).
+19. **One-particle closure meter, SA-deviation decomposition, AVAS
+    verdict** (ticket 16 Phase 2; `window_closure`, `avas_window`,
+    `span_overlap`, `scripts/sa_decomposition.py`): (a) ‖[P,Lz]‖ and
+    ‖[P,L⊥]‖ = ‖[P,Lx]‖²+‖[P,Ly]‖‖¹ᐟ² of the window SPAN projector
+    (S-metric) are the complete closure certificate with NO blind spots:
+    [P,Lz] reproduces the many-body blind spots exactly (m=0-member,
+    equal-±pair tilts invisible), [P,L⊥] sees EVERY member asymmetry.
+    Carried by every ladder row (|[P,Lz]|, |[P,Lp]| columns) and by
+    StageFacts payloads. It exposes what sector commutators cannot:
+    C's converged casscf_radial window is member-tilted at [P,Lp] ≈ 1.1
+    (the flat gauge of fact 18b the single-root optimizer wandered into)
+    while its many-body commutators sit at 5e-7; sa/sa_radial anchor the
+    symmetric gauge ([P,Lp] ~ 1e-4). (b) Decomposition verdicts
+    (artifacts results/*_sa_decomposition.md): the core-fold witness
+    (refold the rung's converged core with the RAW shell window) is
+    ≤ 1e-13 for every SA rung on all three atoms — SA deviations are
+    100% window (identity + member structure), 0% core/fold. Si refines
+    fact 16: FREE sa/sa_pyscf heal below the 3.4e-3 input baseline
+    (→ 4e-6/7e-8) — only the constrained sa_radial is pinned at it.
+    Sc (this run): sa = the 4s↔3p swap basin (sv 0.00, comm 0.83/3.8);
+    sa_radial = exactly the input baseline; sa_pyscf = collapse;
+    canonical-START baselines are huge (Si 0.24/0.32, Sc 2.8/3.7 — the
+    SCF window block is member-polarized; that is what sa_pyscf eats).
+    (c) Span overlap ≠ closure — independent axes: Sc's AVAS window
+    overlaps the shell span at 0.9855 yet carries closure defects
+    0.5/0.4 (≈ 0.17-rad member tilt) and CASCI commutators 0.59/2.6;
+    overlap-based "window quality" says nothing about rotational
+    closure. (d) AVAS verdict (verified; refutes the same-span guess):
+    right SIZE, but the span is the mean-field-inherited relaxation —
+    on C/Si exactly the fact-18 m-symmetric optimum (−250.8/−126.7 mEh
+    = the full θ* gains, near m-symmetric), on Sc the diffuse canonical
+    virtual d-set (+80.8 mEh WORSE than raw shells, <L²> 5.90
+    masquerading as ²D). Raw shells strictly dominate for our purpose;
+    sv(AVAS) ≈ sv(CASSCF family) on C (0.917) and Si (0.883) — three
+    independent constructions agree on the relaxed span. (e) Sc
+    tilt-follow (deterministic, <L²>-tracked): the fact-18d descent
+    deepens monotonically to −2.7 mEh (subset {0,1,2}) / −3.6 mEh
+    ({0,1,3,4}) at δ=0.35 with ground-state L drifting 2.00 → 1.87/1.84
+    — the anatomy of the optimizer's ²D→²P relabeling; {0,1,3,4} is
+    Lz-BLIND ([H,Lz] ~ 1e-14) while [H,L²] ≈ 1–2 fires (this Ms=1/2
+    multi-term sector catches it; maximal-Ms single-irrep sectors would
+    catch NOTHING). m-symmetric reference rises steeply (+51.6 mEh at
+    δ=0.30) with <L²> = 6.000 exact. The m-scalar-constraint rung is
+    NOT built (decision): the member gauge is exactly flat on p²
+    (fact 18b) and sa_radial already realizes the m-symmetric optimum
+    reproducibly — there is nothing to gain.
 
 ## Conventions
 
@@ -260,7 +306,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 75 tests in ~4 min (chkfile caching; ROHF computed once per
+`pytest` runs 78 tests in ~4 min (chkfile caching; ROHF computed once per
 session; the Sc ladders are the slowest block, ~2.5 min cold). Test files map
 1:1 to src modules; tests are named for the
 invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci`
@@ -280,7 +326,12 @@ gain, zero l-leakage), `test_divergence_guard_fires_on_broken_orthonormality`
 `test_casscf_input_window_orthogonalization_defect` (fact 17),
 `test_radial_basis_labels_and_partners` + `test_lm_sectors_partition_fused_shells`
 (the labeled substrate), `test_avas_cross_validates_the_shell_window`
-(independent ecosystem window selection), `test_stages.py` (the facts-module
+(independent ecosystem window selection), `test_window_closure_certificate_and_blind_spots`
+and `test_window_closure_sc_shell_and_defective` (the one-particle meter:
+exact certificates, the fact-18c blind spots closed by [P,L⊥]),
+`test_avas_window_reproduces_the_shell_cascade` (fact 19d: AVAS inherits
+the mean-field relaxation — C = the full θ* gain near-symmetric, Sc = +80 mEh
+and O(0.5) closure defects), `test_stages.py` (the facts-module
 contract), `test_scans.py` (frozen-scan anatomy: full radial gain at exact
 symmetry, exactly-flat single-member tilts, the Lz blind spots, the Sc
 inversion — deterministic, no optimizer),
@@ -293,9 +344,9 @@ ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and
 lists the live tickets. Update it when a decision is made; keep tickets
-one-session sized. The live wave (16: deep understanding of C/Si/Sc --
-plain docs, frozen radial scans, SA decomposition, AVAS; then 12: Ti, a
-data-row exercise; then 13: the closed core span, motivated by fact 17)
+one-session sized. The live wave (13 NEXT: the closed core span,
+motivated by fact 17 + fact 19's measured input baselines; then 12: Ti,
+a data-row exercise — ticket 16 RESOLVED at the facts-18/19 level)
 is fully specified
 in `wayfinder/tickets/` — each ticket
 is self-contained (no conversation context needed). Review protocol:

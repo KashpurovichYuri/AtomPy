@@ -46,6 +46,13 @@ where reported energies plunge BELOW the variational bound). Such rungs
 are flagged DIVERGED in the report and their numbers must not be read as
 physics.
 
+One-particle columns: ``|[P,Lz]|`` and ``|[P,Lp]|`` are the closure
+defects of the window SPAN itself (operators.window_closure) -- no core
+fold, no CI. They attribute each rung's many-body commutators to the
+one-particle space: ``|[P,Lz]|`` is the part [H, Lz] can see (blind to
+m=0-member and equal-+-pair tilts), ``|[P,Lp]|`` the part only L^2 sees.
+Both zero = the complete closure certificate of the span (fact 19).
+
 max|dE| dictionary (our reconstruction vs PySCF's own energies):
   0.0          -- identical folds (raw/frac rungs), or a spherical core
                    (SA: the ensemble density is a rotational scalar);
@@ -299,8 +306,8 @@ def _report(rungs: dict, out: Path, label: str, mf) -> None:
     lines = [f"# Orbital-treatment ladder: {label}", "",
              f"ROHF reference energy: {mf.e_tot:.8f} Eh", "",
              f"{'rung':<14} {'E_ground':>16} {'dE_vs_avg':>10} {'<L^2>':>9} "
-             f"{'|[H,Lz]|':>10} {'|[H,L2]|':>10} {'win_l':>6} {'aniso':>9} "
-             f"{'max|dE|':>9} {'ortho':>9}  ground config"]
+             f"{'|[H,Lz]|':>10} {'|[H,L2]|':>10} {'|[P,Lz]|':>9} {'|[P,Lp]|':>9} "
+             f"{'win_l':>6} {'aniso':>9} {'max|dE|':>9} {'ortho':>9}  ground config"]
     for tag in tags:
         r = rungs[tag]
         d_e = r["e_ground"] - ref["e_ground"] if ref else 0.0
@@ -310,6 +317,7 @@ def _report(rungs: dict, out: Path, label: str, mf) -> None:
         lines.append(
             f"{tag:<14} {r['e_ground']:>16.8f} {d_e:>10.3e} {r['ground_l2']:>9.5f} "
             f"{r['comm_norm_h_lz']:>10.2e} {r['comm_norm_h_l2']:>10.2e} "
+            f"{r['win_lz']:>9.1e} {r['win_lperp']:>9.1e} "
             f"{purity:>6.3f} {aniso if aniso is not None else float('nan'):>9.1e} "
             f"{r['max_de_vs_pyscf']:>9.1e} {r['ortho_err']:>9.1e}  "
             f"{r['configurations'][0]}{flag}"

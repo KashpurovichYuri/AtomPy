@@ -38,6 +38,16 @@ use is defined here; the precise statement follows the plain one.
 - **commutator norms** ‖[H, Lz]‖, ‖[H, L²]‖ — the symmetry meters. Exactly
   zero when core+window is rotation-closed; their size is a measured
   number for every calculation ("rung") we do.
+- **one-particle closure meter** ‖[P, Lz]‖, ‖[P, L⊥]‖ — the same question
+  asked of the window *span* alone (P = its projector): no core, no CI.
+  [P, Lz] is exactly the part the many-body [H, Lz] can see (blind to
+  m=0-member and equal ±-pair tilts); [P, Lx/Ly] sees *every* member
+  asymmetry. Both zero = the complete closure certificate, no blind
+  spots.
+- **span overlap** — smallest principal cosine between two spans (1.0 =
+  identical). The *identity* gauge of the ladder ("did the window become
+  a different space?"). Independent of closure: an overlap of 0.9855 can
+  hide a member tilt of ~0.17 rad, worth closure defects O(0.5).
 - **window purity** — how much of each window orbital lies in its
   nominal l (1.000 = no leakage). Necessary, not sufficient: a pure-p
   window can still be m-incomplete (see above).

@@ -39,6 +39,8 @@ __all__ = [
     "run_casscf_core_relax",
     "run_casscf_virtual_mix",
     "run_casscf_pyscf_start",
+    "avas_window",
+    "span_overlap",
     "CASResult",
 ]
 
@@ -96,6 +98,43 @@ def select_valence_ao(mol, patterns: list[str]) -> list[int]:
             )
         idx += matches
     return idx
+
+
+def avas_window(mf, labels: list[str], ncore: int, threshold: float = None):
+    """Window chosen by AVAS (pyscf.mcscf.avas, arXiv:1701.07862): an
+    independent ecosystem window selector for cross-validating our raw
+    shell AOs.
+
+    AVAS projects the target AO span (``labels``, e.g. ``["Sc 3d",
+    "Sc 4s"]``) out of the converged MOs and keeps eigenvectors of the
+    projected overlap above ``threshold`` (its default 0.2). Because the
+    construction PROJECTS onto the target span, an AVAS window of full
+    shell dimension IS the shell span exactly -- closed by construction;
+    a threshold that drops members of an m-set gives a rotation-DEFECTIVE
+    span (the negative-control case for the closure meters).
+
+    Returns ``(mo_full, ncas, nelecas)`` with the AVAS active span at
+    ``[ncore : ncore+ncas]`` (ready for run_casci; electron bookkeeping
+    stays ours -- pass the sector you want).
+    """
+    from pyscf.mcscf import avas
+
+    kw = {} if threshold is None else {"threshold": threshold}
+    ncas, nelecas, mo = avas.avas(mf, labels, ncore=ncore, **kw)
+    nelecas = np.atleast_1d(np.asarray(nelecas)).ravel()
+    return mo, int(ncas), nelecas
+
+
+def span_overlap(c_a: np.ndarray, c_b: np.ndarray, s: np.ndarray) -> float:
+    """Smallest principal cosine between two spans in the S metric
+    (1.0 = identical spans, 0.0 = orthogonal direction present).
+
+    The identity-change gauge of the ladder decomposition: sv_min of
+    ``C_a^dag S C_b`` is 1 exactly when the converged window kept the
+    shell span, and drops first when the window identity changes.
+    """
+    sv = np.linalg.svd(c_a.conj().T @ s @ c_b, compute_uv=False)
+    return float(sv.min())
 
 
 def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,

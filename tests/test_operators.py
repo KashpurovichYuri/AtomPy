@@ -121,3 +121,55 @@ def test_lz_spectrum_ms0(shell_ops):
     vals = np.sort(np.real(np.linalg.eigvals(ops0["Lz"])))
     expected = np.sort([0.0, -2, -1, 0, 1, 2, -1, 0, 1])
     assert np.allclose(vals, expected, atol=1e-8)
+
+
+def test_window_closure_certificate_and_blind_spots(carbon):
+    """Fact 19: the one-particle closure meter ||[P, L]|| certificates a
+    window SPAN exactly (no core fold, no CI) and closes the fact-18c
+    blind spots: [P, Lz] cannot see an m=0-member tilt nor equal tilts
+    of a full +-m pair, [P, Lx/Ly] SEES both."""
+    _, mol, mf, act_idx = carbon
+    from atomterm.drivers import select_shell_ao
+    from atomterm.operators import window_closure
+    from atomterm.scans import scan_window
+
+    fam_a, fam_b = act_idx, select_shell_ao(mol, "3p")
+    eye = np.eye(mol.nao_nr())
+    th = 0.61
+    exact = {
+        "raw shell": eye[:, fam_a],
+        "m-symmetric": scan_window(mol, mf, [th] * 3, fam_a, fam_b),
+    }
+    for name, w in exact.items():
+        c = window_closure(mol, w)
+        assert c["lz"] < 1e-13 and c["lperp"] < 1e-13, (name, c)
+    for name, thetas in {
+        "tilt px": [th + .1, th, th],
+        "tilt pz (Lz-blind)": [th, th, th + .1],
+        "equal +-pair (Lz-blind)": [th + .1, th + .1, th],
+    }.items():
+        c = window_closure(mol, scan_window(mol, mf, thetas, fam_a, fam_b))
+        assert c["lperp"] > 0.05, (name, c)   # Lx/Ly see every member tilt
+        if "Lz-blind" in name:
+            assert c["lz"] < 1e-13, (name, c)  # fact 18c blind spot, at the
+        else:                                   # one-particle level
+            assert c["lz"] > 0.05, (name, c)
+
+
+def test_window_closure_sc_shell_and_defective(sc_rohf):
+    """Sc {3d, 4s} raw shell span: exact certificate. A window that drops
+    d members (m-incomplete) or mixes s with p is rotation-defective."""
+    _, mol, mf, act_idx = sc_rohf
+    from atomterm.operators import window_closure
+
+    eye = np.eye(mol.nao_nr())
+    c = window_closure(mol, eye[:, act_idx])
+    assert c["lz"] < 1e-12 and c["lperp"] < 1e-12
+    # 4 of the 5 d members + 4s (drop d member 4): m-incomplete span
+    c = window_closure(mol, eye[:, act_idx[:4] + act_idx[5:]])
+    assert c["lz"] > 1e-2 or c["lperp"] > 1e-2
+    # replace the 4s column by a 4p AO (the SA-swap-style identity change)
+    p4 = [i for i, lbl in enumerate(mol.ao_labels())
+          if lbl.split()[-1].startswith("4p")][0]
+    c = window_closure(mol, eye[:, act_idx[:5] + [p4]])
+    assert c["lz"] > 1e-3 or c["lperp"] > 1e-3

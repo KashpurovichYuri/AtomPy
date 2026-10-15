@@ -117,15 +117,18 @@ machinery; tickets 14/15 answer the open machinery questions first.
   RESOLVED: pre-item refactor (a024d26) + the experiment matrix; findings
   in facts 16/17 and the ticket's Resolution section.
 - [16: deep understanding of C/Si/Sc](tickets/16-deep-understanding.md) —
-  runs NOW (user decision: no Ti until C/Si/Sc are understood): plain
-  docs (RUNGS/GLOSSARY), frozen radial scans (no optimizer), SA-deviation
-  decomposition, AVAS comparison.
+  RESOLVED: plain docs (RUNGS/GLOSSARY), frozen radial scans (fact 18:
+  full gain at exact symmetry on C/Si, exactly-flat member tilts, the
+  Lz blind spots, the Sc JT-like inversion), SA-deviation decomposition
+  + one-particle closure meter + AVAS verdict (fact 19: deviations are
+  100% window; free SA heals below baseline on Si; span overlap ≠
+  closure; AVAS inherits the mean-field relaxation — bad on Sc).
 - [12: Ti](tickets/12-ti.md) — 3d² ³F; a data-row exercise on the
   settled machinery (projection-selected frac block, TM bands from Sc).
 - [13: purified core / closed core span](tickets/13-purify-general.md) —
-  promoted by fact 17: the shared-radial purified core span should remove
-  the 1e-3 input-window commutator baseline (Phase 3 of the
-  deep-understanding plan; after 16).
+  NEXT: promoted by fact 17 + the measured input baselines (Si 3.4e-3,
+  Sc 5.7e-2 one-particle): the shared-radial purified core span should
+  remove them (Phase 3 of the deep-understanding plan).
 
 ## Out of scope
 

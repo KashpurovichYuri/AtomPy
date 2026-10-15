@@ -38,6 +38,7 @@ __all__ = [
     "full_space_integrals",
     "lz_operator",
     "l2_operator_parts",
+    "window_closure",
     "s2_operator_parts",
     "number_operator",
     "build_operator_parts",
@@ -173,6 +174,45 @@ def _composite_two_body(a: np.ndarray, b: np.ndarray) -> np.ndarray:
 def lz_operator(mol, c_act: np.ndarray) -> np.ndarray:
     """Lz as a spin-orbital one-body matrix (spatially diagonal)."""
     return spin_block_one_body(_mo_transform(l_matrices(mol)["z"], c_act))
+
+
+def window_closure(mol, c_win: np.ndarray) -> dict[str, float]:
+    """One-particle rotational-closure defects of a window SPAN.
+
+    The span of the S-orthonormal columns ``c_win`` is rotation-closed
+    iff its projector commutes with all three rotation generators. In
+    the symmetrically orthonormalized AO basis (fact 4 metric dance) the
+    projector is ``P = Q Q^dag`` with ``Q = S^(1/2) c_win`` (QR-cleaned)
+    and the generators act as ``S^(-1/2) l_a S^(-1/2)``. Reported as
+    Frobenius norms of the commutators:
+
+    ``lz``    = ||[P, Lz]||  -- exactly the part the many-body ``[H, Lz]``
+    can see: Lz mixes only within +-m pairs, so m=0-member tilts and
+    EQUAL tilts of a full +-m pair are invisible here (fact 18c blind
+    spots);
+    ``lperp`` = sqrt(||[P, Lx]||^2 + ||[P, Ly]||^2) -- the defect only
+    L+- (hence L^2, trivial in maximal-Ms single-irrep sectors) sees.
+
+    ``lz = lperp = 0`` (to roundoff) is the COMPLETE closure certificate
+    of the one-particle space: no blind spots, no core fold, no CI --
+    symmetry breaking is attributed to the span itself. The many-body
+    commutator norms respond to these defects at O(defect) while the
+    energy responds at O(defect^2) at stationary points (facts 16/18).
+    """
+    s = mol.intor("int1e_ovlp")
+    ev, u = np.linalg.eigh(s)
+    s_half = (u * np.sqrt(ev)) @ u.T
+    s_ihalf = (u / np.sqrt(ev)) @ u.T
+    q, _ = np.linalg.qr(s_half @ c_win)
+    p = q @ q.conj().T
+    defect = {}
+    for axis, l_ao in l_matrices(mol).items():
+        a = s_ihalf @ l_ao @ s_ihalf
+        defect[axis] = frobenius_norm(p @ a - a @ p)
+    return {
+        "lz": float(defect["z"]),
+        "lperp": float(np.hypot(defect["x"], defect["y"])),
+    }
 
 
 def l2_operator_parts(mol, c_act: np.ndarray):
