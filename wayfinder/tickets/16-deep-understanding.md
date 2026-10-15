@@ -1,6 +1,7 @@
 # Ticket 16: Deep understanding of C/Si/Sc orbital effects (Phases 0-2)
 
-Status: open (plan: /home/kashpur/.opencode/plan/deep-understanding-pre-ti.md)
+Status: open -- Phase 0 DONE (RUNGS.md + GLOSSARY, 13a1b15), Phase 1 DONE (scans.py + fact 18); remaining: Phase 2 (SA decomposition + AVAS), then ticket 13 = Phase 3.
+Plan: /home/kashpur/.opencode/plan/deep-understanding-pre-ti.md
 
 ## Question
 

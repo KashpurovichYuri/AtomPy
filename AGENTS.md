@@ -34,6 +34,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation |
 | `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `constrained_casscf`, `core_virtual_only_mask`, `no_core_window_exchange_mask`, `lm_sectors`, `radial_basis`, `radial_mask`, `run_sa_casscf`, `run_casscf_*`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core` | all checkpointed (`.chk`); `constrained_casscf(mo_full=, mask=, weights=)` is the one deep CASSCF driver — a mask is any `uniq_var_indices`-shaped callable, and the `run_casscf_*` names are one-line adapters over it; `lm_sectors`/`radial_basis`/`radial_mask` build the (l, member)-labeled substrate for same-sector (radial) constraints (facts 16e/17); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core` |
 | `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and ladder share — callers only render (report text / flat json payload) |
+| `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
 | `src/atomterm/pipeline.py` | `run_atom`, `run_carbon` | generic end-to-end orchestration for any atom (Ms sectors derived from spin + active-electron count); `run_carbon` = carbon wrapper; writes `results/` |
 | `src/atomterm/ladder.py` | `Rung`, `run_ladder`, `run_carbon_ladder` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
@@ -218,6 +219,35 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     baseline needs a rotation-closed projector — i.e. an l-purified core
     span, which is exactly ticket 13. Read every Si/Sc CASSCF-family
     commutator as baseline + optimizer gauge.
+18. **The frozen-scan anatomy of the radial direction** (ticket 16,
+    `scans.py`, optimizer-free): (a) on p² atoms the ENTIRE CASSCF gain
+    is a ONE-PARAMETER m-symmetric radial rotation at EXACT symmetry —
+    C: θ* = 0.61 rad over 2p→3p, gain −0.2508 Eh (= the full free/radial
+    CASSCF gain); Si: θ* = 0.85 over 3p→4p, −0.1267 Eh; [H, Lz] = 0 at
+    every point of the curve. Mechanism visible in the one-/two-body
+    split: active-active repulsion falls faster than the (nucleus+core)
+    attraction rises. (b) Single-member tilts cost EXACTLY 0 Eh (to
+    1e-12): each M_L component of the ³P multiplet avoids one member, so
+    the CI finds an untouched component — the term's rotational
+    degeneracy IS the flat direction of fact 16; tilting ≥2 members costs
+    real energy (C: +1.6 mEh/pair at δ=0.1). This is why free single-root
+    CASSCF breaks m-symmetry for free, and why SA (which averages all M_L
+    components, every one of which feels a single-member tilt) has the
+    symmetric window as its stationary point. (c) METER BLIND SPOTS:
+    [H, Lz] cannot see a tilt of the m=0 member (Lz pz = 0) nor EQUAL
+    tilts of a full ±m pair (Lz mixes only within ±pairs) — such
+    deformations leak only through L± / L², which is trivially zero in
+    maximal-Ms single-irrep sectors. Sector commutators are necessary,
+    not sufficient, closure witnesses. (d) Sc INVERTS the structure: the
+    m-symmetric 3d→4d rotation gains NOTHING (the curve rises — radial
+    diffusion of a one-electron d shell only loses nuclear attraction;
+    4s→5s likewise harmful), while MEMBER-ASYMMETRIC tilts DESCEND
+    (−0.3 mEh for one tilted member at δ=0.1, −0.9 mEh for four, with
+    comm ~ 0.2–0.45): a genuine Jahn–Teller-like instability along the
+    degenerate ²D manifold — the drive behind Sc's chaotically broken
+    single-root radial solutions; SA over the quintet averages the
+    instability away (sa_radial stays symmetric). Scan numbers are
+    DETERMINISTIC (no optimizer, no basin chaos).
 
 ## Conventions
 
@@ -230,7 +260,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 70 tests in ~4 min (chkfile caching; ROHF computed once per
+`pytest` runs 75 tests in ~4 min (chkfile caching; ROHF computed once per
 session; the Sc ladders are the slowest block, ~2.5 min cold). Test files map
 1:1 to src modules; tests are named for the
 invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci`
@@ -251,7 +281,10 @@ gain, zero l-leakage), `test_divergence_guard_fires_on_broken_orthonormality`
 `test_radial_basis_labels_and_partners` + `test_lm_sectors_partition_fused_shells`
 (the labeled substrate), `test_avas_cross_validates_the_shell_window`
 (independent ecosystem window selection), `test_stages.py` (the facts-module
-contract), `test_half_integer_spin_labels` (doublet
+contract), `test_scans.py` (frozen-scan anatomy: full radial gain at exact
+symmetry, exactly-flat single-member tilts, the Lz blind spots, the Sc
+inversion — deterministic, no optimizer),
+`test_half_integer_spin_labels` (doublet
 labeling), `test_drivers.py` (build_full_mo block properties — the
 ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 `test_analysis.py` (configuration labels), `test_system.py` (validation).
