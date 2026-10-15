@@ -116,12 +116,16 @@ machinery; tickets 14/15 answer the open machinery questions first.
 - [14: constrained-optimization & start-variant axis](tickets/14-start-variants.md) —
   RESOLVED: pre-item refactor (a024d26) + the experiment matrix; findings
   in facts 16/17 and the ticket's Resolution section.
+- [16: deep understanding of C/Si/Sc](tickets/16-deep-understanding.md) —
+  runs NOW (user decision: no Ti until C/Si/Sc are understood): plain
+  docs (RUNGS/GLOSSARY), frozen radial scans (no optimizer), SA-deviation
+  decomposition, AVAS comparison.
 - [12: Ti](tickets/12-ti.md) — 3d² ³F; a data-row exercise on the
   settled machinery (projection-selected frac block, TM bands from Sc).
-- [13: purified_core_orbitals](tickets/13-purify-general.md) — optional,
-  per-shell core purification; now concretely motivated by fact 17 (an
-  l-purified core span would remove the 1e-3 input-window commutator
-  baseline and make optimized rungs exactly closed).
+- [13: purified core / closed core span](tickets/13-purify-general.md) —
+  promoted by fact 17: the shared-radial purified core span should remove
+  the 1e-3 input-window commutator baseline (Phase 3 of the
+  deep-understanding plan; after 16).
 
 ## Out of scope
 

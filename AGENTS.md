@@ -260,9 +260,10 @@ ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and
 lists the live tickets. Update it when a decision is made; keep tickets
-one-session sized. The live wave (12: Ti -- a data-row exercise on the
-mature machinery; 13 optional purify, now motivated by fact 17 as the way
-to remove the 1e-3 input-window baseline) is fully specified
+one-session sized. The live wave (16: deep understanding of C/Si/Sc --
+plain docs, frozen radial scans, SA decomposition, AVAS; then 12: Ti, a
+data-row exercise; then 13: the closed core span, motivated by fact 17)
+is fully specified
 in `wayfinder/tickets/` — each ticket
 is self-contained (no conversation context needed). Review protocol:
 `/code-review` (two axes, parallel sub-agents) after each ticket wave, then
