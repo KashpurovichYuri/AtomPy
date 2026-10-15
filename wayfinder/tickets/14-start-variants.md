@@ -1,6 +1,8 @@
 # Ticket 14: Constrained-optimization & start-variant axis (window/provenance/constraint study)
 
-Status: open
+Status: RESOLVED (pre-item refactor at a024d26; experiments + facts 16/17
+in the follow-up commit; 70 tests green over two consecutive cold suite
+runs)
 
 ## Question
 
@@ -52,3 +54,46 @@ by pipeline.stage_analysis and ladder._rung.
   much of the escape gain is radial vs l/m-breaking" and "does the big
   window beat the escape at exact closure"; AVAS span agreement asserted;
   guard-fire test green; new facts in AGENTS.md.
+
+## Resolution
+
+Machinery: `drivers.lm_sectors` / `radial_basis` / `radial_mask` (the
+(l, member)-labeled substrate; construction lessons in fact 16e — fused
+shells via bas_nctr, member-preserving Gram-Schmidt because the symmetric
+Loewdin gauge is free within degenerate member sets, strong-vs-needle
+directions split at 1e-4), two new registry rungs (casscf_radial,
+sa_radial), `rung_tags=` subset selection, comparison columns in _report.
+
+Answers to the five questions (facts 16/17):
+
+1. "How much of the escape gain is radial?" — on p² atoms ALL of it: the
+   radial rung equals the free minimum to <=3e-7 Eh at exact shell purity,
+   so the m-breaking is an energetically flat member GAUGE. On Sc NONE of
+   it below the ceiling: the escape basin is ~25 mEh BELOW the best radial
+   solution (stable: +24.4/+25.1 mEh) — it needs l/window-identity change.
+2. "Does the complete {3d,4s,4p} window beat the escape at exact
+   closure?" — CAS(3,9) (not 11: 5+1+3=9 orbitals, 324 dets) gains ~25 mEh
+   of static 4p correlation at exact closure at CASCI, but free CASSCF
+   STILL escapes (window grabs even f): the escape is an optimizer
+   attractor, not correlation hunger; complete start != complete
+   converged.
+3. "Does sa_radial restore BOTH commutators to ~1e-13?" — C yes (8e-11);
+   Sc no: L² = 5.9997 exact but commutators land at ~1e-3, which turned
+   out to be the INPUT window's core-orthogonalization baseline (fact 17)
+   — SA suppresses the member asymmetry (4e-2 single-root -> ~2e-3) but
+   cannot go below the baseline. Removing it = ticket 13.
+4. "Does the constraint kill the sa/sa_pyscf basin split?" — with window
+   identity frozen there is no basin to split (sa_radial reproducible to
+   µEh across cold runs). Bonus finding: the FREE shell-start sa is itself
+   BIMODAL across chaos (4s<->3p swap or healthy window) — fact 15g.
+5. "Attribute the relax-rung comm (~1e-3)" — RESOLVED as fact 17: it is
+   the input window's defect (measured pre-optimization: 6.76e-4 == the
+   relax rung's converged value), not core polarization (optimized core +
+   raw window refold commutes at 1e-13) and not the optimizer (sa_radial
+   with frozen canonical core shows the same 1e-3).
+
+Plus: AVAS cross-validation (ncas/nelecas exact, span overlaps >= 0.985
+Sc / 0.917 C); guard negative control (non-orthonormal input -> DIVERGED).
+Test discipline learned: single-root radial commutators/L and the TM SA
+basins are chaotic — pin structural invariants (window identity, ortho,
+energy gaps) and branch on window weights, never the gauge.

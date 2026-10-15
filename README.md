@@ -16,7 +16,7 @@ first transition metal).
 
 ```bash
 conda activate pyscf          # PySCF 2.13 environment
-pytest                        # 57 tests, ~2 min (chkfile caching)
+pytest                        # 70 tests, ~4 min (chkfile caching)
 python scripts/run_carbon.py  # writes results/ (chkfiles + report.md/.json)
 ```
 
@@ -47,10 +47,17 @@ exactly rotation-closed.
   to a dominantly-L=0 basin — orthonormal and variational, a real
   multi-solution of the TM landscape, not a bug.
 - **SA-CASSCF over the term's M_L components**: restores ⟨L²⟩ on C/Si to
-  machine precision. On Sc the shell-start SA restores ⟨L²⟩ but not
-  [H, Lz]: the optimizer swaps the window's 4s for a core 3p (m-incomplete
-  window) — which motivates the constrained-optimization axis
-  (same-(l,m) radial-only rotations) in `wayfinder/tickets/`.
+  machine precision. On Sc the shell-start SA is bimodal across SCF chaos:
+  either it swaps the window's 4s for a core 3p (m-incomplete window) or
+  it converges healthy at the ~1e-3 input-window baseline.
+- **Constrained optimization** (`constrained_casscf` + rotation masks):
+  restricting rotations to same-(l, m) pairs (pure radial mixing) shows
+  the m-breaking buys *nothing* energetically — the radial rung reaches
+  the free minimum at exact shell purity on C/Si — while on Sc the
+  escape basin sits ~25 mEh *below* the radial ceiling: the escape
+  requires window-identity change, not radial correlation. The ~1e-3
+  commutator baseline of every optimized Si/Sc rung is the input window's
+  core-orthogonalization defect, measurable before any optimization runs.
 
 ## Design
 

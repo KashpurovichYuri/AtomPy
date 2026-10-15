@@ -16,13 +16,23 @@ Rungs, in order of increasing orbital freedom:
                    folded WITHOUT averaging: spherical at the source.
 4. casscf_relax -- window span frozen; only core<->virtual rotations: adds
                    the core's polarization by the correlated active density.
-5. casscf_virtmix -- core<->window exchange blocked; window may borrow
+5. casscf_radial -- window slots may rotate ONLY with same-(l, m) partners
+                   (pure radial mixing, member-preserving basis + mask):
+                   how much correlation is radially reachable WITHOUT any
+                   angular freedom. NOTE exact closure additionally needs
+                   the radial rotation applied identically to all m
+                   partners; independent per-member radial mixing can leave
+                   [H, Lz] at the member-radial-difference level (that is
+                   the measurement).
+6. casscf_virtmix -- core<->window exchange blocked; window may borrow
                    virtual character: the active pair's radial correlation,
                    isolated from identity-changing rotations.
-6. casscf_shell -- free CASSCF from the raw-shell start.
-7. casscf_pyscf -- free CASSCF from PySCF's default start (start dependence).
-8. sa / sa_pyscf -- SA-CASSCF over the given weights, from the raw-shell and
-                   the canonical start (restoration + start dependence).
+7. casscf_shell -- free CASSCF from the raw-shell start.
+8. casscf_pyscf -- free CASSCF from PySCF's default start (start dependence).
+9. sa / sa_radial / sa_pyscf -- SA-CASSCF over the given weights: free from
+                   the raw-shell start; constrained to radial rotations
+                   (imposed symmetry -- does SA + the constraint drive BOTH
+                   commutators to zero?); free from the canonical start.
 
 Adding a rung = appending one :class:`Rung` to :func:`_registry` (data, not
 code): the runner executes it through :func:`stage_facts` and the report
@@ -62,6 +72,9 @@ import numpy as np
 from atomterm.system import AtomConfig
 from atomterm.drivers import (
     build_full_mo,
+    constrained_casscf,
+    radial_basis,
+    radial_mask,
     run_casci,
     run_casscf,
     run_casscf_core_relax,
@@ -153,11 +166,21 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
         )
 
     mo_shell = mo_of(mf)
+    # member-labeled basis + same-(l, member) rotation mask: the radial rungs
+    mo_rad, lab_rad = radial_basis(mf, list(range(ncore)), act_idx)
+    mask_rad = radial_mask(lab_rad, ncore, ncas)
     rungs += [
         Rung(
             "casscf_relax", "casscf",
             lambda: run_casscf_core_relax(
                 mf, ncas, nelecas, mo_shell, chk("casscf_relax")),
+            c_win, lambda: mf,
+        ),
+        Rung(
+            "casscf_radial", "casscf",
+            lambda: constrained_casscf(
+                mf, ncas, nelecas, chk("casscf_radial"), mo_full=mo_rad,
+                mask=mask_rad, name="casscf_radial"),
             c_win, lambda: mf,
         ),
         Rung(
@@ -185,6 +208,15 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
                 "sa", "casscf",
                 lambda: run_sa_casscf(
                     mf, ncas, nelecas, mo_shell, list(sa_weights), chk("sa")),
+                c_win, lambda: mf,
+            ),
+            # imposed-symmetry SA: same weights, rotations restricted to
+            # same-(l, member) radial mixing -- the constrained twin of "sa"
+            Rung(
+                "sa_radial", "casscf",
+                lambda: run_sa_casscf(
+                    mf, ncas, nelecas, mo_rad, list(sa_weights),
+                    chk("sa_radial"), mask=mask_rad),
                 c_win, lambda: mf,
             ),
             # canonical-start variant: isolates the optimizer's start

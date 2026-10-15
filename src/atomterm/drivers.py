@@ -27,6 +27,9 @@ __all__ = [
     "purified_s_core",
     "complete_orthonormal",
     "build_full_mo",
+    "lm_sectors",
+    "radial_basis",
+    "radial_mask",
     "run_casci",
     "constrained_casscf",
     "core_virtual_only_mask",
@@ -304,6 +307,16 @@ def build_full_mo(mf, core_idx: list[int], act_idx: list[int], c_core: np.ndarra
     S-orthonormal, and silently returns extra columns otherwise (observed:
     (nao, nao+6) on Si).
     """
+    v = _core_window_block(mf, core_idx, act_idx, c_core)
+    if v.shape[1] == mf.mo_coeff.shape[0]:
+        return v
+    return complete_orthonormal(v, mf.get_ovlp())
+
+
+def _core_window_block(mf, core_idx: list[int], act_idx: list[int],
+                       c_core: np.ndarray = None) -> np.ndarray:
+    """Steps (1)+(2) of :func:`build_full_mo`: the S-orthonormal
+    core+window block that both it and :func:`radial_basis` start from."""
     n = mf.mo_coeff.shape[0]
     s = mf.get_ovlp()
     core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
@@ -319,10 +332,151 @@ def build_full_mo(mf, core_idx: list[int], act_idx: list[int], c_core: np.ndarra
     ev_a, u_a = np.linalg.eigh(gram_a)
     act = act @ (u_a / np.sqrt(ev_a)) @ u_a
 
-    v = np.hstack([core, act])
-    if v.shape[1] == n:
-        return v
-    return complete_orthonormal(v, s)
+    return np.hstack([core, act])
+
+
+def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
+    """AO rows grouped by (l, member): the EXACTLY S-orthogonal sectors of
+    a one-center spherical basis.
+
+    For a single atom at the origin, AOs of different (l, member) integrate
+    to zero against each other (angular orthogonality) whatever their
+    radial labels, while same-sector functions of different n OVERLAP --
+    the AO space is a direct sum of radial chains, one per (l, member).
+    This decomposition is what makes a per-sector Loewdin complement
+    (:func:`radial_basis`) globally S-orthonormal by construction.
+    """
+    sectors: dict[tuple[int, int], list[int]] = {}
+    loc = mol.ao_loc_nr()
+    for ib in range(mol.nbas):
+        l = abs(mol.bas_angular(ib))
+        nctr = mol.bas_nctr(ib)
+        for c in range(nctr):
+            for member in range(2 * l + 1):
+                # fused shells (nctr > 1) are contraction-outer, m-inner
+                sectors.setdefault((l, member), []).append(
+                    loc[ib] + c * (2 * l + 1) + member)
+    return sectors
+
+
+def radial_basis(mf, core_idx: list[int], act_idx: list[int]):
+    """Full MO matrix plus per-slot (l, member) labels -- the substrate for
+    :func:`radial_mask`.
+
+    Everything non-core is built in a MEMBER-PRESERVING gauge (sequential
+    S-metric Gram-Schmidt, not a symmetric Loewdin): the projected window
+    members have near-equal norms, so the Loewdin eigenvector gauge is an
+    arbitrary rotation within each degenerate member set -- span-preserving
+    (CASCI/CASSCF never noticed; that is why :func:`build_full_mo` can keep
+    it) but it silently reassigns which column is which (l, m). Here the
+    column identity IS the product, so the gauge is fixed by construction.
+
+    Window slots carry their AO's sector label; each sector's STRONG
+    residual directions against the core+window span are appended with
+    their sector label; the near-null directions left over (radial needles)
+    pad the matrix through :func:`complete_orthonormal` with label
+    ``None`` and never serve as rotation partners.
+
+    Returns ``(mo_full, labels)`` with ``labels[i] = (l, member) | None``.
+    """
+    mol = mf.mol
+    n = mf.mo_coeff.shape[0]
+    s = mf.get_ovlp()
+    sec = lm_sectors(mol)
+    row_sector = {row: key for key, rows in sec.items() for row in rows}
+
+    core = mf.mo_coeff[:, core_idx]
+    gram = core.conj().T @ s @ core
+    ev, u = np.linalg.eigh(gram)
+    core = core @ (u / np.sqrt(ev)) @ u.T
+
+    def sgs(cols, base):
+        """S-metric Gram-Schmidt (two refinement passes) of the columns in
+        ``cols`` on top of the S-orthonormal block(s) in ``base``;
+        preserves column identity (unlike a symmetric Loewdin)."""
+        out = []
+        cur = np.hstack(base) if base else None
+        for c in cols:
+            c = np.asarray(c).reshape(-1, 1)  # uniform (n, 1) columns
+            for _ in range(2):
+                if cur is not None:
+                    c = c - cur @ (cur.conj().T @ s @ c)
+                c = c / float(np.real(np.sqrt((c.conj().T @ s @ c)[0, 0])))
+            out.append(c)
+            cur = c if cur is None else np.hstack([cur, c])
+        return out
+
+    # window in member order: raw AO minus the core span, sequentially
+    # orthogonalized -- column j IS the (l, m) of act_idx[j] by construction
+    p_core = core @ core.conj().T @ s
+    window = sgs([np.eye(n)[:, ao] - p_core @ np.eye(n)[:, ao]
+                  for ao in act_idx], [core])
+    v = np.hstack([core] + window)
+    labels: list = [None] * len(core_idx) + [row_sector[ao] for ao in act_idx]
+
+    # strong sector residuals, same member-preserving treatment. Strength
+    # cutoff: genuine radial residuals are >= 8e-2 of S-weight (even when
+    # they heavily overlap the frozen span, e.g. the 3s of cc-pVDZ C at
+    # 0.085); the core's symmetry-breaking tails are <= ~3e-6 -- 30x margin
+    # both ways. Below the cut sit the near-linearly-dependent radial
+    # needles (Sc 6p: 1.7e-4 outside the frozen span).
+    p_v = v @ v.conj().T @ s
+    strong, strong_labels = [], []
+    for key, rows in sorted(sec.items()):
+        block = np.eye(n)[:, rows]
+        r = block - p_v @ block
+        gr = r.conj().T @ s @ r
+        ev, u = np.linalg.eigh(gr)
+        keep = ev > 1e-4
+        if keep.any():
+            strong += [r @ (u[:, j] / np.sqrt(ev[j])) for j in np.where(keep)[0]]
+            strong_labels += [key] * int(keep.sum())
+    if strong:
+        v = np.hstack([v] + sgs(strong, [v]))
+        labels += strong_labels
+
+    mo = v if v.shape[1] == n else complete_orthonormal(v, s)
+    labels += [None] * (mo.shape[1] - len(labels))
+
+    # gauge assertion: every labeled column really is dominated by its own
+    # sector (catches any gauge surprise at the purity level)
+    for i, lab in enumerate(labels):
+        if lab is None:
+            continue
+        rows = sec[lab]
+        c = mo[rows, i]
+        w = float(np.real(c.conj().T @ s[np.ix_(rows, rows)] @ c))
+        assert w > 0.9, (i, lab, w)
+    assert mo.shape[1] == n
+    return mo, labels
+
+
+def radial_mask(labels: list, ncore: int, ncas: int):
+    """``uniq_var_indices`` mask allowing ONLY same-(l, member) rotations
+    into a window slot: pure RADIAL mixing (3d_m may borrow 4d_m/5d_m; the
+    4s any s), l-content and m-membership of every slot untouchable, and
+    no core<->window exchange at all (core slots carry no label).
+
+    Physics caveat (measured by the radial rungs): this preserves each
+    slot's angular character, but exact rotational closure of the WINDOW
+    additionally requires the radial rotation to be applied IDENTICALLY to
+    all m partners (closure = complete m-set with SHARED radial vectors,
+    see GLOSSARY.md). Independent per-member radial mixing can leave
+    [H, Lz] nonzero at the level of the member-radial-vector differences;
+    SA over the term's M_L set is the symmetry-restoring companion rung.
+    """
+    lab = list(labels)
+
+    def mask(self, nmo, ncore_, ncas_, frozen):
+        m = np.zeros((nmo, nmo), dtype=bool)
+        for w in range(ncore, ncore + ncas):
+            same = np.array([lab[u] is not None and lab[u] == lab[w]
+                             for u in range(nmo)])
+            same[w] = False
+            m[same, w] = True
+        return m
+
+    return mask
 
 
 @dataclass

@@ -17,6 +17,9 @@ import pytest
 from atomterm.system import AtomConfig
 from atomterm.drivers import (
     build_full_mo,
+    lm_sectors,
+    radial_basis,
+    radial_mask,
     run_frac_occ_scf,
     run_rohf,
     select_shell_ao,
@@ -185,3 +188,96 @@ def test_sc_frac_occ_selects_open_shell_by_projection(sc_rohf, tmp_path):
         assert w[:, names.index("p")].mean() > 0.3  # p-contaminated block
     else:
         pass  # face (b): non-convergence is itself the failure mode
+
+
+# --------------------------------------------------------------------------
+# The radial-constraint substrate (ticket 14): (l, member)-labeled bases.
+# --------------------------------------------------------------------------
+
+
+def test_lm_sectors_partition_fused_shells(sc_rohf):
+    """(l, member) sectors: exactly S-orthogonal, and the fused shells
+    (nctr > 1, contraction-outer/m-inner) are unpacked so every AO lands in
+    exactly one sector with its radial chain."""
+    _, mol, mf, _ = sc_rohf
+    sec = lm_sectors(mol)
+    rows = [r for rs in sec.values() for r in rs]
+    assert sorted(rows) == list(range(mol.nao_nr()))
+    s = mf.get_ovlp()
+    keys = sorted(sec)
+    for i, ki in enumerate(keys):
+        for kj in keys[i + 1:]:
+            assert np.abs(s[np.ix_(sec[ki], sec[kj])]).max() < 1e-10
+    # Sc: 6 s + 3x5 p + 3x5 d + 1x7 f radial chains per member sector
+    assert len(sec[(0, 0)]) == 6 and len(sec[(1, 0)]) == 5
+    assert len(sec[(2, 2)]) == 3 and len(sec[(3, 6)]) == 1
+
+
+def test_radial_basis_labels_and_partners(sc_rohf):
+    """radial_basis: square S-orthonormal matrix whose window slots carry
+    their AO's (l, member) sector; every window slot has at least one
+    same-sector rotation partner; the mask never pairs core or cross-(l,m)
+    slots."""
+    cfg, mol, mf, act_idx = sc_rohf
+    ncore = (mol.nelectron - 3) // 2
+    mo, labels = radial_basis(mf, list(range(ncore)), act_idx)
+    s = mf.get_ovlp()
+    assert mo.shape == (mol.nao_nr(), mol.nao_nr())
+    assert np.abs(mo.conj().T @ s @ mo - np.eye(mo.shape[1])).max() < 1e-10
+    row_sector = {r: k for k, rs in lm_sectors(mol).items() for r in rs}
+    got = [labels[ncore + i] for i in range(len(act_idx))]
+    assert got == [row_sector[a] for a in act_idx]
+    mask = radial_mask(labels, ncore, len(act_idx))(
+        None, mo.shape[1], ncore, len(act_idx), None)
+    assert mask.sum() >= len(act_idx)  # every slot: >= 1 radial partner
+    assert not mask[:ncore, :].any()   # core slots never pair
+    for i, j in np.argwhere(mask):
+        assert labels[i] == labels[j] is not None
+
+
+def test_casscf_input_window_orthogonalization_defect(sc_rohf):
+    """Fact 17: the raw {3d, 4s} shell window is exactly rotation-closed,
+    but the core-ORTHOGONALIZED window every CASSCF must start from carries
+    a ~1e-3 closure defect (the projection subtracts non-closed canonical
+    core directions; the Sc window-core overlap is ~0.3). This -- not core
+    polarization, not the optimizer -- is the relax rung's commutator
+    baseline, and it is present BEFORE any optimization runs."""
+    from atomterm.analysis import analyze
+    from atomterm.operators import build_operators
+
+    cfg, mol, mf, act_idx = sc_rohf
+    ncore = (mol.nelectron - 3) // 2
+    c_shell = np.eye(mol.nao_nr())[:, act_idx]
+    mo_shell = build_full_mo(mf, list(range(ncore)), act_idx)
+    mo_rad, _ = radial_basis(mf, list(range(ncore)), act_idx)
+    for name, w in [("raw shell AOs", c_shell),
+                    ("build_full_mo window", mo_shell[:, ncore:ncore + 6]),
+                    ("radial_basis window", mo_rad[:, ncore:ncore + 6])]:
+        ops = build_operators(mol, mf, w, ncore, 2, 1)
+        res = analyze(ops["H"], ops["Lz"], ops["L2"], ops["S2"], name)
+        if name == "raw shell AOs":
+            assert res.comm_norm_h_lz < 1e-12
+        else:
+            assert 1e-4 < res.comm_norm_h_lz < 1e-2, name
+
+
+def test_avas_cross_validates_the_shell_window(sc_rohf, carbon):
+    """AVAS (an independent ecosystem window selector) picks exactly our
+    shell window's size and electron count, with a span overlapping the raw
+    shell AOs (principal S-overlaps >= 0.9): the window choice is not an
+    artifact of our selection machinery."""
+    from pyscf.mcscf import avas
+
+    for (cfg, mol, mf, act_idx), labels, nelec in [
+        (sc_rohf, ["Sc 3d", "Sc 4s"], 3),
+        (carbon, ["C 2p"], 2),
+    ]:
+        ncore = (mol.nelectron - nelec) // 2
+        ncas, nelecas, mo = avas.avas(mf, labels, ncore=ncore)
+        assert ncas == len(act_idx), labels
+        assert int(np.sum(nelecas)) == nelec, labels
+        s = mf.get_ovlp()
+        c_raw = np.eye(mol.nao_nr())[:, act_idx]
+        sv = np.linalg.svd(
+            c_raw.conj().T @ s @ mo[:, ncore:ncore + ncas], compute_uv=False)
+        assert sv.min() > 0.9, (labels, sv)

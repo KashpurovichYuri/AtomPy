@@ -79,6 +79,17 @@ green, reports written.
   constrained_casscf(mo_full=, mask=, weights=)` over public
   `uniq_var_indices` masks, `ladder.Rung` registry (report iterates it —
   the drop-a-rung bug class is gone).
+- [Constrained-optimization & start-variant axis](tickets/14-start-variants.md):
+  the radial mask (same-(l, member) rotations over an (l,m)-labeled
+  basis) answered all five questions — see facts 16/17. Headlines: the
+  p² m-breaking is an energetically flat member GAUGE (radial rung ==
+  free rung); the Sc escape is ~25 mEh below the radial ceiling (needs
+  window-identity change); the complete {3d,4s,4p} window still escapes
+  (optimizer attractor, not 4p hunger); sa_radial anchors the gauge but
+  lands on the 1e-3 input-window baseline; the relax-rung ~1e-3 commutator
+  is that same baseline, present before optimization (attribution
+  resolved; motivates ticket 13). AVAS cross-validates the window; the
+  guard negative control fires.
 
 ## Not yet specified
 
@@ -103,14 +114,14 @@ machinery; tickets 14/15 answer the open machinery questions first.
   2→1→3 approved and executed as ticket 14's pre-item), step 3 (protocol
   recorded in AGENTS.md Planning).
 - [14: constrained-optimization & start-variant axis](tickets/14-start-variants.md) —
-  IN PROGRESS: pre-item refactor landed (stage_facts, constrained_casscf +
-  masks, Rung registry, report comparison columns); remaining: radial
-  rungs, CAS(3,11) complete-window reference, AVAS cross-validation,
-  guard negative control, facts + bands.
+  RESOLVED: pre-item refactor (a024d26) + the experiment matrix; findings
+  in facts 16/17 and the ticket's Resolution section.
 - [12: Ti](tickets/12-ti.md) — 3d² ³F; a data-row exercise on the
   settled machinery (projection-selected frac block, TM bands from Sc).
 - [13: purified_core_orbitals](tickets/13-purify-general.md) — optional,
-  per-shell core purification for future core-explicit TM tests.
+  per-shell core purification; now concretely motivated by fact 17 (an
+  l-purified core span would remove the 1e-3 input-window commutator
+  baseline and make optimized rungs exactly closed).
 
 ## Out of scope
 

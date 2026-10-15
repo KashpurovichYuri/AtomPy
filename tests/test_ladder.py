@@ -30,7 +30,9 @@ import pytest
 
 from conftest import SC_EXACT_TERMS
 
+from atomterm.drivers import build_full_mo, run_casci
 from atomterm.ladder import run_ladder
+from atomterm.stages import stage_facts
 from atomterm.system import AtomConfig
 
 LADDER_CASES = {
@@ -55,6 +57,11 @@ LADDER_CASES = {
             sa_l2=1.99999,
             sa_nroots=True,             # assert len(energies_pyscf) == 3
             basin_tol=1e-4,
+            radial_purity=0.999,        # the mask's structural guarantee
+            sa_radial_comm=1e-8,        # measured 8e-11
+            sa_radial_l2=1.99999,
+            radial_free_tol=1e-5,       # radial == free minimum (measured 2e-8)
+            sa_radial_dE=1e-4,          # vs the free SA (measured 2.7e-5)
         ),
     ),
     "Si": dict(
@@ -80,6 +87,12 @@ LADDER_CASES = {
             sa_l2=1.9999,
             sa_nroots=False,
             basin_tol=1e-3,
+            radial_purity=0.999,
+            sa_radial_comm=1e-2,        # measured 1.6e-5 (gauge chaos headroom)
+            sa_radial_l2=1.99,
+            radial_free_tol=1e-3,       # radial == free (measured 3e-7; the
+                                        # free rung's own basin wobbles)
+            sa_radial_dE=5e-4,          # vs the free SA (measured 3.4e-5)
         ),
     ),
 }
@@ -192,6 +205,52 @@ def test_sa_restoration(name, ladders):
             assert len(sa["energies_pyscf"]) == 3, (name, tag)
 
 
+@pytest.mark.parametrize("name", list(LADDER_CASES))
+def test_radial_rung_full_gain_without_l_leakage(name, ladders):
+    """The same-(l, member) radial constraint (fact 16): the ENTIRE
+    free-CASSCF correlation gain is radially reachable (radial rung ==
+    free rung to µEh) with ZERO l-leakage (exact shell purity, the mask's
+    structural guarantee). Which MEMBER gauge the single-root optimizer
+    lands in is chaotic (C measured 5e-11, Si 1.2e-1 -- a flat direction),
+    so the commutators are documented facts, not pinned here; sa_radial
+    anchors the gauge (L exactly restored, commutators per-case bounded).
+    """
+    case, r = LADDER_CASES[name], ladders[name]
+    b = case["bands"]
+    rad = r["casscf_radial"]
+    assert rad["ground_term"] == "3P", name
+    assert rad["ortho_err"] < 1e-10 and not rad["diverged"], name
+    assert rad["window"]["p"] > b["radial_purity"], name  # no l-leakage at all
+    assert abs(rad["e_ground"] - r["casscf_shell"]["e_ground"]) < b["radial_free_tol"], name
+    lo, hi = b["corr_gain"]
+    assert lo < rad["e_ground"] - r["casci_avg"]["e_ground"] < hi, name
+    # imposed-symmetry SA: same window family, L restored
+    sar = r["sa_radial"]
+    assert sar["ground_term"] == "3P", name
+    assert sar["ortho_err"] < 1e-10, name
+    assert sar["window"]["p"] > b["radial_purity"], name
+    assert sar["ground_l2"] > b["sa_radial_l2"], name
+    assert sar["comm_norm_h_lz"] < b["sa_radial_comm"], name
+    assert abs(sar["e_ground"] - r["sa"]["e_ground"]) < b["sa_radial_dE"], name
+
+
+def test_divergence_guard_fires_on_broken_orthonormality(carbon, tmp_path):
+    """Negative control for the ortho_err guard (ticket 14): a deliberately
+    non-S-orthonormal MO matrix (pre-fix-style) must be flagged DIVERGED --
+    the energies of such a rung are meaningless and the flag says so."""
+    _, mol, mf, act_idx = carbon
+    ncore = (mol.nelectron - 2) // 2
+    mo = build_full_mo(mf, list(range(ncore)), act_idx)
+    mo[:, ncore] = 1.05 * mo[:, ncore]  # break S-orthonormality (~0.1)
+    cas = run_casci(mf, 3, (2, 0), mo, str(tmp_path / "bad.chk"), nroots=3,
+                    name="bad")
+    facts = stage_facts(mol, mf, cas, mo[:, ncore:ncore + 3], ncore, 2, 0,
+                        tag="bad")
+    assert facts.ortho_err > 1e-6
+    assert facts.diverged
+    assert facts.payload("casci")["diverged"] is True
+
+
 # --------------------------------------------------------------------------
 # Sc (ticket 11): the transition-metal ladder. Same machinery, different
 # physics -- every assertion below is the measured Sc pattern across three
@@ -282,22 +341,89 @@ def test_sc_free_casscf_escapes_the_shell(sc_ladder):
 
 
 def test_sc_sa_restores_l2_not_lz(sc_ladder):
-    """Shell-start SA over the five 2D M_L components restores <L^2> = 6 --
-    but NOT [H, Lz]: the optimizer swaps the window's 4s member for a core
-    3p (window p-weight exactly 1/6, core reorganized 4s+5p, anisotropy
-    0.30): an m-INCOMPLETE window. Our averaged fold of that strongly
-    polarized core vs PySCF's raw one shows as max|dE| ~ 0.8 (the
-    polarized-core detector at Eh scale). The canonical-start SA collapses
-    outright -- the start dependence is real on a TM."""
+    """Shell-start SA over the five 2D M_L components restores <L^2> = 6
+    always, and is BIMODAL across SCF chaos (fact 15 amended): either it
+    swaps the window's 4s member for a core 3p (window p-weight exactly
+    1/6, an m-INCOMPLETE window, [H, Lz] ~ 0.3; our averaged fold of that
+    strongly polarized core vs PySCF's raw one shows as max|dE| ~ 0.8 --
+    the polarized-core detector at Eh scale), or it converges healthy
+    (window {3d, 4s}, commutators at the ~1e-3 input-window baseline of
+    fact 17, like sa_radial). The canonical-start SA collapses to the
+    dominantly-L=0 basin -- the start dependence is real on a TM."""
     r = sc_ladder
     sa = r["sa"]
     assert sa["ortho_err"] < 1e-10
     assert 5.99 < sa["ground_l2"] < 6.02
-    assert sa["comm_norm_h_lz"] > 0.1
-    assert 0.1 < sa["window"].get("p", 0.0) < 0.25
-    assert 0.7 < sa["window"].get("d", 0.0) < 0.9
-    assert 0.1 < sa["max_de_vs_pyscf"] < 5.0
+    if sa["window"].get("p", 0.0) > 0.05:  # the swapped-window basin
+        assert sa["comm_norm_h_lz"] > 0.1
+        assert 0.1 < sa["window"].get("p", 0.0) < 0.25
+        assert 0.7 < sa["window"].get("d", 0.0) < 0.9
+        assert 0.1 < sa["max_de_vs_pyscf"] < 5.0
+    else:  # the healthy basin (observed in cold runs after ticket 14)
+        assert sa["comm_norm_h_lz"] < 5e-3
+        assert abs(sa["window"].get("s", 0.0) - 1 / 6) < 1e-2
+        assert abs(sa["window"].get("d", 0.0) - 5 / 6) < 1e-2
 
     sa_p = r["sa_pyscf"]
     assert sa_p["ground_l2"] < 0.5
     assert sa_p["ortho_err"] < 1e-10
+
+
+def test_sc_radial_rung_blocks_the_escape(sc_ladder):
+    """Fact 16 on the TM: the same-(l, member) mask keeps the window
+    exactly {3d 5/6, 4s 1/6} (no p-route to the escape), so the radial
+    ceiling sits ~25 mEh ABOVE the escaped free minimum (stable across
+    cold runs: +24.4, +25.1) -- the escape is an l/window-identity
+    phenomenon, not radially reachable correlation. The single-root radial
+    GAUGE is chaotic (cold runs: comm 2e-3..1.6, <L^2> 3.5..5.4, the
+    ground term even relabels 2D->2P -- a flat member direction, exactly
+    like the free rung's m-breaking), so only its energy is pinned.
+    sa_radial is the anchored counterpart: reproducible to µEh, <L^2> =
+    5.9997, commutators at the INPUT window's core-orthogonalization
+    baseline (~1e-3, fact 17), NOT machine precision. All Sc CASSCF-family
+    energies carry the window-definition offset vs casci_avg (fact 14)."""
+    r = sc_ladder
+    rad, sar, shell = r["casscf_radial"], r["sa_radial"], r["casscf_shell"]
+    for rung in (rad, sar):
+        assert abs(rung["window"].get("s", 0.0) - 1 / 6) < 1e-3
+        assert abs(rung["window"].get("d", 0.0) - 5 / 6) < 1e-3
+        assert rung["window"].get("p", 0.0) < 1e-3
+        assert rung["ortho_err"] < 1e-10 and not rung["diverged"]
+        assert 0.03 < rung["e_ground"] - r["casci_avg"]["e_ground"] < 0.09
+    # the escape is BELOW the radial ceiling (both minima are well-defined
+    # even though the single-root radial gauge is not; observed gap ~25 mEh,
+    # band widened for the escape energy's own wobble, fact 10)
+    assert 0.0 < rad["e_ground"] - shell["e_ground"] < 0.05
+    # imposed-symmetry SA: L restored, commutators at the 1e-3 baseline
+    assert sar["ground_term"] == "2D"
+    assert sar["ground_l2"] == pytest.approx(6.0, abs=1e-3)
+    assert sar["comm_norm_h_lz"] < 5e-3
+
+
+@pytest.fixture(scope="session")
+def sc_big_window_ladder(tmp_path_factory):
+    """CAS(3,9) over the complete {3d, 4s, 4p} window (324 dets): is the
+    escape just 4p correlation hunger?"""
+    return run_ladder(
+        AtomConfig("Sc", "ccpvdz", spin=1), ["3d", "4s", "4p"], 3,
+        workdir=str(tmp_path_factory.mktemp("ladder_Sc_cas311")),
+        sa_weights=[1 / 5] * 5, rung_tags=["casci_avg", "casscf_shell"])
+
+
+def test_sc_complete_window_still_escapes(sc_ladder, sc_big_window_ladder):
+    """With 4p IN the window the CASCI gains ~25 mEh of static correlation
+    at EXACT closure (complete shells) -- yet the free CASSCF still leaves
+    for the dominantly-L=0 basin (window grabs even f character): the
+    escape is an optimizer attractor, not a physical correlation target,
+    and a complete START window is not a complete CONVERGED window."""
+    small, big = sc_ladder, sc_big_window_ladder
+    ci = big["casci_avg"]
+    assert ci["comm_norm_h_lz"] < 1e-10 and ci["comm_norm_h_l2"] < 1e-10
+    assert ci["ground_term"] == "2D"
+    assert ci["ground_l2"] == pytest.approx(6.0, abs=1e-8)
+    assert abs(ci["window"].get("p", 0.0) - 3 / 9) < 1e-3
+    d_static = ci["e_ground"] - small["casci_avg"]["e_ground"]
+    assert -0.035 < d_static < -0.015  # ~-25 mEh of 4p static correlation
+    shell = big["casscf_shell"]
+    assert shell["ground_l2"] < 1.5  # escaped anyway
+    assert not shell["diverged"] and shell["ortho_err"] < 1e-10

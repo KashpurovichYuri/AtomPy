@@ -54,9 +54,13 @@ tickets, and AGENTS.md use them exactly.
   the same l and member index — pure radial mixing; keeps every slot's
   (l, m) character. NOTE: exact closure additionally requires the radial
   rotation to be applied IDENTICALLY to all m partners (shared radial
-  vectors); independent per-member radial mixing preserves each slot's
-  purity but can still break [H, Lz] at the level of the radial-vector
-  differences. Measured by the radial rungs.
+  vectors). Measured (fact 16): the member-gauge freedom is energetically
+  FLAT (radial rung == free rung on p² atoms), chaotic in which gauge a
+  single-root optimizer lands, anchored by SA; on Sc the escape basin is
+  ~25 mEh below the radial ceiling — not radially reachable.
+- **window-orthogonalization defect** (fact 17): the ~1e-3 commutator
+  baseline every CASSCF rung inherits from its INPUT window (core-
+  orthogonalized raw shell AOs); NOT core polarization, NOT the optimizer.
 - **escape**: free CASSCF leaving the intended window basin (Sc: dominantly
   L=0 basin of the escaped window — optimizer artifact, not a physical
   term).
