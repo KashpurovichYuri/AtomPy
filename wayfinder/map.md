@@ -133,9 +133,12 @@ machinery; tickets 14/15 answer the open machinery questions first.
   free SA machine-exact on C/Si; Sc's residual sa_radial_pur gauge
   floor (~1e-6, no restoring force) and the surviving 4s↔3p swap
   attractor close the attribution questions. Phase 4 not needed.
-- [12: Ti](tickets/12-ti.md) — NEXT: 3d² ³F; a data-row exercise on the
-  settled machinery (projection-selected frac block, TM bands from Sc,
-  pur rungs for the exact-symmetry stages).
+- [12: Ti](tickets/12-ti.md) — NEXT: d² tables (A: CAS(2,5)/{3d}, first
+  L=3 ground term and first L=4 term, first f-block load) + the Ti-atom
+  ladder (B: CAS(4,6)/{3d,4s}, pur rungs, the ³F tilt-stability
+  question). Pre-flight verified 2026-10-16: default ROHF is an aufbau
+  runaway (+123 mEh) — the ticket ships a verified character-forced
+  occupation recipe.
 
 ## Out of scope
 

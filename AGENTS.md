@@ -404,9 +404,10 @@ ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and
 lists the live tickets. Update it when a decision is made; keep tickets
-one-session sized. The live wave (12 NEXT: Ti 3d², a data-row exercise on
-the settled machinery — tickets 13/16 RESOLVED, facts 18/19/20; run the
-`*_pur` rungs on Ti for the exact-symmetry stages)
+one-session sized. The live wave (12 NEXT: Ti — options A then B in one
+session; tickets 13/16 RESOLVED, facts 18/19/20; the ticket carries a
+pre-flight-verified ROHF occupation fix — default ROHF on Ti is an aufbau
+runaway; PHYSICS.md narrative deferred by the user)
 is fully specified
 in `wayfinder/tickets/` — each ticket
 is self-contained (no conversation context needed). Review protocol:
