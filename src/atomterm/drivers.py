@@ -93,7 +93,8 @@ def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
 
 
 def run_rohf(cfg, chkfile: str, occ_closed: list[str] | None = None,
-             occ_open: list[str] | None = None):
+             occ_open: list[str] | None = None,
+             occ_e_ref: float | None = None):
     """ROHF for the configured atom, cached in ``chkfile``.
 
     If the chkfile exists, the converged MOs are loaded and no SCF is run.
@@ -115,6 +116,17 @@ def run_rohf(cfg, chkfile: str, occ_closed: list[str] | None = None,
         SCF lands the physical reference deterministically. The hook is
         part of the object's identity: set BEFORE the cache branch
         (ticket-10 lesson).
+    occ_e_ref : reference energy of the target SCF basin (Eh). Even with
+        forced occupations the SCF is multi-basin where the open shell is
+        orbitally degenerate: on Ti the same 3d2 4s2 occupations converge
+        either to the true reference (-848.40648875, nearly Lz-closed
+        open-pair gauge, build_full_mo window defect ~1e-8) or to a
+        metastable +11.2 mEh basin (a member-gauge whose polarized core
+        smears the window at the 1e-2 level) -- the default init guess
+        is NOT reliable between them. When given, the run is retried over
+        cycled init guesses ("atom", "huckel"; both verified to reach the
+        reference basin on Ti) until |E - occ_e_ref| <= 1e-4, else
+        RuntimeError.
     """
     from atomterm.system import build_mol
 
@@ -126,6 +138,8 @@ def run_rohf(cfg, chkfile: str, occ_closed: list[str] | None = None,
             raise ValueError(
                 "occ_closed and occ_open must be given together")
         mf.get_occ = _forced_rohf_occ(mol, occ_closed, occ_open)
+    elif occ_e_ref is not None:
+        raise ValueError("occ_e_ref needs the occ_closed/occ_open patterns")
     try:
         _, rec = scf.chkfile.load_scf(chkfile)
         mf.__dict__.update(rec)
@@ -137,6 +151,24 @@ def run_rohf(cfg, chkfile: str, occ_closed: list[str] | None = None,
     mf.chkfile = chkfile
     mf.conv_tol = 1e-12  # tight core density: keeps rotational symmetry clean
     mf.run()
+    if occ_e_ref is not None:
+        for guess in ("atom", "huckel"):
+            if mf.converged and abs(mf.e_tot - occ_e_ref) <= 1e-4:
+                break
+            mf = scf.ROHF(mol)
+            mf.get_occ = _forced_rohf_occ(mol, occ_closed, occ_open)
+            mf.chkfile = chkfile
+            mf.conv_tol = 1e-12
+            mf.verbose = cfg.verbose
+            mf.init_guess = guess
+            mf.run()
+        else:
+            if not (mf.converged and abs(mf.e_tot - occ_e_ref) <= 1e-4):
+                raise RuntimeError(
+                    f"character-forced ROHF did not reach the reference "
+                    f"basin E = {occ_e_ref:.8f} (got {mf.e_tot:.8f}, "
+                    f"converged={mf.converged}); the basin census or the "
+                    f"guess list needs revisiting")
     return mol, mf
 
 

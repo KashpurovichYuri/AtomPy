@@ -137,3 +137,68 @@ def test_sc_radial_structure_inverts(sc_rohf, tmp_path):
     assert tilts["tilt 0"].comm_h_lz > 0.1               # and breaks L
     e_t3 = tilts["tilt 0,1,2"].e_active
     assert e_t3 < e_t1 < p0.e_active                     # more tilt, lower E
+
+
+@pytest.fixture(scope="session")
+def ti_scan_ref(tmp_path_factory):
+    """Ti reference for the frozen scans: the character-forced, basin-gated
+    ROHF (conftest TI_OCC) -- deterministic closure measurements."""
+    from conftest import TI_OCC
+
+    cfg = AtomConfig("Ti", "ccpvdz", spin=2)
+    mol, mf = run_rohf(cfg, str(tmp_path_factory.mktemp("scan_ti") / "rohf.chk"),
+                       **TI_OCC)
+    return mol, mf
+
+
+def test_ti_d2_tilts_descend_radial_rises(ti_scan_ref):
+    """Fact 21 (ticket 12): the d2 3F anatomy inverts the p2 story the
+    SAME way Sc 3d1 2D does, but ~2x weaker:
+
+    - SINGLE-member tilts DESCEND (measured -163 uEh at delta = 0.1 vs
+      Sc's ~-300 uEh) with <L^2> ~ 12 barely moved -- a Jahn-Teller-like
+      instability of the orbitally degenerate 3F term, so free single-root
+      optimizers wander and sa_radial_pur stops at its flat-gauge floor
+      (no restoring force tightens the member gauge);
+    - the m-SYMMETRIC radial rotation of the d shell RISES steeply
+      (+28 mEh at theta = 0.05): radial diffusion of the contracted 3d
+      only loses, exactly like Sc (and unlike C/Si, whose p-shell radial
+      breathing recovers the full CASSCF gain);
+    - the {0,1,3,4} tilt pattern (everything but dz^2 = equal tilts of
+      both +-m pairs) stays Lz-BLIND (|[H, Lz]| ~ 1e-13) while [H, L^2]
+      fires -- the fact-18c blind-spot structure on a 5-member shell.
+
+    Deterministic: no optimizer anywhere in the loop."""
+    mol, mf = ti_scan_ref
+    d3, d4 = select_shell_ao(mol, "3d"), select_shell_ao(mol, "4d")
+    c4s = np.eye(mol.nao_nr())[:, select_shell_ao(mol, "4s")].reshape(-1, 1)
+    ncore, na, nb = 9, 3, 1
+
+    def state(thetas):
+        c_act = np.hstack([scan_window(mol, mf, thetas, d3, d4), c4s])
+        return scan_state(mol, mf, c_act, ncore, na, nb, with_l2=True)
+
+    p0 = state([0.0] * 5)
+    assert p0.ground_l2 == pytest.approx(12.0, abs=1e-8)  # 3F ground
+
+    # m-symmetric radial rotation: harmful (the Sc class, not C/Si;
+    # measured +9.8 mEh at theta = 0.05, rising steeply)
+    p_rad = state([0.05] * 5)
+    assert p0.e_active + 0.005 < p_rad.e_active < p0.e_active + 0.02
+    assert p_rad.comm_h_lz < 1e-10          # but exactly closed
+    assert p_rad.ground_l2 == pytest.approx(12.0, abs=1e-6)
+
+    # single-member tilt: DESCENDS (JT class), breaks L
+    p_t1 = state([0.10] * 1 + [0.0] * 4)
+    assert -8e-4 < p_t1.e_active - p0.e_active < -5e-5
+    assert p_t1.comm_h_lz > 0.1
+    assert 11.9 < p_t1.ground_l2 < 12.0     # term identity nearly kept
+
+    # two members: roughly twice the descent
+    p_t2 = state([0.10, 0.10, 0.0, 0.0, 0.0])
+    assert p_t2.e_active < p_t1.e_active < p0.e_active
+
+    # the Lz-blind pattern: equal tilts of both +-m pairs (no dz^2)
+    p_bl = state([0.10, 0.10, 0.0, 0.10, 0.10])
+    assert p_bl.comm_h_lz < 1e-10           # Lz cannot see it
+    assert p_bl.comm_h_l2 > 0.1             # L^2 fires

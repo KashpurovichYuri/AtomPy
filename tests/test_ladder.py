@@ -28,7 +28,7 @@ from collections import Counter
 import numpy as np
 import pytest
 
-from conftest import SC_EXACT_TERMS
+from conftest import SC_EXACT_TERMS, TI_EXACT_TERMS, TI_OCC
 
 from atomterm.drivers import build_full_mo, run_casci
 from atomterm.ladder import run_ladder
@@ -552,3 +552,193 @@ def test_sc_complete_window_still_escapes(sc_ladder, sc_big_window_ladder):
     shell = big["casscf_shell"]
     assert shell["ground_l2"] < 1.5  # escaped anyway
     assert not shell["diverged"] and shell["ortho_err"] < 1e-10
+
+
+# ==========================================================================
+# Ti (ticket 12, option B): CAS(4,6)/{3d, 4s}, Ms=1 sector (120 dets) --
+# does the whole settled story (fact 15 TM phenomenology, fact 18 scans,
+# fact 20 purification) transfer to a 4-valence-electron d2 TM?
+# ==========================================================================
+
+
+@pytest.fixture(scope="session")
+def ti_ladder(tmp_path_factory):
+    return run_ladder(
+        AtomConfig("Ti", "ccpvdz", spin=2), ["3d", "4s"], 4,
+        workdir=str(tmp_path_factory.mktemp("ladder_Ti")),
+        sa_weights=[1 / 7] * 7, frac_nelec_open=4, frac_n_open=6,
+        purified=True, **TI_OCC)
+
+
+def test_ti_casci_exact_closure_and_term_table(ti_ladder):
+    """Raw-shell CAS(4,6) over {3d, 4s} is exactly rotation-closed: the
+    averaged/frac cores commute at 1e-13 and the 120-state sector
+    reproduces the d2 + d3 s + d4 term tables (ground 3F, the first F
+    ground term). The RAW core field is percent-level (like Sc) and the
+    frac reference is a different (+38 mEh) but exactly invariant one."""
+    r = ti_ladder
+    for tag in ("casci_avg", "casci_frac"):
+        assert r[tag]["comm_norm_h_lz"] < 1e-10, tag
+        assert r[tag]["comm_norm_h_l2"] < 1e-10, tag
+        assert r[tag]["terms"] == TI_EXACT_TERMS, tag
+        assert r[tag]["ground_term"] == "3F", tag
+        assert r[tag]["ground_l2"] == pytest.approx(12.0, abs=1e-8), tag
+        w = r[tag]["window"]
+        assert abs(w.get("s", 0.0) - 1 / 6) < 1e-4, tag
+        assert abs(w.get("d", 0.0) - 5 / 6) < 1e-4, tag
+
+    raw = r["casci_raw"]
+    assert 1e-3 < raw["comm_norm_h_lz"] < 1e-1
+    assert 1e-2 < raw["comm_norm_h_l2"] < 0.5
+    # unlike Sc (whose raw core shifts <L^2> to 6.0001), Ti's weaker raw
+    # polarization (anisotropy 7.8e-3 vs Sc's 1.3e-2) leaves the ground
+    # <L^2> essentially unshifted (measured 12.0 - 1e-13)
+    assert raw["ground_l2"] == pytest.approx(12.0, abs=1e-3)
+    assert raw["ground_term"] == "3F"
+    assert 1e-3 < raw["core_anisotropy"] < 1e-1
+    # PySCF's own (unaveraged) fold splits the 3F septet at the mEh scale
+    # (measured 4.1e-3)
+    e = np.sort(np.asarray(raw["energies_pyscf"]))
+    assert 1e-4 < e[6] - e[0] < 1e-2
+
+    # frac core: exactly invariant (septet degenerate to its numerical
+    # floor, measured 6.5e-11), a DIFFERENT reference (+38 mEh measured;
+    # band widened for the SCF-chaos wobble)
+    frac = r["casci_frac"]
+    ef = np.sort(np.asarray(frac["energies_pyscf"]))
+    assert ef[6] - ef[0] < 1e-8
+    assert 1e-3 < abs(frac["e_ground"] - r["casci_avg"]["e_ground"]) < 1e-1
+
+
+def test_ti_relax_keeps_window_exact(ti_ladder):
+    """Frozen window + relaxed core: on Ti (reference gated to the clean
+    ROHF basin by occ_e_ref) the relax rung is nearly closed -- measured
+    2.3e-8, versus Sc's fact-17 ~1e-3 baseline: Ti's good-basin input
+    window carries only a ~1e-8 core-orthogonalization defect (the dirty
+    +11.2 mEh SCF basin would show 1e-2-class defects; the basin gate
+    keeps tests deterministic)."""
+    relax = ti_ladder["casscf_relax"]
+    assert relax["ortho_err"] < 1e-10
+    assert relax["ground_term"] == "3F"
+    assert relax["ground_l2"] == pytest.approx(12.0, abs=1e-3)  # meas 12.000000
+    assert relax["terms"] == TI_EXACT_TERMS
+    w = relax["window"]
+    assert w.get("s", 0.0) + w.get("d", 0.0) > 0.999
+    assert relax["comm_norm_h_lz"] < 1e-6  # measured 2.3e-8
+    assert relax["max_de_vs_pyscf"] < 5e-3
+
+
+def test_ti_purified_rungs_unbroken_lz_and_l2(ti_ladder):
+    """Fact 20's deliverable transfers to the d2 atom: on the purified
+    [Ar] substrate the frozen-window rungs close at machine precision
+    (relax_pur 6.2e-14, sa_relax_pur 1.4e-13/8.1e-13) with the full
+    120-state term table, <L^2> = 12 and unbroken Lz -- Ti CASSCF and
+    SA-CASSCF with exact rotational symmetry. sa_radial_pur sits at the
+    flat-gauge optimizer floor (fact 21: d2 tilts DESCEND, so no
+    restoring force tightens the member gauge; measured 1.4e-4, slightly
+    above Sc's 5.7e-7). The free-sa swap attractor survives the purified
+    substrate (bimodal across SCF chaos: branch on window p-weight)."""
+    r = ti_ladder
+    ci = r["casci_avg_pur"]
+    assert ci["comm_norm_h_lz"] < 1e-10 and ci["comm_norm_h_l2"] < 1e-10
+    assert ci["terms"] == TI_EXACT_TERMS
+    assert ci["max_de_vs_pyscf"] < 1e-8          # measured 1.1e-13
+    assert ci["core_anisotropy"] < 1e-12         # m-scalar by construction
+    # the pur reference shift: the discarded core polarization (+1.36 mEh
+    # measured in PySCF's own folds -- same scale as Sc's +0.67 mEh)
+    d_e = ci["energies_pyscf"][0] - r["casci_avg"]["energies_pyscf"][0]
+    assert 0.0 < d_e < 5e-3, d_e
+
+    for tag in ("casscf_relax_pur", "sa_relax_pur"):
+        rung = r[tag]
+        assert rung["comm_norm_h_lz"] < 1e-10, tag
+        assert rung["comm_norm_h_l2"] < 1e-10, tag
+        assert rung["ground_l2"] == pytest.approx(12.0, abs=1e-6), tag
+        assert rung["terms"] == TI_EXACT_TERMS, tag
+        assert rung["ground_term"] == "3F", tag
+        assert rung["ortho_err"] < 1e-10 and not rung["diverged"], tag
+        w = rung["window"]
+        assert abs(w.get("s", 0.0) - 1 / 6) < 1e-6, tag
+        assert abs(w.get("d", 0.0) - 5 / 6) < 1e-6, tag
+        assert abs(rung["e_ground"] - ci["e_ground"]) < 5e-3, tag
+    assert r["sa_relax_pur"]["max_de_vs_pyscf"] < 1e-5  # measured 8e-8
+
+    sar = r["sa_radial_pur"]
+    assert sar["comm_norm_h_lz"] < 1e-3, sar["comm_norm_h_lz"]  # meas 1.4e-4
+    assert sar["comm_norm_h_l2"] < 1e-2, sar["comm_norm_h_l2"]  # meas 5.3e-4
+    assert sar["ground_l2"] == pytest.approx(12.0, abs=1e-4), sar
+    assert sar["terms"] == TI_EXACT_TERMS, sar
+    assert sar["ortho_err"] < 1e-10 and not sar["diverged"], sar
+
+    sa = r["sa_pur"]
+    assert sa["ortho_err"] < 1e-10
+    # SA restores L in both basins; the swap mixes slightly (observed
+    # 12.011..12.025 across fresh ROHF draws)
+    assert sa["ground_l2"] == pytest.approx(12.0, abs=0.05)
+    if sa["window"].get("p", 0.0) > 0.03:  # the swap basin (measured p=1/18)
+        assert sa["comm_norm_h_lz"] > 0.1, sa
+    else:  # the healthy basin
+        assert sa["comm_norm_h_lz"] < 1e-3, sa
+
+
+def test_ti_free_casscf_escapes_the_shell(ti_ladder):
+    """All three free-CASSCF starts land in one dominantly-L=0 basin
+    (+46 mEh above casci_avg, the window borrowing p massively --
+    s/p/d-mixed): the Sc escape phenomenology transfers to d2 unchanged."""
+    r = ti_ladder
+    for tag in ("casscf_virtmix", "casscf_shell", "casscf_pyscf"):
+        rung = r[tag]
+        assert rung["ortho_err"] < 1e-10, tag
+        assert rung["ground_l2"] < 0.5, tag
+        assert 0.1 < rung["comm_norm_h_lz"] < 1.0, tag
+        assert rung["window"].get("p", 0.0) > 0.3, tag
+        assert rung["max_de_vs_pyscf"] < 5e-3, tag
+        assert not rung["diverged"], tag
+        d_e = rung["e_ground"] - r["casci_avg"]["e_ground"]
+        assert 0.03 < d_e < 0.08, tag
+    _assert_same_basin(r, ("casscf_virtmix", "casscf_shell", "casscf_pyscf"),
+                       r, "casscf_virtmix", 5e-3)
+
+
+def test_ti_sa_basins_and_radial_rung(ti_ladder):
+    """Shell-start SA over the seven 3F M_L components: <L^2> = 12 always;
+    bimodal across SCF chaos -- either the exact 4s<->3p swap basin of Sc
+    (window p-weight EXACTLY 1/6, s ~ 0, [H, Lz] ~ 1) or healthy. The
+    radial-masked rungs keep the window exactly {3d, 4s}: sa_radial is
+    reproducible with commutators at the canonical-substrate baseline
+    (~1e-3 class) and gains ~11 mEh over relax -- on Ti that gain lives on
+    the ORTHOGONALIZED substrate's s slot (a diffuse 6s admixture, fact
+    21), NOT in raw radial rotations (raw 3d->4d and 4s->5s/6s all RISE).
+    The single-root radial gauge is chaotic (like fact 16c on Sc)."""
+    r = ti_ladder
+    sa = r["sa"]
+    assert sa["ortho_err"] < 1e-10
+    assert sa["ground_l2"] == pytest.approx(12.0, abs=0.02)  # swap mixes slightly
+    if sa["window"].get("p", 0.0) > 0.05:  # the swapped-window basin
+        assert sa["comm_norm_h_lz"] > 0.1
+        assert abs(sa["window"].get("p", 0.0) - 1 / 6) < 1e-2
+        assert 0.7 < sa["window"].get("d", 0.0) < 0.9
+        assert 0.1 < sa["max_de_vs_pyscf"] < 5.0
+    else:  # the healthy basin
+        assert sa["comm_norm_h_lz"] < 5e-3
+        assert abs(sa["window"].get("s", 0.0) - 1 / 6) < 1e-2
+        assert abs(sa["window"].get("d", 0.0) - 5 / 6) < 1e-2
+
+    sa_p = r["sa_pyscf"]
+    assert sa_p["ground_l2"] < 0.5
+    assert sa_p["ortho_err"] < 1e-10
+
+    for tag in ("casscf_radial", "sa_radial"):
+        rung = r[tag]
+        assert abs(rung["window"].get("s", 0.0) - 1 / 6) < 1e-3, tag
+        assert abs(rung["window"].get("d", 0.0) - 5 / 6) < 1e-3, tag
+        assert rung["window"].get("p", 0.0) < 1e-3, tag
+        assert rung["ortho_err"] < 1e-10 and not rung["diverged"], tag
+    # the radial gain over the frozen relax window (~11 mEh, orthogonalized
+    # substrate; the raw-window fold would show every one-parameter radial
+    # rotation RISING -- fact 21)
+    assert -0.02 < r["sa_radial"]["e_ground"] - r["casscf_relax"]["e_ground"] < 0.0
+    sar = r["sa_radial"]
+    assert sar["ground_term"] == "3F"
+    assert sar["ground_l2"] == pytest.approx(12.0, abs=1e-3)
+    assert sar["comm_norm_h_lz"] < 5e-3

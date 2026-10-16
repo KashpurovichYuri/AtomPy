@@ -83,6 +83,7 @@ CASES = {
         nroots_primary=10,
         occ_closed=["1s", "2s", "3s", "4s", "2p", "3p"],
         occ_open=["3d"],
+        occ_e_ref=-848.40648875,
         ground=("3F", 3, 1),
         primary_tag="casci_ms1",
         primary={"3F": 7, "3P": 3},
@@ -108,6 +109,7 @@ def atom_results(tmp_path_factory):
             nroots_primary=case.get("nroots_primary", 9),
             occ_closed=case.get("occ_closed"),
             occ_open=case.get("occ_open"),
+            occ_e_ref=case.get("occ_e_ref"),
         )
         for name, case in CASES.items()
     }
