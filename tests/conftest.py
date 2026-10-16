@@ -34,6 +34,23 @@ def sc_rohf(tmp_path_factory):
     return cfg, mol, mf, select_valence_ao(mol, ["3d", "4s"])
 
 
+# Ti occupations are forced by character (fact 21 / ticket 12): the default
+# energy-ordered ROHF is an aufbau runaway (+123.07 mEh). [Ar]+4s closed,
+# 3d open.
+TI_OCC = dict(occ_closed=["1s", "2s", "3s", "4s", "2p", "3p"],
+              occ_open=["3d"])
+
+
+@pytest.fixture(scope="session")
+def ti_rohf(tmp_path_factory):
+    """(cfg, mol, mf, act_idx) for Ti/cc-pVDZ triplet ROHF: the
+    character-forced 3d2 4s2 reference (see TI_OCC)."""
+    cfg = AtomConfig("Ti", "ccpvdz", spin=2)
+    chk = str(tmp_path_factory.mktemp("ti_rohf") / "rohf.chk")
+    mol, mf = run_rohf(cfg, chk, **TI_OCC)
+    return cfg, mol, mf, select_valence_ao(mol, ["3d", "4s"])
+
+
 @pytest.fixture(scope="session")
 def p_shell_mol():
     """Minimal single-center atom with an s and a p shell."""

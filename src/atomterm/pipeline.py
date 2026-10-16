@@ -62,6 +62,8 @@ def run_atom(
     sa_weights: list[float] | None = None,
     run_casscf: bool = True,
     nroots_primary: int = 9,
+    occ_closed: list[str] | None = None,
+    occ_open: list[str] | None = None,
 ) -> dict:
     """End-to-end pipeline for any single atom.
 
@@ -79,6 +81,9 @@ def run_atom(
     nroots_primary : PySCF roots for the primary CASCI (clamped to the sector
         size; the Ms=0 CASCI always diagonalizes the full sector so the
         complete multiplet table is produced).
+    occ_closed, occ_open : passed through to :func:`run_rohf` -- the
+        character-forced occupation patterns, mandatory where the default
+        ROHF is an aufbau runaway (Ti; see :func:`run_rohf`).
 
     Every stage is checkpointed under ``workdir`` and analyzed with the exact
     L/S operator matrices; see :func:`run_carbon` for the carbon instance.
@@ -93,7 +98,7 @@ def run_atom(
 
     # ---- stage 1: ROHF (checkpointed) -------------------------------------
     rohf_chk = str(out / f"{label}_rohf.chk")
-    mol, mf = run_rohf(cfg, rohf_chk)
+    mol, mf = run_rohf(cfg, rohf_chk, occ_closed=occ_closed, occ_open=occ_open)
     print(f"[ROHF      ] E = {mf.e_tot:.8f} Eh   (chk: {rohf_chk})")
 
     act_idx = select_valence_ao(mol, shell_patterns)

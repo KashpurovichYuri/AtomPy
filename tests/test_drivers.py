@@ -155,6 +155,35 @@ def test_sc_rohf_reference_is_3d1_4s2_with_argon_core(sc_rohf):
     assert w[:, names.index("d")].max() < 1e-4  # measured ~5e-5, numerical
 
 
+def test_ti_rohf_reference_needs_character_forced_occupations(ti_rohf, tmp_path):
+    """Ticket 12's blocker, pinned: the DEFAULT energy-ordered ROHF on Ti is
+    an aufbau runaway (a doubly-occupied 3d inside canonical [:10] and a
+    {4s, 4p} open block, +123.07 mEh above the physical 3d2 4s2 3F state),
+    while the character-forced hook lands the physical reference
+    deterministically (E = -848.40648875, core d ~ 2e-13, open = 3d2)."""
+    cfg, mol, mf, act_idx = ti_rohf
+    assert mf.converged
+    occ = np.asarray(mf.mo_occ)
+    assert np.allclose(occ[:10], 2.0) and occ[10] == 1.0 and occ[11] == 1.0
+    assert -848.41 < mf.e_tot < -848.40  # trap converges to -848.2834
+    s = mf.get_ovlp()
+    names, w = shell_weights(mol, mf.mo_coeff[:, :10], s)
+    assert w[:, names.index("d")].max() < 1e-6  # measured ~2e-13
+    names_o, w_o = shell_weights(mol, mf.mo_coeff[:, 10:12], s)
+    assert w_o[:, names_o.index("d")].min() > 0.99  # two pure 3d open MOs
+
+    # the documented failure face: default (energy-ordered) filling is
+    # unusable as the reference. Like the Sc frac-occ runaway it has two
+    # faces: (a) converges to the WRONG configuration (a 3d in the core),
+    # (b) never converges. Either way the hook is mandatory.
+    chk = tmp_path / "ti_default_rohf.chk"
+    _, mf_d = run_rohf(cfg, str(chk))
+    if mf_d.converged:
+        names_d, w_d = shell_weights(mol, mf_d.mo_coeff[:, :10], s)
+        assert w_d[:, names_d.index("d")].max() > 0.9  # 3d invaded the core
+        assert mf_d.e_tot > -848.30  # +123.07 mEh above the reference
+
+
 def test_sc_frac_occ_selects_open_shell_by_projection(sc_rohf, tmp_path):
     """The fact-15(c) invariant: on a TM the fractional block MUST be
     selected by character. Energy-ordered filling converges -- to a

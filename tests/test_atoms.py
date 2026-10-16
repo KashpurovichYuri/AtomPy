@@ -68,6 +68,29 @@ CASES = {
         # the (2,1) sector carries exactly S = 1/2 and S = 3/2
         s_values={0.75, 3.75},
     ),
+    # ticket 12 option A: d2 -- the Ti+-ion-like CAS(2,5) over {3d} on the
+    # [Ar]+4s2 closed core. First L=3 ground term (3F, Hund), first L=4
+    # term (1G, in the Ms=0 sector), first basis with an f shell under a
+    # d-analyzed load (4f AOs present; core f-tails ~1e-4). occ_* are the
+    # MANDATORY character-forced occupations: default energy-ordered ROHF
+    # on Ti is an aufbau runaway (+123.07 mEh, fact 21).
+    "Ti": dict(
+        cfg=AtomConfig("Ti", "ccpvdz", spin=2),
+        patterns=["3d"],
+        nelec_act=2,
+        run_casscf=False,
+        sa_weights=None,
+        nroots_primary=10,
+        occ_closed=["1s", "2s", "3s", "4s", "2p", "3p"],
+        occ_open=["3d"],
+        ground=("3F", 3, 1),
+        primary_tag="casci_ms1",
+        primary={"3F": 7, "3P": 3},
+        ms0_tag="casci_ms0",
+        ms0={"1S": 1, "1D": 5, "3P": 3, "1G": 9, "3F": 7},
+        # the (2,0) sector carries exactly S = 1
+        s_values={2.0},
+    ),
 }
 
 
@@ -83,6 +106,8 @@ def atom_results(tmp_path_factory):
             sa_weights=case["sa_weights"],
             run_casscf=case["run_casscf"],
             nroots_primary=case.get("nroots_primary", 9),
+            occ_closed=case.get("occ_closed"),
+            occ_open=case.get("occ_open"),
         )
         for name, case in CASES.items()
     }

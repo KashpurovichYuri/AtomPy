@@ -323,7 +323,9 @@ def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
                workdir: str = "results", sa_weights: list[float] | None = None,
                frac_nelec_open: int | None = None, frac_n_open: int | None = None,
                rung_tags: list[str] | None = None,
-               purified: bool = False) -> dict:
+               purified: bool = False,
+               occ_closed: list[str] | None = None,
+               occ_open: list[str] | None = None) -> dict:
     """Run ladder rungs for one atom's primary Ms sector, print and persist
     the all-vs-all comparison. Returns ``{rung_tag: payload}``.
 
@@ -331,12 +333,15 @@ def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
         that only need the CASCI + free-CASSCF rungs); ``None`` = all.
     purified : append the ``*_pur`` rungs (the same treatments on the
         exactly-closed purified core substrate, ticket 13 / fact 17).
+    occ_closed, occ_open : passed through to :func:`run_rohf` (the
+        character-forced occupation patterns; mandatory on Ti).
     """
     out = Path(workdir)
     out.mkdir(parents=True, exist_ok=True)
     label = cfg.label
 
-    mol, mf = run_rohf(cfg, str(out / f"{label}_rohf.chk"))
+    mol, mf = run_rohf(cfg, str(out / f"{label}_rohf.chk"),
+                       occ_closed=occ_closed, occ_open=occ_open)
     act_idx = select_valence_ao(mol, shell_patterns)
     mol_f = mf_f = None
     if frac_nelec_open is not None:

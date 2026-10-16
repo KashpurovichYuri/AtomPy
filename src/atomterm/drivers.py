@@ -46,27 +46,95 @@ __all__ = [
 ]
 
 
-def run_rohf(cfg, chkfile: str):
+def _ao_span_projector(s_mat: np.ndarray, rows: list[int]) -> np.ndarray:
+    """S-metric projector onto an AO row span: ``P = S[:, o] S_oo^{-1} S[o, :]``.
+
+    The weight of an S-orthonormal MO column ``c`` on the span is
+    ``c^dag P c`` -- bounded by 1 (a true projector weight), unlike the
+    bare quadratic form ``c_o^dag S_oo c_o`` which is unbounded for
+    diffuse bases (fact 15c).
+    """
+    s_oo = s_mat[np.ix_(rows, rows)]
+    return s_mat[:, rows] @ np.linalg.inv(s_oo) @ s_mat[rows, :]
+
+
+def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
+    """Build the character-forced ROHF ``get_occ`` hook (see :func:`run_rohf`).
+
+    Each SCF cycle the occupations are assigned by S-projector WEIGHT on
+    two AO spans, never by energy order: the ``n_closed`` MOs with the
+    largest closed-span weight get 2.0; of the rest, the ``spin`` MOs
+    with the largest (open + closed)-span weight get 1.0. The closed term
+    in the open ranking lets early-cycle 3d-like character that leaks
+    into core-like MOs still be found.
+    """
+    s_mat = mol.intor_symmetric("int1e_ovlp")
+    p_closed = _ao_span_projector(s_mat, select_valence_ao(mol, occ_closed))
+    p_open = _ao_span_projector(s_mat, select_valence_ao(mol, occ_open))
+    n_closed = (mol.nelectron - mol.spin) // 2
+    n_open = mol.spin
+
+    def _occ(mo_energy, mo_coeff=None):
+        if mo_coeff is None:
+            raise ValueError("character-forced occupations need the MOs")
+        occ = np.zeros(len(mo_energy))
+        w_closed = np.einsum("ai,ab,bi->i", mo_coeff.conj(), p_closed,
+                             mo_coeff).real
+        closed = np.argsort(w_closed)[::-1][:n_closed]
+        occ[closed] = 2.0
+        w_open = np.einsum("ai,ab,bi->i", mo_coeff.conj(), p_open,
+                           mo_coeff).real
+        rest = np.flatnonzero(occ == 0.0)
+        open_mos = sorted(rest, key=lambda i: -(w_open[i] + w_closed[i]))[:n_open]
+        occ[open_mos] = 1.0
+        return occ
+
+    return _occ
+
+
+def run_rohf(cfg, chkfile: str, occ_closed: list[str] | None = None,
+             occ_open: list[str] | None = None):
     """ROHF for the configured atom, cached in ``chkfile``.
 
     If the chkfile exists, the converged MOs are loaded and no SCF is run.
     Returns ``(mol, mf)``.
+
+    occ_closed, occ_open : shell-pattern lists (as in :func:`select_valence_ao`)
+        that force the occupations by CHARACTER instead of energy order --
+        the integer analog of :func:`run_frac_occ_scf`'s ``open_idx``
+        selection. Each cycle, the ``(nelectron - spin)/2`` MOs with the
+        largest S-projector weight on the ``occ_closed`` AO span are doubly
+        occupied and, of the rest, the ``spin`` MOs with the largest
+        combined ``occ_open``/``occ_closed`` weight are singly occupied.
+        MANDATORY on atoms whose default ROHF is an aufbau runaway: on
+        Ti (ccpvdz, spin=2) energy-ordered filling converges to a
+        doubly-occupied 3d inside the canonical core with a {4s, 4p} open
+        block -- +123.07 mEh above the physical 3d2 4s2 3F state -- and
+        every energy-ordered start tested falls back into that trap. With
+        the hook (occ_closed = [Ar]+4s patterns, occ_open = ["3d"]) the
+        SCF lands the physical reference deterministically. The hook is
+        part of the object's identity: set BEFORE the cache branch
+        (ticket-10 lesson).
     """
     from atomterm.system import build_mol
 
     mol = build_mol(cfg)
+    mf = scf.ROHF(mol)
+    mf.verbose = cfg.verbose
+    if occ_closed is not None or occ_open is not None:
+        if occ_closed is None or occ_open is None:
+            raise ValueError(
+                "occ_closed and occ_open must be given together")
+        mf.get_occ = _forced_rohf_occ(mol, occ_closed, occ_open)
     try:
         _, rec = scf.chkfile.load_scf(chkfile)
-        mf = scf.ROHF(mol)
         mf.__dict__.update(rec)
         mf.converged = True
         mf.verbose = cfg.verbose
         return mol, mf
     except (OSError, KeyError, ValueError):
         pass
-    mf = scf.ROHF(mol)
     mf.chkfile = chkfile
-    mf.verbose = cfg.verbose
     mf.conv_tol = 1e-12  # tight core density: keeps rotational symmetry clean
     mf.run()
     return mol, mf
