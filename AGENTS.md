@@ -348,6 +348,66 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     averaged fold discards the polarization the optimizer bought:
     max|dE| ~ 1e-3 is the detector), not physics — bound, don't pin.
 
+21. **Ti: d², the aufbau runaway, and the basin gate** (ticket 12):
+    (a) THE REFERENCE IS TWO-LAYERED CHAOS. Default ROHF on Ti/ccpvdz
+    (spin=2) is an aufbau runaway (fact-15c class, but on the reference
+    itself): E -848.28341842 with a DOUBLY-OCCUPIED 3d inside canonical
+    [:10] and a {4s,4p} open block, +123.07 mEh above the physical
+    3d2 4s2 3F; energy-ordered get_occ falls back from EVERY start
+    (default, post-swap, frac-occ guess). Fix: CHARACTER-FORCED
+    occupations (run_rohf(occ_closed=, occ_open=) -> _forced_rohf_occ):
+    each cycle occupy by S-projector weight (fact-15c metric) on the
+    closed AO span ([Ar]+4s) / open span (3d) -- lands
+    E = -848.40648875, core d ~ 2e-13, two pure-3d open MOs. But even
+    with forced occupations the SCF is MULTI-BASIN (orbitally degenerate
+    open shell): a metastable +11.2 mEh solution exists (same
+    occupations, member gauge whose polarized core smears the
+    build_full_mo input window at 1.6e-2 -- vs ~1e-8 in the good basin;
+    default minao and vsap guesses reach it, atom/huckel reliably do
+    not). Fix: occ_e_ref = an energy gate with guess cycling. The gate
+    also stabilizes the relax rung: Ti's good-basin input window defect
+    is ~1e-8, so casscf_relax sits at 2.3e-8 -- NOT Sc's fact-17 1e-3
+    class (which is basin/substrate-specific, not atom-intrinsic).
+    (b) Option A (CAS(2,5)/{3d}, ncore=10=[Ar]+4s2): the d2 tables are
+    textbook-exact on first pin -- Ms=1: 3F x7 + 3P x3; Ms=0 (25 dets):
+    1S+1D+3P+1G x9+3F, ordering 3F < 1D < 3P < 1G < 1S (NIST); first
+    L=3 ground term, first L=4 (1G) term, first f-shell-bearing basis
+    under load (43 AOs, radial chains s6/p5/d3/f1, core f-tails ~1e-4).
+    (c) Option B (CAS(4,6)/{3d,4s}, Ms=1, 120 dets): TI_EXACT_TERMS =
+    {3D:15, 3F:35, 3G:18, 3H:22, 3P:15, 5D:5, 5F:7, 5P:3} (d2s2 gives
+    10, d3s 60, d4 50; S>=1 only -- the sector holds no singlets).
+    Raw core: percent-class commutators (4.9e-2/2.6e-1, aniso 7.8e-3)
+    but the ground <L^2> is UNSHIFTED (12.0 - 1e-13) unlike Sc's
+    6.0001 -- weaker polarization, so <L^2> alone is not a raw-core
+    detector on every atom (commutators are). Frac reference +38 mEh,
+    invariant as always.
+    (d) THE d2 3F SCAN VERDICT (question 1): member tilts DESCEND
+    (-163 uEh at delta=0.1, ~half Sc's depth; <L^2> barely moves) --
+    the JT class, NOT the p2 flat class: free single-root optimizers
+    wander and NO restoring force tightens the member gauge, so
+    sa_radial_pur stops at its floor (1.4e-4/5.3e-4, slightly above
+    Sc's 5.7e-7). The m-SYMMETRIC radial picture inverts C/Si exactly
+    like Sc: raw 3d->4d, 4s->5s and 4s->6s one-parameter rotations ALL
+    RISE steeply (+9.8 mEh at theta=0.05 for the d shell). The radial
+    rungs' real ~11 mEh gain lives on the ORTHOGONALIZED substrate's
+    s slot (converged sa_radial window: 4s 0.75 + 6s 0.27) -- a third
+    radial anatomy: C/Si = raw one-parameter theta* recovers everything;
+    Sc = nothing anywhere; Ti = orthogonalized-substrate s-slot only
+    (never rotate raw valence AOs to find it; and a rotated-but-
+    nonorthogonalized column is the ticket-09 bug class -- the energy
+    drops spuriously).
+    (e) The fact-20 deliverable TRANSFERS unchanged: relax_pur 6.2e-14,
+    sa_relax_pur 1.4e-13/8.1e-13 -- machine-exact CASSCF/SA-CASSCF with
+    unbroken Lz/L^2, the full 120-state table, max|dE| 8e-8. The Sc
+    basin phenomenology also transfers: free CASSCF -> the L~0 escape
+    (+46 mEh, s/p/d window); sa = the EXACT 4s<->3p swap (window
+    p = 1/6, s ~ 0, comm 1.1, our-fold max|dE| 0.85); sa_pur = a
+    PARTIAL swap (s-slot 2/3 s + 1/3 p, window p ~ 1/18, <L^2> wanders
+    12.01..12.03 across draws) -- the attractor survives purification,
+    branch on window weights. Test-band lessons: leave real headroom on
+    degenerate-but-numerical quantities (frac septet 6.5e-11 vs a 1e-10
+    bound flaked once) and on basin-mixed <L^2>.
+
 ## Conventions
 
 - Atomic units, ℏ = 1. Spin-orbitals: alpha = `0..norb-1`, beta = `norb..2norb-1`.
@@ -359,8 +419,9 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 83 tests in ~4.5 min (chkfile caching; ROHF computed once per
-session; the Sc ladders are the slowest block, ~2.5 min cold). Test files map
+`pytest` runs 91 tests in ~13 min (chkfile caching; ROHF computed once per
+session; the Ti ladder is the slowest block, ~7 min cold; the Sc ladders
+~2.5 min). Test files map
 1:1 to src modules; tests are named for the
 invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
@@ -375,11 +436,15 @@ exact closure + free-ion tables, relax honesty, S-basin escape, the bimodal
 SA basins, radial ceiling vs escape, complete-window still-escapes, and the
 purified-substrate block: machine-exact closure on C/Si, Sc's
 `sa_relax_pur`/`relax_pur` at 1e-13 with unbroken Lz/L², the flat-gauge
-floor, the surviving swap attractor — branched on window weights),
+floor, the surviving swap attractor — branched on window weights; the Ti
+block: TI_EXACT_TERMS, the gated-basin relax honesty, pur machine-exactness,
+the escape + swap basins, sa_radial's orthogonalized-substrate gain),
 `test_purified_core_orbitals_exact_closed_span` +
 `test_purified_substrate_closes_the_input_windows` (fact 20: the closure
 certificate on the core span and both input windows, m-scalar density,
 contamination/density-shift scales — the gate-(a)/(b) pins),
+`test_ti_rohf_reference_needs_character_forced_occupations` (fact 21a:
+the runaway + the hook + the basin gate's reference numbers),
 `test_radial_rung_full_gain_without_l_leakage` (fact 16a: radial == free
 gain, zero l-leakage), `test_divergence_guard_fires_on_broken_orthonormality`
 (the ticket-09 guard's negative control),
@@ -394,7 +459,8 @@ the mean-field relaxation — C = the full θ* gain near-symmetric, Sc = +80 mEh
 and O(0.5) closure defects), `test_stages.py` (the facts-module
 contract), `test_scans.py` (frozen-scan anatomy: full radial gain at exact
 symmetry, exactly-flat single-member tilts, the Lz blind spots, the Sc
-inversion — deterministic, no optimizer),
+inversion, and the Ti d² verdict — tilts descend, radial rises, the
+Lz-blind ±pair pattern — deterministic, no optimizer),
 `test_half_integer_spin_labels` (doublet
 labeling), `test_drivers.py` (build_full_mo block properties — the
 ticket-09 regression guard — shell_weights partition, frac-occ ordering),
@@ -404,12 +470,12 @@ ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and
 lists the live tickets. Update it when a decision is made; keep tickets
-one-session sized. The live wave (12 NEXT: Ti — options A then B in one
-session; tickets 13/16 RESOLVED, facts 18/19/20; the ticket carries a
-pre-flight-verified ROHF occupation fix — default ROHF on Ti is an aufbau
-runaway; PHYSICS.md narrative deferred by the user)
-is fully specified
-in `wayfinder/tickets/` — each ticket
-is self-contained (no conversation context needed). Review protocol:
+one-session sized. The atom campaign (C, Si, Sc, Ti) is COMPLETE — tickets
+01–16 all RESOLVED (facts 18–21; Ti delivered the d² tables incl. ¹G, the
+character-forced/basin-gated ROHF reference, the JT verdict for ³F, and the
+machine-exact pur rungs on a second TM). Next wave is UNASSIGNED — user's
+candidate list: PHYSICS.md narrative (deferred), spin–orbit, transition
+moments, g-factors; each ticket is self-contained in `wayfinder/tickets/`
+(no conversation context needed). Review protocol:
 `/code-review` (two axes, parallel sub-agents) after each ticket wave, then
 `/improve-codebase-architecture` survey; see ticket 13.

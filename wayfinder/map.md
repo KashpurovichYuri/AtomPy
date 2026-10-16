@@ -133,12 +133,23 @@ machinery; tickets 14/15 answer the open machinery questions first.
   free SA machine-exact on C/Si; Sc's residual sa_radial_pur gauge
   floor (~1e-6, no restoring force) and the surviving 4s↔3p swap
   attractor close the attribution questions. Phase 4 not needed.
-- [12: Ti](tickets/12-ti.md) — NEXT: d² tables (A: CAS(2,5)/{3d}, first
-  L=3 ground term and first L=4 term, first f-block load) + the Ti-atom
-  ladder (B: CAS(4,6)/{3d,4s}, pur rungs, the ³F tilt-stability
-  question). Pre-flight verified 2026-10-16: default ROHF is an aufbau
-  runaway (+123 mEh) — the ticket ships a verified character-forced
-  occupation recipe.
+- [12: Ti](tickets/12-ti.md) — RESOLVED (fact 21): options A+B in one
+  session. A: d² tables textbook-exact on first pin (³F×7+³P×3; ¹G —
+  the first L=4 term — in Ms=0). B: TI_EXACT_TERMS over 120 dets; the
+  reference needed TWO fixes beyond the pre-flight — character-forced
+  occupations AND an SCF-basin energy gate (occ_e_ref; a +11.2 mEh
+  metastable member-gauge basin with a 1.6e-2 window defect exists even
+  with forced occupations); the ³F tilt verdict: JT class (descends,
+  ~½ Sc) so sa_radial_pur sits at its floor; a THIRD radial anatomy
+  (raw rotations rise; the rungs' ~11 mEh gain lives on the
+  orthogonalized substrate's s slot); relax_pur/sa_relax_pur
+  MACHINE-EXACT (6.2e-14/1.4e-13) — the fact-20 deliverable transfers;
+  the Sc basins transfer (escape +46 mEh, exact 4s↔3p swap on sa,
+  partial swap on sa_pur). Suite 91 green.
+
+The atom campaign (C, Si, Sc, Ti) is complete; the next wave is
+UNASSIGNED — user candidates: PHYSICS.md narrative (deferred),
+spin–orbit coupling, transition moments, g-factors.
 
 ## Out of scope
 
