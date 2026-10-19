@@ -40,13 +40,13 @@ commutators at round-off, because this window is exactly rotation-closed
 
 **The ladder** — every orbital treatment priced against the ROHF
 reference, broken and symmetric variants side by side. Titanium's
-summary card (ΔE in total energies, mEh):
+summary card (ROHF reference −848.406 Eh = −23 086 eV; ΔE vs ROHF, eV):
 
 | deliverable | free variant | symmetric variant |
 |---|---|---|
-| CASCI, raw shell | — | +10.6 (exact) |
-| CASSCF | **−31.3** (escape — broken) | +10.4 frozen (baseline) / −0.4 radial (baseline) |
-| SA-CASSCF | −10.1 (swap — broken) | +1.0 radial purified (floor) / +11.7 frozen purified (exact) |
+| CASCI, raw shell | — | +0.29 (exact) |
+| CASSCF | **−0.85** (escape — broken) | +0.28 frozen (baseline) / −0.01 radial (baseline) |
+| SA-CASSCF | −0.27 (swap — broken) | +0.03 radial purified (floor) / +0.32 frozen purified (exact) |
 
 §7.3; regenerate: the `run_ladder` calls recorded in each ladder header.
 
@@ -803,9 +803,10 @@ are CAS-level values, not experimental ones.
 The full 17-rung registry per atom (every orbital treatment, including
 start-variants and single-root radial runs) is tabulated in
 `results/*_ladder.md`. Here each atom is presented twice: a summary card
-(totals against the ROHF reference, broken and symmetric variants side by
-side), then the mechanism tables (ground energy in our fold; ΔE in total
-energies against ROHF, mEh; ⟨L̂²⟩; many-body and window-span commutators).
+(totals against the ROHF reference, in eV, broken and symmetric variants
+side by side), then the mechanism tables (ground energy in our fold; ΔE
+in total energies against ROHF, mEh; ⟨L̂²⟩; many-body and window-span
+commutators).
 "Substrate" means the starting MO matrix the optimizer receives — core
 block, window block, complement (§3.3).
 
@@ -820,36 +821,37 @@ below ROHF, not the −730/−786 mEh our fold seems to show.
 
 **The summary cards.**
 
-**C** — ROHF −37.682418 Eh; CAS(2,3)/{2p}
+**C** — ROHF −37.682418 Eh = −1 025.4 eV; CAS(2,3)/{2p}
 
 | deliverable | free variant | symmetric variant |
 |---|---|---|
-| CASCI, raw shell | — | +250.8 (confinement; exact window, exact tables) |
-| CASSCF | 0.0 (member-tilted: baseline window, exact sector) | 0.0 (radial restriction — full recovery; exact) |
-| SA-CASSCF | +0.03 (lands symmetric: exact) | 0.0 (radial restriction, purified core; exact) |
+| CASCI, raw shell | — | +6.82 (confinement; exact window, exact tables) |
+| CASSCF | 0.00 (member-tilted: baseline window, exact sector) | 0.00 (radial restriction — full recovery; exact) |
+| SA-CASSCF | +0.001 (lands symmetric: exact) | 0.00 (radial restriction, purified core; exact) |
 
-**Si** — ROHF −288.846437; CAS(2,3)/{3p}: CASCI +221.5 (exact); CASSCF
-free 0.0 → radial +0.03 (exact); SA-CASSCF +0.04 (exact).
+**Si** — ROHF −288.846437 Eh = −7 859.9 eV; CAS(2,3)/{3p}: CASCI +6.03
+(exact); CASSCF free 0.00 → radial +0.001 (exact); SA-CASSCF +0.001
+(exact).
 
-**Sc** — ROHF −759.736255; CAS(3,6)/{3d,4s}
-
-| deliverable | free variant | symmetric variant |
-|---|---|---|
-| CASCI, raw shell | — | +6.7 (exact) |
-| CASSCF | **−31.5** (escape: L ≈ 0, identity changed — broken) | +6.6 frozen / −0.8 radial (baseline) |
-| SA-CASSCF | −13.3 (swap; ⟨L̂²⟩ = 6.002, term-readable — broken) | +7.3 frozen purified (exact) / +0.0 radial purified (floor) |
-
-**Ti** — ROHF −848.406489; CAS(4,6)/{3d,4s}
+**Sc** — ROHF −759.736255 Eh = −20 673.5 eV; CAS(3,6)/{3d,4s}
 
 | deliverable | free variant | symmetric variant |
 |---|---|---|
-| CASCI, raw shell | — | +10.6 (exact) |
-| CASSCF | **−31.3** (escape — broken) | +10.4 frozen (baseline, gated basin) / −0.4 radial (baseline) |
-| SA-CASSCF | −10.1 (swap — broken) | +1.0 radial purified (floor) / +11.7 frozen purified (exact) |
+| CASCI, raw shell | — | +0.18 (exact) |
+| CASSCF | **−0.86** (escape: L ≈ 0, identity changed — broken) | +0.18 frozen / −0.02 radial (baseline) |
+| SA-CASSCF | −0.36 (swap; ⟨L̂²⟩ = 6.002, term-readable — broken) | +0.20 frozen purified (exact) / 0.00 radial purified (floor) |
 
-One sentence per atom: what confinement costs (+250.8 / +221.5 / +6.7 /
-+10.6), what breaking buys (−31.5 / −31.3, or the swap's −13.3 / −10.1),
-and what symmetry costs against ROHF (≈ 0 on p²; −0.8 to +1.0 on the
+**Ti** — ROHF −848.406489 Eh = −23 086.3 eV; CAS(4,6)/{3d,4s}
+
+| deliverable | free variant | symmetric variant |
+|---|---|---|
+| CASCI, raw shell | — | +0.29 (exact) |
+| CASSCF | **−0.85** (escape — broken) | +0.28 frozen (baseline, gated basin) / −0.01 radial (baseline) |
+| SA-CASSCF | −0.27 (swap — broken) | +0.03 radial purified (floor) / +0.32 frozen purified (exact) |
+
+One sentence per atom: what confinement costs (+6.82 / +6.03 / +0.18 /
++0.29), what breaking buys (−0.86 / −0.85, or the swap's −0.36 / −0.27),
+and what symmetry costs against ROHF (≈ 0 on p²; −0.02 to +0.03 on the
 d-atoms for the best symmetric treatment).
 
 **The confinement finding.** The +250.8 on carbon is *purely* the
