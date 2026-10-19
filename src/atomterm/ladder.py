@@ -85,7 +85,7 @@ from typing import Callable
 
 import numpy as np
 
-from atomterm.system import AtomConfig
+from atomterm.system import AtomConfig, ncore_of, sector_occupations
 from atomterm.drivers import (
     build_full_mo,
     constrained_casscf,
@@ -102,6 +102,7 @@ from atomterm.drivers import (
     run_rohf,
     run_sa_casscf,
     select_valence_ao,
+    ReferenceSpec,
 )
 from atomterm.stages import StageFacts, stage_facts
 
@@ -324,9 +325,7 @@ def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
                frac_nelec_open: int | None = None, frac_n_open: int | None = None,
                rung_tags: list[str] | None = None,
                purified: bool = False,
-               occ_closed: list[str] | None = None,
-               occ_open: list[str] | None = None,
-               occ_e_ref: float | None = None) -> dict:
+               ref: ReferenceSpec | None = None) -> dict:
     """Run ladder rungs for one atom's primary Ms sector, print and persist
     the all-vs-all comparison. Returns ``{rung_tag: payload}``.
 
@@ -334,17 +333,15 @@ def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
         that only need the CASCI + free-CASSCF rungs); ``None`` = all.
     purified : append the ``*_pur`` rungs (the same treatments on the
         exactly-closed purified core substrate, ticket 13 / fact 17).
-    occ_closed, occ_open, occ_e_ref : passed through to :func:`run_rohf`
-        (the character-forced occupation patterns + reference-basin energy
-        gate; mandatory on Ti).
+    ref : passed through to :func:`run_rohf` (the character-forced
+        occupation patterns + reference-basin energy gate; mandatory on
+        Ti).
     """
     out = Path(workdir)
     out.mkdir(parents=True, exist_ok=True)
     label = cfg.label
 
-    mol, mf = run_rohf(cfg, str(out / f"{label}_rohf.chk"),
-                       occ_closed=occ_closed, occ_open=occ_open,
-                       occ_e_ref=occ_e_ref)
+    mol, mf = run_rohf(cfg, str(out / f"{label}_rohf.chk"), ref=ref)
     act_idx = select_valence_ao(mol, shell_patterns)
     mol_f = mf_f = None
     if frac_nelec_open is not None:
@@ -356,8 +353,8 @@ def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
             open_idx=act_idx)
     ncas = len(act_idx)
     spin = cfg.spin
-    na, nb = (nelec_act + spin) // 2, (nelec_act - spin) // 2
-    ncore = (mol.nelectron - nelec_act) // 2
+    na, nb = sector_occupations(nelec_act, spin)
+    ncore = ncore_of(mol.nelectron, nelec_act)
     chk = lambda name: str(out / f"{label}_{name}.chk")  # noqa: E731
     ndet = math.comb(ncas, na) * math.comb(ncas, nb)
 

@@ -168,10 +168,13 @@ forward:
   `pipeline._ncore` recomputes nelectron from nuclear charge — WRONG
   under ECP (core electrons removed); use `mol.nelectron`; (b) a named
   `h1_ao(mol, mf)` helper in operators.py would make the seam explicit.
-- **Deepening candidates** (approved order): `ReferenceSpec` dataclass
-  for the occ/frac parameter clump (both reviews flagged it; conftest
-  already hand-rolls TI_OCC); sector-geometry helper shared by
-  pipeline/ladder (`_ncore`/`_ndet` derived twice). DONE now:
+- **Deepening candidates** (approved order): DONE (post-switch session):
+  `ReferenceSpec` dataclass owns the occ/frac clump + its validation,
+  threaded as `ref=` through run_rohf/run_ladder/run_atom (conftest TI_REF;
+  pipeline._ncore deleted — `system.ncore_of(mol.nelectron, …)` and
+  `system.sector_occupations(…)` are the shared sector geometry, and the
+  mol.nelectron switch pre-closes the ECP (a) wrinkle). Deferred: none
+  blocking. DONE earlier:
   `StageFacts.analysis` typed + the three read fields exposed as
   properties (the one interface leak).
 - secondquant.py survives the deletion test as a *witness* (independent

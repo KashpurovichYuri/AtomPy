@@ -14,7 +14,7 @@ import pytest
 
 from atomterm.pipeline import run_atom
 from atomterm.system import AtomConfig
-from conftest import TI_OCC
+from conftest import TI_REF
 
 # ground: expected (term, L, S) of the lowest CASCI state in the primary
 # sector; primary_tag / primary: sector chkfile tag and expected term -> count
@@ -82,7 +82,7 @@ CASES = {
         run_casscf=False,
         sa_weights=None,
         nroots_primary=10,
-        **TI_OCC,
+        ref=TI_REF,
         ground=("3F", 3, 1),
         primary_tag="casci_ms1",
         primary={"3F": 7, "3P": 3},
@@ -111,9 +111,7 @@ def atom_results(tmp_path_factory):
             sa_weights=case["sa_weights"],
             run_casscf=case["run_casscf"],
             nroots_primary=case.get("nroots_primary", 9),
-            occ_closed=case.get("occ_closed"),
-            occ_open=case.get("occ_open"),
-            occ_e_ref=case.get("occ_e_ref"),
+            ref=case.get("ref"),
         )
         for name, case in CASES.items()
     }

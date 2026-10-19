@@ -42,6 +42,21 @@ class AtomConfig:
         return f"{self.symbol} {x} {y} {z}"
 
 
+def sector_occupations(nelec_act: int, spin: int) -> tuple[int, int]:
+    """(na, nb) of the primary Ms sector from the active-electron count
+    and PySCF's spin = 2S: ((n + 2S)/2, (n - 2S)/2)."""
+    return (nelec_act + spin) // 2, (nelec_act - spin) // 2
+
+
+def ncore_of(nelectron: int, nelec_act: int) -> int:
+    """Doubly-occupied core count: (nelectron - nelec_act) // 2.
+
+    Pass ``mol.nelectron`` — never recompute it from nuclear charge: an
+    ECP removes core electrons, so Z - charge overcounts (the shared
+    definition keeps pipeline and ladder honest under future ECPs)."""
+    return (nelectron - nelec_act) // 2
+
+
 def build_mol(cfg: AtomConfig) -> gto.Mole:
     """Build and validate a PySCF :class:`Mole` for the configured atom."""
     mol = gto.Mole()

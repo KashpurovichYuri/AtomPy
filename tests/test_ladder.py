@@ -28,7 +28,7 @@ from collections import Counter
 import numpy as np
 import pytest
 
-from conftest import SC_EXACT_TERMS, TI_EXACT_TERMS, TI_OCC
+from conftest import SC_EXACT_TERMS, TI_EXACT_TERMS, TI_REF
 
 from atomterm.drivers import build_full_mo, run_casci
 from atomterm.ladder import run_ladder
@@ -574,7 +574,7 @@ def ti_ladder(tmp_path_factory):
         AtomConfig("Ti", "ccpvdz", spin=2), ["3d", "4s"], 4,
         workdir=str(tmp_path_factory.mktemp("ladder_Ti")),
         sa_weights=[1 / 7] * 7, frac_nelec_open=4, frac_n_open=6,
-        purified=True, **TI_OCC)
+        purified=True, ref=TI_REF)
 
 
 def test_ti_casci_exact_closure_and_term_table(ti_ladder):

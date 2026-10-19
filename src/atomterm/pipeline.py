@@ -13,8 +13,9 @@ from pathlib import Path
 
 import numpy as np
 
-from atomterm.system import AtomConfig
+from atomterm.system import AtomConfig, ncore_of, sector_occupations
 from atomterm.drivers import (
+    ReferenceSpec,
     build_full_mo,
     run_casci,
     run_casscf as casscf_stage,
@@ -26,14 +27,6 @@ from atomterm.stages import stage_facts
 from atomterm.analysis import format_report
 
 __all__ = ["run_atom", "run_carbon", "main"]
-
-
-def _ncore(cfg: AtomConfig, nelecas: tuple[int, int]) -> int:
-    nelectron = cfg.charge
-    from pyscf.data import elements
-
-    nelectron += elements.ELEMENTS_PROTON[cfg.symbol.upper().capitalize()]
-    return (nelectron - (nelecas[0] + nelecas[1])) // 2
 
 
 def _ndet(ncas: int, na: int, nb: int) -> int:
@@ -62,9 +55,7 @@ def run_atom(
     sa_weights: list[float] | None = None,
     run_casscf: bool = True,
     nroots_primary: int = 9,
-    occ_closed: list[str] | None = None,
-    occ_open: list[str] | None = None,
-    occ_e_ref: float | None = None,
+    ref: ReferenceSpec | None = None,
 ) -> dict:
     """End-to-end pipeline for any single atom.
 
@@ -82,11 +73,10 @@ def run_atom(
     nroots_primary : PySCF roots for the primary CASCI (clamped to the sector
         size; the Ms=0 CASCI always diagonalizes the full sector so the
         complete multiplet table is produced).
-    occ_closed, occ_open : passed through to :func:`run_rohf` -- the
-        character-forced occupation patterns, mandatory where the default
-        ROHF is an aufbau runaway (Ti; see :func:`run_rohf`).
-    occ_e_ref : passed through to :func:`run_rohf` -- the reference-basin
-        energy gate (Ti's multi-basin chaos).
+    ref : passed through to :func:`run_rohf` as a :class:`ReferenceSpec`
+        -- the character-forced occupation patterns + reference-basin
+        energy gate, mandatory where the default ROHF is an aufbau
+        runaway (Ti; see :func:`run_rohf`).
 
     Every stage is checkpointed under ``workdir`` and analyzed with the exact
     L/S operator matrices; see :func:`run_carbon` for the carbon instance.
@@ -101,8 +91,7 @@ def run_atom(
 
     # ---- stage 1: ROHF (checkpointed) -------------------------------------
     rohf_chk = str(out / f"{label}_rohf.chk")
-    mol, mf = run_rohf(cfg, rohf_chk, occ_closed=occ_closed,
-                       occ_open=occ_open, occ_e_ref=occ_e_ref)
+    mol, mf = run_rohf(cfg, rohf_chk, ref=ref)
     print(f"[ROHF      ] E = {mf.e_tot:.8f} Eh   (chk: {rohf_chk})")
 
     act_idx = select_valence_ao(mol, shell_patterns)
@@ -110,7 +99,7 @@ def run_atom(
     c_shell = np.eye(mol.nao_nr())[:, act_idx]
 
     # Ms sectors: (na, nb, nroots) for each CASCI diagonalization
-    na_p, nb_p = (nelec_act + spin) // 2, (nelec_act - spin) // 2
+    na_p, nb_p = sector_occupations(nelec_act, spin)
     sector_defs = [(na_p, nb_p, min(nroots_primary, _ndet(ncas, na_p, nb_p)))]
     if nelec_act % 2 == 0 and spin > 0:
         na0 = nelec_act // 2
@@ -120,7 +109,7 @@ def run_atom(
     reports: list[str] = []
 
     def stage_analysis(tag: str, cas, c_act, na: int, nb: int):
-        ncore = _ncore(cfg, (na, nb))
+        ncore = ncore_of(mol.nelectron, na + nb)
         # fold with the stage's OWN core (inside stage_facts: it uses
         # cas.mo_coeff[:, :ncore]): orbital optimization may legally
         # reorganize the inactive span, and a different fold than the one
@@ -152,7 +141,7 @@ def run_atom(
     # ---- stage 2: CASCI in every Ms sector (checkpointed) ------------------
     mo_by_sector: dict[tuple[int, int], np.ndarray] = {}
     for na, nb, nroots in sector_defs:
-        ncore = _ncore(cfg, (na, nb))
+        ncore = ncore_of(mol.nelectron, na + nb)
         mo = build_full_mo(mf, list(range(ncore)), act_idx)
         mo_by_sector[(na, nb)] = mo
         tag = f"casci_ms{_ms_label(na, nb)}"
@@ -162,7 +151,7 @@ def run_atom(
         stage_analysis(tag, cas, c_shell, na, nb)
 
     mo_p = mo_by_sector[(na_p, nb_p)]
-    ncore_p = _ncore(cfg, (na_p, nb_p))
+    ncore_p = ncore_of(mol.nelectron, na_p + nb_p)
 
     # ---- stage 3: CASSCF (single root) on the primary sector ---------------
     if run_casscf:

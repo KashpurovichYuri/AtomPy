@@ -4,7 +4,12 @@ import numpy as np
 import pytest
 
 from atomterm.system import AtomConfig
-from atomterm.drivers import run_rohf, select_shell_ao, select_valence_ao
+from atomterm.drivers import (
+    ReferenceSpec,
+    run_rohf,
+    select_shell_ao,
+    select_valence_ao,
+)
 
 # Shared per-atom data (import from conftest in test modules -- pytest puts
 # the tests dir on sys.path; no __init__.py by design).
@@ -46,17 +51,20 @@ def sc_rohf(tmp_path_factory):
 # 3d open. occ_e_ref gates the SCF basin: with the same forced occupations
 # a metastable +11.2 mEh member-gauge basin exists whose polarized core
 # smears the input window at the 1e-2 level.
-TI_OCC = dict(occ_closed=["1s", "2s", "3s", "4s", "2p", "3p"],
-              occ_open=["3d"], occ_e_ref=-848.40648875)
+TI_REF = ReferenceSpec(
+    occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
+    occ_open=("3d",),
+    occ_e_ref=-848.40648875,
+)
 
 
 @pytest.fixture(scope="session")
 def ti_rohf(tmp_path_factory):
     """(cfg, mol, mf, act_idx) for Ti/cc-pVDZ triplet ROHF: the
-    character-forced 3d2 4s2 reference (see TI_OCC)."""
+    character-forced 3d2 4s2 reference (see TI_REF)."""
     cfg = AtomConfig("Ti", "ccpvdz", spin=2)
     chk = str(tmp_path_factory.mktemp("ti_rohf") / "rohf.chk")
-    mol, mf = run_rohf(cfg, chk, **TI_OCC)
+    mol, mf = run_rohf(cfg, chk, ref=TI_REF)
     return cfg, mol, mf, select_valence_ao(mol, ["3d", "4s"])
 
 
