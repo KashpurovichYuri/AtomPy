@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from atomterm.analysis import analyze, configuration_summary
+from atomterm.analysis import AnalysisResult, analyze, configuration_summary
 from atomterm.drivers import shell_weights
 from atomterm.operators import build_operators, core_anisotropy, window_closure
 
@@ -37,7 +37,7 @@ class StageFacts:
     """Everything a finished stage reports, presentation-free."""
 
     tag: str
-    analysis: object  # analysis result: states, lz_spectrum, commutators
+    analysis: AnalysisResult  # states, lz_spectrum, commutators
     energies: np.ndarray  # our reconstruction: eigvalsh(H) + core_energy
     energies_pyscf: np.ndarray
     max_de_vs_pyscf: float
@@ -48,6 +48,21 @@ class StageFacts:
     win_lz: float   # one-particle closure defects of the window SPAN
     win_lperp: float  # (operators.window_closure; 0 = exact certificate)
     configurations: list[str]
+
+    # the three analysis fields every renderer/payload reads, exposed so
+    # callers need not reach into the analysis object (interface leak
+    # flagged by the design survey; kept as thin properties)
+    @property
+    def ground_term(self) -> str:
+        return self.analysis.states[0].term
+
+    @property
+    def ground_l2(self) -> float:
+        return float(self.analysis.states[0].l2)
+
+    @property
+    def comm_norm_h_lz(self) -> float:
+        return float(self.analysis.comm_norm_h_lz)
     core_anisotropy: float | None = None  # CASCI reference rungs only
 
     @property

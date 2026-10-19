@@ -151,6 +151,36 @@ The atom campaign (C, Si, Sc, Ti) is complete; the next wave is
 UNASSIGNED — user candidates: PHYSICS.md narrative (deferred),
 spin–orbit coupling, transition moments, g-factors.
 
+## Post-wave survey (2026-10-19, deep-module pass + code review)
+
+Reviews run: two-axis code review of `96e3c61..HEAD` (0 hard standards
+violations; spec verified — fixes applied at d30f366: TI_OCC
+single-sourced, Lz-spectrum + ms0-ordering pins landed, bands aligned)
+and the deep-module survey. Survey verdicts: all modules deep or
+correctly arranged; tests cross public seams only. Findings carried
+forward:
+
+- **ECP design (pre-verified)**: the seam already exists — PySCF's
+  `get_hcore()` includes `int1e_ecp` when `mol.ecp` is set, and h1 is
+  built in exactly two places (`operators.active_space_integrals`,
+  `operators.full_space_integrals`). The ECP ticket = `AtomConfig.ecp`
+  field + `build_mol` wiring + verification. TWO WRINKLES: (a)
+  `pipeline._ncore` recomputes nelectron from nuclear charge — WRONG
+  under ECP (core electrons removed); use `mol.nelectron`; (b) a named
+  `h1_ao(mol, mf)` helper in operators.py would make the seam explicit.
+- **Deepening candidates** (approved order): `ReferenceSpec` dataclass
+  for the occ/frac parameter clump (both reviews flagged it; conftest
+  already hand-rolls TI_OCC); sector-geometry helper shared by
+  pipeline/ladder (`_ncore`/`_ndet` derived twice). DONE now:
+  `StageFacts.analysis` typed + the three read fields exposed as
+  properties (the one interface leak).
+- secondquant.py survives the deletion test as a *witness* (independent
+  construction), not leverage — keep, documented as such.
+
+Docs survey (pending, first item after context switch): AGENTS physics
+facts (18–21) compress to agent-facing content + README pointers;
+GLOSSARY.md folds into a README appendix; wayfinder/tickets stay.
+
 ## Out of scope
 
 - Performance tuning of the determinant-basis builder beyond CAS sizes used
