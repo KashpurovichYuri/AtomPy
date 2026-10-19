@@ -35,6 +35,8 @@ from atomterm.ladder import run_ladder
 from atomterm.stages import stage_facts
 from atomterm.system import AtomConfig
 
+pytestmark = pytest.mark.slow
+
 LADDER_CASES = {
     "C": dict(
         cfg=AtomConfig(),

@@ -9,6 +9,8 @@ from atomterm.detbasis import (
     frobenius_norm,
     slater_condon_matrix,
 )
+
+pytestmark = pytest.mark.fast
 from atomterm.operators import (
     _composite_two_body,
     number_operator,

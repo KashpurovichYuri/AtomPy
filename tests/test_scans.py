@@ -14,6 +14,8 @@ from atomterm.operators import build_operators
 from atomterm.scans import member_tilt_map, radial_scan, scan_state, scan_window
 from atomterm.system import AtomConfig
 
+pytestmark = pytest.mark.slow
+
 
 @pytest.fixture(scope="session")
 def si_rohf(tmp_path_factory):

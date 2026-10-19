@@ -8,6 +8,9 @@ from atomterm.analysis import (
     spin_quantum_number,
     term_symbol,
 )
+
+import pytest
+pytestmark = pytest.mark.fast
 from atomterm.detbasis import determinant_basis
 
 

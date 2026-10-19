@@ -10,3 +10,7 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "-q"
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+    "fast: pure-numpy/libcint tier, no SCF anywhere in the fixture chain (seconds)",
+    "slow: runs SCF/CASSCF/SA -- the real chemistry (minutes; full suite ~13 min)",
+]

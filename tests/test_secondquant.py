@@ -17,6 +17,7 @@ from atomterm.detbasis import (
     frobenius_norm,
     slater_condon_matrix,
 )
+pytestmark = pytest.mark.fast
 from atomterm.secondquant import annihilate, create, secondquant_matrix
 from atomterm.operators import (
     build_operators,

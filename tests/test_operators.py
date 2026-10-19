@@ -8,6 +8,8 @@ from atomterm.drivers import build_full_mo
 from atomterm.operators import build_operators
 from atomterm.analysis import analyze, term_symbol
 
+pytestmark = pytest.mark.slow
+
 
 @pytest.fixture(scope="module")
 def shell_ops(carbon):

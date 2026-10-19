@@ -5,6 +5,9 @@ import numpy as np
 from atomterm.angular import l2_matrix, l_matrices, l_matrices_analytic
 from atomterm.detbasis import commutator, frobenius_norm
 
+import pytest
+pytestmark = pytest.mark.fast
+
 
 def test_libcint_matrices_hermitian_imaginary(p_shell_mol):
     l_ops = l_matrices(p_shell_mol)

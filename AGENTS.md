@@ -322,9 +322,13 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 91 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 92 tests in ~13 min (chkfile caching; ROHF computed once per
 session; the Ti ladder is the slowest block, ~7 min cold; the Sc ladders
-~2.5 min). Test files map
+~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
+anywhere in the fixture chain, sub-second); `pytest -m slow` = the
+SCF-bearing chemistry. Run the full suite before committing changes to
+physics-bearing modules (drivers/operators/stages/ladder/scans); targeted
+files or `-m fast` are fine for everything else. Test files map
 1:1 to src modules; tests are named for the
 invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`

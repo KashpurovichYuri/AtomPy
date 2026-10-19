@@ -5,6 +5,8 @@ import pytest
 
 from atomterm.system import AtomConfig, build_mol
 
+pytestmark = pytest.mark.fast
+
 
 def test_atom_config_label_encodes_basis_and_spin():
     assert AtomConfig().label == "C_ccpvdz_s2"

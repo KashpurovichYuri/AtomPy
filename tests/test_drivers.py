@@ -28,6 +28,7 @@ from atomterm.drivers import (
     select_valence_ao,
     shell_weights,
 )
+pytestmark = pytest.mark.slow
 
 
 def _s_ortho_err(mo, s):

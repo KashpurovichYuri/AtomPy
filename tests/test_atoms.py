@@ -16,6 +16,8 @@ from atomterm.pipeline import run_atom
 from atomterm.system import AtomConfig
 from conftest import TI_REF
 
+pytestmark = pytest.mark.slow
+
 # ground: expected (term, L, S) of the lowest CASCI state in the primary
 # sector; primary_tag / primary: sector chkfile tag and expected term -> count
 # over the FULL sector spectrum (ms0_* likewise, None when the sector does not

@@ -10,6 +10,9 @@ import numpy as np
 from atomterm.drivers import build_full_mo, run_casci
 from atomterm.stages import ORTHO_TOL, stage_facts
 
+import pytest
+pytestmark = pytest.mark.slow
+
 
 def test_stage_facts_payload_and_invariants(carbon, tmp_path):
     """stage_facts owns the fold: CASCI on the raw 2p window in the Ms=0

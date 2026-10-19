@@ -7,6 +7,9 @@ import numpy as np
 from atomterm.pipeline import run_carbon
 from atomterm.system import AtomConfig
 
+import pytest
+pytestmark = pytest.mark.slow
+
 
 def test_pipeline_end_to_end(tmp_path):
     cfg = AtomConfig(verbose=0)
