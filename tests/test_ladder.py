@@ -99,7 +99,7 @@ LADDER_CASES = {
                                         # free rung's own basin wobbles)
             sa_radial_dE=5e-4,          # vs the free SA (measured 3.4e-5)
             # purified-substrate rungs (fact 20): machine precision here
-            # too -- the free SA heals BELOW its canonical 4e-6 (fact 19b)
+            # too -- the free SA heals BELOW its canonical 4e-6 (fact 19)
             # all the way to the certificate (measured 3.3e-16)
             pur_comm=1e-10,
             pur_sa_comm=1e-8,
@@ -393,7 +393,7 @@ def test_sc_purified_rungs_unbroken_lz_and_l2(sc_ladder):
       precision (measured 1.3e-13 / 6.7e-14, 3.6e-13) with the full
       90-state free-ion term table and max|dE| ~ 0 -- the rung pair that
       answers "SA-CASSCF with exact rotational symmetry on a TM";
-    - sa_radial_pur: the flat member gauge of fact 18d has NO restoring
+    - sa_radial_pur: the flat member gauge of fact 18b has NO restoring
       force (m-symmetric radial rotation gains nothing), so the optimizer
       stops at a ~1e-6 window tilt (measured comm 5.7e-7 / 1.8e-5,
       convergence-tolerance-independent -- an optimizer floor, not a

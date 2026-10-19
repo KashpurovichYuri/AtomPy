@@ -101,7 +101,7 @@ unbroken Lz and L² at 1e-13** via sa_relax_pur.)
 substrate".** (C/Si: machine-exact — the radial direction has a
 restoring force, so SA's stationary point IS the symmetric window.
 Sc: the member gauge is exactly flat — m-symmetric radial rotation gains
-nothing, fact 18d — so the optimizer stops at a ~1e-6 tilt that no
+nothing, fact 18b — so the optimizer stops at a ~1e-6 tilt that no
 convergence tightening removes; an optimizer floor, not a baseline. The
 free-sa 4s↔3p swap attractor survives the purification: it is an
 optimizer basin, not a core-span artifact.)

@@ -31,8 +31,8 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/angular.py` | `l_matrices`, `l2_matrix`, `l_matrices_analytic` | one-electron `Lx/Ly/Lz` AO matrices. Primary: libcint `int1e_irp` (decoded layout in the docstring). Cross-check: exact tesseral algebra via overlaps. |
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
-| `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19a) |
-| `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `constrained_casscf`, `core_virtual_only_mask`, `no_core_window_exchange_mask`, `lm_sectors`, `radial_basis`, `radial_mask`, `run_sa_casscf`, `run_casscf_*`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core`, `purified_core_orbitals`, `avas_window`, `span_overlap` | all checkpointed (`.chk`); `constrained_casscf(mo_full=, mask=, weights=)` is the one deep CASSCF driver — a mask is any `uniq_var_indices`-shaped callable, and the `run_casscf_*` names are one-line adapters over it; `lm_sectors`/`radial_basis(c_core=)`/`radial_mask` build the (l, member)-labeled substrate for same-sector (radial) constraints (facts 16e/17); `purified_core_orbitals` = the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members closure theorem); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core`; `avas_window`/`span_overlap` = the ecosystem window probe (fact 19c/d) |
+| `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19) |
+| `src/atomterm/drivers.py` | `run_rohf`, `run_frac_occ_scf`, `run_casci`, `constrained_casscf`, `core_virtual_only_mask`, `no_core_window_exchange_mask`, `lm_sectors`, `radial_basis`, `radial_mask`, `run_sa_casscf`, `run_casscf_*`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core`, `purified_core_orbitals`, `avas_window`, `span_overlap` | all checkpointed (`.chk`); `constrained_casscf(mo_full=, mask=, weights=)` is the one deep CASSCF driver — a mask is any `uniq_var_indices`-shaped callable, and the `run_casscf_*` names are one-line adapters over it; `lm_sectors`/`radial_basis(c_core=)`/`radial_mask` build the (l, member)-labeled substrate for same-sector (radial) constraints (facts 16e/17); `purified_core_orbitals` = the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members closure theorem); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core`; `avas_window`/`span_overlap` = the ecosystem window probe (fact 19) |
 | `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and ladder share — callers only render (report text / flat json payload) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
@@ -219,194 +219,96 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     baseline needs a rotation-closed projector — i.e. an l-purified core
     span, which is exactly ticket 13. Read every Si/Sc CASSCF-family
     commutator as baseline + optimizer gauge.
-18. **The frozen-scan anatomy of the radial direction** (ticket 16,
-    `scans.py`, optimizer-free): (a) on p² atoms the ENTIRE CASSCF gain
-    is a ONE-PARAMETER m-symmetric radial rotation at EXACT symmetry —
-    C: θ* = 0.61 rad over 2p→3p, gain −0.2508 Eh (= the full free/radial
-    CASSCF gain); Si: θ* = 0.85 over 3p→4p, −0.1267 Eh; [H, Lz] = 0 at
-    every point of the curve. Mechanism visible in the one-/two-body
-    split: active-active repulsion falls faster than the (nucleus+core)
-    attraction rises. (b) Single-member tilts cost EXACTLY 0 Eh (to
-    1e-12): each M_L component of the ³P multiplet avoids one member, so
-    the CI finds an untouched component — the term's rotational
-    degeneracy IS the flat direction of fact 16; tilting ≥2 members costs
-    real energy (C: +1.6 mEh/pair at δ=0.1). This is why free single-root
-    CASSCF breaks m-symmetry for free, and why SA (which averages all M_L
-    components, every one of which feels a single-member tilt) has the
-    symmetric window as its stationary point. (c) METER BLIND SPOTS:
-    [H, Lz] cannot see a tilt of the m=0 member (Lz pz = 0) nor EQUAL
-    tilts of a full ±m pair (Lz mixes only within ±pairs) — such
-    deformations leak only through L± / L², which is trivially zero in
-    maximal-Ms single-irrep sectors. Sector commutators are necessary,
-    not sufficient, closure witnesses. (d) Sc INVERTS the structure: the
-    m-symmetric 3d→4d rotation gains NOTHING (the curve rises — radial
-    diffusion of a one-electron d shell only loses nuclear attraction;
-    4s→5s likewise harmful), while MEMBER-ASYMMETRIC tilts DESCEND
-    (−0.3 mEh for one tilted member at δ=0.1, −0.9 mEh for four, with
-    comm ~ 0.2–0.45): a genuine Jahn–Teller-like instability along the
-    degenerate ²D manifold — the drive behind Sc's chaotically broken
-    single-root radial solutions; SA over the quintet averages the
-    instability away (sa_radial stays symmetric). Scan numbers are
-    DETERMINISTIC (no optimizer, no basin chaos).
-19. **One-particle closure meter, SA-deviation decomposition, AVAS
-    verdict** (ticket 16 Phase 2; `window_closure`, `avas_window`,
-    `span_overlap`, `scripts/sa_decomposition.py`): (a) ‖[P,Lz]‖ and
-    ‖[P,L⊥]‖ = ‖[P,Lx]‖²+‖[P,Ly]‖‖¹ᐟ² of the window SPAN projector
-    (S-metric) are the complete closure certificate with NO blind spots:
-    [P,Lz] reproduces the many-body blind spots exactly (m=0-member,
-    equal-±pair tilts invisible), [P,L⊥] sees EVERY member asymmetry.
-    Carried by every ladder row (|[P,Lz]|, |[P,Lp]| columns) and by
-    StageFacts payloads. It exposes what sector commutators cannot:
-    C's converged casscf_radial window is member-tilted at [P,Lp] ≈ 1.1
-    (the flat gauge of fact 18b the single-root optimizer wandered into)
-    while its many-body commutators sit at 5e-7; sa/sa_radial anchor the
-    symmetric gauge ([P,Lp] ~ 1e-4). (b) Decomposition verdicts
-    (artifacts results/*_sa_decomposition.md): the core-fold witness
-    (refold the rung's converged core with the RAW shell window) is
-    ≤ 1e-13 for every SA rung on all three atoms — SA deviations are
-    100% window (identity + member structure), 0% core/fold. Si refines
-    fact 16: FREE sa/sa_pyscf heal below the 3.4e-3 input baseline
-    (→ 4e-6/7e-8) — only the constrained sa_radial is pinned at it.
-    Sc (this run): sa = the 4s↔3p swap basin (sv 0.00, comm 0.83/3.8);
-    sa_radial = exactly the input baseline; sa_pyscf = collapse;
-    canonical-START baselines are huge (Si 0.24/0.32, Sc 2.8/3.7 — the
-    SCF window block is member-polarized; that is what sa_pyscf eats).
-    (c) Span overlap ≠ closure — independent axes: Sc's AVAS window
-    overlaps the shell span at 0.9855 yet carries closure defects
-    0.5/0.4 (≈ 0.17-rad member tilt) and CASCI commutators 0.59/2.6;
-    overlap-based "window quality" says nothing about rotational
-    closure. (d) AVAS verdict (verified; refutes the same-span guess):
-    right SIZE, but the span is the mean-field-inherited relaxation —
-    on C/Si exactly the fact-18 m-symmetric optimum (−250.8/−126.7 mEh
-    = the full θ* gains, near m-symmetric), on Sc the diffuse canonical
-    virtual d-set (+80.8 mEh WORSE than raw shells, <L²> 5.90
-    masquerading as ²D). Raw shells strictly dominate for our purpose;
-    sv(AVAS) ≈ sv(CASSCF family) on C (0.917) and Si (0.883) — three
-    independent constructions agree on the relaxed span. (e) Sc
-    tilt-follow (deterministic, <L²>-tracked): the fact-18d descent
-    deepens monotonically to −2.7 mEh (subset {0,1,2}) / −3.6 mEh
-    ({0,1,3,4}) at δ=0.35 with ground-state L drifting 2.00 → 1.87/1.84
-    — the anatomy of the optimizer's ²D→²P relabeling; {0,1,3,4} is
-    Lz-BLIND ([H,Lz] ~ 1e-14) while [H,L²] ≈ 1–2 fires (this Ms=1/2
-    multi-term sector catches it; maximal-Ms single-irrep sectors would
-    catch NOTHING). m-symmetric reference rises steeply (+51.6 mEh at
-    δ=0.30) with <L²> = 6.000 exact. The m-scalar-constraint rung is
-    NOT built (decision): the member gauge is exactly flat on p²
-    (fact 18b) and sa_radial already realizes the m-symmetric optimum
-    reproducibly — there is nothing to gain.
-20. **The closed core span, realized** (ticket 13; `purified_core_orbitals`,
-    the `*_pur` ladder rungs; fact 17's fix, verified on C/Si/Sc):
-    (a) PREMISE CORRECTION: canonical core MOs are NOT confined to their
-    own (n,l) AO shells (C's 2s MO has 66% of its S-weight on other
-    radials — same-l radial mixing is physical), so "project each core
-    MO onto its own shell" is WRONG (gate (a) failed at density 0.77).
-    The correct closure theorem is sharper: for one-center bases the
-    l-chain rows decompose into MEMBER sectors with identical radial
-    chains (S = I_m ⊗ S_rad exactly), and L acts ONLY on the member
-    index — so E ⊗ members is L-invariant for ANY radial subspace E.
-    Shared radial comes free; full AO shell subspaces are unnecessary.
-    Construction: per l, the member-resolved radial blocks R = [r_{i,m}]
-    of the core MOs; E_l = top-k span of the S-metric column Gram RᵀSR
-    (eigenvalues count S-weight × m-multiplicity — ~2l+1 per occupied
-    radial, tail-level beyond: the selection AND the certificate);
-    replicate every radial on ALL members; one global Löwdin (S = 0
-    between different l keeps l-purity). Beware the metric trap: the
+18. **Frozen-scan verdicts** (ticket 16, `scans.py`; optimizer-free,
+    DETERMINISTIC — never pin optimizer output where a scan exists):
+    (a) p² atoms: the full CASSCF gain is a ONE-parameter m-symmetric
+    radial rotation at exact symmetry (C θ*=0.61 over 2p→3p, −250.8 mEh;
+    Si θ*=0.85 over 3p→4p, −126.7 mEh; [H,Lz]=0 along the whole curve);
+    single-member tilts cost EXACTLY 0 Eh, ≥2 tilted members cost real
+    energy (C +1.6 mEh/pair at δ=0.1). (b) Sc/Ti INVERT this: the
+    m-symmetric radial curve only rises (nothing to gain anywhere:
+    3d→4d, 4s→5s/6s all harmful), member-asymmetric tilts DESCEND (the
+    Jahn–Teller class — Sc −0.3/−0.9 mEh, Ti −163 µEh at δ=0.1 — the
+    drive behind their chaotically broken single-root solutions; SA
+    averages it away). (c) Sector commutators have BLIND SPOTS: [H,Lz]
+    cannot see an m=0-member or equal-±pair tilt; multi-term sectors
+    catch those via [H,L²], maximal-Ms single-irrep sectors catch
+    NOTHING — the projector pair (fact 19) has no blind spots.
+    Numbers/curves: README §7.4; anatomy: §3.6.
+19. **The one-particle closure meter is the universal certificate**
+    (ticket 16 P2; `operators.window_closure`, `avas_window`,
+    `span_overlap`): ‖[P,Lz]‖ and ‖[P,L⊥]‖ of the window SPAN projector
+    (S-metric) close the fact-18c blind spots — [P,L⊥] sees EVERY
+    member asymmetry; both ≈ 0 certifies closure completely. Carried by
+    every ladder row (|[P,Lz]|, |[P,Lp]|) and StageFacts payloads.
+    Span overlap is the IDENTITY axis, independent of closure (Sc's
+    AVAS window: 0.9855 overlap yet O(0.5) closure defects — overlap
+    says nothing about closure). AVAS verdict: right size,
+    mean-field-inherited span; raw shells strictly dominate. SA
+    deviations decompose 100% window / 0% core-fold (witness: refold
+    the converged core with the raw shell window; artifacts
+    results/*_sa_decomposition.md). Verdict tables: README §7.3.
+20. **The closed core span** (ticket 13; `purified_core_orbitals`, the
+    `*_pur` rungs — fact 17's fix, verified C/Si/Sc/Ti): per l, take the
+    member-resolved radial blocks R of the core MOs; E_l = top-k span of
+    the S-metric COLUMN Gram RᵀSR (eigenvalues = S-weight × member
+    multiplicity; the tail level is both the selection and the
+    certificate); replicate every radial on ALL members; one global
+    Löwdin (S = 0 between different l keeps l-purity). TRAPS: the
     S-generalized eigenproblem of RRᵀ returns S⁻¹-warped radials — the
-    COLUMN Gram is the correct object. (b) Verified gates: input windows
-    (build_full_mo AND radial_basis) close at machine precision —
-    Si 3.4e-3/4.5e-3 → 1.1e-15/1.8e-15, Sc 5.7e-3/2.1e-2 →
-    6.6e-15/8.7e-15; the purified core's density is m-scalar EXACTLY
-    (equal member-diagonal blocks, zero cross-member coherences,
-    anisotropy 1e-16, raw fold == averaged fold → casci_avg_pur's
-    max|dE| = 0.0) — it is the orbital realization of the scalar core
-    the fold already uses. Reference shift = the discarded core
-    polarization only (spherically averaged density change C 4.2e-6,
-    Si 3.6e-6, Sc 1.05e-4; energy C +3.0 µEh, Si +128 µEh, Sc
-    +674 µEh — C's equals the fact-12 avg-vs-raw shift exactly).
-    (c) THE DELIVERABLE: Sc CASSCF/SA-CASSCF with unbroken Lz and L².
-    Frozen-window rungs close at machine precision on every atom:
-    Sc relax_pur 1.3e-13, sa_relax_pur (SA + core-relax mask, window
-    frozen) 6.7e-14/3.6e-13 with the full 90-state term table and
-    max|dE| 5e-8. FREE SA closes exactly where the optimizer has a
-    restoring force: C sa_pur/sa_radial_pur = 0.0 exactly, Si 3.3e-16
-    (vs 4e-6 healing on the canonical substrate) with the full θ*
-    gains. On Sc the member gauge is exactly FLAT (fact 18d), so
-    sa_radial_pur stops at a ~1e-6 window tilt (comm 5.7e-7/1.8e-5)
-    that NO convergence tightening removes (conv_tol 1e-7→1e-12: [P,Lp]
-    3.8e-6→1.0e-6, energy identical) — an optimizer floor with no
-    restoring force, not a baseline. The free-sa 4s↔3p swap attractor
-    SURVIVES the purified substrate (window p = 1/6 exactly again) —
-    it is an optimizer basin, closing the fact-17 attribution question.
-    Single-root casscf_radial_pur keeps the flat member-gauge chaos of
-    fact 16 (C [P,Lp] 1.1 with [H,Lz] 0.0 — the blind-spot demo again).
-    (d) Phase 4 (post-hoc window repair) NOT needed — free SA is
-    machine-exact on p² atoms on this substrate. Bookkeeping note:
-    pur-rung energies carry the same fact-14 window-definition offset
-    vs raw-fold CASCI rows (Sc +88.7 mEh; the projected window is the
-    honest common definition *within* the pur family); relax-family
-    energy SIGNS vs the unpolarized CASCI are fold bookkeeping (our
-    averaged fold discards the polarization the optimizer bought:
-    max|dE| ~ 1e-3 is the detector), not physics — bound, don't pin.
+    column Gram is the correct object; canonical core MOs are NOT
+    shell-confined (C 2s: 66% of S-weight off its shell) — per-shell
+    projection is WRONG. Result: both input windows (build_full_mo and
+    radial_basis) close at machine precision; the purified core density
+    is exactly m-scalar (avg fold == raw fold); frozen-window pur rungs
+    (relax_pur, sa_relax_pur) deliver CASSCF/SA-CASSCF with unbroken
+    Lz/L² on every atom incl. Ti (comm ~1e-13, max|dE| ≤ 1e-7). Free SA
+    is machine-exact on p² on this substrate; on Sc/Ti the member gauge
+    is exactly FLAT, so sa_radial_pur stops at its floor (~1e-6..1e-4
+    window tilt) that no convergence tightening removes, and the 4s↔3p
+    swap attractor SURVIVES purification (branch on window weights).
+    Energy bookkeeping: the pur family carries the window-definition
+    offset vs raw-fold CASCI rows (Sc +88.7 mEh — the projected window
+    is the honest common definition WITHIN the pur family);
+    relax-family max|dE| ~1e-3 vs unpolarized CASCI is fold bookkeeping
+    (bound, don't pin). Narrative: README §5.3, §7.3.
 
 21. **Ti: d², the aufbau runaway, and the basin gate** (ticket 12):
     (a) THE REFERENCE IS TWO-LAYERED CHAOS. Default ROHF on Ti/ccpvdz
-    (spin=2) is an aufbau runaway (fact-15c class, but on the reference
-    itself): E -848.28341842 with a DOUBLY-OCCUPIED 3d inside canonical
-    [:10] and a {4s,4p} open block, +123.07 mEh above the physical
-    3d2 4s2 3F; energy-ordered get_occ falls back from EVERY start
-    (default, post-swap, frac-occ guess). Fix: CHARACTER-FORCED
-    occupations (run_rohf(occ_closed=, occ_open=) -> _forced_rohf_occ):
-    each cycle occupy by S-projector weight (fact-15c metric) on the
-    closed AO span ([Ar]+4s) / open span (3d) -- lands
-    E = -848.40648875, core d ~ 2e-13, two pure-3d open MOs. But even
-    with forced occupations the SCF is MULTI-BASIN (orbitally degenerate
-    open shell): a metastable +11.2 mEh solution exists (same
-    occupations, member gauge whose polarized core smears the
-    build_full_mo input window at 1.6e-2 -- vs ~1e-8 in the good basin;
-    default minao and vsap guesses reach it, atom/huckel reliably do
-    not). Fix: occ_e_ref = an energy gate with guess cycling. The gate
-    also stabilizes the relax rung: Ti's good-basin input window defect
-    is ~1e-8, so casscf_relax sits at 2.3e-8 -- NOT Sc's fact-17 1e-3
-    class (which is basin/substrate-specific, not atom-intrinsic).
-    (b) Option A (CAS(2,5)/{3d}, ncore=10=[Ar]+4s2): the d2 tables are
-    textbook-exact on first pin -- Ms=1: 3F x7 + 3P x3; Ms=0 (25 dets):
-    1S+1D+3P+1G x9+3F, ordering 3F < 1D < 3P < 1G < 1S (NIST); first
-    L=3 ground term, first L=4 (1G) term, first f-shell-bearing basis
-    under load (43 AOs, radial chains s6/p5/d3/f1, core f-tails ~1e-4).
-    (c) Option B (CAS(4,6)/{3d,4s}, Ms=1, 120 dets): TI_EXACT_TERMS =
-    {3D:15, 3F:35, 3G:18, 3H:22, 3P:15, 5D:5, 5F:7, 5P:3} (d2s2 gives
-    10, d3s 60, d4 50; S>=1 only -- the sector holds no singlets).
-    Raw core: percent-class commutators (4.9e-2/2.6e-1, aniso 7.8e-3)
-    but the ground <L^2> is UNSHIFTED (12.0 - 1e-13) unlike Sc's
-    6.0001 -- weaker polarization, so <L^2> alone is not a raw-core
-    detector on every atom (commutators are). Frac reference +38 mEh,
-    invariant as always.
-    (d) THE d2 3F SCAN VERDICT (question 1): member tilts DESCEND
-    (-163 uEh at delta=0.1, ~half Sc's depth; <L^2> barely moves) --
-    the JT class, NOT the p2 flat class: free single-root optimizers
-    wander and NO restoring force tightens the member gauge, so
-    sa_radial_pur stops at its floor (1.4e-4/5.3e-4, slightly above
-    Sc's 5.7e-7). The m-SYMMETRIC radial picture inverts C/Si exactly
-    like Sc: raw 3d->4d, 4s->5s and 4s->6s one-parameter rotations ALL
-    RISE steeply (+9.8 mEh at theta=0.05 for the d shell). The radial
-    rungs' real ~11 mEh gain lives on the ORTHOGONALIZED substrate's
-    s slot (converged sa_radial window: 4s 0.75 + 6s 0.27) -- a third
-    radial anatomy: C/Si = raw one-parameter theta* recovers everything;
-    Sc = nothing anywhere; Ti = orthogonalized-substrate s-slot only
-    (never rotate raw valence AOs to find it; and a rotated-but-
-    nonorthogonalized column is the ticket-09 bug class -- the energy
-    drops spuriously).
-    (e) The fact-20 deliverable TRANSFERS unchanged: relax_pur 6.2e-14,
-    sa_relax_pur 1.4e-13/8.1e-13 -- machine-exact CASSCF/SA-CASSCF with
-    unbroken Lz/L^2, the full 120-state table, max|dE| 8e-8. The Sc
-    basin phenomenology also transfers: free CASSCF -> the L~0 escape
-    (+46 mEh, s/p/d window); sa = the EXACT 4s<->3p swap (window
-    p = 1/6, s ~ 0, comm 1.1, our-fold max|dE| 0.85); sa_pur = a
-    PARTIAL swap (s-slot 2/3 s + 1/3 p, window p ~ 1/18, <L^2> wanders
-    12.01..12.03 across draws) -- the attractor survives purification,
-    branch on window weights. Test-band lessons: leave real headroom on
-    degenerate-but-numerical quantities (frac septet 6.5e-11 vs a 1e-10
-    bound flaked once) and on basin-mixed <L^2>.
+    (spin=2) is an aufbau runaway (doubly-occupied 3d inside the
+    canonical core, +123.07 mEh above the physical 3d2 4s2 ³F);
+    energy-ordered get_occ falls back from EVERY start. Fix:
+    `run_rohf(occ_closed=, occ_open=)` — character-forced occupations
+    via the fact-15c S-projector metric; lands −848.40648875 with
+    pure-3d open MOs. Second layer: even with forced occupations the
+    SCF is MULTI-BASIN (orbitally degenerate open shell): a metastable
+    +11.2 mEh basin exists (same occupations; its polarized core smears
+    the build_full_mo input window at 1.6e-2 vs ~1e-8 in the good
+    basin; default minao/vsap guesses reach it, atom/huckel reliably do
+    not) — add the `occ_e_ref` energy gate (retried over cycled guesses
+    until |E−ref| ≤ 1e-4, else RuntimeError; cached chkfiles are
+    trusted). The gate also fixes the relax rung's substrate (good-basin
+    input defect ~1e-8, so casscf_relax sits at 2.3e-8 — NOT Sc's
+    fact-17 class; that class is basin/substrate-specific, not
+    atom-intrinsic). (b) Tables (pinned in tests): option A CAS(2,5)/{3d}
+    — Ms=1 ³F×7+³P×3; Ms=0 ¹S+¹D+³P+¹G×9+³F in NIST order ³F<¹D<³P<¹G<¹S
+    (the `ms0_order` pin); first L=3 ground, first ¹G, first f-bearing
+    basis (core f-tails ~1e-4). Option B CAS(4,6): TI_EXACT_TERMS in
+    conftest (120 dets, S≥1 only). Raw-core caveat: Ti's ground ⟨L²⟩ is
+    UNSHIFTED at the percent-class commutators (4.9e-2/2.6e-1) — ⟨L²⟩
+    alone is not a raw-core detector on every atom; commutators are.
+    (c) The Sc phenomenology transfers (escape, the exact 4s↔3p swap,
+    the partial swap under pur — branch on window weights); the radial
+    anatomy is a THIRD kind: raw valence rotations all RISE, the ~11 mEh
+    radial gain lives on the ORTHOGONIZED substrate's s slot
+    (converged sa_radial window: 4s 0.75 + 6s 0.27); never rotate raw
+    valence AOs to find it, and a rotated-but-nonorthogonalized column
+    is the ticket-09 bug class. d² tilts descend (JT class) so
+    sa_radial_pur stops above its Sc floor (1.4e-4/5.3e-4). pur rungs
+    machine-exact (6.2e-14). (d) Test-band lessons: leave real headroom
+    on degenerate-but-numerical quantities (the frac septet 6.5e-11 vs
+    a 1e-10 bound flaked once) and on basin-mixed ⟨L²⟩. Narrative:
+    README §5.5, §7.2–7.3, §7.4.
 
 ## Conventions
 
@@ -454,7 +356,7 @@ gain, zero l-leakage), `test_divergence_guard_fires_on_broken_orthonormality`
 (independent ecosystem window selection), `test_window_closure_certificate_and_blind_spots`
 and `test_window_closure_sc_shell_and_defective` (the one-particle meter:
 exact certificates, the fact-18c blind spots closed by [P,L⊥]),
-`test_avas_window_reproduces_the_shell_cascade` (fact 19d: AVAS inherits
+`test_avas_window_reproduces_the_shell_cascade` (fact 19: AVAS inherits
 the mean-field relaxation — C = the full θ* gain near-symmetric, Sc = +80 mEh
 and O(0.5) closure defects), `test_stages.py` (the facts-module
 contract), `test_scans.py` (frozen-scan anatomy: full radial gain at exact
