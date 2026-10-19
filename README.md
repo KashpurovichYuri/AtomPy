@@ -45,7 +45,7 @@ summary card (ROHF reference −848.406 Eh = −23 086 eV; ΔE vs ROHF, eV):
 | deliverable | free variant | symmetric variant |
 |---|---|---|
 | CASCI, raw shell | — | +0.29 (exact) |
-| CASSCF | **−0.85** (escape — broken) | +0.28 frozen (baseline) / −0.01 radial (baseline) |
+| CASSCF | **−0.85** (escape — broken) | +0.28 frozen (baseline) / −0.06 radial (single root, gauge-chaotic) |
 | SA-CASSCF | −0.27 (swap — broken) | +0.03 radial purified (floor) / +0.32 frozen purified (exact) |
 
 §7.3; regenerate: the `run_ladder` calls recorded in each ladder header.
@@ -493,6 +493,26 @@ not to tighten convergence. And on Sc/Ti the free state average can
 still reach the swap basin. The symmetric endpoint combines the tools:
 state average, window frozen, isotropic core substrate (§5.3).
 
+**Is the symmetric window stationary for the average? Measured, not
+assumed.** A member tilt (one window column rotated toward its next
+radial, §3.6) is *not* a rotation of the atom — a rotation maps a closed
+window onto itself; a tilt deforms it into a non-closed one, and the
+term components split at first order. What the tilt does to the average
+therefore depends on which physics the tilted radial carries. Measured
+(frozen-window scans, §7.4: mean over the ground term's components, one
+member tilted by δ = 0.1 from the raw shell): on C and Si the mean
+*descends* (−28.1 and −11.0 mEh) — tilting toward 3p/4p is a fraction of
+the beneficial radial rotation θ* for every component containing that
+member; on Sc and Ti it *rises* (+1.6 and +4.9 mEh) — there the same
+rotation only loses nuclear attraction. In both regimes the m-symmetric
+radial direction is orders of magnitude steeper (the full −250.8 mEh on
+C), which is why converged state-averaged runs land m-symmetric
+(measured: ‖[P, L̂⊥]‖ ~ 1e-4, §7.3): the optimizer follows the symmetric
+direction first, and on the d atoms the average turns the single-root
+tilt descent — the Jahn–Teller-like instability of §7.4, for which the
+symmetric window would be a saddle for one state — into an uphill
+direction.
+
 ### 3.5 What textbook runs give you, and why
 
 | Standard practice | What you get | Why | What we do instead |
@@ -705,6 +725,15 @@ deliberately, not letting the optimizer silently redraw the partition.
 On a multi-basin landscape every free run is classified — not merely
 converged — by σ, window weights and the projector pair.
 
+**A rebuilt window is not a broken window — an m-incomplete one is.**
+Closure (§2.3) requires complete member sets with shared radials per l,
+whatever the orbitals' origin: a mean-field-relaxed radial span, and
+even a complete multi-l window ({3d, 4s, 4p} on Sc — ~25 mEh of 4p
+correlation at exact closure), are legitimately symmetric. What no
+rebuilt window obtains for free is the optimizer's respect: closure is
+imposed (masks, substrate) or certified (the projector pair), never
+converged to — a complete start window still escapes (§7.3).
+
 ### 5.5 Level 5 — the SCF reference
 
 **The bottom of the stack fails first on transition metals.** Energy-
@@ -821,38 +850,74 @@ below ROHF, not the −730/−786 mEh our fold seems to show.
 
 **The summary cards.**
 
-**C** — ROHF −37.682418 Eh = −1 025.4 eV; CAS(2,3)/{2p}
+**C / Si** — ROHF −37.682418 / −288.846437 Eh; CAS(2,3), Ms=0.
+*References (totals):* the averaged fold leaves the ROHF total unchanged
+(measured raw-vs-avg ground shift: −29 µEh on C, −0.31 mEh on Si — the
+multiplet-splitting scale); the frac-occ SCF totals are −37.678694 /
+−288.867793 Eh (2/3-per-orbital ensembles — a different functional, not
+a variational neighbor of ROHF).
 
-| deliverable | free variant | symmetric variant |
+| rung (ΔE vs ROHF, eV) | C | Si |
 |---|---|---|
-| CASCI, raw shell | — | +6.82 (confinement; exact window, exact tables) |
-| CASSCF | 0.00 (member-tilted: baseline window, exact sector) | 0.00 (radial restriction — full recovery; exact) |
-| SA-CASSCF | +0.001 (lands symmetric: exact) | 0.00 (radial restriction, purified core; exact) |
-
-**Si** — ROHF −288.846437 Eh = −7 859.9 eV; CAS(2,3)/{3p}: CASCI +6.03
-(exact); CASSCF free 0.00 → radial +0.001 (exact); SA-CASSCF +0.001
-(exact).
+| CASCI raw shell, averaged fold | +6.82 (confinement; exact) | +6.03 (confinement; exact) |
+| CASCI raw core fold | +6.82 (comm 9.8e-6 — the detector) | +6.03 (comm 5.6e-4) |
+| CASCI frac reference | +6.59 | +5.93 |
+| CASSCF free | 0.00 (member-tilted window, baseline sector) | 0.00 (lands symmetric) |
+| CASSCF radial restriction | 0.00 (full recovery, exact) | +0.001 (exact) |
+| SA-CASSCF | +0.001 (lands symmetric, exact) | +0.001 (exact) |
 
 **Sc** — ROHF −759.736255 Eh = −20 673.5 eV; CAS(3,6)/{3d,4s}
+*References (totals):* the averaged fold leaves the ROHF total unchanged
+(measured ground shift between raw and averaged folds: −1.5 mEh, the
+multiplet-splitting scale); the frac-occ SCF total is −758.014967 Eh —
+the ensemble of the smeared {3d,4s}³ shell, a different functional
+(Eh-scale exchange cost; only its exactly isotropic core field is used).
 
 | deliverable | free variant | symmetric variant |
 |---|---|---|
-| CASCI, raw shell | — | +0.18 (exact) |
-| CASSCF | **−0.86** (escape: L ≈ 0, identity changed — broken) | +0.18 frozen / −0.02 radial (baseline) |
+| CASCI, raw shell, averaged fold | — | +0.18 (exact) |
+| CASCI, raw core fold | — | +0.18 (raw split: commutator 2.8e-2 — the polarized-core detector) |
+| CASCI, frac reference | — | +1.00 (invariant; a different reference) |
+| CASSCF | **−0.86** (escape: L ≈ 0, identity changed — broken) | +0.18 frozen (baseline) / −0.18 radial (single root, gauge-chaotic) |
 | SA-CASSCF | −0.36 (swap; ⟨L̂²⟩ = 6.002, term-readable — broken) | +0.20 frozen purified (exact) / 0.00 radial purified (floor) |
 
 **Ti** — ROHF −848.406489 Eh = −23 086.3 eV; CAS(4,6)/{3d,4s}
+*References (totals):* averaged fold leaves the ROHF total unchanged
+(raw-vs-avg ground shift −2.8 mEh); frac-occ SCF total −847.296157 Eh
+(the smeared-shell ensemble, +1.11 Eh vs ROHF).
 
 | deliverable | free variant | symmetric variant |
 |---|---|---|
-| CASCI, raw shell | — | +0.29 (exact) |
-| CASSCF | **−0.85** (escape — broken) | +0.28 frozen (baseline, gated basin) / −0.01 radial (baseline) |
+| CASCI, raw shell, averaged fold | — | +0.29 (exact) |
+| CASCI, raw core fold | — | +0.29 (raw split: commutator 4.9e-2) |
+| CASCI, frac reference | — | +1.31 (invariant; a different reference) |
+| CASSCF | **−0.85** (escape — broken) | +0.28 frozen (baseline, gated basin) / −0.06 radial (single root, gauge-chaotic) |
 | SA-CASSCF | −0.27 (swap — broken) | +0.03 radial purified (floor) / +0.32 frozen purified (exact) |
 
-One sentence per atom: what confinement costs (+6.82 / +6.03 / +0.18 /
-+0.29), what breaking buys (−0.86 / −0.85, or the swap's −0.36 / −0.27),
-and what symmetry costs against ROHF (≈ 0 on p²; −0.02 to +0.03 on the
-d-atoms for the best symmetric treatment).
+One sentence per atom: where the raw-shell CASCI total sits against
+ROHF (+6.82 / +6.03 eV on the p² atoms — there it is the confinement
+cost; +0.18 / +0.29 eV as run on the d atoms, where the window already
+correlates — our raw-span analysis fold reads −2.2 / −2.0 eV there, the
+window-definition offset), what breaking buys (−0.86 / −0.85, or the
+swap's −0.36 / −0.27), and what symmetry costs against ROHF (≈ 0 on p²;
+−0.02 to +0.03 on the d-atoms for the best symmetric treatment).
+
+None of these numbers is a fine paid for symmetry. The p² CASCI row is
+confinement, recovered in full by an m-symmetric rotation; the escapes
+are window-identity changes — a different question, not a cheaper
+answer to this one. What symmetry itself costs is ≈ 0 eV on the p²
+atoms and −0.02 to +0.03 eV on the d atoms — and it buys term tables
+exact to machine precision with correlation included.
+
+The escape and the swap fail differently. The escape rebuilds the
+active space from orbitals the configuration never implied; its states
+are not L̂² eigenstates at all (⟨L̂²⟩ wanders across draws) — it
+describes no term. The swap keeps the window's size but changes its
+identity (a valence 4s for a core 3p); its ground root keeps a readable
+label only approximately — the commutator is O(1) and the term table
+scrambles (Ti: ³F 38 instead of 35, ³G 25 instead of 18). The terms are
+described exactly by the certified treatment; the direct runs are
+reported for their energies and their anatomy, not their labels.
 
 **The confinement finding.** The +250.8 on carbon is *purely* the
 raw-shell confinement, verified directly: CASCI over the ROHF's own
@@ -862,8 +927,9 @@ express, and the famous "−250.8 mEh CASSCF gain" is the recovery of the
 confinement cost, not correlation won. The optimized window (~2/3 2p +
 1/3 3p at θ\* = 0.61, §7.4) simply rebuilds the relaxed ROHF-like
 orbital inside the window. The same holds on Si (+221.5 recovered); on
-the d-atoms the confinement is small and the radial channel nets only
-−0.8 (Sc) / −0.4 (Ti) — the scan verdict of §7.4 in totals.
+the d-atoms the as-run confinement reading is small (+6.7 / +10.6 mEh)
+and the state-averaged radial channel nets −0.8 (Sc) / −0.4 (Ti) mEh —
+the scan verdict of §7.4 in totals.
 
 **Chaos.** Rungs marked † have an optimizer landscape with several
 distinct local minima, each with its own region of attraction (a
