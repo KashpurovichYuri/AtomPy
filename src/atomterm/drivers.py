@@ -19,6 +19,7 @@ import numpy as np
 from pyscf import lib, mcscf, scf
 
 __all__ = [
+    "ReferenceSpec",
     "run_rohf",
     "run_frac_occ_scf",
     "select_shell_ao",
@@ -58,15 +59,22 @@ def _ao_span_projector(s_mat: np.ndarray, rows: list[int]) -> np.ndarray:
     return s_mat[:, rows] @ np.linalg.inv(s_oo) @ s_mat[rows, :]
 
 
+def _lowdin(c: np.ndarray, s: np.ndarray) -> np.ndarray:
+    """Symmetric Loewdin orthonormalization of the columns of ``c`` in the
+    S metric. Span-preserving; the eigenvector gauge within a degenerate
+    set is an arbitrary rotation -- fine unless column identity matters
+    (:func:`radial_basis` fixes the gauge by Gram-Schmidt instead)."""
+    ev, u = np.linalg.eigh(c.conj().T @ s @ c)
+    return c @ (u / np.sqrt(ev)) @ u.T
+
+
 def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
     """Build the character-forced ROHF ``get_occ`` hook (see :func:`run_rohf`).
 
-    Each SCF cycle the occupations are assigned by S-projector WEIGHT on
-    two AO spans, never by energy order: the ``n_closed`` MOs with the
-    largest closed-span weight get 2.0; of the rest, the ``spin`` MOs
-    with the largest (open + closed)-span weight get 1.0. The closed term
-    in the open ranking lets early-cycle 3d-like character that leaks
-    into core-like MOs still be found.
+    Occupations by S-projector WEIGHT on two AO spans, never energy order
+    (the counts and spans: :func:`run_rohf`). The closed term in the open
+    ranking lets early-cycle 3d-like character that leaks into core-like
+    MOs still be found.
     """
     s_mat = mol.intor_symmetric("int1e_ovlp")
     p_closed = _ao_span_projector(s_mat, select_valence_ao(mol, occ_closed))
@@ -125,32 +133,17 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     If the chkfile exists, the converged MOs are loaded and no SCF is run.
     Returns ``(mol, mf)``.
 
-    ref : a :class:`ReferenceSpec` (character-forced occupations + optional
-        basin gate). Each cycle, the ``(nelectron - spin)/2`` MOs with the
-        largest S-projector weight on the ``occ_closed`` AO span are doubly
-        occupied and, of the rest, the ``spin`` MOs with the largest
-        combined ``occ_open``/``occ_closed`` weight are singly occupied.
-        MANDATORY on atoms whose default ROHF is an aufbau runaway: on
-        Ti (ccpvdz, spin=2) energy-ordered filling converges to a
-        doubly-occupied 3d inside the canonical core with a {4s, 4p} open
-        block -- +123.07 mEh above the physical 3d2 4s2 3F state -- and
-        every energy-ordered start tested falls back into that trap. With
-        the hook (occ_closed = [Ar]+4s patterns, occ_open = ["3d"]) the
-        SCF lands the physical reference deterministically. The hook is
-        part of the object's identity: set BEFORE the cache branch
-        (ticket-10 lesson).
-        ``ref.occ_e_ref``: even with forced occupations the SCF is
-        multi-basin where the open shell is orbitally degenerate: on Ti
-        the same 3d2 4s2 occupations converge either to the true
-        reference (-848.40648875, nearly Lz-closed open-pair gauge,
-        build_full_mo window defect ~1e-8) or to a metastable +11.2 mEh
-        basin (a member-gauge whose polarized core smears the window at
-        the 1e-2 level) -- the default init guess is NOT reliable between
-        them. When set, the run is retried over cycled init guesses
-        ("atom", "huckel"; both verified to reach the reference basin on
-        Ti) until |E - occ_e_ref| <= 1e-4, else RuntimeError. The gate
-        applies to FRESH runs only: a cached chkfile is trusted (produce
-        it from a gated run and the trust is inherited).
+    ref : a :class:`ReferenceSpec` (character-forced occupations +
+        optional basin gate). Occupations are assigned each cycle by
+        S-projector weight on the ``occ_closed``/``occ_open`` AO spans,
+        never by energy order -- mandatory on aufbau-runaway atoms
+        (Ti: +123.07 mEh runaway, fact 21a / README §5.5). Even forced,
+        a degenerate open shell is multi-basin (Ti: +11.2 mEh
+        metastable), so with ``occ_e_ref`` set a FRESH run is retried
+        over cycled init guesses until |E - occ_e_ref| <= 1e-4, else
+        RuntimeError; cached chkfiles are trusted without the gate. The
+        occupation hook is part of the object's identity: set BEFORE
+        the cache branch (ticket-10 lesson).
     """
     from atomterm.system import build_mol
 
@@ -227,15 +220,16 @@ def select_valence_ao(mol, patterns: list[str]) -> list[int]:
 def avas_window(mf, labels: list[str], ncore: int, threshold: float = None):
     """Window chosen by AVAS (pyscf.mcscf.avas, arXiv:1701.07862): an
     independent ecosystem window selector for cross-validating our raw
-    shell AOs.
+    shell AOs (verdicts: fact 19, README §7.3).
 
     AVAS projects the target AO span (``labels``, e.g. ``["Sc 3d",
     "Sc 4s"]``) out of the converged MOs and keeps eigenvectors of the
-    projected overlap above ``threshold`` (its default 0.2). Because the
-    construction PROJECTS onto the target span, an AVAS window of full
-    shell dimension IS the shell span exactly -- closed by construction;
-    a threshold that drops members of an m-set gives a rotation-DEFECTIVE
-    span (the negative-control case for the closure meters).
+    projected overlap above ``threshold`` (its default 0.2). Because
+    the construction PROJECTS onto the target span, a full
+    shell-dimension AVAS window IS the shell span exactly -- closed by
+    construction; a threshold that drops members of an m-set gives a
+    rotation-DEFECTIVE span (the negative-control case for the closure
+    meters).
 
     Returns ``(mo_full, ncas, nelecas)`` with the AVAS active span at
     ``[ncore : ncore+ncas]`` (ready for run_casci; electron bookkeeping
@@ -267,41 +261,35 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
 
     The open shell is occupied fractionally (``nelec_open / n_open`` per
     orbital, e.g. 2/3 per 2p AO for the carbon 2p^2 configuration), which
-    makes the Fock operator exactly spherical. Unlike a symmetry-broken
-    ROHF (whose core is polarized by the one occupied open-shell member),
-    the converged core orbitals are pure l-eigenfunctions: this IS the
-    rotationally invariant "scalar core" that spherically averaging a
-    symmetry-broken core density reproduces to O(eps^2) in the tiny
-    polarization weight eps -- while remaining a DIFFERENT physical
-    reference (open-shell exchange with a smeared vs a localized valence),
-    which is why the two cores' energies differ at the mEh scale.
+    makes the converged Fock exactly spherical -- the scalar-core
+    reference that density averaging reproduces, but a DIFFERENT physical
+    reference from ROHF (smeared vs localized valence exchange; the
+    measured energy relation: README §3.2, fact 15f).
 
-    Control mechanism: ``get_occ`` is PySCF's occupation hook, called every
-    SCF cycle to map canonical orbital energies to occupation numbers; the
-    density and Fock are built from whatever it returns, so the SCF
-    converges self-consistently in the ensemble density. The returned
-    ``e_tot`` is the ensemble energy of the averaged configuration -- use
-    this object as a CORE PROVIDER, never as a term energy.
+    Control mechanism: ``get_occ`` is PySCF's occupation hook, called
+    every SCF cycle; the density and Fock are built from whatever it
+    returns, so the SCF converges self-consistently in the ensemble
+    density. The returned ``e_tot`` is the ensemble energy of the
+    averaged configuration -- use this object as a CORE PROVIDER, never
+    as a term energy.
 
-    ``open_idx`` selects the fractional block by CHARACTER (the AO indices
+    ``open_idx`` selects the fractional block by CHARACTER (AO indices
     of the open shell): the ``n_open`` non-core orbitals with the largest
-    weight on that shell's AOs (S metric) get the fractional occupation.
+    S-projector weight on that shell get the fractional occupation.
     This matters for transition metals: energy-ordered filling is
-    unstable where 3d/4p quasi-degenerate -- on Sc the aufbau block runs
-    away to {4s, 4p, ~2d} (a p-containing ensemble, not 3d1 4s2). Without
-    ``open_idx`` the block is the HOMO block (energy order; fine for
-    C/Si, where it selects the same orbitals as the projection would).
+    unstable where 3d/4p quasi-degenerate (on Sc the aufbau block runs
+    away to {4s, 4p, ~2d} -- fact 15c). Without ``open_idx`` the block
+    is the HOMO block (energy order; fine for C/Si, where it selects
+    the same orbitals as the projection would).
 
-    Closed-shell RHF formalism with custom occupations; spin in ``cfg`` is
-    ignored (the configuration average is an S-ensemble object — only the
-    nelectron/spin PARITY of ``cfg`` is used, and it matches the atom).
-    Returns ``(mol, mf)``.
+    Closed-shell RHF formalism; spin in ``cfg`` is ignored (only its
+    nelectron/spin PARITY is used). Returns ``(mol, mf)``.
     """
     from atomterm.system import build_mol
 
-    # The caller's cfg is parity-consistent by construction (its ROHF ran
-    # on it); any such spin works here because the fractional occupations
-    # below define the density -- the RHF formalism never sees mol.spin.
+    # cfg only needs the right nelectron/spin parity: the fractional
+    # occupations below define the density; the RHF formalism never sees
+    # mol.spin.
     mol = build_mol(cfg)
     s_mat = None
     g_inv = None
@@ -309,9 +297,8 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
         assert len(open_idx) == n_open, (
             f"open_idx has {len(open_idx)} AOs but n_open={n_open}")
         s_mat = mol.intor_symmetric("int1e_ovlp")
-        # AO-subspace projector metric: weight of MO i on the open shell =
-        # (S c)_o^dag  S_oo^{-1}  (S c)_o  -- bounded by 1 for S-orthonormal
-        # MOs (an S-projector), unlike a bare quadratic form c_o^dag S_oo c_o.
+        # S-projector metric on the open-shell AO span (bounded by 1 for
+        # S-orthonormal MOs, unlike a bare quadratic form): _ao_span_projector
         g_inv = np.linalg.inv(s_mat[np.ix_(open_idx, open_idx)])
 
     def _frac_occ(mo_energy, mo_coeff=None):
@@ -332,8 +319,8 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
     mf = scf.RHF(mol)
     mf.conv_tol = 1e-12
     mf.verbose = cfg.verbose
-    # the occupation hook is part of the object's identity: set it BEFORE
-    # the cache branch so a cache hit returns the same behavior
+    # the occupation hook is part of the object's identity: set BEFORE
+    # the cache branch (ticket-10 lesson)
     mf.get_occ = _frac_occ
     try:
         _, rec = scf.chkfile.load_scf(chkfile)
@@ -352,17 +339,13 @@ def shell_weights(mol, c: np.ndarray, s: np.ndarray):
     """S-metric projection norms of columns onto angular (l) AO subspaces.
 
     ``w[i, k] = c[:, i]^dag S_l c[:, i]`` over ALL AOs of angular momentum
-    l_k (S_l = S[np.ix_(rows_k, rows_k)]). S-orthonormal columns make every
-    row of ``w`` sum to 1 -- this partition is valid because different-l
-    subspaces are exactly orthogonal; grouping by (n, l) instead would NOT
-    partition (2p and 3p AO subspaces overlap, weights double-count).
-
-    Interpretation hierarchy: l-purity is NECESSARY but not SUFFICIENT for
-    rotational closure -- a pure-p window can still be m-incomplete (radial
-    mixtures lacking the full m-set), and only the commutator norms
-    ||[H, Lz]||, ||[H, L^2]|| measure closure itself. Same metric quantity
-    as the ``contamination`` of :func:`purified_s_core`: orbital weights
-    live in the AO metric, not the Euclidean norm.
+    l_k. S-orthonormal columns make every row of ``w`` sum to 1 -- valid
+    because different-l subspaces are exactly orthogonal; grouping by
+    (n, l) instead would NOT partition (2p and 3p AO subspaces overlap,
+    weights double-count). Same AO-metric quantity as the
+    ``contamination`` of :func:`purified_s_core`. l-purity is NECESSARY
+    but not SUFFICIENT for rotational closure -- only the commutators
+    measure closure itself (facts 8, 19).
     Returns ``(names, w)`` with ``names = ['s', 'p', 'd', ...]``.
     """
     import re
@@ -385,33 +368,19 @@ def shell_weights(mol, c: np.ndarray, s: np.ndarray):
 def purified_s_core(mol, mf, n_core: int):
     """Canonical core MOs projected onto the s-AO subspace (l = 0 exactly).
 
-    Why this is needed (causal chain):
+    The converged "s" MOs of an open-shell atom carry a tiny p/d tail
+    (measured on C/cc-pVDZ: 1s 1.9e-7, 2s 6.3e-6 weight deficit) which
+    breaks two preconditions at once -- orthonormality (<MO|2p_AO>
+    ~ 1e-3, so second quantization is ill-defined on such columns) and
+    rotational closure ([H, Lz] fails at ~1e-4 instead of machine
+    precision). Projection + a Loewdin inside the s subspace repairs
+    both at second-order cost (~1e-10 Eh) -- the orbital analog of the
+    density-space spherical average. Full causal chain: fact 9.
 
-    1. Numerically converged SCF orbitals of an open-shell atom are NOT exact
-       symmetry eigenfunctions: the reference density (e.g. |px py| for C) is
-       anisotropic, the converged Fock inherits that anisotropy, and the
-       canonical "s" MOs carry a small p/d tail (measured on C/cc-pVDZ:
-       1s 1.9e-7, 2s 6.3e-6 weight deficit). The tail is numerical noise,
-       not physics -- the core of a central-field atom is spherical.
-    2. That tail breaks two preconditions at once:
-       - orthonormality: <MO_1 | 2p_AO> ~ 1e-3 != 0, so a W built from such
-         columns is not orthonormal, and second quantization (which assumes
-         an orthonormal one-particle basis) is ill-defined on it;
-       - rotational closure: L maps a pure solid harmonic within its (n,l)
-         shell only; L acting on the p-tail leaves the span, so [H, Lz]
-         fails at the ~1e-4 level instead of machine precision.
-    3. Projection onto the s-AO subspace is the orbital-space analog of the
-       spherically averaged density used in the folded path: it takes the
-       l = 0 component exactly. The energy shifts only at second order in
-       the tail amplitude (~1e-10 Eh) -- noise repair, not a model change.
-    4. A Loewdin orthonormalization inside the remaining pair then restores
-       orthonormality while staying inside the l = 0 subspace (rotations
-       within l = 0 preserve purity).
-
-    Returns ``(C, contamination)``: full-length (nao, n_core) orthonormal
-    columns and the fraction ``1 - <c_s|S|c>`` of each canonical MO that was
-    dropped (the SCF symmetry-breaking diagnostic). Note the MO s-weight
-    lives in the AO metric (c^dag S c = 1), not the Euclidean norm.
+    Returns ``(C, contamination)``: (nao, n_core) orthonormal columns
+    and the dropped fraction ``1 - <c_s|S|c>`` per canonical MO (the SCF
+    symmetry-breaking diagnostic; MO weights live in the AO metric,
+    c^dag S c = 1, not the Euclidean norm).
     """
     import re
 
@@ -427,9 +396,7 @@ def purified_s_core(mol, mf, n_core: int):
     contamination = np.clip(1.0 - weight, 0.0, None)     # fp noise can dip < 0
     c_s = c_s / np.sqrt(weight)                          # renormalize the rest
 
-    gram = c_s.conj().T @ s_ov @ c_s                     # Loewdin in S metric
-    ev, u = np.linalg.eigh(gram)
-    c_s = c_s @ (u / np.sqrt(ev)) @ u.T
+    c_s = _lowdin(c_s, s_ov)
 
     c = np.zeros((mol.nao_nr(), n_core), dtype=c_s.dtype)
     c[s_idx, :] = c_s
@@ -439,46 +406,30 @@ def purified_s_core(mol, mf, n_core: int):
 def purified_core_orbitals(mol, mf, n_core: int):
     """Canonical core MOs replaced by an exactly rotation-closed core span.
 
-    Generalizes :func:`purified_s_core` to p/d cores (Si [Ne]+3s, Sc [Ar]).
-    The canonical core MOs of an open-shell atom carry (i) foreign-l tails
-    and (ii) m-ASYMMETRIC same-l content (each MO of a closed shell is
-    polarized differently by the open shell); both break the L-closure of
+    Generalizes :func:`purified_s_core` to p/d cores (Si [Ne]+3s, Sc
+    [Ar]). The canonical core MOs of an open-shell atom carry foreign-l
+    tails and m-ASYMMETRIC same-l content; both break the L-closure of
     the core SPAN, and every window orthogonalized against that span
     inherits the defect (the fact-17 input-window baseline, ~1e-3 Si /
-    ~1e-2 Sc). This construction removes both at once.
-
-    Mechanism. For one angular momentum l the AO rows decompose into m
-    MEMBER sectors of identical radial chains (S = I_m x S_rad exactly,
-    :func:`lm_sectors`). L acts ONLY on the member index, so a subspace
-    E (x) members is L-invariant for ANY radial subspace E: shared radial
-    vectors are what closure requires, and they come free -- no full AO
-    shell subspaces, no m-averaging gauge choices beyond E itself. For a
-    closed-shell core the occupied m-set of each shell shares ONE radial,
-    so the whole core is k_l copies of (radial x members) per l, with
-    k_l = number of core MOs of dominant l. Construction per l:
+    ~1e-2 Sc). Closure theorem (E (x) members is L-invariant for any
+    radial subspace E): fact 20, README §5.3. Construction per l:
 
     1. member-resolved radial blocks ``R = [r_{i,m}]`` (each column =
-       MO i's coefficients on member m's radial chain; the arbitrary
-       member rotation of the canonical MOs only mixes R's columns, and
-       each ideal shared-radial shell contributes one direction of
-       multiplicity 2l+1);
-    2. E_l = the span of the top-k_l eigenvectors of the column Gram
-       ``R^T S_rad R`` (S-orthonormalized) -- the occupied radial space;
-       its eigenvalues count S-weight x member multiplicity (~2l+1 per
-       occupied radial), so the beyond-k spectrum is the tail content --
-       asserted tail-level, a measured invariant;
-    3. purified columns: every radial of E_l replicated on ALL member
-       sectors of l (k_l x (2l+1) columns -- m-complete by construction,
-       the shared-radial structure).
+       MO i's coefficients on member m's radial chain);
+    2. E_l = top-k_l span of the S-metric column Gram ``R^T S_rad R``,
+       S-orthonormalized -- eigenvalues = S-weight x member multiplicity
+       (~2l+1 per occupied radial), so the beyond-k spectrum is the tail
+       content, asserted as such;
+    3. every radial of E_l replicated on ALL member sectors of l
+       (k_l x (2l+1) columns -- m-complete by construction).
 
-    One global Loewdin in the S metric then orthonormalizes the set
-    (S = 0 between different l keeps every column l-pure; mixing within
-    l is span-preserving). The resulting core DENSITY is the spherical
-    average of the canonical one restricted to its dominant radials --
-    the orbital realization of the scalar reference the analysis fold
-    already uses, so the purified reference is physically the SAME
-    scalar core, not a new one. For l = 0 the construction reduces
-    exactly to :func:`purified_s_core` (truncation to the s chain).
+    One global Loewdin then orthonormalizes the set (S = 0 between
+    different l keeps l-purity; within-l mixing is span-preserving).
+    TRAPS (fact 20): the S-generalized eigenproblem of ``R R^T`` returns
+    S^{-1}-warped radials -- the column Gram is the correct object; and
+    canonical core MOs are NOT shell-confined (C 2s: 66% of S-weight off
+    its shell) -- per-shell projection is wrong. For l = 0 the
+    construction reduces exactly to :func:`purified_s_core`.
 
     Returns ``(C, contamination)``: (nao, n_core) S-orthonormal columns
     and per-MO ``1 - own-l weight`` (the foreign-l SCF tail diagnostic).
@@ -532,10 +483,7 @@ def purified_core_orbitals(mol, mf, n_core: int):
 
     # one global Loewdin (S = 0 between different l -> l-purity survives;
     # within-l mixing is span-preserving)
-    gram = c_pur.conj().T @ s @ c_pur
-    ev, u = np.linalg.eigh(gram)
-    c_pur = c_pur @ (u / np.sqrt(ev)) @ u.T
-    return c_pur, contamination
+    return _lowdin(c_pur, s), contamination
 
 
 def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
@@ -560,17 +508,16 @@ def build_full_mo(mf, core_idx: list[int], act_idx: list[int], c_core: np.ndarra
     are the RAW AO functions of the target shell -- exactly rotation-closed,
     essential for the L-quantum-number analysis.
 
-    Construction is block-safe in the AO metric S: (1) the core block is
-    Loewdin-orthonormalized within its own span (span- and density-preserving
-    -- the folded core density cannot change); (2) the active columns are
-    projected against the core span and renormalized, because raw valence
-    AOs overlap the canonical core's same-l members (adjacent radial shells:
-    <2p_MO|3p_AO> can reach ~0.3). That correction is same-l and m-diagonal,
-    so an m-complete shell window keeps both its l-purity and its m-set
-    structure. (3) the S-orthonormal complement is appended through an exact
-    projector -- the naive `I - P` filter is only exact when v is already
-    S-orthonormal, and silently returns extra columns otherwise (observed:
-    (nao, nao+6) on Si).
+    Construction is block-safe in the AO metric S (fact 14): (1) the core
+    block is Loewdin-orthonormalized within its own span (span- and
+    density-preserving); (2) the active columns are projected against the
+    core span and renormalized (raw valence AOs overlap the canonical
+    core's same-l members: <2p_MO|3p_AO> can reach ~0.3) -- a same-l,
+    m-diagonal correction, so window l-purity and m-set structure
+    survive; (3) the complement is appended through an exact projector --
+    the naive `I - P` filter is exact only for S-orthonormal v and
+    silently returns extra columns otherwise (observed: (nao, nao+6)
+    on Si).
     """
     v = _core_window_block(mf, core_idx, act_idx, c_core)
     if v.shape[1] == mf.mo_coeff.shape[0]:
@@ -587,28 +534,21 @@ def _core_window_block(mf, core_idx: list[int], act_idx: list[int],
     core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
     act = np.eye(n)[:, act_idx]
 
-    gram = core.conj().T @ s @ core
-    ev, u = np.linalg.eigh(gram)
-    core = core @ (u / np.sqrt(ev)) @ u.T
+    core = _lowdin(core, s)
 
     p_core = core @ core.conj().T @ s
     act = act - p_core @ act
-    gram_a = act.conj().T @ s @ act
-    ev_a, u_a = np.linalg.eigh(gram_a)
-    act = act @ (u_a / np.sqrt(ev_a)) @ u_a
+    act = _lowdin(act, s)
 
     return np.hstack([core, act])
 
 
 def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
     """AO rows grouped by (l, member): the EXACTLY S-orthogonal sectors of
-    a one-center spherical basis.
-
-    For a single atom at the origin, AOs of different (l, member) integrate
-    to zero against each other (angular orthogonality) whatever their
-    radial labels, while same-sector functions of different n OVERLAP --
-    the AO space is a direct sum of radial chains, one per (l, member).
-    This decomposition is what makes a per-sector Loewdin complement
+    a one-center spherical basis -- the AO space is a direct sum of radial
+    chains, one per (l, member); same-sector functions of different n
+    OVERLAP, different-sector functions never do (angular orthogonality,
+    fact 16e). This decomposition is what makes a per-sector treatment
     (:func:`radial_basis`) globally S-orthonormal by construction.
     """
     sectors: dict[tuple[int, int], list[int]] = {}
@@ -627,25 +567,20 @@ def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
 def radial_basis(mf, core_idx: list[int], act_idx: list[int],
                  c_core: np.ndarray = None):
     """Full MO matrix plus per-slot (l, member) labels -- the substrate for
-    :func:`radial_mask`.
-
-    ``c_core`` overrides the core block (default ``mf.mo_coeff[:, core_idx]``);
-    pass :func:`purified_core_orbitals` output for the exactly-closed
+    :func:`radial_mask`. ``c_core`` overrides the core block; pass
+    :func:`purified_core_orbitals` output for the exactly-closed
     substrate (the fact-17 fix).
 
     Everything non-core is built in a MEMBER-PRESERVING gauge (sequential
-    S-metric Gram-Schmidt, not a symmetric Loewdin): the projected window
-    members have near-equal norms, so the Loewdin eigenvector gauge is an
-    arbitrary rotation within each degenerate member set -- span-preserving
-    (CASCI/CASSCF never noticed; that is why :func:`build_full_mo` can keep
-    it) but it silently reassigns which column is which (l, m). Here the
-    column identity IS the product, so the gauge is fixed by construction.
-
-    Window slots carry their AO's sector label; each sector's STRONG
-    residual directions against the core+window span are appended with
-    their sector label; the near-null directions left over (radial needles)
-    pad the matrix through :func:`complete_orthonormal` with label
-    ``None`` and never serve as rotation partners.
+    S-metric Gram-Schmidt, not a symmetric Loewdin): the Loewdin gauge
+    within a degenerate member set is an arbitrary rotation --
+    span-preserving, but it reassigns which column is which (l, m), and
+    here column identity IS the product (fact 16e, README §3.3). Window
+    slots carry their AO's sector label; STRONG sector residuals
+    (>= 8e-2 of S-weight; core tails <= 3e-6) join with their label; the
+    near-linearly-dependent needles (Sc 6p: 1.7e-4) pad through
+    :func:`complete_orthonormal` with label ``None`` -- never rotation
+    partners.
 
     Returns ``(mo_full, labels)`` with ``labels[i] = (l, member) | None``.
     """
@@ -656,9 +591,7 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
     row_sector = {row: key for key, rows in sec.items() for row in rows}
 
     core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
-    gram = core.conj().T @ s @ core
-    ev, u = np.linalg.eigh(gram)
-    core = core @ (u / np.sqrt(ev)) @ u.T
+    core = _lowdin(core, s)
 
     def sgs(cols, base):
         """S-metric Gram-Schmidt (two refinement passes) of the columns in
@@ -685,11 +618,8 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
     labels: list = [None] * len(core_idx) + [row_sector[ao] for ao in act_idx]
 
     # strong sector residuals, same member-preserving treatment. Strength
-    # cutoff: genuine radial residuals are >= 8e-2 of S-weight (even when
-    # they heavily overlap the frozen span, e.g. the 3s of cc-pVDZ C at
-    # 0.085); the core's symmetry-breaking tails are <= ~3e-6 -- 30x margin
-    # both ways. Below the cut sit the near-linearly-dependent radial
-    # needles (Sc 6p: 1.7e-4 outside the frozen span).
+    # cutoff 8e-2 / needle class 1.7e-4: docstring + fact 16e (the 3s of
+    # cc-pVDZ C survives at 0.085; the Sc 6p needle does not)
     p_v = v @ v.conj().T @ s
     strong, strong_labels = [], []
     for key, rows in sorted(sec.items()):
@@ -727,13 +657,11 @@ def radial_mask(labels: list, ncore: int, ncas: int):
     4s any s), l-content and m-membership of every slot untouchable, and
     no core<->window exchange at all (core slots carry no label).
 
-    Physics caveat (measured by the radial rungs): this preserves each
-    slot's angular character, but exact rotational closure of the WINDOW
-    additionally requires the radial rotation to be applied IDENTICALLY to
-    all m partners (closure = complete m-set with SHARED radial vectors,
-    see the README glossary). Independent per-member radial mixing can leave
-    [H, Lz] nonzero at the level of the member-radial-vector differences;
-    SA over the term's M_L set is the symmetry-restoring companion rung.
+    Physics caveat (measured, fact 16): exact rotational closure of the
+    window additionally requires the radial rotation applied IDENTICALLY
+    to all m partners; independent per-member radial mixing leaves
+    [H, Lz] nonzero at the member-difference level. SA over the term's
+    M_L set is the symmetry-restoring companion rung.
     """
     lab = list(labels)
 
@@ -791,10 +719,7 @@ def _run(mc, nroots: int, chkfile: str, name: str, verbose: int) -> CASResult:
     mc.verbose = verbose
     mc.chkfile = chkfile
     mc.kernel()
-    if nroots == 1:
-        energies = np.atleast_1d(float(np.atleast_1d(np.asarray(mc.e_tot)).ravel()[0]))
-    else:
-        energies = _root_energies(mc)
+    energies = _root_energies(mc)  # nroots=1 reproduces float(mc.e_tot)
     ci = [mc.ci] if nroots == 1 else list(mc.ci)
     _persist(chkfile, name, energies, ci)
     return CASResult(name, energies, ci, mc.mo_coeff, mc, _core_energy(mc))
@@ -848,8 +773,7 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
         build one per window from AO labels); ``None`` = free optimization.
     weights : state-average over these weights. PySCF's SA kernel returns
         only the ENSEMBLE energy, so per-root energies come from a CASCI
-        pass in the converged window -- the SA solution's own orbitals,
-        diagonalizing the same active Hamiltonian the ensemble solved.
+        pass in the SA-converged window.
     name : chkfile store key under ``atomterm/`` -- keep it distinct per
         variation so differently-constrained runs never collide.
     """
@@ -881,14 +805,10 @@ def run_casscf(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
 
 def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
                   mask=None) -> CASResult:
-    """SA-CASSCF over the given state weights (primary sector).
-
-    Note: PySCF's state-average kernel returns only the ENSEMBLE energy
-    (scalar e_cas = the weighted mean). The per-root energies reported in
-    the result come from a CASCI pass in the converged window -- the SA
-    solution's own orbitals, diagonalizing the same active Hamiltonian the
-    ensemble was built from.
-    """
+    """SA-CASSCF over the given state weights (primary sector). PySCF's SA
+    kernel returns only the ensemble energy; per-root energies come from
+    the CASCI pass in the converged window -- see :func:`constrained_casscf`
+    (``weights``)."""
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               weights=list(weights), mask=mask,
                               name="sa_casscf", verbose=verbose)
@@ -897,16 +817,14 @@ def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
 def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
     """CASSCF with the active-window span frozen ("CASCI + core relaxation").
 
-    The mask (:func:`core_virtual_only_mask`) permits only
-    inactive<->virtual rotations, so the core polarizes in response to the
-    correlated active CI density but no orbital ever enters or leaves the
-    active window: the state's identity (and the window's rotation closure)
-    is preserved by construction, while real physics (core relaxation,
-    typically ~mEh) is added on top of plain CASCI.
-
-    Peculiarity: the relaxed core is slightly anisotropic. The analysis
-    fold spherically averages it, so the rung's ``max|dE|`` vs PySCF is a
-    measure of that anisotropy -- reported, not hidden.
+    Mask :func:`core_virtual_only_mask`: only inactive<->virtual
+    rotations -- the core polarizes in response to the correlated CI
+    density (real physics, typically ~mEh) but no orbital ever enters
+    or leaves the window: state identity and window closure preserved
+    by construction. Peculiarity: the relaxed core is slightly
+    anisotropic; the analysis fold averages it, so the rung's
+    ``max|dE|`` vs PySCF measures that anisotropy -- reported, not
+    hidden.
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               mask=core_virtual_only_mask,
@@ -916,19 +834,12 @@ def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CAS
 def run_casscf_virtual_mix(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
     """CASSCF with core<->window exchange blocked ("virtmix" rung).
 
-    Mask (:func:`no_core_window_exchange_mask`): active<->virtual AND
-    inactive<->virtual rotations allowed, active<->inactive blocked. The
-    window may borrow radial/polarization character from the virtual space
-    -- real dynamic correlation of the active pair (radial separation is
-    energetically favorable) -- but no orbital ever trades places between
-    core and window, so the state's identity cannot change.
-
-    Physics note: within the enlarged window the CI re-solves, so the
-    effect appears as radial correlation (natural occupations spread below
-    closed-shell values, natural orbitals delocalized over radials) -- the
-    active-side analog of the core's first-order polarization by virtuals.
-    Compare: rung4 (core-relax) < virtmix < free CASSCF brackets the three
-    contributions.
+    Mask :func:`no_core_window_exchange_mask`: active<->virtual and
+    inactive<->virtual allowed, active<->inactive blocked -- the window
+    borrows radial/polarization character from the virtuals (real
+    dynamic correlation; appears as radial correlation in the natural
+    orbitals) but the state's identity cannot change. relax < virtmix <
+    free CASSCF brackets the contributions (README §3.3).
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               mask=no_core_window_exchange_mask,
