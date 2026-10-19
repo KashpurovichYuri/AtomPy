@@ -15,7 +15,13 @@ pytest                        # 91 tests, ~13 min (chkfile caching)
 python scripts/run_c.py       # writes results/ (chkfiles + report.md/.json)
 ```
 
-## Example output (carbon, CAS(2,3) = 2p², Ms=0 sector)
+## What you get
+
+Three result types, all written under `results/` (§8 maps every file to
+its regeneration command).
+
+**Term tables** — every state classified, per Ms sector. Carbon
+(CAS(2,3), Ms=0 sector):
 
 ```
  #           E (Eh)      <L^2>  L      <S^2>  S  term
@@ -28,26 +34,80 @@ Lz eigenvalues (M_L content): [-2, -1, -1, 0, 0, 0, 1, 1, 2]
 ||[H, Lz]||_F  = 1.5e-15      ||[H, L^2]||_F = 3.2e-15
 ```
 
-Textbook 2p² multiplet (Hund: ³P < ¹D < ¹S) recovered exactly; the commutators
-sit at round-off because the active space (the 2p shell AOs) is exactly
-rotation-closed.
+The textbook 2p² multiplet (Hund: ³P < ¹D < ¹S) comes out exactly —
+commutators at round-off, because this window is exactly rotation-closed
+(§2.3). §7.1–7.2; regenerate: `python scripts/run_c.py`.
+
+**The ladder** — every orbital treatment priced against the ROHF
+reference, broken and symmetric variants side by side. Titanium's
+summary card (ΔE in total energies, mEh):
+
+| deliverable | free variant | symmetric variant |
+|---|---|---|
+| CASCI, raw shell | — | +10.6 (exact) |
+| CASSCF | **−31.3** (escape — broken) | +10.4 frozen (baseline) / −0.4 radial (baseline) |
+| SA-CASSCF | −10.1 (swap — broken) | +1.0 radial purified (floor) / +11.7 frozen purified (exact) |
+
+§7.3; regenerate: the `run_ladder` calls recorded in each ladder header.
+
+**Scan curves** — the deterministic energy landscape: freeze everything,
+deform one window coordinate, re-diagonalize. §7.4; regenerate:
+`python scripts/radial_scan.py`.
 
 ---
 
-**This repository is documented as a technical note** — why CAS treatments
-lose L̂² and L̂z symmetry, what that loss costs, and how to restore it:
-§1 goal → §2 objects and diagnostics → §3 method hierarchy → §4 pipeline →
-§5 where symmetry breaks → §6 protocol card → §7 results → §8 file map →
-§9 roadmap. Plain-language companions: `RUNGS.md`, `GLOSSARY.md`; agent
-instructions: `AGENTS.md`.
+## Introduction
 
-*How to read.* §1 states the goal. §2 fixes the objects, the language and
-the diagnostics — later sections use nothing that is not defined there.
-§3 walks the method hierarchy (why each exists, what it computes, how we
-run it, and what textbook usage gets wrong). §4 maps the methods onto the
-code. §5 is the core: where symmetry breaks, level by level, each with
-symptom, mechanism, fix, and cost. §6 is the operational protocol card.
-§7 holds the results tables. §8 is the file map; §9 the roadmap.
+The exact states of an isolated atom carry sharp term symbols (³P, ¹D, …):
+the Hamiltonian commutes with all rotations — the SO(3) × SU(2)
+invariance of coordinates and spins — so every state has definite L and
+S, and the states of one term are exactly degenerate. CASCI and CASSCF
+treatments *can* lose this structure. What breaks is not quantum
+mechanics but the *restriction*: the calculation is confined to a small
+set of orbitals, and two properties of that restriction can fail.
+
+First, CASCI inherits an anisotropic field from its reference (§2.4).
+Carbon: the two ³P electrons occupy two of the three 2p orbitals — the
+choice is arbitrary, all pairs are degenerate — say px and py; their
+charge is then unevenly distributed (heavier along x and y than z), the
+closed-shell core polarizes in response, and the resulting field acts
+unevenly on the valence states, splitting the ³P term. The pz-pair case
+is the same story in another orientation; no pair is spherical.
+
+Second, CASSCF additionally lets the active orbitals themselves relax
+(§3.3, §3.6). The active orbital set — the *window* (§2.3) — can then
+deform in three ways with different consequences: some deformations
+leave the energy unchanged, and the optimizer stops at an arbitrary
+point of them; some *lower* the energy by tilting orbitals (on d-shells;
+the Jahn–Teller mechanism, §3.6); and some change *which* orbitals are
+active at all — trading a valence 4s for a core 3p (§5-L4c).
+
+State-averaged CASSCF exists because a single optimized state represents
+just one component of the multiplet; the average over all components is
+the rotationally symmetric object (§3.4). It restores sharp L values,
+but it cannot alone guarantee the full symmetry, and on heavier atoms it
+can still trade orbitals.
+
+Heavier atoms add failure modes (§5): the energy-lowering tilts, the
+orbital trades, and the reference calculation itself can converge to a
+wrong or metastable solution (§5.5).
+
+Is the minimum correct? Where the energy is insensitive to a
+deformation, the energy is still well defined — the orbitals are not,
+and that is fine (§3.6). Across genuinely different solutions, every
+free run must be inspected for which orbitals it actually uses before it
+is believed (§7.3).
+
+---
+
+*How to read.* §1 states the goal. §2 fixes the objects, the language
+and the diagnostics — later sections use nothing that is not defined
+there. §3 walks the method hierarchy (why each exists, what it computes,
+how we run it, and what textbook usage gets wrong). §4 maps the methods
+onto the code. §5 is the core: where symmetry breaks, level by level.
+§6 is the operational protocol card. §7 holds the results. §8 is the
+file map; §9 the roadmap. Plain-language companions: `RUNGS.md`,
+`GLOSSARY.md`; agent instructions: `AGENTS.md`.
 
 ---
 
@@ -209,10 +269,10 @@ decomposes into irreducible L-representations, and L̂² acts as L(L+1)·**1**
 on each copy. If a sector carries a single irrep — carbon's ³P Ms=1
 sector, three determinants — then L̂² is a multiple of the identity on
 the whole sector and ‖[H, L̂²]‖ vanishes *whatever is wrong*: the check
-is vacuous there, and multi-term sectors are the honest courts. On Ti,
-the four-member tilt above — invisible to L̂z at ‖[H, L̂z]‖ ≈ 1e-14 in
-this multi-term sector — is caught by ‖[H, L̂²]‖ ≈ 1–2, exactly because
-the sector's many irreps give L̂² room to act. These examples come from
+is vacuous there, and multi-term sectors are the honest courts. The
+four-member tilt above, invisible to L̂z, is caught here precisely
+because this sector's many irreps give L̂² room to act. These examples
+come from
 the four atoms analyzed so far (C, Si, Sc, Ti); testing the picture on
 further atoms is part of the roadmap (§9). The projector pair, being
 sector-independent, is the universal certificate.
@@ -222,9 +282,8 @@ CASCI never breaks window closure — the raw shell window is exactly
 closed, so the L̂² we build is the true L̂² (on carbon's raw window its
 eigenvalues are exactly {2, 2, 2}); a drifting ⟨L̂²⟩ like 1.72 requires a
 *deformed* window (optimizer output) and cannot occur here. CASCI over
-the raw ROHF fold, however, does carry the ε defect of §2.4 — first-order
-splittings, second-order ⟨L̂²⟩ shifts — through the core field, not the
-window.
+the raw ROHF fold, however, does carry the ε defect (§2.4) through the
+core field, not the window.
 
 ### 2.4 The diagnostics and their sensitivity
 
@@ -242,13 +301,11 @@ core anisotropy; ‖A‖_F = sqrt(Σ|A_ij|²) is the Frobenius norm.
 | orthonormality error | validity of the stage's MO matrix (C†SC = 1) — a guard, not a symmetry diagnostic | construction bugs | — |
 
 **All five diagnostics respond to one object: the symmetry-breaking part
-of H.** It is convenient to write H = H₀ + εV, with H₀ exactly symmetric,
-ε collecting the size of the breaking and V its shape. That ε is small is
-not an assumption but a measurement: core anisotropy is 2.4e-3 (C),
-2.1e-3 (Si), 7.8e-3 (Ti), 1.3e-2 (Sc) — percent-level at worst. And the
-bookkeeping is verified rather than expected: commutators and splittings
-track ε to first order across the atoms, while ⟨L̂²⟩ shifts stay orders
-below, as the expansion predicts.
+of H.** Write H = H₀ + εV, with H₀ exactly symmetric, ε the size of the
+breaking and V its shape. ε is measured, not assumed: core anisotropy is
+2.4e-3 (C), 2.1e-3 (Si), 7.8e-3 (Ti), 1.3e-2 (Sc) — percent-level at
+worst — and the bookkeeping is verified: commutators and splittings
+track ε to first order across the atoms, ⟨L̂²⟩ shifts stay orders below.
 
 **The breaking must act twice to move an expectation value, but only once
 to split a degenerate set.** An expectation value like ⟨L̂²⟩ changes only
@@ -261,14 +318,12 @@ splitting. We call these component energy differences the **splitting**
 and their mean the **centroid**; the centroid, averaged over the
 multiplet, again moves only at order ε².
 
-**Core anisotropy has a physical origin and three cures.** The open
-shell's charge cloud is angularly anisotropic, the closed core polarizes
-in its field during the SCF, and the folded core field then acts unevenly
-on the valence M_L components. The cures — spherically averaging the core
-density, replacing the reference by a fractional-occupation
-(average-of-configuration) field, or rebuilding the core as an exactly
-isotropic ("purified") orbital span — are compared in §7 by what each
-costs in energy and bookkeeping.
+**Core anisotropy has a physical origin and three cures.** The origin is
+condition 2 of §2.3: the open shell's anisotropic charge polarizes the
+closed core during the SCF, and the folded field acts unevenly on the
+valence M_L components. The cures — spherically averaging the core
+density, the fractional-occupation reference, or the purified core span
+— are compared in §7 by what each costs.
 
 **Orthonormality is a validity guard, not a symmetry diagnostic.** Every
 CAS stage consumes an MO matrix, and if it is not orthonormal in the AO
@@ -818,20 +873,7 @@ give one common energy (spread < 1e-6 mEh) while ⟨L̂²⟩ ranges over
 *multi-basin* landscape the noise picks the basin: the same census on Sc
 spreads 2.2 mEh with ⟨L̂²⟩ 3.5–5.7.
 
-**C — CAS(2,3), mechanism table:**
-
-| rung | E_ground | ΔE vs ROHF (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | annotation |
-|---|---|---|---|---|---|---|---|---|
-| casci_avg | −37.431582 | +250.8 | 2.0 | 1.3e-15 | 0 | 7e-16 | 9e-16 | core density spherically averaged: scalar field (§3.2) |
-| casci_raw | −37.431611 | +250.8 | 2.0 | 9.8e-06 | 0 | 7e-16 | 9e-16 | raw SCF core field: the open-shell quadrupole splits ³P (§2.4) |
-| casci_frac | −37.440244 | +242.2 | 2.0 | 0 | 0 | 7e-16 | 9e-16 | average-of-configuration reference: invariant by construction (§3.2) |
-| CASSCF (free) † | −37.682365 | 0.0 | 1.69 | 2.3e-02 | 3e-08 | 0.15 | 1.1 | unconstrained single root, shell start (§3.3): full confinement recovery, window member-tilted; totals agree with SA-CASSCF (one basin) |
-| casscf_relax | −37.440370 | +242.0 | 2.0 | 8e-17 | 0 | 7e-16 | 1e-15 | window frozen, core relaxes (§3.3) |
-| sa | −37.682391 | +0.03 | 2.0 | 1.0e-10 | 5e-20 | 8e-05 | 7e-05 | SA-CASSCF over the ³P M_L components (§3.4) |
-| sa_radial | −37.682365 | 0.0 | 2.0 | 8.3e-12 | 0 | 1.2e-06 | 9.5e-05 | SA-CASSCF + radial restriction (§3.3) |
-| pur family | −37.431608 … −37.682391 | +242.0 … +0.03 | 2.0 | ≤6e-16 | 0 | ≤5e-15 | ≤4e-15 | same treatments on the isotropic core substrate (§5.3) |
-
-Carbon's free-CASSCF row is the instructive one: the full −250.8 mEh
+Carbon's free CASSCF is the instructive case: the full −250.8 mEh
 window gain (the confinement recovery, above) with ⟨L̂²⟩ = 1.69–1.72
 while ‖[H, L̂²]‖ = 0. Both are
 window effects on this smallest sector. The optimized window is
@@ -844,7 +886,9 @@ shell), and the ground expectation drifts to 1.723. The vanishing
 commutator is the single-irrep caveat of §2.3: with one irrep on three
 determinants, H and the window-L̂² are simultaneously diagonal (verified
 — the expectations in the H eigenstates reproduce the L̂² eigenvalues
-exactly), so ‖[H, L̂²]‖ carries no closure information here.
+exactly), so ‖[H, L̂²]‖ carries no closure information here. (C's full
+mechanism table, like Si's, is in `results/`; its summary card above
+carries the essentials.)
 
 **Si:** analogous to carbon throughout — raw 5.6e-04; the +221.5 mEh
 confinement recovered by every optimizer rung; the pur family at the
