@@ -20,6 +20,11 @@ class AtomConfig:
     spin : 2S, the spin multiplicity minus 1 (PySCF convention). Carbon
         ground state: spin=2 (triplet, Ms=1 for ROHF).
     charge : integer charge.
+    ecp : PySCF ECP name or ``None`` (all-electron). Must pair with the
+        basis (e.g. ``ecp="ccecp"`` with ``basis="ccecpccpvdz"``).
+        Under an ECP ``mol.nelectron`` counts VALENCE electrons only —
+        the ECP-honest bookkeeping every consumer already uses via
+        ``ncore_of(mol.nelectron, ...)``; never recompute from Z.
     coord : nuclear position in Bohr. Must be the origin: the angular
         momentum operators are defined about r=0 (see atomterm.angular).
     verbose : PySCF output level.
@@ -29,13 +34,15 @@ class AtomConfig:
     basis: str = "ccpvdz"
     spin: int = 2
     charge: int = 0
+    ecp: str | None = None
     coord: tuple[float, float, float] = (0.0, 0.0, 0.0)
     verbose: int = 0
     extra: dict = field(default_factory=dict)
 
     @property
     def label(self) -> str:
-        return f"{self.symbol}_{self.basis}_s{self.spin}"
+        ecp = f"_{self.ecp}" if self.ecp else ""
+        return f"{self.symbol}_{self.basis}{ecp}_s{self.spin}"
 
     def gto_string(self) -> str:
         x, y, z = self.coord
@@ -64,6 +71,7 @@ def build_mol(cfg: AtomConfig) -> gto.Mole:
     mol.basis = cfg.basis
     mol.charge = cfg.charge
     mol.spin = cfg.spin
+    mol.ecp = cfg.ecp
     mol.verbose = cfg.verbose
     mol.unit = "Bohr"
     mol.build()

@@ -146,10 +146,32 @@ machinery; tickets 14/15 answer the open machinery questions first.
   MACHINE-EXACT (6.2e-14/1.4e-13) — the fact-20 deliverable transfers;
   the Sc basins transfer (escape +46 mEh, exact 4s↔3p swap on sa,
   partial swap on sa_pur). Suite 91 green.
+- [17: drivers line-review](tickets/17-line-review.md) — RESOLVED
+  (a3b09a1): _lowdin dedup x5, docstring diet (944 → 855; the −120
+  estimate was optimistic, no content lost), _run unified, __all__
+  fixed. Zero interface change; suite 92 green.
+- [18: ECP pairing + p² validation](tickets/18-ecp-pair.md) — RESOLVED
+  (code+tests; docs drafted for review): ccECP + ccecpccpvdz (the ONLY
+  bundled PP family covering C/Si/Sc/Ti — cc-pVDZ-PP skips Si/Sc/Ti,
+  bfd lacks Sc/Ti). C/Si = 4 valence e (ncore=1), Sc/Ti = 11/12 e
+  (ncore=4, 3s3p explicit; ticket 19). MEASURED: term tables exact
+  (³P/¹D/¹S, ⟨L²⟩ = 2/6/0, commutators ~1e-15 through SA); the
+  ncore=0 full-valence fold is an exact no-op; raw detector LOUDER
+  (1.1e-4 vs 6.1e-6); E_CASCI = E_ROHF = E_CASSCF and θ* = 0.00
+  exactly — the all-electron "confinement" class (+250.8/+221.5 mEh)
+  is a core-polarization artifact, not an intrinsic raw-window cost;
+  spacings: one-parameter F₂ structure (¹S:¹D = 5:2 exactly in all
+  four tables), ccECP shrinks F₂ by ~34%. Suite 96 green.
 
-The atom campaign (C, Si, Sc, Ti) is complete; the next wave is
-UNASSIGNED — user candidates: PHYSICS.md narrative (deferred),
-spin–orbit coupling, transition moments, g-factors.
+Ticket 19 (next, written when picked up): ECP Sc/Ti — ReferenceSpec
+re-measurement under the new field, the 3s3p explicit-core purified
+story (fact 20 at ncore=4), TM ladder fingerprints, escape/swap
+basins under ECP.
+
+The atom campaign (C, Si, Sc, Ti) is complete; the ECP wave (18 done,
+19 queued) re-runs it in the valence reference frame. Beyond: user
+candidates: PHYSICS.md narrative (deferred), spin–orbit coupling,
+transition moments, g-factors.
 
 ## Post-wave survey (2026-10-19, deep-module pass + code review)
 

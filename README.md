@@ -1050,10 +1050,10 @@ exact-class closure pins, the basin branches. Plain-language companions:
 *Scalar relativity* (DKH/X2C): h₁ changes, nothing else — a scalar
 Hamiltonian is rotationally invariant, so every theorem and diagnostic
 survives; the reference basins (E_ref, the good-basin census) must be
-re-measured once. *ECP-based full relativity*: the pseudopotential's
-angular projectors are l-resolved, so windows stay closed, but the
-AO-label and member bookkeeping (§5.1) must be re-verified per
-pseudopotential. *Spin–orbit coupling*: the natural next symmetry step —
+re-measured once. *ECP-based full relativity*: measured on C/Si — the
+machinery is unchanged (only h₁ moves; term structure and closure
+classes identical, `wayfinder/tickets/18-ecp-pair.md`); Sc/Ti = ticket
+19. *Spin–orbit coupling*: the natural next symmetry step —
 it splits the multiplets this note certifies; the machinery extends in
 place (Ĵ² = (L̂+Ŝ)², Ĵz as determinant-basis matrices; term symbols
 become levels). *Further atoms* (V, Cr, …): data rows, not code — the

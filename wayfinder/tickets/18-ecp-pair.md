@@ -1,6 +1,7 @@
 # Ticket 18: ECP support — ccECP pairing, wiring, p² validation (C, Si)
 
-Status: OPEN
+Status: RESOLVED (code + tests + measurements below; README/AGENTS text
+drafted for in-conversation review per the working agreement)
 Origin: map.md "Post-wave survey" ECP design (pre-verified seam) + the
 2026-10-19 pre-flight (all numbers below are MEASURED in this env, PySCF
 2.13 bundled sets — no new dependencies).
@@ -18,12 +19,14 @@ Origin: map.md "Post-wave survey" ECP design (pre-verified seam) + the
 2. STRUCTURE (mol.nelectron is ECP-honest automatically):
    - C: 4 e (He-core in ECP), ncore=1 (the explicit 2s²), window {2p},
      CAS(2,3). ROHF converges; E = −5.31427464 Eh.
-   - Si: 4 e (Ne-core), ncore=0 (!), window {3p}, CAS(2,3). The first
-     ncore=0 case — the fold has an empty core (veff_core must be 0;
-     verify, don't assume).
-   - Sc/Ti: 11/12 e (Ne-core; 3s3p EXPLICIT valence), ncore=3,
+   - Si: 4 e (Ne-core), ncore=1 (the explicit 3s²), window {3p},
+     CAS(2,3) — structurally identical to C-ecp.
+   - Sc/Ti: 11/12 e (Ne-core; 3s3p EXPLICIT valence), ncore=4 (3s²3p⁶),
      window {3d,4s} — same active space as all-electron, the [Ar] core
      replaced by ECP + explicit 3s²3p⁶. (TM execution = ticket 19.)
+   - The ncore=0 mode is the FULL-VALENCE CAS(4,4) (window {2s,2p} or
+     {3s,3p}, no fold at all) — measure it as the empty-fold edge
+     (veff_core must be identically 0).
 3. AO labels truthful and spherical under ccECP (C: 2s,3s,2px,2py,2pz,
    3p...; Si: 3s,4s,3p,4p...) — fact-1 prefix matching works; m-sets
    complete; lm_sectors decomposition expected to transfer (verify
@@ -48,12 +51,12 @@ A. `AtomConfig.ecp: str | None = None` + `build_mol` wiring
    — mol.nelectron is valence-only, NEVER recompute from Z (the
    ncore_of contract already enforces it)). Update `label` to include
    the ecp tag when set.
-B. ncore=0 path (Si): `active_space_integrals`/fold with an empty core
-   — measure veff_core == 0 (or skip the fold entirely) and that
-   `build_full_mo(mf, [], act)` works; fix whatever the empty edge
-   breaks (defensively: CASCI with ncore=0 is already exercised
-   all-electron-wise by the core-explicit test? — measure).
-C. Pipeline + ladder on C and Si with ECP (CAS(2,3), both Ms sectors):
+B. ncore=0 path (full-valence CAS): `active_space_integrals`/fold with
+   an empty core — measure veff_core == 0 (or skip the fold entirely)
+   and that `build_full_mo(mf, [], act)` works; fix whatever the empty
+   edge breaks.
+C. Pipeline + ladder on C and Si with ECP (CAS(2,3), both Ms sectors,
+   ncore=1 = the explicit ns²):
    - term tables match all-electron ORDERING (³P < ¹D < ¹S) with exact
      ⟨L²⟩ = 2/6/0 and machine-exact commutators (averaged fold);
    - term SPACINGS vs all-electron cc-pVDZ: measure and report (ccECP
