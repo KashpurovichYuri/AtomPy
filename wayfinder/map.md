@@ -183,6 +183,13 @@ forward:
 Docs survey (pending, first item after context switch): AGENTS physics
 facts (18–21) compress to agent-facing content + README pointers;
 GLOSSARY.md folds into a README appendix; wayfinder/tickets stay.
+[2026-10-19 update: DONE — commits 35cd327/cf369f3/2e0f5ad; deepening
+pre-item DONE at 9a22ab0 (ReferenceSpec + shared sector geometry, the
+_ncore-from-Z ECP trap closed); test tiers fast/slow at 345351a.]
+
+NEXT WAVE: ticket 17 (drivers line-review: docstring diet ~−120 lines,
+Löwdin dedup ×4, __all__ fix, _run branch unify) then the ECP ticket
+(design pre-verified above; wrinkle (a) already closed by ncore_of).
 
 ## Out of scope
 
