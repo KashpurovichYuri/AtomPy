@@ -14,7 +14,7 @@ Two families of scans:
 
 - m-SYMMETRIC (one angle for all members): every such window is EXACTLY
   rotation-closed -- the members share their radial vector, which IS the
-  closure condition (see GLOSSARY "m-completeness"). E(theta) is the
+  closure condition (see the README glossary, "m-completeness"). E(theta) is the
   clean radial-correlation curve at [H, Lz] = 0, and its one-body /
   two-body split shows the mechanism: the repulsion term drops faster
   than the (nucleus + core) attraction rises.

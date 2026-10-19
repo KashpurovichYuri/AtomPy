@@ -114,7 +114,8 @@ optimizer basin, not a core-span artifact.)
 - `win_l` — the window's l-purity (1.000 = no s/d leakage; necessary but
   NOT sufficient for symmetry — the m-members must also stay complete).
 - `|[P,Lz]|`, `|[P,Lp]|` — the one-particle closure defects of the window
-  span itself (see GLOSSARY): what the many-body commutators can and
+  span itself (see the README glossary appendix): what the many-body
+  commutators can and
   cannot see, with no core fold and no CI. Both ~0 = the window span is
   certified rotation-closed.
 - `aniso` — the core density's discarded anisotropy (casci rungs).

@@ -717,7 +717,7 @@ def radial_mask(labels: list, ncore: int, ncas: int):
     slot's angular character, but exact rotational closure of the WINDOW
     additionally requires the radial rotation to be applied IDENTICALLY to
     all m partners (closure = complete m-set with SHARED radial vectors,
-    see GLOSSARY.md). Independent per-member radial mixing can leave
+    see the README glossary). Independent per-member radial mixing can leave
     [H, Lz] nonzero at the level of the member-radial-vector differences;
     SA over the term's M_L set is the symmetry-restoring companion rung.
     """

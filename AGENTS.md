@@ -473,9 +473,22 @@ lists the live tickets. Update it when a decision is made; keep tickets
 one-session sized. The atom campaign (C, Si, Sc, Ti) is COMPLETE — tickets
 01–16 all RESOLVED (facts 18–21; Ti delivered the d² tables incl. ¹G, the
 character-forced/basin-gated ROHF reference, the JT verdict for ³F, and the
-machine-exact pur rungs on a second TM). Next wave is UNASSIGNED — user's
-candidate list: spin–orbit, transition
-moments, g-factors; each ticket is self-contained in `wayfinder/tickets/`
-(no conversation context needed). Review protocol:
-`/code-review` (two axes, parallel sub-agents) after each ticket wave, then
-`/improve-codebase-architecture` survey; see ticket 13.
+machine-exact pur rungs on a second TM). Next wave: ECP (design pre-verified
+in map.md "Post-wave survey"); beyond it the user's candidate list:
+spin–orbit, transition moments, g-factors; each ticket is self-contained in
+`wayfinder/tickets/` (no conversation context needed).
+
+Review protocol after each ticket wave, then a design survey:
+
+- **Two-axis review** — run the `code-review` skill over
+  `git diff <fixed-point>...HEAD`, fixed point = the last reviewed
+  commit. Spec source = the wave's wayfinder ticket; docs commits have
+  no file spec — review them only against this working agreement.
+  Standards source = this file; the skill's smell baseline applies as
+  judgement calls only, and this file overrides it.
+- **Design survey** — apply the `codebase-design` skill vocabulary
+  (module/interface/depth/seam/adapter, the deletion test) over `src/`.
+- **Findings** — fix what is worthwhile now and commit; record the rest
+  (candidates, declinations, and why) in map.md under "Post-wave
+  survey" with the date. Widen a grazed test band only with the
+  observed fresh-draw value in a comment (2026-10-15 precedent).
