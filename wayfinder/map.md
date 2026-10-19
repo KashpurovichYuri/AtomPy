@@ -191,6 +191,12 @@ NEXT WAVE: ticket 17 (drivers line-review: docstring diet ~−120 lines,
 Löwdin dedup ×4, __all__ fix, _run branch unify) then the ECP ticket
 (design pre-verified above; wrinkle (a) already closed by ncore_of).
 
+[2026-10-19 late update: docs survey + deepening + test tiers DONE
+(35cd327…345351a); 7.3 reference axis measured and card corrections
+landed (f38fb6d) — including the falsified SA-flatness draft, replaced
+by measured tilt-mean curves (C/Si descend, Sc/Ti rise — §3.4); the
+handoff is in message.txt.]
+
 ## Out of scope
 
 - Performance tuning of the determinant-basis builder beyond CAS sizes used
