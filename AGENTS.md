@@ -17,7 +17,7 @@ basis (no second quantization anywhere), symmetry quantified by
 source ~/miniconda3/etc/profile.d/conda.sh && conda activate pyscf
 # or call ~/miniconda3/envs/pyscf/bin/python directly
 pytest                      # from repo root; pythonpath=src is preconfigured
-python scripts/run_carbon.py [workdir]
+python scripts/run_c.py [workdir]
 ```
 
 Python 3.12, PySCF 2.13, numpy 2.5, scipy 1.18 (note: `scipy.special.sph_harm`
@@ -474,7 +474,7 @@ one-session sized. The atom campaign (C, Si, Sc, Ti) is COMPLETE — tickets
 01–16 all RESOLVED (facts 18–21; Ti delivered the d² tables incl. ¹G, the
 character-forced/basin-gated ROHF reference, the JT verdict for ³F, and the
 machine-exact pur rungs on a second TM). Next wave is UNASSIGNED — user's
-candidate list: PHYSICS.md narrative (deferred), spin–orbit, transition
+candidate list: spin–orbit, transition
 moments, g-factors; each ticket is self-contained in `wayfinder/tickets/`
 (no conversation context needed). Review protocol:
 `/code-review` (two axes, parallel sub-agents) after each ticket wave, then

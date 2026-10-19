@@ -2,6 +2,8 @@
 
 Plain-language vocabulary for AtomTerm. Every term the reports and code
 use is defined here; the precise statement follows the plain one.
+*(The full technical narrative is the README; this file keeps the
+plain-language versions.)*
 
 ## The objects
 

@@ -2,7 +2,7 @@
 """Run the carbon term-symbol pipeline: ROHF -> CASCI -> CASSCF -> SA-CASSCF.
 
 Usage:
-    python scripts/run_carbon.py [workdir]
+    python scripts/run_c.py [workdir]
 """
 
 import sys
