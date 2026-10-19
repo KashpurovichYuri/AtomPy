@@ -850,14 +850,20 @@ below ROHF, not the −730/−786 mEh our fold seems to show.
 
 **The summary cards.**
 
-**C / Si** — ROHF −37.682418 / −288.846437 Eh; CAS(2,3), Ms=0.
-*References (totals):* the averaged fold leaves the ROHF total unchanged
-(measured raw-vs-avg ground shift: −29 µEh on C, −0.31 mEh on Si — the
-multiplet-splitting scale); the frac-occ SCF totals are −37.678694 /
-−288.867793 Eh (2/3-per-orbital ensembles — a different functional, not
-a variational neighbor of ROHF).
+**The reference table** (all four atoms; totals in Eh; the anchor every
+ΔE hangs on. The averaged fold leaves the ROHF total unchanged — measured
+raw-vs-avg ground shifts: −29 µEh / −0.31 mEh / −1.5 mEh / −2.8 mEh, the
+multiplet-splitting scale. The frac-occ SCF is a different functional,
+not a variational neighbor of ROHF):
 
-| rung (ΔE vs ROHF, eV) | C | Si |
+| reference | C | Si | Sc | Ti |
+|---|---|---|---|---|
+| ROHF (raw core = averaged fold) | −37.682418 | −288.846437 | −759.736255 | −848.406489 |
+| frac-occ SCF (ΔE vs ROHF, eV) | −37.678694 (+0.10) | −288.867793 (−0.58) | −758.014967 (+46.8) | −847.296157 (+30.2) |
+
+**C / Si rungs** (ΔE vs ROHF, eV; CAS(2,3), Ms=0):
+
+| rung | C | Si |
 |---|---|---|
 | CASCI raw shell, averaged fold | +6.82 (confinement; exact) | +6.03 (confinement; exact) |
 | CASCI raw core fold | +6.82 (comm 9.8e-6 — the detector) | +6.03 (comm 5.6e-4) |
@@ -866,12 +872,7 @@ a variational neighbor of ROHF).
 | CASSCF radial restriction | 0.00 (full recovery, exact) | +0.001 (exact) |
 | SA-CASSCF | +0.001 (lands symmetric, exact) | +0.001 (exact) |
 
-**Sc** — ROHF −759.736255 Eh = −20 673.5 eV; CAS(3,6)/{3d,4s}
-*References (totals):* the averaged fold leaves the ROHF total unchanged
-(measured ground shift between raw and averaged folds: −1.5 mEh, the
-multiplet-splitting scale); the frac-occ SCF total is −758.014967 Eh —
-the ensemble of the smeared {3d,4s}³ shell, a different functional
-(Eh-scale exchange cost; only its exactly isotropic core field is used).
+**Sc** — CAS(3,6)/{3d,4s}
 
 | deliverable | free variant | symmetric variant |
 |---|---|---|
@@ -881,10 +882,7 @@ the ensemble of the smeared {3d,4s}³ shell, a different functional
 | CASSCF | **−0.86** (escape: L ≈ 0, identity changed — broken) | +0.18 frozen (baseline) / −0.18 radial (single root, gauge-chaotic) |
 | SA-CASSCF | −0.36 (swap; ⟨L̂²⟩ = 6.002, term-readable — broken) | +0.20 frozen purified (exact) / 0.00 radial purified (floor) |
 
-**Ti** — ROHF −848.406489 Eh = −23 086.3 eV; CAS(4,6)/{3d,4s}
-*References (totals):* averaged fold leaves the ROHF total unchanged
-(raw-vs-avg ground shift −2.8 mEh); frac-occ SCF total −847.296157 Eh
-(the smeared-shell ensemble, +1.11 Eh vs ROHF).
+**Ti** — CAS(4,6)/{3d,4s}
 
 | deliverable | free variant | symmetric variant |
 |---|---|---|
@@ -966,6 +964,8 @@ exact class. Full table in `results/Si_ccpvdz_s2_ladder.md`.
 
 | rung | E_ground | ΔE vs ROHF (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | annotation |
 |---|---|---|---|---|---|---|---|---|
+| rohf | −759.736255 | 0 | — | — | — | — | — | the anchor: character-forced filling (§5.5); raw core density anisotropy 1.3e-2 |
+| frac-scf | −758.014967 | +1721 | — | — | — | — | — | the smeared-shell ensemble: a different functional (§3.2); only its isotropic core field is used |
 | casci_avg | −759.817560 | +6.7 | 6.0 | 5.6e-15 | 6.4e-13 | 7e-15 | 9e-15 | spherically averaged core: reference CASCI (§3.2) |
 | casci_raw | −759.819083 | +6.7 | 6.0004 | 2.8e-02 | 1.4e-01 | 7e-15 | 9e-15 | raw field: percent-level quadrupole (§2.4) |
 | casci_frac | −759.787295 | +36.8 | 6.0 | 3.4e-14 | 3.5e-13 | 7e-15 | 9e-15 | average-of-configuration: a different reference (§3.2) |
@@ -979,6 +979,8 @@ exact class. Full table in `results/Si_ccpvdz_s2_ladder.md`.
 
 | rung | E_ground | ΔE vs ROHF (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | annotation |
 |---|---|---|---|---|---|---|---|---|
+| rohf | −848.406489 | 0 | — | — | — | — | — | the anchor: character-forced filling + E_ref basin gate (§5.5) |
+| frac-scf | −847.296157 | +1110 | — | — | — | — | — | the smeared-shell ensemble: a different functional (§3.2); only its isotropic core field is used |
 | casci_avg | −848.481312 | +10.6 | 12.0 | 2.2e-14 | 4.1e-13 | 6e-15 | 8e-15 | spherically averaged core: reference CASCI (§3.2) |
 | casci_raw | −848.484093 | +10.6 | 12.0000 | 4.9e-02 | 2.6e-01 | 6e-15 | 8e-15 | raw field: the quadrupole at first order (§2.4) |
 | casci_frac | −848.443405 | +48.0 | 12.0 | 1.2e-13 | 7.5e-13 | 6e-15 | 8e-15 | average-of-configuration: a different reference (§3.2) |
