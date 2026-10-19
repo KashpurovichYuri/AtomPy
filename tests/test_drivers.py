@@ -182,6 +182,8 @@ def test_ti_rohf_reference_needs_character_forced_occupations(ti_rohf, tmp_path)
         names_d, w_d = shell_weights(mol, mf_d.mo_coeff[:, :10], s)
         assert w_d[:, names_d.index("d")].max() > 0.9  # 3d invaded the core
         assert mf_d.e_tot > -848.30  # +123.07 mEh above the reference
+    # else: the non-converging face -- nothing to pin (the runaway
+    # surface simply failed to converge); either face is unusable.
 
 
 def test_sc_frac_occ_selects_open_shell_by_projection(sc_rohf, tmp_path):

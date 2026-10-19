@@ -126,11 +126,25 @@ def run_rohf(cfg, chkfile: str, occ_closed: list[str] | None = None,
         is NOT reliable between them. When given, the run is retried over
         cycled init guesses ("atom", "huckel"; both verified to reach the
         reference basin on Ti) until |E - occ_e_ref| <= 1e-4, else
-        RuntimeError.
+        RuntimeError. The gate applies to FRESH runs only: a cached
+        chkfile is trusted (produce it from a gated run and the trust is
+        inherited).
     """
     from atomterm.system import build_mol
 
     mol = build_mol(cfg)
+
+    def fresh_mf(guess: str | None = None):
+        m = scf.ROHF(mol)
+        if occ_closed is not None:
+            m.get_occ = _forced_rohf_occ(mol, occ_closed, occ_open)
+        m.chkfile = chkfile
+        m.conv_tol = 1e-12  # tight core density: keeps symmetry clean
+        m.verbose = cfg.verbose
+        if guess is not None:
+            m.init_guess = guess
+        return m
+
     mf = scf.ROHF(mol)
     mf.verbose = cfg.verbose
     if occ_closed is not None or occ_open is not None:
@@ -155,12 +169,7 @@ def run_rohf(cfg, chkfile: str, occ_closed: list[str] | None = None,
         for guess in ("atom", "huckel"):
             if mf.converged and abs(mf.e_tot - occ_e_ref) <= 1e-4:
                 break
-            mf = scf.ROHF(mol)
-            mf.get_occ = _forced_rohf_occ(mol, occ_closed, occ_open)
-            mf.chkfile = chkfile
-            mf.conv_tol = 1e-12
-            mf.verbose = cfg.verbose
-            mf.init_guess = guess
+            mf = fresh_mf(guess)
             mf.run()
         else:
             if not (mf.converged and abs(mf.e_tot - occ_e_ref) <= 1e-4):

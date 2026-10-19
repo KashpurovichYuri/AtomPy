@@ -14,6 +14,7 @@ import pytest
 
 from atomterm.pipeline import run_atom
 from atomterm.system import AtomConfig
+from conftest import TI_OCC
 
 # ground: expected (term, L, S) of the lowest CASCI state in the primary
 # sector; primary_tag / primary: sector chkfile tag and expected term -> count
@@ -81,9 +82,7 @@ CASES = {
         run_casscf=False,
         sa_weights=None,
         nroots_primary=10,
-        occ_closed=["1s", "2s", "3s", "4s", "2p", "3p"],
-        occ_open=["3d"],
-        occ_e_ref=-848.40648875,
+        **TI_OCC,
         ground=("3F", 3, 1),
         primary_tag="casci_ms1",
         primary={"3F": 7, "3P": 3},
@@ -91,6 +90,11 @@ CASES = {
         ms0={"1S": 1, "1D": 5, "3P": 3, "1G": 9, "3F": 7},
         # the (2,0) sector carries exactly S = 1
         s_values={2.0},
+        # deterministic extras pinned per the ticket: the M_L content of
+        # the primary sector, and the ms0 term ordering (NIST: 3F < 1D <
+        # 3P < 1G < 1S)
+        lz={"casci_ms1": [-3, -2, -1, -1, 0, 0, 1, 1, 2, 3]},
+        ms0_order=["3F", "1D", "3P", "1G", "1S"],
     ),
 }
 
@@ -145,6 +149,19 @@ def test_atom_term_tables(name, atom_results):
     if "s_values" in case:
         s2_set = {round(st.s2, 6) for st in results[case["primary_tag"]]["analysis"].states}
         assert s2_set == case["s_values"], (name, sorted(s2_set))
+
+    # optional deterministic pins: the M_L content of a sector (Lz
+    # eigenvalue spectrum) and the term ordering by energy
+    if "lz" in case:
+        for tag, expected in case["lz"].items():
+            got = sorted(int(round(v)) for v in results[tag]["analysis"].lz_spectrum)
+            assert got == expected, (name, tag, got)
+    if "ms0_order" in case:
+        seen = []
+        for st in results[case["ms0_tag"]]["analysis"].states:
+            if st.term not in seen:
+                seen.append(st.term)
+        assert seen == case["ms0_order"], (name, seen)
 
     # optimized-orbital stages keep the same ground term (their residual
     # symmetry breaking is physical output, asserted in test_pipeline)
