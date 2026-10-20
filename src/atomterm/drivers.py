@@ -69,17 +69,39 @@ def _lowdin(c: np.ndarray, s: np.ndarray) -> np.ndarray:
     return c @ (u / np.sqrt(ev)) @ u.T
 
 
+def _span_rows(mol, pattern: str) -> list[int]:
+    """AO rows of one occupation-span pattern: ``"l0".."l9"`` selects a
+    WHOLE angular-momentum subspace (the honest vocabulary for uncontracted
+    bases, where labels are shell counters -- fact 1); anything else is a
+    label prefix (:func:`select_shell_ao`)."""
+    if len(pattern) == 2 and pattern[0] == "l" and pattern[1].isdigit():
+        l = int(pattern[1])
+        return sorted(r for (ll, m), rws in lm_sectors(mol).items()
+                      if ll == l for r in rws)
+    rows = select_shell_ao(mol, pattern)
+    if not rows:
+        raise ValueError(
+            f"span pattern {pattern!r} matched no AO labels; available: "
+            f"{[line.split()[-1] for line in mol.ao_labels()]}")
+    return rows
+
+
 def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
     """Build the character-forced ROHF ``get_occ`` hook (see :func:`run_rohf`).
 
     Occupations by S-projector WEIGHT on two AO spans, never energy order
-    (the counts and spans: :func:`run_rohf`). The closed term in the open
-    ranking lets early-cycle 3d-like character that leaks into core-like
-    MOs still be found.
+    (the counts and spans: :func:`run_rohf`). The open block is ranked by
+    ``2 w_open + w_closed``: open-shell character carries a strict premium
+    (with whole-l spans a 1:1 sum lets closed-character leftovers tie the
+    open MOs -- measured on U, where DIIS then closed garbage), while the
+    closed term still lets early-cycle open-shell character hiding in
+    core-like MOs be found (the Sc/Ti leakage case).
     """
     s_mat = mol.intor_symmetric("int1e_ovlp")
-    p_closed = _ao_span_projector(s_mat, select_valence_ao(mol, occ_closed))
-    p_open = _ao_span_projector(s_mat, select_valence_ao(mol, occ_open))
+    p_closed = _ao_span_projector(
+        s_mat, sum((_span_rows(mol, p) for p in occ_closed), []))
+    p_open = _ao_span_projector(
+        s_mat, sum((_span_rows(mol, p) for p in occ_open), []))
     n_closed = (mol.nelectron - mol.spin) // 2
     n_open = mol.spin
 
@@ -94,7 +116,8 @@ def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
         w_open = np.einsum("ai,ab,bi->i", mo_coeff.conj(), p_open,
                            mo_coeff).real
         rest = np.flatnonzero(occ == 0.0)
-        open_mos = sorted(rest, key=lambda i: -(w_open[i] + w_closed[i]))[:n_open]
+        open_mos = sorted(rest,
+                          key=lambda i: -(2 * w_open[i] + w_closed[i]))[:n_open]
         occ[open_mos] = 1.0
         return occ
 
@@ -107,18 +130,27 @@ class ReferenceSpec:
     (fact 21a). One object bundling character-forced occupations and the
     basin gate, threaded through run_rohf / run_ladder / run_atom.
 
-    occ_closed, occ_open : AO label prefixes (as :func:`select_valence_ao`)
-        forcing the occupations by orbital CHARACTER instead of energy
-        order -- the integer analog of :func:`run_frac_occ_scf`'s
-        ``open_idx`` selection. MANDATORY on atoms whose default ROHF is
-        an aufbau runaway (Ti).
+    occ_closed, occ_open : AO span patterns (label prefixes as
+        :func:`select_shell_ao`, or ``"l0".."l9"`` for a WHOLE angular
+        momentum subspace -- the honest vocabulary on uncontracted bases
+        where labels are shell counters) forcing the occupations by
+        orbital CHARACTER instead of energy order -- the integer analog
+        of :func:`run_frac_occ_scf`'s ``open_idx`` selection. MANDATORY
+        on atoms whose default ROHF is an aufbau runaway (Ti; U needs
+        whole-l spans plus Newton).
     occ_e_ref : reference energy (Eh) of the target SCF basin; gates the
         multi-basin chaos by guess cycling (see :func:`run_rohf`).
+    scf_method : "diis" (default) or "newton" (second-order SOSCF). On
+        heavy uncontracted bases with near-degenerate f/d/p valence
+        shells, plain DIIS with forced occupations can fail to converge
+        from ANY start (U: E > +1e3, garbage blocks), while Newton lands
+        the target basin deterministically from every guess tested.
     """
 
     occ_closed: tuple[str, ...] | None = None
     occ_open: tuple[str, ...] | None = None
     occ_e_ref: float | None = None
+    scf_method: str = "diis"
 
     def __post_init__(self):
         if (self.occ_closed is None) != (self.occ_open is None):
@@ -126,6 +158,8 @@ class ReferenceSpec:
         if self.occ_e_ref is not None and self.occ_closed is None:
             raise ValueError(
                 "occ_e_ref needs the occ_closed/occ_open patterns")
+        if self.scf_method not in ("diis", "newton"):
+            raise ValueError(f"unknown scf_method: {self.scf_method!r}")
 
 
 def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
@@ -160,6 +194,8 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
         m.verbose = cfg.verbose
         if guess is not None:
             m.init_guess = guess
+        if ref is not None and ref.scf_method == "newton":
+            m = m.newton()
         return m
 
     try:

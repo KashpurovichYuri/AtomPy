@@ -523,3 +523,51 @@ def test_select_diffuse_on_uncontracted_basis(tmp_path):
     # the physics pin: a selected primitive m-set is exactly closed
     cl = window_closure(mol, np.eye(mol.nao_nr())[:, select_diffuse(mol, 1, 1)])
     assert cl["lz"] < 1e-12 and cl["lperp"] < 1e-12
+
+
+@pytest.mark.fast
+def test_forced_occ_l_specifiers_and_open_premium():
+    """The occupation hook's span vocabulary and ranking: 'l0'..'l9'
+    select whole angular-momentum subspaces (the honest vocabulary on
+    uncontracted bases), and the open block is ranked by 2 w_open +
+    w_closed -- with whole-l spans a 1:1 sum lets closed-character
+    leftovers tie the open MOs (measured on U: DIIS then closed s/p
+    garbage, E > +1e3), while the premium keeps the early-cycle leakage
+    case (Sc/Ti) findable."""
+    from pyscf import gto
+
+    from atomterm.drivers import _forced_rohf_occ
+
+    mol = gto.Mole()
+    mol.atom = "C 0 0 0"
+    mol.basis = gto.parse("""
+        C S
+             8.0  1.0
+        C S
+             1.0  1.0
+        C S
+             0.1  1.0
+        C P
+             2.0  1.0
+        C P
+             0.2  1.0
+        C D
+             0.5  1.0
+    """)
+    mol.spin = 2   # nelec = 6: closed = 2, open = 2
+    mol.verbose = 0
+    mol.build()
+
+    from atomterm.drivers import lm_sectors
+    rows_l = {l: sorted(r for (ll, m), rws in lm_sectors(mol).items()
+                        if ll == l for r in rws) for l in range(4)}
+    hook = _forced_rohf_occ(mol, ["l0", "l1"], ["l2"])
+    mo = np.eye(mol.nao_nr())
+    occ = hook(np.zeros(mol.nao_nr()), mo)
+    closed = set(np.flatnonzero(occ == 2.0))
+    open_ = set(np.flatnonzero(occ == 1.0))
+    assert all(i in rows_l[0] + rows_l[1] for i in closed)  # s/p-pure
+    assert open_ <= set(rows_l[2])                          # d wins the
+    # 2:1 premium even though closed leftovers tie at 1.0
+    with pytest.raises(ValueError, match="matched no AO labels"):
+        _forced_rohf_occ(mol, ["4z"], ["l2"])
