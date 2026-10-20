@@ -90,6 +90,7 @@ from atomterm.drivers import (
     build_full_mo,
     constrained_casscf,
     core_virtual_only_mask,
+    occupied_core_idx,
     purified_core_orbitals,
     radial_basis,
     radial_mask,
@@ -158,7 +159,7 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
     c_shell = lambda cas: np.eye(mf.mo_coeff.shape[0])[:, act_idx]  # noqa: E731
     c_win = lambda cas: cas.mo_coeff[:, ncore : ncore + ncas]  # noqa: E731
     mo_of = lambda mf_ref, c_core=None: build_full_mo(  # noqa: E731
-        mf_ref, list(range(ncore)), act_idx, c_core=c_core)
+        mf_ref, occupied_core_idx(mf_ref, ncore), act_idx, c_core=c_core)
     nroots = min(9, ndet)
 
     rungs = [
@@ -192,7 +193,8 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
 
     mo_shell = mo_of(mf)
     # member-labeled basis + same-(l, member) rotation mask: the radial rungs
-    mo_rad, lab_rad = radial_basis(mf, list(range(ncore)), act_idx)
+    mo_rad, lab_rad = radial_basis(
+        mf, occupied_core_idx(mf, ncore), act_idx)
     mask_rad = radial_mask(lab_rad, ncore, ncas)
     rungs += [
         Rung(
@@ -265,7 +267,7 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
         # anisotropy detector both vanish on this substrate).
         mo_shell_p = mo_of(mf, c_pur)
         mo_rad_p, lab_rad_p = radial_basis(
-            mf, list(range(ncore)), act_idx, c_core=c_pur)
+            mf, occupied_core_idx(mf, ncore), act_idx, c_core=c_pur)
         mask_rad_p = radial_mask(lab_rad_p, ncore, ncas)
         rungs += [
             Rung(

@@ -141,7 +141,13 @@ def active_space_integrals(
     ``g[p,q,r,s] = <pq|rs> = int p(1) q(2) r(1) s(2)`` = chemist ``(pr|qs)``.
     CI eigenvalues of (h1, g) equal ``mc.e_cas``.
     """
-    c_core = mf.mo_coeff[:, :ncore] if c_core is None else c_core
+    # the ROHF CLOSED BLOCK, not canonical order (which is junk on
+    # near-degenerate uncontracted bases -- the trap occupied_core_idx
+    # guards; callers with their own core (stages, pur rungs) override)
+    from atomterm.drivers import occupied_core_idx
+
+    c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+              if c_core is None else c_core)
     d_raw = 2.0 * c_core @ c_core.conj().T
     d_core = _spherical_average_density(mol, d_raw) if spherical_core else d_raw
 
@@ -181,27 +187,38 @@ def lz_operator(mol, c_act: np.ndarray) -> np.ndarray:
 def parity_one_body(mol, c_act: np.ndarray) -> np.ndarray:
     """Per-window-orbital parity signs ``(-1)^l`` (diagonal matrix).
 
-    Requires RAW AO columns (each column one basis function of definite
-    l) -- asserted: optimized windows mix l within a column and per-
-    column parity is undefined there. Parity labels therefore live on
-    the raw-window census stages.
+    Requires each column to be l-PURE (all its S-weight inside one
+    angular-momentum sector): true for raw AO columns and for Löwdin-
+    rotated same-(l, m) combinations, false for optimized windows that
+    mix l within a column -- parity labels live on l-pure window stages.
     """
     from atomterm.drivers import lm_sectors
 
     sectors = lm_sectors(mol)
-    row_l = np.zeros(mol.nao_nr(), dtype=int)
-    for (l, m), rows in sectors.items():
-        for r in rows:
-            row_l[r] = l
-    unit = np.eye(mol.nao_nr())
+    s = mol.intor_symmetric("int1e_ovlp")
     signs = np.zeros(c_act.shape[1])
     for j in range(c_act.shape[1]):
-        r = int(np.argmax(np.abs(c_act[:, j])))
-        if np.abs(c_act[:, j] - unit[:, r]).max() > 1e-10:
-            raise ValueError(
-                "parity_one_body needs raw AO columns (definite l per "
-                "column); optimized windows break per-column parity")
-        signs[j] = (-1.0) ** row_l[r]
+        col = c_act[:, j]
+        # sector-resolved S-weights (sectors of one l sum to the
+        # l-subspace weight)
+        by_l: dict[int, float] = {}
+        for (l, m), rows in sectors.items():
+            ss = s[np.ix_(rows, rows)]
+            w = float(np.real(col[rows].conj() @ ss @ col[rows]))
+            if w > 1e-10:
+                by_l[l] = by_l.get(l, 0.0) + w
+        if len(by_l) != 1:
+            dom = max(by_l.values())
+            if dom < 1.0 - 2e-2:
+                raise ValueError(
+                    "parity_one_body needs l-pure columns (one angular "
+                    f"momentum per column); column {j} has weights {by_l}")
+            by_l = {max(by_l, key=by_l.get): dom}  # cross-l tails from
+            # Loewdin rotation (1e-4 class) and core orthogonalization
+            # (percent class: the 6d window column carries 0.8% of 7s --
+            # measured on U) do not spoil the parity LABEL; <P> reads
+            # 0.98 instead of 1.0 and the pur substrate restores it
+        signs[j] = (-1.0) ** next(iter(by_l))
     return np.diag(signs)
 
 
@@ -312,7 +329,10 @@ def core_anisotropy(mol, mf, ncore: int, c_core: np.ndarray = None) -> float:
     ``||rho - rho_sph||_F / ||rho_sph||_F`` -- the ``eps`` weight of the
     internal-field term in ``H_eff = H0 + eps*W`` (see
     :func:`active_space_integrals`)."""
-    c_core = mf.mo_coeff[:, :ncore] if c_core is None else c_core
+    from atomterm.drivers import occupied_core_idx
+
+    c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+              if c_core is None else c_core)
     d = 2.0 * c_core @ c_core.conj().T
     d_sph = _spherical_average_density(mol, d)
     return float(frobenius_norm(d - d_sph) / frobenius_norm(d_sph))

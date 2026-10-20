@@ -50,9 +50,41 @@ corrections *findable*.
   open-count forcing in ReferenceSpec if the U census shows f3d1-vs-f4
   steering is needed (measure first).
 
-## 3. Pressure points found during U (append-only; empty now)
+## 3. Pressure points found during U (append-only)
 
--
+- Census scripts re-implemented in /tmp for Ti-AE, Sc-ecp, Ti-ecp, U
+  (guesses x forcing x methods x fingerprints) -> item B, confirmed.
+- **Canonical-order assumption, three strikes in one campaign**: (1) the
+  run script's `range(ncore)` core (max|dE| 14.5 Eh), (2) the analysis
+  call relying on `active_space_integrals`' default c_core (13.8 Eh),
+  (3) `purified_core_orbitals`' own slice (the pur construction crashed).
+  All library defaults now route through `occupied_core_idx`; the
+  pressure point: "canonical order = occupied block" was never a checked
+  invariant anywhere. CaseSpec should own the occupied-block semantics.
+- **Non-orthonormal windows**: two overlapping f primitives are not
+  S-orthonormal; raw-column analysis silently breaks every product
+  operator (L^2 eigenvalues 172.98, non-quantized -- fact 4). The
+  analysis must use the build_full_mo-orthonormalized window;
+  `build_operator_parts` could GUARD (assert S-orthonormality of c_act).
+- **Comparison arithmetic traps**: active-space eigenvalues vs PySCF
+  totals (needs + core_energy); sorted-vs-per-root alignment. Two bugs
+  in one campaign script. sector_plan (item E) should print the
+  bookkeeping contract next to the sizes.
+- **slater_condon_matrix is an O(ndet^2) pure-Python double loop**:
+  18,411 dets (tier-1b Ms=1) is hours-to-days; 29k impossible. The
+  single blocker for sector depth on U. Vectorization (grouped by
+  excitation class) is now a campaign-critical item; the secondquant
+  witness + existing pins make it safe to build.
+- **Window convergence is itself an experiment axis on U**: the
+  f3d1/f4/f2d2 ordering flips with the primitive selection (1f window:
+  f4 5I ground; 2f window: f2d2 5L ground by 6.3 mEh; physical answer:
+  f3d1 5L). Near-degenerate manifolds need a systematic window scan --
+  a new item: window_scan (add primitives by measured open-MO weight
+  until the low-spectrum ordering stabilizes).
+- **Parity's l-purity invariant needed a percent-class tolerance**: the
+  core-orthogonalized 6d window column carries 0.8% of 7s (fact-17
+  class); <P> reads 0.98 and the pur substrate restores 1.0.
+
 
 ## 4. Scope split with the U campaign
 

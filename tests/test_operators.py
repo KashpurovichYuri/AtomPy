@@ -204,9 +204,12 @@ def test_parity_operator_diagonal_and_letters():
     assert np.allclose(op_sp, np.diag(np.diag(op_sp)))  # det-diagonal
     assert set(np.round(np.diag(op_sp), 9)) == {-1.0, 1.0}
 
-    mixed = 0.5 * c_p[:, :1] + 0.5 * c_p[:, 1:2]        # not a raw column
-    with pytest.raises(ValueError):
-        parity_one_body(mol, np.hstack([c_p, mixed]))
+    mixed = 0.5 * c_sp[:, :1] + 0.5 * c_sp[:, 3:4]  # s/p l-MIX: no
+    with pytest.raises(ValueError):                 # definite parity
+        parity_one_body(mol, np.hstack([c_sp, mixed]))
+    # same-l rotations (Loewdin of overlapping primitives) stay pure
+    rot = 0.6 * c_p[:, :1] + 0.8 * c_p[:, 1:2]
+    assert np.allclose(np.diag(parity_one_body(mol, rot)), -1.0)
     # L-letters through L = 11 (f^3 d^1), J skipped by convention
     assert term_symbol(0.0, 132.0) == "1O"              # 11 * 12 = 132
     assert term_symbol(0.0, 110.0) == "1N"              # 10 * 11

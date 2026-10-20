@@ -17,6 +17,7 @@ from atomterm.system import AtomConfig, ncore_of, sector_occupations
 from atomterm.drivers import (
     ReferenceSpec,
     build_full_mo,
+    occupied_core_idx,
     run_casci,
     run_casscf as casscf_stage,
     run_rohf,
@@ -142,7 +143,7 @@ def run_atom(
     mo_by_sector: dict[tuple[int, int], np.ndarray] = {}
     for na, nb, nroots in sector_defs:
         ncore = ncore_of(mol.nelectron, na + nb)
-        mo = build_full_mo(mf, list(range(ncore)), act_idx)
+        mo = build_full_mo(mf, occupied_core_idx(mf, ncore), act_idx)
         mo_by_sector[(na, nb)] = mo
         tag = f"casci_ms{_ms_label(na, nb)}"
         cas = run_casci(mf, ncas, (na, nb), mo, str(out / f"{label}_{tag}.chk"),

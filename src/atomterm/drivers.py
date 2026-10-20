@@ -25,6 +25,7 @@ __all__ = [
     "select_shell_ao",
     "select_valence_ao",
     "select_diffuse",
+    "occupied_core_idx",
     "shell_weights",
     "purified_s_core",
     "purified_core_orbitals",
@@ -67,6 +68,32 @@ def _lowdin(c: np.ndarray, s: np.ndarray) -> np.ndarray:
     (:func:`radial_basis` fixes the gauge by Gram-Schmidt instead)."""
     ev, u = np.linalg.eigh(c.conj().T @ s @ c)
     return c @ (u / np.sqrt(ev)) @ u.T
+
+
+def occupied_core_idx(mf, ncore: int) -> list[int]:
+    """Indices of the ``ncore`` doubly-occupied MOs -- the honest core
+    block for every build_full_mo/radial_basis call.
+
+    Canonical MO ORDER is meaningless on near-degenerate uncontracted
+    bases (U: the first canonical MOs are virtual junk at eps ~ 0.02,
+    while the closed block sits at 22/61/88/120/143); ``range(ncore)``
+    then silently folds five garbage columns (measured: max|dE| = 14.5
+    Eh). On contracted bases the two coincide -- this makes the
+    coincidence a checked invariant instead of an assumption.
+    """
+    closed = np.flatnonzero(np.asarray(mf.mo_occ) == 2.0)
+    if len(closed) < ncore:
+        raise ValueError(
+            f"asked for {ncore} core orbitals; ROHF closed block has "
+            f"{len(closed)}")
+    if not np.array_equal(closed[:ncore], np.arange(ncore)):
+        import warnings
+
+        warnings.warn(
+            f"core block is NOT the first {ncore} canonical MOs "
+            f"(closed at {closed[:ncore].tolist()}); folding the "
+            f"occupied block instead", stacklevel=2)
+    return closed[:ncore].tolist()
 
 
 def _span_rows(mol, pattern: str) -> list[int]:
@@ -453,7 +480,7 @@ def purified_s_core(mol, mf, n_core: int):
     labels = [line.split()[-1] for line in mol.ao_labels()]
     s_idx = [i for i, lbl in enumerate(labels) if re.fullmatch(r"\d+s", lbl)]
 
-    c_can = mf.mo_coeff[:, :n_core]
+    c_can = mf.mo_coeff[:, occupied_core_idx(mf, n_core)]
     c_s = c_can[s_idx, :]                                # drop the p/d tail
     # MO normalization lives in the AO metric (c^dag S c = 1), so the
     # s-subspace weight is c_s^dag S_ss c_s -- not the Euclidean norm.
@@ -501,7 +528,8 @@ def purified_core_orbitals(mol, mf, n_core: int):
     and per-MO ``1 - own-l weight`` (the foreign-l SCF tail diagnostic).
     """
     s = mf.get_ovlp()
-    c_can = np.asarray(mf.mo_coeff[:, :n_core])
+    c_can = np.asarray(
+        mf.mo_coeff[:, occupied_core_idx(mf, n_core)])
     sectors = lm_sectors(mol)
 
     # dominant l per core MO (lumped-l weights partition unity exactly;
