@@ -1,16 +1,31 @@
-"""ECP mode (ticket 18): ccECP pairing, valence bookkeeping, exact p^2
-multiplets, the ncore=0 full-valence fold, and the louder raw-core
-detector. All bands carry the measured fresh-draw values in comments."""
+"""ECP mode (tickets 18/19): ccECP pairing, valence bookkeeping, exact p^2
+multiplets, the ncore=0 full-valence fold, the louder raw-core detector,
+the gated TM references, TM free-ion tables, and the fact-20 closure
+certificate at ncore=4. All bands carry the measured fresh-draw values in
+comments."""
 
 import numpy as np
 import pytest
 
 from atomterm import analysis, drivers, operators
+from atomterm.drivers import ReferenceSpec
 from atomterm.system import AtomConfig, build_mol, ncore_of, sector_occupations
 
 C_ECP = AtomConfig(symbol="C", basis="ccecpccpvdz", ecp="ccecp", spin=2)
 SI_ECP = AtomConfig(symbol="Si", basis="ccecpccpvdz", ecp="ccecp", spin=2)
 SC_ECP = AtomConfig(symbol="Sc", basis="ccecpccpvdz", ecp="ccecp", spin=1)
+TI_ECP = AtomConfig(symbol="Ti", basis="ccecpccpvdz", ecp="ccecp", spin=2)
+SC_REF = ReferenceSpec(
+    occ_closed=("3s", "3p", "4s"), occ_open=("3d",),
+    occ_e_ref=-46.12052897)  # the forced basin: 4/4 guesses (minao/atom/
+# huckel/vsap) land it -- the REPRODUCIBLE choice; the unforced minao/vsap
+# basin (-46.12083302, 0.30 mEh lower) exists but is guess-dependent, and
+# unforced atom/huckel run away to 4s^2 4p^1 (+104.7 mEh). Ticket 19.
+TI_REF = ReferenceSpec(
+    occ_closed=("3s", "3p", "4s"), occ_open=("3d",),
+    occ_e_ref=-57.60649802)  # good basin (window defect 1.4e-8); huckel
+# and unforced-default land the +11.1 mEh member-gauge basin (defect 1.6e-2)
+# -- the fact-21a phenomenology, reversed: under ECP the DEFAULT is bad.
 
 
 @pytest.mark.fast
@@ -105,3 +120,81 @@ def test_ecp_si_multiplet_and_ncore0_fold():
     ops0 = operators.build_operators(mol, mf, c_fv, 0, 3, 1)
     h0, lz0 = ops0["H"], ops0["Lz"]
     assert np.linalg.norm(h0 @ lz0 - lz0 @ h0) < 1e-13  # measured 1.8e-15
+
+
+@pytest.mark.slow
+def test_ecp_tm_references_and_basins():
+    """The gated references (ticket 19 census). Ti: the good basin
+    (window defect 1.4e-8). Sc: the forced basin is the reproducible one
+    from EVERY guess but carries the AMPLIFIED fact-17 baseline (~1e-2:
+    the explicit 3s3p core sits adjacent to the {3d,4s} window)."""
+    from atomterm.operators import window_closure
+
+    for cfg, ref, e_pinned, defect_lo, defect_hi in [
+        (SC_ECP, SC_REF, -46.12052897, 1e-3, 1e-1),  # measured 1.4e-2
+        (TI_ECP, TI_REF, -57.60649802, 0.0, 1e-6),   # measured 1.4e-8
+    ]:
+        mol, mf = drivers.run_rohf(
+            cfg, f"results/{cfg.label}_rohf.chk", ref=ref)
+        assert abs(mf.e_tot - e_pinned) < 1e-6
+        act = drivers.select_valence_ao(mol, ["3d", "4s"])
+        ncore = ncore_of(mol.nelectron, len(act))
+        mo = drivers.build_full_mo(mf, list(range(ncore)), act)
+        cl = window_closure(mol, mo[:, ncore:ncore + len(act)])
+        assert defect_lo < cl["lz"] < defect_hi
+
+
+@pytest.mark.slow
+def test_ecp_tm_multiplet_tables():
+    """The free-ion tables under ECP, from OUR folded H (raw shell window,
+    averaged fold): Sc 2D ground (<L^2> = 6); Ti 3F x7 ground, exactly
+    degenerate, with 5F x7 next -- the 120-detector sector, all integer
+    L(S+1)/S(S+1)."""
+    for cfg, ref, nelec, spin, ground_l2, first_ev, last_ev, l2_next in [
+        (SC_ECP, SC_REF, 3, 1, 6.0, 0, 4, None),      # 2D x5 ground
+        (TI_ECP, TI_REF, 4, 2, 12.0, 0, 6, 12.0),     # 3F x7, then 5F x7
+    ]:
+        mol, mf = drivers.run_rohf(
+            cfg, f"results/{cfg.label}_rohf.chk", ref=ref)
+        act = drivers.select_valence_ao(mol, ["3d", "4s"])
+        c_shell = np.eye(mol.nao_nr())[:, act]
+        na, nb = sector_occupations(nelec, spin)
+        ncore = ncore_of(mol.nelectron, nelec)
+        ops = operators.build_operators(mol, mf, c_shell, ncore, na, nb)
+        h, lz, l2, s2 = ops["H"], ops["Lz"], ops["L2"], ops["S2"]
+        assert np.linalg.norm(h @ lz - lz @ h) < 1e-11  # Sc 1.5e-12, Ti 5.7e-13
+        # per-root labels via the library path (V^dag O V diagonal) -- an
+        # einsum with the root index on the WRONG axis silently returns
+        # garbage on exactly-degenerate multiplets (caught on Sc's 2D x5)
+        res = analysis.analyze(h, lz, l2, s2, "sector")
+        st = res.states
+        assert abs(st[first_ev].l2 - ground_l2) < 1e-8
+        assert abs(st[first_ev].s2 - spin * (spin + 2) / 4) < 1e-8
+        assert st[last_ev].energy - st[first_ev].energy < 1e-10  # term-exact
+        if l2_next is not None:  # Ti: roots 7..13 = 5F (S = 2)
+            assert abs(st[7].l2 - 12.0) < 1e-8
+            assert abs(st[7].s2 - 6.0) < 1e-8
+            assert st[13].energy - st[7].energy < 1e-10
+
+
+@pytest.mark.slow
+def test_ecp_tm_purified_core_closes_the_input_windows():
+    """Fact 20 under ECP at ncore=4: the purified core closes both input
+    windows at machine precision (measured 4.9e-15 Sc / 7.2e-15 Ti vs the
+    canonical-core defects 1.4e-2 / 9.5e-8); contamination at 1e-5-class
+    foreign-l tails (measured 5.7e-5 / 7.0e-5)."""
+    from atomterm.operators import window_closure
+
+    for cfg, ref, nelec in [(SC_ECP, SC_REF, 3), (TI_ECP, TI_REF, 4)]:
+        mol, mf = drivers.run_rohf(
+            cfg, f"results/{cfg.label}_rohf.chk", ref=ref)
+        act = drivers.select_valence_ao(mol, ["3d", "4s"])
+        ncore = ncore_of(mol.nelectron, nelec)
+        c_pur, contam = drivers.purified_core_orbitals(mol, mf, ncore)
+        assert contam.max() < 1e-3
+        for mo in [
+            drivers.build_full_mo(mf, list(range(ncore)), act, c_core=c_pur),
+            drivers.radial_basis(mf, list(range(ncore)), act, c_core=c_pur)[0],
+        ]:
+            cl = window_closure(mol, mo[:, ncore:ncore + len(act)])
+            assert cl["lz"] < 1e-12 and cl["lperp"] < 1e-12

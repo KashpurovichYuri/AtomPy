@@ -163,15 +163,26 @@ machinery; tickets 14/15 answer the open machinery questions first.
   spacings: one-parameter F₂ structure (¹S:¹D = 5:2 exactly in all
   four tables), ccECP shrinks F₂ by ~34%. Suite 96 green.
 
-Ticket 19 (next, written when picked up): ECP Sc/Ti — ReferenceSpec
-re-measurement under the new field, the 3s3p explicit-core purified
-story (fact 20 at ncore=4), TM ladder fingerprints, escape/swap
-basins under ECP.
+Ticket 19 (Sc/Ti ECP) — RESOLVED (tickets/19-ecp-tm.md): gated
+references (Ti: good basin −57.60649802, defect 1.4e-8, default lands
+the +11.1 mEh basin — fact-21a with the default REVERSED; Sc: forced
+basin −46.12052897 from every guess, +0.30 mEh above the guess-dependent
+unforced minimum — reproducibility chosen; unforced atom/huckel run away
+to 4s²4p¹). Free-ion tables textbook-exact (Sc ²D×5, 90 dets, comm
+1.5e-12; Ti ³F×7 over 120 dets, 5.7e-13). Ladder: escape on both
+(−51.6/−57.3 mEh; Ti shell grabbed 4f, −0.88 Eh), Sc sa = the 4s↔3p
+swap (fold illusion), Ti sa healthy this draw (bimodal — branch), pur
+family MACHINE-EXACT at ncore=4 (relax_pur/sa_relax_pur 1.5e-12/5.3e-13;
+closure certificate 4.9e-15/7.2e-15 vs 1.4e-2/9.5e-8; the pur fold kills
+even the 1e-3 bookkeeping class). Test lesson: per-root labels via
+analysis.analyze only — a wrong-axis einsum on exactly-degenerate
+multiplets returns reproducible garbage (cost one diagnosis loop). Suite
+99 green. ECP wave (18+19) COMPLETE. Next: U (u_14e) per the plan-mode
+agreement — frozen-7s² CAS(4,12) tier first, sparse O·v mode deferred.
 
-The atom campaign (C, Si, Sc, Ti) is complete; the ECP wave (18 done,
-19 queued) re-runs it in the valence reference frame. Beyond: user
-candidates: PHYSICS.md narrative (deferred), spin–orbit coupling,
-transition moments, g-factors.
+The atom campaign (C, Si, Sc, Ti) is complete in BOTH reference frames
+(all-electron + ccECP); beyond U: user candidates: PHYSICS.md narrative
+(deferred), spin–orbit coupling, transition moments, g-factors.
 
 ## Post-wave survey (2026-10-19, deep-module pass + code review)
 

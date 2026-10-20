@@ -322,7 +322,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 92 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 99 tests in ~13 min (chkfile caching; ROHF computed once per
 session; the Ti ladder is the slowest block, ~7 min cold; the Sc ladders
 ~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
 anywhere in the fixture chain, sub-second); `pytest -m slow` = the
