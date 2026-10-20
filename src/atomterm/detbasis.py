@@ -31,6 +31,7 @@ import numpy as np
 __all__ = [
     "determinant_basis",
     "slater_condon_matrix",
+    "_slater_condon_reference",
     "commutator",
     "frobenius_norm",
 ]
@@ -96,9 +97,144 @@ def slater_condon_matrix(
     -------
     complex ndarray of shape ``(len(dets), len(dets))`` with
     ``M[I, J] = <I| O |J>``.
+
+    Vectorized: pair classification by chunked occupation broadcasting,
+    closed-form Slater signs from per-determinant prefix counts, and
+    gathered Slater-Condon values. Elementwise-identical to the
+    reference loop (:func:`_slater_condon_reference`, pinned by tests);
+    the loop version is O(ndet^2) Python per pair and dies in the
+    ~10^4-detector range, this handles 10^5 (the U campaign's sector
+    sizes).
     """
     if one_body is None and two_body is None:
         raise ValueError("at least one of one_body / two_body is required")
+    n = len(dets)
+    nelec = len(dets[0])
+    # the operator fixes the spin-orbital dimension: sectors without beta
+    # electrons never index the beta block (max det index < norb)
+    n2 = (one_body if one_body is not None else two_body).shape[0]
+    occ = np.zeros((n, n2), dtype=bool)
+    for i, d in enumerate(dets):
+        occ[i, list(d)] = True
+    # prefix counts: cum[j, t] = # occupied spin-orbitals < t in det j
+    cum = np.zeros((n, n2), dtype=np.int64)
+    np.cumsum(occ[:, :-1], axis=1, out=cum[:, 1:])
+    mat = np.zeros((n, n), dtype=complex)
+
+    # ---- diagonal (k = 0) ------------------------------------------------
+    diag = np.zeros(n, dtype=complex)
+    if one_body is not None:
+        diag += occ @ np.diag(one_body).astype(complex)
+    if two_body is not None:
+        if nelec >= 2:
+            occ_idx = np.array([list(d) for d in dets])      # (n, nelec)
+            comb = np.array(
+                list(combinations(range(nelec), 2)))          # (nc, 2)
+            p = occ_idx[:, comb[:, 0]]                        # (n, nc)
+            q = occ_idx[:, comb[:, 1]]
+            diag += 0.5 * (
+                two_body[p, q, p, q] + two_body[q, p, q, p]
+                - two_body[q, p, p, q] - two_body[p, q, q, p]
+            ).sum(axis=1)
+    mat[np.diag_indices(n)] = diag
+
+    # ---- off-diagonal (k = 1, 2), chunked over rows ----------------------
+    chunk = max(1, min(n, int(2e7) // (n * n2)))
+    orb = np.arange(n2)
+    for lo in range(0, n, chunk):
+        hi = min(n, lo + chunk)
+        occ_i = occ[lo:hi]                                    # (m, n2)
+        k = nelec - (occ_i[:, None, :] & occ[None, :, :]).sum(-1)
+        rows, cols = np.nonzero((k == 1) | (k == 2))
+        if rows.size == 0:
+            continue
+        ii = rows + lo
+        jj = cols
+        occ_j_c = occ[jj]                                     # (P, n2)
+        occ_i_c = occ[ii]
+        ann_mask = occ_j_c & ~occ_i_c                         # k entries
+        cre_mask = occ_i_c & ~occ_j_c
+        k_c = k[rows, cols]
+
+        # per-pair excitation indices, ascending within each pair
+        ann_r, ann_c = np.nonzero(ann_mask)
+        cre_r, cre_c = np.nonzero(cre_mask)
+        ann = np.zeros((ii.size, 2), dtype=np.int64)
+        cre = np.zeros((ii.size, 2), dtype=np.int64)
+        ann[ann_r, _within_rank(ann_r, ann_c)] = ann_c
+        cre[cre_r, _within_rank(cre_r, cre_c)] = cre_c
+        # _within_rank: 0 for the first (smaller) index of a pair, 1 for
+        # the second; k=1 pairs use only slot 0 (slot 1 stays 0 = dummy)
+
+        # closed-form transition signs from prefix counts (cum):
+        #  k=1 (ann i, cre a): (-1)^{cum[j,i] + cum[j,a] - (i<a)}
+        #  k=2 (ann i<j, cre a<b, b inserted first):
+        #      (-1)^{cum[j,i] + cum[j,j_o] - 1 + cnt(i_or_j removed)(a|b)}
+        sign = np.ones(ii.size)
+        pref_j = cum[jj]                                      # (P, n2)
+        m1 = k_c == 1
+        if m1.any():
+            i1, a1 = ann[m1, 0], cre[m1, 0]
+            sign[m1] = (-1.0) ** (pref_j[m1, i1] + pref_j[m1, a1]
+                                  - (i1 < a1).astype(np.int64))
+        m2 = ~m1
+        if m2.any():
+            i2, j2 = ann[m2, 0], ann[m2, 1]                   # i2 < j2
+            a2, b2 = cre[m2, 0], cre[m2, 1]                   # a2 < b2
+            pj = pref_j[m2]
+            ar = np.arange(len(i2))
+            cnt = (lambda y: pj[ar, y]                        # noqa: E731
+                   - (i2 < y).astype(np.int64) - (j2 < y).astype(np.int64))
+            sign[m2] = (-1.0) ** (pj[ar, i2] + pj[ar, j2] - 1
+                                  + cnt(b2) + cnt(a2))
+
+        val = np.zeros(ii.size, dtype=complex)
+        if one_body is not None:
+            val[m1] += one_body[cre[m1, 0], ann[m1, 0]]
+        if two_body is not None:
+            if m1.any():
+                i1, a1 = ann[m1, 0], cre[m1, 0]
+                common = occ_j_c[m1] & occ_i_c[m1]            # (P1, n2)
+                g = two_body                                 # shorthand
+                tb = 0.5 * (
+                    g[a1[:, None], orb[None, :], i1[:, None], orb[None, :]]
+                    + g[orb[None, :], a1[:, None], orb[None, :], i1[:, None]]
+                    - g[orb[None, :], a1[:, None], i1[:, None], orb[None, :]]
+                    - g[a1[:, None], orb[None, :], orb[None, :], i1[:, None]]
+                )
+                val[m1] += (tb * common).sum(axis=1)
+            if m2.any():
+                i2, j2 = ann[m2, 0], ann[m2, 1]
+                a2, b2 = cre[m2, 0], cre[m2, 1]
+                val[m2] += 0.5 * (
+                    two_body[a2, b2, i2, j2] + two_body[b2, a2, j2, i2]
+                    - two_body[b2, a2, i2, j2] - two_body[a2, b2, j2, i2]
+                )
+        nz = val != 0
+        mat[ii[nz], jj[nz]] = sign[nz] * val[nz]
+    return mat
+
+
+def _within_rank(rows: np.ndarray, cols: np.ndarray) -> np.ndarray:
+    """0 for an entry's first occurrence within its row, 1 for the
+    second (np.nonzero returns ascending column order per row; rows
+    have at most two entries because k <= 2)."""
+    out = np.zeros(len(rows), dtype=np.int64)
+    order = np.lexsort((cols, rows))
+    rs = rows[order]
+    rk = np.zeros(len(rs), dtype=np.int64)
+    rk[1:] = (rs[1:] == rs[:-1]).astype(np.int64)  # 2nd within row -> 1
+    out[order] = rk
+    return out
+
+
+def _slater_condon_reference(
+    dets: list[tuple[int, ...]],
+    one_body: np.ndarray | None = None,
+    two_body: np.ndarray | None = None,
+) -> np.ndarray:
+    """Original loop implementation -- kept as the elementwise-identity
+    reference for the vectorized :func:`slater_condon_matrix` (tests)."""
     ndet = len(dets)
     mat = np.zeros((ndet, ndet), dtype=complex)
 

@@ -97,3 +97,30 @@ def test_composite_two_body_hermitian():
         two_body=spin_block_two_body(two),
     )
     assert frobenius_norm(m - m.conj().T) < 1e-12
+
+
+@pytest.mark.fast
+def test_vectorized_slater_condon_matches_reference():
+    """The vectorized slater_condon_matrix (chunked occupation
+    broadcasting + closed-form signs) is elementwise identical to the
+    reference loop implementation -- to summation-reassociation noise
+    (<1e-13) -- across sectors and operator kinds, including complex
+    NON-symmetric two-body kernels (the L.L composite class) and the
+    beta-free sector that fixes n2 from the operator, not the dets."""
+    from itertools import product
+
+    from atomterm.detbasis import (_slater_condon_reference,
+                                   determinant_basis, slater_condon_matrix)
+
+    rng = np.random.default_rng(11)
+    norb = 5
+    h = rng.standard_normal((2 * norb, 2 * norb)) \
+        + 1j * rng.standard_normal((2 * norb, 2 * norb))
+    g = rng.standard_normal((2 * norb,) * 4) \
+        + 1j * rng.standard_normal((2 * norb,) * 4)
+    for na, nb in [(2, 0), (2, 1), (2, 2), (3, 1), (4, 0), (1, 0)]:
+        dets = determinant_basis(norb, na, nb)
+        for one, two in [(h, g), (h, None), (None, g)]:
+            a = slater_condon_matrix(dets, one_body=one, two_body=two)
+            b = _slater_condon_reference(dets, one_body=one, two_body=two)
+            assert np.allclose(a, b, atol=1e-13), (na, nb, one is None)
