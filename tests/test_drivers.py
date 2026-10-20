@@ -477,3 +477,49 @@ def test_avas_window_reproduces_the_shell_cascade(sc_rohf, carbon, tmp_path):
             assert 0.05 < d_e < 0.12, d_e          # diffuse virtual d set
             assert facts.analysis.comm_norm_h_lz > 0.1
             assert facts.analysis.comm_norm_h_l2 > 1.0
+
+
+@pytest.mark.fast
+def test_select_diffuse_on_uncontracted_basis(tmp_path):
+    """The exponent-aware selector: on an uncontracted basis the labels
+    number shells from the TIGHT end starting at the valence name (fact-1
+    amendment -- '5f' is the most contracted f primitive on U), so raw
+    selection must go by radial position. select_diffuse returns the
+    n_prim most diffuse primitives, m-complete, and the span is exactly
+    rotation-closed."""
+    from pyscf import gto
+
+    from atomterm.drivers import select_diffuse
+    from atomterm.operators import window_closure
+
+    mol = gto.Mole()
+    mol.atom = "C 0 0 0"
+    mol.basis = gto.parse("""
+        C S
+             8.0  1.0
+        C S
+             1.0  1.0
+        C S
+             0.1  1.0
+        C P
+             2.0  1.0
+        C P
+             0.2  1.0
+        C D
+             0.5  1.0
+    """)
+    mol.spin = 2
+    mol.verbose = 0
+    mol.build()
+    kin = mol.intor("int1e_kin").diagonal()
+    # one f-style check per l: counts, tight/diffuse split, m-completeness
+    assert len(select_diffuse(mol, 1, 1)) == 3          # 1 p primitive
+    rows = select_diffuse(mol, 1, 2)                    # both p primitives
+    assert len(rows) == 6
+    assert select_diffuse(mol, 1, 1) == sorted(
+        rows, key=lambda r: kin[r])[:3]                 # the DIFFUSE one
+    with pytest.raises(ValueError):
+        select_diffuse(mol, 1, 3)                       # basis has only 2
+    # the physics pin: a selected primitive m-set is exactly closed
+    cl = window_closure(mol, np.eye(mol.nao_nr())[:, select_diffuse(mol, 1, 1)])
+    assert cl["lz"] < 1e-12 and cl["lperp"] < 1e-12

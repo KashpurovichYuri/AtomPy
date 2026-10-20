@@ -16,32 +16,43 @@ class AtomConfig:
     ----------
     symbol : atomic symbol, e.g. ``"C"``.
     basis : PySCF basis set name (must resolve to *spherical* functions;
-        cc-pVnZ family qualifies).
+        cc-pVnZ family qualifies), or a raw basis specification (dict of
+        parsed shells / gto string) -- assigned straight to ``mol.basis``
+        (PySCF parses raw input). Custom bases want ``tag`` set: the
+        label must stay path-safe.
     spin : 2S, the spin multiplicity minus 1 (PySCF convention). Carbon
         ground state: spin=2 (triplet, Ms=1 for ROHF).
     charge : integer charge.
-    ecp : PySCF ECP name or ``None`` (all-electron). Must pair with the
+    ecp : PySCF ECP name, a raw ECP string block (assigned straight to
+        ``mol.ecp``), or ``None`` (all-electron). Must pair with the
         basis (e.g. ``ecp="ccecp"`` with ``basis="ccecpccpvdz"``).
         Under an ECP ``mol.nelectron`` counts VALENCE electrons only —
         the ECP-honest bookkeeping every consumer already uses via
         ``ncore_of(mol.nelectron, ...)``; never recompute from Z.
+    tag : explicit artifact-name tag (chkfile/report stems, workdir
+        layout). Falls back to a ``symbol_basis_s{spin}`` string when
+        unset; custom (dict/string) bases should set it.
     coord : nuclear position in Bohr. Must be the origin: the angular
         momentum operators are defined about r=0 (see atomterm.angular).
     verbose : PySCF output level.
     """
 
     symbol: str = "C"
-    basis: str = "ccpvdz"
+    basis: str | dict = "ccpvdz"
     spin: int = 2
     charge: int = 0
     ecp: str | None = None
+    tag: str | None = None
     coord: tuple[float, float, float] = (0.0, 0.0, 0.0)
     verbose: int = 0
     extra: dict = field(default_factory=dict)
 
     @property
     def label(self) -> str:
-        ecp = f"_{self.ecp}" if self.ecp else ""
+        if self.tag is not None:
+            return self.tag
+        # raw (multi-line) ECP strings are not path-safe: use tag
+        ecp = f"_{self.ecp}" if self.ecp and "\n" not in self.ecp else ""
         return f"{self.symbol}_{self.basis}{ecp}_s{self.spin}"
 
     def gto_string(self) -> str:

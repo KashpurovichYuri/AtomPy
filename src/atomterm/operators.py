@@ -37,6 +37,8 @@ __all__ = [
     "active_space_integrals",
     "full_space_integrals",
     "lz_operator",
+    "parity_one_body",
+    "parity_operator",
     "l2_operator_parts",
     "window_closure",
     "s2_operator_parts",
@@ -176,6 +178,55 @@ def lz_operator(mol, c_act: np.ndarray) -> np.ndarray:
     return spin_block_one_body(_mo_transform(l_matrices(mol)["z"], c_act))
 
 
+def parity_one_body(mol, c_act: np.ndarray) -> np.ndarray:
+    """Per-window-orbital parity signs ``(-1)^l`` (diagonal matrix).
+
+    Requires RAW AO columns (each column one basis function of definite
+    l) -- asserted: optimized windows mix l within a column and per-
+    column parity is undefined there. Parity labels therefore live on
+    the raw-window census stages.
+    """
+    from atomterm.drivers import lm_sectors
+
+    sectors = lm_sectors(mol)
+    row_l = np.zeros(mol.nao_nr(), dtype=int)
+    for (l, m), rows in sectors.items():
+        for r in rows:
+            row_l[r] = l
+    unit = np.eye(mol.nao_nr())
+    signs = np.zeros(c_act.shape[1])
+    for j in range(c_act.shape[1]):
+        r = int(np.argmax(np.abs(c_act[:, j])))
+        if np.abs(c_act[:, j] - unit[:, r]).max() > 1e-10:
+            raise ValueError(
+                "parity_one_body needs raw AO columns (definite l per "
+                "column); optimized windows break per-column parity")
+        signs[j] = (-1.0) ** row_l[r]
+    return np.diag(signs)
+
+
+def parity_operator(mol, c_act: np.ndarray, na: int, nb: int) -> np.ndarray:
+    """Parity as a diagonal matrix in the determinant basis: each
+    determinant's eigenvalue is the PRODUCT ``prod (-1)^{l_i}`` over its
+    occupied window orbitals.
+
+    Structurally outside the (one_body, two_body) parts protocol: that
+    machinery SUMS one-body contributions (N, Lz, H1), while parity is
+    multiplicative -- so this is a direct construction over the
+    determinant occupations, not a Slater-Condon evaluation.
+    """
+    from atomterm.detbasis import determinant_basis
+
+    signs = np.diag(parity_one_body(mol, c_act))
+    norb = c_act.shape[1]
+    dets = determinant_basis(norb, na, nb)
+    out = np.ones(len(dets))
+    for k, det in enumerate(dets):
+        for so in det:
+            out[k] *= signs[so % norb]
+    return np.diag(out)
+
+
 def window_closure(mol, c_win: np.ndarray) -> dict[str, float]:
     """One-particle rotational-closure defects of a window SPAN.
 
@@ -299,7 +350,7 @@ def build_operator_parts(
     dets = determinant_basis(c_act.shape[1], na, nb)
     s2_one, s2_two = s2_operator_parts(c_act.shape[1])
     l2_one, l2_two = l2_operator_parts(mol, c_act)
-    return {
+    parts = {
         "dets": dets,
         "h1": h1,
         "g": g,
@@ -309,6 +360,7 @@ def build_operator_parts(
         "S2": (s2_one, s2_two),
         "N": (number_operator(c_act.shape[1]), None),
     }
+    return parts
 
 
 def build_operators(

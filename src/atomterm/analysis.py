@@ -32,7 +32,8 @@ __all__ = [
     "save_report",
 ]
 
-_L_LETTERS = "SPDFGHI"
+_L_LETTERS = "SPDFGHIKLMNO"  # J skipped by spectroscopic convention;
+# length 12 covers L <= 11 = f^3 d^1 (3+3+3+2), the uranium window
 
 
 def quantum_number(observed: float) -> int:

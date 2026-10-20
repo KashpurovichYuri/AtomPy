@@ -175,3 +175,38 @@ def test_window_closure_sc_shell_and_defective(sc_rohf):
           if lbl.split()[-1].startswith("4p")][0]
     c = window_closure(mol, eye[:, act_idx[:5] + [p4]])
     assert c["lz"] > 1e-3 or c["lperp"] > 1e-3
+
+
+@pytest.mark.fast
+def test_parity_operator_diagonal_and_letters():
+    """Parity: raw AO columns give (-1)^l per orbital; the determinant
+    operator is diagonal with eigenvalue = the PRODUCT over occupied
+    orbitals (multiplicative -- outside the additive parts protocol). A
+    p^2 sector is all-even; an {s,p} sector carries both parities. Also
+    pins the L-letter table to L <= 11 (the f^3 d^1 uranium window)."""
+    from atomterm.analysis import term_symbol
+    from atomterm.drivers import select_valence_ao
+    from atomterm.operators import parity_one_body, parity_operator
+    from atomterm.system import AtomConfig, build_mol
+
+    mol = build_mol(AtomConfig(verbose=0))
+    p_rows = select_valence_ao(mol, ["2p"])
+    c_p = np.eye(mol.nao_nr())[:, p_rows]
+    par_p = parity_one_body(mol, c_p)
+    assert np.allclose(np.diag(par_p), -1.0)            # l = 1 orbitals
+
+    op = parity_operator(mol, c_p, 2, 0)                # p^2, Ms = 1
+    assert np.allclose(op, np.eye(op.shape[0]))         # two p -> even
+
+    sp = select_valence_ao(mol, ["2s", "2p"])
+    c_sp = np.eye(mol.nao_nr())[:, sp]
+    op_sp = parity_operator(mol, c_sp, 1, 1)            # {2s,2p}, Ms = 0
+    assert np.allclose(op_sp, np.diag(np.diag(op_sp)))  # det-diagonal
+    assert set(np.round(np.diag(op_sp), 9)) == {-1.0, 1.0}
+
+    mixed = 0.5 * c_p[:, :1] + 0.5 * c_p[:, 1:2]        # not a raw column
+    with pytest.raises(ValueError):
+        parity_one_body(mol, np.hstack([c_p, mixed]))
+    # L-letters through L = 11 (f^3 d^1), J skipped by convention
+    assert term_symbol(0.0, 132.0) == "1O"              # 11 * 12 = 132
+    assert term_symbol(0.0, 110.0) == "1N"              # 10 * 11

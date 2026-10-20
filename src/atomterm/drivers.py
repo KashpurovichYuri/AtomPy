@@ -24,6 +24,7 @@ __all__ = [
     "run_frac_occ_scf",
     "select_shell_ao",
     "select_valence_ao",
+    "select_diffuse",
     "shell_weights",
     "purified_s_core",
     "purified_core_orbitals",
@@ -215,6 +216,35 @@ def select_valence_ao(mol, patterns: list[str]) -> list[int]:
             )
         idx += matches
     return idx
+
+
+def select_diffuse(mol, l: int, n_prim: int) -> list[int]:
+    """AO rows of the ``n_prim`` most diffuse radial primitives of angular
+    momentum ``l`` -- m-complete by construction (``n_prim * (2l+1)`` rows,
+    exactly rotation-closed as a window).
+
+    For uncontracted bases PySCF's AO labels number shells from the TIGHT
+    end starting at the valence name, so ``"5f"`` is the most contracted f
+    primitive, not the valence 5f (fact-1 amendment: labels truthful,
+    n-numbers fake on uncontracted bases). The kinetic-energy diagonal is
+    the row key: monotone in the primitive exponent and identical across
+    m partners, so sorting by it selects whole primitives, diffuse end
+    first.
+    """
+    sectors = lm_sectors(mol)
+    rows = [r for (ll, m), rws in sectors.items() if ll == l
+            for r in rws]
+    kin = mol.intor("int1e_kin").diagonal()
+    width = 2 * l + 1
+    if len(rows) % width:
+        raise ValueError("AO rows of one l should be complete m-sets")
+    order = sorted(rows, key=lambda r: kin[r])
+    n_take = n_prim * width
+    if n_take > len(rows):
+        raise ValueError(
+            f"asked for {n_prim} primitives of l={l}; basis has "
+            f"{len(rows) // width}")
+    return sorted(order[:n_take])
 
 
 def avas_window(mf, labels: list[str], ncore: int, threshold: float = None):
