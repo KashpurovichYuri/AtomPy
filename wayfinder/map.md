@@ -180,9 +180,23 @@ multiplets returns reproducible garbage (cost one diagnosis loop). Suite
 99 green. ECP wave (18+19) COMPLETE. Next: U (u_14e) per the plan-mode
 agreement — frozen-7s² CAS(4,12) tier first, sparse O·v mode deferred.
 
+- [21: U part 1 — CASCI](tickets/21-u-casci.md) — RESOLVED for the
+  CASCI story: gated Newton reference (−50.38185233, 4/4 guesses);
+  the label trap quantified (uncontracted labels = tight-end counters);
+  three-strike canonical-order bug fixed at all defaults; fact 4
+  triggered and handled (orthonormalized windows); pur mandatory
+  ([H,L²] 2.2 → 5.1e-13); VECTORIZED + real-dtype slater_condon_matrix
+  (identity-pinned, 18k dets hours→22 s; BLAS livelock diagnosed,
+  128-thread rule); THE RESULT: ⁵L° ×17 exactly degenerate (odd,
+  ⟨L²⟩=72, ⟨N_f⟩ 2.33) reached by the window-convergence series
+  (1f: f¹d³ → 2f: f²d² → 3f: odd ground) — the ⁵L°₆ parent. PART 2
+  (next): select_diffuse rework (exponent walk, decided), 4f/2d
+  stability points, per-config tables, run_u upgrade; then the SA wave.
+
 The atom campaign (C, Si, Sc, Ti) is complete in BOTH reference frames
-(all-electron + ccECP); beyond U: user candidates: PHYSICS.md narrative
-(deferred), spin–orbit coupling, transition moments, g-factors.
+(all-electron + ccECP); U part 1 done. Beyond: SA wave, ticket 20
+(ergonomics), then user candidates: PHYSICS.md narrative (deferred),
+spin–orbit coupling, transition moments, g-factors.
 
 ## Post-wave survey (2026-10-19, deep-module pass + code review)
 
