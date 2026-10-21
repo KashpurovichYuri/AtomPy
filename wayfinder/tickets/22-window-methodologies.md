@@ -49,6 +49,9 @@ replication, pur substrate, SA restoration.
 
 ## Scope / acceptance
 
+- Ticket 24 runs FIRST the matched-cost A-vs-B comparison and the
+  README §7.x lattice section (user frame, 2026-10-21) — its results
+  are this ticket's methodology-B column; build on them, don't redo.
 - The selector registry: one signature per methodology; candidates
   combinable with any fold/method treatment (the axes product).
 - U as the testbed: run B/C/D against the A-series results (the

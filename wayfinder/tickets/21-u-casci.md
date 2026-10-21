@@ -91,17 +91,14 @@ results/u_14e/u_run_part2.log (10 sectors, 2h17m).
 - **4f+2d**: RESOLVED (2026-10-21 22:15): ⁵L° f³d¹ restored by > 37
   mEh; ground −50.3920 CROSSES BELOW the ROHF (−50.38185). The ground
   term is stable at every saturated lattice corner; last open neighbor
-  = the 3rd d primitive (0.076, w 0.216).
-- **CASCI-stage completion (feeds ticket 22)**: (a) raw-ROHF CASCI
-  baseline — methodology B (SCF-radial window): contains the ROHF
-  determinant → immediate variational bound; NOT m-closed → the
-  energy-vs-symmetry comparison column; virtual columns need
-  character selection (canonical order is junk on this basis).
-  (b) CAS(6,13) = 1f+1d+7s, 6 electrons — the 7s-active core/window
-  split; NOW dense-feasible via Lanczos ((3,3) = 81,796 dets, the
-  sparse-mode deferral is obsolete); expectation: ¹S-closed 7s² moves
-  energies only at the pair-correlation level; parity manifolds
-  enrich (7s² pair transfer).
+  = the 3rd d primitive (0.076, w 0.216) — POSTPONED (no heavy runs,
+  user rule 2026-10-21).
+- **Ticket 24** (next): the matched-cost comparison (AO-exact vs
+  raw-ROHF-broken at equal det counts, U + Sc/Ti, contracted AND
+  decontracted, short windows only; the Sc plateau-vs-escape question;
+  the README §7.x section with the lattice table + per-block ΔE
+  matrix). The raw-ROHF CASCI baseline and CAS(6,13) items moved
+  there / postponed.
 - **Ticket 22**: window methodologies AOs→NOs (the comparison frame:
   primitive bands / replicated SCF radials incl. virtuals / NO
   occupation selection / hybrid NO compression; core/window split as

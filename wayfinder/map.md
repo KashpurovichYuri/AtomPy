@@ -209,12 +209,21 @@ agreement — frozen-7s² CAS(4,12) tier first, sparse O·v mode deferred.
   compression; core/window split as a parallel axis). Hard constraints
   only: orthonormality + m-complete replication (fact 20 licenses any
   radial subspace; fact 19 forbids per-member thresholds).
-- [23: U SA wave](tickets/23-u-sa-wave.md) — OPEN: 17-root SA over
-  the ⁵L° M_L set; relax/pur-relax; the open question — orbital
-  relaxation vs window growth (ticket 22's comparison in disguise).
-  Order: 21p2 → 22/23 → review wave (two-axis + codebase-design over
-  4f3cf27...HEAD) → architecture discussion → ticket 20 (the axes-
-  product ergonomics) last.
+- [24: matched-cost window comparison](tickets/24-matched-cost-windows.md)
+  — OPEN (user frame, 2026-10-21): AO-exact (A) vs raw-ROHF-broken (B)
+  at EQUAL det counts, U + Sc/Ti, contracted AND decontracted, short
+  windows only (≤30 min/sector; heavy runs postponed by user rule);
+  the Sc plateau-vs-escape question (fact 16b's +25 mEh must melt in a
+  wide-enough m-complete window — full-space intuition); delivers the
+  README §7.x lattice section (table + per-block ΔE matrix with
+  explicit references + the representability comment, brief).
+- [23: U SA wave](tickets/23-u-sa-wave.md) — OPEN: DIRECT single-root
+  CASSCF first (the multi-minima/term-basin phenomenology), then
+  17-root SA over the ⁵L° M_L set; relax/pur-relax; the open question
+  — orbital relaxation vs window growth.
+  Order: 24 (light) → 23 → 22 → review wave (two-axis +
+  codebase-design over 4f3cf27...HEAD) → architecture discussion →
+  ticket 20 (the axes-product ergonomics) last.
 
 The atom campaign (C, Si, Sc, Ti) is complete in BOTH reference frames
 (all-electron + ccECP); U part 1 done. Beyond: SA wave, ticket 20
