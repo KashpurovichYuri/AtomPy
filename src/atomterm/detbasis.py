@@ -119,12 +119,17 @@ def slater_condon_matrix(
     # prefix counts: cum[j, t] = # occupied spin-orbitals < t in det j
     cum = np.zeros((n, n2), dtype=np.int64)
     np.cumsum(occ[:, :-1], axis=1, out=cum[:, 1:])
-    mat = np.zeros((n, n), dtype=complex)
+    # real operators stay real: every operator of this project is
+    # real-valued, and the complex dtype costs 2x memory traffic plus a
+    # ~2.5x eigendecomposition at the 10^4-detector scale
+    dtype = complex if (np.iscomplexobj(one_body if one_body is not None
+                                        else two_body)) else float
+    mat = np.zeros((n, n), dtype=dtype)
 
     # ---- diagonal (k = 0) ------------------------------------------------
-    diag = np.zeros(n, dtype=complex)
+    diag = np.zeros(n, dtype=dtype)
     if one_body is not None:
-        diag += occ @ np.diag(one_body).astype(complex)
+        diag += occ @ np.diag(one_body).astype(dtype)
     if two_body is not None:
         if nelec >= 2:
             occ_idx = np.array([list(d) for d in dets])      # (n, nelec)
@@ -188,7 +193,7 @@ def slater_condon_matrix(
             sign[m2] = (-1.0) ** (pj[ar, i2] + pj[ar, j2] - 1
                                   + cnt(b2) + cnt(a2))
 
-        val = np.zeros(ii.size, dtype=complex)
+        val = np.zeros(ii.size, dtype=dtype)
         if one_body is not None:
             val[m1] += one_body[cre[m1, 0], ann[m1, 0]]
         if two_body is not None:
