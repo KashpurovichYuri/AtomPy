@@ -213,3 +213,44 @@ def test_parity_operator_diagonal_and_letters():
     # L-letters through L = 11 (f^3 d^1), J skipped by convention
     assert term_symbol(0.0, 132.0) == "1O"              # 11 * 12 = 132
     assert term_symbol(0.0, 110.0) == "1N"              # 10 * 11
+
+
+@pytest.mark.fast
+def test_population_operator_partitions_the_window():
+    """Population (per-l electron counting for configuration tables): the
+    S-metric row projector makes l-disjoint row sets PARTITION the number
+    operator elementwise (exact angular orthogonality on one center), a
+    raw-AO determinant's diagonal entry counts its occupied spin-orbitals
+    of that l exactly, and the one-particle spectrum is {0, 1}."""
+    from atomterm.detbasis import determinant_basis
+    from atomterm.drivers import select_valence_ao
+    from atomterm.operators import population_operator
+    from atomterm.system import AtomConfig, build_mol
+
+    mol = build_mol(AtomConfig(verbose=0))
+    iao = np.eye(mol.nao_nr())
+    s_rows = select_valence_ao(mol, ["2s"])
+    p_rows = select_valence_ao(mol, ["2p"])
+    sp_rows = select_valence_ao(mol, ["2s", "2p"])
+    c_sp = iao[:, sp_rows]
+
+    na, nb = 1, 1
+    n_s = population_operator(mol, c_sp, s_rows, na, nb)
+    n_p = population_operator(mol, c_sp, p_rows, na, nb)
+    n_all = population_operator(mol, c_sp, sp_rows, na, nb)
+
+    # the partition: different-l row sets are exactly S-orthogonal, so
+    # the two projectors resolve the identity on the window span
+    assert frobenius_norm(n_s + n_p - n_all) < 1e-12
+
+    # raw AO columns: each determinant's diagonal IS its occupation count
+    dets = determinant_basis(len(sp_rows), na, nb)
+    expected = np.array([
+        sum(1 for so in det if so % len(sp_rows) == 0)  # 2s is column 0
+        for det in dets
+    ], dtype=float)
+    assert np.allclose(np.diag(n_s), expected)
+
+    # many-body spectrum: the possible occupation counts, integers only
+    eigs = np.linalg.eigvalsh(n_p)
+    assert set(np.round(eigs, 9)) <= {0.0, 1.0, 2.0}

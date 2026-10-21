@@ -180,17 +180,25 @@ multiplets returns reproducible garbage (cost one diagnosis loop). Suite
 99 green. ECP wave (18+19) COMPLETE. Next: U (u_14e) per the plan-mode
 agreement — frozen-7s² CAS(4,12) tier first, sparse O·v mode deferred.
 
-- [21: U part 1 — CASCI](tickets/21-u-casci.md) — RESOLVED for the  CASCI story: gated Newton reference (−50.38185233, 4/4 guesses);
+- [21: U — CASCI campaign](tickets/21-u-casci.md) — RESOLVED (both
+  parts). Part 1: gated Newton reference (−50.38185233, 4/4 guesses);
   the label trap quantified (uncontracted labels = tight-end counters);
   three-strike canonical-order bug fixed at all defaults; fact 4
   triggered and handled (orthonormalized windows); pur mandatory
   ([H,L²] 2.2 → 5.1e-13); VECTORIZED + real-dtype slater_condon_matrix
   (identity-pinned, 18k dets hours→22 s; BLAS livelock diagnosed,
-  128-thread rule); THE RESULT: ⁵L° ×17 exactly degenerate (odd,
-  ⟨L²⟩=72, ⟨N_f⟩ 2.33) reached by the window-convergence series
-  (1f: f¹d³ → 2f: f²d² → 3f: odd ground) — the ⁵L°₆ parent. PART 2
-  (next): select_diffuse rework (exponent walk, decided), 4f/2d
-  stability points, per-config tables, run_u upgrade; then the SA wave.
+  128-thread rule); ⁵L° ×17 odd ground via the window series
+  (1f: f¹d³ → 2f: f²d² → 3f: odd ground). Part 2 (2026-10-21):
+  select_primitives (exponent bands from MEASURED open-MO weights);
+  standard per-configuration term tables (u_run_part2.log, 10 sectors
+  2h17m); CORRECTION: ⁵L° is configuration-PURE f³d¹ (⟨N_f⟩=3.000;
+  part 1's 2.33 mix reading was an artifact — L=8 unreachable from
+  f¹d³); the two-axis race: f-side stable (4f point, +339 mEh, f⁴ at
+  +25 mEh), d-side FLIPS back to even ⁵L f²d² by 19.1 mEh (3f2d) —
+  resolution = 4f+2d (73,815 dets, launched); engine: PySCF Davidson
+  straggles in degenerate clusters (38 mEh; pspace_size=ndet exact
+  fix, fci_opts hook), dense LAPACK eig wall → ARPACK Lanczos
+  (40,920 dets ~35 min/sector, validated vs exact).
 
 - [22: window methodologies — AOs→NOs](tickets/22-window-methodologies.md)
   — OPEN (user frame, 2026-10-21): methodology-plural window

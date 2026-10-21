@@ -480,16 +480,15 @@ def test_avas_window_reproduces_the_shell_cascade(sc_rohf, carbon, tmp_path):
 
 
 @pytest.mark.fast
-def test_select_diffuse_on_uncontracted_basis(tmp_path):
-    """The exponent-aware selector: on an uncontracted basis the labels
-    number shells from the TIGHT end starting at the valence name (fact-1
-    amendment -- '5f' is the most contracted f primitive on U), so raw
-    selection must go by radial position. select_diffuse returns the
-    n_prim most diffuse primitives, m-complete, and the span is exactly
-    rotation-closed."""
+def test_primitive_chain_and_select_primitives():
+    """The exponent-walk selector (kin proxy retired): the chain IS the
+    basis's radial coordinate (ascending exponent, one m-complete slot
+    per primitive), bands/counts select whole primitives, and contractions
+    -- which have no single exponent -- are rejected with the pointer to
+    label/MO selection."""
     from pyscf import gto
 
-    from atomterm.drivers import select_diffuse
+    from atomterm.drivers import primitive_chain, select_primitives
     from atomterm.operators import window_closure
 
     mol = gto.Mole()
@@ -511,18 +510,44 @@ def test_select_diffuse_on_uncontracted_basis(tmp_path):
     mol.spin = 2
     mol.verbose = 0
     mol.build()
-    kin = mol.intor("int1e_kin").diagonal()
-    # one f-style check per l: counts, tight/diffuse split, m-completeness
-    assert len(select_diffuse(mol, 1, 1)) == 3          # 1 p primitive
-    rows = select_diffuse(mol, 1, 2)                    # both p primitives
-    assert len(rows) == 6
-    assert select_diffuse(mol, 1, 1) == sorted(
-        rows, key=lambda r: kin[r])[:3]                 # the DIFFUSE one
-    with pytest.raises(ValueError):
-        select_diffuse(mol, 1, 3)                       # basis has only 2
+
+    # the chain: exponent ordering DIRECT, m-complete slots, row identity
+    chain = primitive_chain(mol, 1)
+    assert [e for e, _ in chain] == [0.2, 2.0]
+    assert chain[0][1] == [6, 7, 8]          # the exp-0.2 p shell
+    assert chain[1][1] == [3, 4, 5]          # the exp-2.0 p shell
+
+    # band semantics: exactly the exponents inside the interval
+    assert select_primitives(mol, 1, exponent_band=(0.5, 5.0)) == [3, 4, 5]
+    assert select_primitives(mol, 1, exponent_band=(0.1, 0.3)) == [6, 7, 8]
+    # count = the most diffuse end
+    assert select_primitives(mol, 1, count=1) == [6, 7, 8]
+    assert select_primitives(mol, 1, count=2) == [3, 4, 5, 6, 7, 8]
+
+    # the error surface: both/neither selector, over-count, empty band
+    with pytest.raises(ValueError, match="exactly one"):
+        select_primitives(mol, 1)
+    with pytest.raises(ValueError, match="exactly one"):
+        select_primitives(mol, 1, count=1, exponent_band=(0.0, 9.0))
+    with pytest.raises(ValueError, match="chain has"):
+        select_primitives(mol, 1, count=3)
+    with pytest.raises(ValueError, match="no l=1 primitive"):
+        select_primitives(mol, 1, exponent_band=(100.0, 200.0))
+
     # the physics pin: a selected primitive m-set is exactly closed
-    cl = window_closure(mol, np.eye(mol.nao_nr())[:, select_diffuse(mol, 1, 1)])
+    cl = window_closure(mol, np.eye(mol.nao_nr())[
+        :, select_primitives(mol, 1, count=1)])
     assert cl["lz"] < 1e-12 and cl["lperp"] < 1e-12
+
+    # contracted shells have no single exponent: clear error, and the
+    # message points at the label/MO routes instead
+    ccd = gto.Mole()
+    ccd.atom = "C 0 0 0"
+    ccd.basis = "cc-pvdz"
+    ccd.verbose = 0
+    ccd.build()
+    with pytest.raises(ValueError, match="contractions"):
+        primitive_chain(ccd, 1)
 
 
 @pytest.mark.fast

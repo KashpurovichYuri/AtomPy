@@ -24,7 +24,8 @@ __all__ = [
     "run_frac_occ_scf",
     "select_shell_ao",
     "select_valence_ao",
-    "select_diffuse",
+    "primitive_chain",
+    "select_primitives",
     "occupied_core_idx",
     "shell_weights",
     "purified_s_core",
@@ -281,33 +282,80 @@ def select_valence_ao(mol, patterns: list[str]) -> list[int]:
     return idx
 
 
-def select_diffuse(mol, l: int, n_prim: int) -> list[int]:
-    """AO rows of the ``n_prim`` most diffuse radial primitives of angular
-    momentum ``l`` -- m-complete by construction (``n_prim * (2l+1)`` rows,
-    exactly rotation-closed as a window).
+def primitive_chain(mol, l: int) -> list[tuple[float, list[int]]]:
+    """The radial primitives of angular momentum ``l`` as ``(exponent,
+    ao_rows)`` pairs, sorted by exponent ASCENDING (diffuse end first) --
+    the honest radial coordinate of an uncontracted basis, where PySCF's
+    AO labels number shells from the TIGHT end starting at the valence
+    name ("5f" = the exp-36.8 primitive on U; fact-1 amendment).
 
-    For uncontracted bases PySCF's AO labels number shells from the TIGHT
-    end starting at the valence name, so ``"5f"`` is the most contracted f
-    primitive, not the valence 5f (fact-1 amendment: labels truthful,
-    n-numbers fake on uncontracted bases). The kinetic-energy diagonal is
-    the row key: monotone in the primitive exponent and identical across
-    m partners, so sorting by it selects whole primitives, diffuse end
-    first.
+    Walks the basis exactly as :func:`lm_sectors` does (``bas_angular``
+    checked, ``nctr`` unpacked): a primitive's m-set occupies the rows
+    ``loc[ib] + c*(2l+1) + m`` of its shell. A contraction slot is a
+    RAW primitive iff its ``bas_ctr_coeff`` column carries exactly one
+    exponent; true contractions (several exponents combined into one
+    function) have no single exponent and RAISE -- for them use
+    :func:`select_valence_ao` (a contracted shell is one pre-converged
+    radial) or MO/NO-based window selection.
     """
-    sectors = lm_sectors(mol)
-    rows = [r for (ll, m), rws in sectors.items() if ll == l
-            for r in rws]
-    kin = mol.intor("int1e_kin").diagonal()
+    loc = mol.ao_loc_nr()
     width = 2 * l + 1
-    if len(rows) % width:
-        raise ValueError("AO rows of one l should be complete m-sets")
-    order = sorted(rows, key=lambda r: kin[r])
-    n_take = n_prim * width
-    if n_take > len(rows):
-        raise ValueError(
-            f"asked for {n_prim} primitives of l={l}; basis has "
-            f"{len(rows) // width}")
-    return sorted(order[:n_take])
+    chain: list[tuple[float, list[int]]] = []
+    for ib in range(mol.nbas):
+        if abs(mol.bas_angular(ib)) != l:
+            continue
+        exps = np.asarray(mol.bas_exp(ib))
+        coeff = mol.bas_ctr_coeff(ib)  # (nprim, nctr)
+        for c in range(coeff.shape[1]):
+            nz = np.flatnonzero(np.abs(coeff[:, c]) > 1e-12)
+            if len(nz) != 1:
+                raise ValueError(
+                    f"shell {ib} (l={l}) contraction slot {c} combines "
+                    f"{len(nz)} exponents -- exponent-ranked selection is "
+                    "undefined for contractions; use select_valence_ao "
+                    "(a contracted shell is one pre-converged radial) or "
+                    "MO/NO-based window selection"
+                )
+            rows = [loc[ib] + c * width + m for m in range(width)]
+            chain.append((float(exps[nz[0]]), rows))
+    chain.sort(key=lambda t: t[0])
+    return chain
+
+
+def select_primitives(mol, l: int, count: int = None,
+                      exponent_band: tuple[float, float] = None) -> list[int]:
+    """AO rows of radial primitives of angular momentum ``l``, selected
+    by EXPONENT on the :func:`primitive_chain` -- m-complete by
+    construction (each primitive contributes its whole 2l+1 m-set), so
+    the window is exactly rotation-closed.
+
+    Exactly one of ``count`` / ``exponent_band``:
+    * ``exponent_band=(lo, hi)``: every primitive with ``lo <= exp <=
+      hi``. The scan protocol: bands are CONTIGUOUS sets built from the
+      measured open-MO primitive weights, never hand-picked intervals,
+      and conclusions require neighboring-band stability (admit one
+      more / one fewer primitive on each side -> same ordering).
+    * ``count``: the ``count`` most diffuse primitives (convenience
+      shorthand for the diffuse end of the chain).
+    """
+    chain = primitive_chain(mol, l)
+    if (count is None) == (exponent_band is None):
+        raise ValueError("give exactly one of count / exponent_band")
+    if exponent_band is not None:
+        lo, hi = exponent_band
+        picked = [rows for exp, rows in chain if lo <= exp <= hi]
+        if not picked:
+            raise ValueError(
+                f"no l={l} primitive has an exponent in "
+                f"{exponent_band!r}; the chain (ascending): "
+                f"{[round(e, 6) for e, _ in chain]}")
+    else:
+        if count > len(chain):
+            raise ValueError(
+                f"asked for {count} primitives of l={l}; the chain has "
+                f"{len(chain)}")
+        picked = [rows for _, rows in chain[:count]]
+    return sorted(r for rows in picked for r in rows)
 
 
 def avas_window(mf, labels: list[str], ncore: int, threshold: float = None):
@@ -820,11 +868,18 @@ def _run(mc, nroots: int, chkfile: str, name: str, verbose: int) -> CASResult:
 
 
 def run_casci(mf, ncas, nelecas, mo_full, chkfile, nroots=1, verbose=0,
-              name="casci") -> CASResult:
+              name="casci", fci_opts: dict = None) -> CASResult:
     """CASCI in the given window. ``name`` is the chkfile store key -- keep
-    it distinct per variation so differently-folded runs never collide."""
+    it distinct per variation so differently-folded runs never collide.
+    ``fci_opts``: attributes set on the fcisolver before the kernel (e.g.
+    ``{"pspace_size": ndet}`` forces pyscf's EXACT full-diagonalization
+    branch -- Davidson straggles inside degenerate clusters: measured on
+    U 2f2d/Ms=2, 48 roots: up to 38 mEh within 13-17-fold multiplets
+    while both exact spectra agree to 1e-7)."""
     mc = mcscf.CASCI(mf, ncas, nelecas)
     mc.mo_coeff = mo_full
+    for k, v in (fci_opts or {}).items():
+        setattr(mc.fcisolver, k, v)
     return _run(mc, nroots, chkfile, name, verbose)
 
 

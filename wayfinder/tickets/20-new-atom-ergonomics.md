@@ -34,9 +34,10 @@ corrections *findable*.
   belongs in it.
 - **C. occupation_characters()**: span-weight fingerprinting re-written
   three times this session. One helper, shared by censuses and reports.
-- **D. select_diffuse()**: labels lie on uncontracted bases (measured:
-  "5f" = the exp-36.8 primitive; valence f = the diffuse end). First-
-  class exponent-aware selector + fact-1 amendment.
+- **D. select_diffuse()**: RESOLVED by ticket 21 part 2 (2026-10-21):
+  `primitive_chain` + `select_primitives` (exponent walk, band/count
+  semantics, contracted shells raise with the label/MO pointer; the kin
+  proxy retired). Remaining ergonomics gap for this item: nothing.
 - **E. sector_plan()**: ndet = C(norb,na)*C(norb,nb) and GB = ndet^2*8*nops
   computed by hand all session. Print the plan (sectors, dets, dense-op
   GB estimate + threshold warning) before any 30-minute burn.
@@ -84,6 +85,14 @@ corrections *findable*.
 - **Parity's l-purity invariant needed a percent-class tolerance**: the
   core-orthogonalized 6d window column carries 0.8% of 7s (fact-17
   class); <P> reads 0.98 and the pur substrate restores 1.0.
+- **PySCF's Davidson straggles inside degenerate multiplets** (found
+  2026-10-21, part 2): nroots=48 on 10,626 dets, up to 38 mEh errors
+  WITHIN exact 13-17-fold clusters (single-root tolerance tests pass
+  while cluster interiors drift). The exact fix: `pspace_size = ndet`
+  (pyscf's full-diagonalization branch, needs norb < 64) -- now
+  `run_casci(fci_opts=...)`; both-sides-exact max|dE| = 7e-15. Health
+  lines (item F) must distinguish "fold difference" from "solver
+  residual" before quoting any dE.
 
 
 ## 4. Scope split with the U campaign

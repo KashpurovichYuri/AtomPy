@@ -1,11 +1,12 @@
 # Ticket 21: U (u_14e) — reference, engine, and the ⁵L° ground by window convergence
 
-Status: PART 1 RESOLVED (CASCI story: reference + engine + ground-state
-identification). SA/ladder = the next session's wave.
+Status: PART 2 RESOLVED (bands + tables + stability verdicts; the
+4f+2d completion point launched same day). SA/ladder = ticket 23.
 
 Origin: user request 2026-10-20 ("identify its ground state"; Stuttgart
 RLC ECP78 + cut-Dyall with high harmonics cut). All numbers measured;
-full narrative in results/u_14e/U_casci_report.md.
+full narrative in results/u_14e/U_casci_report.md; serial tables in
+results/u_14e/u_run_part2.log (10 sectors, 2h17m).
 
 ## Resolved findings
 
@@ -45,20 +46,51 @@ full narrative in results/u_14e/U_casci_report.md.
    are the O(n³) trap — truncate to the roots read. U timing at 128t:
    95 s ops + 370 s eigh at 14,950 dets.
 
-## Open (next session — now separated into tickets)
+## Part-2 findings (2026-10-21)
 
-- **Ticket 21 part 2** (this ticket): `select_primitives` rework
-  (kin → exponent walk; bands = contiguous measured weight-sets;
-  neighboring-band stability as the pick criterion), 4f/2d stability
-  points, per-configuration term tables as the standard report,
-  run_u.py upgrade.
+9. **The selector rework**: `primitive_chain` + `select_primitives`
+   (exponent walk, band/count semantics, contracted shells raise).
+   Bands are contiguous sets around the MEASURED open-MO Mulliken
+   peaks (f: 1.44 w1.12 / 0.674 w0.91 / 2.92 w0.53 / 0.294 w0.41;
+   d: 0.172 w0.41 / 0.372 w0.30 / 0.076 w0.22) — the kin proxy retired.
+10. **Standard tables**: term × parity × ⟨N_f⟩/⟨N_d⟩ × dominant config
+   × E per root + per-block max|dE| (population_operator = exact
+   S-metric projector; integer per-det N_f = exact config weights).
+   CORRECTION of finding 6: the ⁵L° ground is configuration-PURE f³d¹
+   (⟨N_f⟩ = 3.000, w 1.00) — part 1's ⟨N_f⟩ 2.33 "f¹d³ mix" was an
+   artifact; L = 8 is angular-momentum-unreachable from f¹d³ (L ≤ 5).
+11. **The two-axis race** (Ms=2 block grounds, Eh): f-side growth
+   favors f³d¹ (3f −49.9928 → 4f −50.3320, +339 mEh; f⁴ surfaces at
+   +25 mEh); d-side growth favors f²d² (2f1d −49.7506 → 2f2d −49.8943
+   → 3f2d −50.0809). 3f+2d FLIPS the 3f ordering back to even ⁵L by
+   19.1 mEh. Verdicts: f-side ⁵L° stable (4f point); d-side UNRESOLVED
+   until 4f+2d (73,815 dets, launched).
+12. **PySCF Davidson straggles inside degenerate multiplets**: up to
+   38 mEh within exact 13–17-fold clusters (nroots=48, measured vs the
+   exact spectrum). Fix: run_casci(fci_opts={"pspace_size": ndet}) =
+   their exact branch; both-sides-exact max|dE| 7e-15..8.6e-13.
+13. **Dense LAPACK eig is the wall at >= 18k dets** (memory-bound
+   ~40-80 GFLOPs effective regardless of threads; 18,411 dets spent
+   >45 min incomplete — killed). ARPACK Lanczos (low_roots: k = nroots
+   + 16 for the clusters, fixed v0) does 40,920 dets in ~35 min/sector;
+   validated against the exact 2f2d spectrum.
+14. **255-thread pools are two pools**: OpenBLAS 128 + PySCF's own OMP
+   (PYSCF_NUM_THREADS) — set BOTH explicitly at launch; utime-advancing
+   threads are NOT proof of progress (spin-wait burns utime too): track
+   RSS motion + log checkpoints, kill on frozen-RSS windows.
+
+## Open (next waves — separated into tickets)
+
+- **4f+2d**: the two-axis race's resolution point (73,815 dets,
+  launched 2026-10-21 evening; table lands in u_run_part2.log).
 - **Ticket 22**: window methodologies AOs→NOs (the comparison frame:
   primitive bands / replicated SCF radials incl. virtuals / NO
   occupation selection / hybrid NO compression; core/window split as
   a parallel axis; orthonormality + m-complete replication the only
-  hard constraints).
+  hard constraints). The U lattice is methodology A's reference.
 - **Ticket 23**: the SA wave — 17-root SA over the ⁵L° M_L set;
-  relax/pur-relax; the orbital-relaxation-vs-window-growth question.
+  relax/pur-relax; the orbital-relaxation-vs-window-growth question
+  (now sharpened: relaxation vs EACH axis of the race).
 - Then: the review wave (two-axis code-review + codebase-design over
   4f3cf27...HEAD), the architecture discussion, and ticket 20
   (ergonomics) last, on reviewed foundations.

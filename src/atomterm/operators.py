@@ -39,6 +39,7 @@ __all__ = [
     "lz_operator",
     "parity_one_body",
     "parity_operator",
+    "population_operator",
     "l2_operator_parts",
     "window_closure",
     "s2_operator_parts",
@@ -242,6 +243,29 @@ def parity_operator(mol, c_act: np.ndarray, na: int, nb: int) -> np.ndarray:
         for so in det:
             out[k] *= signs[so % norb]
     return np.diag(out)
+
+
+def population_operator(mol, c_act: np.ndarray, rows: list[int], na: int,
+                        nb: int) -> np.ndarray:
+    """Number of electrons with S-weight in the given AO ``rows``, as a
+    determinant-basis matrix -- the per-root ``<N_f>`` / ``<N_d>`` of
+    configuration tables.
+
+    The one-body part is the S-METRIC projector onto the rows' span,
+    ``A = S Sel (Sel† S Sel)^{-1} Sel† S`` (Hermitian, eigenvalues {0, 1}
+    on the one-particle space), evaluated over the window columns by the
+    same Slater-Condon path as every other one-body operator. Rows of
+    different l are exactly S-orthogonal on one center, so for a window
+    that is an l-disjoint union (e.g. f rows + d rows) the population
+    operators PARTITION the number operator: ``population(f) +
+    population(d) == N`` elementwise.
+    """
+    sel = np.eye(mol.nao_nr())[:, list(rows)]
+    s = mol.intor_symmetric("int1e_ovlp")
+    a = s @ sel @ np.linalg.solve(sel.T @ s @ sel, sel.T @ s)
+    one = spin_block_one_body(_mo_transform(a, c_act))
+    dets = determinant_basis(c_act.shape[1], na, nb)
+    return slater_condon_matrix(dets, one_body=one, two_body=None)
 
 
 def window_closure(mol, c_win: np.ndarray) -> dict[str, float]:
