@@ -180,8 +180,7 @@ multiplets returns reproducible garbage (cost one diagnosis loop). Suite
 99 green. ECP wave (18+19) COMPLETE. Next: U (u_14e) per the plan-mode
 agreement — frozen-7s² CAS(4,12) tier first, sparse O·v mode deferred.
 
-- [21: U part 1 — CASCI](tickets/21-u-casci.md) — RESOLVED for the
-  CASCI story: gated Newton reference (−50.38185233, 4/4 guesses);
+- [21: U part 1 — CASCI](tickets/21-u-casci.md) — RESOLVED for the  CASCI story: gated Newton reference (−50.38185233, 4/4 guesses);
   the label trap quantified (uncontracted labels = tight-end counters);
   three-strike canonical-order bug fixed at all defaults; fact 4
   triggered and handled (orthonormalized windows); pur mandatory
@@ -192,6 +191,20 @@ agreement — frozen-7s² CAS(4,12) tier first, sparse O·v mode deferred.
   (1f: f¹d³ → 2f: f²d² → 3f: odd ground) — the ⁵L°₆ parent. PART 2
   (next): select_diffuse rework (exponent walk, decided), 4f/2d
   stability points, per-config tables, run_u upgrade; then the SA wave.
+
+- [22: window methodologies — AOs→NOs](tickets/22-window-methodologies.md)
+  — OPEN (user frame, 2026-10-21): methodology-plural window
+  construction compared on one axis (primitive bands / replicated SCF
+  radials incl. virtuals / NO-occupation selection / hybrid NO
+  compression; core/window split as a parallel axis). Hard constraints
+  only: orthonormality + m-complete replication (fact 20 licenses any
+  radial subspace; fact 19 forbids per-member thresholds).
+- [23: U SA wave](tickets/23-u-sa-wave.md) — OPEN: 17-root SA over
+  the ⁵L° M_L set; relax/pur-relax; the open question — orbital
+  relaxation vs window growth (ticket 22's comparison in disguise).
+  Order: 21p2 → 22/23 → review wave (two-axis + codebase-design over
+  4f3cf27...HEAD) → architecture discussion → ticket 20 (the axes-
+  product ergonomics) last.
 
 The atom campaign (C, Si, Sc, Ti) is complete in BOTH reference frames
 (all-electron + ccECP); U part 1 done. Beyond: SA wave, ticket 20

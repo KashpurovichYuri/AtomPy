@@ -45,9 +45,21 @@ full narrative in results/u_14e/U_casci_report.md.
    are the O(n³) trap — truncate to the roots read. U timing at 128t:
    95 s ops + 370 s eigh at 14,950 dets.
 
-## Open (next session)
+## Open (next session — now separated into tickets)
 
-4f stability point + 2d variant; per-configuration term tables as the
-standard report; run_u.py upgrade; the SA wave (17 roots over ⁵L° M_L;
-does SA radial relaxation replace window growth); ticket 20 execution;
-sparse O·v mode for 7s-active windows.
+- **Ticket 21 part 2** (this ticket): `select_primitives` rework
+  (kin → exponent walk; bands = contiguous measured weight-sets;
+  neighboring-band stability as the pick criterion), 4f/2d stability
+  points, per-configuration term tables as the standard report,
+  run_u.py upgrade.
+- **Ticket 22**: window methodologies AOs→NOs (the comparison frame:
+  primitive bands / replicated SCF radials incl. virtuals / NO
+  occupation selection / hybrid NO compression; core/window split as
+  a parallel axis; orthonormality + m-complete replication the only
+  hard constraints).
+- **Ticket 23**: the SA wave — 17-root SA over the ⁵L° M_L set;
+  relax/pur-relax; the orbital-relaxation-vs-window-growth question.
+- Then: the review wave (two-axis code-review + codebase-design over
+  4f3cf27...HEAD), the architecture discussion, and ticket 20
+  (ergonomics) last, on reviewed foundations.
+- Deferred: sparse O·v mode, NIST comparison.
