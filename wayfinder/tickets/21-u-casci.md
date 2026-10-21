@@ -59,12 +59,19 @@ results/u_14e/u_run_part2.log (10 sectors, 2h17m).
    CORRECTION of finding 6: the ⁵L° ground is configuration-PURE f³d¹
    (⟨N_f⟩ = 3.000, w 1.00) — part 1's ⟨N_f⟩ 2.33 "f¹d³ mix" was an
    artifact; L = 8 is angular-momentum-unreachable from f¹d³ (L ≤ 5).
-11. **The two-axis race** (Ms=2 block grounds, Eh): f-side growth
-   favors f³d¹ (3f −49.9928 → 4f −50.3320, +339 mEh; f⁴ surfaces at
-   +25 mEh); d-side growth favors f²d² (2f1d −49.7506 → 2f2d −49.8943
-   → 3f2d −50.0809). 3f+2d FLIPS the 3f ordering back to even ⁵L by
-   19.1 mEh. Verdicts: f-side ⁵L° stable (4f point); d-side UNRESOLVED
-   until 4f+2d (73,815 dets, launched).
+11. **The two-axis race, RESOLVED at the symmetric corner** (Ms=2
+   block grounds, Eh): f-side growth favors f³d¹ (3f −49.9928 → 4f
+   −50.3320, +339 mEh; f⁴ surfaces at +25 mEh); d-side growth favors
+   f²d² (2f1d −49.7506 → 2f2d −49.8943 → 3f2d −50.0809). 3f+2d flips
+   to even ⁵L by 19.1 mEh — a TRANSIENT of the asymmetric lattice
+   point: 4f+2d (73,815 dets, 2h50m) restores ⁵L° f³d¹ by > 37 mEh
+   (f²d² ground above the 48th root −50.3547) AND crosses below the
+   ROHF: −50.3920 < −50.38185 (measured-gradient extrapolation
+   predicted −50.40). GROUND TERM: ⁵L° (5f³6d¹, L=8, S=2, odd), stable
+   at every saturated corner. Last open neighbor: the 3rd d primitive
+   (0.076, w 0.216); flip-back needs f²d² to gain > 37 mEh MORE than
+   f³d¹ from it (the 2nd d gave +119 mEh relative at 3f — not closed,
+   but the burden is now on the d side).
 12. **PySCF Davidson straggles inside degenerate multiplets**: up to
    38 mEh within exact 13–17-fold clusters (nroots=48, measured vs the
    exact spectrum). Fix: run_casci(fci_opts={"pspace_size": ndet}) =
@@ -81,16 +88,28 @@ results/u_14e/u_run_part2.log (10 sectors, 2h17m).
 
 ## Open (next waves — separated into tickets)
 
-- **4f+2d**: the two-axis race's resolution point (73,815 dets,
-  launched 2026-10-21 evening; table lands in u_run_part2.log).
+- **4f+2d**: RESOLVED (2026-10-21 22:15): ⁵L° f³d¹ restored by > 37
+  mEh; ground −50.3920 CROSSES BELOW the ROHF (−50.38185). The ground
+  term is stable at every saturated lattice corner; last open neighbor
+  = the 3rd d primitive (0.076, w 0.216).
+- **CASCI-stage completion (feeds ticket 22)**: (a) raw-ROHF CASCI
+  baseline — methodology B (SCF-radial window): contains the ROHF
+  determinant → immediate variational bound; NOT m-closed → the
+  energy-vs-symmetry comparison column; virtual columns need
+  character selection (canonical order is junk on this basis).
+  (b) CAS(6,13) = 1f+1d+7s, 6 electrons — the 7s-active core/window
+  split; NOW dense-feasible via Lanczos ((3,3) = 81,796 dets, the
+  sparse-mode deferral is obsolete); expectation: ¹S-closed 7s² moves
+  energies only at the pair-correlation level; parity manifolds
+  enrich (7s² pair transfer).
 - **Ticket 22**: window methodologies AOs→NOs (the comparison frame:
   primitive bands / replicated SCF radials incl. virtuals / NO
   occupation selection / hybrid NO compression; core/window split as
   a parallel axis; orthonormality + m-complete replication the only
   hard constraints). The U lattice is methodology A's reference.
-- **Ticket 23**: the SA wave — 17-root SA over the ⁵L° M_L set;
-  relax/pur-relax; the orbital-relaxation-vs-window-growth question
-  (now sharpened: relaxation vs EACH axis of the race).
+- **Ticket 23**: direct single-root CASSCF FIRST (the multi-minima/
+  term-basin phenomenology), then the SA wave (17-root SA over the
+  ⁵L° M_L set); relax/pur-relax; relaxation-vs-growth per axis.
 - Then: the review wave (two-axis code-review + codebase-design over
   4f3cf27...HEAD), the architecture discussion, and ticket 20
   (ergonomics) last, on reviewed foundations.

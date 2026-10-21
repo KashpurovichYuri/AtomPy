@@ -17,6 +17,12 @@ window growth is irreducible and the scan protocol is mandatory.
 
 ## The runs (maximal Ms=2 sector, (4,0))
 
+0. **Free single-root CASSCF FIRST** (user direction 2026-10-21, before
+   any SA): from the shell start in the 3f/4f windows. This is where the
+   "many different minima characterized by a specific term" phenomenology
+   lives (the fact-8/15/16 class: symmetry-broken basins, member-gauge
+   chaos, escape/swap windows). Measure: which term the optimizer lands
+   in, ⟨L²⟩ breaking, window weights, ortho_err; branch on basins.
 1. **17-root SA over the 5L° M_L set** (L=8: M_L = -8..+8; weights
    1/17 each) in the 2f and 3f windows. Read: does the ensemble window
    borrow the missing f-radial character (occupancies/weights per
@@ -25,9 +31,8 @@ window growth is irreducible and the scan protocol is mandatory.
 2. **relax / pur-relax rungs** (frozen window, core relaxes; pur
    substrate): TM precedent says machine-exact closure expected —
    these are the honest symmetric rungs for U.
-3. **Free single-root CASSCF** only as an escape probe (chaos: branch
-   on window weights, never pin; the 7s/6p<->window swap class from
-   the TM campaign is the likely attractor on U).
+3. Free CASSCF from OTHER starts (canonical, NO-like) = the basin map,
+   only after 0-2 established the reference phenomenology.
 
 ## Acceptance
 

@@ -195,7 +195,9 @@ agreement — frozen-7s² CAS(4,12) tier first, sparse O·v mode deferred.
   part 1's 2.33 mix reading was an artifact — L=8 unreachable from
   f¹d³); the two-axis race: f-side stable (4f point, +339 mEh, f⁴ at
   +25 mEh), d-side FLIPS back to even ⁵L f²d² by 19.1 mEh (3f2d) —
-  resolution = 4f+2d (73,815 dets, launched); engine: PySCF Davidson
+  resolution = 4f+2d RESOLVED (⁵L° f³d¹ by > 37 mEh, −50.3920 BELOW the
+  ROHF — the flip was an asymmetric-corner transient; ground term
+  stable at every saturated corner); engine: PySCF Davidson
   straggles in degenerate clusters (38 mEh; pspace_size=ndet exact
   fix, fci_opts hook), dense LAPACK eig wall → ARPACK Lanczos
   (40,920 dets ~35 min/sector, validated vs exact).
