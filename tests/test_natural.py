@@ -116,8 +116,9 @@ def test_m_scalar_density_yields_whole_m_sets():
 
 
 def test_single_ml_root_breaks_the_m_set():
-    """p^2 3P, M_L = 0, M_S = 1: the single determinant (m=0 alpha,
-    m=0 beta). Its density is m-DIAGONAL but m-UNEQUAL: the top
+    """The single determinant (p m=0 alpha, p m=0 beta) -- an M_S = 0,
+    M_L = 0 state of p^2 (not a term eigenstate; any single det makes
+    the point). Its density is m-DIAGONAL but m-UNEQUAL: the top
     occupation selects ONE member -- occupation selection on a single
     root is NOT symmetry-safe (the AVAS mistake, fact 19)."""
     dets = determinant_basis(3, 1, 1)

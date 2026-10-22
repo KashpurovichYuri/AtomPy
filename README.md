@@ -1027,8 +1027,8 @@ primitive bands, one column below (the granularity axis is measured
 weak: decontracted windows land within ~2 mEh of the shell windows at
 equal cost, ticket 24 — which granularity a row ran is a code detail);
 and **raw-ROHF MO windows** — the open reference MOs plus virtuals
-ranked by valence-band S-weight. A **natural-orbital** column is
-planned (ticket 22). Energies are CASCI grounds in the atom's standard
+ranked by valence-band S-weight; and **natural-orbital (NO) group
+windows** (ticket 22). Energies are CASCI grounds in the atom's standard
 M_S sector, pur fold; ⟨L²⟩ is the ground root's. NO column: ticket-22
 group windows (term-averaged density of each atom's largest-window
 CASCI ground term); ⟨L²⟩ and the span certificates are machine-exact
