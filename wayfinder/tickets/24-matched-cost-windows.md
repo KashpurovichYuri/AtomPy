@@ -170,3 +170,52 @@ postponed, not cancelled); any sector > 30 min; 4f+2d-class runs; the
   exponent-band pattern vocabulary (basis-kind-aware forcing); the
   needle linear-dependence helper; --fresh / key-versioning for chks.
 - Deferred: 3rd-d U point, CAS(6,13), NIST.
+
+## Appendix: the final-format tables (user format, 2026-10-23;
+## README 7.5 refinement pending). United AO column; ROHF line;
+## <L^2> separate; 3 decimals; NO column planned (ticket 22).
+
+### Sc — ROHF reference: -759.736 Eh (3d1 4s2)
+
+| CAS | window | m-complete AO, Eh | <L^2> | raw ROHF (MO), Eh | <L^2> | NO |
+| CAS(3,5) 1d | -759.436 | 12.000 | - | - | - | - |
+| CAS(3,6) 1d+1s | - | - | -759.736 | 0.000 | - | - |
+| CAS(3,7) 1d+2s | -759.734 | 6.000 | - | - | - | - |
+| CAS(3,10) 2d | - | - | -759.555 | 12.000 | - | - |
+| CAS(3,11) 2d+1s | - | - | -759.739 | 6.000 | -759.745 | 0.008 |
+| CAS(3,12) 1d+1s+1p | - | - | -759.760 | 6.000 | - | - |
+| CAS(3,14) 1d+2s+2p | -759.763 | 6.000 | - | - | - | - |
+| CAS(3,17) 2d+1s+1p | - | - | -759.765 | 6.000 | -759.745(a) | 0.143 |
+
+(a) equal-determinant pair, 1,274 dets (MO window CAS(3,14)).
+
+### Ti — ROHF reference: -848.406 Eh (3d2 4s2, gated)
+
+| CAS(4,5) 1d | -848.054 | 12.000 | -848.054 | 12.000 | - | - |
+| CAS(4,6) 1d+1s | - | - | -848.395 | 12.000 | -848.405 | 0.000 |
+| CAS(4,7) 1d+2s | -848.401 | 12.000 | - | - | - | - |
+| CAS(4,10) 2d | - | - | -848.232 | 12.000 | - | - |
+| CAS(4,11) 2d+1s | - | - | -848.409 | 12.000 | -848.414 | 0.010 |
+| CAS(4,12) 1d+1s+1p | - | - | -848.429 | 12.000 | - | - |
+| CAS(4,13) 1d+2s+2p | -848.432 | 12.000 | - | - | - | - |
+| CAS(4,17) 2d+1s+1p | - | - | -848.438 | 12.000 | -848.420(a) | 0.201 |
+
+(a) equal-determinant pair, 5,096 dets (MO window CAS(4,14)).
+
+### U — ROHF reference: -50.382 Eh (5f3 6d1; the reference det is the
+### exact-5S-deg state, <L^2> = 0)
+
+| CAS(4,12) 1f+1d | -49.459 | 42.000 | -50.382 | 0.016 | - | - |
+| CAS(4,19) 2f+1d | -49.751 | 56.000 | -50.383 | 0.132 | - | - |
+| CAS(4,22) 1f+3d | -49.733 | 42.000 | -50.384 | 0.192 | - | - |
+| CAS(4,24) 2f+2d | -49.894 | 56.000 | -50.384 | 0.254 | - | - |
+| CAS(4,26) 3f+1d | -49.993 | 72.000 | -50.384 | 0.258 | - | - |
+| CAS(4,28) 4f+1d | -50.332 | 72.000 | - | - | - | - |
+| CAS(4,31) 3f+2d | -50.062 | 56.000 | - | - | - | - |
+| CAS(4,38) 4f+2d | -50.392 | 72.000 | - | - | - | - |
+
+MO-window certificates (span closure, U): |[P,Lperp]| = 7.6/7.8/8.8/9.1
+at norb = 8/20/38/100 vs the AO window's 1.7e-12 at rank 38 -- raw-ROHF
+spans never close; big CASCI on raw ROHF cannot give symmetric roots.
+Ticket-22 claim: symmetric CIs have m-scalar 1-RDMs, so NOs arrive in
+complete occupation-degenerate m-sets (certificate-ready).
