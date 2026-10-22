@@ -118,7 +118,7 @@ def main():
         # k=0 is a 1-det CASCI (exact trivially)
         cas = drivers.run_casci(mf, ncas, (4, 0), mo, CHK,
                                 nroots=min(NTRACK, ndet),
-                                name=f"methb_k{k}")
+                                name=f"mo_norb{ncas}")  # key = MO window size (self-describing)
         core = cas.core_energy
         d_e = float(np.max(np.abs(ev[:1] + core - cas.energies[:1])))
 
@@ -139,7 +139,12 @@ def main():
         nf_op = population_operator(mol, mo[:, NCORE:], rows_f, 4, 0)
         nf0 = float(np.einsum("ik,ij,jk->", vec[:, :1].conj(), nf_op,
                               vec[:, :1]).real)
-        par = float(np.diag(parity_operator(mol, mo[:, NCORE:], 4, 0))[0])
+        par = None
+        try:
+            par = float(np.diag(parity_operator(mol, mo[:, NCORE:],
+                                                4, 0))[0])
+        except ValueError:
+            pass  # l-mixed MO window: parity is undefined, honestly "n/a"
         h_norm = max(frobenius_norm(h), 1e-300)
         clz = frobenius_norm(commutator(h, ops["Lz"]))
         cl2 = frobenius_norm(commutator(h, ops["L2"]))
@@ -149,11 +154,12 @@ def main():
         results[k] = dict(ncas=ncas, ndet=ndet, e_g=e_g, e_det=e_det,
                           l2=l2s[0], near=near, l2near=l2s[near],
                           enear=ev[near] + core, clz=clz, cl2=cl2,
-                          hn=h_norm, wc=wc, de=d_e, nf=nf0, par=par,
+                          hn=h_norm, wc=wc, de=d_e, nf=nf0, par=par is not None,
                           gtxt=gtxt)
         print(f"\n[k={k}] norb={ncas} ndet={ndet}")
+        ptxt = f"{par:+.0f}" if par is not None else "n/a (l-mixed)"
         print(f"  E_ground      = {e_g:.6f} Eh   <N_f> = {nf0:.3f}   "
-              f"<L^2> = {l2s[0]:.4f}   parity = {par:+.0f}")
+              f"<L^2> = {l2s[0]:.4f}   parity = {ptxt}")
         print(f"  E_ref det     = {e_det:.6f}   ground-det = "
               f"{(e_g - e_det) * 1e3:+.3f} mEh mixing gain")
         print(f"  ground vec: {gtxt}")

@@ -60,14 +60,14 @@ def main():
         cfg = AtomConfig(sym, "ccpvdz", spin=spin)
         chk = str(RES / f"{sym}_ccpvdz_s{spin}_rohf.chk")
         mol, mf = drivers.run_rohf(
-            cfg, chk, ref=(kw["ref_factory"]() if kw["ref_factory"] else None))
+            cfg, chk, ref=(kw["ref_factory"]() if kw.get("ref_factory") else None))
         c_pur, contam = drivers.purified_core_orbitals(mol, mf, ncore)
         print(f"pur core: max contamination {max(contam):.2e}")
 
         closed = drivers.occupied_core_idx(mf, ncore)
-        nval_closed = int((mf.mo_occ == 2.0).sum()) - ncore  # the 4s pair
-        val_occ = closed[ncore:] + list(np.flatnonzero(mf.mo_occ == 1.0))
-        assert len(val_occ) == nval_closed + int(cfg.spin), val_occ
+        occ2 = list(np.flatnonzero(mf.mo_occ == 2.0))
+        val_occ = occ2[ncore:] + list(np.flatnonzero(mf.mo_occ == 1.0))
+        assert len(val_occ) == 1 + int(cfg.spin), val_occ
         rows_v = drivers.select_valence_ao(mol, ["3d", "4s", "4d", "4p"])
         s = mol.intor_symmetric("int1e_ovlp")
         virt = [k for k in range(mf.mo_coeff.shape[1]) if mf.mo_occ[k] == 0.0]

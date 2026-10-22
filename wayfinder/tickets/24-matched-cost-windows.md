@@ -116,13 +116,57 @@ postponed, not cancelled); any sector > 30 min; 4f+2d-class runs; the
     FRESH chk — a cached runaway chk is trusted and short-circuits it
     (cost us one confusing pass).
 
+18. **Matched-cost comparison, Sc/Ti (run_tm_methb.py; all both-sides
+    exact; chk keys renamed mo_norb<ncas> — self-describing)**:
+    equal-size pairs (same determinant count), exact m-complete
+    primitive window vs raw ROHF-orbital window:
+    Sc: 90 dets: A −759.728891 / B −759.736003 (B by 7.1 mEh);
+    605: A −759.739490 / B −759.745047 (B by 5.6);
+    1,274: A −759.760397 / B −745353 (A by 15.0).
+    Ti: 120: A −848.394585 / B −848.405235 (B by 10.7);
+    1,815: A −848.408935 / B −848.414096 (B by 5.2);
+    5,096: A −848.438477 / B −848.419572 (A by 18.9).
+    VERDICT: opposite small-size behavior to U — on d-electrons B
+    wins only the ~100-det point (representability) and A overtakes
+    by ~600 dets, reaching the escape at 5k; B's size-gain is again
+    tiny (Sc 9.4 / Ti 14.3 mEh over the whole ladder) while A's
+    radial freedom gains 31.5/43.9. ⟨L²⟩: A exact (6/12); B ≈ 0-0.2
+    (the Ti B ground also sits at ⟨L²⟩ = 0.0000 at w=6 — the same
+    L=0-det phenomenon as U's ROHF, now on a d-shell atom).
+19. **U matched B-grid complete** (k = 8/15/18/20/22 = 495/3,876/
+    7,315/10,626/14,950 dets, matched to 1f1d/2f1d/1f3d/2f2d/3f1d):
+    B = −50.3825/−50.3827/−50.3839/−50.3840/−50.3844 (−0.42 → −2.57
+    mEh vs the ⁵S° ref det; ⟨L²⟩ 0.13-0.26; ‖[H,Lz]‖ up to 44) vs
+    A = −49.4587/−49.7506/−49.7333/−49.8943/−49.9928: B wins every
+    pair below 15k (representability), A only at the 4f+2d corner
+    (73,815) — where it is exact. The 1f+3d A point: ⁵I° f¹d³
+    −49.733255 ×13 (the d-heavy window favors f¹d³, like 1f+1d).
+20. **TM crossing tiers**: Sc {3d,4d,5d,4s,4p} (3,249) +0.73 vs
+    escape — 5d is flat; Sc {3d,4d,4s,4p,4f} (4,410) −759.769055 =
+    −3.06 mEh BELOW the escape: **Sc crosses via the 4f radial**
+    (the p-mixing escape is expressed exactly once f-room exists).
+    Ti {3d,4d,5d,4s,4p} (18,411) −848.439334 = −4.36 (deeper than
+    dsdp's −3.50). BOTH TMs now cross below their broken-symmetry
+    basins at exact symmetry — the fact-16b ceiling statement is
+    revised to a WINDOW statement with measured crossing points.
+21. **Ti-decontracted lattice** (the gated reference, finding 17):
+    dalls (2d+2s, 245) −848.400893; dallsp (2d+2s+2p, 3,718)
+    −848.432303 = +2.67 vs escape (approaches, not crossed — the
+    contracted 4d-inclusive set crosses). Granularity verdict
+    consistent with Sc: shell radials ≈ near-optimal primitive
+    combos; window-unit granularity is a weak axis.
+
 ## Open (next waves)
 
-- **README §7.5**: drafted (lattice table + per-block Δ matrix with
-  explicit references + the representability comment) — awaiting the
-  user's in-conversation review before landing.
-- **Sc/Ti methodology B at matched det counts**: RUNNING (queued chain:
-  run_tm_methb.py; matched to ds/dsd/dsdp = 90/605/1274 on Sc,
-  120/1815/5096 on Ti). The U matched-cost verdict is in.
-- **Sc crossing tiers** (dsdpd5/dsdpf): in the running chain.
-- Then ticket 23 (direct CASSCF first), ticket 22, the review wave.
+- **README §7.5**: LANDED (lattice + Δ matrix + representability +
+  B-curve + ⁵S° fact + TM plateau table + planned-extension lines);
+  the matched Sc/Ti table goes in with the physical naming at the
+  next README pass (user: "we will return to README a bit later").
+- **Ticket 23** (next): direct single-root CASSCF FIRST, then SA-17,
+  then relax/pur-relax.
+- **Ticket 22**: NO column of the matched-cost tables (window-units
+  registry: shell / primitive / SCF-MO / NO).
+- **Ticket 20 entries**: full-matrix slice guard; ReferenceSpec
+  exponent-band pattern vocabulary (basis-kind-aware forcing); the
+  needle linear-dependence helper; --fresh / key-versioning for chks.
+- Deferred: 3rd-d U point, CAS(6,13), NIST.

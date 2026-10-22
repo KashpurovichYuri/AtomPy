@@ -235,16 +235,17 @@ def main():
             bd, bs, bp = band.get(2, []), band.get(0, []), band.get(1, [])
             print(f"bands (w >= 0.05): d x{len(bd)}  s x{len(bs)}  "
                   f"p x{len(bp)}")
-            tiers = []
+            unc_tiers = []
             for k in range(1, len(bd) + 1):
-                tiers.append((f"d{k}", [r for rs in bd[:k] for r in rs]))
-            tiers.append(("dalls",
-                          [r for rs in bd for r in rs]
-                          + [r for rs in bs for r in rs]))
-            tiers.append(("dallsp",
-                          [r for rs in bd for r in rs]
-                          + [r for rs in bs for r in rs]
-                          + [r for rs in bp for r in rs]))
+                unc_tiers.append((f"d{k}", [r for rs in bd[:k] for r in rs]))
+            tier_spec = list(unc_tiers)
+            tier_spec.append(("dalls",
+                              [r for rs in bd for r in rs]
+                              + [r for rs in bs for r in rs]))
+            tier_spec.append(("dallsp",
+                              [r for rs in bd for r in rs]
+                              + [r for rs in bs for r in rs]
+                              + [r for rs in bp for r in rs]))
             anc = anchors(sym, spin)
 
         if anc:
