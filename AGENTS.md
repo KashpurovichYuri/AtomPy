@@ -312,6 +312,45 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     a 1e-10 bound flaked once) and on basin-mixed ⟨L²⟩. Narrative:
     README §5.5, §7.2–7.3, §7.4.
 
+
+22. **U campaign: matched cost, the ⁵S° reference, and the window
+    verdicts** (tickets 21/24): (a) the gated Newton ROHF reference
+    (−50.38185233) determinant is a numerically pure ⁵S° state —
+    ⟨L²⟩ = 0 in three independent constructions, all 3,876 generic
+    dets of 1f+1d sit at ⟨L²⟩ ≥ 6; "below ROHF" means beating an ⁵S°
+    mean field. Mechanism open (AOC-smearing hypothesis). (b) The f²d²
+    ground blocks are ⁵L (L = 8, ⟨L²⟩ = 72) — the 56 labels that
+    circulated in conversation were wrong; logs are authoritative.
+    (c) Matched-cost verdicts: raw-ROHF MO windows win small pairs by
+    REPRESENTABILITY (the reference det's projection onto 3f+2d has
+    norm 0.948; every AO window below 4f+2d sits above the mean
+    field), then saturate correlation-starved (−2.6 mEh); the
+    m-complete AO lattice wins the top pairs (Sc 1,274 dets by
+    19.7 mEh, Ti 5,096 by 18.9) and the 4f+2d corner resolves the
+    Δf/Δd race (⁵L° by > 37 mEh). (d) Raw-ROHF MO spans NEVER
+    rotation-close: ‖[P,L⊥]‖ = 7–9 at every size 4..100 (the SCF's
+    open orbitals are m-delocalized; each added virtual adds
+    fractional m-directions) — the certificate excludes symmetric
+    roots from raw-MO CASCI without running any CI. (e) Both TMs
+    cross below their escaped CASSCF basins at exact symmetry
+    (fact-16b ceilings are window statements).
+23. **The γ ladder and NO windows** (ticket 22): which density you
+    diagonalize decides what occupation selection can build.
+    [γ, L_z] = 0 (any single M_L root, any SCF reference) ⇒
+    m-DIAGONAL but m-UNEQUAL (p₀αp₀β of p²: occ = (2, 0, 0)) —
+    occupation cutoffs there commit the AVAS mistake. [γ, L_a] = 0
+    for all generators — the average over a whole term's M_L set
+    inside one M_S sector (spatial rotations don't touch spin; γ is
+    spin-summed) ⇒ by Schur γ = R ⊗ c·𝟙_{2l+1}: NOs arrive as
+    complete l-pure m-sets, occupation groups never split them
+    (natural.occupation_groups), and windows are exactly
+    rotation-closed. Measured: U groups d/f/d/f = 5/7/5/7 (occ
+    0.399/0.286/5e-4/2e-4); every group window at ~1e-13 certificate
+    with exact ⟨L²⟩; 12 NO cols (495 dets) within 4.6 mEh of the full
+    10,626-det window; Sc/Ti NO beats the shell lattice at every
+    equal-det count. E_core from the closed-shell pur-core formula
+    reproduces the campaign totals (validation built into the
+    pilots).
 ## Conventions
 
 - Atomic units, ℏ = 1. Spin-orbitals: alpha = `0..norb-1`, beta = `norb..2norb-1`.
@@ -323,7 +362,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 99 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 116 tests in ~13 min (chkfile caching; ROHF computed once per
 session; the Ti ladder is the slowest block, ~7 min cold; the Sc ladders
 ~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
 anywhere in the fixture chain, sub-second); `pytest -m slow` = the
@@ -370,7 +409,7 @@ symmetry, exactly-flat single-member tilts, the Lz blind spots, the Sc
 inversion, and the Ti d² verdict — tilts descend, radial rises, the
 Lz-blind ±pair pattern — deterministic, no optimizer),
 `test_half_integer_spin_labels` (doublet
-labeling), `test_drivers.py` (build_full_mo block properties — the
+labeling), `test_natural.py` (the γ-ladder claim: m-scalar densities yield whole m-sets, single roots do not; the 1-RDM pinned against a brute-force pair sum; real-AO certificates), `test_drivers.py` (build_full_mo block properties — the
 ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 `test_analysis.py` (configuration labels), `test_system.py` (validation).
 

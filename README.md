@@ -997,6 +997,11 @@ Member sets below use the §2.3 ordering (dxy, dyz, dz², dxz, dx²−y² =
 | Sc | rises | descends: −0.3 mEh @ δ=0.1; deeper with more members (−0.9 with four) | nowhere radial; the ceiling sits +25 mEh above the escape basin |
 | Ti | rises (+9.8 mEh @ θ=0.05) | descends: −163 µEh @ δ=0.1; the pair {0,1} doubles it; {0,1,2} and {0,1,3,4} rise | the orthogonalized substrate's s-slot (4s→6s admixture), ~11 mEh |
 
+Ticket-24 amendment: these Sc/Ti ceilings are WINDOW
+statements, not physical ones — growing the m-complete
+lattice crosses below the escaped CASSCF values (Sc via the
+4f radial −3.06 mEh, Ti already via 5d −4.36; §7.5).
+
 Reading: *flat* → the optimizer may break m at zero cost (§2.3, flat
 directions); *descending* → it is driven to break m (mechanism §5-L4);
 *rises* → the direction buys nothing. Sc and Ti share the qualitative
@@ -1217,7 +1222,7 @@ each ladder header; the canonical-window confinement check is
 `run_casci(mf, ncas, sector, mf.mo_coeff, …)`). §7.4:
 `python scripts/radial_scan.py` and the scan calls recorded in
 `results/*_scan.md`. The executable
-documentation is the test suite (105 tests): the term tables, the
+documentation is the test suite (116 tests): the term tables, the
 exact-class closure pins, the basin branches. Plain-language companions:
 `RUNGS.md` (the rung ladder) and the glossary appendix (vocabulary).
 
@@ -1228,10 +1233,10 @@ exact-class closure pins, the basin branches. Plain-language companions:
 *Scalar relativity* (DKH/X2C): h₁ changes, nothing else — a scalar
 Hamiltonian is rotationally invariant, so every theorem and diagnostic
 survives; the reference basins (E_ref, the good-basin census) must be
-re-measured once. *ECP-based full relativity*: measured on C/Si — the
-machinery is unchanged (only h₁ moves; term structure and closure
-classes identical, `wayfinder/tickets/18-ecp-pair.md`); Sc/Ti = ticket
-19. *Spin–orbit coupling*: the natural next symmetry step —
+re-measured once. *ECP-based full relativity*: measured on C/Si and
+Sc/Ti (tickets 18/19) — the machinery is unchanged (only h₁ moves; term
+structure and closure classes identical). *Spin–orbit coupling*: the
+natural next symmetry step —
 it splits the multiplets this note certifies; the machinery extends in
 place (Ĵ² = (L̂+Ŝ)², Ĵz as determinant-basis matrices; term symbols
 become levels). *Further atoms* (V, Cr, …): data rows, not code — the
@@ -1265,7 +1270,11 @@ lives in the sections of this note.
   correlate. The natural choice for an atom: the raw functions of one
   valence shell (e.g. the three 2p). A window made of *complete shells*
   is rotation-closed, which is what makes the angular-momentum analysis
-  exact.
+  exact. Window units today: contracted shells or primitive bands
+  (m-complete by construction), raw-SCF MOs (never rotation-closed —
+  their span defect is 7–9 at every practical size), and
+  natural-orbital occupation groups (m-sets, exact, provided the
+  density came from a term average — §7.5).
 - **sector** — the determinant space for fixed numbers of alpha and beta
   electrons; the label is Ms = (na − nb)/2. Atoms need several sectors
   to hold all terms of a configuration.
