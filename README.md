@@ -1029,19 +1029,21 @@ equal cost, ticket 24 — which granularity a row ran is a code detail);
 and **raw-ROHF MO windows** — the open reference MOs plus virtuals
 ranked by valence-band S-weight. A **natural-orbital** column is
 planned (ticket 22). Energies are CASCI grounds in the atom's standard
-M_S sector, pur fold; ⟨L²⟩ is the ground root's. The NO column awaits
-ticket 22.
+M_S sector, pur fold; ⟨L²⟩ is the ground root's. NO column: ticket-22
+group windows (term-averaged density of each atom's largest-window
+CASCI ground term); ⟨L²⟩ and the span certificates are machine-exact
+at every NO size (results/u_14e/u_run_no.log, results/tm_no.log).
 
 **Sc** — ROHF reference −759.736 Eh (3d¹4s²; M_S = 1/2):
 
 | window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
 |---|---|---|---|---|---|---|---|
 | 3d | (3,5) | 50 | −759.436 | 12.000 | — | — | — |
-| 3d4s | (3,6) | 90 | −759.729 | 6.000 | −759.736 | 0.000 | — |
+| 3d4s | (3,6) | 90 | −759.729 | 6.000 | −759.736 | 0.000 | −759.731 |
 | 3d4d | (3,10) | 450 | −759.555 | 12.000 | — | — | — |
-| 3d4s4p | (3,9) | 324 | −759.760 | 6.000 | — | — | — |
+| 3d4s4p | (3,9) | 324 | −759.760 | 6.000 | — | — | −759.762 |
 | 3d4s4d | (3,11) | 605 | −759.739 | 6.000 | −759.745 | 0.008 | — |
-| 3d4s4p4d | (3,14) | 1,274 | **−759.765** | 6.000 | −759.745 | 0.143 | — |
+| 3d4s4p4d | (3,14) | 1,274 | **−759.765** | 6.000 | −759.745 | 0.143 | **−759.765** |
 | 3d4s4p4d5d | (3,19) | 3,249 | −759.765 | 6.000 | — | — | — |
 | 3d4s4p4d4f | (3,21) | 4,410 | **−759.769** | 6.000 | — | — | — |
 
@@ -1051,11 +1053,11 @@ reference; M_S = 1):
 | window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
 |---|---|---|---|---|---|---|---|
 | 3d | (4,5) | 50 | −848.054 | 6.000 | — | — | — |
-| 3d4s | (4,6) | 120 | −848.395 | 12.000 | −848.405 | 0.000 | — |
+| 3d4s | (4,6) | 120 | −848.395 | 12.000 | −848.405 | 0.000 | −848.399 |
 | 3d4d | (4,10) | 1,200 | −848.232 | 6.000 | — | — | — |
-| 3d4s4p | (4,9) | 756 | −848.429 | 12.000 | — | — | — |
+| 3d4s4p | (4,9) | 756 | −848.429 | 12.000 | — | — | −848.432 |
 | 3d4s4d | (4,11) | 1,815 | −848.409 | 12.000 | −848.414 | 0.010 | — |
-| 3d4s4p4d | (4,14) | 5,096 | **−848.438** | 12.000 | −848.420 | 0.201 | — |
+| 3d4s4p4d | (4,14) | 5,096 | **−848.438** | 12.000 | −848.420 | 0.201 | **−848.438** |
 | 3d4s4p4d5d | (4,19) | 18,411 | −848.439 | 12.000 | — | — | — |
 | 3d4s4p4d4f | (4,21) | 27,930 | **−848.446** | 12.000 | — | — | — |
 
@@ -1066,10 +1068,10 @@ rows are equal-determinant pairs:
 
 | window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
 |---|---|---|---|---|---|---|---|
-| 1f+1d ‖ open+8 virt. | (4,12) | 495 | −49.459 | 42.000 | −50.382 | 0.000 | — |
+| 1f+1d ‖ open+8 virt. | (4,12) | 495 | −49.459 | 42.000 | −50.382 | 0.000 | −49.890 |
 | 2f+1d ‖ open+15 | (4,19) | 3,876 | −49.751 | 72.000 | −50.383 | 0.132 | — |
 | 1f+3d ‖ open+18 | (4,22) | 7,315 | −49.733 | 42.000 | −50.384 | 0.192 | — |
-| 2f+2d ‖ open+20 | (4,24) | 10,626 | −49.894 | 72.000 | −50.384 | 0.254 | — |
+| 2f+2d ‖ open+20 | (4,24) | 10,626 | −49.894 | 72.000 | −50.384 | 0.254 | −49.894 |
 | 3f+1d ‖ open+22 | (4,26) | 14,950 | −49.993 | 72.000 | −50.384 | 0.258 | — |
 | 3f+2d | (4,31) | 31,465 | −50.081 | 72.000 | — | — | — |
 | 4f+1d | (4,33) | 40,920 | −50.332 | 72.000 | — | — | — |
@@ -1122,6 +1124,14 @@ and further with 4f (−11.46). The fact-16b radial-vs-escape gap
 (§7.4) is a WINDOW statement, not a physical one: at a few thousand
 determinants the exact-symmetry lattice reaches (Ti: crosses) the
 broken value.
+5. *The NO column (ticket 22) beats the shell lattice at every equal
+determinant count measured* — Sc 90 dets: −759.731 vs −759.729; 324:
+−759.762 vs −759.760; Ti 120: −848.399 vs −848.395; 756: −848.432 vs
+−848.429 — because a term-averaged-density NO group is a better
+radial than the contraction, while staying exactly rotation-closed
+(certificates ~1e-13, ⟨L²⟩ exact at every size). The raw-ROHF column
+still wins the smallest pairs by containing the reference
+determinant.
 
 **The span-closure certificate predicts all of this without running
 any CI** (fact 19). The raw-ROHF MO spans never rotation-close:

@@ -101,13 +101,16 @@ runner (ticket 20 consumes this registry); NIST comparison.
 
 ## Remaining (next round)
 
-- Sc/Ti NO columns of the matched tables (same pilot pattern; the Sc
-  1,274-det CASCI is seconds).
-- NO windows vs the B (raw-MO) side at matched det counts on Sc/Ti
-  (the NO column the tables reserve).
+- DONE this round: Sc/Ti NO columns landed in README 7.5
+  (results/tm_no.log): l-pure groups 4s(1)/3d(5)/4p(3)/[3d+4d](5);
+  NO beats the shell lattice at every equal-det count (90/324/120/756)
+  and the MO column at the top pairs; certificates ~1e-13 everywhere.
 - Methodology B proper (replicated SCF radials via the
   purified_core_orbitals construction generalized to valence) --
-  partially covered by ticket 24's MO column; decide after the NO
-  columns land whether a separate B-variant row adds anything.
+  partially covered by ticket 24's MO column; decide after the review
+  wave whether a separate B-variant row adds anything.
 - Tests: the NO helper is pinned; add a NO-window CASCI regression
   (small Sc case) if the NO columns enter the standard tables.
+- U smallest pair: the NO 12-col value −49.890 sits at the (4,12)
+  row's det count (495) but above the MO ⁵S° det — the
+  representability asymmetry, quantified per window kind.
