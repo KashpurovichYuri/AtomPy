@@ -1084,6 +1084,28 @@ on its own radial axis — that is the whole race, and the symmetric
 corner resolves it: at 4f+2d the ⁵L° (f³d¹) manifold stands below the
 best f²d² root by > 37 mEh.
 
+**Why the source density decides the window (ticket 22).** NOs are the
+eigenvectors of a one-particle density γ — occupations = eigenvalues —
+so WHICH γ you diagonalize decides what "top occupations" can select.
+In the (l, m) basis there are three levels:
+
+- *generic* γ: carries m↔m′ coherences (not even L_z-clean);
+- *[γ, L_z] = 0* — any single M_L state, any SCF reference: γ is
+  m-DIAGONAL but the occupations differ across m (the p₀αp₀β
+  determinant of p²: γ_mm = (2, 0, 0)) — an occupation cutoff keeps
+  members and drops partners: the AVAS mistake (fact 19);
+- *[γ, L_a] = 0 for all three generators* — the average over a whole
+  term's M_L set (all inside one M_S sector): by Schur's lemma γ is a
+  scalar on each m-set, γ = R (radials) ⊗ c·𝟙_{2l+1}: every eigenvalue
+  of a radial comes with all 2l+1 partners, occupation selection can
+  only rank RADIALS, and the window is rotation-closed by construction
+  (certificate ~1e-13, ⟨L²⟩ exact).
+
+Operational rule: average the whole degenerate ground-term eigenspace
+before diagonalizing — the averaging is what buys the m-scalar
+density. (The M_L average at fixed M_S is already fully invariant:
+spatial rotations don't touch spin, and γ is spin-summed.)
+
 **Natural orbitals (ticket 22 pilot).** Averaging the 17 ⁵L roots of
 the 2f+2d CASCI into the 1-RDM (a rotation-invariant root set) yields
 natural orbitals in EXACT l-pure m-sets: four occupation groups of 5
