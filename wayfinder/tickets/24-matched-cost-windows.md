@@ -58,3 +58,64 @@ the window grows.
 CAS(6,13) on U (even the short (5,1) sector — 16,731 dets — is
 postponed, not cancelled); any sector > 30 min; 4f+2d-class runs; the
 3rd-d-primitive U point; NO compression (ticket 22); SA wave (23).
+
+## Findings (2026-10-22, in execution)
+
+15. **U methodology-B scan** (`scripts/run_u_methb.py`, ≤ 495 dets,
+    seconds/step): (a) the window-B virtual admission MUST rank by
+    S-weight on the VALENCE-BAND rows — all-f+d-chain character admits
+    the near-core tight MOs (canonical mo123, eps = +38.8 Eh, f-weight
+    1.000 on the tight primitives) whose singles sit tens of Eh up and
+    never mix (the curve reads flat); (b) NEW FACT: the gated U ROHF
+    reference determinant is a numerically pure ⁵S° state — ⟨L²⟩ = 8e-10,
+    parity −1 — i.e. the "raw ROHF" ground is an L=0 term 10 mEh above
+    the ⁵L°, not an m-broken ⁵L°; (c) the B correlation gain SATURATES
+    at −0.24 mEh by k=6→8 virtuals (mean-field-representable but
+    correlation-starved); (d) MATCHED-COST VERDICT on U (495 dets):
+    B = −50.3825 (0.66 below ROHF, broken: |[H,Lz]| 2.6, ⁵S° content)
+    vs A(1f+1d) = −49.4587 (+923 mEh, exact) — exactness costs ~0.9 Eh
+    at 495 dets; A catches B only at the 4f+2d corner (73,815 dets,
+    −50.3920, exact). The B ceiling (−50.3825) is broken only by the
+    saturated lattice — the ⁵L° ground needs radial freedom, not just
+    the mean field.
+16. **The TM lattices, contracted (shell granularity)** (`scripts/
+    run_tm_lattice.py`; sector (2,1)/(3,1); the {d,s}-line with the 4s
+    active; pur substrate; every sector ≤ 12k dets both-sides exact):
+    (a) the {3d,4s} point REPRODUCES casci_avg_pur bit-wise (+0.00 mEh
+    both atoms) — construction validated; (b) **THE PLATEAU MELTS**:
+    Ti {3d,4d,4s,4p} (5,096 dets) = −848.438477 = 3.50 mEh BELOW the
+    escaped free-CASSCF basin (−848.434973) at exact symmetry
+    (|[H,Lz]| 7.2e-13, ⟨L²⟩ = 12.0000); Sc {3d,4d,4s,4p} (1,274 dets)
+    = −759.765064 = +0.93 mEh from the escape and descending ~5 mEh
+    per axis step — the user's full-space intuition CONFIRMED: the
+    escape's correlation becomes available at exact closure once the
+    window includes the p directions m-completely; (c) caveat: the
+    uniform-nelec {d}/{dd} tiers force d³/d⁴ configurations (+293/+
+    173 mEh on Sc) — lattice points on the d axis at fixed nelec, NOT
+    the campaign's folded-4s convention; (d) trap fixed in-script:
+    build_full_mo returns the FULL matrix — the analysis space is
+    mo[:, ncore:ncore+ncas] (a [:, ncore:] slice silently runs a
+    CAS(3,34): measured −46.9 mEh against PySCF's correct fold).
+17. **Decontracted granularity** (Sc; Ti postponed): decontract_basis
+    never changes the one-particle span (the ROHF energy is IDENTICAL
+    to the contracted value bit-wise) — only the window-unit
+    granularity differs. Primitive-band windows (RELATIVE 0.05
+    threshold; the absolute one admits the fact-16e needles and
+    crashes build_full_mo's Löwdin) reach −34.50 mEh vs the
+    contracted shell windows' −36.17 at equal cost: the contracted
+    shell radials are near-optimal primitive combos; granularity is a
+    non-axis on Sc. Ti-decontracted POSTPONED: the plain ROHF runs to
+    the exact fact-21a aufbau runaway (+123.07 mEh — the detector
+    fired) and the pinned occ_e_ref gate does not transfer to the
+    uncontracted basis (needs one dedicated Newton reference run to
+    establish the gate energy).
+
+## Open (next waves)
+
+- **README §7.5**: drafted (lattice table + per-block Δ matrix with
+  explicit references + the representability comment) — awaiting the
+  user's in-conversation review before landing.
+- **Sc/Ti methodology B at matched det counts**: the remaining light
+  item (the U matched-cost verdict is in; Sc/Ti B = the per-atom-class
+  "does exactness cost energy" completion).
+- Then ticket 23 (direct CASSCF first), ticket 22, the review wave.
