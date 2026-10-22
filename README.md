@@ -1067,11 +1067,11 @@ rows are equal-determinant pairs:
 | window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
 |---|---|---|---|---|---|---|---|
 | 1f+1d ‖ open+8 virt. | (4,12) | 495 | −49.459 | 42.000 | −50.382 | 0.000 | — |
-| 2f+1d ‖ open+15 | (4,19) | 3,876 | −49.751 | 56.000 | −50.383 | 0.132 | — |
+| 2f+1d ‖ open+15 | (4,19) | 3,876 | −49.751 | 72.000 | −50.383 | 0.132 | — |
 | 1f+3d ‖ open+18 | (4,22) | 7,315 | −49.733 | 42.000 | −50.384 | 0.192 | — |
-| 2f+2d ‖ open+20 | (4,24) | 10,626 | −49.894 | 56.000 | −50.384 | 0.254 | — |
+| 2f+2d ‖ open+20 | (4,24) | 10,626 | −49.894 | 72.000 | −50.384 | 0.254 | — |
 | 3f+1d ‖ open+22 | (4,26) | 14,950 | −49.993 | 72.000 | −50.384 | 0.258 | — |
-| 3f+2d | (4,31) | 31,465 | −50.081 | 56.000 | — | — | — |
+| 3f+2d | (4,31) | 31,465 | −50.081 | 72.000 | — | — | — |
 | 4f+1d | (4,33) | 40,920 | −50.332 | 72.000 | — | — | — |
 | 4f+2d | (4,38) | 73,815 | **−50.392** | 72.000 | — | — | — |
 
@@ -1081,6 +1081,20 @@ pays f²d² −144 but f³d¹ only −69/−60. Each configuration block profits
 on its own radial axis — that is the whole race, and the symmetric
 corner resolves it: at 4f+2d the ⁵L° (f³d¹) manifold stands below the
 best f²d² root by > 37 mEh.
+
+**Natural orbitals (ticket 22 pilot).** Averaging the 17 ⁵L roots of
+the 2f+2d CASCI into the 1-RDM (a rotation-invariant root set) yields
+natural orbitals in EXACT l-pure m-sets: four occupation groups of 5
+(d) and 7 (f), occupations 0.399 / 0.286 / 0.0005 / 0.0002 — the
+m-scalar-density claim, measured. Occupation-GROUP windows are exactly
+rotation-closed at every size (‖[P,L⊥]‖ ≈ 1e-13) and exact in every
+observable: 12 NO columns (495 dets) hold the ⁵L ground at −49.890 —
+4.6 mEh above the full 10,626-det window, while the AO lattice at the
+same 495 dets sits 431 mEh higher (−49.459); 17 columns (2,380 dets):
++3.4 mEh; 17-fold degeneracy and ⟨L²⟩ = 72.0000 machine-exact
+everywhere. The NO compression realizes full-window quality at a
+fraction of the cost; like every AO-span window it does NOT contain
+the ROHF determinant (representability, point 1 below).
 
 **What the tables say.**
 
