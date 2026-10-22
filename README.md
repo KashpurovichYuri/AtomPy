@@ -1019,75 +1019,127 @@ express on these atoms (the table above), and the swap follows at
 Purification is the cheapest real repair of all: the start-window
 baseline falls to the exact class at −0.05 mEh.
 
-### 7.5 The window lattice — exact-symmetry descent vs broken windows
+### 7.5 The window lattice — exact symmetry vs raw MOs at matched cost
 
-Two experiments on the same mean field: grow an m-complete primitive
-window along both radial axes (the **A lattice**), and grow a raw-ROHF
-MO window by valence-character virtuals (the **B curve**). U data;
-ticket 21/24.
+Two window kinds on the same mean field, compared at **equal determinant
+count** (equal cost): **m-complete AO windows** — contracted shells or
+primitive bands, one column below (the granularity axis is measured
+weak: decontracted windows land within ~2 mEh of the shell windows at
+equal cost, ticket 24 — which granularity a row ran is a code detail);
+and **raw-ROHF MO windows** — the open reference MOs plus virtuals
+ranked by valence-band S-weight. A **natural-orbital** column is
+planned (ticket 22). Energies are CASCI grounds in the atom's standard
+M_S sector, pur fold; ⟨L²⟩ is the ground root's. The NO column awaits
+ticket 22.
 
-**The A lattice** (U, Ms=2 block grounds, Eh; Δf = E(kf) − E(k−1 f) at
-fixed d, Δd = E(2d) − E(1d) at fixed f, mEh):
+**Sc** — ROHF reference −759.736 Eh (3d¹4s²; M_S = 1/2):
 
-| window | f³d¹ (⁵L° odd) | f²d² (⁵L even) | ground |
-|---|---|---|---|
-| 1f+1d | — | — | f¹d³ −49.4587 |
-| 2f+1d | — | −49.7506 | f²d² |
-| 3f+1d | −49.9928 | (above roots) | f³d¹ ⁵L° |
-| 4f+1d | −50.3320 | (above; f⁴ −50.3070) | f³d¹ |
-| 2f+2d | — | −49.8943 | f²d² |
-| 3f+2d | −50.0617 | −50.0809 | f²d² (⁵L° +19.1) |
-| 4f+2d | **−50.3920** | > −50.3547 | f³d¹ ⁵L° ×17 |
+| window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
+|---|---|---|---|---|---|---|---|
+| 3d | (3,5) | 50 | −759.436 | 12.000 | — | — | — |
+| 3d4s | (3,6) | 90 | −759.729 | 6.000 | −759.736 | 0.000 | — |
+| 3d4d | (3,10) | 450 | −759.555 | 12.000 | — | — | — |
+| 3d4s4p | (3,9) | 324 | −759.760 | 6.000 | — | — | — |
+| 3d4s4d | (3,11) | 605 | −759.739 | 6.000 | −759.745 | 0.008 | — |
+| 3d4s4p4d | (3,14) | 1,274 | **−759.765** | 6.000 | −759.745 | 0.143 | — |
+| 3d4s4p4d5d | (3,19) | 3,249 | −759.765 | 6.000 | — | — | — |
+| 3d4s4p4d4f | (3,21) | 4,410 | **−759.769** | 6.000 | — | — | — |
 
-Δ matrix: Δf pays f³d¹ −339/−330 (at 1d/2d) but f²d² only −187; Δd pays
-f²d² −144 but f³d¹ only −69/−60. Each block profits on its own axis —
-that is the whole race, and the symmetric corner resolves it: ⁵L° stands
-by > 37 mEh.
+**Ti** — ROHF reference −848.406 Eh (3d²4s², the gated good-basin
+reference; M_S = 1):
 
-**Representability.** A CASCI bounds the ROHF determinant only when the
-window's span contains the occupied active MOs — window nesting (AO
-spans) is not determinant nesting. The ROHF 5f lives on all four
-weight-carrying f primitives, the 6d on three d primitives; smaller
-windows sit above the mean field (−50.38185). 4f+2d covers ~98%/~70%
-and crosses 10 mEh below: the crossing measures how much radial span
-the mean field uses.
+| window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
+|---|---|---|---|---|---|---|---|
+| 3d | (4,5) | 50 | −848.054 | 6.000 | — | — | — |
+| 3d4s | (4,6) | 120 | −848.395 | 12.000 | −848.405 | 0.000 | — |
+| 3d4d | (4,10) | 1,200 | −848.232 | 6.000 | — | — | — |
+| 3d4s4p | (4,9) | 756 | −848.429 | 12.000 | — | — | — |
+| 3d4s4d | (4,11) | 1,815 | −848.409 | 12.000 | −848.414 | 0.010 | — |
+| 3d4s4p4d | (4,14) | 5,096 | **−848.438** | 12.000 | −848.420 | 0.201 | — |
+| 3d4s4p4d5d | (4,19) | 18,411 | −848.439 | 12.000 | — | — | — |
+| 3d4s4p4d4f | (4,21) | 27,930 | **−848.446** | 12.000 | — | — | — |
 
-**The B curve** (raw ROHF MOs, broken by construction; E vs the ROHF
-determinant, pur fold):
+**U** — ROHF reference −50.382 Eh (5f³6d¹). The reference determinant
+itself is a numerically pure ⁵S° state (⟨L²⟩ = 0; §below). Sector
+M_S = 2 on both sides (the cheapest quintet sector); the first five
+rows are equal-determinant pairs:
 
-| k virtuals | norb | ndet | E_ground | vs ref | ⟨L²⟩ | ‖[H,Lz]‖ |
-|---|---|---|---|---|---|---|
-| 0 | 4 | 1 | −50.382275 | 0 | 0.0000 | 0 |
-| 4 | 8 | 70 | −50.382435 | −0.16 mEh | 0.0154 | 1.2 |
-| 8 | 12 | 495 | −50.382514 | −0.24 mEh | 0.0161 | 2.6 |
+| window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
+|---|---|---|---|---|---|---|---|
+| 1f+1d ‖ open+8 virt. | (4,12) | 495 | −49.459 | 42.000 | −50.382 | 0.000 | — |
+| 2f+1d ‖ open+15 | (4,19) | 3,876 | −49.751 | 56.000 | −50.383 | 0.132 | — |
+| 1f+3d ‖ open+18 | (4,22) | 7,315 | −49.733 | 42.000 | −50.384 | 0.192 | — |
+| 2f+2d ‖ open+20 | (4,24) | 10,626 | −49.894 | 56.000 | −50.384 | 0.254 | — |
+| 3f+1d ‖ open+22 | (4,26) | 14,950 | −49.993 | 72.000 | −50.384 | 0.258 | — |
+| 3f+2d | (4,31) | 31,465 | −50.081 | 56.000 | — | — | — |
+| 4f+1d | (4,33) | 40,920 | −50.332 | 72.000 | — | — | — |
+| 4f+2d | (4,38) | 73,815 | **−50.392** | 72.000 | — | — | — |
 
-The B gain SATURATES at −0.24 mEh: mean-field-representable,
-correlation-starved. Two facts: (a) the gated U ROHF determinant is a
-numerically pure ⁵S° state (⟨L²⟩ = 8e-10, parity −1) — the "raw ROHF"
-is a different TERM 10 mEh above the ⁵L°, not an m-broken ⁵L°; (b)
-matched cost (495 dets): B −50.3825 vs A(1f+1d) −49.4587 — exactness
-costs ~0.9 Eh at small sizes; A catches B only at the saturated corner.
+The U descent race behind those grounds: Δf (adding an f radial at
+fixed d) pays f³d¹ −339/−330 mEh (at 1d/2d) but f²d² only −187; Δd
+pays f²d² −144 but f³d¹ only −69/−60. Each configuration block profits
+on its own radial axis — that is the whole race, and the symmetric
+corner resolves it: at 4f+2d the ⁵L° (f³d¹) manifold stands below the
+best f²d² root by > 37 mEh.
 
-**The same race on the transition metals** (contracted shell windows,
-pur substrate, both-sides exact): {3d,4s} reproduces the campaign
-CASCI bit-wise; growing the window toward the escape's p directions,
+**What the tables say.**
 
-| atom | {3d,4d,4s,4p} | vs CAS(3/4,6) CASCI | vs escaped CASSCF | ⟨L²⟩ |
-|---|---|---|---|---|
-| Sc | −759.765064 (1,274 dets) | −36.17 mEh | +0.93 mEh | 6.0000 |
-| Ti | −848.438477 (5,096 dets) | −43.89 mEh | **−3.50 mEh** | 12.0000 |
+1. *Small cost: the raw-ROHF windows win — by representability, not
+correlation.* Their windows contain the reference determinant; the AO
+windows do not (AO-span nesting is not determinant nesting: the U 5f
+lives on all four weight-carrying f primitives, the 6d on three d
+primitives — the reference det's projection onto the 3f+2d span has
+norm 0.948, so a tenth of it lives outside; every AO window below
+4f+2d sits above the mean field). At 495 dets the MO ground IS the
+reference determinant.
+2. *The MO descent then saturates, correlation-starved.* U: −2.6 mEh
+total by k = 22 (−2.1 within the fold), the ⁵S° determinant still the
+ground's leading component everywhere. The small Sc/Ti MO windows even
+pin ²S-like grounds (⟨L²⟩ = 0 at w = 6), and ⟨L²⟩ never quantizes
+(0.143/0.201 at the top pairs).
+3. *The AO lattice descends monotonically at exact ⟨L²⟩ and owns the
+top pair on every atom*: Sc 1,274 dets by 19.7 mEh, Ti 5,096 by 18.9,
+and the U corner (4f+2d) beats the MO saturation by 7.6 mEh with the
+⁵L° ×17 manifold exact.
+4. *Both transition metals cross below their escaped CASSCF basins at
+exact symmetry*: Sc via the 4f radial (3d4s4p4d4f, −3.06 mEh below the
+escape; the 5d radial flat, −0.2), Ti already via the 5d (−4.36 mEh)
+and further with 4f (−11.46). The fact-16b radial-vs-escape gap
+(§7.4) is a WINDOW statement, not a physical one: at a few thousand
+determinants the exact-symmetry lattice reaches (Ti: crosses) the
+broken value.
 
-**the plateau melts**: the fact-16b radial-vs-escape gap (the "+25 mEh
-no symmetric window can express" of §7.4) is a WINDOW statement, not a
-physical one — at ~5k determinants the exact-symmetry lattice reaches
-(Ti: crosses) the broken value. Granularity note: decontracted
-primitive-band windows land within ~2 mEh of the shell windows at
-equal cost (contraction coefficients are near-optimal radial combos) —
-window-unit granularity is a weak axis.
+**The span-closure certificate predicts all of this without running
+any CI** (fact 19). The raw-ROHF MO spans never rotation-close:
+‖[P,L⊥]‖ stays at 7–9 for every size from 4 to 100 orbitals, while the
+m-complete AO windows close at ~1e-12. The reason is structural: the
+SCF's open orbitals are m-DELOCALIZED (each carries a fraction of
+every m of its shell — the complex-harmonic decomposition of the U
+open MOs spreads weight over all |m| = 0…3), so each added virtual
+adds fractional m-directions and completeness arrives only at the full
+basis. A big CASCI on raw ROHF therefore cannot return symmetric roots
+at any practical size — and the certificate says so in seconds.
 
-Planned extensions (ticket 24): the matched B grid (2f+1d, 2f+2d,
-1f+3d, 3f+1d), the Sc crossing point, and B on Sc/Ti at matched det
-counts.
+**Two facts worth keeping on U.** (a) The gated U ROHF determinant is
+a numerically pure ⁵S° state (⟨L²⟩ = 8e-10, ⟨L_z⟩ = 0, parity −1;
+three independent constructions agree, and all 3,876 generic
+determinants of the 1f+1d window lie at ⟨L²⟩ ≥ 6) — the raw-ROHF
+reference is a different TERM ~10 mEh above the ⁵L°, not an m-broken
+⁵L°. Why the SCF's open-shell wedge is an exact L = 0 eigenstate is
+still open (the average-of-configuration smearing is the suspect).
+(b) Exactness costs energy at small matched cost: 495 dets buys either
+the exact ⁵I° of f¹d³ at −49.459 or the ⁵S° determinant at −50.382 —
+the AO window must grow into the mean field's radial span before the
+race turns.
+
+Regeneration: `scripts/run_tm_lattice.py` (AO columns, Sc/Ti; the
+crossing rows via `--tiers dsdpd5,dsdpf`), `scripts/run_tm_methb.py`
+(Sc/Ti MO columns), `scripts/run_u.py` (U AO lattice),
+`scripts/run_u_methb.py` (U MO curve); logs under `results/`. Ticket
+22 adds the NO column: natural orbitals of a symmetric CI have m-scalar
+1-RDMs, so they arrive in complete occupation-degenerate m-sets — NO
+selection should be symmetry-safe where SCF orbitals are not (to be
+verified with the same certificate).
 
 **Band mechanism, in brief.** A "band" is the exponent interval of
 admitted primitives for one l. It is read off a measurement: (1) for
@@ -1119,7 +1171,7 @@ each ladder header; the canonical-window confinement check is
 `run_casci(mf, ncas, sector, mf.mo_coeff, …)`). §7.4:
 `python scripts/radial_scan.py` and the scan calls recorded in
 `results/*_scan.md`. The executable
-documentation is the test suite (91 tests): the term tables, the
+documentation is the test suite (105 tests): the term tables, the
 exact-class closure pins, the basin branches. Plain-language companions:
 `RUNGS.md` (the rung ladder) and the glossary appendix (vocabulary).
 

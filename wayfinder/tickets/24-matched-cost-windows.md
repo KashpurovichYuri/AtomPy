@@ -219,3 +219,15 @@ at norb = 8/20/38/100 vs the AO window's 1.7e-12 at rank 38 -- raw-ROHF
 spans never close; big CASCI on raw ROHF cannot give symmetric roots.
 Ticket-22 claim: symmetric CIs have m-scalar 1-RDMs, so NOs arrive in
 complete occupation-degenerate m-sets (certificate-ready).
+
+## Appendix correction (2026-10-23)
+
+The tables above were written from conversation memory and mix sources:
+the Sc "CAS(3,7)"/"CAS(3,12)" rows are the DECONTRACTED lattice tiers
+(dalls/dallsp, different window contents, not granularity variants),
+the Sc dsdp energy was dallsp's, and the U MO k=8 <L^2> = 0.016 came
+from the retired all-chain virtual selection (the final valence-band
+selection gives 0.000 -- the ground stays the reference determinant).
+The authoritative, log-verified tables are README §7.5 (landed this
+commit); k=15 was re-measured for it (-50.382697, <L^2> = 0.1322,
+u_run_methb_grid.log).
