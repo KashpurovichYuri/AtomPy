@@ -1019,6 +1019,86 @@ express on these atoms (the table above), and the swap follows at
 Purification is the cheapest real repair of all: the start-window
 baseline falls to the exact class at −0.05 mEh.
 
+### 7.5 The window lattice — exact-symmetry descent vs broken windows
+
+Two experiments on the same mean field: grow an m-complete primitive
+window along both radial axes (the **A lattice**), and grow a raw-ROHF
+MO window by valence-character virtuals (the **B curve**). U data;
+ticket 21/24.
+
+**The A lattice** (U, Ms=2 block grounds, Eh; Δf = E(kf) − E(k−1 f) at
+fixed d, Δd = E(2d) − E(1d) at fixed f, mEh):
+
+| window | f³d¹ (⁵L° odd) | f²d² (⁵L even) | ground |
+|---|---|---|---|
+| 1f+1d | — | — | f¹d³ −49.4587 |
+| 2f+1d | — | −49.7506 | f²d² |
+| 3f+1d | −49.9928 | (above roots) | f³d¹ ⁵L° |
+| 4f+1d | −50.3320 | (above; f⁴ −50.3070) | f³d¹ |
+| 2f+2d | — | −49.8943 | f²d² |
+| 3f+2d | −50.0617 | −50.0809 | f²d² (⁵L° +19.1) |
+| 4f+2d | **−50.3920** | > −50.3547 | f³d¹ ⁵L° ×17 |
+
+Δ matrix: Δf pays f³d¹ −339/−330 (at 1d/2d) but f²d² only −187; Δd pays
+f²d² −144 but f³d¹ only −69/−60. Each block profits on its own axis —
+that is the whole race, and the symmetric corner resolves it: ⁵L° stands
+by > 37 mEh.
+
+**Representability.** A CASCI bounds the ROHF determinant only when the
+window's span contains the occupied active MOs — window nesting (AO
+spans) is not determinant nesting. The ROHF 5f lives on all four
+weight-carrying f primitives, the 6d on three d primitives; smaller
+windows sit above the mean field (−50.38185). 4f+2d covers ~98%/~70%
+and crosses 10 mEh below: the crossing measures how much radial span
+the mean field uses.
+
+**The B curve** (raw ROHF MOs, broken by construction; E vs the ROHF
+determinant, pur fold):
+
+| k virtuals | norb | ndet | E_ground | vs ref | ⟨L²⟩ | ‖[H,Lz]‖ |
+|---|---|---|---|---|---|---|
+| 0 | 4 | 1 | −50.382275 | 0 | 0.0000 | 0 |
+| 4 | 8 | 70 | −50.382435 | −0.16 mEh | 0.0154 | 1.2 |
+| 8 | 12 | 495 | −50.382514 | −0.24 mEh | 0.0161 | 2.6 |
+
+The B gain SATURATES at −0.24 mEh: mean-field-representable,
+correlation-starved. Two facts: (a) the gated U ROHF determinant is a
+numerically pure ⁵S° state (⟨L²⟩ = 8e-10, parity −1) — the "raw ROHF"
+is a different TERM 10 mEh above the ⁵L°, not an m-broken ⁵L°; (b)
+matched cost (495 dets): B −50.3825 vs A(1f+1d) −49.4587 — exactness
+costs ~0.9 Eh at small sizes; A catches B only at the saturated corner.
+
+**The same race on the transition metals** (contracted shell windows,
+pur substrate, both-sides exact): {3d,4s} reproduces the campaign
+CASCI bit-wise; growing the window toward the escape's p directions,
+
+| atom | {3d,4d,4s,4p} | vs CAS(3/4,6) CASCI | vs escaped CASSCF | ⟨L²⟩ |
+|---|---|---|---|---|
+| Sc | −759.765064 (1,274 dets) | −36.17 mEh | +0.93 mEh | 6.0000 |
+| Ti | −848.438477 (5,096 dets) | −43.89 mEh | **−3.50 mEh** | 12.0000 |
+
+**the plateau melts**: the fact-16b radial-vs-escape gap (the "+25 mEh
+no symmetric window can express" of §7.4) is a WINDOW statement, not a
+physical one — at ~5k determinants the exact-symmetry lattice reaches
+(Ti: crosses) the broken value. Granularity note: decontracted
+primitive-band windows land within ~2 mEh of the shell windows at
+equal cost (contraction coefficients are near-optimal radial combos) —
+window-unit granularity is a weak axis.
+
+Planned extensions (ticket 24): the matched B grid (2f+1d, 2f+2d,
+1f+3d, 3f+1d), the Sc crossing point, and B on Sc/Ti at matched det
+counts.
+
+**Band mechanism, in brief.** A "band" is the exponent interval of
+admitted primitives for one l. It is read off a measurement: (1) for
+every primitive, compute the Mulliken S-weight of the open reference
+MOs on its rows; (2) sort primitives by that weight — the peaks rank
+themselves; (3) "kf" = the k heaviest primitives, accepted only if
+they form one CONTIGUOUS exponent interval (the printed "(lo, hi)" is
+read off the set, not chosen); (4) contiguity is the honesty guard —
+a scattered selection would carve an artificial radial hole — and a
+conclusion holds only if the neighbor steps (k±1) reorder nothing.
+
 ---
 
 ## 8. Dictionary and file map

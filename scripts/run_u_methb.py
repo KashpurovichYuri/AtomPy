@@ -118,7 +118,7 @@ def main():
         # k=0 is a 1-det CASCI (exact trivially)
         cas = drivers.run_casci(mf, ncas, (4, 0), mo, CHK,
                                 nroots=min(NTRACK, ndet),
-                                name=f"mo_norb{ncas}")  # key = MO window size (self-describing)
+                                name=f"mo_ne4_norb{ncas}")  # MO window: 4 active e-, ncas orbitals
         core = cas.core_energy
         d_e = float(np.max(np.abs(ev[:1] + core - cas.energies[:1])))
 
