@@ -31,7 +31,6 @@ import numpy as np
 __all__ = [
     "determinant_basis",
     "slater_condon_matrix",
-    "_slater_condon_reference",
     "commutator",
     "frobenius_norm",
 ]

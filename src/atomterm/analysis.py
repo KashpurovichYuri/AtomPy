@@ -32,9 +32,10 @@ __all__ = [
     "save_report",
 ]
 
-_L_LETTERS = "SPDFGHIKLMNOP"  # J skipped by spectroscopic convention;
-# length 13 covers L <= 12: f^3 d^1 reaches L = 11, f^4 reaches L = 12
-# (both manifolds live in the uranium window)
+_L_LETTERS = "SPDFGHIKLMNOQRTUVWXYZ"  # J skipped, and the second P and
+# second S skipped, by spectroscopic convention (S P D F G H I K L M N
+# O Q R T ...); length 21 covers L <= 20: f^3 d^1 reaches L = 8, f^4
+# terms reach L = 12 (Q) -- both manifolds live in the uranium window
 
 
 def quantum_number(observed: float) -> int:
@@ -59,6 +60,9 @@ def term_symbol(s2: float, l2: float) -> str:
     """Term symbol ^(2S+1)L from expectation values of S^2 and L^2."""
     s = spin_quantum_number(s2)
     l = quantum_number(l2)
+    if l >= len(_L_LETTERS):
+        raise ValueError(f"L = {l} beyond the letter table "
+                         f"({_L_LETTERS})")
     return f"{int(round(2 * s + 1))}{_L_LETTERS[l]}"
 
 

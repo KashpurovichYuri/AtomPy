@@ -281,3 +281,41 @@ handoff is in message.txt.]
 - Performance tuning of the determinant-basis builder beyond CAS sizes used
   here (explicit Slater–Condon is O(ndet²); fine for ndet ≤ a few thousand).
 - Cartesian basis support (angular analysis requires pure spherical functions).
+
+## Post-wave survey (2026-10-23, tickets 18/19/21/24 + ticket-22 round 1)
+
+Two-axis review of `4f3cf27...HEAD` (22 commits). Fixed now (commit
+pair with this entry): (1) `_L_LETTERS` reused P at L = 12 — the
+spectroscopic sequence skips J then the second P/S, so O(11) is
+followed by Q(12); table extended to L <= 20 with an explicit
+beyond-table ValueError, pinned in test_analysis. (2)
+`occupied_core_idx` — the fold's core-selection semantics — had no
+test (the one hard standards finding); the U-style scattered-block,
+contracted-coincidence, and too-few-closed branches are now pinned.
+(3) `_slater_condon_reference` removed from detbasis `__all__`
+(private name; tests import it directly). Recorded, not fixed:
+
+- **Duplicated `closed_shell_core_energy` / `_ti_ref`** across
+  run_u_no.py / run_tm_no.py / run_tm_methb.py (scan-stage scripts;
+  library-promotion deferred until a second consumer needs the core
+  energy — candidate for the ticket-20 axes pass).
+- **Lazy `from atomterm.drivers import ...` cycle dodges** repeated in
+  4+ functions across operators/drivers (layering wrinkle; a shared
+  core-resolution seam was considered and declined this wave — the
+  call sites are settled and the churn risk outweighs the gain).
+- **`fci_opts: dict` sets arbitrary fcisolver attributes by string
+  key** (primitive obsession; a named `pspace_size` kwarg would be
+  type-checked). Declined: the dict is the documented extension seam
+  in run_casci's docstring and callers pass exactly one key.
+- **`slater_condon_matrix` dtype probe checks one operand**; a mixed
+  real-h1/complex-g2 call would raise a casting TypeError rather than
+  mis-execute (fail-loud, no in-repo caller). Accepted as-is.
+- **Ticket-22 open items** (tracked in the ticket): methodology B
+  proper (replicated SCF radials) — decide after this wave; scf_mo
+  selector has no certificate run (only the slicing pin); the U
+  f3d1-vs-f2d2 ordering comparison inside one NO window (the pilot
+  pinned the 5L ground + the next block instead).
+- **Ticket-20 scope creep, self-declared**: ergonomics fields
+  (AtomConfig.tag, raw basis/ECP passthrough, occupied_core_idx)
+  landed during the write-only ticket-20 — the remaining ticket-20
+  items (axes product, --fresh, intent manifest) still open.

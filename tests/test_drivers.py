@@ -596,3 +596,41 @@ def test_forced_occ_l_specifiers_and_open_premium():
     # 2:1 premium even though closed leftovers tie at 1.0
     with pytest.raises(ValueError, match="matched no AO labels"):
         _forced_rohf_occ(mol, ["4z"], ["l2"])
+
+
+def test_occupied_core_idx_selects_the_closed_block_not_canonical_order():
+    """The core fold takes the DOUBLY-OCCUPIED MOs; canonical MO order
+    is meaningless on near-degenerate uncontracted bases (U: the first
+    canonical MOs are virtual junk at eps ~ 0.02 while the closed block
+    sits at 22/61/88/120/143 -- folding range(ncore) silently corrupted
+    the fold at max|dE| = 14.5 Eh). The contracted-basis coincidence is
+    a checked invariant, not an assumption."""
+    import warnings
+
+    from atomterm.drivers import occupied_core_idx
+
+    class FakeMF:
+        def __init__(self, mo_occ):
+            self.mo_occ = np.asarray(mo_occ, dtype=float)
+
+    # U-style: closed block scattered (canonical [0:5] are virtual junk)
+    occ = [0.0] * 10
+    for k in (2, 5, 6, 8, 9):
+        occ[k] = 2.0
+    mf = FakeMF(occ)
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter("always")
+        core = occupied_core_idx(mf, 5)
+    assert core == [2, 5, 6, 8, 9]
+    assert any("NOT the first" in str(w.message) for w in rec)
+
+    # contracted-style coincidence: closed block IS the canonical head
+    mf = FakeMF([2.0, 2.0, 2.0, 1.0, 0.0])
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter("always")
+        assert occupied_core_idx(mf, 3) == [0, 1, 2]
+    assert not any("NOT the first" in str(w.message) for w in rec)
+
+    # asking for more closed orbitals than exist is refused loudly
+    with pytest.raises(ValueError, match="closed block has"):
+        occupied_core_idx(mf, 4)

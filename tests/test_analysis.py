@@ -27,6 +27,20 @@ def test_quantum_number_round_trips_measured_momenta():
     assert term_symbol(0.0, 20.0) == "1G"
 
 
+def test_letter_table_follows_spectroscopic_convention():
+    """The sequence skips J, then the second P and second S: after
+    O (L = 11) comes Q (L = 12) -- the review-wave catch: the table
+    reused P at L = 12. f^3 d^1 reaches L = 8 (the uranium 5L ground),
+    f^4 terms reach L = 12."""
+    assert term_symbol(0.0, 72.0) == "1L"      # L = 8, the U ground
+    assert term_symbol(0.0, 110.0) == "1N"     # L = 10
+    assert term_symbol(0.0, 132.0) == "1O"     # L = 11
+    assert term_symbol(0.0, 156.0) == "1Q"     # L = 12: not P
+    assert term_symbol(0.0, 380.0) == "1Y"     # L = 19, table end - 1
+    with pytest.raises(ValueError, match="beyond the letter table"):
+        term_symbol(0.0, 99 * 100.0)           # L = 99: refuse, not wrap
+
+
 def test_half_integer_spin_labels():
     """Odd-electron states: S = 1/2, 3/2 give multiplicities 2 and 4.
 
