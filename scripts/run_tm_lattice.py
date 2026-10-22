@@ -56,6 +56,9 @@ SHELL_TIERS = [
     ("dsd", ["3d", "4s", "4d"]),
     ("dsp", ["3d", "4s", "4p"]),
     ("dsdp", ["3d", "4d", "4s", "4p"]),
+    # the crossing candidates (ticket 24): one more radial on the axes
+    ("dsdpd5", ["3d", "4d", "5d", "4s", "4p"]),
+    ("dsdpf", ["3d", "4d", "4s", "4p", "4f"]),
 ]
 
 # whole-l-span occupations for the decontracted references: [Ar] (s+p)
@@ -147,6 +150,11 @@ def main():
             else "contracted")
     drop = {i for i, a in enumerate(args) if a.startswith("--")}
     drop |= {i + 1 for i, a in enumerate(args) if a == "--kind"}
+    tiers = None
+    if "--tiers" in args:
+        i = args.index("--tiers")
+        tiers = set(args[i + 1].split(","))
+        drop |= {i, i + 1}
     wanted = [a for i, a in enumerate(args) if i not in drop] or list(CASES)
     for name in wanted:
         cfg_kw = CASES[name]
@@ -161,8 +169,7 @@ def main():
             chk = str(RES / f"{sym}_ccpvdz_s{spin}_rohf.chk")
             mol, mf = drivers.run_rohf(cfg, chk,
                                        ref=cfg_kw.get("ref_contract"))
-            tiers = [(t, drivers.select_valence_ao(mol, pats))
-                     for t, pats in SHELL_TIERS]
+            tier_spec = list(SHELL_TIERS)  # (tag, patterns); lazy resolve
             anc = anchors(sym, spin)
         else:
             from pyscf import gto
@@ -247,7 +254,20 @@ def main():
         print(f"{'tier':>7} {'ncas':>4} {'ndet':>6} {'E_ground':>16} "
               f"{'<L^2>':>8} {'<S^2>':>7} {'term':>6} {'|[H,Lz]|':>9} "
               f"{'|[H,L2]|':>9} {'smear':>8} {'dEvsPy':>8}")
-        for t, rows in tiers:
+        for item in tier_spec:
+            if kind == "contracted":
+                t, pats = item
+                if tiers and t not in tiers:
+                    continue
+                try:
+                    rows = drivers.select_valence_ao(mol, pats)
+                except ValueError as exc:
+                    print(f"{t:>7}: skipped ({exc})")
+                    continue
+            else:
+                t, rows = item
+                if tiers and t not in tiers:
+                    continue
             r = run_tier(mol, mf, f"lat_{kind}_{t}", rows, ncore, na, nb,
                          chk)
             extra = ""

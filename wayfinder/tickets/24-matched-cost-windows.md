@@ -96,26 +96,33 @@ postponed, not cancelled); any sector > 30 min; 4f+2d-class runs; the
     build_full_mo returns the FULL matrix — the analysis space is
     mo[:, ncore:ncore+ncas] (a [:, ncore:] slice silently runs a
     CAS(3,34): measured −46.9 mEh against PySCF's correct fold).
-17. **Decontracted granularity** (Sc; Ti postponed): decontract_basis
-    never changes the one-particle span (the ROHF energy is IDENTICAL
-    to the contracted value bit-wise) — only the window-unit
-    granularity differs. Primitive-band windows (RELATIVE 0.05
-    threshold; the absolute one admits the fact-16e needles and
-    crashes build_full_mo's Löwdin) reach −34.50 mEh vs the
-    contracted shell windows' −36.17 at equal cost: the contracted
-    shell radials are near-optimal primitive combos; granularity is a
-    non-axis on Sc. Ti-decontracted POSTPONED: the plain ROHF runs to
-    the exact fact-21a aufbau runaway (+123.07 mEh — the detector
-    fired) and the pinned occ_e_ref gate does not transfer to the
-    uncontracted basis (needs one dedicated Newton reference run to
-    establish the gate energy).
+17. **Decontracted granularity** (Sc DONE; Ti UNBLOCKED same day): de-
+    contract_basis never changes the one-particle span (the ROHF energy
+    is IDENTICAL to the contracted value bit-wise) — only the window-
+    unit granularity differs. Primitive-band windows (RELATIVE 0.05
+    threshold; the absolute one admits the fact-16e needles and crashes
+    build_full_mo's Löwdin) reach −34.50 mEh vs the contracted shell
+    windows' −36.17 at equal cost: the contracted shell radials are
+    near-optimal primitive combos; granularity is a non-axis on Sc.
+    **Ti-unc RESOLVED (user direction: try accelerators/guesses)**: the
+    whole-l-span forced spec + occ_e_ref = −848.40648875 + NEWTON lands
+    the good basin at E = −848.4064887504744 — the pinned contracted
+    gate energy to 10 decimals (decontraction preserves the span, so
+    the variational minimum transfers). TWO earlier statements
+    corrected: the gate energy DOES transfer across basis kinds; and
+    the Sc-unc −737 attempt was a DIIS-with-forced-occ convergence
+    failure (the U docstring's warning), NOT whole-l smearing — Sc-unc
+    plain ROHF was already valid. Operational: the gate only runs on a
+    FRESH chk — a cached runaway chk is trusted and short-circuits it
+    (cost us one confusing pass).
 
 ## Open (next waves)
 
 - **README §7.5**: drafted (lattice table + per-block Δ matrix with
   explicit references + the representability comment) — awaiting the
   user's in-conversation review before landing.
-- **Sc/Ti methodology B at matched det counts**: the remaining light
-  item (the U matched-cost verdict is in; Sc/Ti B = the per-atom-class
-  "does exactness cost energy" completion).
+- **Sc/Ti methodology B at matched det counts**: RUNNING (queued chain:
+  run_tm_methb.py; matched to ds/dsd/dsdp = 90/605/1274 on Sc,
+  120/1815/5096 on Ti). The U matched-cost verdict is in.
+- **Sc crossing tiers** (dsdpd5/dsdpf): in the running chain.
 - Then ticket 23 (direct CASSCF first), ticket 22, the review wave.

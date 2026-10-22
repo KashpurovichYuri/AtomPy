@@ -110,6 +110,7 @@ TIERS = [  # science-critical first: the stability question, then the rest
      [(4, 0, 30), (3, 1, 40), (2, 2, 40)]),
     ("2f",   {"f": (0.5, 2.0), "d": (0.1, 0.25)},
      [(4, 0, 48), (3, 1, 40), (2, 2, 40)]),
+    ("1f3d", {"f": (1.0, 2.0), "d": (0.05, 0.5)}, [(4, 0, 30)]),
 ]
 
 # set in main(): the OCCUPIED closed block (canonical order is
