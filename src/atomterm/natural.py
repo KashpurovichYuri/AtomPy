@@ -77,31 +77,45 @@ def ci_rdm1(dets, vec, norb: int, weights=None) -> np.ndarray:
                 tuple(p - norb for p in det if p >= norb))
 
     index = {split(det): i for i, det in enumerate(dets)}
-    gamma = np.zeros((norb, norb))
 
+    # transition table (root-independent, built once): j -> annih(q),
+    # create(p) -> i with the combined fermionic sign
+    js, ps, qs, sgs, tgt = [], [], [], [], []
+    for j, det in enumerate(dets):
+        occ_a, occ_b = split(det)
+        for occ, new_a in ((occ_a, False), (occ_b, True)):
+            for q in occ:
+                sg_q, o1 = annihilate(occ, q)
+                for p in range(norb):
+                    made = create(o1, p)
+                    if made is None:  # p already occupied
+                        continue
+                    sg_p, o2 = made
+                    key = ((occ_a, o2) if new_a else (o2, occ_b))
+                    i = index.get(key)
+                    if i is None:
+                        continue
+                    js.append(j)
+                    ps.append(p)
+                    qs.append(q)
+                    sgs.append(sg_q * sg_p)
+                    tgt.append(i)
+    js = np.asarray(js)
+    ps = np.asarray(ps)
+    qs = np.asarray(qs)
+    sgs = np.asarray(sgs, dtype=float)
+    tgt = np.asarray(tgt)
+
+    gamma = np.zeros((norb, norb))
     for r in range(vec.shape[1]):
-        w = weights[r]
+        w = float(weights[r])
         if w == 0.0:
             continue
         c = vec[:, r]
-        for j, det in enumerate(dets):
-            cj = c[j] * w
-            if cj == 0.0:
-                continue
-            occ_a, occ_b = split(det)
-            for occ, new_a in ((occ_a, False), (occ_b, True)):
-                for q in occ:
-                    sg_q, o1 = annihilate(occ, q)
-                    for p in range(norb):
-                        made = create(o1, p)
-                        if made is None:  # p already occupied
-                            continue
-                        sg_p, o2 = made
-                        key = ((occ_a, o2) if new_a else (o2, occ_b))
-                        i = index.get(key)
-                        if i is None:
-                            continue
-                        gamma[p, q] += sg_q * sg_p * cj * c[i]
+        contrib = sgs * c[tgt] * c[js]
+        flat = np.bincount(ps * norb + qs, weights=contrib,
+                           minlength=norb * norb)
+        gamma += w * flat.reshape(norb, norb)
     return gamma
 
 
