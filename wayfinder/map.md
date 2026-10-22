@@ -319,3 +319,16 @@ contracted-coincidence, and too-few-closed branches are now pinned.
   (AtomConfig.tag, raw basis/ECP passthrough, occupied_core_idx)
   landed during the write-only ticket-20 — the remaining ticket-20
   items (axes product, --fresh, intent manifest) still open.
+
+Design survey (2026-10-23, wave delta over src/): natural.py is DEEP
+at a real seam (four selector adapters; the 1-RDM/sign/transition-table
+machinery behind a 4-arg interface; the m-scalar invariant lives in the
+module docstring, the certificate is the enforcement tool).
+occupied_core_idx deepens the fold seam (callers hand mf+ncore; the
+closed-block selection + invariant check are inside). No deletions
+warranted; prior 2026-10-19 verdicts stand for untouched modules.
+Forward note for ticket 20: Window's dual representation (ao_rows |
+c_win) is resolved statically by today's callers; the axes-product
+runner will need ONE resolution method (Window.columns(mol, mf)
+routing ao_rows through build_full_mo) so selectors stay swappable
+there.
