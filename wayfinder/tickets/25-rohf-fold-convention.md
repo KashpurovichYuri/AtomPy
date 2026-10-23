@@ -61,3 +61,27 @@ One Ti CASCI rung (the gated reference, CAS(4,6) shell window):
   what this ticket enforces on the ROHF atoms.
 - The as-run energy column of T3b is PySCF's total and is untouched by
   this ticket; only the ANALYSIS ruler's relation to it is at stake.
+
+## RESOLUTION (2026-10-24; scripts/diag_fold.py, results/diag_fold.log)
+
+The three contributions, measured (Ti CAS(4,6)/(3,1) gated reference;
+C CAS(2,3)/(1,1) negative control):
+
+| contribution | Ti | C |
+|---|---|---|
+| (i) fold CONVENTION (our h_eff vs PySCF get_h1eff, raw fold, the run's own columns) | 5.3e-15 — NONE | 1.8e-15 |
+| (ii) averaging (the analysis ruler: avg vs raw core density) | +2.774 mEh on the ground | +0.029 mEh (= the README's documented -29 uEh) |
+| (iii) window definition (stage_facts' CASCI convention: the raw shell AO span vs the run's core-projected columns) | -85.372 mEh (window x core overlap 0.105: the 4s|3s projection) | 0 (2p is exactly S-orthogonal to the core; span deviation 2.2e-16) |
+
+(ii) + (iii) = the ladder's ~88 mEh cross-check on Ti, fully decomposed.
+The bookkeeping contract HOLDS (component (i) = 0); there is NO
+convention bug. The 85 mEh is the DELIBERATE stage_facts convention
+(analyze CASCI stages in the raw shell AO span = fact 14's
+window-definition offset), not an error.
+
+Actions taken: none in the fold code (it is exact); the decomposition
+documented here + in stages.py's docstring + the T3b cross-check
+legend (ticket 26) reads: "cross-check = (ii) the averaging effect +
+(iii) the window-definition offset where the valence shell overlaps
+the core; the fold convention itself is machine-exact (1e-15)".
+Status: RESOLVED.

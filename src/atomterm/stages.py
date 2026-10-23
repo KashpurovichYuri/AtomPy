@@ -127,7 +127,13 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         are geometry-defined; ``mf`` supplies hcore and the overlap).
     cas : the stage's CASResult (mo_coeff, energies, ci, core_energy).
     c_act : window columns to analyze -- raw shell AOs for CASCI stages,
-        ``cas.mo_coeff[:, ncore:ncore+ncas]`` for optimized stages.
+        ``cas.mo_coeff[:, ncore:ncore+ncas]`` for optimized stages. NOTE
+        (ticket 25): the raw-AO choice is a deliberate window DEFINITION;
+        where the valence shell overlaps the core (Ti 4s|3s: overlap
+        ~0.1) it shifts the CI ground by ~85 mEh vs the run's projected
+        columns -- that offset, plus the mEh-class averaging effect, is
+        the whole content of max_de_vs_pyscf. The fold CONVENTION itself
+        is machine-exact vs PySCF's get_h1eff (1e-15, diag_fold.py).
     tag : stage label used throughout reports and chkfile stores.
     spherical_core : fold with the spherically averaged core density (the
         physical reference) or the raw one (the anisotropy detector rung).
