@@ -114,3 +114,24 @@ results/u_14e/) become the regression examples.
   where are the artifacts.
 - §3 empty-or-resolved: every pressure point recorded during U maps to
   an item in §2 or a new one, and none remain unhandled.
+
+
+## 6. Axes-systematization acceptance (added 2026-10-24, from the
+ticket-22/23 waves + the user's window x treatment direction)
+
+- `Window.columns(mol, mf)` resolver: one first-class object per window
+  spec (AO shell, primitive band, MO span, NO group); NO windows carry
+  their dependency (a parent CASCI for the term-averaged density).
+- Axes runner: window x treatment x start, per-cell budget knobs
+  (mc_opts pass-through exists; the user wants longer runs later) --
+  fills each atom's elements T3 product table.
+- Completion runs (the measured gaps): U SA-24, relax-24, SA-(6,13);
+  Sc/Ti NO-start ladders (SA + relax); then the full product.
+- `--fresh` / chkfile key versioning (cached artifacts trusted today).
+- Intent manifest (precursor: the six13 printed intent header).
+- Full-matrix slice guard at library level (ncas from mc.ncas;
+  [ncore:ncore+ncas] on outputs too).
+- Needle linear-dependence helper (the relative-threshold path threw
+  one unreproduced ValueError session; map.md survey 2026-10-24).
+- Promote `closed_shell_core_energy` from the scan scripts to the
+  library.

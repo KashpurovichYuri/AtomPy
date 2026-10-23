@@ -1,21 +1,18 @@
 # C — carbon (p²)
 
-cc-pVDZ; reference **ROHF −37.682418 Eh** (raw core = averaged fold).
-Standard sectors Ms = 1 and Ms = 0. The textbook atom: ³P < ¹D < ¹S,
-the confinement finding, and the full m-symmetric radial recovery.
+cc-pVDZ. Reference **ROHF −37.682418 Eh**. Sectors Ms = 1 and Ms = 0.
+The textbook atom: ³P < ¹D < ¹S. Provenance: `results/*_ladder.md`,
+`tests/test_ladder.py` (C block), `tests/test_full_multiplet_ms0`.
+NOTES.md carries the confinement finding and the flat-gauge census.
 
-Provenance: `results/*_ladder.md`, `tests/test_ladder.py` (C block),
-`tests/test_radial_rung_full_gain_without_l_leakage`,
-`tests/test_full_multiplet_ms0`. Cross-atom verdicts: README §7.3–7.5.
-
-## Term content
+## T1 — Term content (the contract: what exact diagonalization must return)
 
 | CAS / window | Sector | Dets | Term → states |
 |---|---|---|---|
 | CAS(2,3) / {2p} | Ms=1 | 3 | ³P: 3 |
-| | Ms=0 | 9 | ³P: 3, ¹D: 5, ¹S: 1 |
+| CAS(2,3) / {2p} | Ms=0 | 9 | ³P: 3, ¹D: 5, ¹S: 1 |
 
-## Multiplet spectrum (our fold, exact ≤1e-9)
+## T2 — Spectrum (averaged fold, exact ≤1e-9)
 
 | Term | States | Energy (Eh) | Gap to ground | M_L set |
 |---|---|---|---|---|
@@ -23,33 +20,24 @@ Provenance: `results/*_ladder.md`, `tests/test_ladder.py` (C block),
 | ¹D | 5 | −1.012515 | +0.0881 | −2…2 |
 | ¹S | 1 | −0.880374 | +0.2202 | 0 |
 
-## Treatment ladder (ΔE vs ROHF, mEh)
+## T3 — Window × treatment (single window {2p}, raw shell span
+certificate ~1e-14; ΔE vs ROHF in mEh; full diagnostics in
+`results/*_ladder.md`)
 
-| rung | ΔE | note |
-|---|---|---|
-| CASCI, averaged fold | +250.8 | exact — the CONFINEMENT cost |
-| CASCI, raw core fold | +250.8 | comm 9.8e-6 |
-| CASCI, frac reference | +242.2 | |
-| CASSCF, free | +0.05 | member-tilted gauge (chaotic) |
-| CASSCF, window frozen | +242.0 | |
-| CASSCF, radial restriction | +0.05 | exact: the ENTIRE gain is the θ\* rotation |
-| SA-CASSCF, free | +0.03 | lands symmetric |
-| SA-CASSCF, frozen, purified core | +242.0 | |
-| SA-CASSCF, radial, purified core | +0.03 | exact |
+| rung | ΔE | ⟨L²⟩ | note |
+|---|---|---|---|
+| CASCI, averaged fold | +250.8 | 2.000 exact | the confinement cost (NOTES) |
+| CASCI, raw fold | +250.8 | 2.0000000000 | ‖[H,Lz]‖ 9.8e-6 — the polarized-core detector |
+| CASCI, frac reference | +242.2 | — | different functional |
+| CASSCF, free | +0.05 | 1.69–1.72 | member-tilted gauge (NOTES); ‖[P,L⊥]‖ ≈ 1.1 |
+| CASSCF, window frozen | +242.0 | — | core relaxation only |
+| CASSCF, radial restriction | +0.05 | 2.000 exact | the entire gain is the θ\* rotation |
+| SA-CASSCF, free | +0.03 | ≈ 2 | lands symmetric |
+| SA-CASSCF, frozen, pur core | +242.0 | — | pur family |
+| SA-CASSCF, radial, pur core | +0.03 | 2.000 exact | the certified treatment |
 
-## The confinement finding
+## T5 — Frozen-scan verdicts (definitions in README §7.4)
 
-CASCI over the ROHF's own 2p-like orbitals (canonical window)
-reproduces the ROHF total exactly (ΔE = 0.00 mEh): the ³P pair carries
-no net correlation the CAS can express. The +250.8 mEh "CASSCF gain"
-is the recovery of the raw-shell confinement cost, not correlation won.
-
-## Scan anatomy (§7.4)
-
-The whole gain is ONE m-symmetric radial rotation θ\* = 0.61 over
-2p → 3p (−250.8 mEh) at exact symmetry ([H,Lz] = 0 along the curve);
-single-member tilts cost EXACTLY 0 (five draws, one energy).
-
-Purified-substrate facts: the pur core closes both input windows at
-machine precision; the pur family carries the window-definition offset
-vs raw-fold CASCI rows (bound, don't pin).
+| radial rotation (m-symmetric) | single-member tilt |
+|---|---|
+| recovers everything: θ\* = 0.61 (2p→3p), −250.8 mEh | exactly flat (five draws, one energy) |

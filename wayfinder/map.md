@@ -349,3 +349,11 @@ c_win) is resolved statically by today's callers; the axes-product
 runner will need ONE resolution method (Window.columns(mol, mf)
 routing ao_rows through build_full_mo) so selectors stay swappable
 there.
+
+UPDATE (2026-10-24, docs wave): README refactored per user review
+(compression + generalization; method sections carry structure, values
+live in elements/); elements/<Atom>/ = TABLES.md + NOTES.md per atom;
+README 7 = table-kind enumerator with Ti as the worked example; 3.6
+dissolved (deformations math -> 2.4; SA logic -> 3.4); 5 flattened to
+table + per-level comments; 8/9/appendix compressed (README 1420 -> 996
+lines). Ticket 20 carries the axes-systematization acceptance list.
