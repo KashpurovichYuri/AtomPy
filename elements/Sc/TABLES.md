@@ -1,58 +1,63 @@
 # Sc — scandium (d¹)
 
-cc-pVDZ (Balabanov–Peterson). Reference **ROHF −759.736255 Eh**
-(3d¹4s²; M_S = ½; S half-integer — snap to the half-grid). Provenance:
-`results/sc_ladder.md`, `results/*_ladder.md`, `results/tm_no.log`,
-`tests/test_ladder.py` (Sc block). NOTES.md carries the basin stories.
+cc-pVDZ. Reference **ROHF −759.736255 Eh** (3d¹4s²; M_S = ½; S
+half-integer). Provenance: `results/Sc_ccpvdz_s1_ladder.json` (T3b),
+the lattice logs (T3a), `results/tm_no.log`. NOTES.md: escape/swap
+basins, bimodal SA, frac septet, AVAS cross-check.
 
-## T1 — Term content (the contract: what exact diagonalization must return)
+## T1 — Term content (the contract)
 
 | CAS / window | Sector | Dets | Term → states |
 |---|---|---|---|
 | CAS(1,5) / {3d} | Ms=½ | 5 | ²D: 5 |
 | CAS(3,6) / {3d,4s} | Ms=½ | 90 | ²D: 20, ⁴F: 14, ²F: 14, ²G: 18, ⁴P: 6, ²P: 6, ²S: 1, ²H: 11 |
 
-CAS(1,5) is the Sc⁺-like d¹ space on the [Ar]+4s² closed core.
-
-## T2 — Spectrum (CAS(1,5), averaged fold, exact ≤1e-9)
+## T2 — Spectrum (CAS(1,5), averaged fold)
 
 | Term | States | Energy (Eh) | Gap to ground | M_L set |
 |---|---|---|---|---|
 | ²D | 5 | −0.342549 | — | −2…2 |
 
-## T3 — Window × treatment (energies in Eh; ΔE vs ROHF in mEh;
-‖·‖ = many-body commutator; |[P,·]| = span certificate)
+## T3a — Window lattice at matched cost (frozen CASCI; ROHF reference
+−759.736 Eh; the d-atom window already correlates)
 
-Optimizer treatments measured at the standard window **3d4s** (bold);
-"—" = not run (ticket 20 completes the product).
+| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ | NO, Eh | ⟨L²⟩ |
+|---|---|---|---|---|---|---|---|---|
+| 3d | (3,5) | 50 | −759.436 | 12.000 | — | — | — | — |
+| 3d4s | (3,6) | 90 | −759.729 | 6.000 | −759.736 | 0.000 | −759.731 | 6.000 |
+| 3d4d | (3,10) | 450 | −759.555 | 12.000 | — | — | — | — |
+| 3d4s4p | (3,9) | 324 | −759.760 | 6.000 | — | — | −759.762 | 6.000 |
+| 3d4s4d | (3,11) | 605 | −759.739 | 6.000 | −759.745 | 0.008 | — | — |
+| 3d4s4p4d | (3,14) | 1,274 | **−759.765** | 6.000 | −759.745 | 0.143 | **−759.765** | 6.000 |
+| 3d4s4p4d5d | (3,19) | 3,249 | −759.765 | 6.000 | — | — | — | — |
+| 3d4s4p4d4f | (3,21) | 4,410 | **−759.769** | 6.000 | — | — | — | — |
 
-| window | dets | \|[P,Lz]\| | \|[P,L⊥]\| | CASCI, Eh | ⟨L²⟩ | relax | SA |
-|---|---|---|---|---|---|---|---|
-| 3d | 50 | ~1e-14 | ~1e-14 | −759.436 | 12.000 | — | — |
-| **3d4s** | 90 | 7e-15 | 9e-15 | −759.729 (+6.7 avg; raw fold ‖[H,Lz]‖ 2.8e-2) | 6.000 | +6.6, ‖·‖ 5.7e-3 (start-window defect) | free: swap basin (totals −13.3, ‖·‖ 0.8); frozen pur: +7.3 exact; radial pur: 0.0 (floor) |
-| 3d4d | 450 | ~1e-14 | ~1e-14 | −759.555 | 12.000 | — | — |
-| 3d4s4p | 324 | ~1e-14 | ~1e-14 | −759.760 | 6.000 | — | — |
-| 3d4s4d | 605 | ~1e-14 | ~1e-14 | −759.739 | 6.000 | — | — |
-| 3d4s4p4d | 1,274 | ~1e-14 | ~1e-14 | **−759.765** | 6.000 | — | — |
-| 3d4s4p4d5d | 3,249 | ~1e-14 | ~1e-14 | −759.765 | 6.000 | — | — |
-| 3d4s4p4d4f | 4,410 | ~1e-14 | ~1e-14 | **−759.769** | 6.000 | — | — |
-| ROHF MO window (open+virtuals) | — | O(1), never closed | O(1) | ⟨L²⟩ 0.000–0.143 | broken | — | — |
-| NO groups (term-averaged) | 90–324 | ~1e-13 | ~1e-13 | −759.731 … −759.765 | 6.000 exact | — | — |
+## T3b — Treatment ladder at 3d4s (cross-check ≈ 90 mEh on frozen rows
+= the window-definition offset (4s|3p overlap) + the mEh averaging
+effect — ticket 25; 0 on the pur rows)
 
-Free single-root CASSCF at the standard window: escape basin, −31.5
-mEh, L ≈ 0 window, identity-destroying (⟨L²⟩ 0.05, certs 2.3/2.7).
-See NOTES.
+| treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | cross-check (mEh) | note |
+|---|---|---|---|---|---|---|
+| ROHF (anchor) | −759.736255 | 0 | — | — | 0 | forced filling |
+| CASCI, averaged | −759.729565 | +6.7 | 6.0000 | 5.6e-15 | 89.9 | reference fold |
+| CASCI, raw | −759.729565 | +6.7 | 6.0004 | 2.8e-02 | 89.5 | polarized-core detector |
+| CASCI, fractional | −759.699492 | +36.8 | 6.0000 | 3.4e-14 | 87.8 | different functional |
+| CASSCF, free | −759.767769 | −31.5 | 0.0526 | 3.2e-01 | 1.9 | escape — no term |
+| CASSCF, core-relax | −759.729655 | +6.6 | 5.9998 | 2.8e-03 | 1.3 | |
+| SA-CASSCF, free | −759.749511 | −13.3 | 6.0020 | 8.3e-01 | 798.6 | swap basin — totals only |
+| CASCI, pur | −759.728891 | +7.4 | 6.0000 | 6.6e-15 | 0.0 | pur substrate |
+| SA-CASSCF, core-relax, pur | −759.728978 | +7.3 | 6.0000 | 3.5e-14 | 0.0 | the certified rung |
 
 ## T5 — Frozen-scan verdicts (definitions in README §7.4)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|
-| rises everywhere (3d→4d, 4s→5s/6s harmful) | descends: −0.3 mEh @ δ = 0.1, −0.9 with four members — JT-like |
+| rises everywhere | descends (−0.3 mEh @ δ = 0.1; −0.9 with four members) — JT-like |
 
-Ticket-24 amendment: the +25 mEh radial ceiling is a window statement —
-the grown lattice crosses below the escaped value (4f −3.06 mEh).
+Ticket-24 amendment: the +25 mEh radial ceiling is a window statement
+(the lattice crosses below the escape via 4f, −3.06 mEh).
 
 ## Open questions
 
-- Semicore (3p) treatment (deprioritized); spin–orbit of ²D.
-- The frac-occ septet ordering is SCF-chaos-dependent — never pin.
+Semicore (3p; deprioritized); spin–orbit of ²D; the frac-occ septet
+ordering is SCF-chaos-dependent — never pin.

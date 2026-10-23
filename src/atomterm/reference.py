@@ -75,17 +75,19 @@ class ReferenceSpec:
         whole-l spans plus Newton).
     occ_e_ref : reference energy (Eh) of the target SCF basin; gates the
         multi-basin chaos by guess cycling (see :func:`run_rohf`).
-    scf_method : "diis" (default) or "newton" (second-order SOSCF). On
-        heavy uncontracted bases with near-degenerate f/d/p valence
-        shells, plain DIIS with forced occupations can fail to converge
-        from ANY start (U: E > +1e3, garbage blocks), while Newton lands
-        the target basin deterministically from every guess tested.
+    conv_accelerator : "diis" (default; the plain SCF), "newton"
+        (second-order SOSCF from the start), or "diis+newton" (DIIS
+        linearly first, then the Newton switch). On heavy uncontracted
+        bases with near-degenerate f/d/p valence shells, plain DIIS
+        with forced occupations can fail to converge from ANY start
+        (U: E > +1e3, garbage blocks), while Newton lands the target
+        basin deterministically from every guess tested.
     """
 
     occ_closed: tuple[str, ...] | None = None
     occ_open: tuple[str, ...] | None = None
     occ_e_ref: float | None = None
-    scf_method: str = "diis"
+    conv_accelerator: str = "diis"
 
     def __post_init__(self):
         if (self.occ_closed is None) != (self.occ_open is None):
@@ -93,8 +95,9 @@ class ReferenceSpec:
         if self.occ_e_ref is not None and self.occ_closed is None:
             raise ValueError(
                 "occ_e_ref needs the occ_closed/occ_open patterns")
-        if self.scf_method not in ("diis", "newton"):
-            raise ValueError(f"unknown scf_method: {self.scf_method!r}")
+        if self.conv_accelerator not in ("diis", "newton", "diis+newton"):
+            raise ValueError(
+                f"unknown conv_accelerator: {self.conv_accelerator!r}")
 
 
 def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
@@ -129,8 +132,21 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
         m.verbose = cfg.verbose
         if guess is not None:
             m.init_guess = guess
-        if ref is not None and ref.scf_method == "newton":
+        acc = ref.conv_accelerator if ref is not None else "diis"
+        if acc == "newton":
             m = m.newton()
+        return m
+
+    def solve(m):
+        """Run one SCF under the declared acceleration policy
+        ("diis+newton": DIIS linearly first, then the Newton switch)."""
+        acc = ref.conv_accelerator if ref is not None else "diis"
+        if acc == "diis+newton":
+            m.run()
+            m2 = m.newton()
+            m2.run()
+            return m2
+        m.run()
         return m
 
     try:
@@ -142,14 +158,12 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
         return mol, mf
     except (OSError, KeyError, ValueError):
         pass
-    mf = fresh_mf()
-    mf.run()
+    mf = solve(fresh_mf())
     if ref is not None and ref.occ_e_ref is not None:
         for guess in ("atom", "huckel"):
             if mf.converged and abs(mf.e_tot - ref.occ_e_ref) <= 1e-4:
                 break
-            mf = fresh_mf(guess)
-            mf.run()
+            mf = solve(fresh_mf(guess))
         else:
             if not (mf.converged and abs(mf.e_tot - ref.occ_e_ref) <= 1e-4):
                 raise RuntimeError(

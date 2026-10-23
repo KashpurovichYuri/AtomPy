@@ -87,7 +87,7 @@ BAS = {"U": gto.parse((HERE / ".." / "data" / "u_dyall_cut_basis.txt")
 CFG = AtomConfig(symbol="U", basis=BAS, ecp=ECP, spin=4,
                  tag="U_stuttgart78_dyall")
 REF = ReferenceSpec(occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
-                    occ_e_ref=-50.38185233, scf_method="newton")
+                    occ_e_ref=-50.38185233, conv_accelerator="newton")
 OUT = Path("results/u_14e")
 OUT.mkdir(parents=True, exist_ok=True)
 CHK = str(OUT / "U_stuttgart78_dyall_rohf.chk")

@@ -657,13 +657,18 @@ diagnostic) lives in `results/*_ladder.md` and
 `elements/<Atom>/TABLES.md`. Here: the cross-atom summary, then the
 per-atom mechanism tables with full diagnostics.
 
-**How to read.** All energies are totals against the ROHF reference.
-The **PySCF cross-check** (max over the CI roots r of
-|E_r(our fold) − E_r(PySCF's own)|) validates the pipeline against an
-independent implementation: machine-zero when the bookkeeping agrees;
-mEh jumps expose a non-scalar raw-core field. Rows that moved the
-core/active boundary (the swap) are compared in totals only — our
-fold's number for them is partition bookkeeping, not physics.
+**How to read.** Every table carries ONE energy column — **E (as
+run)**, the run's own variational total, comparable across rungs; ΔE
+is vs the ROHF anchor. The **cross-check** column = |E(our analysis
+fold) − E(as run)|, max over roots: our analysis re-evaluates every
+rung in the spherically averaged core field (the common ε-free ruler
+behind ⟨L²⟩/commutators/term tables); ticket 25 decomposed it exactly
+into the mEh-class averaging effect plus the window-definition offset
+where the valence shell overlaps the core (the 4s|3s-type overlap
+carries ~85–95 mEh on Sc/Ti/Si; exactly 0 on C and the pur rows) —
+the fold CONVENTION itself is machine-exact (1e-15 vs PySCF's
+get_h1eff). Rows that moved the core/active boundary (the swap) are
+compared in totals only
 
 **The summary cards.**
 

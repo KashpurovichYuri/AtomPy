@@ -1,11 +1,11 @@
 # C — carbon (p²)
 
-cc-pVDZ. Reference **ROHF −37.682418 Eh**. Sectors Ms = 1 and Ms = 0.
-The textbook atom: ³P < ¹D < ¹S. Provenance: `results/*_ladder.md`,
-`tests/test_ladder.py` (C block), `tests/test_full_multiplet_ms0`.
-NOTES.md carries the confinement finding and the flat-gauge census.
+cc-pVDZ. Reference **ROHF −37.682418 Eh** (raw core = averaged fold).
+Sectors Ms = 1 and Ms = 0. Provenance: `results/C_ccpvdz_s2_ladder.json`
+(T3b values), campaign logs (T1/T2/T5). NOTES.md: the confinement
+finding, the flat-gauge census, the free-CASSCF tilt anatomy.
 
-## T1 — Term content (the contract: what exact diagonalization must return)
+## T1 — Term content (the contract)
 
 | CAS / window | Sector | Dets | Term → states |
 |---|---|---|---|
@@ -20,24 +20,22 @@ NOTES.md carries the confinement finding and the flat-gauge census.
 | ¹D | 5 | −1.012515 | +0.0881 | −2…2 |
 | ¹S | 1 | −0.880374 | +0.2202 | 0 |
 
-## T3 — Window × treatment (single window {2p}, raw shell span
-certificate ~1e-14; ΔE vs ROHF in mEh; full diagnostics in
-`results/*_ladder.md`)
+## T3b — Treatment ladder at {2p} (single window; cross-check ≈ 0:
+the 2p shell is exactly S-orthogonal to the core — no window offset)
 
-| rung | ΔE | ⟨L²⟩ | note |
-|---|---|---|---|
-| CASCI, averaged fold | +250.8 | 2.000 exact | the confinement cost (NOTES) |
-| CASCI, raw fold | +250.8 | 2.0000000000 | ‖[H,Lz]‖ 9.8e-6 — the polarized-core detector |
-| CASCI, frac reference | +242.2 | — | different functional |
-| CASSCF, free | +0.05 | 1.69–1.72 | member-tilted gauge (NOTES); ‖[P,L⊥]‖ ≈ 1.1 |
-| CASSCF, window frozen | +242.0 | — | core relaxation only |
-| CASSCF, radial restriction | +0.05 | 2.000 exact | the entire gain is the θ\* rotation |
-| SA-CASSCF, free | +0.03 | ≈ 2 | lands symmetric |
-| SA-CASSCF, frozen, pur core | +242.0 | — | pur family |
-| SA-CASSCF, radial, pur core | +0.03 | 2.000 exact | the certified treatment |
+| treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | note |
+|---|---|---|---|---|---|
+| ROHF (anchor) | −37.682418 | 0 | — | — | |
+| CASCI, averaged | −37.431611 | +250.8 | 2.0000 | 1.3e-15 | the confinement cost (NOTES) |
+| CASCI, raw | −37.431611 | +250.8 | 2.0000 | 9.8e-06 | same run; the polarized-core detector |
+| CASCI, fractional | −37.440244 | +242.2 | 2.0000 | 0.0 | a different functional |
+| CASSCF, free | −37.682418 | +0.0 | 1.6864 | 2.3e-02 | member-tilted gauge (NOTES) |
+| CASSCF, core-relax | −37.440394 | +242.0 | 2.0000 | 7.6e-17 | |
+| SA-CASSCF, free | −37.682391 | +0.0 | 2.0000 | 1.0e-10 | lands symmetric |
+| SA-CASSCF, core-relax, pur | −37.440382 | +242.0 | 2.0000 | 0.0 | the certified rung |
 
 ## T5 — Frozen-scan verdicts (definitions in README §7.4)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|
-| recovers everything: θ\* = 0.61 (2p→3p), −250.8 mEh | exactly flat (five draws, one energy) |
+| recovers everything (θ* = 0.61, −250.8 mEh) | exactly flat |
