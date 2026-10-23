@@ -1,4 +1,7 @@
-"""Natural-orbital windows and the window-selector registry (ticket 22).
+"""Natural-orbital mathematics: the CI 1-RDM, the NOs, occupation
+groups, and the NO window selection (ticket 22). The Window object
+and the window-kind registry (shell / primitive / scf_mo / no) live
+in atomterm.windows.
 
 The closure theorem (fact 20) licenses ANY per-l radial subspace
 replicated over ALL members as window units. NOs are legal units
@@ -18,42 +21,16 @@ beta = norb..2norb-1; determinants are sorted spin-orbital tuples.
 
 from __future__ import annotations
 
-from typing import NamedTuple
-
 import numpy as np
 
 from atomterm.secondquant import annihilate, create
 
 __all__ = [
-    "Window",
     "ci_rdm1",
     "natural_orbitals",
     "occupation_groups",
     "select_no_window",
-    "window_shell",
-    "window_primitive",
-    "window_scf_mo",
-    "window_no",
-    "SELECTORS",
 ]
-
-
-class Window(NamedTuple):
-    """A candidate active space in one of two representations.
-
-    ``ao_rows``: AO indices -- m-complete by construction (shell /
-    primitive selectors); feed through drivers.build_full_mo.
-    ``c_win``: orthonormal orbital columns (SCF-MO / NO selectors);
-    use directly as the active columns. Exactly one is not None.
-    ``m_complete``: the construction's closure GUARANTEE (shell /
-    primitive: exact; scf_mo: never; no: only if the source density was
-    m-scalar -- verify with window_closure, this flag records intent).
-    """
-
-    label: str
-    ao_rows: list[int] | None
-    c_win: np.ndarray | None
-    m_complete: bool
 
 
 def ci_rdm1(dets, vec, norb: int, weights=None) -> np.ndarray:
@@ -178,60 +155,3 @@ def select_no_window(c_no: np.ndarray, occ, n_max: int,
 # construction; orbital-column windows carry their measured/declared
 # status in the flag (verify with the certificate either way).
 
-def window_shell(mol, mf, ncore: int, *, patterns) -> Window:
-    """Contracted-shell window (AO rows; drivers.select_valence_ao)."""
-    from atomterm.drivers import select_valence_ao
-    return Window(f"shell {patterns}", select_valence_ao(mol, patterns),
-                  None, True)
-
-
-def window_primitive(mol, mf, ncore: int, *, bands) -> Window:
-    """Primitive-band window (AO rows), ``bands = {l: count | (lo, hi)}``.
-
-    Bands must be contiguous sets of the measured open-MO primitive
-    weights (the scan protocol); select_primitives enforces m-completeness
-    per primitive."""
-    from atomterm.drivers import select_primitives
-    rows: list[int] = []
-    for l in sorted(bands):
-        sel = bands[l]
-        if isinstance(sel, tuple):
-            rows += select_primitives(mol, l, exponent_band=sel)
-        else:
-            rows += select_primitives(mol, l, count=sel)
-    return Window(f"primitive {bands}", rows, None, True)
-
-
-def window_scf_mo(mol, mf, ncore: int, *, open_cols, rank, k: int) -> Window:
-    """Raw-SCF-MO window (ticket 24 methodology B): the open reference
-    MOs plus the ``k`` top-``rank`` virtuals (the caller owns the
-    ranking metric -- atom-specific valence-band rows live in the
-    scripts). NEVER rotation-closed: the span certificate measures 7-9
-    at every practical size (README 7.5)."""
-    cols = list(open_cols) + list(rank[:k])
-    return Window(f"scf_mo +{k}", None, mf.mo_coeff[:, cols], False)
-
-
-def window_no(mol, mf, ncore: int, *, c_act, dets, vec, n_max: int,
-              weights=None, deg_tol: float = 1e-7) -> Window:
-    """NO window: term-average roots -> 1-RDM -> top-occupation NOs.
-
-    ``vec``/``weights`` select and average the roots (pass the whole
-    term's multiplet for an m-scalar density; a single root yields an
-    m-split window -- legal but NOT rotation-closed, see the module
-    docstring). Verify every output with operators.window_closure.
-    """
-    norb = c_act.shape[1]
-    gamma = ci_rdm1(dets, vec, norb, weights)
-    c_no, occ = natural_orbitals(c_act, gamma)
-    c_win, kept = select_no_window(c_no, occ, n_max, deg_tol)
-    n_cols = sum(len(g) for g in kept)
-    return Window(f"no {n_cols} cols", None, c_win, False)
-
-
-SELECTORS = {
-    "shell": window_shell,
-    "primitive": window_primitive,
-    "scf_mo": window_scf_mo,
-    "no": window_no,
-}

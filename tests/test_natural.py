@@ -22,10 +22,13 @@ from atomterm.natural import (
     natural_orbitals,
     occupation_groups,
     select_no_window,
-    window_shell,
+)
+from atomterm.windows import (
+    Window,
+    window_no,
     window_primitive,
     window_scf_mo,
-    window_no,
+    window_shell,
 )
 from atomterm.secondquant import annihilate, create
 from atomterm.system import AtomConfig, build_mol

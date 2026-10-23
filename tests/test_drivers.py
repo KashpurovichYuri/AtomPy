@@ -561,7 +561,7 @@ def test_forced_occ_l_specifiers_and_open_premium():
     case (Sc/Ti) findable."""
     from pyscf import gto
 
-    from atomterm.drivers import _forced_rohf_occ
+    from atomterm.reference import _forced_rohf_occ
 
     mol = gto.Mole()
     mol.atom = "C 0 0 0"

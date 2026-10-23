@@ -493,11 +493,12 @@ verdicts of §7.4 (per-atom values in `elements/`).
 | `angular` | one-electron L̂x/L̂y/L̂z AO matrices — two independent constructions pinning each other (libcint; exact tesseral algebra) |
 | `detbasis` / `secondquant` | many-body matrices over determinants — Slater–Condon and explicit a†/a, elementwise-identical twins (§2.2) |
 | `operators` | operator assembly — the fold (§3.2), the H/L̂z/L̂²/Ŝ²/N̂ symbols, the window-closure certificates (§2.3) |
-| `drivers` | the deep module — the capability map below |
+| `reference` / `casscf` | the engine — SCF reference with gates; the one deep optimizer (`constrained_casscf`) with its masks and adapters |
+| `windows` / `core` | window construction, selection, the kind registry (`Window.columns`); the purified core substrate and fold energy |
 | `stages` | the one uniform analysis pass per finished stage — the source of every §7 number |
 | `scans` | frozen-landscape measurements — deterministic (§7.4) |
 | `analysis` | term labels, configuration summaries, report rendering |
-| `pipeline` / `ladder` | orchestration — per-atom CASCI sectors (`pipeline`); the rung registry as data (`ladder`, §7.3) |
+| `cases` / `ladder` / `sweep` | orchestration — the declared per-atom campaign (`cases`: CaseSpec → run_case); rungs as data (`ladder`, §7.3); the window × treatment runner (`sweep`) |
 
 **The drivers capability map.** Every treatment is a point in a
 five-axis space:

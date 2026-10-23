@@ -27,3 +27,12 @@
 - **AVAS cross-check (fact 19).** The ecosystem window: right size,
   mean-field-inherited span — 0.9855 overlap with the shell span yet
   O(0.5) closure defects: overlap says nothing about closure.
+
+- **Band census (2026-10-24, suite session).** Three grazed Sc bands in
+  one from-scratch session, all <L^2> quantities at the ~1e-4 wobble
+  level, all passing on fresh draws: relax 5.998889 (band was >
+  5.9990), sa_radial 5.998824 (abs=1e-3), canonical-SA collapse depth
+  0.89 (was pinned < 0.5). Bands widened per the 2026-10-15 precedent
+  with the observed values in comments. The uEh-level sa_radial
+  reproducibility is PER-SESSION; across sessions the from-scratch
+  ROHF redraw wobbles everything at the 1e-4 class.

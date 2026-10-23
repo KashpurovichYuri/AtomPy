@@ -32,13 +32,18 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19) |
-| `src/atomterm/drivers.py` | `run_rohf`, `ReferenceSpec`, `run_frac_occ_scf`, `run_casci`, `constrained_casscf`, `core_virtual_only_mask`, `no_core_window_exchange_mask`, `lm_sectors`, `radial_basis`, `radial_mask`, `run_sa_casscf`, `run_casscf_*`, `select_valence_ao`, `select_shell_ao`, `shell_weights`, `purified_s_core`, `purified_core_orbitals`, `avas_window`, `span_overlap` | all checkpointed (`.chk`); `ReferenceSpec` bundles the character-forced occupations + basin gate and threads `run_rohf(ref=)/run_ladder(ref=)/run_atom(ref=)`; `constrained_casscf(mo_full=, mask=, weights=)` is the one deep CASSCF driver — a mask is any `uniq_var_indices`-shaped callable, and the `run_casscf_*` names are one-line adapters over it; `lm_sectors`/`radial_basis(c_core=)`/`radial_mask` build the (l, member)-labeled substrate for same-sector (radial) constraints (facts 16e/17); `purified_core_orbitals` = the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members closure theorem); active space = raw shell AO columns placed at `[ncore:ncore+ncas]`; core-explicit tests use `purified_s_core`; `avas_window`/`span_overlap` = the ecosystem window probe (fact 19) |
+| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_ladder(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README 3.1) |
+| `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the one deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters; `mc_opts` = per-run optimizer knobs (budgets); all checkpointed (`.chk`); labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source) |
+| `src/atomterm/windows.py` | `Window(.columns)`, `window_shell/primitive/scf_mo/no`, `SELECTORS`, `select_*`, `primitive_chain`, `shell_weights`, `build_full_mo`, `complete_orthonormal`, `lm_sectors`, `radial_basis`, `radial_mask`, `avas_window`, `span_overlap`, `lowdin(tol=)` | window construction + selection + the kind registry: `Window.columns(mf, ncore, closed=, c_core=)` materializes any kind to the full MO substrate (bounded-slice contract owned here); `lowdin` raises a named error on near-linearly-dependent blocks (the needle class, fact 16e) instead of NaN-ing downstream |
+| `src/atomterm/core.py` | `purified_s_core`, `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
 | `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and ladder share — callers only render (report text / flat json payload) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
-| `src/atomterm/pipeline.py` | `run_atom`, `run_carbon` | generic end-to-end orchestration for any atom (Ms sectors derived from spin + active-electron count); `run_carbon` = carbon wrapper; writes `results/` |
+| `src/atomterm/cases.py` | `CaseSpec`, `run_case`, `run_atom`, `run_carbon` | the DECLARED per-atom campaign (the intent manifest): `CaseSpec` fixes atom/reference-data/window/sectors/want before anything runs; `run_case(spec)` executes; `run_atom` = the staged implementation; `pipeline.py` remains a compat shim |
 | `src/atomterm/ladder.py` | `Rung`, `run_ladder`, `run_carbon_ladder` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); `purified=True` appends the `*_pur` rungs (same treatments on the exactly-closed purified core substrate, fact 20 — incl. `sa_relax_pur`, the exact-symmetry SA rung); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
-| `src/atomterm/natural.py` | `Window`, `ci_rdm1`, `natural_orbitals`, `occupation_groups`, `select_no_window`, `window_shell/primitive/scf_mo/no`, `SELECTORS` | NO windows + the selector registry (ticket 22): spin-summed 1-RDM from CI roots (secondquant signs), NOs = density eigenvectors in the orthonormal span, occupation-GROUP selection never splits an m-set; `window_no` is symmetry-safe only from a term-AVERAGED root set (a single \|L,M_L⟩ density is m-diagonal but m-unequal — pinned); run `window_closure` on every NO output, never assume |
+| `src/atomterm/sweep.py` | `SweepSpec`, `plan_sweep`, `run_sweep`, `render_insert` | the window × treatment × start runner (ticket 20): declared product, per-cell budget knobs, per-cell failure quarantine, exact-eigh labels in full-diagnostics mode; writes `results/<tag>_sweep.json` + the generated T3 insert for `elements/<Atom>/TABLES.md` |
+| `src/atomterm/natural.py` | `ci_rdm1`, `natural_orbitals`, `occupation_groups`, `select_no_window` | the NO mathematics (ticket 22): spin-summed 1-RDM from CI roots (secondquant signs), NOs = density eigenvectors in the orthonormal span, occupation-GROUP selection never splits an m-set; symmetry-safe only from a term-AVERAGED root set (a single \|L,M_L⟩ density is m-diagonal but m-unequal — pinned); the Window object + selectors live in `windows.py` |
+| `src/atomterm/drivers.py` | (compat facade) | re-exports the historic surface over reference/windows/core/casscf — existing imports keep working; NEW code imports the owning module |
 
 ## Hard-won facts (do not re-derive)
 
@@ -366,14 +371,16 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 116 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 123 tests in ~13 min (chkfile caching; ROHF computed once per
 session; the Ti ladder is the slowest block, ~7 min cold; the Sc ladders
 ~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
 anywhere in the fixture chain, sub-second); `pytest -m slow` = the
 SCF-bearing chemistry. Run the full suite before committing changes to
 physics-bearing modules (drivers/operators/stages/ladder/scans); targeted
 files or `-m fast` are fine for everything else. Test files map
-1:1 to src modules; tests are named for the
+1:1 to src modules (`test_drivers.py` exercises the
+reference/windows/core/casscf quartet through the drivers facade -- the
+split kept its tests in place); tests are named for the
 invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
 (second quantization ≡ first quantization, elementwise),
