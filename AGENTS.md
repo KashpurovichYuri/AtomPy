@@ -353,6 +353,10 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     pilots).
 ## Conventions
 
+- Per-atom tables live in `elements/<Atom>/TABLES.md` (committed,
+  log-provenanced); README §7 carries cross-atom comparisons and one
+  worked example (U). New atom = new element file + a data row, not
+  README growth.
 - Atomic units, ℏ = 1. Spin-orbitals: alpha = `0..norb-1`, beta = `norb..2norb-1`.
 - Determinants: sorted tuples of occupied spin-orbitals.
 - Every operator enters the determinant space as (one-body matrix,

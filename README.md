@@ -1039,35 +1039,18 @@ group windows (term-averaged density of each atom's largest-window
 CASCI ground term); ⟨L²⟩ and the span certificates are machine-exact
 at every NO size (results/u_14e/u_run_no.log, results/tm_no.log).
 
-**Sc** — ROHF reference −759.736 Eh (3d¹4s²; M_S = 1/2):
+**Sc** and **Ti** — the full per-atom tables (window lattice,
+treatment ladder, scan anatomy, term content, open questions) live in
+`elements/Sc/TABLES.md` and `elements/Ti/TABLES.md`. Headlines: the
+d-atom as-run windows already correlate (+6.7 / +10.6 mEh vs ROHF);
+NO occupation groups beat the shell lattice at every equal-determinant
+count; the free/swap optimizer rungs trade terms for energy; the pur
+rungs are machine-exact; the ticket-24 ceilings are window statements
+(Sc 4f −3.06, Ti 5d −4.36 / 4f −11.46).
 
-| window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
-|---|---|---|---|---|---|---|---|
-| 3d | (3,5) | 50 | −759.436 | 12.000 | — | — | — |
-| 3d4s | (3,6) | 90 | −759.729 | 6.000 | −759.736 | 0.000 | −759.731 |
-| 3d4d | (3,10) | 450 | −759.555 | 12.000 | — | — | — |
-| 3d4s4p | (3,9) | 324 | −759.760 | 6.000 | — | — | −759.762 |
-| 3d4s4d | (3,11) | 605 | −759.739 | 6.000 | −759.745 | 0.008 | — |
-| 3d4s4p4d | (3,14) | 1,274 | **−759.765** | 6.000 | −759.745 | 0.143 | **−759.765** |
-| 3d4s4p4d5d | (3,19) | 3,249 | −759.765 | 6.000 | — | — | — |
-| 3d4s4p4d4f | (3,21) | 4,410 | **−759.769** | 6.000 | — | — | — |
-
-**Ti** — ROHF reference −848.406 Eh (3d²4s², the gated good-basin
-reference; M_S = 1):
-
-| window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
-|---|---|---|---|---|---|---|---|
-| 3d | (4,5) | 50 | −848.054 | 6.000 | — | — | — |
-| 3d4s | (4,6) | 120 | −848.395 | 12.000 | −848.405 | 0.000 | −848.399 |
-| 3d4d | (4,10) | 1,200 | −848.232 | 6.000 | — | — | — |
-| 3d4s4p | (4,9) | 756 | −848.429 | 12.000 | — | — | −848.432 |
-| 3d4s4d | (4,11) | 1,815 | −848.409 | 12.000 | −848.414 | 0.010 | — |
-| 3d4s4p4d | (4,14) | 5,096 | **−848.438** | 12.000 | −848.420 | 0.201 | **−848.438** |
-| 3d4s4p4d5d | (4,19) | 18,411 | −848.439 | 12.000 | — | — | — |
-| 3d4s4p4d4f | (4,21) | 27,930 | **−848.446** | 12.000 | — | — | — |
 
 **U** — ROHF reference −50.382 Eh (5f³6d¹). The reference determinant
-itself is a numerically pure ⁵S° state (⟨L²⟩ = 0; §below). Sector
+itself is a numerically pure ⁵S° state (⟨L²⟩ = 0; §5.5). Sector
 M_S = 2 on both sides (the cheapest quintet sector); the first five
 rows are equal-determinant pairs:
 
@@ -1243,6 +1226,13 @@ conclusion holds only if the neighbor steps (k±1) reorder nothing.
 
 ## 8. Dictionary and file map
 
+**Per-atom tables**: `elements/<Atom>/TABLES.md` (C, Si, Sc, Ti, U) —
+the committed, human-readable per-atom record: reference lines, term
+content, spectra, window lattice, treatment ladders, scan anatomy,
+open questions, and log provenance. README §7 carries the cross-atom
+comparisons and one worked example (U); when an atom's detail grows,
+it moves to its element file, not into this README.
+
 **Primary sources of §7** (regenerated, not committed): per-atom
 `results/*_report.md/json` — the pipeline CASCI multiplet tables
 (§7.1–7.2); `results/*_ladder.md/json` — the full 17-rung registry
@@ -1265,22 +1255,61 @@ exact-class closure pins, the basin branches. Plain-language companions:
 
 ---
 
-## 9. Roadmap
+## 9. Status and directions
 
-*Scalar relativity* (DKH/X2C): h₁ changes, nothing else — a scalar
-Hamiltonian is rotationally invariant, so every theorem and diagnostic
-survives; the reference basins (E_ref, the good-basin census) must be
-re-measured once. *ECP-based full relativity*: measured on C/Si and
-Sc/Ti (tickets 18/19) — the machinery is unchanged (only h₁ moves; term
-structure and closure classes identical). *Spin–orbit coupling*: the
-natural next symmetry step —
-it splits the multiplets this note certifies; the machinery extends in
-place (Ĵ² = (L̂+Ŝ)², Ĵz as determinant-basis matrices; term symbols
-become levels). *Further atoms* (V, Cr, …): data rows, not code — the
-L4/L5 phenomena are expected to recur, and the protocol card's checks
-are the guard.
+**Status.** Four atoms delivered end-to-end (C, Si, Sc, Ti) plus the U
+campaign: ROHF references (character-forced, basin-gated where the SCF
+is multi-basin), exact term tables, the treatment ladders (frozen /
+radial / relax / SA / pur rungs), frozen-scan anatomy, the window
+lattice at matched cost, NO group windows, and the ticket-23 verdict:
+the deep correlation on U is RADIAL relaxation, taken at exact ⁵L by
+the ensemble (−50.4238, 42 mEh below the ⁵S° mean field), destroyed by
+free single-root optimization. Per-atom tables live in
+`elements/<Atom>/TABLES.md`; this README carries the cross-atom story.
 
----
+**Open physics.**
+- The ⁵S° mechanism (U): why the gated ROHF determinant is an exact
+  ⁵S° state, and why free optimization falls into ⁵S°-like basins
+  (AOC-smearing hypothesis; the free-run attractor is landscape-level
+  support). Same class: the Ti ⟨L²⟩ = 0 MO-window phenomenon.
+- Inner core-pair valence: promoting a 6p member moved −551 mEh on U
+  (m-incomplete — indicative). The m-complete core-pair design is the
+  next correlation tier.
+- U f³d¹-vs-f²d² ordering inside ONE NO window (ticket-22 remainder).
+- NIST comparison of the term tables (postponed; the orderings already
+  match the free-ion tables where checked).
+
+**Method gaps (ticket 20).**
+- Axes-product runners (window × treatment × start) behind one
+  interface — needs a `Window.columns(mol, mf)` resolver so windows
+  are first-class objects (AO shells, primitive bands, MO spans, NO
+  groups).
+- `--fresh` / chkfile key versioning (cached artifacts are trusted
+  today; staleness is manual).
+- Intent manifest: declare valence / folded pairs / reachable terms
+  BEFORE a run (precursor: the six13 printed intent header).
+- Full-matrix slice guard: `ncas` from `mc.ncas`, slices
+  `[ncore:ncore+ncas]` — enforced in the staged drivers, worth a
+  library-level guard.
+- Needle linear-dependence helper: the relative-threshold
+  primitive-admission path threw one unreproduced ValueError session
+  (map.md survey, 2026-10-24).
+- Duplicate `closed_shell_core_energy` across scan scripts — promote
+  to the library.
+
+**Forward directions** (beyond ticket 20).
+- *Spin–orbit coupling*: the natural next symmetry step — it splits
+  the multiplets this note certifies; the machinery extends in place
+  (Ĵ² = (L̂+Ŝ)², Ĵz as determinant-basis matrices; term symbols
+  become levels).
+- *Transition moments / g-factors*: the certified term eigenstates
+  are the states between which matrix elements would be taken.
+- *Scalar relativity* (DKH/X2C): h₁ changes, nothing else; the
+  reference basins must be re-measured once. *ECP variants*: measured
+  on C/Si and Sc/Ti (tickets 18/19) — machinery unchanged.
+- *Further atoms* (V, Cr, …): data rows in `elements/`, not code —
+  the L4/L5 phenomena are expected to recur, and the protocol card's
+  checks are the guard.
 
 ## Appendix. Plain-language glossary
 
