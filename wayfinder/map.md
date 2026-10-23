@@ -103,7 +103,29 @@ green, reports written.
   untouched for output stability, fix belongs in its own decision since it
   changes every report.
 
-## Live tickets (the current wave, reordered after ticket 11)
+## Live tickets (updated 2026-10-24, after the docs + structure waves)
+
+- [25: ROHF fold-convention diagnostic](tickets/25-rohf-fold-convention.md)
+  — OPEN, task zero: our h_eff vs PySCF's h1eff differ ~90 mEh on the
+  ground for ROHF atoms (closed-shell: 1e-13). Decompose operator /
+  constant / window; fix or document; rewrites the cross-check legend.
+- [26: elements tables T3a/T3b](tickets/26-elements-tables.md) — OPEN:
+  the approved formats (AO/MO/NO lattice reinstated as the headline;
+  single-E T3b with the cross-check column; verified values in the
+  ticket).
+- [27: launch & naming polish](tickets/27-launch-naming.md) — OPEN:
+  conv_accelerator {diis,newton,diis+newton}; sa-casscf naming;
+  sweep.py → treatments.py (StudySpec/run_study); the v4 launch
+  diagram into README.
+- [28: completion runs](tickets/28-completion-runs.md) — OPEN, after
+  25/26/27: U SA-24 / relax-24 / SA-(6,13); Sc/Ti NO-start ladders;
+  the approved stop rules.
+- [20: new-atom ergonomics](tickets/20-new-atom-ergonomics.md) —
+  partially delivered (windows/core/reference/casscf split, cases.py,
+  sweep.py first cut, needle guard); the axes acceptance list in §6.
+  25–28 are its decomposition; close 20 when they land.
+
+(The pre-2026-10-24 ticket list follows for history.)
 
 Wave order decision (post-Sc): run the review and the constraint axis
 BEFORE Ti -- Ti would only repeat Sc's phenomenology on unsettled
