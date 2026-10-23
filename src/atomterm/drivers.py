@@ -911,7 +911,8 @@ def no_core_window_exchange_mask(self, nmo, ncore, ncas, frozen):
 
 
 def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
-                       weights=None, verbose=0, name="casscf") -> CASResult:
+                       weights=None, verbose=0, name="casscf",
+                       mc_opts: dict = None) -> CASResult:
     """CASSCF with declaratively constrained orbital rotations -- the one
     deep driver every orbital-optimization rung goes through.
 
@@ -925,12 +926,16 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
         pass in the SA-converged window.
     name : chkfile store key under ``atomterm/`` -- keep it distinct per
         variation so differently-constrained runs never collide.
+    mc_opts : attributes set on the mc object before the kernel (optimizer
+        knobs: ``max_cycle_macro``, ``conv_tol``, ...).
     """
     import types
 
     mc = mcscf.CASSCF(mf, ncas, nelecas)
     if mo_full is not None:
         mc.mo_coeff = mo_full
+    for k, v in (mc_opts or {}).items():
+        setattr(mc, k, v)
     if mask is not None:
         mc.uniq_var_indices = types.MethodType(mask, mc)
     if weights is None:

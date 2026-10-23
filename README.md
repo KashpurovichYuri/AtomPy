@@ -1125,6 +1125,43 @@ everywhere. The NO compression realizes full-window quality at a
 fraction of the cost; like every AO-span window it does NOT contain
 the ROHF determinant (representability, point 1 below).
 
+**Ticket 23 — relaxation vs growth from the NO windows** (M_S = 2
+sector; ROHF reference −50.381852; exact-eigh labels everywhere —
+PySCF's own CI vectors straggle in the 17-fold cluster and must never
+be trusted for ⟨L²⟩). Every optimizer rung on the NO-12 substrate,
+read against the frozen anchors:
+
+| rung | window | CAS | dets | E, Eh | ⟨L²⟩ | symmetry |
+|---|---|---|---|---|---|---|
+| frozen CASCI (anchor) | NO groups d5+f7 | (4,12) | 495 | −49.889731 | 72.0000 | machine-exact |
+| frozen growth | all 4 NO groups | (4,24) | 10,626 | −49.894287 | 72.0000 | machine-exact |
+| core relax (span frozen) | NO-12, core relaxed | (4,12) | 495 | −49.899729 | 72.0000 | machine-exact |
+| SA-CASSCF, 17×⁵L | NO-12 start, radials relaxed | (4,12) | 495 | −50.423810 | 72.0000 | fold 1.3e-4, span 8e-4 |
+| 7s² promoted | NO-12 + 7s pur column | (6,13) | 16,731 | −49.894866 | 72.0000 | machine-exact |
+| free single-root | any start | — | — | ≈ −50.43 | broken | unconverged; spans O(5–8) |
+
+Verdicts. (1) *The deep correlation is radial.* SA holds the window
+inside the f/d shells (l-content exactly l2 + l3 = 12.0 before and
+after) while redistributing weight ACROSS the exponent bands
+(f-band weight 7.000 → 4.706): the missing-radial axis of the growth
+lattice, recovered by relaxation instead of growth — −534 mEh vs the
+frozen anchor, at exactly quantized ⁵L. This is the first U object
+below the ⁵S° ROHF mean field at certified symmetry (−42 mEh).
+(2) *Only the ensemble survives the attractor.* Free single-root
+CASSCF loses the window in one macro step (−493 mEh), never converges
+(gradient stuck at ~1e-2), and lands broken (⟨L²⟩ 0.6–31) — the ⁵S°
+attractor takes the same money and destroys the terms; SA takes it
+and keeps ⁵L. SA-17 degrades (fold [H,Lz] = 10), SA-12 is the rung.
+(3) *7s² is inert as valence*: −0.58 mEh, ⟨N7s⟩ = 1.97, f²d² ⁵L
+ground unchanged — the ⁵L verdict is 7s²-independent. (Promoting an
+INNER core pair instead — a 6p member, by identification error —
+moves −551 mEh but with an m-incomplete lone member: indicative that
+the next correlation tier is core-pair valence, done properly.)
+(4) Core relaxation at frozen span buys 10.0 mEh — ~2× the entire
+12→24 frozen growth axis (4.6 mEh) at exact symmetry. PySCF's
+`converged=False` on truncated runs is chaotic across reruns while
+converged endpoints reproduce bit-exactly — fact 10, re-measured.
+
 **What the tables say.**
 
 1. *Small cost: the raw-ROHF windows win — by representability, not
