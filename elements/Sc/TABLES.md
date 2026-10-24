@@ -32,16 +32,17 @@ basins, bimodal SA, frac septet, AVAS cross-check.
 | 3d4s4p4d5d | (3,19) | 3,249 | −759.765 | 6.000 | — | — | — | — |
 | 3d4s4p4d4f | (3,21) | 4,410 | **−759.769** | 6.000 | — | — | — | — |
 
-## T3b — Treatment ladder at 3d4s (cross-check ≈ 90 mEh on frozen rows
-= the window-definition offset (4s|3p overlap) + the mEh averaging
-effect — ticket 25; 0 on the pur rows)
+## T3b — Treatment ladder at 3d4s (cross-check = the averaging effect
+(1.3 mEh; ticket 25) — the old ~90 mEh window-definition offset was an
+artifact of the retired raw-AO-span analysis convention; 0 on the pur
+rows)
 
 | treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | cross-check (mEh) | note |
 |---|---|---|---|---|---|---|
 | ROHF (anchor) | −759.736255 | 0 | — | — | 0 | forced filling |
-| CASCI, averaged | −759.729565 | +6.7 | 6.0000 | 5.6e-15 | 89.9 | reference fold |
-| CASCI, raw | −759.729565 | +6.7 | 6.0004 | 2.8e-02 | 89.5 | polarized-core detector |
-| CASCI, fractional | −759.699492 | +36.8 | 6.0000 | 3.4e-14 | 87.8 | different functional |
+| CASCI, averaged | −759.729565 | +6.7 | 6.0000 | 5.6e-15 | 1.3 | reference fold |
+| CASCI, raw | −759.729565 | +6.7 | 6.0004 | 2.8e-02 | ~0 | polarized-core detector |
+| CASCI, fractional | −759.699492 | +36.8 | 6.0000 | 3.4e-14 | ~0 | different functional |
 | CASSCF, free | −759.767769 | −31.5 | 0.0526 | 3.2e-01 | 1.9 | escape — no term |
 | CASSCF, core-relax | −759.729655 | +6.6 | 5.9998 | 2.8e-03 | 1.3 | |
 | SA-CASSCF, free | −759.749511 | −13.3 | 6.0020 | 8.3e-01 | 798.6 | swap basin — totals only |

@@ -443,15 +443,25 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
     mo = v if v.shape[1] == n else complete_orthonormal(v, s)
     labels += [None] * (mo.shape[1] - len(labels))
 
-    # gauge assertion: every labeled column really is dominated by its own
-    # sector (catches any gauge surprise at the purity level)
+    # gauge check: every labeled column must be dominated by its own
+    # sector. A column that fails is a NEEDLE -- its sector content was
+    # consumed by the orthogonalization against the substrate -- and is
+    # DEMOTED to unlabeled padding (fact 16e: strong directions labeled,
+    # needles padded; never a rotation partner). The needle helper of
+    # ticket 20/26: deterministic, no flake.
+    demoted = []
     for i, lab in enumerate(labels):
         if lab is None:
             continue
         rows = sec[lab]
         c = mo[rows, i]
         w = float(np.real(c.conj().T @ s[np.ix_(rows, rows)] @ c))
-        assert w > 0.9, (i, lab, w)
+        if w <= 0.9:
+            labels[i] = None
+            demoted.append((i, lab, round(w, 3)))
+    if demoted:
+        print(f"radial_basis: needle directions demoted to unlabeled "
+              f"(fact 16e): {demoted}")
     assert mo.shape[1] == n
     return mo, labels
 

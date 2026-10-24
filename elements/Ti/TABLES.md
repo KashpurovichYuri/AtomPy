@@ -38,16 +38,17 @@ windows.
 | 3d4s4p4d5d | (4,19) | 18,411 | −848.439 | 12.000 | — | — | — | — |
 | 3d4s4p4d4f | (4,21) | 27,930 | **−848.446** | 12.000 | — | — | — | — |
 
-## T3b — Treatment ladder at 3d4s (cross-check ≈ 88 mEh on frozen rows
-= the window-definition offset (4s|3s overlap 0.105) + 2.8 mEh
-averaging — ticket 25's exact decomposition; 0 on the pur rows)
+## T3b — Treatment ladder at 3d4s (cross-check = the averaging effect
+(2.8 mEh; ticket 25: the fold convention is machine-exact) — the old
+~88 mEh window-definition offset was an artifact of the retired
+raw-AO-span analysis convention; 0 on the pur rows)
 
 | treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | cross-check (mEh) |
 |---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | −848.406489 | 0 | — | — | — | — | — | 0 |
-| CASCI, averaged | −848.395940 | +10.5 | 12.0000 | 2.2e-14 | 4.1e-13 | 5.9e-15 | 7.6e-15 | 89.5 |
-| CASCI, raw | −848.395940 | +10.5 | 12.0000 | 4.9e-02 | 2.6e-01 | 5.9e-15 | 7.6e-15 | 88.2 |
-| CASCI, fractional | −848.358519 | +48.0 | 12.0000 | 1.2e-13 | 7.5e-13 | 5.9e-15 | 7.6e-15 | 84.9 |
+| CASCI, averaged | −848.395940 | +10.5 | 12.0000 | 2.2e-14 | 4.1e-13 | 5.9e-15 | 7.6e-15 | 2.8 |
+| CASCI, raw | −848.395940 | +10.5 | 12.0000 | 4.9e-02 | 2.6e-01 | 5.9e-15 | 7.6e-15 | ~0 |
+| CASCI, fractional | −848.358519 | +48.0 | 12.0000 | 1.2e-13 | 7.5e-13 | 5.9e-15 | 7.6e-15 | ~0 |
 | CASSCF, free | −848.437740 | −31.3 | 0.0503 | 4.3e-01 | 1.1e+00 | 2.8 | 4.0 | 2.8 |
 | CASSCF, core-relax | −848.396109 | +10.4 | 12.0 | 2.3e-08 | 1.7e-07 | 3.2e-08 | 5.9e-08 | 2.7 |
 | SA-CASSCF, free | −848.416563 | −10.1 | 12.003 | 1.1e+00 | 6.0e+00 | 1.4 | 1.5 | 851 |
