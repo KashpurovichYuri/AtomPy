@@ -41,7 +41,6 @@ __all__ = [
     "window_no",
     "SELECTORS",
     "lowdin",
-    "lowdin",
 ]
 
 
@@ -554,7 +553,10 @@ class Window(NamedTuple):
             defaults to the first ``ncore`` columns of ``mf``.
         """
         if self.ao_rows is not None:
-            closed = closed if closed is not None else list(range(ncore))
+            # canonical MO order is meaningless on near-degenerate bases:
+            # always the OCCUPIED block (the U trap -- fact 21a)
+            closed = closed if closed is not None \
+                else occupied_core_idx(mf, ncore)
             return build_full_mo(mf, closed, self.ao_rows, c_core=c_core)
         core = c_core if c_core is not None else mf.mo_coeff[:, :ncore]
         return complete_orthonormal(np.hstack([core, self.c_win]),

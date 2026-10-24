@@ -22,8 +22,7 @@ CASES = {
            [1 / 7] * 7, 4, 6),
 }
 
-import sys as _sys
-only = _sys.argv[1:] or None
+only = sys.argv[1:] or None
 for name, (cfg, patterns, nelec, saw, fo, no) in CASES.items():
     if only and name not in only:
         continue

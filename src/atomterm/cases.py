@@ -16,15 +16,12 @@ from pathlib import Path
 import numpy as np
 
 from atomterm.system import AtomConfig, ncore_of, sector_occupations
-from atomterm.drivers import (
-    ReferenceSpec,
-    build_full_mo,
-    occupied_core_idx,
+from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.windows import build_full_mo, occupied_core_idx, select_valence_ao
+from atomterm.casscf import (
     run_casci,
     run_casscf as casscf_stage,
-    run_rohf,
     run_sa_casscf,
-    select_valence_ao,
 )
 from atomterm.stages import stage_facts
 from atomterm.analysis import format_report
