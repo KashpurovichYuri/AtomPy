@@ -156,7 +156,6 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
     same orbital treatments on the exactly-closed substrate (the fact-17
     input-window baseline removed; ticket 13)."""
     n_open = len(act_idx)
-    c_shell = lambda cas: np.eye(mf.mo_coeff.shape[0])[:, act_idx]  # noqa: E731
     c_win = lambda cas: cas.mo_coeff[:, ncore : ncore + ncas]  # noqa: E731
     mo_of = lambda mf_ref, c_core=None: build_full_mo(  # noqa: E731
         mf_ref, occupied_core_idx(mf_ref, ncore), act_idx, c_core=c_core)
@@ -167,14 +166,14 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
             "casci_raw", "casci",
             lambda: run_casci(mf, ncas, nelecas, mo_of(mf), chk("casci_raw"),
                               nroots=nroots, name="casci_raw"),
-            c_shell, lambda: mf, spherical_core=False,
+            c_win, lambda: mf, spherical_core=False,
             anisotropy_ref=lambda: (mf, None),
         ),
         Rung(
             "casci_avg", "casci",
             lambda: run_casci(mf, ncas, nelecas, mo_of(mf), chk("casci_avg"),
                               nroots=nroots, name="casci_avg"),
-            c_shell, lambda: mf,
+            c_win, lambda: mf,
             anisotropy_ref=lambda: (mf, None),
         ),
     ]
@@ -186,7 +185,7 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
                 lambda: run_casci(mf_f, ncas, nelecas, mo_of(mf_f, c_frac()),
                                   chk("casci_frac"), nroots=nroots,
                                   name="casci_frac"),
-                c_shell, lambda: mf_f,
+                c_win, lambda: mf_f,
                 anisotropy_ref=lambda: (mf_f, c_frac()),
             )
         )

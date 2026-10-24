@@ -155,7 +155,6 @@ def run_atom(
 
     act_idx = select_valence_ao(mol, shell_patterns)
     ncas = len(act_idx)
-    c_shell = np.eye(mol.nao_nr())[:, act_idx]
 
     # Ms sectors: (na, nb, nroots) for each CASCI diagonalization
     na_p, nb_p = sector_occupations(nelec_act, spin)
@@ -207,7 +206,7 @@ def run_atom(
         cas = run_casci(mf, ncas, (na, nb), mo, str(out / f"{label}_{tag}.chk"),
                         nroots=nroots, verbose=0)
         print(f"[CASCI Ms={_ms_label(na, nb)}] roots: {np.round(cas.energies, 6)}")
-        stage_analysis(tag, cas, c_shell, na, nb)
+        stage_analysis(tag, cas, cas.mo_coeff[:, ncore:ncore + ncas], na, nb)
 
     mo_p = mo_by_sector[(na_p, nb_p)]
     ncore_p = ncore_of(mol.nelectron, na_p + nb_p)

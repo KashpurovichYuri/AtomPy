@@ -25,6 +25,7 @@ pytestmark = pytest.mark.slow
 CASES = {
     "C": dict(
         cfg=AtomConfig("C", "ccpvdz", spin=2),
+        comm_band=1e-12,
         patterns=["2p"],
         nelec_act=2,
         run_casscf=True,
@@ -39,6 +40,7 @@ CASES = {
     # converge in the 3P basin (the old "escape" was a non-orthonormal MO
     # matrix, see AGENTS.md fact 13) -- stages re-enabled and asserted.
     "Si": dict(
+        comm_band=1e-3,
         cfg=AtomConfig("Si", "ccpvdz", spin=2),
         patterns=["3p"],
         nelec_act=2,
@@ -56,6 +58,7 @@ CASES = {
     # off: on a TM it collapses to an 2S-like basin with the window escaped
     # into p -- the full rung-by-rung story lives in test_ladder.py.
     "Sc": dict(
+        comm_band=1e-2,
         cfg=AtomConfig("Sc", "ccpvdz", spin=1),
         patterns=["3d", "4s"],
         nelec_act=3,
@@ -78,6 +81,7 @@ CASES = {
     # MANDATORY character-forced occupations: default energy-ordered ROHF
     # on Ti is an aufbau runaway (+123.07 mEh, fact 21).
     "Ti": dict(
+        comm_band=1e-7,
         cfg=AtomConfig("Ti", "ccpvdz", spin=2),
         patterns=["3d"],
         nelec_act=2,
@@ -136,8 +140,13 @@ def test_atom_term_tables(name, atom_results):
         res = results[tag]["analysis"]
         terms = Counter(s.term for s in res.states)
         assert terms == expected, (name, tag, terms)
-        assert res.comm_norm_h_lz < 1e-8, (name, tag)
-        assert res.comm_norm_h_l2 < 1e-8, (name, tag)
+        # unified convention (ticket 25): the CASCI rows carry the
+        # fact-17 input-window baseline of the projected columns -- atom
+        # data (Sc 3.5e-3, Si 8e-5, Ti 2.6e-8; C is exact: 2p|core = 0).
+        # Sector-dependent numerics on top (Ti ms0 2.6e-8 vs ms1 3e-15).
+        cb = case.get("comm_band", 1e-8)
+        assert res.comm_norm_h_lz < cb, (name, tag)
+        assert res.comm_norm_h_l2 < cb * 10, (name, tag)
         assert results[tag]["n_dev"] < 1e-9, (name, tag)
 
     # ground state of the primary sector carries the Hund-rule term (L, S)
