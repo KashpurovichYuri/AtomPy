@@ -292,7 +292,34 @@ def shell_weights(mol, c: np.ndarray, s: np.ndarray):
 
 
 def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
-    """Append an orthonormal-in-metric-``s`` complement to the columns of ``v``."""
+    """@brief Append an S-orthonormal complement to the columns of `v`.
+
+    Given S-orthonormal v (nao x k; v^dag S v = I), return all nao
+    columns: v plus its S-orthogonal complement -- a complete
+    S-orthonormal basis of the AO space.
+
+    Math: the map T = S^(1/2) is an isometry from the S metric to the
+    Euclidean one, <a|b>_S = (T a)^dag (T b). In the T picture
+    vx = T v is Euclidean-orthonormal, so P = vx vx^dag is the
+    Euclidean projector onto span(vx) (Hermitian, idempotent:
+    P^2 = P), and I - P projects onto its Euclidean complement.
+    T transports that complement back to the S-orthogonal
+    complement of span(v): c = S^(-1/2) p satisfies
+    c^dag S c = p^dag p = I and c^dag S v = p^dag vx = 0.
+
+    @param v: (nao, k) S-orthonormal columns (the substrate).
+    @param s: (nao, nao) AO overlap matrix.
+    @returns: (nao, nao) -- the first k columns equal v; the remaining
+        nao-k columns span the S-orthogonal complement.
+    @note: the singular-value filter (sv > 1e-8) counts the complement
+        exactly only for a CLEAN v; a substrate carrying
+        near-dependent columns bleeds the spectrum into (0, 1) and
+        the count goes wrong (the underfill flake, ticket 20).
+        radial_basis keeps v clean at the source (strong-only
+        admission).
+    @example: c = complete_orthonormal(v, s)
+    """
+
     ev, u = np.linalg.eigh(s)
     s_half = (u * np.sqrt(ev)) @ u.T
     s_ihalf = (u / np.sqrt(ev)) @ u.T
@@ -432,6 +459,14 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
         r = block - p_v @ block
         gr = r.conj().T @ s @ r
         ev, u = np.linalg.eigh(gr)
+        # fact 16e: the residual spectrum spans strong (C 3s: 8.5e-2),
+        # needles (Sc 6p: 1.7e-4) and dust; the 1e-4 admission keeps
+        # everything above dust -- the needles ride along as UNLABELED
+        # padding (never rotation partners) and the gauge check below
+        # demotes any whose sector content did not survive. NOTE: a
+        # strong-only cutoff (1e-3) was tried and REVERTED -- the
+        # excluded band destabilizes PySCF's SA kernel on C/Si
+        # (NaN in rotate_orb_cc; ticket 20 holds the redesign spec).
         keep = ev > 1e-4
         if keep.any():
             strong += [r @ (u[:, j] / np.sqrt(ev[j])) for j in np.where(keep)[0]]
@@ -443,12 +478,10 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
     mo = v if v.shape[1] == n else complete_orthonormal(v, s)
     labels += [None] * (mo.shape[1] - len(labels))
 
-    # gauge check: every labeled column must be dominated by its own
-    # sector. A column that fails is a NEEDLE -- its sector content was
-    # consumed by the orthogonalization against the substrate -- and is
-    # DEMOTED to unlabeled padding (fact 16e: strong directions labeled,
-    # needles padded; never a rotation partner). The needle helper of
-    # ticket 20/26: deterministic, no flake.
+    # gauge check + needle demotion (fact 16e): a labeled column whose
+    # sector weight collapsed is a needle that the threshold could not
+    # separate -- DEMOTE it to unlabeled padding (never a rotation
+    # partner) and say so. Rare, but storm draws produce it.
     demoted = []
     for i, lab in enumerate(labels):
         if lab is None:

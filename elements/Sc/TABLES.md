@@ -40,7 +40,7 @@ rows)
 | treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | cross-check (mEh) | note |
 |---|---|---|---|---|---|---|
 | ROHF (anchor) | −759.736255 | 0 | — | — | 0 | forced filling |
-| CASCI, averaged | −759.729565 | +6.7 | 6.0000 | 5.6e-15 | 1.3 | reference fold |
+| CASCI, averaged | −759.729685 | +6.7 | 6.0000 | 5.6e-15 | 1.8 | reference fold |
 | CASCI, raw | −759.729565 | +6.7 | 6.0004 | 2.8e-02 | ~0 | polarized-core detector |
 | CASCI, fractional | −759.699492 | +36.8 | 6.0000 | 3.4e-14 | ~0 | different functional |
 | CASSCF, free | −759.767769 | −31.5 | 0.0526 | 3.2e-01 | 1.9 | escape — no term |

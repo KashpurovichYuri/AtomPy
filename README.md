@@ -177,6 +177,22 @@ other.
 | Ŝ² | — | closed combinatorial form (pair exchange) |
 | Ĥ | folded h₁ (nucleus + core field) | active-orbital two-electron integrals |
 
+**The frozen-core partition must be orthogonal.** The core enters the
+active Hamiltonian as a folded field,
+
+  h_eff(p,q) = h(p,q) + Σᵢ[2(pq|ii) − (pi|iq)],  E_core separate,
+
+and the partition is *exact iff the active space is orthogonal to the
+core orbitals*. If a window vector leans into the core, w = w⊥ + w∥
+with w∥ ∈ span(core), the model admits configurations with extra
+density in *occupied* core orbitals that the antisymmetrized problem
+forbids; the CI harvests the deep-core stabilization the Pauli
+principle would have priced. Hence every window is built
+core-orthogonal (§3.3). Canonical SCF MOs need nothing — occupied vs
+virtual subsets of one orthonormal basis cannot leak into each other
+(their defect is different: m-delocalization, §7.5); core averaging
+changes the field, never the orthogonality of the basis.
+
 ### 2.3 The closure theorem
 
 **We call a space rotation-closed if L̂W ⊆ W, and an operator a scalar if
@@ -400,17 +416,11 @@ With the averaged fold, the CASCI term tables of §7.1–7.2 come out exact
 on all four atoms; the averaged–raw and averaged–frac differences are
 the ΔE anchors of §7.3.
 
-**The fold, explicitly.** With core orbitals {φᵢ} doubly occupied,
-restriction to active-space wavefunctions gives
-
-  H_act = Σ_pq h_eff(p,q) a⁺_p a_q + ½ Σ_pqrs (pq|rs) a⁺_p a⁺_q a_s a_r + E_core,
-
-h_eff(p,q) = h(p,q) + Σᵢ [2(pq|ii) − (pi|iq)] — each core electron's
-Coulomb–exchange field folded into the one-body part; E_core is the
-core's own energy. That construction is *the fold*. Our fold vs
-PySCF's raw fold = spherically averaged vs raw core density inside
-those J/K terms.
-
+**The fold** is defined in §2.2 (the h_eff formula and the
+orthogonality requirement). The three constructions here differ
+exactly in which core density feeds it: averaged (the physical
+reference), fractional-occupation (a different functional), raw (the
+anisotropy detector).
 
 ### 3.3 CASSCF — letting the orbitals move
 
@@ -429,7 +439,15 @@ step is explicit mathematics: a raw window column w is replaced by
   w̃ = (1 − P_core) w / ‖(1 − P_core) w‖_S,  P_core = C (C†SC)⁻¹ C†,
 
 i.e. its component in the core span is subtracted in the AO overlap
-metric and the remainder re-normalized. The construction is forced by convergence — a non-orthonormal
+metric and the remainder re-normalized. The projection is the leak guard of §2.2: without it, a window that
+leans into the core would double-count the core region. And the three
+orthogonalizers of this project each preserve a different auxiliary
+property (all in the S metric — §2.2's isometry turns them into the
+Euclidean ones): symmetric **Löwdin** (shape-preserving — the core,
+§2.2), two-pass S-**Gram–Schmidt** (identity-preserving — column j
+is the (l, m) of AO j; the masks require it), and the residual
+**completion** (span-filling — the complement). The construction is
+forced by convergence — a non-orthonormal
 substrate makes the optimizer diverge to sub-variational energies
 (observed once; `elements/Si/NOTES.md`, the §2.4 guard).
 
@@ -707,55 +725,17 @@ confinement cost; on the d atoms the as-run window already correlates;
 the raw-fold row is the polarized-core detector (same energy,
 commutator jumps). The full story of each atom: its element file.
 
-**Sc — CAS(3,6), mechanism table** (E_ground in our fold; ΔE in
-totals vs ROHF, mEh; diagnostics per row):
-
-| rung | E_ground | ΔE | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | ‖[P,Lz]‖ | ‖[P,Lᵔ]‖ | note |
-|---|---|---|---|---|---|---|---|---|
-| rohf | −759.736255 | 0 | — | — | — | — | — | 1 |
-| frac-scf | −758.014967 | +1721 | — | — | — | — | — | 2 |
-| casci_avg | −759.817560 | +6.7 | 6.0 | 5.6e-15 | 6.4e-13 | 7e-15 | 9e-15 | 3 |
-| casci_raw | −759.819083 | +6.7 | 6.0004 | 2.8e-02 | 1.4e-01 | 7e-15 | 9e-15 | 4 |
-| casci_frac | −759.787295 | +36.8 | 6.0 | 3.4e-14 | 3.5e-13 | 7e-15 | 9e-15 | 2 |
-| CASSCF (free) † | −759.765900 | **−31.5** | 0.05 | 3.2e-01 | 7.2e-01 | 2.3 | 2.7 | 5 |
-| casscf_relax | −759.728374 | +6.6 | 5.9998 | 2.8e-03 | 4.0e-02 | 5.7e-03 | 2.1e-02 | 6 |
-| sa † | −760.548082 | −13.3 | 6.002 | 8.3e-01 | 3.8 | 1.4 | 1.4 | 7 |
-| sa_radial | −759.735593 | −0.8 | 5.9997 | 3.3e-03 | 5.4e-02 | 6.0e-03 | 2.2e-02 | 6 |
-| pur family | −759.7284…−759.7362 | +6.7 / −5.8 / 0.0 | 6.0 | ≤4.8e-13 | ≤4.8e-13 | 7e-15 | 9e-15 | 8 |
-
-1 anchor (§3.1); raw core anisotropy 1.3e-2.
-2 the smeared-shell ensemble — a different functional (§3.2); only its
-isotropic core field is used.
-3 spherically averaged core — the reference CASCI.
-4 raw field — percent-level quadrupole (§2.4); same energy, commutators
-jump (the polarized-core detector).
-5 escape to the L≈0 basin — deepest minimum, identity-destroying (§5).
-6 window frozen, core relaxes; carries the start-window defect (§5-L4a).
-7 the 4s→3p swap basin; the fold ΔE is partition bookkeeping — totals
-only (§5).
-8 purified core substrate (§5-L3): machine-exact closures; the SA-radial
-floor 4.5e-07; the swap attractor survives (one draw, 9.2e-02).
-
-**Ti — CAS(4,6), mechanism table** (same columns):
-
-| rung | E_ground | ΔE | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | ‖[P,Lz]‖ | ‖[P,Lᵔ]‖ | note |
-|---|---|---|---|---|---|---|---|---|
-| rohf | −848.406489 | 0 | — | — | — | — | — | 9 |
-| frac-scf | −847.296157 | +1110 | — | — | — | — | — | 2 |
-| casci_avg | −848.481312 | +10.6 | 12.0 | 2.2e-14 | 4.1e-13 | 6e-15 | 8e-15 | 3 |
-| casci_raw | −848.484093 | +10.6 | 12.0000 | 4.9e-02 | 2.6e-01 | 6e-15 | 8e-15 | 4 |
-| casci_frac | −848.443405 | +48.0 | 12.0 | 1.2e-13 | 7.5e-13 | 6e-15 | 8e-15 | 2 |
-| CASSCF (free) † | −848.434973 | **−31.3** | 0.05 | 4.3e-01 | 1.1e+00 | 2.8 | 4.0 | 5 |
-| casscf_relax | −848.393394 | +10.4 | 12.0 | 2.3e-08 | 1.7e-07 | 3.2e-08 | 5.9e-08 | 6, 9 |
-| sa † | −849.267643 | −10.1 | 12.003 | 1.1e+00 | 6.0e+00 | 1.4 | 1.5 | 10 |
-| sa_radial | −848.404105 | −0.4 | 12.0 | 8.7e-04 | 3.5e-03 | 1.2e-03 | 7.4e-04 | 6 |
-| pur family | −848.3934…−848.4099 | +10.4 / −3.5 / +1.0 | 12.0 | ≤1.1e-12 | ≤1.1e-12 | 6e-15 | 8e-15 | 11 |
-
-9 anchor — character-forced filling + E_ref basin gate (§3.1); the gated
-reference keeps the relax rung's start defect at 2.3e-08.
-10 the exact 4s→3p swap (window p = 1/6); totals only (§5).
-11 machine-exact closures (1e-13); the SA-radial floor 1.1e-04; sa_pur =
-a partial swap (s-slot ⅔ s + ⅓ p, −3.8).
+**Sc and Ti — the mechanism tables** live in
+`elements/Sc/TABLES.md` and `elements/Ti/TABLES.md` (the T3b format:
+E as run, ΔE, ⟨L²⟩, the commutator and span-certificate columns,
+per-rung notes). Their headline on the unified ruler: the certified
+rungs sit mEh-tight around the frozen value (CASCI +10.5 ≈
+core-relax +10.4 ≈ SA-pur +11.7 on Ti) — orbital optimization buys
+≈nothing on the as-run window; the negative free/SA numbers are
+window-identity changes, classified by the span certificates. Ticket
+25: the fold convention is machine-exact; the cross-check column is
+the mEh-class averaging effect — the old ~90 mEh window-definition
+offset was the retired raw-AO analysis convention's artifact.
 
 Carbon and silicon: the summary table above is the whole story at this
 precision — the p² confinement recovered in full by the symmetric

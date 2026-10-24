@@ -379,3 +379,23 @@ README 7 = table-kind enumerator with Ti as the worked example; 3.6
 dissolved (deformations math -> 2.4; SA logic -> 3.4); 5 flattened to
 table + per-level comments; 8/9/appendix compressed (README 1420 -> 996
 lines). Ticket 20 carries the axes-systematization acceptance list.
+
+## EXECUTION LEDGER (2026-10-24, the durable copy — write-off of the
+architecture discussion; do not lose)
+
+README: (1) 2.2 gains the fold formula + the orthogonality requirement
+block; 3.2 references it; 3.3 gains the leak-guard line + the
+orthogonalization-routines enumeration (Lowdin=shape-preserving-core,
+S-GS=identity-preserving-window/radial, completion=span-filling);
+(2) 7.3 mechanism tables -> T3b (single E as-run + cross-check);
+(3) 4: the v4 launch diagram; sa-casscf naming sweep.
+CODE: windows.radial_basis strong-only admission
+(STRONG_RESIDUAL_WEIGHT = 1e-3, fact 16e gap), demotion helper deleted,
+complete_orthonormal docstring (isometry derivation, the {0,1} count,
+the flake note); sweep.py -> study.py (StudySpec/plan_study/run_study);
+ladder.py -> treatments.py (registry; shim).
+TESTS: Sc/Ti ladder re-run bands; planted-needle toy test; study
+plan/render.
+DOCS: AGENTS conventions += docstring standard (@brief/math/@param/
+@note/@example) + naming rule; RUNGS.md staleness check.
+THEN: ticket 28 completion runs; two-axis review + AGENTS facts.
