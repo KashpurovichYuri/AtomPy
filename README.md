@@ -516,7 +516,7 @@ verdicts of §7.4 (per-atom values in `elements/`).
 | `stages` | the one uniform analysis pass per finished stage — the source of every §7 number |
 | `scans` | frozen-landscape measurements — deterministic (§7.4) |
 | `analysis` | term labels, configuration summaries, report rendering |
-| `cases` / `ladder` / `sweep` | orchestration — the declared per-atom campaign (`cases`: CaseSpec → run_case); rungs as data (`ladder`, §7.3); the window × treatment runner (`sweep`) |
+| `cases` / `treatments` / `study` | orchestration — the declared per-atom campaign (`cases`: CaseSpec → run_case); rungs as data (`treatments`, §7.3); the declared window × treatment study runner (`study`) |
 
 **The drivers capability map.** Every treatment is a point in a
 five-axis space:
@@ -531,6 +531,38 @@ five-axis space:
 
 The 17-rung registry tabulated in `results/` enumerates the corners of
 this space; §7.3 keeps the rows that differ in mechanism.
+
+**The launch path.** A new atom is a declared case, executed top-down:
+
+```
+CaseSpec — the declaration
+│  atom, basis/ECP, spin, nelec_act, ncore, shell_patterns
+│  ref: ReferenceSpec (occ spans l0..l3 | label prefixes,
+│        conv_accelerator ∈ {"diis","newton","diis+newton"}, occ_e_ref)
+│  want: {terms, casci-variants, casscf, sa-casscf, treatments, scans}
+│
+└─ run_case(spec)
+   ├─ 1. ROHF reference (reference.py)
+   │      a cached checkpoint is reused as is; a fresh run applies
+   │      character-forced filling, the declared acceleration, and
+   │      retries guesses until the gate |E − E_ref| is satisfied.
+   ├─ 2. CASCI per sector — fold ∈ {averaged, raw, fractional}
+   │      term tables produced and compared to the combinatorial
+   │      contract; deviations are reported.
+   ├─ 3. if "casscf" → single-root CASSCF
+   ├─ 4. if "sa-casscf" → SA-CASSCF over the ground term's M_L set
+   ├─ 5. if "treatments" → the declared window × treatment product
+   │      (study.py, on the treatments.py registry): the windows are
+   │      walked for frozen CASCI as well as for the optimizer
+   │      treatments.
+   └─ 6. if "scans" → radial / tilt scans (scans.py)
+```
+
+The reference gate's energy `occ_e_ref` is self-calibrated atom data:
+several starting guesses are tried, their solutions classified by
+character (the S-projector weight), and the passing basin's energy
+recorded — the gate then rejects the known-wrong basins on every later
+run.
 
 ---
 

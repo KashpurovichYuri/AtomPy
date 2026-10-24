@@ -103,27 +103,31 @@ green, reports written.
   untouched for output stability, fix belongs in its own decision since it
   changes every report.
 
-## Live tickets (updated 2026-10-24, after the docs + structure waves)
+## Live tickets (updated 2026-10-24, ticket-27 wave)
 
 - [25: ROHF fold-convention diagnostic](tickets/25-rohf-fold-convention.md)
-  — OPEN, task zero: our h_eff vs PySCF's h1eff differ ~90 mEh on the
-  ground for ROHF atoms (closed-shell: 1e-13). Decompose operator /
-  constant / window; fix or document; rewrites the cross-check legend.
-- [26: elements tables T3a/T3b](tickets/26-elements-tables.md) — OPEN:
-  the approved formats (AO/MO/NO lattice reinstated as the headline;
-  single-E T3b with the cross-check column; verified values in the
-  ticket).
-- [27: launch & naming polish](tickets/27-launch-naming.md) — OPEN:
-  conv_accelerator {diis,newton,diis+newton}; sa-casscf naming;
-  sweep.py → treatments.py (StudySpec/run_study); the v4 launch
-  diagram into README.
-- [28: completion runs](tickets/28-completion-runs.md) — OPEN, after
-  25/26/27: U SA-24 / relax-24 / SA-(6,13); Sc/Ti NO-start ladders;
-  the approved stop rules.
+  — RESOLVED + EXTENDED: the convention is machine-exact on all five
+  atoms (1.8e-15…1.7e-14); the cross-check fully decomposed (the
+  averaging effect per atom: 0.03/0.12/1.3/2.8/6.2 mEh); the retired
+  raw-span ruler's window-definition offsets quantified
+  (0/94.7/88.0/85.4/463.4 mEh).
+- [26: elements tables T3a/T3b](tickets/26-elements-tables.md) — mostly
+  DONE: T3a/T3b landed for all five atoms with verified values;
+  README §7.3 = summary + pointer. Remainder: the study markers in the
+  element files (needed by ticket 28's inserts), C/Si T3a rows, the
+  per-atom study provenance notes.
+- [27: launch & naming polish](tickets/27-launch-naming.md) —
+  conv_accelerator DONE; sa-casscf naming DONE (want keys, treatment
+  values, tables); ladder.py → treatments.py + sweep.py → study.py
+  DONE (shims in place, tests renamed); the v4 diagram in README §4
+  DONE. Remainder: none blocking — close at the wave review.
+- [28: completion runs](tickets/28-completion-runs.md) — OPEN, the
+  runner is ready: U SA-24 / relax-24 / SA-(6,13); Sc/Ti NO-start
+  ladders; the approved stop rules (certificate / saturation / cost).
 - [20: new-atom ergonomics](tickets/20-new-atom-ergonomics.md) —
   partially delivered (windows/core/reference/casscf split, cases.py,
-  sweep.py first cut, needle guard); the axes acceptance list in §6.
-  25–28 are its decomposition; close 20 when they land.
+  study.py, treatments.py, needle guard); the axes acceptance list in
+  §6. 25–28 are its decomposition; close 20 when they land.
 
 (The pre-2026-10-24 ticket list follows for history.)
 

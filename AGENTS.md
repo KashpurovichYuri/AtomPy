@@ -40,8 +40,8 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
 | `src/atomterm/cases.py` | `CaseSpec`, `run_case`, `run_atom`, `run_carbon` | the DECLARED per-atom campaign (the intent manifest): `CaseSpec` fixes atom/reference-data/window/sectors/want before anything runs; `run_case(spec)` executes; `run_atom` = the staged implementation; `pipeline.py` remains a compat shim |
-| `src/atomterm/ladder.py` | `Rung`, `run_ladder`, `run_carbon_ladder` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); `purified=True` appends the `*_pur` rungs (same treatments on the exactly-closed purified core substrate, fact 20 — incl. `sa_relax_pur`, the exact-symmetry SA rung); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
-| `src/atomterm/sweep.py` | `SweepSpec`, `plan_sweep`, `run_sweep`, `render_insert` | the window × treatment × start runner (ticket 20): declared product, per-cell budget knobs, per-cell failure quarantine, exact-eigh labels in full-diagnostics mode; writes `results/<tag>_sweep.json` + the generated T3 insert for `elements/<Atom>/TABLES.md` |
+| `src/atomterm/treatments.py` | `Rung`, `run_ladder`, `run_carbon_ladder` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); `purified=True` appends the `*_pur` rungs (same treatments on the exactly-closed purified core substrate, fact 20 — incl. `sa_relax_pur`, the exact-symmetry SA rung); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
+| `src/atomterm/study.py` | `StudySpec`, `plan_study`, `run_study`, `render` | the declared window × treatment study runner (ticket 20): declared product, per-cell budget knobs, per-cell failure quarantine, exact-eigh labels in full-diagnostics mode; writes `results/<tag>_study.json` + the generated insert between the study markers of `elements/<Atom>/TABLES.md`; `ladder.py`/`pipeline.py`/`drivers.py` are compat shims |
 | `src/atomterm/natural.py` | `ci_rdm1`, `natural_orbitals`, `occupation_groups`, `select_no_window` | the NO mathematics (ticket 22): spin-summed 1-RDM from CI roots (secondquant signs), NOs = density eigenvectors in the orthonormal span, occupation-GROUP selection never splits an m-set; symmetry-safe only from a term-AVERAGED root set (a single \|L,M_L⟩ density is m-diagonal but m-unequal — pinned); the Window object + selectors live in `windows.py` |
 | `src/atomterm/drivers.py` | (compat facade) | re-exports the historic surface over reference/windows/core/casscf — existing imports keep working; NEW code imports the owning module |
 
@@ -376,7 +376,7 @@ session; the Ti ladder is the slowest block, ~7 min cold; the Sc ladders
 ~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
 anywhere in the fixture chain, sub-second); `pytest -m slow` = the
 SCF-bearing chemistry. Run the full suite before committing changes to
-physics-bearing modules (drivers/operators/stages/ladder/scans); targeted
+physics-bearing modules (drivers/operators/stages/treatments/scans); targeted
 files or `-m fast` are fine for everything else. Test files map
 1:1 to src modules (`test_drivers.py` exercises the
 reference/windows/core/casscf quartet through the drivers facade -- the
@@ -389,7 +389,7 @@ PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
 `test_analytic_matches_libcint` (two independent L constructions),
 `test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows),
-`test_ladder.py` (per-rung fingerprints, parameterized C/Si; Sc TM block:
+`test_treatments.py` (per-rung fingerprints, parameterized C/Si; Sc TM block:
 exact closure + free-ion tables, relax honesty, S-basin escape, the bimodal
 SA basins, radial ceiling vs escape, complete-window still-escapes, and the
 purified-substrate block: machine-exact closure on C/Si, Sc's

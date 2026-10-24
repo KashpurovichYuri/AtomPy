@@ -62,9 +62,9 @@ class CaseSpec:
         (uniform over the ground term's M_L set by convention).
     run_casscf : the single-root stage (off on multi-solution atoms).
     want : the deliverables to produce -- subset of {"terms", "casscf",
-        "sa"}; "terms" is always produced (T1/T2 are the contract).
-        Later kinds ("treatments", "scans") dispatch to the sweep /
-        scan modules as they come online.
+        "sa-casscf"}; "terms" is always produced (T1/T2 are the
+        contract). Later kinds ("treatments", "scans") dispatch to the
+        study / scan modules as they come online.
     """
 
     symbol: str
@@ -79,7 +79,7 @@ class CaseSpec:
     sa_weights: list[float] | None = None
     run_casscf: bool = True
     nroots_primary: int = 9
-    want: frozenset = frozenset({"terms", "casscf", "sa"})
+    want: frozenset = frozenset({"terms", "casscf", "sa-casscf"})
 
     def atom_config(self) -> AtomConfig:
         return AtomConfig(symbol=self.symbol, basis=self.basis, ecp=self.ecp,

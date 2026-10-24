@@ -180,7 +180,8 @@ def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
                               name="sa_casscf", verbose=verbose)
 
 
-def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
+def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0,
+                          mc_opts: dict = None) -> CASResult:
     """CASSCF with the active-window span frozen ("CASCI + core relaxation").
 
     Mask :func:`core_virtual_only_mask`: only inactive<->virtual
@@ -190,10 +191,10 @@ def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CAS
     by construction. Peculiarity: the relaxed core is slightly
     anisotropic; the analysis fold averages it, so the rung's
     ``max|dE|`` vs PySCF measures that anisotropy -- reported, not
-    hidden.
+    hidden. ``mc_opts``: per-run optimizer knobs (budgets).
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
-                              mask=core_virtual_only_mask,
+                              mask=core_virtual_only_mask, mc_opts=mc_opts,
                               name="casscf_relax", verbose=verbose)
 
 

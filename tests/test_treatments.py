@@ -31,7 +31,7 @@ import pytest
 from conftest import SC_EXACT_TERMS, TI_EXACT_TERMS, TI_REF
 
 from atomterm.drivers import build_full_mo, run_casci
-from atomterm.ladder import run_ladder
+from atomterm.treatments import run_ladder
 from atomterm.stages import stage_facts
 from atomterm.system import AtomConfig
 

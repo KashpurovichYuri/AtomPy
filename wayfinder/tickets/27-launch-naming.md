@@ -1,6 +1,8 @@
 # Ticket 27: launch & naming polish — conv_accelerator, sa-casscf, study runner
 
-Status: OPEN
+Status: EXECUTED 2026-10-24 (all four items: conv_accelerator,
+sa-casscf naming, treatments.py+study.py with shims, the v4
+diagram; close at the wave review).
 
 Origin: the 2026-10-24 architecture discussion (approved item by item).
 

@@ -31,7 +31,7 @@ def test_casespec_is_the_intent_manifest():
 def test_run_case_demands_term_tables():
     # T1/T2 are the contract; a case without them is not a case
     with pytest.raises(AssertionError):
-        run_case(_spec(want=frozenset({"casscf", "sa"})))
+        run_case(_spec(want=frozenset({"casscf", "sa-casscf"})))
 
 
 def test_casespec_atom_config_roundtrip():

@@ -397,23 +397,37 @@ def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
 
 def radial_basis(mf, core_idx: list[int], act_idx: list[int],
                  c_core: np.ndarray = None):
-    """Full MO matrix plus per-slot (l, member) labels -- the substrate for
-    :func:`radial_mask`. ``c_core`` overrides the core block; pass
-    :func:`purified_core_orbitals` output for the exactly-closed
-    substrate (the fact-17 fix).
+    """@brief Build the full MO matrix with per-slot (l, member) labels --
+    the labeled substrate that :func:`radial_mask` reads.
 
-    Everything non-core is built in a MEMBER-PRESERVING gauge (sequential
-    S-metric Gram-Schmidt, not a symmetric Loewdin): the Loewdin gauge
-    within a degenerate member set is an arbitrary rotation --
-    span-preserving, but it reassigns which column is which (l, m), and
-    here column identity IS the product (fact 16e, README §3.3). Window
-    slots carry their AO's sector label; STRONG sector residuals
-    (>= 8e-2 of S-weight; core tails <= 3e-6) join with their label; the
-    near-linearly-dependent needles (Sc 6p: 1.7e-4) pad through
-    :func:`complete_orthonormal` with label ``None`` -- never rotation
-    partners.
+    Math: the (l, member) sectors of :func:`lm_sectors` are exactly
+    S-orthogonal on one center, so a slot's label is well defined only
+    if the basis is built MEMBER-PRESERVING: sequential S-metric
+    Gram-Schmidt (two refinement passes), not a symmetric Löwdin --
+    within a degenerate member set the Löwdin gauge is an arbitrary
+    rotation, span-preserving but identity-reassigning, and here
+    column identity IS the product (fact 16e). Window slots carry
+    their AO's sector label; sector residuals join by S-weight:
+    strong ones with their label (C 3s: 8.5e-2; core tails <= 3e-6),
+    near-linearly-dependent needles (Sc 6p: 1.7e-4) unlabeled through
+    :func:`complete_orthonormal` -- never rotation partners.
 
-    Returns ``(mo_full, labels)`` with ``labels[i] = (l, member) | None``.
+    @param mf: converged SCF object (the AO substrate + the overlap).
+    @param core_idx: MO column indices of the core block
+        (``mf.mo_coeff[:, core_idx]``).
+    @param act_idx: AO-row indices of the window slots, one per
+        (l, member); column j of the window IS the (l, m) of
+        ``act_idx[j]`` by construction.
+    @param c_core: optional core MO columns overriding ``mf.mo_coeff``;
+        pass :func:`purified_core_orbitals` output for the
+        exactly-closed substrate (the fact-17 fix).
+    @returns: ``(mo_full, labels)`` -- the full (nao, nao) S-orthonormal
+        MO matrix and ``labels[i] = (l, member) | None`` per column.
+    @note: the gauge check below demotes any labeled column whose
+        sector weight collapsed to unlabeled padding (rare; storm
+        draws) -- it says so on stdout when it fires.
+    @example: mo, lab = radial_basis(mf, core_idx, act_idx)
+        mask = radial_mask(lab, ncore, ncas)
     """
     mol = mf.mol
     n = mf.mo_coeff.shape[0]

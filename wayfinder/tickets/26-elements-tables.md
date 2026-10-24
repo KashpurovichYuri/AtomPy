@@ -1,6 +1,9 @@
 # Ticket 26: elements/ tables to the approved T3a/T3b formats
 
-Status: OPEN (after ticket 25 -- the cross-check column's meaning
+Status: MOSTLY DONE (2026-10-24: T3a/T3b all five atoms, verified;
+cross-check = the averaging effect). Remainder: the study
+markers, C/Si T3a rows. Original gate:
+(after ticket 25 -- the cross-check column's meaning
 depends on it)
 
 Origin: the 2026-10-24 review. The user reinstated the AO/MO/NO lattice

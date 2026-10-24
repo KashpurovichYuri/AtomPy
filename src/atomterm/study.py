@@ -1,11 +1,13 @@
-"""The window x treatment x start runner: one declared sweep, one table.
+"""The declared study runner: the window x treatment product, one
+table (ticket 20; ticket 27 named it -- a "study", never "sweep"/"grid").
 
-A :class:`SweepSpec` enumerates the product explicitly -- windows (the
+A :class:`StudySpec` enumerates the product explicitly -- windows (the
 :class:`atomterm.windows.Window` objects), treatments (subset of
-"casci" / "relax" / "sa"), and per-treatment budgets -- and
-:func:`run_sweep` executes it cell by cell with three guarantees:
+"casci" / "relax" / "sa-casscf"; the full treatment axis lives in the
+:mod:`atomterm.treatments` registry), and per-treatment budgets -- and
+:func:`run_study` executes it cell by cell with three guarantees:
 
-- **Quarantine**: a failing cell is recorded as an error and the sweep
+- **Quarantine**: a failing cell is recorded as an error and the study
   continues (a crash in one window must not kill the rest);
 - **Budgets**: per-treatment optimizer knobs (e.g. ``max_cycle_macro``)
   so long runs are a declared parameter, not a default;
@@ -14,8 +16,8 @@ A :class:`SweepSpec` enumerates the product explicitly -- windows (the
   vectors straggle inside degenerate clusters and are never a label
   source).
 
-Outputs: ``results/<label>_sweep.json`` (all cells) and a markdown
-insert (via :func:`render_insert`) meant for the sweep markers of the
+Outputs: ``results/<label>_study.json`` (all cells) and a markdown
+insert (via :func:`render`) meant for the study markers of the
 atom's ``elements/<Atom>/TABLES.md``.
 """
 
@@ -35,22 +37,22 @@ from atomterm.casscf import (
 from atomterm.operators import build_operators, window_closure
 from atomterm.windows import occupied_core_idx
 
-__all__ = ["SweepSpec", "CellResult", "plan_sweep", "run_sweep",
-           "render_insert", "ground_block"]
+__all__ = ["StudySpec", "CellResult", "plan_study", "run_study",
+           "render", "ground_block"]
 
-TREATMENTS = ("casci", "relax", "sa")
+TREATMENTS = ("casci", "relax", "sa-casscf")
 
 
 @dataclass(frozen=True)
-class SweepSpec:
-    """The declaration of a window x treatment sweep (ticket 20)."""
+class StudySpec:
+    """The declaration of a window x treatment study (ticket 20)."""
 
     label: str                       # chk/store tag (e.g. "u_14e")
     ncore: int
     na: int
     nb: int
     windows: tuple                   # of atomterm.windows.Window
-    treatments: tuple = ("casci", "relax", "sa")
+    treatments: tuple = ("casci", "relax", "sa-casscf")
     sa_weights: tuple | None = None  # default: uniform on the measured block
     budgets: dict = field(default_factory=dict)   # treatment -> mc_opts
     diagnostics: str = "light"       # "light" | "full" (exact-eigh labels)
@@ -60,7 +62,7 @@ class SweepSpec:
         assert not bad, f"unknown treatments {bad}; choose from {TREATMENTS}"
 
     def cell_key(self, wtag: str, treatment: str) -> str:
-        return f"sweep_{self.label}_{wtag}_{treatment}"
+        return f"study_{self.label}_{wtag}_{treatment}"
 
 
 @dataclass
@@ -79,11 +81,12 @@ def _wtag(w) -> str:
     return "".join(ch if ch.isalnum() else "_" for ch in w.label).strip("_")
 
 
-def ground_block(mol, mf, ncore: int, c_act, na: int, nb: int):
+def ground_block(mol, mf, ncore: int, c_act, na: int, nb: int,
+                 c_core: np.ndarray = None):
     """The frozen ground-term block of a window, MEASURED: the exact
     eigenspace at ev[0] with its own <L^2>. Returns (ev0, nroots,
     weights) -- the SA anchoring rule (never hardcode a term)."""
-    ops = build_operators(mol, mf, c_act, ncore, na, nb)
+    ops = build_operators(mol, mf, c_act, ncore, na, nb, c_core=c_core)
     ev, vec = np.linalg.eigh(ops["H"].real)
     nchk = min(60, len(ev))
     l2 = [vec[:, r] @ ops["L2"].real @ vec[:, r] for r in range(nchk)]
@@ -94,9 +97,9 @@ def ground_block(mol, mf, ncore: int, c_act, na: int, nb: int):
     return float(ev[0]), len(block), w
 
 
-def plan_sweep(spec: SweepSpec, mol=None) -> str:
+def plan_study(spec: StudySpec, mol=None) -> str:
     """The intent manifest: exactly what will run, before anything runs."""
-    lines = [f"SWEEP {spec.label}: sector (na, nb) = ({spec.na}, {spec.nb});"
+    lines = [f"STUDY {spec.label}: sector (na, nb) = ({spec.na}, {spec.nb});"
              f" treatments = {', '.join(spec.treatments)};"
              f" diagnostics = {spec.diagnostics}"]
     for w in spec.windows:
@@ -118,12 +121,12 @@ def _ndet(ncas, na, nb):
     return comb(ncas, na) * comb(ncas, nb)
 
 
-def run_sweep(spec: SweepSpec, mol, mf, out: str | Path,
+def run_study(spec: StudySpec, mol, mf, out: str | Path,
               c_core: np.ndarray = None) -> dict:
-    """Execute the declared sweep. Quarantined per cell; JSON out."""
+    """Execute the declared study. Quarantined per cell; JSON out."""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
-    chk = str(out / f"{spec.label}_sweep.chk")   # per-cell atomterm/ keys
+    chk = str(out / f"{spec.label}_study.chk")   # per-cell atomterm/ keys
     closed = occupied_core_idx(mf, spec.ncore)
     cells: dict[str, dict] = {}
     for w in spec.windows:
@@ -153,18 +156,19 @@ def run_sweep(spec: SweepSpec, mol, mf, out: str | Path,
                 elif t == "relax":
                     cas = run_casscf_core_relax(mf, ncas, (spec.na, spec.nb),
                                                 mo, chk,
-                                                **spec.budgets.get(t, {}))
-                elif t == "sa":
+                                                mc_opts=spec.budgets.get(t))
+                elif t == "sa-casscf":
                     if spec.sa_weights is not None:
                         weights = list(spec.sa_weights)
                     else:
                         _, nroots, wts = ground_block(
-                            mol, mf, spec.ncore, c_act, spec.na, spec.nb)
+                            mol, mf, spec.ncore, c_act, spec.na, spec.nb,
+                            c_core=c_core)
                         weights = list(wts)
                     cas = constrained_casscf(
                         mf, ncas, (spec.na, spec.nb), chk, mo_full=mo,
-                        weights=weights, name=f"sweep_{wtag}_sa",
-                        **spec.budgets.get(t, {}))
+                        weights=weights, name=f"study_{wtag}_sa_casscf",
+                        mc_opts=spec.budgets.get(t))
                 else:                            # pragma: no cover
                     raise ValueError(t)
                 res = {"key": key, "status": "ok",
@@ -180,16 +184,16 @@ def run_sweep(spec: SweepSpec, mol, mf, out: str | Path,
             except Exception as exc:             # noqa: BLE001 (quarantine)
                 cells[key] = vars(CellResult(key=key, status="error",
                                              error=repr(exc)))
-    (out / f"{spec.label}_sweep.json").write_text(
+    (out / f"{spec.label}_study.json").write_text(
         json.dumps({"label": spec.label, "cells": cells}, indent=2),
         encoding="utf-8")
     return cells
 
 
-def render_insert(cells: dict) -> str:
-    """The markdown rows for the atom's T3 sweep markers (between
-    ``<!-- sweep:begin -->`` and ``<!-- sweep:end -->``)."""
-    lines = ["<!-- sweep:begin --> (generated by atomterm.sweep)",
+def render(cells: dict) -> str:
+    """The markdown rows for the atom's T3 study markers (between
+    ``<!-- study:begin -->`` and ``<!-- study:end -->``)."""
+    lines = ["<!-- study:begin --> (generated by atomterm.study)",
              "| cell | status | E, Eh | <L2> | |[P,Lz]| | |[P,Lp]| |",
              "|---|---|---|---|---|---|"]
     for key, c in cells.items():
@@ -199,5 +203,5 @@ def render_insert(cells: dict) -> str:
                          f"| {c['span_lz']:.1e} | {c['span_lperp']:.1e} |")
         else:
             lines.append(f"| {key} | ERROR | {c['error'][:60]} | | | |")
-    lines.append("<!-- sweep:end -->")
+    lines.append("<!-- study:end -->")
     return "\n".join(lines) + "\n"
