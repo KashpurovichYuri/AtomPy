@@ -85,3 +85,24 @@ legend (ticket 26) reads: "cross-check = (ii) the averaging effect +
 (iii) the window-definition offset where the valence shell overlaps
 the core; the fold convention itself is machine-exact (1e-15)".
 Status: RESOLVED.
+
+## EXTENDED: all five atoms verified (2026-10-24, diag_fold.py per-atom)
+
+| atom | A: convention (max|dh1|) | B: averaging | C: window definition |
+|---|---|---|---|
+| C  | 1.8e-15 | +0.029 mEh | ~0 (2p S-orthogonal to core) |
+| Si | 1.8e-15 | +0.118 mEh | -94.7 mEh (3p|2s,2p-core leak) |
+| Sc | 3.6e-15 | +1.33 mEh  | -88.0 mEh |
+| Ti | 7.1e-15 | +2.77 mEh  | -85.4 mEh (4s|3s overlap 0.105) |
+| U  | 1.7e-14 | +6.16 mEh  | -463.4 mEh (raw-band|core overlap 0.078, span deviation 0.43!) |
+
+The fold CONVENTION is machine-exact on every atom including U (ECP +
+the counter-labeled uncontracted basis -- the most treacherous label
+environment). The averaging effect scales with the atom's epsilon
+(C smallest, U largest). The window-definition offset of the RETIRED
+raw-span ruler scales with the valence|core overlap and is huge on U
+(-463 mEh) -- quantifying precisely why the projected window is the
+only honest definition there and why the ruler was retired.
+(Si's first pass in this diagnostic ran with ncore=2 -- garbage core;
+rerun with the correct [Ne] core, ncore=6.)
+Status: RESOLVED + EXTENDED to all campaign atoms.

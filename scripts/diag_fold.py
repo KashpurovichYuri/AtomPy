@@ -33,12 +33,12 @@ TI_REF = drivers.ReferenceSpec(
     occ_open=("3d",),
     occ_e_ref=-848.40648875,
 )
+from run_u import BAS, ECP
 
 
-def compare(label, mol, mf, act_idx, ncore, na, nb, ref=None):
+def compare(label, mol, mf, act_idx, ncore, na, nb):
     out = Path("results/diag"); out.mkdir(exist_ok=True)
     chk = str(out / f"{label}_diag.chk")
-    mol, mf = mf
     mo = drivers.build_full_mo(mf, drivers.occupied_core_idx(mf, ncore),
                                act_idx)
     ncas = len(act_idx)
@@ -87,17 +87,35 @@ def compare(label, mol, mf, act_idx, ncore, na, nb, ref=None):
 
 def main():
     Path("results/diag").mkdir(parents=True, exist_ok=True)
-    print("Ti (ROHF, gated) ...")
-    cfg = AtomConfig("Ti", "ccpvdz", spin=2)
-    mol, mf = drivers.run_rohf(cfg, "results/diag/ti_rohf.chk", ref=TI_REF)
-    act = drivers.select_valence_ao(mol, ["3d", "4s"])
-    compare("Ti", mol, (mol, mf), act, 9, 3, 1)
+    # gated U reference (ticket 21): whole-l spans + Newton
+    U_REF = drivers.ReferenceSpec(
+        occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
+        occ_e_ref=-50.38185233, conv_accelerator="newton")
+    U_BANDS = {"f": (0.5, 2.0), "d": (0.1, 0.5)}
 
-    print("\nC (negative control) ...")
-    cfg = AtomConfig("C", "ccpvdz", spin=2)
-    mol, mf = drivers.run_rohf(cfg, "results/diag/c_rohf.chk")
-    act = drivers.select_valence_ao(mol, ["2p"])
-    compare("C", mol, (mol, mf), act, 2, 1, 1)  # core = 1s2 2s2
+    cases = [
+        ("C", AtomConfig("C", "ccpvdz", spin=2), None,
+         ["2p"], 2, 1, 1, 1),
+        ("Si", AtomConfig("Si", "ccpvdz", spin=2), None,
+         ["3p"], 2, 1, 1, 6),  # core = [Ne] (1s2s2p), not 1s2s
+        ("Sc", AtomConfig("Sc", "ccpvdz", spin=1), None,
+         ["3d", "4s"], 3, 2, 1, 9),
+        ("Ti", AtomConfig("Ti", "ccpvdz", spin=2), TI_REF,
+         ["3d", "4s"], 4, 3, 1, 9),
+        ("U", AtomConfig("U", BAS, ecp=ECP, spin=4, tag="U_stuttgart78_dyall"),
+         U_REF, None, 4, 4, 0, 5),  # window = 2f+2d bands (built below)
+    ]
+    for (label, cfg, ref, patterns, nelec, na, nb, ncore) in cases:
+        print(f"\n{label} (ROHF{' gated' if ref else ''}) ...", flush=True)
+        mol, mf = drivers.run_rohf(cfg, f"results/diag/{label}_rohf.chk",
+                                   ref=ref)
+        if patterns is not None:
+            act = drivers.select_valence_ao(mol, patterns)
+        else:
+            f_rows = drivers.select_primitives(mol, 3, exponent_band=U_BANDS["f"])
+            d_rows = drivers.select_primitives(mol, 2, exponent_band=U_BANDS["d"])
+            act = f_rows + d_rows
+        compare(label, mol, mf, act, ncore, na, nb)
 
 
 if __name__ == "__main__":
