@@ -63,6 +63,7 @@ class StudySpec:
     sa_weights: tuple | None = None  # default: uniform on the measured block
     budgets: dict = field(default_factory=dict)   # treatment -> mc_opts
     diagnostics: str = "light"       # "light" | "full" (exact-eigh labels)
+    verbose: int = 0                 # per-cell optimizer chatter (long cells)
 
     def __post_init__(self):
         bad = set(self.treatments) - set(TREATMENTS)
@@ -81,6 +82,7 @@ class CellResult:
     span_lz: float | None = None
     span_lperp: float | None = None
     dets: int | None = None
+    converged: bool | None = None
     error: str | None = None
 
 
@@ -156,13 +158,14 @@ def run_study(spec: StudySpec, mol, mf, out: str | Path,
             continue
         for t in spec.treatments:
             key = spec.cell_key(wtag, t)
+            print(f"  [cell] {key} starting", flush=True)
             try:
                 if t == "casci":
                     cas = run_casci(mf, ncas, (spec.na, spec.nb), mo,
-                                    chk, nroots=1)
+                                    chk, nroots=1, verbose=spec.verbose)
                 elif t == "relax":
                     cas = run_casscf_core_relax(mf, ncas, (spec.na, spec.nb),
-                                                mo, chk,
+                                                mo, chk, verbose=spec.verbose,
                                                 mc_opts=spec.budgets.get(t))
                 elif t == "sa-casscf":
                     if spec.sa_weights is not None:
@@ -175,13 +178,15 @@ def run_study(spec: StudySpec, mol, mf, out: str | Path,
                     cas = constrained_casscf(
                         mf, ncas, (spec.na, spec.nb), chk, mo_full=mo,
                         weights=weights, name=f"study_{wtag}_sa_casscf",
-                        mc_opts=spec.budgets.get(t))
+                        verbose=spec.verbose, mc_opts=spec.budgets.get(t))
                 else:                            # pragma: no cover
                     raise ValueError(t)
                 res = {"key": key, "status": "ok",
                        "energy": float(cas.energies[0]),
                        "dets": int(_ndet(ncas, spec.na, spec.nb)),
-                       "span_lz": wc["lz"], "span_lperp": wc["lperp"]}
+                       "span_lz": wc["lz"], "span_lperp": wc["lperp"],
+                       "converged": bool(getattr(cas.mc, "converged",
+                                                 True))}
                 if spec.diagnostics == "full":
                     ops = build_operators(mol, mf, c_act, spec.ncore,
                                           spec.na, spec.nb, c_core=c_core)
@@ -206,7 +211,8 @@ def render(cells: dict) -> str:
     for key, c in cells.items():
         if c["status"] == "ok":
             l2 = f"{c['l2']:.4f}" if c.get("l2") is not None else "--"
-            lines.append(f"| {key} | ok | {c['energy']:.6f} | {l2} "
+            status = "NOT-CONVERGED" if c.get("converged") is False else "ok"
+            lines.append(f"| {key} | {status} | {c['energy']:.6f} | {l2} "
                          f"| {c['span_lz']:.1e} | {c['span_lperp']:.1e} |")
         else:
             lines.append(f"| {key} | ERROR | {c['error'][:60]} | | | |")
