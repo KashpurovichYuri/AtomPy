@@ -64,6 +64,9 @@ class StudySpec:
     budgets: dict = field(default_factory=dict)   # treatment -> mc_opts
     diagnostics: str = "light"       # "light" | "full" (exact-eigh labels)
     verbose: int = 0                 # per-cell optimizer chatter (long cells)
+    fci_opts: dict | None = None     # e.g. pspace_size=ndet: the exact-CI
+                                     # branch per macro (ticket 23's straggle
+                                     # fix; clustered multi-root SA needs it)
 
     def __post_init__(self):
         bad = set(self.treatments) - set(TREATMENTS)
@@ -178,7 +181,8 @@ def run_study(spec: StudySpec, mol, mf, out: str | Path,
                     cas = constrained_casscf(
                         mf, ncas, (spec.na, spec.nb), chk, mo_full=mo,
                         weights=weights, name=f"study_{wtag}_sa_casscf",
-                        verbose=spec.verbose, mc_opts=spec.budgets.get(t))
+                        verbose=spec.verbose, mc_opts=spec.budgets.get(t),
+                        fci_opts=spec.fci_opts)
                 else:                            # pragma: no cover
                     raise ValueError(t)
                 res = {"key": key, "status": "ok",

@@ -67,6 +67,28 @@ StudySpec -- it needs the custom core, pur minus the 7s column):
     # window = NO {d5, f7} + the 7s pur column; inject tag="study-six13"
     # -> its own section of elements/U/TABLES.md (user decision).
 
+## Cost-stop record (2026-10-25): the U SA-24 cell
+
+Landed: Sc/Ti NO studies (all cells); U relax-24 = -49.918895 (the
+relax curve deepens -18.5 mEh from 12->24 cols -- growth, not
+saturation; no2 reproduced the campaign's relax-12 to 1 uEh; span
+certificates 1e-13 everywhere).
+
+Cost-stopped: U SA-24. Three attempts, zero completed macros:
+(a) 4h20m blind (verbose=0, default Davidson) -- runner improvements
+came out of this (verbose field, the converged flag captured per
+cell); (b) the exact-CI branch (pspace_size=ndet, ticket 23's
+straggle fix) -- no macro in 40 min; (c) the exact branch + a
+loosened micro solver (conv_tol 1e-6, max_cycle_micro 30) -- no
+macro in 31 min. Diagnosis: the 17-clustered-root CI solve in
+10626 dets needs >= 1 h per macro in pyscf's python-level direct-CI
+-- the macro cadence, not the budget, is the wall. A saturation
+verdict needs a specialized SA solver (root-tracking Davidson or a
+selected-CI path) -- POSTPONED with NIST/semicore. six13 (17 roots
+x 16731 dets) is the same cost class: postponed with it.
+Budgets that DID work: relax (single-root, minutes); the small NO
+windows' SA cells (Sc/Ti, minutes).
+
 ## Acceptance
 
 - Every cell: E (as run), ΔE, ⟨L²⟩ (exact eigh), commutators, span

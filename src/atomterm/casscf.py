@@ -124,7 +124,8 @@ def no_core_window_exchange_mask(self, nmo, ncore, ncas, frozen):
 
 def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
                        weights=None, verbose=0, name="casscf",
-                       mc_opts: dict = None) -> CASResult:
+                       mc_opts: dict = None,
+                       fci_opts: dict = None) -> CASResult:
     """CASSCF with declaratively constrained orbital rotations -- the one
     deep driver every orbital-optimization rung goes through.
 
@@ -148,6 +149,8 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
         mc.mo_coeff = mo_full
     for k, v in (mc_opts or {}).items():
         setattr(mc, k, v)
+    for k, v in (fci_opts or {}).items():
+        setattr(mc.fcisolver, k, v)
     if mask is not None:
         mc.uniq_var_indices = types.MethodType(mask, mc)
     if weights is None:
@@ -206,7 +209,7 @@ def run_casscf_virtual_mix(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CA
     borrows radial/polarization character from the virtuals (real
     dynamic correlation; appears as radial correlation in the natural
     orbitals) but the state's identity cannot change. relax < virtmix <
-    free CASSCF brackets the contributions (README §3.3).
+    free CASSCF brackets the contributions (README §2.3).
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               mask=no_core_window_exchange_mask,
