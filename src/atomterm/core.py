@@ -66,7 +66,7 @@ def purified_core_orbitals(mol, mf, n_core: int):
     the core SPAN, and every window orthogonalized against that span
     inherits the defect (the fact-17 input-window baseline, ~1e-3 Si /
     ~1e-2 Sc). Closure theorem (E (x) members is L-invariant for any
-    radial subspace E): fact 20, README §5.3. Construction per l:
+    radial subspace E): fact 20, README §4.3. Construction per l:
 
     1. member-resolved radial blocks ``R = [r_{i,m}]`` (each column =
        MO i's coefficients on member m's radial chain);

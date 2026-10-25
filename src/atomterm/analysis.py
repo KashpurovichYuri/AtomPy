@@ -79,13 +79,14 @@ class StateSummary:
 
 @dataclass
 class AnalysisResult:
-    sector: str  # e.g. "Ms=1 (na=2, nb=0)"
+    sector: str  # e.g. "Ms=+1 (na=2, nb=0)"
     n_det: int
     states: list[StateSummary]
     lz_spectrum: list[float]
     comm_norm_h_lz: float
     comm_norm_h_l2: float
     h_norm: float
+    sz_spectrum: list[float] | None = None  # Sz = M_S*1 exactly: constant
 
 
 def _expectation(evecs: np.ndarray, op: np.ndarray) -> np.ndarray:
@@ -94,8 +95,14 @@ def _expectation(evecs: np.ndarray, op: np.ndarray) -> np.ndarray:
     return np.real(np.diag(mat))
 
 
-def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, sector: str) -> AnalysisResult:
-    """Classify the eigenstates of H and test the [H, L] commutators."""
+def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, sector: str,
+            sz: np.ndarray | None = None) -> AnalysisResult:
+    """Classify the eigenstates of H and test the [H, L] commutators.
+
+    ``sz`` (optional): the delivered Ŝz matrix. Its spectrum is the
+    sector's M_S, exactly -- reported for the record, certifying nothing
+    (Ĥ is spin-free, so [Ĥ, Ŝz] ≡ 0 identically).
+    """
     if frobenius_norm(h.imag) > 1e-9 * max(frobenius_norm(h.real), 1.0):
         raise ValueError("Hamiltonian matrix should be real")
     h = np.real(h)
@@ -116,6 +123,8 @@ def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, secto
         for i in range(len(evals))
     ]
     lz_eigs = np.sort(np.real(np.linalg.eigvals(lz)))
+    sz_eigs = (np.sort(np.real(np.linalg.eigvals(sz)))
+               if sz is not None else None)
 
     h_norm = max(frobenius_norm(h), 1e-300)
     return AnalysisResult(
@@ -123,6 +132,8 @@ def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, secto
         n_det=len(evals),
         states=states,
         lz_spectrum=[float(v) for v in lz_eigs],
+        sz_spectrum=([float(v) for v in sz_eigs] if sz_eigs is not None
+                     else None),
         comm_norm_h_lz=frobenius_norm(commutator(h, lz)),
         comm_norm_h_l2=frobenius_norm(commutator(h, l2)),
         h_norm=h_norm,
@@ -143,6 +154,15 @@ def format_report(res: AnalysisResult, title: str) -> str:
     lines.append("")
     lines.append(f"Lz eigenvalues (M_L content): "
                  f"{np.round(res.lz_spectrum, 6).tolist()}")
+    if res.sz_spectrum is not None:
+        uniq, counts = np.unique(np.round(res.sz_spectrum, 6),
+                                 return_counts=True)
+        parts = []
+        for v, c in zip(uniq, counts):
+            txt = "0" if v == 0 else f"{v:+g}"
+            parts.append(f"[{txt}] x{c}" if c > 1 else f"[{txt}]")
+        lines.append("Sz eigenvalues (M_S content): " + ", ".join(parts)
+                     + "   (exactly M_S·1 in a fixed sector)")
     lines.append(f"||[H, Lz]||_F  = {res.comm_norm_h_lz:.3e}   "
                  f"(relative {res.comm_norm_h_lz / res.h_norm:.3e})")
     lines.append(f"||[H, L^2]||_F = {res.comm_norm_h_l2:.3e}   "

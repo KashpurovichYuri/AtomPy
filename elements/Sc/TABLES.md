@@ -49,7 +49,7 @@ rows)
 | CASCI, pur | −759.728891 | +7.4 | 6.0000 | 6.6e-15 | 0.0 | pur substrate |
 | SA-CASSCF, core-relax, pur | −759.728978 | +7.3 | 6.0000 | 3.5e-14 | 0.0 | the certified rung |
 
-## T5 — Frozen-scan verdicts (definitions in README §7.4)
+## T5 — Frozen-scan verdicts (definitions in README §6.4)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|

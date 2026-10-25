@@ -34,7 +34,7 @@ the 2p shell is exactly S-orthogonal to the core — no window offset)
 | SA-CASSCF, free | −37.682391 | +0.0 | 2.0000 | 1.0e-10 | lands symmetric |
 | SA-CASSCF, core-relax, pur | −37.440382 | +242.0 | 2.0000 | 0.0 | the certified rung |
 
-## T5 — Frozen-scan verdicts (definitions in README §7.4)
+## T5 — Frozen-scan verdicts (definitions in README §6.4)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|

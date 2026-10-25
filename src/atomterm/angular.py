@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import numpy as np
 
-__all__ = ["l_matrices", "l2_matrix", "l_matrices_analytic"]
+__all__ = ["l_matrices", "l_ladder_matrices", "l2_matrix", "l_matrices_analytic"]
 
 
 def _check_single_center(mol) -> None:
@@ -57,6 +57,14 @@ def l_matrices(mol) -> dict[str, np.ndarray]:
         "y": img * (t[6] - t[2]),
         "z": img * (t[1] - t[3]),
     }
+
+
+def l_ladder_matrices(mol) -> dict[str, np.ndarray]:
+    """AO matrices of the orbital ladders L± = Lx ± iLy (built explicitly;
+    the analytic path assembles its Lx/Ly FROM these ladders in the
+    |l,m> basis -- :func:`_complex_generators`)."""
+    l = l_matrices(mol)
+    return {"+": l["x"] + 1j * l["y"], "-": l["x"] - 1j * l["y"]}
 
 
 def l2_matrix(mol) -> np.ndarray:

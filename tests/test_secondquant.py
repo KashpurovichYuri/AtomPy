@@ -91,7 +91,7 @@ def test_elementwise_identical_to_slater_condon(carbon, na, nb):
     c_act = np.eye(mol.nao_nr())[:, act_idx]
     m1 = build_operators(mol, mf, c_act, 2, na, nb, method="slater_condon")
     m2 = build_operators(mol, mf, c_act, 2, na, nb, method="secondquant")
-    for key in ["H", "Lz", "L2", "S2", "N"]:
+    for key in ["H", "Lz", "L2", "S2", "Sz", "N"]:
         assert np.allclose(m1[key], m2[key], atol=1e-12), key
 
 

@@ -31,7 +31,7 @@ close everything to 0)
 | SA-CASSCF, free | −288.846398 | +0.0 | 2.0000 | 7.4e-10 | 0.0 |
 | SA-CASSCF, core-relax, pur | −288.628792 | +217.6 | 2.0000 | 0.0 | 0.0 |
 
-## T5 — Frozen-scan verdicts (definitions in README §7.4)
+## T5 — Frozen-scan verdicts (definitions in README §6.4)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|

@@ -28,11 +28,11 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | Module | Interface | Notes |
 |---|---|---|
 | `src/atomterm/system.py` | `AtomConfig`, `build_mol`, `sector_occupations`, `ncore_of` | validates: single atom at origin, spherical basis; `AtomConfig.ecp` pairs basis+pseudopotential; the sector/core bookkeeping helpers take `mol.nelectron` (ECP-honest — never recompute from Z) |
-| `src/atomterm/angular.py` | `l_matrices`, `l2_matrix`, `l_matrices_analytic` | one-electron `Lx/Ly/Lz` AO matrices. Primary: libcint `int1e_irp` (decoded layout in the docstring). Cross-check: exact tesseral algebra via overlaps. |
+| `src/atomterm/angular.py` | `l_matrices`, `l_ladder_matrices`, `l2_matrix`, `l_matrices_analytic` | one-electron `Lx/Ly/Lz` AO matrices. Primary: libcint `int1e_irp` (decoded layout in the docstring). Cross-check: exact tesseral algebra via overlaps. |
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
-| `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19) |
-| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_ladder(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README 3.1) |
+| `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, Sz, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19); the explicit ladder operators (`spin_ladders`, `l_ladder_operator`, `spin_ladder_matrix`) power the L²/S² twin-construction tests |
+| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_ladder(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README 2.1) |
 | `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the one deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters; `mc_opts` = per-run optimizer knobs (budgets); all checkpointed (`.chk`); labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source) |
 | `src/atomterm/windows.py` | `Window(.columns)`, `window_shell/primitive/scf_mo/no`, `SELECTORS`, `select_*`, `primitive_chain`, `shell_weights`, `build_full_mo`, `complete_orthonormal`, `lm_sectors`, `radial_basis`, `radial_mask`, `avas_window`, `span_overlap`, `lowdin(tol=)` | window construction + selection + the kind registry: `Window.columns(mf, ncore, closed=, c_core=)` materializes any kind to the full MO substrate (bounded-slice contract owned here); `lowdin` raises a named error on near-linearly-dependent blocks (the needle class, fact 16e) instead of NaN-ing downstream |
 | `src/atomterm/core.py` | `purified_s_core`, `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
@@ -240,7 +240,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     cannot see an m=0-member or equal-±pair tilt; multi-term sectors
     catch those via [H,L²], maximal-Ms single-irrep sectors catch
     NOTHING — the projector pair (fact 19) has no blind spots.
-    Numbers/curves: README §7.4; anatomy: §3.6.
+    Numbers/curves: README §6.4; anatomy: §2.6.
 19. **The one-particle closure meter is the universal certificate**
     (ticket 16 P2; `operators.window_closure`, `avas_window`,
     `span_overlap`): ‖[P,Lz]‖ and ‖[P,L⊥]‖ of the window SPAN projector
@@ -253,7 +253,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     mean-field-inherited span; raw shells strictly dominate. SA
     deviations decompose 100% window / 0% core-fold (witness: refold
     the converged core with the raw shell window; artifacts
-    results/*_sa_decomposition.md). Verdict tables: README §7.3.
+    results/*_sa_decomposition.md). Verdict tables: README §6.3.
 20. **The closed core span** (ticket 13; `purified_core_orbitals`, the
     `*_pur` rungs — fact 17's fix, verified C/Si/Sc/Ti): per l, take the
     member-resolved radial blocks R of the core MOs; E_l = top-k span of
@@ -277,7 +277,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     offset vs raw-fold CASCI rows (Sc +88.7 mEh — the projected window
     is the honest common definition WITHIN the pur family);
     relax-family max|dE| ~1e-3 vs unpolarized CASCI is fold bookkeeping
-    (bound, don't pin). Narrative: README §5.3, §7.3.
+    (bound, don't pin). Narrative: README §4.3, §6.3.
 
 21. **Ti: d², the aufbau runaway, and the basin gate** (ticket 12):
     (a) THE REFERENCE IS TWO-LAYERED CHAOS. Default ROHF on Ti/ccpvdz
@@ -315,7 +315,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     machine-exact (6.2e-14). (d) Test-band lessons: leave real headroom
     on degenerate-but-numerical quantities (the frac septet 6.5e-11 vs
     a 1e-10 bound flaked once) and on basin-mixed ⟨L²⟩. Narrative:
-    README §5.5, §7.2–7.3, §7.4.
+    README §4.5, §6.2–6.3, §6.4.
 
 
 22. **U campaign: matched cost, the ⁵S° reference, and the window
@@ -359,19 +359,23 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 ## Conventions
 
 - Per-atom tables live in `elements/<Atom>/TABLES.md` (committed,
-  log-provenanced); README §7 carries cross-atom comparisons and one
+  log-provenanced); README §6 carries cross-atom comparisons and one
   worked example (U). New atom = new element file + a data row, not
   README growth.
 - Atomic units, ℏ = 1. Spin-orbitals: alpha = `0..norb-1`, beta = `norb..2norb-1`.
 - Determinants: sorted tuples of occupied spin-orbitals.
 - Every operator enters the determinant space as (one-body matrix,
   two-body integral tensor) — never creation/annihilation algebra.
+  One documented exception: the explicit ladder operators
+  (`spin_ladder_matrix`) apply a†/a directly — an inter-sector map has
+  no sector-symbol representation; its signs are pinned by the
+  twin-construction tests (L²/S² from L±/S±).
 - New physics code ships with a test that would catch a sign or phase error
   (spectra, commutators, or independent-construction agreement).
 
 ## Tests
 
-`pytest` runs 123 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 128 tests in ~13 min (chkfile caching; ROHF computed once per
 session; the Ti ladder is the slowest block, ~7 min cold; the Sc ladders
 ~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
 anywhere in the fixture chain, sub-second); `pytest -m slow` = the
@@ -388,6 +392,11 @@ invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci
 PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
 `test_analytic_matches_libcint` (two independent L constructions),
+`test_orbital_ladders_twin_construct_l2` +
+`test_spin_ladders_twin_construct_s2_across_sectors` (the ladder
+operators built explicitly: L² = Lz² + ½(L₊L₋ + L₋L₊) and S² = Sz² +
+½(S₋S₊ + S₊S₋) elementwise on every p² sector, S± as inter-sector
+maps),
 `test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows),
 `test_treatments.py` (per-rung fingerprints, parameterized C/Si; Sc TM block:
 exact closure + free-ion tables, relax honesty, S-basin escape, the bimodal

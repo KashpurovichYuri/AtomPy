@@ -84,3 +84,37 @@ def test_configuration_summary_reads_shell_configurations(carbon):
     c_pol[:, 0] = 0.9 * c_win[:, 0] + 0.3 * mf.mo_coeff[:, 1]  # 2s admixture
     labels = configuration_summary(mol, s, [ci], c_pol, na=2, nb=0)
     assert "s^" in labels[0]
+
+
+def test_report_carries_the_sz_spectrum_line():
+    """The delivered Sz matrix enters the report as one compressed line:
+    its spectrum IS the sector's M_S (Sz = M_S*1 exactly), so the line
+    documents the quantum number and certifies nothing. No sz matrix ->
+    no line (analyze stays backward compatible)."""
+    from atomterm.analysis import analyze, format_report
+    from atomterm.detbasis import determinant_basis, slater_condon_matrix
+    from atomterm.operators import sz_operator
+
+    def report(norb, na, nb, pass_sz):
+        dets = determinant_basis(norb, na, nb)
+        sz_mb = slater_condon_matrix(dets, one_body=sz_operator(norb))
+        h = slater_condon_matrix(dets, one_body=np.eye(2 * norb))
+        kw = {"sz": sz_mb} if pass_sz else {}
+        res = analyze(h, sz_mb, 2.0 * np.eye(len(dets)),
+                      0.75 * np.eye(len(dets)),
+                      f"Ms={(na - nb) / 2:+g}", **kw)
+        return res, format_report(res, "test")
+
+    # Ms = +1 sector: three determinants, all at M_S = +1
+    res, text = report(3, 2, 0, pass_sz=True)
+    assert res.sz_spectrum == [1.0] * 3
+    assert "Sz eigenvalues (M_S content): [+1] x3" in text
+    assert "exactly M_S·1 in a fixed sector" in text
+
+    # Ms = 0 sector: the zero prints unsigned
+    _, text0 = report(3, 1, 1, pass_sz=True)
+    assert "Sz eigenvalues (M_S content): [0] x9" in text0
+
+    # without the matrix the line is omitted, not broken
+    _, text_none = report(3, 2, 0, pass_sz=False)
+    assert "Sz eigenvalues" not in text_none

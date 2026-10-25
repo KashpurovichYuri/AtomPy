@@ -233,7 +233,9 @@ def run_atom(
         # reorganize the inactive span, and a different fold than the one
         # PySCF's energies used breaks E_tot = E_core + e_cas. For CASCI
         # stages the passed core IS the mf core (built by build_full_mo).
-        sector = f"Ms={'+' if na - nb > 0 else ''}{na - nb} (na={na}, nb={nb})"
+        ms = (na - nb) / 2  # the true M_S (chkfile tags label M_S too)
+        ms_txt = "0" if ms == 0 else f"{ms:+g}"
+        sector = f"Ms={ms_txt} (na={na}, nb={nb})"
         facts = stage_facts(mol, mf, cas, c_act, ncore, na, nb, tag=sector)
         title = (f"[{tag}]  total energies vs PySCF: "
                  f"max|dE| = {facts.max_de_vs_pyscf:.2e} Eh")
@@ -301,6 +303,7 @@ def run_atom(
             "energies_pyscf": payload["energies_pyscf"],
             "states": [vars(s) for s in payload["analysis"].states],
             "lz_spectrum": payload["analysis"].lz_spectrum,
+            "sz_spectrum": payload["analysis"].sz_spectrum,
             "comm_norm_h_lz": payload["analysis"].comm_norm_h_lz,
             "comm_norm_h_l2": payload["analysis"].comm_norm_h_l2,
             "window_weights": payload["window_weights"],

@@ -144,7 +144,8 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     c_core = cas.mo_coeff[:, :ncore]
     ops = build_operators(mol, mf, c_act, ncore, na, nb,
                           spherical_core=spherical_core, c_core=c_core)
-    res = analyze(ops["H"], ops["Lz"], ops["L2"], ops["S2"], tag)
+    res = analyze(ops["H"], ops["Lz"], ops["L2"], ops["S2"], tag,
+                  sz=ops["Sz"])
     e_mine = np.linalg.eigvalsh(ops["H"]) + cas.core_energy
     e_pyscf = np.sort(np.atleast_1d(np.asarray(cas.energies)))[: len(e_mine)]
     w_names, w = shell_weights(mol, c_act, mf.get_ovlp())

@@ -2,57 +2,72 @@
 
 Atomic term-symbol analysis on top of [PySCF](https://pyscf.org): the pipeline
 runs ROHF → CASCI → CASSCF → SA-CASSCF, then classifies every state by
-**exact** angular-momentum operators L̂z, L̂², Ŝ² built as plain matrices in
+**exact** angular-momentum operators L̂z, L̂², Ŝz, Ŝ² built as plain matrices in
 the Slater-determinant basis, and certifies rotational-symmetry preservation
-by ‖[Ĥ, L̂z]‖_F and ‖[Ĥ, L̂²]‖_F. Atoms covered: **C** (2p²), **Si** (3p²),
-**Sc** (3d¹4s²), **Ti** (3d²4s²).
+by ‖[Ĥ, L̂z]‖_F and ‖[Ĥ, L̂²]‖_F (Ŝz certifies nothing — spin-free Ĥ commutes
+with it identically; it is the exact M_S label of a sector). Atoms covered:
+**C** (2p²), **Si** (3p²), **Sc** (3d¹4s²), **Ti** (3d²4s²), **U** (f³d¹;
+ECP + cut-Dyall).
 
 ## Quick start
 
 ```bash
-conda activate pyscf          # PySCF 2.13 environment
-pytest                        # 91 tests, ~13 min (chkfile caching)
+conda activate pyscf          # PySCF 2.13 environment (any platform; in a bare
+                              # shell: source <conda-root>/etc/profile.d/conda.sh first)
+pytest                        # 128 tests, ~13 min (chkfile caching); -m fast = sub-second tier
 python scripts/run_c.py       # writes results/ (chkfiles + report.md/.json)
 ```
 
+Run from the repo root — `pyproject.toml` preconfigures `pythonpath = src`
+and the test paths; no install step.
+
 ## What you get
 
-Three result types, all written under `results/` (§8 maps every file to
+Two result types, all written under `results/` (§7 maps every file to
 its regeneration command).
 
-**Term tables** — every state classified, per Ms sector. Carbon
-(CAS(2,3), Ms=0 sector):
+**Term tables** — every state classified, per Ms sector. Titanium
+(CAS(2,5) over {3d}, Ms = +1 sector — the d² triplet manifold; rows
+compressed by multiplicity):
 
 ```
- #           E (Eh)      <L^2>  L      <S^2>  S  term
- 0      -1.10060875   2.000000  1   2.000000  1    3P
- 1      -1.10060875   2.000000  1   2.000000  1    3P
- 2      -1.10060875   2.000000  1   2.000000  1    3P
- 3      -1.01251492   6.000000  2   0.000000  0    1D      (x5)
- 8      -0.88037417   0.000000  0   0.000000  0    1S
-Lz eigenvalues (M_L content): [-2, -1, -1, 0, 0, 0, 1, 1, 2]
-||[H, Lz]||_F  = 1.5e-15      ||[H, L^2]||_F = 3.2e-15
+sector: Ms=+1 (na=2, nb=0)   (10 determinants)
+
+ #           E (Eh)      <L^2>  L      <S^2>    S  term
+ 0      -1.46866251  12.000000  3   2.000000    1    3F   (x7)
+ 7      -1.41396932   2.000000  1   2.000000    1    3P   (x3)
+
+Lz eigenvalues (M_L content): [-3.0, -2.0, -1.0, -1.0, 0.0, 0.0, 1.0, 1.0, 2.0, 3.0]
+Sz eigenvalues (M_S content): [+1] x10   (exactly M_S·1 in a fixed sector)
+||[H, Lz]||_F  = 1.386e-14   (relative 3.018e-15)
+||[H, L^2]||_F = 5.819e-14   (relative 1.267e-14)
 ```
 
-The textbook 2p² multiplet (Hund: ³P < ¹D < ¹S) comes out exactly —
-commutators at round-off, because this window is exactly rotation-closed
-(§2.3). §7.1–7.2; regenerate: `python scripts/run_c.py`.
+The textbook d² multiplet comes out exactly (Hund: ³F ground, ³P
+excited) — commutators at round-off, because the {3d} window is exactly
+rotation-closed (§1.3). The Ŝz line documents the sector's M_S; it
+certifies nothing, since [Ĥ, Ŝz] ≡ 0 identically (§1.2). §6.1–6.2;
+regeneration: §7.
 
-**The ladder** — every orbital treatment priced against the ROHF
-reference, broken and symmetric variants side by side. Titanium's
-summary row set (ROHF reference −848.406489 Eh; ΔE vs ROHF, mEh):
+**Treatment rungs** — every orbital treatment priced against the ROHF
+anchor, the free variant beside the symmetric one, each classified by
+its diagnostics (E as run = the run's own variational total; ΔE vs the
+ROHF anchor). Titanium's headline rows (ROHF reference −848.406489 Eh):
 
-| deliverable | free variant | symmetric variant |
-|---|---|---|
-| CASCI, raw shell | — | +10.6 (exact) |
-| CASSCF | **−31.3** (escape — broken) | +10.4 frozen (baseline) / −2.1 radial (single root, gauge-chaotic) |
-| SA-CASSCF | −10.1 (swap — broken) | +1.0 radial purified (floor) / +11.7 frozen purified (exact) |
+| treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | verdict |
+|---|---|---|---|---|---|
+| CASCI, averaged fold | −848.394046 | +12.4 | 12.0 | 2.2e-14 | exact |
+| CASSCF, free | −848.437740 | −31.3 | 0.0503 | 4.3e-01 | escape — broken |
+| CASSCF, window frozen (core-relax) | −848.395884 | +10.6 | 12.0 | 2.3e-08 | baseline |
+| SA-CASSCF, free | −848.416563 | −10.1 | 12.003 | 1.1e+00 | swap — broken |
+| SA-CASSCF, frozen, purified core | −848.394753 | +11.7 | 12.0 | 5.2e-13 | exact |
 
-§7.3; regenerate: the `run_ladder` calls recorded in each ladder header.
-
-**Scan curves** — the deterministic energy landscape: freeze everything,
-deform one window coordinate, re-diagonalize. §7.4; regenerate:
-`python scripts/radial_scan.py`.
+Verdicts: **exact** = commutators and span certificates at the 1e-13
+class; **escape / swap** = window-identity basins (§4); **baseline** =
+a named non-closure mechanism at its signature scale (§1.5). §6.3 is
+the reading guide; the full per-atom tables (span certificates,
+cross-check column, configurations) live in
+`elements/<Atom>/TABLES.md`.
 
 ---
 
@@ -66,92 +81,88 @@ treatments *can* lose this structure. What breaks is not quantum
 mechanics but the *restriction*: the calculation is confined to a small
 set of orbitals, and two properties of that restriction can fail.
 
-First, CASCI inherits an anisotropic field from its reference (§2.4).
-Carbon: the two ³P electrons occupy two of the three 2p orbitals — the
-choice is arbitrary, all pairs are degenerate — say px and py; their
-charge is then unevenly distributed (heavier along x and y than z), the
-closed-shell core polarizes in response, and the resulting field acts
-unevenly on the valence states, splitting the ³P term. The pz-pair case
-is the same story in another orientation; no pair is spherical.
+First, CASCI inherits an anisotropic field from its reference (§1.4).
+ROHF calculation for Carbon: the two ³P electrons occupy two of the
+three 2p orbitals — the choice is arbitrary, all pairs are degenerate —
+say px and py; their charge is then unevenly distributed (heavier along
+x and y than z), the closed-shell core polarizes in response, and
+the resulting field acts unevenly on the valence states, splitting the
+³P term.
 
 Second, CASSCF additionally lets the active orbitals themselves relax
-(§3.3, §2.4). The active orbital set — the *window* (§2.3) — can then
+(§2.3, §1.4). The active orbital set — the *window* (§1.3) — can then
 deform in three ways with different consequences: some deformations
 leave the energy unchanged, and the optimizer stops at an arbitrary
-point of them; some *lower* the energy by tilting orbitals (on d-shells;
-the Jahn–Teller mechanism, §2.4); and some change *which* orbitals are
-active at all — trading a valence 4s for a core 3p (§5).
+point of them; some *lower* the energy by tilting orbitals (§1.4); and
+some change *which* orbitals are active at all (§4).
 
 State-averaged CASSCF exists because a single optimized state represents
 just one component of the multiplet; the average over all components is
-the rotationally symmetric object (§3.4). It restores sharp L values,
+the rotationally symmetric object (§2.4). It restores sharp L values,
 but it cannot alone guarantee the full symmetry, and on heavier atoms it
 can still trade orbitals.
 
-Heavier atoms add failure modes (§5): the energy-lowering tilts, the
+Heavier atoms add failure modes (§4): the energy-lowering tilts, the
 orbital trades, and the reference calculation itself can converge to a
-wrong or metastable solution (§5).
+wrong or metastable solution (§4).
 
 Is the minimum correct? Where the energy is insensitive to a
 deformation, the energy is still well defined — the orbitals are not,
-and that is fine (§2.4). Across genuinely different solutions, every
+and that is fine (§1.4). Across genuinely different solutions, every
 free run must be inspected for which orbitals it actually uses before it
-is believed (§7.3).
+is believed (§6.3).
+
+The deliverable is threefold: **certified term assignments** (the three
+questions of §1.1); **comparisons** — every orbital treatment priced
+against one common anchor (E as run, ΔE vs the ROHF reference), across
+treatments, windows at matched determinant cost, and atoms (§6); and
+the **loss accounting** — what each restriction and each symmetry
+breaking costs, and which of those losses are removable (§4, §6). The
+treatment class is CASCI/CASSCF, non-relativistic throughout; the
+roadmap (§8) extends to scalar relativity and ECP-based full relativity.
 
 ---
 
-*How to read.* §1 states the goal. §2 fixes the objects, the language
+*How to read.* The header, the showcase and the Introduction state the
+goal and tell the story. §1 fixes the objects, the language
 and the diagnostics — later sections use nothing that is not defined
-there. §3 walks the method hierarchy (why each exists, what it computes,
-how we run it, and what textbook usage gets wrong). §4 maps the methods
-onto the code. §5 is the core: where symmetry breaks, level by level.
-§6 is the operational protocol card. §7 holds the results. §8 is the
-file map; §9 the roadmap. Plain-language companions: `RUNGS.md` and the
+there. §2 walks the method hierarchy (why each exists, what it computes,
+how we run it, and what textbook usage gets wrong). §3 maps the methods
+onto the code. §4 is the core: where symmetry breaks, level by level.
+§5 is the operational protocol card. §6 holds the results. §7 is the
+file map; §8 the roadmap. Plain-language companions: `RUNGS.md` and the
 glossary appendix below; agent instructions: `AGENTS.md`.
 
 ---
 
-## 1. Goal and scope
+## 1. The object and the diagnostics
 
-**The goal: atom term assignments from CAS treatments, with certified
-L̂² and L̂z symmetry, for any atom.** "Certified" means the three
-questions of §2.1 answered against the classes of §2.5 — sharp term
-labels, exact-class commutators, exact term tables — not approximate
-agreement. The treatment delivered is CASCI/CASSCF-class,
-non-relativistic throughout this note; the roadmap (§9) extends to
-scalar-relativistic Hamiltonians (which change h₁ only — a scalar is
-rotationally invariant, so the entire machinery survives) and to
-ECP-based full relativity. The evidence base is four atoms (C, Si, Sc,
-Ti; cc-pVDZ); the machinery is atom-generic, with per-atom *data*
-(closed/open AO spans, the reference energy E_ref, the combinatorial
-term tables) rather than per-atom code.
-
----
-
-## 2. The object and the diagnostics
-
-### 2.1 The symmetry an atom demands — and the question of this project
+### 1.1 Atom symmetries
 
 An isolated atom is invariant under rotations. Its Hamiltonian therefore
 commutes with L̂², L̂z, Ŝ², Ŝz, and every exact eigenstate is
 |γ; L, M_L, S, M_S⟩ — it carries a **term symbol** (2S+1)L. Because of
 L̂² and Ŝ² symmetry, the (2L+1)(2S+1) components of one term are *exactly
-degenerate*: ³P is one energy, nine times.
+degenerate*.
 
 The goal of this project is to understand **why practical CAS stages
-(CASCI over an SCF reference, CASSCF, SA-CASSCF) lose this symmetry**, and
-how to follow it after all — without giving up the correlation these
+(CASCI over an SCF reference, CASSCF, SA-CASSCF) can lose this symmetry**,
+and how to follow it without giving up the correlation these
 methods buy. A treatment is examined through three questions:
 
 1. does every diagonalized root carry a sharp term label
    (⟨L̂²⟩ = L(L+1), ⟨Ŝ²⟩ = S(S+1))?
-2. how large are the commutators ‖[H, L̂z]‖, ‖[H, L̂²]‖ — evaluated as
-   exact matrices over the determinant basis — compared against the
-   numerical classes of §2.5?
+2. how large are the commutators ‖[H, L̂z]‖, ‖[H, L̂²]‖ evaluated as
+   exact (§1.5) matrices over the determinant basis?
 3. does the term table (state counts per term) equal the combinatorial
    free-ion table?
 
-### 2.2 The operators, over determinants
+"Certified" is the word for exactly this, throughout this note: the
+three questions answered against the classes of §1.5 — sharp term
+labels, exact-class commutators, exact term tables — not approximate
+agreement.
+
+### 1.2 The operators, over determinants
 
 We work with spin-orbitals (α = 0..n−1, β = n..2n−1) and
 **determinants** — sorted occupation tuples. A **sector** fixes the
@@ -160,7 +171,7 @@ operators N̂, L̂z, L̂², Ŝz, Ŝ² all preserve sectors (each commutes with �
 and N̂), so every matrix lives inside one sector of fixed M_S.
 
 A CAS treats a chosen set of active orbitals — the **window** (analyzed
-in §2.3). Every operator is brought in as **one-body symbol + two-body
+in §1.3). Every operator is brought in as **one-body symbol + two-body
 symbol**: the symbol is the operator's matrix in the active-orbital
 basis, built from its AO-basis matrix via the orbital coefficients; both
 implementations below consume the same symbols. Evaluation is by
@@ -169,36 +180,63 @@ identically, pinned by test — by explicit creation/annihilation on
 occupation vectors (`secondquant`). The two implementations validate each
 other.
 
-| Operator | One-body symbol | Two-body symbol |
-|---|---|---|
-| N̂ | identity | — |
-| L̂z | Lz matrix in the active-orbital basis | — |
-| L̂² | Σᵢ L̂ᵢ² (l² AO matrices, transformed) | 2 Σᵢ<ⱼ L̂ᵢ·L̂ⱼ (composite integrals) |
-| Ŝ² | — | closed combinatorial form (pair exchange) |
-| Ĥ | folded h₁ (nucleus + core field) | active-orbital two-electron integrals |
+Every operator enters the determinant space as a **one-body part** and,
+where it has one, a **two-body part**,
 
-**The frozen-core partition must be orthogonal.** The core enters the
-active Hamiltonian as a folded field,
+  O₁ = Σ_pq o_pq a†_p a_q,   O₂ = ½ Σ_pqrs g_pqrs a†_p a†_q a_s a_r,
 
-  h_eff(p,q) = h(p,q) + Σᵢ[2(pq|ii) − (pi|iq)],  E_core separate,
+with these symbols (spin-orbitals ordered (α; β); L̂^a = C† $L̂^a_{AO}$ C,
+a = x, y, z — the AO angular-momentum matrices transformed into the
+window):
 
-and the partition is *exact iff the active space is orthogonal to the
-core orbitals*. If a window vector leans into the core, w = w⊥ + w∥
-with w∥ ∈ span(core), the model admits configurations with extra
-density in *occupied* core orbitals that the antisymmetrized problem
-forbids; the CI harvests the deep-core stabilization the Pauli
-principle would have priced. Hence every window is built
-core-orthogonal (§3.3). Canonical SCF MOs need nothing — occupied vs
-virtual subsets of one orthonormal basis cannot leak into each other
-(their defect is different: m-delocalization, §7.5); core averaging
-changes the field, never the orthogonality of the basis.
+```
+N̂  :  o = 𝟙                                          (counts each electron once)
+L̂z :  o = L̂^z
+L̂² :  o = Σ_a (L̂^a)²
+      g = 2 Σ_a (L̂^a)_pr (L̂^a)_qs
+Ŝz :  o = diag(½·𝟙, −½·𝟙)
+Ŝ² :  o = ¾·𝟙
+      g = 2·[(ŝ_z)_pr (ŝ_z)_qs + ½(ŝ₊)_pr (ŝ₋)_qs + ½(ŝ₋)_pr (ŝ₊)_qs]
+Ĥ  :  o = h_eff  (the folded core field, §2.2)
+      g = (pq|rs)   (the active-orbital Coulomb integrals)
+```
 
-### 2.3 The closure theorem
+All of it exact algebra — the L̂²/Ŝ² two-body symbols are products of
+one-body matrix elements, nothing fitted or truncated. Ŝz carries no
+certificate: Ĥ is spin-free, so [Ĥ, Ŝz] ≡ 0 identically; it only labels
+the sector (in a fixed-M_S sector its matrix is exactly M_S·**1**), and
+the symmetry certificates stay ‖[Ĥ, L̂z]‖ and ‖[Ĥ, L̂²]‖.
+
+The ladder operators are built explicitly, for algebraic cross-checks.
+Ŝ± are an **inter-sector map** — the one operator class that does not
+preserve a sector (a bare ladder flips one β → α); L̂± are ordinary
+one-body window operators (orbital ladders do not touch spin). They
+have no analysis role, but they turn the operator algebra into pinned
+tests: L̂² = L̂z² + ½(L̂₊L̂₋ + L̂₋L̂₊) and Ŝ² = Ŝz² + ½(S₋S₊ + S₊S₋) hold
+elementwise against the delivered operators on every p² sector, and
+[L̂z, L̂±] = ±L̂±.
+
+### 1.3 The window: rotation closure, deformations, certificates
 
 **We call a space rotation-closed if L̂W ⊆ W, and an operator a scalar if
 it commutes with all rotations.** The members of an l-shell are its 2l+1
-m-functions (px, py, pz; dxy, dyz, dz², dxz, dx²−y² — where we refer to
-member *sets*, the indices 0–4 follow this order).
+m-functions, indexed within the shell (0…2l) in AO order:
+
+| p member | index | d member | index | f member | index |
+|---|---|---|---|---|---|
+| px | 0 | dxy | 0 | fy(3x²−y²) | 0 |
+| py | 1 | dyz | 1 | fxyz | 1 |
+| pz | 2 | dz² | 2 | fyz² | 2 |
+| | | dxz | 3 | fz³ | 3 |
+| | | dx²−y² | 4 | fxz² | 4 |
+| | | | | fz(x²−y²) | 5 |
+| | | | | fx(x²−3y²) | 6 |
+
+(f abbreviations: yz² = y(3z²−r²), z³ = z(5z²−3r²); PySCF's own labels
+for f members are the m values, `4f−3 … 4f+3`.) The ±m partners —
+(px, py); (dxz, dyz), (dx²−y², dxy); (fxz², fyz²), (fz(x²−y²), fxyz),
+(fx(x²−3y²), fy(3x²−y²)) — are the pairing behind the L̂z blind spots
+below.
 
 **Exact symmetry imposes two conditions on the treatment.**
 
@@ -209,11 +247,11 @@ member *sets*, the indices 0–4 follow this order).
    carry member-dependent radial mixtures, because truncation-by-weight
    can drop members, and because even core-orthogonalization of a raw
    shell window can inject non-closed directions (the mechanisms, with
-   numbers, are §5's subject).
+   numbers, are §4's subject).
 2. **The core fold is a scalar.** The inactive core enters the active
    problem as a one-body field inside h₁; if that field is angularly
    anisotropic, it breaks L̂z directly. This happens because the SCF core
-   polarizes in the anisotropic field of the open shell (§2.4).
+   polarizes in the anisotropic field of the open shell (§1.4).
 
 **Rotation generators never touch radial coordinates.**
 
@@ -227,12 +265,9 @@ member *sets*, the indices 0–4 follow this order).
 **Exactly two failure modes exist: members missing, and radials not
 shared across members.**
 
-**Window operators never leave the window Fock space.** Constructing
-"L̂²" from a†_p a_q (p, q ∈ W) therefore gives the *projected* L̂²; it
-equals the true L̂² on W's determinants iff W is rotation-closed.
-
 **Two projector norms check the window alone.** With no CI and no
-optimizer involved, ‖[P, L̂z]‖ and ‖[P, L̂⊥]‖ — P the orthogonal
+optimizer involved, ‖[P, L̂z]‖ and ‖[P, L̂⊥]‖ — L̂⊥ = (L̂x, L̂y), the two
+components perpendicular to z — P the orthogonal
 projector onto the window span in the AO overlap metric — catch exactly
 the two failure modes above.
 
@@ -241,8 +276,8 @@ replaced by a radial admixture, cos θ·(n l m) + sin θ·(n′ l m) — same
 l, same m, neighboring radial. In the real AO basis L̂z mixes only the
 two functions of each ±m pair and annihilates m = 0 members, so
 ‖[P, L̂z]‖ has **blind spots** (an m = 0 tilt, or equal tilts of both
-partners of a pair, are invisible to it); L̂ᵔ rotates any member into
-any other, so ‖[P, L̂ᵔ]‖ sees every member asymmetry — together, no
+partners of a pair, are invisible to it); L̂⊥ rotates any member into
+any other, so ‖[P, L̂⊥]‖ sees every member asymmetry — together, no
 blind spots. Both directions of the asymmetry are measured (per-atom
 records: `elements/*/NOTES.md`).
 
@@ -258,7 +293,7 @@ L(L+1)·**1** identically, so ‖[H, L̂²]‖ vanishes *whatever is wrong* —
 multi-term sectors are the honest courts. The projector pair, being
 sector-independent, is the universal certificate.
 
-### 2.4 The diagnostics and their sensitivity
+### 1.4 The diagnostics and their sensitivity
 
 **ε measures the size of the symmetry breaking.** Throughout, it is the
 weight of the angularly non-scalar part of the core field's density (a
@@ -268,7 +303,7 @@ core anisotropy; ‖A‖_F = sqrt(Σ|A_ij|²) is the Frobenius norm.
 | Diagnostic | What it measures | Sensitive to | Blind to |
 |---|---|---|---|
 | ‖[H, L̂z]‖_F, ‖[H, L̂²]‖_F | the assembled treatment (window + core fold) | everything, order ε | vacuous in single-irrep sectors (L̂²); ±pair structure (L̂z) |
-| ‖[P, L̂z]‖, ‖[P, L̂⊥]‖ | the window span alone (members §2.3) | member asymmetry, missing members; no optimizer noise | — (as a pair) |
+| ‖[P, L̂z]‖, ‖[P, L̂⊥]‖ | the window span alone (members §1.3) | member asymmetry, missing members; no optimizer noise | — (as a pair) |
 | ⟨L̂²⟩, ⟨Ŝ²⟩ per root | term identity | order ε² | small defects |
 | multiplet splitting | fold anisotropy | order ε | — |
 | orthonormality error | validity of the stage's MO matrix (C†SC = 1) — a guard, not a symmetry diagnostic | construction bugs | — |
@@ -291,10 +326,10 @@ and their mean the **centroid**; the centroid, averaged over the
 multiplet, again moves only at order ε².
 
 **Core anisotropy has a physical origin and three cures.** The open
-shell's quadrupole polarizes the core during the SCF (§2.3, condition
+shell's quadrupole polarizes the core during the SCF (§1.3, condition
 2); the cures — spherical averaging of the core density, the
 fractional-occupation reference, core purification — are compared by
-cost in §7.
+cost in §6.
 
 **Orthonormality is a validity guard, not a symmetry diagnostic.** If
 the stage's MO matrix is not orthonormal in the AO overlap metric the
@@ -317,15 +352,15 @@ splitting follows at order ε with an atom-dependent coupling:
 The ratio splitting/ε is the effective coupling strength — an atomic
 property. The order relations hold throughout: commutators and
 splittings are the detectors; a numerically pretty ⟨L̂²⟩ is not.
-### 2.5 Numerical conventions — what “exact” costs
+### 1.5 Numerical conventions — what “exact” costs
 
 | Class | Typical scale | Meaning | Always resolvable? |
 |---|---|---|---|
 | exact | ~1e-13 | round-off of the construction | — |
-| baseline | 1e-8…1e-2 | a *named* mechanism: core-orthogonalization defect, core polarization, optimizer floor | each has a signature (checkable); all resolvable except the optimizer floor — certifiable and boundable, but with no restoring force to remove it (§5) |
-| broken | 1e-1…10 | window identity change (swap/escape, §5) | yes — recognized and rejected by the diagnostics |
+| baseline | 1e-8…1e-2 | a *named* mechanism: core-orthogonalization defect, core polarization, optimizer floor | each has a signature (checkable); all resolvable except the optimizer floor — certifiable and boundable, but with no restoring force to remove it (§4) |
+| broken | 1e-1…10 | window identity change (swap/escape, §4) | yes — recognized and rejected by the diagnostics |
 
-§5 maps every rung to a class.
+§4 maps every rung to a class.
 
 **The optimizer's deformations (derived).** Over m-labeled determinants
 H is block-diagonal in M_L: the one-body fold is m-diagonal, and the
@@ -349,18 +384,18 @@ consequences:
 - *The state average.* Because the block is traceless, Σₐ ∂Eₐ/∂δ = 0:
   the ensemble is stationary at the m-symmetric window — stationary
   with zero curvature, however, which is not a minimum with restoring
-  force (§3.4).
+  force (§2.4).
 
 
 ---
 
-## 3. The method hierarchy
+## 2. The method hierarchy
 
 Each method gets the same triple: why it exists, what it computes, how we
 run it. Two vocabulary items are defined here and used everywhere after:
-the *substrate* (§3.3) and the *basin* (§3.3).
+the *substrate* (§2.3) and the *basin* (§2.3).
 
-### 3.1 ROHF — the reference that defines "core"
+### 2.1 ROHF — the reference that defines "core"
 
 **The reference calculation fixes what the core is: everything downstream
 folds it.** Two of its aspects matter here: how an orbital's *type* is measured,
@@ -369,7 +404,7 @@ fails.
 **An orbital's type is measured by projection.** For an AO span with
 index set o, the S-metric projector is P_o = S[:,o] S_oo⁻¹ S[o,:], and an
 orbital c carries weight w = c†P_oc ∈ [0,1] on that span (bounded — a
-true projector weight; the same metric appears in §3.2's window
+true projector weight; the same metric appears in §2.2's window
 construction). Occupations can then be assigned by *character* rather
 than energy order.
 
@@ -387,16 +422,36 @@ until the reference basin is reached; **cached trusted references**
 (E_ref and the AO spans are the atom's data). Records:
 `elements/*/NOTES.md`.
 **The reference is also the source of the core anisotropy ε.** The open
-shell's quadrupole polarizes the core during the SCF (§2.4); the fold
-variants of §3.2 are three ways of dealing with what this calculation
+shell's quadrupole polarizes the core during the SCF (§1.4); the fold
+variants of §2.2 are three ways of dealing with what this calculation
 leaves behind.
 
-### 3.2 CASCI — diagonalization at fixed core and window
+### 2.2 CASCI — diagonalization at fixed core and window
 
 **CASCI diagonalizes the CI problem inside one sector, at fixed core and
 window.** The window is the raw shell AOs (rotation-closed by
-construction, §2.3); the core enters through the one-body fold, in three
-constructions that differ exactly in how they treat ε:
+construction, §1.3).
+
+**Core, fold, and the exactness condition.** *Core* means the
+closed-shell (doubly occupied) orbitals the treatment does not
+correlate — a subset of the *electrons*; it is not an effective core
+potential (where an ECP is in play — U — it has already replaced the
+innermost shells before any partition is made). The core enters the
+active Hamiltonian only through the **folded field** — the Ĥ one-body
+symbol of §1.2:
+
+  h_eff(p,q) = h(p,q) + Σᵢ[2(pq|ii) − (pi|iq)],  E_core kept separate,
+
+sum over occupied core orbitals i. The partition is **exact iff the
+window is orthogonal to the core orbitals**. A window vector leaning
+into the core, w = w⊥ + w∥ with w∥ ∈ span(core), admits configurations
+with extra density in *occupied* core orbitals that the antisymmetrized
+problem forbids — the CI harvests deep-core stabilization the Pauli
+principle would have priced, silently sub-variational. Hence every
+window is built core-orthogonal (the §2.3 substrate step); core
+averaging changes the field, never the orthogonality of the basis. The
+three constructions below differ exactly in which core density feeds
+this fold:
 
 - **averaged** — one-shot post-processing of the *same* ROHF core: the
   core density is spherically averaged (its l = 0 component kept),
@@ -410,24 +465,18 @@ constructions that differ exactly in how they treat ε:
 different functional of the smearing, not a variational neighbor of
 ROHF.
 - **raw** — the core field as the SCF left it: ε unscreened, the
-  multiplet splits by §2.4's mechanism.
+  multiplet splits by §1.4's mechanism.
 
-With the averaged fold, the CASCI term tables of §7.1–7.2 come out exact
+With the averaged fold, the CASCI term tables of §6.1–6.2 come out exact
 on all four atoms; the averaged–raw and averaged–frac differences are
-the ΔE anchors of §7.3.
+the ΔE anchors of §6.3.
 
-**The fold** is defined in §2.2 (the h_eff formula and the
-orthogonality requirement). The three constructions here differ
-exactly in which core density feeds it: averaged (the physical
-reference), fractional-occupation (a different functional), raw (the
-anisotropy detector).
-
-### 3.3 CASSCF — letting the orbitals move
+### 2.3 CASSCF — letting the orbitals move
 
 **CASSCF minimizes the chosen root's energy over orbital rotations.** Its
 motivation is visible in carbon's radial gain — the valence 2p functions
-want a 3p admixture worth −250.8 mEh of window energy (§7.4 — in totals
-this is the recovery of the raw-shell confinement cost, §7.3), a
+want a 3p admixture worth −250.8 mEh of window energy (§6.4 — in totals
+this is the recovery of the raw-shell confinement cost, §6.3), a
 relaxation CASCI cannot
 express. How we run it is a grid of *starts × restrictions*, and both
 axes matter.
@@ -439,17 +488,18 @@ step is explicit mathematics: a raw window column w is replaced by
   w̃ = (1 − P_core) w / ‖(1 − P_core) w‖_S,  P_core = C (C†SC)⁻¹ C†,
 
 i.e. its component in the core span is subtracted in the AO overlap
-metric and the remainder re-normalized. The projection is the leak guard of §2.2: without it, a window that
+metric and the remainder re-normalized. The projection is the leak guard
+of §2.2: without it, a window that
 leans into the core would double-count the core region. And the three
 orthogonalizers of this project each preserve a different auxiliary
-property (all in the S metric — §2.2's isometry turns them into the
+property (all in the S metric — §1.2's isometry turns them into the
 Euclidean ones): symmetric **Löwdin** (shape-preserving — the core,
 §2.2), two-pass S-**Gram–Schmidt** (identity-preserving — column j
 is the (l, m) of AO j; the masks require it), and the residual
 **completion** (span-filling — the complement). The construction is
 forced by convergence — a non-orthonormal
 substrate makes the optimizer diverge to sub-variational energies
-(observed once; `elements/Si/NOTES.md`, the §2.4 guard).
+(observed once; `elements/Si/NOTES.md`, the §1.4 guard).
 
 
 **Restrictions are masks on rotation pairs.** *Window frozen*: only
@@ -458,7 +508,7 @@ untouched. *Radial restriction*: only pairs within a same-(l, m) radial
 chain — the symmetry-preserving channel; where it exists (C, Si) it
 recovers the full gain at exact closure. *Free*: no mask — the textbook
 run. **A basin is the region of attraction of one local minimum of this
-optimization**; the free landscape has several (§7.3's chaos paragraph).
+optimization**; the free landscape has several (§6.3's chaos paragraph).
 
 
 **The rotations themselves.** The optimizer parameterizes C(κ) =
@@ -474,7 +524,7 @@ onto an AO row-block X (an exponent band, or all rows of one l). Same
 total l-weight with redistributed bands — *radial relaxation*: the
 orbitals re-project onto the AO lattice where the energy wants them.
 
-### 3.4 SA-CASSCF — averaging over the multiplet
+### 2.4 SA-CASSCF — averaging over the multiplet
 
 **State-averaging replaces the single root by the multiplet average:**
 
@@ -487,52 +537,54 @@ alone — the average is the rotationally scalar object.
 
 **The average anchors the term identity but not the window.** ⟨L̂²⟩
 is restored, yet along flat directions the average is stationary with
-no restoring force (§2.4: the deformation block is traceless), so
+no restoring force (§1.4: the deformation block is traceless), so
 convergence tolerance, not physics, decides the endpoint; and other
-basins remain reachable (the swap, §5). Exactness combines the tools:
+basins remain reachable (the swap, §4). Exactness combines the tools:
 state average + frozen window + isotropic substrate. Whether tilting
 helps or hurts the average is atom-dependent — the frozen-scan
-verdicts of §7.4 (per-atom values in `elements/`).
+verdicts of §6.4 (per-atom values in `elements/`).
 
 
-### 3.5 What textbook runs give you, and why
+### 2.5 What textbook runs give you, and why
 
 | Standard practice | What you get | Why | What we do instead |
 |---|---|---|---|
-| CASCI over canonical virtual MOs | closure defects at the 1e-1 level; term labels unreliable | canonical MOs diagonalize a Fock built from an anisotropic density; quasi-degenerate same-l members mix arbitrarily | raw shell windows, averaged fold (§3.2) |
-| free CASSCF, default start | p²: full gain with a silently member-tilted window; d-shells: escape/swap basins, ⟨L̂²⟩ off by units | flat directions (endpoint = noise) and descending directions (§2.4); window identity free to change | restrictions + substrate control (§3.3) |
-| free SA-CASSCF | ⟨L̂²⟩ ≈ L(L+1) restored, closure not (Sc: 6.002 with ‖[H,L̂z]‖ ≈ 0.8) | the average is scalar to first order only; no restoring force on flat directions; other basins still reachable | frozen-window SA on the isotropic substrate (§5) |
+| CASCI over canonical virtual MOs | closure defects at the 1e-1 level; term labels unreliable | canonical MOs diagonalize a Fock built from an anisotropic density; quasi-degenerate same-l members mix arbitrarily | raw shell windows, averaged fold (§2.2) |
+| free CASSCF, default start | p²: full gain with a silently member-tilted window; d-shells: escape/swap basins, ⟨L̂²⟩ off by units | flat directions (endpoint = noise) and descending directions (§1.4); window identity free to change | restrictions + substrate control (§2.3) |
+| free SA-CASSCF | ⟨L̂²⟩ ≈ L(L+1) restored, closure not (Sc: 6.002 with ‖[H,L̂z]‖ ≈ 0.8) | the average is scalar to first order only; no restoring force on flat directions; other basins still reachable | frozen-window SA on the isotropic substrate (§4) |
 
-## 4. The pipeline tour
+## 3. The pipeline tour
 
 | Module | Owns |
 |---|---|
 | `system` | system validation — one atom at the origin, spherical basis (L̂ defined about r = 0) |
 | `angular` | one-electron L̂x/L̂y/L̂z AO matrices — two independent constructions pinning each other (libcint; exact tesseral algebra) |
-| `detbasis` / `secondquant` | many-body matrices over determinants — Slater–Condon and explicit a†/a, elementwise-identical twins (§2.2) |
-| `operators` | operator assembly — the fold (§3.2), the H/L̂z/L̂²/Ŝ²/N̂ symbols, the window-closure certificates (§2.3) |
+| `detbasis` / `secondquant` | many-body matrices over determinants — Slater–Condon and explicit a†/a, elementwise-identical twins (§1.2) |
+| `operators` | operator assembly — the fold (§2.2), the H/L̂z/L̂²/Ŝ²/N̂ symbols, the window-closure certificates (§1.3) |
 | `reference` / `casscf` | the engine — SCF reference with gates; the one deep optimizer (`constrained_casscf`) with its masks and adapters |
 | `windows` / `core` | window construction, selection, the kind registry (`Window.columns`); the purified core substrate and fold energy |
-| `stages` | the one uniform analysis pass per finished stage — the source of every §7 number |
-| `scans` | frozen-landscape measurements — deterministic (§7.4) |
+| `stages` | the one uniform analysis pass per finished stage — the source of every §6 number |
+| `scans` | frozen-landscape measurements — deterministic (§6.4) |
 | `analysis` | term labels, configuration summaries, report rendering |
-| `cases` / `treatments` / `study` | orchestration — the declared per-atom campaign (`cases`: CaseSpec → run_case); rungs as data (`treatments`, §7.3); the declared window × treatment study runner (`study`) |
+| `cases` / `treatments` / `study` | orchestration — the declared per-atom campaign (`cases`: CaseSpec → run_case); rungs as data (`treatments`, §6.3); the declared window × treatment study runner (`study`) |
 
 **The drivers capability map.** Every treatment is a point in a
 five-axis space:
 
 | Capability | What it is |
 |---|---|
-| ROHF reference | character-forced filling + energy gate — the anchor (§3.1, §5) |
-| CASCI | exact sector diagonalization — fold variants raw / averaged / fractional (§3.2) |
-| CASSCF | orbital optimization — freedom by mask, start by substrate (§3.3) |
-| SA-CASSCF | multiplet-averaged optimization — weights over the M_L components (§3.4) |
-| core construction | the purified, exactly isotropic core span (§5) |
+| ROHF reference | character-forced filling + energy gate — the anchor (§2.1, §4) |
+| CASCI | exact sector diagonalization — fold variants raw / averaged / fractional (§2.2) |
+| CASSCF | orbital optimization — freedom by mask, start by substrate (§2.3) |
+| SA-CASSCF | multiplet-averaged optimization — weights over the M_L components (§2.4) |
+| core construction | the purified, exactly isotropic core span (§4) |
 
 The 17-rung registry tabulated in `results/` enumerates the corners of
-this space; §7.3 keeps the rows that differ in mechanism.
+this space; §6.3 keeps the rows that differ in mechanism.
 
-**The launch path.** A new atom is a declared case, executed top-down:
+**The launch path.** A new atom is a declared case, executed top-down —
+per-atom *data* (closed/open AO spans, the reference energy E_ref, the
+combinatorial term tables), not per-atom code:
 
 ```
 CaseSpec — the declaration
@@ -566,17 +618,17 @@ run.
 
 ---
 
-## 5. Where symmetry breaks
+## 4. Where symmetry breaks
 
 | Level | Symptom (order of magnitude) | Mechanism | Fix | Cost |
 |---|---|---|---|---|
 | 1. Basis bookkeeping | labels mislead; shells fuse | wrong inputs → wrong constructions | label + metric discipline | none |
-| 2. Sector witnesses | ‖[H,L̂²]‖ = 0 with defects present | single-irrep sectors make L̂² = L(L+1)·**1**; ±pair blind spots (§2.3) | projector pair; multi-term sectors | sector size |
-| 3. Core field | splittings and commutators 1e-5…1e-1 | polarization chain (§2.4) | fold cures / purification | ΔE per §7 |
-| 4. Orbital optimization | tilted windows, floors, escape/swap | flat and descending directions (§2.4); identity change | restrictions + substrate | 0…~30 mEh above the deepest minimum |
-| 5. SCF reference | ~1e2 mEh wrong configuration; ~10 mEh metastable basin | energy-ordered filling; degenerate-open-shell basins | toolbox of §3.1 | per-atom reference data |
+| 2. Sector witnesses | ‖[H,L̂²]‖ = 0 with defects present | single-irrep sectors make L̂² = L(L+1)·**1**; ±pair blind spots (§1.3) | projector pair; multi-term sectors | sector size |
+| 3. Core field | splittings and commutators 1e-5…1e-1 | polarization chain (§1.4) | fold cures / purification | ΔE per §6 |
+| 4. Orbital optimization | tilted windows, floors, escape/swap | flat and descending directions (§1.4); identity change | restrictions + substrate | 0…~30 mEh above the deepest minimum |
+| 5. SCF reference | ~1e2 mEh wrong configuration; ~10 mEh metastable basin | energy-ordered filling; degenerate-open-shell basins | toolbox of §2.1 | per-atom reference data |
 
-Class mapping (§2.5): *exact* — raw-window CASCI, frozen-window rungs
+Class mapping (§1.5): *exact* — raw-window CASCI, frozen-window rungs
 on the isotropic substrate; *baseline* — the start-window defect and
 the flat-direction floor; *broken* — the escape and the swap (L4).
 
@@ -587,16 +639,16 @@ of different n overlap (~0.3), so every projection and normalization
 runs in the AO overlap metric, never the Euclidean one.
 
 **L2 — sector witnesses.** A single-irrep sector makes ‖[H, L̂²]‖ vacuous
-and L̂z has ±pair blind spots (§2.3); the projector pair is the
+and L̂z has ±pair blind spots (§1.3); the projector pair is the
 universal certificate, multi-term sectors the honest courts.
 
 **L3 — the core field.** The reference leaves an anisotropic field
-acting at first order on the multiplet (§2.4). Two cures act at the
+acting at first order on the multiplet (§1.4). Two cures act at the
 density level — spherical averaging, the fractional-occupation
 reference. The third, core purification, exists because of the
 *window*, not the core: the start window is (1−P_core)-projected
-(§3.3), so its closure inherits the core's; rebuilding the core span
-as E_l ⊑ {all members of l} (§2.3's theorem applied to the core)
+(§2.3), so its closure inherits the core's; rebuilding the core span
+as E_l ⊑ {all members of l} (§1.3's theorem applied to the core)
 zeroes that factor and the fold becomes scalar by construction.
 
 **L4 — orbital optimization.** Three mechanisms. **(a) Start-window
@@ -616,18 +668,18 @@ that correlation honestly means enlarging the window deliberately. A
 rebuilt window is not broken — an m-incomplete one is; closure is
 imposed or certified, never converged to.
 
-**L5 — the SCF reference.** The §3.1 toolbox; E_ref is extracted once
+**L5 — the SCF reference.** The §2.1 toolbox; E_ref is extracted once
 per atom by the diagnostics themselves (occupations by projection,
 core purity, window closure) — self-calibrating, per-atom data, not
 code.
 
 ---
 
-## 6. The protocol card
+## 5. The protocol card
 
 **Run all five deliverables, report all five** — the certified treatment
 and the direct values are complements, not alternatives. Each deliverable
-is a named configuration in the §4 capability space; each optimizer
+is a named configuration in the §3 capability space; each optimizer
 deliverable is reported as the pair *free variant / symmetric variant*.
 
 | Deliverable | Configuration | Purpose | Acceptance |
@@ -639,29 +691,29 @@ deliverable is reported as the pair *free variant / symmetric variant*.
 | Direct SA-CASSCF | free SA-CASSCF, shell substrate | best direct value; term-readable even in the swap basin | term label; basin classified; totals quoted |
 
 For a new atom: (1) run the reference (spans and E_ref are the atom's
-data, §3.1/§5); (2) the CASCI anchor — term tables must come out exact
-(§7.1–7.2); (3) the certified treatment (expect the exact class, §7.3's
+data, §2.1/§4); (2) the CASCI anchor — term tables must come out exact
+(§6.1–6.2); (3) the certified treatment (expect the exact class, §6.3's
 pur rows); (4) both direct runs, classified; (5) optionally, frozen
-scans for the radial/tilt anatomy (§7.4).
+scans for the radial/tilt anatomy (§6.4).
 
 ---
 
-## 7. Results tables
+## 6. Results tables
 
 Five table kinds, each answering one question. **T1 term content**
-(§7.1) — the combinatorial contract the exact stage must return;
-**T2 spectrum** (§7.2) — the sharp CAS-level term energies; **T3
-treatment × window** (§7.3) — what each orbital treatment buys and
-costs, per window; **T5 frozen scans** (§7.4) — where the gain lives,
-optimizer-free; **the window lattice** (§7.5) — window kinds at matched
+(§6.1) — the combinatorial contract the exact stage must return;
+**T2 spectrum** (§6.2) — the sharp CAS-level term energies; **T3
+treatment × window** (§6.3) — what each orbital treatment buys and
+costs, per window; **T5 frozen scans** (§6.4) — where the gain lives,
+optimizer-free; **the window lattice** (§6.5) — window kinds at matched
 determinant cost. Per-atom records live in `elements/<Atom>/TABLES.md`
 (+ `NOTES.md` for the dated specifics); **Ti is the worked example**
 below. All numbers are this project's measurements (C, Si, Sc, Ti on
 cc-pVDZ; U on ECP + cut-Dyall); the artifacts live under `results/`
-(regeneration in §8). On symmetry-broken basins the term table itself
+(regeneration in §7). On symmetry-broken basins the term table itself
 scrambles — independent evidence beyond the commutators.
 
-### 7.1 Term tables — what each sector must contain
+### 6.1 Term tables — what each sector must contain
 
 Every CAS below uses raw shell AOs as the window and the spherically
 averaged core fold; the tables are the *combinatorial* content — the
@@ -681,7 +733,7 @@ exact stage must reproduce them state-for-state.
 Sc CAS(1,5) is the Sc⁺-like d¹ space on the [Ar]+4s² closed core — the
 analog of Ti's CAS(2,5).
 
-### 7.2 Multiplet energies — the sharp, degenerate spectra
+### 6.2 Multiplet energies — the sharp, degenerate spectra
 
 Active-space energies (our averaged fold), exact within each term to
 ≤1e-9; the M_L column comes from the sector Lz spectra. Silicon is as
@@ -700,7 +752,7 @@ are CAS-level values, not experimental ones.
 | | ¹G | 9 | −1.398223 | +0.0704 | −4…4 |
 | | ¹S | 1 | −1.295050 | +0.1736 | 0 |
 
-### 7.3 T3 — the treatment ladders, one row per mechanism
+### 6.3 T3 — the treatment rungs, one row per mechanism
 
 The full per-atom registry (every treatment, start-variant and
 diagnostic) lives in `results/*_ladder.md` and
@@ -775,15 +827,15 @@ radial rotation, the pur family at the exact class; the dated censuses
 (flat-direction draws, the free-CASSCF tilt anatomy) live in
 `elements/C/NOTES.md` and `elements/Si/NOTES.md`.
 
-### 7.4 T5 — the frozen-scan verdicts: where the gain lives
+### 6.4 T5 — the frozen-scan verdicts: where the gain lives
 
 Method: freeze everything, deform the window along one coordinate, and
 re-diagonalize the CASCI in it — no optimizer anywhere, so the numbers
 are deterministic. Two coordinates, defined once: the **radial
 rotation** (m-symmetric: the same rotation applied to every member —
 closure-preserving) and the **single-member tilt** (one member only,
-angle δ — closure-breaking; §2.3). What each can do to the energy is
-derived in §2.4's deformations block.
+angle δ — closure-breaking; §1.3). What each can do to the energy is
+derived in §1.4's deformations block.
 
 | Atom | radial rotation (m-symmetric) | single-member tilt |
 |---|---|---|
@@ -794,16 +846,16 @@ derived in §2.4's deformations block.
 
 Reading: *flat* → the optimizer may break m at zero cost (a gauge);
 *descending* → it is driven to break m (the Jahn–Teller-like descent,
-§2.4); *rises* → the direction buys nothing. On the p² atoms symmetry
+§1.4); *rises* → the direction buys nothing. On the p² atoms symmetry
 is free (the symmetric radial rotation recovers the entire window
 gain); on the d atoms the best symmetric treatments sit ~1 mEh from
 ROHF while the escape basin reaches ~−30 mEh by redefining the
 window — and the ticket-24 amendment holds: those ceilings are window
-statements (the grown m-complete lattice crosses below them; §7.5).
+statements (the grown m-complete lattice crosses below them; §6.5).
 Per-atom anatomy (multi-member patterns, blind-spot probes, substrate
 channels): `elements/*/NOTES.md`.
 
-### 7.5 The window lattice — exact symmetry vs raw MOs at matched cost
+### 6.5 The window lattice — exact symmetry vs raw MOs at matched cost
 
 Three window kinds on the same mean field, compared at **equal
 determinant count** (equal cost): **m-complete AO windows** —
@@ -812,7 +864,7 @@ weak; which granularity a row ran is a code detail); **raw-ROHF MO
 windows** — the open reference MOs plus virtuals ranked by valence-band
 S-weight; and **natural-orbital (NO) group windows** — occupation
 groups of the term-averaged density (methodology below). Every window
-row carries the span certificate ‖[P,Lz]‖ / ‖[P,Lᵔ]‖: the AO and NO
+row carries the span certificate ‖[P,Lz]‖ / ‖[P,L⊥]‖: the AO and NO
 windows close at ~1e-13; the raw-MO spans never close (O(1)–9 at
 every size measured, 4–100 orbitals — the SCF's open orbitals are
 m-delocalized, each added virtual adds fractional m-directions, so a
@@ -883,7 +935,7 @@ field.
 total gain; ⟨L²⟩ never quantizes), while *the AO lattice descends
 monotonically at exact ⟨L²⟩ and owns the top pair on every atom*.
 3. *Both transition metals cross below their escaped CASSCF basins at
-exact symmetry* — the radial-vs-escape gap (§7.4) is a WINDOW
+exact symmetry* — the radial-vs-escape gap (§6.4) is a WINDOW
 statement: at a few thousand determinants the exact-symmetry lattice
 reaches (Ti: crosses) the broken value.
 4. *The NO column beats the shell lattice at every equal determinant
@@ -903,33 +955,33 @@ conclusion holds only if the neighbor steps (k±1) reorder nothing.
 
 ---
 
-## 8. Dictionary and file map
+## 7. Dictionary and file map
 
 - **Per-atom records** (committed): `elements/<Atom>/` — `TABLES.md`
   (term content, spectrum, window × treatment, scan verdicts) and
   `NOTES.md` (dated specifics). New atom = new element file, not
   README growth.
-- **Primary §7 sources** (regenerated, under `results/`):
-  `*_report.md/json` — §7.1–7.2; `*_ladder.md/json` — §7.3 (the full
-  17-rung registry); `*_scan.md` — §7.4's curves; `*_sa_decomposition.md`
-  — the §5-L4 window-vs-core attributions.
+- **Primary §6 sources** (regenerated, under `results/`):
+  `*_report.md/json` — §6.1–6.2; `*_ladder.md/json` — §6.3 (the full
+  17-rung registry); `*_scan.md` — §6.4's curves; `*_sa_decomposition.md`
+  — the §4-L4 window-vs-core attributions.
 - **Regeneration, per table kind**: T1/T2 — `scripts/run_c.py` and the
   per-atom `run_atom` calls (recorded in each report header); T3 — the
   per-atom `run_ladder` calls (recorded in each ladder header); T5 —
   `scripts/radial_scan.py` + the scan calls in `results/*_scan.md`;
-  the §7.5 lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`,
+  the §6.5 lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`,
   `run_u.py`, `run_u_methb.py`, `run_u_sa.py` (ticket 23).
-- **Executable documentation**: the test suite (116 tests) — term
+- **Executable documentation**: the test suite (128 tests) — term
   tables, exact-class closure pins, basin branches. Plain-language
   companions: `RUNGS.md`, the glossary appendix.
 
-## 9. Status and directions
+## 8. Status and directions
 
 **Status.** C, Si, Sc, Ti delivered end-to-end; U campaign complete
 through ticket 23 (the relaxation-vs-growth verdict: the deep
 correlation is radial relaxation, held at exact ⁵L by the ensemble,
 destroyed by free single-root). Per-atom records:
-`elements/<Atom>/`; cross-atom story: §7.
+`elements/<Atom>/`; cross-atom story: §6.
 
 **Open physics.** The ⁵S° mechanism (U reference + free-run attractor;
 Ti ⟨L²⟩ = 0 MO windows — same class). Inner core-pair valence (the
@@ -960,54 +1012,54 @@ reference points.
   everything else derived.
 - **reference** — a solved mean field. ROHF is lopsided (it occupied
   one specific open-shell orbital); fractional-occupation is round by
-  construction (§3.2).
+  construction (§2.2).
 - **core** — the orbitals we do not correlate; enters as the fold
   field.
 - **fold** — the effective active-space Hamiltonian with the core's
-  Coulomb–exchange field in h₁ (§3.2, explicit formula).
+  Coulomb–exchange field in h₁ (§2.2, explicit formula).
 - **window** — the active space. Kinds: shell/primitive AO bands
   (m-complete), raw-SCF MOs (never closed), NO occupation groups
-  (exact from a term-averaged density; §7.5).
+  (exact from a term-averaged density; §6.5).
 - **sector** — determinants at fixed (n_α, n_β); label Ms =
   (nα−nβ)/2.
 
 ### The analysis
 
-- **member** — the m-component of a shell (px, py, pz; §2.3).
+- **member** — the m-component of a shell (px, py, pz; §1.3).
 - **m-completeness** — all members present, sharing the same radial
-  mixture per l; l-purity alone is not enough (§2.3).
+  mixture per l; l-purity alone is not enough (§1.3).
 - **commutator norms** ‖[H, Lz]‖, ‖[H, L²]‖ — the symmetry meters
-  (§2.4).
-- **closure meter** ‖[P, Lz]‖, ‖[P, Lᵔ]‖ — the same question for the
-  window span alone; as a pair, no blind spots (§2.3).
+  (§1.4).
+- **closure meter** ‖[P, Lz]‖, ‖[P, L⊥]‖ — the same question for the
+  window span alone; as a pair, no blind spots (§1.3).
 - **span overlap** — smallest principal cosine between two spans; the
   identity gauge (‖did the window become a different space?‖),
-  independent of closure (§5-L4).
+  independent of closure (§4-L4).
 - **window purity** — l-content of each window orbital; necessary, not
   sufficient.
 - **stage / stage facts** — a finished calculation and its one uniform
-  analysis pass (§4).
+  analysis pass (§3).
 - **ortho_err / DIVERGED** — max |C†SC − 1|; above 1e-6 every number
-  of the rung is meaningless (§2.4).
+  of the rung is meaningless (§1.4).
 - **PySCF cross-check** (max|dE|) — max over roots of |E_r(ours) −
   E_r(PySCF)|: zero = identical bookkeeping; jumps = a non-scalar raw
-  core (§7.3).
+  core (§6.3).
 
 ### The experiment axis
 
 - **ladder / rung** — the comparison series over orbital treatments /
   one step of it (`RUNGS.md`).
 - **rotation mask** — which orbital pairs the optimizer may rotate;
-  how physics questions are imposed (§3.3).
+  how physics questions are imposed (§2.3).
 - **radial constraint** — the mask "same (l, member) only": pure
-  radial breathing (§3.3).
+  radial breathing (§2.3).
 - **gauge** — a description choice that does not change the physics
   (which member combination each window orbital is).
 - **flat direction** — a deformation the energy does not see
-  (second-order at a stationary point; §2.4).
+  (second-order at a stationary point; §1.4).
 - **escape / swap** — the two identity basins: window rebuilt from
   unimplied orbitals (no term) / identity traded 4s↔3p (a different
-  partition; totals only) — §5-L4.
+  partition; totals only) — §4-L4.
 - **input-window baseline** — the ~1e-3 closure defect inherited from
   core-orthogonalizing the start window against a non-scalar core
-  (§5-L4); fixed by the closed core span.
+  (§4-L4); fixed by the closed core span.

@@ -29,7 +29,7 @@ from __future__ import annotations
 import numpy as np
 
 from atomterm.detbasis import determinant_basis, frobenius_norm, slater_condon_matrix
-from atomterm.angular import l_matrices
+from atomterm.angular import l_ladder_matrices, l_matrices
 
 __all__ = [
     "spin_block_one_body",
@@ -37,12 +37,16 @@ __all__ = [
     "active_space_integrals",
     "full_space_integrals",
     "lz_operator",
+    "l_ladder_operator",
     "parity_one_body",
     "parity_operator",
     "population_operator",
     "l2_operator_parts",
     "window_closure",
     "s2_operator_parts",
+    "spin_ladders",
+    "spin_ladder_matrix",
+    "sz_operator",
     "number_operator",
     "build_operator_parts",
     "build_operators",
@@ -319,6 +323,29 @@ def l2_operator_parts(mol, c_act: np.ndarray):
     return spin_block_one_body(one), spin_block_two_body(two)
 
 
+def sz_operator(norb: int) -> np.ndarray:
+    """One-body S_z in spin-orbital space: +1/2 on alpha (0..norb-1),
+    -1/2 on beta (norb..2norb-1). Already spin-orbital-resolved (do not
+    spin_block); within a fixed-(na, nb) sector its many-body matrix is
+    exactly M_S * identity -- the sector label."""
+    sz = np.zeros((2 * norb, 2 * norb))
+    diag = np.arange(2 * norb)
+    sz[diag[:norb], diag[:norb]] = 0.5
+    sz[diag[norb:], diag[norb:]] = -0.5
+    return sz
+
+
+def spin_ladders(norb: int):
+    """One-body ŝ₊, ŝ₋ in spin-orbital space: ŝ₊ = |α⟩⟨β| (the β → α
+    flip, ⟨p α| s₊ |p β⟩ = 1), ŝ₋ = ŝ₊†. Building blocks of the Ŝ² pair
+    terms; bare ladders change M_S and are not sector operators."""
+    d = 2 * norb
+    s_plus = np.zeros((d, d), dtype=complex)
+    rows = np.arange(norb)
+    s_plus[rows, rows + norb] = 1.0  # <p alpha| s+ |p beta> = 1
+    return s_plus, s_plus.conj().T
+
+
 def s2_operator_parts(norb: int):
     """(one_body, two_body) parts of the total S^2.
 
@@ -326,17 +353,12 @@ def s2_operator_parts(norb: int):
     ``Sum_{i<j} A(i) B(j)``; equivalently ``Sum_i 3/4 + 2 Sum_{i<j} s_j.s_i``.
     """
     d = 2 * norb
-    sz_diag = np.zeros(d)
-    sz_diag[:norb], sz_diag[norb:] = 0.5, -0.5
-
-    s_plus = np.zeros((d, d), dtype=complex)
-    rows = np.arange(norb)
-    s_plus[rows, rows + norb] = 1.0  # <p alpha| s+ |p beta> = 1
-    s_minus = s_plus.conj().T
+    sz = sz_operator(norb)
+    s_plus, s_minus = spin_ladders(norb)
 
     one = 0.75 * np.eye(d, dtype=complex)
     two = 2.0 * (
-        _composite_two_body(np.diag(sz_diag), np.diag(sz_diag))
+        _composite_two_body(sz, sz)
         + 0.5 * _composite_two_body(s_plus, s_minus)
         + 0.5 * _composite_two_body(s_minus, s_plus)
     )
@@ -346,6 +368,42 @@ def s2_operator_parts(norb: int):
 def number_operator(norb: int) -> np.ndarray:
     """Electron number N (one-body identity in spin-orbital space)."""
     return spin_block_one_body(np.eye(norb))
+
+
+def l_ladder_operator(mol, c_act: np.ndarray) -> dict:
+    """One-body symbols of the orbital ladders L± = Lx ± iLy in the
+    window basis, spin-blocked. Many-body L± are ordinary sector
+    operators (orbital ladders do not touch spin); they power the
+    twin construction L^2 = Lz^2 + (L+ L- + L- L+)/2 (pinned by test)."""
+    ladders = l_ladder_matrices(mol)
+    out = {}
+    for key in ("+", "-"):
+        out[key] = spin_block_one_body(_mo_transform(ladders[key], c_act))
+    return out
+
+
+def spin_ladder_matrix(norb: int, dets_from, dets_to, plus: bool = True) -> np.ndarray:
+    """Many-body S± as an explicit INTER-SECTOR map:
+    S+ : (na, nb) -> (na+1, nb-1) (the beta -> alpha flip),
+    S- : (na, nb) -> (na-1, nb+1).
+
+    S+ = Sum_i a+(i alpha) a(i beta); returned dense
+    ``(len(dets_to), len(dets_from))``. The one operator class in the
+    project that does NOT preserve a sector -- built for the twin
+    construction S^2 = Sz^2 + (S- S+ + S+ S-)/2 (pinned by test)."""
+    from atomterm.secondquant import annihilate, create
+
+    out = np.zeros((len(dets_to), len(dets_from)))
+    index = {d: k for k, d in enumerate(dets_to)}
+    for col, occ in enumerate(dets_from):
+        for i in range(norb):
+            p, q = (i, i + norb) if plus else (i + norb, i)
+            if q not in occ or p in occ:
+                continue
+            sg1, mid = annihilate(occ, q)
+            sg2, new = create(mid, p)
+            out[index[new], col] = sg1 * sg2
+    return out
 
 
 def core_anisotropy(mol, mf, ncore: int, c_core: np.ndarray = None) -> float:
@@ -402,6 +460,7 @@ def build_operator_parts(
         "Lz": (lz_operator(mol, c_act), None),
         "L2": (l2_one, l2_two),
         "S2": (s2_one, s2_two),
+        "Sz": (sz_operator(c_act.shape[1]), None),
         "N": (number_operator(c_act.shape[1]), None),
     }
     return parts

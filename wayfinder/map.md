@@ -113,7 +113,7 @@ green, reports written.
   (0/94.7/88.0/85.4/463.4 mEh).
 - [26: elements tables T3a/T3b](tickets/26-elements-tables.md) — mostly
   DONE: T3a/T3b landed for all five atoms with verified values;
-  README §7.3 = summary + pointer. Remainder: the study markers in the
+  README §6.3 = summary + pointer. Remainder: the study markers in the
   element files (needed by ticket 28's inserts), C/Si T3a rows, the
   per-atom study provenance notes.
 - [27: launch & naming polish](tickets/27-launch-naming.md) —
@@ -241,10 +241,10 @@ agreement — frozen-7s² CAS(4,12) tier first, sparse O·v mode deferred.
   windows only (≤30 min/sector; heavy runs postponed by user rule);
   the Sc plateau-vs-escape question (fact 16b's +25 mEh must melt in a
   wide-enough m-complete window — full-space intuition); delivers the
-  README §7.x lattice section (table + per-block ΔE matrix with
+  README §6.x lattice section (table + per-block ΔE matrix with
   explicit references + the representability comment, brief).
 - [23: U SA wave](tickets/23-u-sa-wave.md) — RESOLVED 2026-10-24
-  (README §7.5 ticket-23 block): SA over the 17×⁵L block from NO-12 =
+  (README §6.5 ticket-23 block): SA over the 17×⁵L block from NO-12 =
   −50.4238 at exactly quantized ⁵L — 42 mEh below the ⁵S° ROHF
   reference, the first U object below the mean field at certified
   symmetry. Mechanism: RADIAL relaxation (l-content preserved, weight
@@ -308,6 +308,15 @@ Löwdin dedup ×4, __all__ fix, _run branch unify) then the ECP ticket
 landed (f38fb6d) — including the falsified SA-flatness draft, replaced
 by measured tilt-mean curves (C/Si descend, Sc/Ti rise — §3.4); the
 handoff is in message.txt.]
+
+[2026-10-25: README §1 (Goal and scope) DELETED — its content is not
+redundant only in three pieces, now placed: the "certified" definition
+→ §1.1; the three-part deliverable (terms / comparisons / loss
+accounting) + the non-relativistic scope → Introduction's closing
+paragraph; the per-atom-data-not-code claim → the §3 launch path.
+README sections renumbered −1 (§2→§1 … §9→§8); live pointers updated
+in AGENTS.md, RUNGS.md, elements/*, and this map. RESOLVED tickets keep
+their original numbering — their §refs are historical.]
 
 ## Out of scope
 
@@ -403,3 +412,30 @@ plan/render.
 DOCS: AGENTS conventions += docstring standard (@brief/math/@param/
 @note/@example) + naming rule; RUNGS.md staleness check.
 THEN: ticket 28 completion runs; two-axis review + AGENTS facts.
+
+## Post-wave survey (2026-10-25, README review wave + explicit ladders)
+
+Two-axis review of the uncommitted working tree vs 0eba2c5 (README
+step-by-step review + Sz delivery + explicit ladder operators; no
+ticket — spec = the conversation directives). Fixed immediately:
+stale test counts (README 91/116, AGENTS 123 → 128), AGENTS Layout
+rows for angular/operators (+l_ladder_matrices, +Sz +ladders), the
+Conventions exception for the inter-sector a†/a ladder construction,
+the surviving L̂ᵔ/Lᵔ glyphs (3×, incl. two my earlier pass missed —
+hatless variant), §6.3 heading "ladders" → "rungs", stale
+results/Ti_ccpvdz_s2_report.{md,json} regenerated (Sz line + the
+Ms=(na−nb)/2 sector-label fix — provenance for the README block).
+Recorded, not fixed:
+
+- **`spin_ladder_matrix(..., plus=True)` flag arg** — two operators
+  behind one boolean; docstring covers it; split only if a third
+  consumer appears.
+- **`analyze(h, lz, l2, s2, sector, sz=)` data clump** — stages.py
+  unpacks ops[...] field-by-field; passing the bundle is the deeper
+  fix (analyze signature churn across 5 call sites; defer).
+- **"ladder" vocabulary residue** — glossary keeps "ladder / rung"
+  (deliberate: documents the historic name) and artifact names
+  `*_ladder.md` + `run_ladder` remain until a naming ticket lands.
+- **Full suite before commit** — deferred at the user's request
+  (busy threads); fast tier green (56). operators/stages/analysis/
+  cases all changed, so the run is mandatory at commit time.

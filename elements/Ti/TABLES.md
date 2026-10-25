@@ -61,7 +61,7 @@ offset; the fold convention itself is machine-exact). Rows whose
 window identity changed (escape, swap) are different problems —
 totals only.
 
-## T5 — Frozen-scan verdicts (definitions in README §7.4)
+## T5 — Frozen-scan verdicts (definitions in README §6.4)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|

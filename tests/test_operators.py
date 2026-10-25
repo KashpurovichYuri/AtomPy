@@ -254,3 +254,110 @@ def test_population_operator_partitions_the_window():
     # many-body spectrum: the possible occupation counts, integers only
     eigs = np.linalg.eigvalsh(n_p)
     assert set(np.round(eigs, 9)) <= {0.0, 1.0, 2.0}
+
+
+@pytest.mark.fast
+def test_sz_matrix_is_the_exact_sector_label():
+    """Sz (+1/2 alpha, -1/2 beta): its many-body matrix is exactly
+    M_S * identity inside every (na, nb) sector -- the sector label.
+    Nothing further to certify: H is spin-free, so [H, Sz] vanishes
+    identically (that is why the certificates are Lz/L^2 only)."""
+    from atomterm.detbasis import determinant_basis, slater_condon_matrix
+    from atomterm.operators import sz_operator
+
+    for norb, na, nb in [(3, 2, 0), (3, 1, 1), (4, 3, 1), (2, 0, 2)]:
+        dets = determinant_basis(norb, na, nb)
+        sz = slater_condon_matrix(dets, one_body=sz_operator(norb))
+        assert np.allclose(sz, ((na - nb) / 2) * np.eye(len(dets))), (na, nb)
+
+
+@pytest.mark.fast
+def test_spin_ladders_one_body_algebra():
+    """The one-electron ladder algebra the S^2 pair terms rest on:
+    {s+, s-} = 1, [sz, s±] = ±s±, s±² = 0 (spin-1/2)."""
+    from atomterm.operators import spin_ladders, sz_operator
+
+    sp, sm = spin_ladders(3)
+    sz = sz_operator(3)
+    eye = np.eye(2 * 3)
+    assert np.allclose(sp @ sm + sm @ sp, eye)
+    assert np.allclose(sp @ sp, 0) and np.allclose(sm @ sm, 0)
+    assert np.allclose(sz @ sp - sp @ sz, sp)
+    assert np.allclose(sz @ sm - sm @ sz, -sm)
+
+
+@pytest.mark.fast
+def test_orbital_ladders_twin_construct_l2():
+    """L± = Lx ± iLy as one-body window operators. The independent
+    ladder construction L^2 = Lz^2 + (L+ L- + L- L+)/2 is elementwise
+    identical to the delivered L^2 parts, and [Lz, L±] = ±L± pins the
+    m-ladder structure (p², Ms=0 sector)."""
+    from atomterm.detbasis import determinant_basis, slater_condon_matrix
+    from atomterm.drivers import select_valence_ao
+    from atomterm.operators import (
+        l2_operator_parts,
+        l_ladder_operator,
+        lz_operator,
+    )
+    from atomterm.system import AtomConfig, build_mol
+
+    mol = build_mol(AtomConfig(verbose=0))
+    c = np.eye(mol.nao_nr())[:, select_valence_ao(mol, ["2p"])]
+    dets = determinant_basis(3, 1, 1)
+
+    ladders = l_ladder_operator(mol, c)
+    lz = slater_condon_matrix(dets, one_body=lz_operator(mol, c))
+    lp = slater_condon_matrix(dets, one_body=ladders["+"])
+    lm = slater_condon_matrix(dets, one_body=ladders["-"])
+    assert np.allclose(lz @ lp - lp @ lz, lp)
+    assert np.allclose(lz @ lm - lm @ lz, -lm)
+
+    one, two = l2_operator_parts(mol, c)
+    l2 = slater_condon_matrix(dets, one_body=one, two_body=two)
+    twin = lz @ lz + 0.5 * (lp @ lm + lm @ lp)
+    assert np.allclose(l2, twin)
+
+
+@pytest.mark.fast
+def test_spin_ladders_twin_construct_s2_across_sectors():
+    """S± as explicit inter-sector maps (the one operator class that
+    does NOT preserve a sector): S² = Sz² + (S- S+ + S+ S-)/2 holds
+    elementwise on EVERY sector of the p² multiplet -- the pair
+    products leave and return home. Strongest check of the Ŝ²
+    flip-flop terms and of the inter-sector signs."""
+    from atomterm.detbasis import determinant_basis, slater_condon_matrix
+    from atomterm.operators import (
+        s2_operator_parts,
+        spin_ladder_matrix,
+        sz_operator,
+    )
+
+    norb = 3
+    one, two = s2_operator_parts(norb)
+    sz1 = sz_operator(norb)
+
+    def sector(dets):
+        s2 = slater_condon_matrix(dets, one_body=one, two_body=two)
+        sz = slater_condon_matrix(dets, one_body=sz1)
+        return s2, sz
+
+    dets_0 = determinant_basis(norb, 1, 1)
+    dets_up = determinant_basis(norb, 2, 0)
+    dets_dn = determinant_basis(norb, 0, 2)
+    s2_0, sz_0 = sector(dets_0)
+    s2_up, sz_up = sector(dets_up)
+    s2_dn, sz_dn = sector(dets_dn)
+
+    sp_0u = spin_ladder_matrix(norb, dets_0, dets_up, plus=True)   # (1,1)->(2,0)
+    sm_0d = spin_ladder_matrix(norb, dets_0, dets_dn, plus=False)  # (1,1)->(0,2)
+
+    # Ms=0: both pair products leave and come home
+    twin_0 = sz_0 @ sz_0 + 0.5 * (
+        sp_0u.conj().T @ sp_0u + sm_0d.conj().T @ sm_0d
+    )
+    assert np.allclose(s2_0, twin_0)
+    # the flipped sectors see only the product through Ms=0
+    twin_up = sz_up @ sz_up + 0.5 * (sp_0u @ sp_0u.conj().T)
+    assert np.allclose(s2_up, twin_up)
+    twin_dn = sz_dn @ sz_dn + 0.5 * (sm_0d @ sm_0d.conj().T)
+    assert np.allclose(s2_dn, twin_dn)

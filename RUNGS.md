@@ -1,7 +1,7 @@
 # The orbital-treatment ladder, in plain words
 
-*(The derivation-level narrative is the README technical note — §5 locates
-each rung's mechanism, §7 the measured numbers.)*
+*(The derivation-level narrative is the README technical note — §4 locates
+each rung's mechanism, §6 the measured numbers.)*
 
 The "ladder" is one series of calculations on the same atom. The active
 window (the few orbitals we correlate — e.g. carbon's three 2p) starts
