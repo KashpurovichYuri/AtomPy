@@ -280,6 +280,11 @@ def inject_markers(path, block: str, tag: str = "study") -> None:
     pat = re.compile(
         rf"(<!-- {tag}:begin -->[^\n]*\n)(.*?)(<!-- {tag}:end -->)", re.S)
     assert pat.search(src), f"no {tag} markers in {p}"
-    p.write_text(pat.sub(lambda m: m.group(1) + block + m.group(3), src),
-                 encoding="utf-8")
+    # render() brackets its output with the same markers (standalone
+    # use); strip them here so repeated injects do not multiply them
+    inner = "\n".join(
+        line for line in block.splitlines()
+        if not re.fullmatch(rf"<!-- {tag}:(begin|end).*", line.strip()))
+    p.write_text(pat.sub(lambda m: m.group(1) + inner + "\n" + m.group(3),
+                         src), encoding="utf-8")
     print(f"[inject] {p} updated")
