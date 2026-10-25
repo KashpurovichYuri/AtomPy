@@ -32,6 +32,41 @@ m-completeness (span certificate opens), bigger is worse: report;
 ⟨L²⟩, energy) is window-independent at mEh precision;
 (c) cost stop — per-cell budgets; declare long budgets explicitly.
 
+## Execution record (2026-10-24/25)
+
+The studies run through the GENERAL machinery (ticket 27's runner): the
+NO arm `atomterm.study.no_group_windows` + `run_case(want={"treatments"})`
+with the `spec.study` declaration. No bespoke per-atom scripts (the
+first-cut `run_completion.py` was deleted on review -- its knowledge
+lives here as declarations).
+
+Sc/Ti NO study (the declaration; U analogous with the band source):
+
+    CaseSpec(symbol="Sc", basis="ccpvdz", spin=1, nelec_act=3, ncore=9,
+             shell_patterns=["3d", "4s"], want={"treatments"},
+             study={"label": "sc_no",
+                    "source": {"patterns": ["3d", "4d", "4s", "4p"]},
+                    "windows": ["no-groups"],
+                    "treatments": ("casci", "relax", "sa-casscf"),
+                    "budgets": {"sa-casscf": {"max_cycle_macro": 60}},
+                    "diagnostics": "full"})
+
+U studies (run_case declaration + the one-off six13 probe on the raw
+StudySpec -- it needs the custom core, pur minus the 7s column):
+
+    CaseSpec(..., tag="U_stuttgart78_dyall", nelec_act=4, ncore=5,
+             ref=REF, want={"treatments"},
+             study={"label": "u_no",
+                    "source": {"bands": {3: (0.5, 2.0), 2: (0.1, 0.5)}},
+                    "windows": ["no-groups"], "no_prefixes": [2, 4],
+                    "treatments": ("sa-casscf", "relax"),
+                    "budgets": {"sa-casscf": {"max_cycle_macro": 60}},
+                    "diagnostics": "full"})
+
+    # six13: ncore=4 (7s out of the pur core), sector (5,1),
+    # window = NO {d5, f7} + the 7s pur column; inject tag="study-six13"
+    # -> its own section of elements/U/TABLES.md (user decision).
+
 ## Acceptance
 
 - Every cell: E (as run), ΔE, ⟨L²⟩ (exact eigh), commutators, span

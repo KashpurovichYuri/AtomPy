@@ -62,9 +62,15 @@ class CaseSpec:
         (uniform over the ground term's M_L set by convention).
     run_casscf : the single-root stage (off on multi-solution atoms).
     want : the deliverables to produce -- subset of {"terms", "casscf",
-        "sa-casscf"}; "terms" is always produced (T1/T2 are the
-        contract). Later kinds ("treatments", "scans") dispatch to the
-        study / scan modules as they come online.
+        "sa-casscf", "treatments"}; "terms" is always produced (T1/T2
+        are the contract).
+    study : the treatments arm, held unless declared -- a dict
+        {"label", "source": {"patterns": [...]} | {"bands": {l: band}},
+         "windows": ["shell", "no-groups"], "no_prefixes": [2, 4],
+         "treatments", "budgets", "diagnostics", "tag"}; resolved
+        against the finished reference and run through
+        atomterm.study.run_study; results injected between the
+        element file's study markers (tag selects the section).
     """
 
     symbol: str
@@ -80,6 +86,7 @@ class CaseSpec:
     run_casscf: bool = True
     nroots_primary: int = 9
     want: frozenset = frozenset({"terms", "casscf", "sa-casscf"})
+    study: dict | None = None
 
     def atom_config(self) -> AtomConfig:
         return AtomConfig(symbol=self.symbol, basis=self.basis, ecp=self.ecp,
@@ -90,17 +97,73 @@ def run_case(spec: CaseSpec, workdir: str = "results") -> dict:
     """Execute a declared case. The launch entry for any atom, new or
     old: the spec is the intent manifest, the outputs land under
     ``workdir`` and (as generated inserts) in ``elements/<Atom>/``."""
-    assert "terms" in spec.want, "a case without term tables is not a case"
-    return run_atom(
-        spec.atom_config(),
-        list(spec.shell_patterns),
-        spec.nelec_act,
-        workdir=workdir,
-        sa_weights=list(spec.sa_weights) if spec.sa_weights else None,
-        run_casscf=spec.run_casscf,
-        nroots_primary=spec.nroots_primary,
-        ref=spec.ref,
-    )
+    assert spec.want, "an empty want is not a case"
+    res = {}
+    if "terms" in spec.want:
+        res = run_atom(
+            spec.atom_config(),
+            list(spec.shell_patterns),
+            spec.nelec_act,
+            workdir=workdir,
+            sa_weights=list(spec.sa_weights) if spec.sa_weights else None,
+            run_casscf=spec.run_casscf,
+            nroots_primary=spec.nroots_primary,
+            ref=spec.ref,
+        )
+    if "treatments" in spec.want:
+        assert spec.study is not None, \
+            "want={'treatments'} needs the spec.study declaration"
+        res.update(_treatments_arm(spec, workdir))
+    return res
+
+
+def _treatments_arm(spec: "CaseSpec", workdir: str) -> dict:
+    """The declared study: windows x treatments through the study
+    runner; results injected into the element file (tickets 20/28)."""
+    from atomterm.core import purified_core_orbitals
+    from atomterm.study import (StudySpec, inject_markers, no_group_windows,
+                                plan_study, render, run_study)
+    from atomterm.windows import (Window, build_full_mo, occupied_core_idx,
+                                  select_valence_ao, window_primitive)
+
+    cfg = spec.atom_config()
+    decl = dict(spec.study)
+    out = Path(workdir)
+    mol, mf = run_rohf(cfg, str(out / f"{cfg.label}_rohf.chk"), ref=spec.ref)
+    ncore = spec.ncore
+    c_pur, _ = purified_core_orbitals(mol, mf, ncore)
+    closed = occupied_core_idx(mf, ncore)
+
+    src = decl["source"]
+    if "patterns" in src:
+        rows = select_valence_ao(mol, src["patterns"])
+    else:
+        rows = window_primitive(mol, mf, ncore, bands=src["bands"]).ao_rows
+    na, nb = sector_occupations(spec.nelec_act, cfg.spin)
+
+    windows = []
+    if "shell" in decl.get("windows", []):
+        windows.append(Window("shell", rows, None, True))
+    if "no-groups" in decl.get("windows", ["no-groups"]):
+        c_act = build_full_mo(mf, closed, rows,
+                              c_core=c_pur)[:, ncore:ncore + len(rows)]
+        arms = no_group_windows(mol, mf, ncore, c_act, na, nb,
+                                c_core=c_pur, cap=decl.get("cap", 12000))
+        keep = decl.get("no_prefixes")
+        windows += [w for i, w in enumerate(arms)
+                    if keep is None or i + 1 in keep]
+    sspec = StudySpec(label=decl["label"], ncore=ncore, na=na, nb=nb,
+                      windows=tuple(windows),
+                      treatments=decl.get("treatments",
+                                          ("casci", "relax", "sa-casscf")),
+                      sa_weights=decl.get("sa_weights"),
+                      budgets=decl.get("budgets", {}),
+                      diagnostics=decl.get("diagnostics", "full"))
+    print(plan_study(sspec, mol))
+    cells = run_study(sspec, mol, mf, out, c_core=c_pur)
+    inject_markers(Path(f"elements/{spec.symbol}/TABLES.md"),
+                   render(cells), tag=decl.get("tag", "study"))
+    return cells
 
 
 def run_atom(
