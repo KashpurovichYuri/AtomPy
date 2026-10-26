@@ -98,6 +98,8 @@ def run_case(spec: CaseSpec, workdir: str = "results") -> dict:
     old: the spec is the intent manifest, the outputs land under
     ``workdir`` and (as generated inserts) in ``elements/<Atom>/``."""
     assert spec.want, "an empty want is not a case"
+    assert "terms" in spec.want, (
+        "T1/T2 term tables are the contract: 'terms' is always produced")
     res = {}
     if "terms" in spec.want:
         res = run_atom(

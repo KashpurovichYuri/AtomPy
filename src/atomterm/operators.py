@@ -452,12 +452,19 @@ def build_operator_parts(
     dets = determinant_basis(c_act.shape[1], na, nb)
     s2_one, s2_two = s2_operator_parts(c_act.shape[1])
     l2_one, l2_two = l2_operator_parts(mol, c_act)
+    lz_ao = _mo_transform(l_matrices(mol)["z"], c_act)
     parts = {
         "dets": dets,
         "h1": h1,
         "g": g,
         "H": (spin_block_one_body(h1), spin_block_two_body(g)),
-        "Lz": (lz_operator(mol, c_act), None),
+        "Lz": (spin_block_one_body(lz_ao), None),
+        # (Lz)^2 as an OPERATOR (the twin-convention square, cf. L2 above):
+        # one-body lz@lz PLUS the two-body composite -- the naive
+        # one-body-only square is not the operator (intermediate q!=r
+        # terms survive the normal ordering)
+        "Lz2": (spin_block_one_body(lz_ao @ lz_ao),
+                spin_block_two_body(2.0 * _composite_two_body(lz_ao, lz_ao))),
         "L2": (l2_one, l2_two),
         "S2": (s2_one, s2_two),
         "Sz": (sz_operator(c_act.shape[1]), None),

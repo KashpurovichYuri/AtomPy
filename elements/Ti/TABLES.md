@@ -95,8 +95,9 @@ shift: ~0 = fold consistency, mEh = the averaging effect,
 totals only there. Starts: AOs = shell AOs in the optimizer-runnable
 orthogonalized form; MOs = the stock low-energy slice (PySCF default;
 other picks admissible); NOs = term-averaged CI occupation groups.
-Pending rows = planned runs. Source: `rungs.json` +
-`scripts/lz2_analysis.py`.
+Pending rows = planned runs. Source: `rungs.json` (ground_lz2 embedded
+natively as of the Lz2 operator; values pre-dating the regen from the
+equivalent standalone analysis).
 
 ### CAS(4,10) / {3d,4s,4d} — planned
 

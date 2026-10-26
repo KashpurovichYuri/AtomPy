@@ -257,6 +257,16 @@ def test_population_operator_partitions_the_window():
 
 
 @pytest.mark.fast
+def test_lz2_operator_product_identity_and_loewner(shell_ops):
+    """Lz2 == Lz@Lz elementwise, and L^2 - Lz^2 is psd on every sector
+    (the Casimir bound <Lz^2> <= <L^2> at the operator level)."""
+    _, _, ops1, ops0 = shell_ops
+    for ops in (ops1, ops0):
+        assert np.allclose(ops["Lz2"], ops["Lz"] @ ops["Lz"], atol=1e-12)
+        eig = np.linalg.eigvalsh(np.real(ops["L2"] - ops["Lz2"]))
+        assert eig.min() > -1e-10
+
+
 def test_sz_matrix_is_the_exact_sector_label():
     """Sz (+1/2 alpha, -1/2 beta): its many-body matrix is exactly
     M_S * identity inside every (na, nb) sector -- the sector label.

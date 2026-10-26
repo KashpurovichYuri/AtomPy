@@ -76,6 +76,8 @@ class StateSummary:
     s: float  # half-integer allowed (odd-electron states)
     term: str
     lz: float = 0.0  # <L_z> of the root (the M_L label, per root)
+    lz2: float = 0.0  # <L_z^2> of the root (M_L^2 on broken folds; gauge
+    # on isotropic ones -- README, the <Lz^2> note)
 
 
 @dataclass
@@ -97,7 +99,7 @@ def _expectation(evecs: np.ndarray, op: np.ndarray) -> np.ndarray:
 
 
 def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, sector: str,
-            sz: np.ndarray | None = None) -> AnalysisResult:
+            sz: np.ndarray | None = None, lz2: np.ndarray | None = None) -> AnalysisResult:
     """Classify the eigenstates of H and test the [H, L] commutators.
 
     ``sz`` (optional): the delivered Ŝz matrix. Its spectrum is the
@@ -112,6 +114,7 @@ def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, secto
     l2_exp = _expectation(evecs, l2)
     s2_exp = _expectation(evecs, s2)
     lz_exp = _expectation(evecs, lz)
+    lz2_exp = _expectation(evecs, lz2) if lz2 is not None else None
     states = [
         StateSummary(
             index=i,
@@ -122,6 +125,7 @@ def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, secto
             s=spin_quantum_number(s2_exp[i]),
             term=term_symbol(s2_exp[i], l2_exp[i]),
             lz=float(lz_exp[i]),
+            lz2=(float(lz2_exp[i]) if lz2_exp is not None else 0.0),
         )
         for i in range(len(evals))
     ]

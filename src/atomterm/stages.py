@@ -61,6 +61,10 @@ class StageFacts:
         return float(self.analysis.states[0].l2)
 
     @property
+    def ground_lz2(self) -> float:
+        return float(self.analysis.states[0].lz2)
+
+    @property
     def comm_norm_h_lz(self) -> float:
         return float(self.analysis.comm_norm_h_lz)
     core_anisotropy: float | None = None  # CASCI reference rungs only
@@ -104,6 +108,7 @@ class StageFacts:
             "max_de_vs_pyscf": self.max_de_vs_pyscf,
             "ground_term": self.ground_term,
             "ground_l2": self.ground_l2,
+            "ground_lz2": self.ground_lz2,
             "terms": self.terms,
             "comm_norm_h_lz": self.analysis.comm_norm_h_lz,
             "comm_norm_h_l2": self.analysis.comm_norm_h_l2,
@@ -145,7 +150,7 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     ops = build_operators(mol, mf, c_act, ncore, na, nb,
                           spherical_core=spherical_core, c_core=c_core)
     res = analyze(ops["H"], ops["Lz"], ops["L2"], ops["S2"], tag,
-                  sz=ops["Sz"])
+                  sz=ops["Sz"], lz2=ops["Lz2"])
     e_mine = np.linalg.eigvalsh(ops["H"]) + cas.core_energy
     e_pyscf = np.sort(np.atleast_1d(np.asarray(cas.energies)))[: len(e_mine)]
     w_names, w = shell_weights(mol, c_act, mf.get_ovlp())
