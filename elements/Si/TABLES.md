@@ -28,9 +28,9 @@ close everything to 0)
 | CASCI, raw | −288.624937 | +221.5 | 2.0000 | 5.6e-04 | ~0 |
 | CASCI, fractional | −288.628625 | +217.8 | 2.0000 | 1.3e-15 | ~0 |
 | CASSCF, free | −288.846437 | +0.0 | 1.5782 | 1.1e-01 | 0.1 |
-| CASSCF, core-relax | −288.628912 | +217.5 | 2.0000 | 6.1e-05 | 0.1 |
+| CASSCF, frozen window | −288.628912 | +217.5 | 2.0000 | 6.1e-05 | 0.1 |
 | SA-CASSCF, free | −288.846398 | +0.0 | 2.0000 | 7.4e-10 | 0.0 |
-| SA-CASSCF, core-relax, pur | −288.628792 | +217.6 | 2.0000 | 0.0 | 0.0 |
+| SA-CASSCF, frozen, pur | −288.628792 | +217.6 | 2.0000 | 0.0 | 0.0 |
 
 ## Frozen-scan verdicts (Motivation; curves: `scripts/radial_scan.py`)
 

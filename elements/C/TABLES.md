@@ -32,9 +32,9 @@ the 2p shell is exactly S-orthogonal to the core — no window offset)
 | CASCI, raw | −37.431611 | +250.8 | 2.0000 | 9.8e-06 | same run; the polarized-core detector |
 | CASCI, fractional | −37.440244 | +242.2 | 2.0000 | 0.0 | a different functional |
 | CASSCF, free | −37.682418 | +0.0 | 1.6864 | 2.3e-02 | member-tilted gauge |
-| CASSCF, core-relax | −37.440394 | +242.0 | 2.0000 | 7.6e-17 | |
+| CASSCF, frozen window | −37.440394 | +242.0 | 2.0000 | 7.6e-17 | |
 | SA-CASSCF, free | −37.682391 | +0.0 | 2.0000 | 1.0e-10 | lands symmetric |
-| SA-CASSCF, core-relax, pur | −37.440382 | +242.0 | 2.0000 | 0.0 | the certified rung |
+| SA-CASSCF, frozen, pur | −37.440382 | +242.0 | 2.0000 | 0.0 | the certified rung |
 
 ### Basin map — start dependence (free CASSCF, CAS(2,3)/{2p}, Ms=1)
 

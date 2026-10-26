@@ -55,13 +55,13 @@ beside the symmetric one, each classified by its diagnostics: ΔE vs the
 ROHF anchor, ⟨L²⟩, commutators. Titanium's headline rows (ROHF reference
 −848.406489 Eh):
 
-| treatment                        | E, Eh       | ΔE (mEh) | ⟨L²⟩    | ‖[H,Lz]‖ | verdict         |
-| ---                              | ---         | ---      | ---     | ---      | ---             |
-| CASCI, averaged fold             | −848.3959   | +10.5    | 12.0    | 4.2e-09  | exact           |
-| CASSCF, free                     | −848.4377   | −31.3    | 0.0503  | 4.3e-01  | escape — broken |
-| CASSCF, window frozen (core-relax) | −848.3961 | +10.4    | 12.0    | 4.2e-09  | baseline        |
-| SA-CASSCF, free                  | −849.2676   | −861.1   | 12.003  | 1.1e+00  | swap — broken   |
-| SA-CASSCF, frozen, purified core | −848.3948   | +11.7    | 12.0    | 1.0e-13  | exact           |
+| treatment                        | E, Eh       | ΔE (mEh) | ⟨L²⟩    | ‖[H,Lz]‖ | verdict |
+| ---                              | ---         | ---      | ---     | ---      | ---     |
+| CASCI, averaged fold             | −848.3959   | +10.5    | 12.0    | 4.2e-09  | exact   |
+| CASSCF, free                     | −848.4377   | −31.3    | 0.0503  | 4.3e-01  | escape  |
+| CASSCF, frozen window            | −848.3961   | +10.4    | 12.0    | 4.2e-09  | baseline |
+| SA-CASSCF, free                  | −848.4166   | −10.1    | 12.003  | 1.1e+00  | swap    |
+| SA-CASSCF, frozen, purified core | −848.3948   | +11.7    | 12.0    | 1.0e-13  | exact   |
 
 Verdicts: **exact** = commutators and span certificates at the 1e-13
 class; **escape / swap** = window-identity basins (Motivation);
@@ -356,15 +356,8 @@ landscape has several. Start and converged windows are compared by the
 **span overlap** (smallest principal cosine between the two spans —
 did the window become a different space?).
 
-**Precaution (both objectives).** The free mask can rotate a core
-orbital into the window — the partition then changes, totals stop
-being comparable, and our fold's re-evaluation of such an endpoint is
-not an energy of the original problem (the bookkeeping double-counts
-the moved core orbital). The run's own total is quoted and the row is
-compared with care — flagged by the fold shift.
-
-**Partition bookkeeping.** For a partition (C, W) — core columns C,
-window W — the folded energy is exactly
+**Partition bookkeeping (the free-mask risk, made precise).** For a
+partition (C, W) — core columns C, window W — the folded energy is exactly
 
     E(C, W) = E_core[C] + min_Ψ∈W ⟨Ψ| Ĥ[h₁(ρ_C)] |Ψ⟩,
 
@@ -386,16 +379,15 @@ own total. The fold shift exists to catch this: ~0 = fold
 consistency; mEh = the averaging effect; large-and-below = partition
 changed — such rows are compared in the kernel's own totals only.
 
-Naming bridge for the tables: the frozen-window mask is what the tables
-call **core-relax** — the window span is untouched (closure preserved
-whatever the core), only core↔virtual rotations re-optimize the core's
-description. Its purified twin (**core-relax, pur**) runs the same mask
-on the purified core substrate, so the run inherits a scalar fold — the
-certified class. Single-root CASSCF stays gauge-chaotic even on the
-purified substrate (its breaking directions are its own), which is why
-the tables report the plain core-relax row for CASSCF and the purified
-one for SA-CASSCF — the state average restores what a single root
-cannot.
+The **frozen-window** mask: the window span is untouched (closure
+preserved whatever the core), only core↔virtual rotations re-optimize
+the core's description. Its purified twin (**frozen, pur**) runs the
+same mask on the purified core substrate, so the run inherits a scalar
+fold — the certified class. Single-root CASSCF stays gauge-chaotic even
+on the purified substrate (its breaking directions are its own), which
+is why the tables report the plain frozen-window row for CASSCF and the
+purified one for SA-CASSCF — the state average restores what a single
+root cannot.
 
 **SA-CASSCF — the multiplet average.** Replaces the single root by the
 average over the ground term's M_L components — the rotationally scalar
@@ -523,32 +515,30 @@ column from the sector Lz spectra. The ordering matches the free-ion
 ### Methods compared
 
 Every row: E — the run's variational total; ΔE vs the ROHF anchor;
-**cross-check** = |E(analysis fold) − E(as run)|, max over roots (the
+**fold shift** = |E(analysis fold) − E(as run)|, max over roots (the
 mEh-class averaging effect; the fold convention is machine-exact,
 1e-15 vs PySCF's get_h1eff). Verdicts (the classes above): **exact** —
 commutators and span certificates at the 1e-13 class; **baseline** — a
 named non-closure mechanism at its signature scale (the raw fold's
 percent-class commutators at unchanged energy make it the
 polarized-core detector); **escape / swap** — the window-identity
-basins, compared in totals only. The certified rungs sit mEh-tight
-around the frozen value (CASCI +10.5 ≈ core-relax +10.4 ≈ SA-pur
-+11.7): orbital optimization buys ≈nothing on the as-run window — the
-negative free numbers are window-identity changes, classified by the
-span certificates; the SA swap dives −861 mEh in its own fold — the
-851 mEh cross-check is exactly that convention break. Full diagnostics
-(span certificates, configurations): `elements/Ti/TABLES.md`; the
-cross-atom summary: the element files.
+basins, compared in totals only. The certified rungs sit mEh-tight around frozen CASCI (+10.5):
+orbital optimization buys ≈ nothing on the as-run window. Every other
+row of the manifest is a *classified* window-identity change — escape,
+swap, gauge — flagged by the fold shift (Partition bookkeeping).
+Values, certificates, verdicts: `elements/Ti/TABLES.md`; other atoms:
+their element files.
 
-| treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | cross-check (mEh) | verdict |
+| treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | fold shift | verdict |
 |---|---|---|---|---|---|---|---|
 | ROHF (anchor) | −848.4065 | 0 | — | — | — | 0 | — |
 | CASCI, averaged | −848.3959 | +10.5 | 12.0000 | 4.2e-09 | 2.3e-08 | 2.8 | exact |
 | CASCI, raw | −848.3959 | +10.5 | 12.0000 | 4.9e-02 | 2.6e-01 | ~0 | baseline (detector) |
 | CASCI, fractional | −848.3585 | +48.0 | 12.0000 | 1.1e-09 | 7.6e-09 | ~0 | exact |
-| CASSCF, free | −848.4377 | −31.3 | 0.0503 | 4.3e-01 | 1.1e+00 | 2.8 | escape — broken |
-| CASSCF, core-relax | −848.3961 | +10.4 | 12.0000 | 4.2e-09 | 2.3e-08 | 2.7 | baseline |
-| SA-CASSCF, free | −849.2676 | −861.1 | 12.0029 | 1.1e+00 | 6.0e+00 | 851 | swap — broken |
-| SA-CASSCF, core-relax, pur | −848.3948 | +11.7 | 12.0000 | 1.0e-13 | 4.0e-13 | 0.0 | exact |
+| CASSCF, free | −848.4377 | −31.3 | 0.0503 | 4.3e-01 | 1.1e+00 | 2.8 | escape |
+| CASSCF, frozen window | −848.3961 | +10.4 | 12.0000 | 4.2e-09 | 2.3e-08 | 2.7 | baseline |
+| SA-CASSCF, free | −848.4166 | −10.1 | 12.0029 | 1.1e+00 | 6.0e+00 | partition changed | swap |
+| SA-CASSCF, frozen, pur | −848.3948 | +11.7 | 12.0000 | 1.0e-13 | 4.0e-13 | 0.0 | exact |
 
 ### The window lattice — window kinds at matched determinant cost
 

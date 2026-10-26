@@ -106,7 +106,7 @@ equivalent standalone analysis).
 | ROHF (anchor) | −848.4065 | 0 | −23086.3167 | +0.0000 | — | — | — |
 | CASCI, averaged | pending | | | | | | |
 | CASSCF, free | pending | | | | | | |
-| CASSCF, core-relax | pending | | | | | | |
+| CASSCF, frozen window | pending | | | | | | |
 | SA-CASSCF, frozen | pending | | | | | | |
 
 ### CAS(4,14) / {3d,4s,4p,4d} — planned
@@ -116,7 +116,7 @@ equivalent standalone analysis).
 | ROHF (anchor) | −848.4065 | 0 | −23086.3167 | +0.0000 | — | — | — |
 | CASCI, averaged | −848.4380 | −31.5 | −23086.6477 | −0.8572 | 12.0000 | pending | pending |
 | CASSCF, free | pending | | | | | | |
-| CASSCF, core-relax | pending | | | | | | |
+| CASSCF, frozen window | pending | | | | | | |
 | SA-CASSCF, frozen | pending | | | | | | |
 
 ## Frozen-scan verdicts (Motivation; curves in `scan.md`)

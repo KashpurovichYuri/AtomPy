@@ -34,8 +34,8 @@ vectors straggle in the 17-fold ⁵L cluster)
 |---|---|---|---|---|---|---|
 | CASCI (anchor) | NO d5+f7, 495 dets | −49.889731 | 0 | 72.0000 | ~1e-13 | machine-exact |
 | frozen growth | all 4 NO groups, 10,626 | −49.894287 | −4.6 | 72.0000 | ~1e-13 | |
-| CASSCF, core-relax | NO-12 | −49.899729 | −10.0 | 72.0000 | 1.3e-13 | machine-exact closure |
-| CASSCF, core-relax | NO-17 | −49.900366 | −10.6 | 72.0000 | 1.3e-12 | |
+| CASSCF, frozen window | NO-12 | −49.899729 | −10.0 | 72.0000 | 1.3e-13 | machine-exact closure |
+| CASSCF, frozen window | NO-17 | −49.900366 | −10.6 | 72.0000 | 1.3e-12 | |
 | SA-CASSCF (17×⁵L) | NO-12 | **−50.423810** | −534.1 | **72.0000** | 1.3e-04 | **below the ⁵S° mean field at exact ⁵L — radial relaxation** |
 | SA-CASSCF (17×⁵L) | NO-17 | ≈ −50.428 | −537 | 71.88 | 1.0e+01 | degraded: span opens |
 | CASSCF, free | any start | ≈ −50.43 | ≈ −540 | broken | 1e+01…1e+02 | never converged; no term |

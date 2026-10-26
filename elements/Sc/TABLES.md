@@ -45,10 +45,10 @@ rows)
 | CASCI, raw | −759.729565 | +6.7 | 6.0004 | 2.8e-02 | ~0 | polarized-core detector |
 | CASCI, fractional | −759.699492 | +36.8 | 6.0000 | 3.4e-14 | ~0 | different functional |
 | CASSCF, free | −759.767769 | −31.5 | 0.0526 | 3.2e-01 | 1.9 | escape — no term |
-| CASSCF, core-relax | −759.729655 | +6.6 | 5.9998 | 2.8e-03 | 1.3 | |
+| CASSCF, frozen window | −759.729655 | +6.6 | 5.9998 | 2.8e-03 | 1.3 | |
 | SA-CASSCF, free | −759.749511 | −13.3 | 6.0020 | 8.3e-01 | 798.6 | swap basin — totals only |
 | CASCI, pur | −759.728891 | +7.4 | 6.0000 | 6.6e-15 | 0.0 | pur substrate |
-| SA-CASSCF, core-relax, pur | −759.728978 | +7.3 | 6.0000 | 3.5e-14 | 0.0 | the certified rung |
+| SA-CASSCF, frozen, pur | −759.728978 | +7.3 | 6.0000 | 3.5e-14 | 0.0 | the certified rung |
 
 ## Frozen-scan verdicts (Motivation; curves in `scan.md`)
 
