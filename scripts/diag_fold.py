@@ -37,7 +37,7 @@ from run_u import BAS, ECP
 
 
 def compare(label, mol, mf, act_idx, ncore, na, nb):
-    out = Path("results/diag"); out.mkdir(exist_ok=True)
+    out = Path("elements/diag"); out.mkdir(parents=True, exist_ok=True)
     chk = str(out / f"{label}_diag.chk")
     mo = drivers.build_full_mo(mf, drivers.occupied_core_idx(mf, ncore),
                                act_idx)
@@ -86,7 +86,7 @@ def compare(label, mol, mf, act_idx, ncore, na, nb):
 
 
 def main():
-    Path("results/diag").mkdir(parents=True, exist_ok=True)
+    Path("elements/diag").mkdir(parents=True, exist_ok=True)
     # gated U reference (ticket 21): whole-l spans + Newton
     U_REF = drivers.ReferenceSpec(
         occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
@@ -107,7 +107,7 @@ def main():
     ]
     for (label, cfg, ref, patterns, nelec, na, nb, ncore) in cases:
         print(f"\n{label} (ROHF{' gated' if ref else ''}) ...", flush=True)
-        mol, mf = drivers.run_rohf(cfg, f"results/diag/{label}_rohf.chk",
+        mol, mf = drivers.run_rohf(cfg, f"elements/diag/{label}_rohf.chk",
                                    ref=ref)
         if patterns is not None:
             act = drivers.select_valence_ao(mol, patterns)

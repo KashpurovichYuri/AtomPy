@@ -4,7 +4,7 @@ m-symmetric correlation curve at exact symmetry + the member-tilt map.
 Usage:
     python scripts/radial_scan.py [C|Si|Sc] [workdir]
 
-Writes results/<label>_scan.md and prints it. No optimizer anywhere --
+Writes elements/<label>_scan.md and prints it. No optimizer anywhere --
 every window is an explicit cos/sin construction (see atomterm.scans).
 """
 
@@ -32,7 +32,7 @@ SPECS = {
 
 def main():
     sym = sys.argv[1] if len(sys.argv) > 1 else "C"
-    workdir = Path(sys.argv[2] if len(sys.argv) > 2 else "results")
+    workdir = Path(sys.argv[2] if len(sys.argv) > 2 else "elements")
     workdir.mkdir(parents=True, exist_ok=True)
     spec = SPECS[sym]
     cfg = spec["cfg"]

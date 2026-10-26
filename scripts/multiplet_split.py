@@ -32,7 +32,7 @@ def main():
 
     cfg = AtomConfig(args.atom, "ccpvdz", spin=2)
     mol = build_mol(cfg)
-    mf = run_rohf(cfg, f"results/{args.atom}_ccpvdz_s{cfg.spin}_rohf.chk",
+    mf = run_rohf(cfg, f"elements/{args.atom}/rungs/rohf.chk",
                   ref=None)[1]
     patterns = {"3d4s": ["3d", "4s"], "3d": ["3d"]}[args.window]
     nelec = {"3d4s": 4, "3d": 2}[args.window]

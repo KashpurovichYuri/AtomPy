@@ -253,6 +253,13 @@ operators: L̂² = L̂z² + ½(L̂₊L̂₋ + L̂₋L̂₊), Ŝ² = Ŝz² + ½(S
 [L̂z, L̂±] = ±L̂±. Ŝz carries no certificate — [Ĥ, Ŝz] ≡ 0 identically;
 it only labels the sector (its matrix is exactly M_S·**1**).
 
+**⟨L̂z²⟩** — a per-root expectation of L̂z·L̂z in the run's own fold,
+reported beside ⟨L̂²⟩. In an isotropic fold the term roots are
+M_L-degenerate, so the value is a degenerate-cluster gauge (starred
+in the tables — anything in [0, L(L+1)] is admissible). On a broken
+fold the root is M_L-definite and the value is diagnostic: the raw
+fold's ground root reads exactly M_L² — the Λ branching made visible.
+
 **ε — the core anisotropy** — is the relative weight of the non-scalar
 part of the frozen core density, ‖ρ_c − ρ̄_c‖_F / ‖ρ̄_c‖_F (ρ̄_c = the
 spherical average; measured directly from the SCF density by

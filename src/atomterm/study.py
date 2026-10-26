@@ -16,7 +16,7 @@ A :class:`StudySpec` enumerates the product explicitly -- windows (the
   vectors straggle inside degenerate clusters and are never a label
   source).
 
-Outputs: ``results/<label>_study.json`` (all cells) and a markdown
+Outputs: ``<out>/<label>_study.json`` (all cells) and a markdown
 insert (via :func:`render`) meant for the study markers of the
 atom's ``elements/<Atom>/TABLES.md``.
 """

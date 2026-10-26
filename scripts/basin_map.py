@@ -31,9 +31,9 @@ from atomterm.windows import build_full_mo, select_valence_ao, span_overlap
 
 CFG = {
     "C": (AtomConfig("C", "ccpvdz", spin=2), ["2p"], 2,
-          "results/C_ccpvdz_s2_rohf.chk"),
+          "elements/C/rungs/rohf.chk"),
     "Ti": (AtomConfig("Ti", "ccpvdz", spin=2), ["3d"], 2,
-           "results/Ti_ccpvdz_s2_rohf.chk"),
+           "elements/Ti/rungs/rohf.chk"),
 }
 
 

@@ -4,7 +4,7 @@ The question (ticket 23): can orbital RELAXATION recover what window
 GROWTH delivers -- and does the NO start (exactly closed, term-averaged,
 compressed) tame the free-CASSCF escape basins? The window axis is the
 measurement: every rung runs on the NO-group ladder nk = 1..4 and is
-read against the frozen NO-CASCI curve (results/u_14e/u_run_no.log):
+read against the frozen NO-CASCI curve (elements/U/cache/u_run_no.log):
 
     nk=1   5 cols      5 dets   -49.660672   <L2>=6    (d4, 5D block)
     nk=2  12 cols    495 dets   -49.889731   <L2>=72   (f2d2, 5L block)
@@ -56,7 +56,7 @@ from atomterm.operators import (
 )
 
 NLOW = 48
-CACHE = Path("results/u_14e/u_no_cache.npz")
+CACHE = Path("elements/U/cache/u_no_cache.npz")
 ANCHOR = {5: -49.660672, 12: -49.889731, 17: -49.890855, 24: -49.894287}
 SHELL12_BANDS = {"f": (1.0, 2.0), "d": (0.1, 0.25)}   # the campaign 1f tier
 NA, NB = 4, 0   # maximal M_S = 2 sector; the 5L ground lives here
