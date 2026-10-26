@@ -1,8 +1,8 @@
 # Si — silicon (p²)
 
 cc-pVDZ. Reference **ROHF −288.846437 Eh**. Sectors Ms = 1 / Ms = 0 —
-as carbon, with its own numbers. Provenance:
-`results/Si_ccpvdz_s2_ladder.json` (Methods compared), campaign logs. NOTES.md: the
+as carbon, with its own numbers. Provenance: `sa_decomposition.md`; the Methods-compared regeneration
+(`scripts/regen_ladders.py Si`) is pending its first run. NOTES.md: the
 ticket-09 record, gauge draws, the fact-17 baseline.
 
 ## Term table — the combinatorial contract

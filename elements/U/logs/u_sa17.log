@@ -1,0 +1,26 @@
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/drivers.py:580: UserWarning: core block is NOT the first 5 canonical MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block instead
+  mf.mo_coeff[:, occupied_core_idx(mf, n_core)])
+[sa/no-17col] measured ground block: 17 roots, <L2> = 72.0000, E_frozen = -49.890855
+[sa/no-17col] ensemble E = -50.427156  converged=True
+  span: |[P,Lz]| = 4.33e+00  |[P,Lperp]| = 5.40e+00
+  root          E, Eh      <L2>      <S2>    dE vs frozen (mEh)
+  window identity: f = 5.527  d = 3.777  (start 7.000/5.000)
+  l-content of the converged window (S-weight): l0=0.000  l1=0.000  l2=5.000  l3=12.000
+    0  -50.428689    26.6068   6.0000   -537.83
+    1  -50.428687    29.6587   6.0000   -537.83
+    2  -50.427799    29.2331   6.0000   -536.94
+    3  -50.427773    28.8872   6.0000   -536.92
+    4  -50.427691    31.2023   6.0000   -536.84
+    5  -50.427639    27.3108   6.0000   -536.78
+    6  -50.427498    29.7336   6.0000   -536.64
+    7  -50.427483    29.2286   6.0000   -536.63
+    8  -50.427326    28.0006   6.0000   -536.47
+    9  -50.427035    28.1912   6.0000   -536.18
+   10  -50.426612    27.9877   6.0000   -535.76
+   11  -50.426393    27.9798   6.0000   -535.54
+   12  -50.426327    26.8634   6.0000   -535.47
+   13  -50.426295    28.6990   6.0000   -535.44
+   14  -50.426194    28.2411   6.0000   -535.34
+   15  -50.426178    29.7735   6.0000   -535.32
+   16  -50.426037    28.5158   6.0000   -535.18
+  exact eigh ground: E = -4.196853  <L2> = 71.8819  <S2> = 6.0000   ||[H,Lz]|| (SA fold) = 1.02e+01

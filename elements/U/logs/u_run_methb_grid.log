@@ -1,0 +1,69 @@
+reference: E = -50.38185233 Eh  (cached gated Newton)
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/drivers.py:580: UserWarning: core block is NOT the first 5 canonical MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block instead
+  mf.mo_coeff[:, occupied_core_idx(mf, n_core)])
+pur core: max contamination 1.27e-02
+open MOs valence-band character: 0.702 0.994 0.990 0.988
+virtual admission order (rank:mo:eps:valence S-weight):
+  0:mo52:+1.127:1.583  1:mo51:+1.126:1.563  2:mo50:+1.126:1.562  3:mo49:+1.118:1.559  4:mo48:+1.118:1.559  5:mo94:+9.040:1.283  6:mo92:+9.038:1.283  7:mo93:+9.039:1.283
+
+[k=0] norb=4 ndet=1
+  E_ground      = -50.382275 Eh   <N_f> = 2.998   <L^2> = 0.0000   parity = -1
+  E_ref det     = -50.382275   ground-det = +0.000 mEh mixing gain
+  ground vec: (0, 1, 2, 3):+1.000
+  5L-like root #0: <L^2> = 0.0000   E = -50.382275
+  ||[H,Lz]|| = 0.00e+00 (rel 0.00e+00)   ||[H,L2]|| = 0.00e+00 (rel 0.00e+00)
+  span: ||[P,Lz]|| = 5.39e+00   ||[P,Lperp]|| = 7.23e+00
+  max|dE| vs PySCF (ground) = 7.82e-14
+
+[k=18] norb=22 ndet=7315
+  E_ground      = -50.383947 Eh   <N_f> = 2.997   <L^2> = 0.1917   parity = n/a (l-mixed)
+  E_ref det     = -50.382275   ground-det = -1.673 mEh mixing gain
+  ground vec: (0, 1, 2, 3):-1.000 (0, 3, 16, 20):+0.010 (0, 2, 16, 19):-0.009
+  5L-like root #21: <L^2> = 12.0171   E = -49.098787
+  ||[H,Lz]|| = 2.36e+01 (rel 2.37e-02)   ||[H,L2]|| = 2.09e+02 (rel 2.09e-01)
+  span: ||[P,Lz]|| = 6.13e+00   ||[P,Lperp]|| = 8.29e+00
+  max|dE| vs PySCF (ground) = 6.63e-12
+
+[k=20] norb=24 ndet=10626
+  E_ground      = -50.383980 Eh   <N_f> = 2.997   <L^2> = 0.2536   parity = n/a (l-mixed)
+  E_ref det     = -50.382275   ground-det = -1.705 mEh mixing gain
+  ground vec: (0, 1, 2, 3):+1.000 (0, 3, 16, 20):-0.010 (0, 2, 16, 19):+0.009
+  5L-like root #21: <L^2> = 12.0695   E = -49.098830
+  ||[H,Lz]|| = 3.87e+01 (rel 3.34e-02)   ||[H,L2]|| = 3.68e+02 (rel 3.17e-01)
+  span: ||[P,Lz]|| = 6.23e+00   ||[P,Lperp]|| = 8.40e+00
+  max|dE| vs PySCF (ground) = 7.23e-12
+
+[k=22] norb=26 ndet=14950
+  E_ground      = -50.384421 Eh   <N_f> = 2.997   <L^2> = 0.2577   parity = n/a (l-mixed)
+  E_ref det     = -50.382275   ground-det = -2.147 mEh mixing gain
+  ground vec: (0, 1, 2, 3):-1.000 (0, 3, 16, 20):+0.010 (0, 2, 16, 19):-0.010
+  5L-like root #21: <L^2> = 12.0675   E = -49.101557
+  ||[H,Lz]|| = 4.36e+01 (rel 3.20e-02)   ||[H,L2]|| = 4.54e+02 (rel 3.33e-01)
+  span: ||[P,Lz]|| = 6.05e+00   ||[P,Lperp]|| = 8.55e+00
+  max|dE| vs PySCF (ground) = 8.01e-11
+
+========================================================================
+broken-symmetry descent curve (U, sector (4,0), pur fold)
+========================================================================
+reference determinant (k=0) vs ROHF total: -0.42 mEh (pur-fold bookkeeping)
+  k norb  ndet      E_ground    vs ref   vs ROHF  mix(mEh)    <L2>g   <L2>5L  |[H,Lz]|
+  0    4     1    -50.382275     +0.00     -0.42    +0.000   0.0000   0.0000   0.0e+00
+ 18   22  7315    -50.383947     -1.67     -2.10    -1.673   0.1917  12.0171   2.4e+01
+ 20   24 10626    -50.383980     -1.70     -2.13    -1.705   0.2536  12.0695   3.9e+01
+ 22   26 14950    -50.384421     -2.15     -2.57    -2.147   0.2577  12.0675   4.4e+01
+reference: E = -50.38185233 Eh  (cached gated Newton)
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/drivers.py:580: UserWarning: core block is NOT the first 5 canonical MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block instead
+  mf.mo_coeff[:, occupied_core_idx(mf, n_core)])
+pur core: max contamination 1.27e-02
+open MOs valence-band character: 0.702 0.994 0.990 0.988
+virtual admission order (rank:mo:eps:valence S-weight):
+  0:mo52:+1.127:1.583  1:mo51:+1.126:1.563  2:mo50:+1.126:1.562  3:mo49:+1.118:1.559  4:mo48:+1.118:1.559  5:mo94:+9.040:1.283  6:mo92:+9.038:1.283  7:mo93:+9.039:1.283
+
+[k=15] norb=19 ndet=3876
+  E_ground      = -50.382697 Eh   <N_f> = 2.998   <L^2> = 0.1322   parity = -1
+  E_ref det     = -50.382275   ground-det = -0.422 mEh mixing gain
+  ground vec: (0, 1, 2, 3):+1.000 (2, 3, 4, 16):-0.006 (0, 1, 4, 6):-0.005
+  5L-like root #21: <L^2> = 10.9626   E = -49.098413
+  ||[H,Lz]|| = 1.12e+01 (rel 1.39e-02)   ||[H,L2]|| = 1.14e+02 (rel 1.43e-01)
+  span: ||[P,Lz]|| = 5.98e+00   ||[P,Lperp]|| = 8.25e+00
+  max|dE| vs PySCF (ground) = 2.84e-13

@@ -1,0 +1,25 @@
+{
+  "label": "u_no",
+  "cells": {
+    "study_u_no_no2_relax": {
+      "key": "study_u_no_no2_relax",
+      "status": "ok",
+      "energy": -49.89972845854749,
+      "dets": 495,
+      "span_lz": 2.0562569813547948e-13,
+      "span_lperp": 4.343217776916385e-13,
+      "converged": true,
+      "l2": 30.76385278980107
+    },
+    "study_u_no_no4_relax": {
+      "key": "study_u_no_no4_relax",
+      "status": "ok",
+      "energy": -49.91889494480211,
+      "dets": 10626,
+      "span_lz": 5.730757457297365e-13,
+      "span_lperp": 1.228906225933937e-12,
+      "converged": true,
+      "l2": 26.48165455324287
+    }
+  }
+}

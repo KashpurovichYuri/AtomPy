@@ -15,7 +15,7 @@ ECP + cut-Dyall).
 conda activate pyscf          # PySCF 2.13 environment (any platform; in a bare
                               # shell: source <conda-root>/etc/profile.d/conda.sh first)
 pytest                        # 128 tests, ~13 min (chkfile caching); -m fast = sub-second tier
-python scripts/run_c.py       # writes results/ (chkfiles + report.md/.json)
+python scripts/run_c.py       # writes elements/C/ (report.md/.json + chkfiles)
 ```
 
 Run from the repo root — `pyproject.toml` preconfigures `pythonpath = src`
@@ -23,8 +23,8 @@ and the test paths; no install step.
 
 ## What you get
 
-The results, at a glance — all written under `results/` (Results · Files
-maps every file to its regeneration command).
+The results, at a glance — committed in `elements/<Atom>/` (Results ·
+Files maps every file to its regeneration command).
 
 **Term tables** — every state classified, per Ms sector. Titanium
 (CAS(2,5) over {3d}, Ms = +1 sector — the d² triplet manifold; rows
@@ -55,13 +55,13 @@ beside the symmetric one, each classified by its diagnostics: ΔE vs the
 ROHF anchor, ⟨L²⟩, commutators. Titanium's headline rows (ROHF reference
 −848.406489 Eh):
 
-| treatment                          | E, Eh       | ΔE (mEh) | ⟨L²⟩    | ‖[H,Lz]‖ | verdict         |
-| ---                                | ---         | ---      | ---     | ---      | ---             |
-| CASCI, averaged fold               | −848.394046 | +12.4    | 12.0    | 2.2e-14  | exact           |
-| CASSCF, free                       | −848.437740 | −31.3    | 0.0503  | 4.3e-01  | escape — broken |
-| CASSCF, window frozen (core-relax) | −848.395884 | +10.6    | 12.0    | 2.3e-08  | baseline        |
-| SA-CASSCF, free                    | −848.416563 | −10.1    | 12.003  | 1.1e+00  | swap — broken   |
-| SA-CASSCF, frozen, purified core   | −848.394753 | +11.7    | 12.0    | 5.2e-13  | exact           |
+| treatment                        | E, Eh       | ΔE (mEh) | ⟨L²⟩    | ‖[H,Lz]‖ | verdict         |
+| ---                              | ---         | ---      | ---     | ---      | ---             |
+| CASCI, averaged fold             | −848.3959   | +10.5    | 12.0    | 4.2e-09  | exact           |
+| CASSCF, free                     | −848.4377   | −31.3    | 0.0503  | 4.3e-01  | escape — broken |
+| CASSCF, window frozen (core-relax) | −848.3961 | +10.4    | 12.0    | 4.2e-09  | baseline        |
+| SA-CASSCF, free                  | −849.2676   | −861.1   | 12.003  | 1.1e+00  | swap — broken   |
+| SA-CASSCF, frozen, purified core | −848.3948   | +11.7    | 12.0    | 1.0e-13  | exact           |
 
 Verdicts: **exact** = commutators and span certificates at the 1e-13
 class; **escape / swap** = window-identity basins (Motivation);
@@ -350,6 +350,17 @@ landscape has several. Start and converged windows are compared by the
 **span overlap** (smallest principal cosine between the two spans —
 did the window become a different space?).
 
+Naming bridge for the tables: the frozen-window mask is what the tables
+call **core-relax** — the window span is untouched (closure preserved
+whatever the core), only core↔virtual rotations re-optimize the core's
+description. Its purified twin (**core-relax, pur**) runs the same mask
+on the purified core substrate, so the run inherits a scalar fold — the
+certified class. Single-root CASSCF stays gauge-chaotic even on the
+purified substrate (its breaking directions are its own), which is why
+the tables report the plain core-relax row for CASSCF and the purified
+one for SA-CASSCF — the state average restores what a single root
+cannot.
+
 **SA-CASSCF — the multiplet average.** Replaces the single root by the
 average over the ground term's M_L components — the rotationally scalar
 object. It anchors the term identity but not the window. The certified
@@ -442,7 +453,7 @@ is this project's measurement. **Every other atom lives in
 `elements/<Atom>/TABLES.md`** (+ `NOTES.md` for the dated specifics;
 C and Si mirror each other throughout, Sc and U carry the
 transition-metal and f-scale stories); the artifacts are under
-`results/` (regeneration: Files, below). Ti: ROHF reference
+`elements/Ti/` (regeneration: Files, below). Ti: ROHF reference
 −848.406489 Eh (3d²4s², the gated reference), M_S = 1, ground term ³F.
 On symmetry-broken basins the term table itself scrambles — independent
 evidence beyond the commutators.
@@ -484,23 +495,24 @@ named non-closure mechanism at its signature scale (the raw fold's
 percent-class commutators at unchanged energy make it the
 polarized-core detector); **escape / swap** — the window-identity
 basins, compared in totals only. The certified rungs sit mEh-tight
-around the frozen value (CASCI +12.4 ≈ core-relax +10.6 ≈ SA-pur
+around the frozen value (CASCI +10.5 ≈ core-relax +10.4 ≈ SA-pur
 +11.7): orbital optimization buys ≈nothing on the as-run window — the
 negative free numbers are window-identity changes, classified by the
-span certificates. Full diagnostics (span certificates,
-configurations): `elements/Ti/TABLES.md`; the cross-atom summary: the
-element files.
+span certificates; the SA swap dives −861 mEh in its own fold — the
+851 mEh cross-check is exactly that convention break. Full diagnostics
+(span certificates, configurations): `elements/Ti/TABLES.md`; the
+cross-atom summary: the element files.
 
 | treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | cross-check (mEh) | verdict |
 |---|---|---|---|---|---|---|---|
-| ROHF (anchor) | −848.406489 | 0 | — | — | — | 0 | — |
-| CASCI, averaged | −848.394046 | +12.4 | 12.0000 | 2.2e-14 | 4.1e-13 | 2.8 | exact |
-| CASCI, raw | −848.394046 | +12.4 | 12.0000 | 4.9e-02 | 2.6e-01 | ~0 | baseline (detector) |
-| CASCI, fractional | −848.358519 | +48.0 | 12.0000 | 1.2e-13 | 7.5e-13 | ~0 | exact |
-| CASSCF, free | −848.437740 | −31.3 | 0.0503 | 4.3e-01 | 1.1e+00 | 2.8 | escape — broken |
-| CASSCF, core-relax | −848.395884 | +10.6 | 12.0 | 2.3e-08 | 1.7e-07 | 2.7 | baseline |
-| SA-CASSCF, free | −848.416563 | −10.1 | 12.003 | 1.1e+00 | 6.0e+00 | 851 | swap — broken |
-| SA-CASSCF, core-relax, pur | −848.394753 | +11.7 | 12.0 | 5.2e-13 | 2.9e-12 | 0.0 | exact |
+| ROHF (anchor) | −848.4065 | 0 | — | — | — | 0 | — |
+| CASCI, averaged | −848.3959 | +10.5 | 12.0000 | 4.2e-09 | 2.3e-08 | 2.8 | exact |
+| CASCI, raw | −848.3959 | +10.5 | 12.0000 | 4.9e-02 | 2.6e-01 | ~0 | baseline (detector) |
+| CASCI, fractional | −848.3585 | +48.0 | 12.0000 | 1.1e-09 | 7.6e-09 | ~0 | exact |
+| CASSCF, free | −848.4377 | −31.3 | 0.0503 | 4.3e-01 | 1.1e+00 | 2.8 | escape — broken |
+| CASSCF, core-relax | −848.3961 | +10.4 | 12.0000 | 4.2e-09 | 2.3e-08 | 2.7 | baseline |
+| SA-CASSCF, free | −849.2676 | −861.1 | 12.0029 | 1.1e+00 | 6.0e+00 | 851 | swap — broken |
+| SA-CASSCF, core-relax, pur | −848.3948 | +11.7 | 12.0000 | 1.0e-13 | 4.0e-13 | 0.0 | exact |
 
 ### The window lattice — window kinds at matched determinant cost
 
@@ -551,17 +563,18 @@ reference determinant that is a numerically pure ⁵S° state
 | `analysis` | term labels, configuration summaries, report rendering |
 | `cases` / `treatments` / `study` | orchestration — the declared per-atom campaign (`cases`: CaseSpec → run_case); rungs as data (`treatments`); the declared window × treatment study runner (`study`) |
 
-**The files.** Per-atom records (committed): `elements/<Atom>/` —
-`TABLES.md` (term content, spectrum, methods compared, window lattice,
-study inserts) and `NOTES.md` (dated specifics, scan curves). New atom
-= new element file, not README growth. Regenerated under `results/`:
-`*_report.md/json` — the term tables; `*_ladder.md/json` — the full
-rung registry; `*_sa_decomposition.md` — the window-vs-core
-attributions. Regeneration: term tables — `scripts/run_c.py` and the
-per-atom `run_atom` calls (recorded in each report header); rungs —
-the per-atom `run_ladder` calls (recorded in each ladder header);
-scans — `scripts/radial_scan.py`; the lattices —
-`scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
+**The files.** Everything human-readable lives committed in
+`elements/<Atom>/`: `TABLES.md` (term content, spectrum, methods
+compared, window lattice, study inserts), `report.md/json` (the term
+tables), `ladder.json` (the full rung registry — Methods compared),
+`scan.md`, `sa_decomposition.md`, `basin_map.md`, `NOTES.md` (dated
+specifics). New atom = new element file, not README growth; the
+regenerators write straight into these files (`scripts/regen_ladders.py
+Ti` -> `elements/Ti/ladder.json`; chkfiles land next to them and are
+gitignored). Regeneration: term tables — `scripts/run_c.py` and the
+per-atom `run_atom` calls (recorded in each report header); rungs — the
+per-atom `run_ladder` calls; scans — `scripts/radial_scan.py`; the
+lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
 `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
 suite (128 tests) — term tables, exact-class closure pins, basin
 branches. Plain-language companion: `RUNGS.md`.

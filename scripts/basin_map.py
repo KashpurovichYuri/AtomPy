@@ -84,7 +84,7 @@ def main():
         start = mo_base if k == 0 else perturb(mo_base, rng, args.scale)
         tag = f"basin_start{k}"
         res = constrained_casscf(
-            mf, ncas, nelec, f"results/basin_{args.atom}_{k}.chk",
+            mf, ncas, nelec, f"elements/{args.atom}/basin_start{k}.chk",
             mo_full=start, name=tag)
         c_win = res.mo_coeff[:, ncore:ncore + ncas]
         wins.append(c_win)

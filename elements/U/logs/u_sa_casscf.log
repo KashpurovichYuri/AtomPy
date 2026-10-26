@@ -1,0 +1,48 @@
+
+===== stage casscf =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/drivers.py:580: UserWarning: core block is NOT the first 5 canonical MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block instead
+  mf.mo_coeff[:, occupied_core_idx(mf, n_core)])
+
+[free/no-5col] converged=False  ortho_err = 1.83e-11
+  E_tot   = -50.378690  (vs frozen 5-col anchor -49.660672: -718.02 mEh,  vs campaign -49.894287: -484.40 mEh)
+  <L2> = 0.6390   <S2> = 6.0000   ||[H,Lz]|| (own fold) = 2.76e+01
+  window span: |[P,Lz]| = 5.63e+00  |[P,Lperp]| = 7.57e+00
+  top columns: col1:f0.66  col3:d0.49  col4:f0.42  col0:f0.41  col2:f0.38
+
+[free/no-12col] converged=False  ortho_err = 1.54e-11
+  E_tot   = -50.429944  (vs frozen 12-col anchor -49.889731: -540.21 mEh,  vs campaign -49.894287: -535.66 mEh)
+  <L2> = 20.7546   <S2> = 6.0000   ||[H,Lz]|| (own fold) = 1.45e+01
+  window span: |[P,Lz]| = 4.78e+00  |[P,Lperp]| = 6.76e+00
+  top columns: col9:f0.67  col8:f0.67  col6:f0.67  col7:f0.67  col11:f0.67  col1:d0.57
+
+[free/no-17col] converged=False  ortho_err = 1.91e-11
+  E_tot   = -50.435867  (vs frozen 17-col anchor -49.890855: -545.01 mEh,  vs campaign -49.894287: -541.58 mEh)
+  <L2> = 23.4542   <S2> = 6.0000   ||[H,Lz]|| (own fold) = 4.44e+01
+  window span: |[P,Lz]| = 5.07e+00  |[P,Lperp]| = 7.45e+00
+  top columns: col0:d0.82  col1:d0.69  col9:f0.68  col7:f0.68  col8:f0.67  col11:f0.67
+
+[free/shell-12col] converged=False  ortho_err = 1.95e-11
+  E_tot   = -50.430112  (vs frozen 12-col anchor -49.889731: -540.38 mEh,  vs campaign -49.894287: -535.82 mEh)
+  <L2> = 20.4947   <S2> = 6.0000   ||[H,Lz]|| (own fold) = 6.52e+00
+  window span: |[P,Lz]| = 5.02e+00  |[P,Lperp]| = 7.83e+00
+  top columns: col7:d0.76  col11:d0.75  col4:f0.68  col1:f0.67  col5:f0.67  col2:f0.67
+
+[free/shell-24col] converged=False  ortho_err = 1.56e-11
+  E_tot   = -50.439084  (vs frozen 24-col anchor -49.894287: -544.80 mEh,  vs campaign -49.894287: -544.80 mEh)
+  <L2> = 30.8920   <S2> = 6.0000   ||[H,Lz]|| (own fold) = 1.51e+02
+  window span: |[P,Lz]| = 5.43e+00  |[P,Lperp]| = 6.70e+00
+  top columns: col21:d0.71  col2:f0.71  col23:d0.70  col6:f0.70  col0:f0.68  col16:d0.67
+
+[free/no-24col] converged=False  ortho_err = 1.69e-11
+  E_tot   = -50.439225  (vs frozen 24-col anchor -49.894287: -544.94 mEh,  vs campaign -49.894287: -544.94 mEh)
+  <L2> = 23.3383   <S2> = 6.0000   ||[H,Lz]|| (own fold) = 2.69e+02
+  window span: |[P,Lz]| = 5.17e+00  |[P,Lperp]| = 6.49e+00
+  top columns: col4:d0.84  col0:d0.83  col1:d0.82  col3:d0.81  col2:d0.79  col6:f0.73
+
+basin table (frozen curve: 5/12/17/24 cols = -49.6607 / -49.8897 / -49.8909 / -49.8943):
+        free/no-5col: E = -50.378690  <L2> =   0.6390  ||[H,Lz]|| = 2.8e+01  |[P,Lp]| = 7.6e+00  ortho = 1.8e-11  conv = False
+       free/no-12col: E = -50.429944  <L2> =  20.7546  ||[H,Lz]|| = 1.4e+01  |[P,Lp]| = 6.8e+00  ortho = 1.5e-11  conv = False
+       free/no-17col: E = -50.435867  <L2> =  23.4542  ||[H,Lz]|| = 4.4e+01  |[P,Lp]| = 7.4e+00  ortho = 1.9e-11  conv = False
+    free/shell-12col: E = -50.430112  <L2> =  20.4947  ||[H,Lz]|| = 6.5e+00  |[P,Lp]| = 7.8e+00  ortho = 1.9e-11  conv = False
+    free/shell-24col: E = -50.439084  <L2> =  30.8920  ||[H,Lz]|| = 1.5e+02  |[P,Lp]| = 6.7e+00  ortho = 1.6e-11  conv = False
+       free/no-24col: E = -50.439225  <L2> =  23.3383  ||[H,Lz]|| = 2.7e+02  |[P,Lp]| = 6.5e+00  ortho = 1.7e-11  conv = False

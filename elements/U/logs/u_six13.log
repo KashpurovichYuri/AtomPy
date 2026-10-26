@@ -1,0 +1,40 @@
+
+===== stage six13 =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/drivers.py:580: UserWarning: core block is NOT the first 5 canonical MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block instead
+  mf.mo_coeff[:, occupied_core_idx(mf, n_core)])
+INTENT -- CAS(6,13), sector (5,1), 16731 dets, exact eigh:
+  valence    : 5f^3 6d^1 7s^2 (7s promoted out of the pur core)
+  window     : NO groups {d5, f7} (ticket-22) + the 7s pur column
+  reachable  : f^k d^m s^n, k+m+n = 6, k<=3, m<=2, n<=2 -- incl. f2d2s2,
+               f3d1s2, f4s2; tests whether the 7s2 pair, made active,
+               moves the 5L ground verdict or the f2d2/f3d1 ordering
+  fold       : pur core minus the 7s column (still m-scalar: an s column
+               leaves, the 6p trio stays m-complete)
+  bookkeeping: E_core recomputed on the 4-column core; differences exact
+
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/run_u_sa.py:321: UserWarning: core block is NOT the first 5 canonical MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block instead
+  occ_idx = drivers.occupied_core_idx(mf, NCORE)
+pur s columns [0, 1]; 7s = col 1 (canonical eps = -0.1983; other: -2.2311)
+core4 E = -43.638310 (drop = -2.608734)
+
+CAS(6,13): E_0 = -49.894866   <L2> = 72.0000  <S2> = 6.0000   |[P,Lz]| = 2.06e-13  |[P,Lp]| = 4.35e-13
+  vs campaign 5L (-49.894287): -0.58 mEh   (both totals carry their own E_core; compare totals as printed)
+  dominant configurations of the ground root:
+    weight 0.057:  Nf = 2  Nd = 2  N7s = 2
+    weight 0.044:  Nf = 2  Nd = 2  N7s = 2
+    weight 0.043:  Nf = 2  Nd = 2  N7s = 2
+    weight 0.042:  Nf = 2  Nd = 2  N7s = 2
+    weight 0.040:  Nf = 2  Nd = 2  N7s = 2
+  low roots:
+    0  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+    1  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+    2  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+    3  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+    4  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+    5  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+    6  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+    7  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+    8  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+    9  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+   10  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028
+   11  E = -49.894866  <L2> =  72.0000  <S2> =  6.000  <N7s> = 1.972  <Nf> =  2.000  <Nd> =  2.028

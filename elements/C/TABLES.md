@@ -1,9 +1,11 @@
 # C — carbon (p²)
 
 cc-pVDZ. Reference **ROHF −37.682418 Eh** (raw core = averaged fold).
-Sectors Ms = 1 and Ms = 0. Provenance: `results/C_ccpvdz_s2_ladder.json`
-(Methods-compared values), campaign logs (term table, energies, scan verdicts). NOTES.md: the confinement
-finding, the flat-gauge census, the free-CASSCF tilt anatomy.
+Sectors Ms = 1 and Ms = 0. Provenance: `report.md/json` (term tables),
+`scan.md`, `sa_decomposition.md`, `basin_map.md`; the Methods-compared
+regeneration (`scripts/regen_ladders.py C`) is pending its first run.
+NOTES.md: the confinement finding, the flat-gauge census, the
+free-CASSCF tilt anatomy.
 
 ## Term table — the combinatorial contract
 

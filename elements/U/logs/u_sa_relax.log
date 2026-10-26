@@ -1,0 +1,22 @@
+
+===== stage relax =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/drivers.py:580: UserWarning: core block is NOT the first 5 canonical MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block instead
+  mf.mo_coeff[:, occupied_core_idx(mf, n_core)])
+
+[relax/no-5col] converged=False  ortho_err = 1.88e-11
+  E_tot   = -49.799843  (vs frozen 5-col anchor -49.660672: -139.17 mEh,  vs campaign -49.894287: +94.44 mEh)
+  <L2> = 6.0000 (exact eigh ground; mc.ci: 6.0000)   <S2> = 6.0000   ||[H,Lz]|| (own fold) = 7.63e-16
+  window span: |[P,Lz]| = 8.62e-14  |[P,Lperp]| = 1.40e-13
+  top columns: col0:d1.00  col1:d1.00  col3:d1.00  col2:d1.00  col4:d1.00
+
+[relax/no-12col] converged=True  ortho_err = 1.81e-11
+  E_tot   = -49.899729  (vs frozen 12-col anchor -49.889731: -10.00 mEh,  vs campaign -49.894287: -5.44 mEh)
+  <L2> = 72.0000 (exact eigh ground; mc.ci: 27.4070)   <S2> = 6.0000   ||[H,Lz]|| (own fold) = 1.27e-13
+  window span: |[P,Lz]| = 2.06e-13  |[P,Lperp]| = 4.35e-13
+  top columns: col0:d1.00  col1:d1.00  col3:d1.00  col2:d1.00  col5:f1.00  col9:f1.00
+
+[relax/no-17col] converged=True  ortho_err = 1.77e-11
+  E_tot   = -49.900366  (vs frozen 17-col anchor -49.890855: -9.51 mEh,  vs campaign -49.894287: -6.08 mEh)
+  <L2> = 72.0000 (exact eigh ground; mc.ci: 28.0296)   <S2> = 6.0000   ||[H,Lz]|| (own fold) = 1.33e-12
+  window span: |[P,Lz]| = 8.96e-13  |[P,Lperp]| = 1.47e-12
+  top columns: col0:d1.00  col13:d1.00  col1:d1.00  col3:d1.00  col2:d1.00  col15:d1.00

@@ -1,8 +1,9 @@
 """Regenerate the campaign ladders under the unified convention
-(ticket 25/27): run_ladder for C/Si/Sc/Ti into results/, then print
-the T3b cross-check values (max_de_vs_pyscf) for the element tables.
+(ticket 25/27): run_ladder per atom into elements/<Atom>/ladder
+(the committed artifact; chkfiles land there too and are gitignored),
+then print the cross-check values (max_de_vs_pyscf) for the tables.
 
-Usage: python scripts/regen_ladders.py
+Usage: python scripts/regen_ladders.py [Ti C Si Sc]
 Threads: OPENBLAS_NUM_THREADS=64 OMP_NUM_THREADS=64 PYSCF_NUM_THREADS=64.
 """
 
@@ -10,8 +11,15 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, "src")
+from atomterm.reference import ReferenceSpec
 from atomterm.system import AtomConfig
 from atomterm.ladder import run_ladder
+
+# the atom's reference data (AGENTS fact 21; identical to tests/conftest.TI_REF)
+REFS = {
+    "Ti": ReferenceSpec(occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
+                        occ_open=("3d",), occ_e_ref=-848.40648875),
+}
 
 CASES = {
     "C": (AtomConfig(), ["2p"], 2, [1 / 3] * 3, 2, 3),
@@ -27,10 +35,15 @@ for name, (cfg, patterns, nelec, saw, fo, no) in CASES.items():
     if only and name not in only:
         continue
     print(f"\n===== ladder {name} =====", flush=True)
-    out = Path("results") / f"{name}_ccpvdz_s{cfg.spin}_ladder"
+    out = Path("elements") / name / "ladder"
     res = run_ladder(cfg, patterns, nelec, workdir=str(out),
                      sa_weights=saw, frac_nelec_open=fo, frac_n_open=no,
-                     purified=True)
+                     purified=True, ref=REFS.get(name))
+    import shutil
+    for ext in ("md", "json"):
+        src = out / f"{cfg.label}_ccpvdz_s{cfg.spin}_ladder.{ext}"
+        if src.exists():
+            shutil.move(str(src), str(out.parent / f"ladder.{ext}"))
     rohf_e = None
     for tag, r in res.items():
         ours = r.get("e_ground")
