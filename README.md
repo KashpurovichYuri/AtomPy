@@ -50,25 +50,9 @@ nothing, since [Ĥ, Ŝz] ≡ 0 identically (Motivation). Details: Results
 (Term table, Multiplet energies); regeneration: Results (Files).
 
 **Treatment rungs** — every orbital treatment priced against the ROHF
-anchor (a rung = one treatment row of this comparison), the free variant
-beside the symmetric one, each classified by its diagnostics: ΔE vs the
-ROHF anchor, ⟨L²⟩, commutators. Titanium's headline rows (ROHF reference
-−848.406489 Eh):
-
-| treatment                        | E, Eh       | ΔE (mEh) | ⟨L²⟩    | ‖[H,Lz]‖ | verdict |
-| ---                              | ---         | ---      | ---     | ---      | ---     |
-| CASCI, averaged fold             | −848.3959   | +10.5    | 12.0    | 4.2e-09  | exact   |
-| CASSCF, free                     | −848.4377   | −31.3    | 0.0503  | 4.3e-01  | escape  |
-| CASSCF, frozen window            | −848.3961   | +10.4    | 12.0    | 4.2e-09  | baseline |
-| SA-CASSCF, free                  | −848.4166   | −10.1    | 12.003  | 1.1e+00  | swap    |
-| SA-CASSCF, frozen, purified core | −848.3948   | +11.7    | 12.0    | 1.0e-13  | exact   |
-
-Verdicts: **exact** = commutators and span certificates at the 1e-13
-class; **escape / swap** = window-identity basins (Motivation);
-**baseline** = a named non-closure mechanism at its signature scale.
-Methods compared (Results) is the reading guide; the full per-atom
-tables (span certificates, cross-check column, configurations) live in
-`elements/<Atom>/TABLES.md`.
+anchor, the free variant beside the symmetric one, each classified by
+its diagnostics. Titanium's manifest: Results (Methods compared); the
+full per-atom tables — `elements/<Atom>/TABLES.md`.
 
 ---
 
@@ -97,14 +81,14 @@ Splitting the orbitals into core (i — doubly occupied, frozen), active
 - **f_tu = h_tu + Σ_{i∈core} [2(tu|ii) − (ti|iu)]** — the folded
   one-electron part: the bare h (nucleus + kinetic) plus the averaged
   effect of the core electrons on an active electron (the local Coulomb
-  potential of the core density, plus nonlocal exchange). This is the
-  mean-field approximation: core–active interaction kept static,
-  core–active correlation dropped.
+  potential of the core density, plus nonlocal exchange).
 - **(tu|vw)** — four-center two-electron integrals among active
   orbitals.
 
 CASCI is the exact diagonalization of this effective Hamiltonian; its
-only approximation is the frozen mean field of the inactive space. The
+only approximation is the frozen mean field of the inactive space —
+the mean-field approximation: core–active interaction kept static,
+core–active correlation dropped. The
 partition is **exact iff the window is orthogonal to the core
 orbitals**: a window vector leaning into the core, w = w⊥ + w∥ with
 w∥ ∈ span(core), admits configurations with extra density in *occupied*
@@ -203,17 +187,8 @@ verification program, Results). The ratio splitting/ε is the effective
 coupling — an atomic property. Commutators and splittings are the
 detectors; a numerically pretty ⟨L̂²⟩ is not.
 
-Throughout, a treatment is examined through three questions:
-
-1. does every diagonalized root carry a sharp term label (⟨L̂²⟩ =
-   L(L+1), ⟨Ŝ²⟩ = S(S+1))?
-2. how large are the commutators ‖[Ĥ, L̂z]‖, ‖[Ĥ, L̂²]‖, evaluated as
-   exact matrices over the determinant basis?
-3. does the term table (state counts per term) equal the combinatorial
-   free-ion table?
-
-And for every remedy we report how it achieves this, and the energetic
-cost relative to the broken-symmetry solutions.
+Every remedy reports how it achieves this, and the energetic cost
+relative to the broken-symmetry solutions.
 
 ### Notation and operators
 
@@ -266,8 +241,9 @@ the Multiplet demonstration, Results).
 **ε — the core anisotropy** — is the relative weight of the non-scalar
 part of the frozen core density, ‖ρ_c − ρ̄_c‖_F / ‖ρ̄_c‖_F (ρ̄_c = the
 spherical average; measured directly from the SCF density by
-`core_anisotropy()`, no CI involved). The meters, and what each is
-blind to:
+`core_anisotropy()`, no CI involved). The standing examination: sharp
+term labels per root, the commutator norms, the combinatorial term
+table. The meters, and what each is blind to:
 
 | Diagnostic | What it measures | Sensitive to | Blind to |
 |---|---|---|---|
@@ -337,11 +313,11 @@ kept honest by character-forced occupations (orbital type measured by
 S-projector weight, not energy order), an energy gate over cycled
 starting guesses, and cached trusted references — E_ref and the AO
 spans are the atom's data. It is also the source of ε; the fold
-variants are raw, averaged, fractional.
+variants are the three core treatments above.
 
 **CASCI — at fixed core and window.** Diagonalizes one sector; the
-window is the raw shell AOs (rotation-closed by construction). The core
-enters through the fold (raw, averaged, fractional).
+window is the raw shell AOs (rotation-closed by construction); the core
+enters through the fold (the three treatments above).
 
 **CASSCF — letting the orbitals move.** Minimizes one root over orbital
 rotations — the relaxation CASCI cannot express. Run as a grid of
@@ -415,11 +391,8 @@ variants:
 
 **Scans — the frozen landscape.** A diagnostic tool, not a deliverable:
 freeze everything, deform one window coordinate, re-diagonalize the
-CASCI — deterministic, no optimizer. This shows *where the optimizer's
-gain lives*: on the m-symmetric radial channel (symmetry-preserving) or
-on member tilts (symmetry-breaking), and whether tilts are flat
-(breaking is free) or descend (breaking is driven). Per-atom curves:
-`elements/<Atom>/scan.md`.
+CASCI — deterministic, no optimizer; the anatomy of the optimizer's
+gain (Motivation, above). Per-atom curves: `elements/<Atom>/scan.md`.
 
 **Running.** Every stage checkpointed (chkfiles cached and trusted);
 tests in two tiers (`-m fast`, sub-second; the full suite ~13 min); a
@@ -532,12 +505,13 @@ column from the sector Lz spectra. The ordering matches the free-ion
 Every row: E — the run's variational total; ΔE vs the ROHF anchor;
 **fold shift** = |E(analysis fold) − E(as run)|, max over roots (the
 mEh-class averaging effect; the fold convention is machine-exact,
-1e-15 vs PySCF's get_h1eff). Verdicts (the classes above): **exact** —
-commutators and span certificates at the 1e-13 class; **baseline** — a
-named non-closure mechanism at its signature scale (the raw fold's
-percent-class commutators at unchanged energy make it the
-polarized-core detector); **escape / swap** — the window-identity
-basins, compared in totals only. The certified rungs sit mEh-tight around frozen CASCI (+10.5):
+1e-15 vs PySCF's get_h1eff). Verdicts (the classes of the
+failure inventory, Motivation): **exact** — commutators and span
+certificates at the 1e-13 class; **baseline** — a named non-closure
+mechanism at its signature scale (the raw fold's percent-class
+commutators at unchanged energy make it the polarized-core detector);
+**escape / swap** — the window-identity basins, compared in totals
+only. The certified rungs sit mEh-tight around frozen CASCI (+10.5):
 orbital optimization buys ≈ nothing on the as-run window. Every other
 row of the manifest is a *classified* window-identity change — escape,
 swap, gauge — flagged by the fold shift (Partition bookkeeping).
@@ -564,18 +538,9 @@ certificate ‖[P,Lz]‖ / ‖[P,L⊥]‖: the AO and NO windows close at
 4–100 orbitals — the SCF's open orbitals are m-delocalized), so the
 certificate disqualifies them without running any CI.
 
-| window | CAS | dets | AO, Eh | ⟨L²⟩ | ROHF MO, Eh | ⟨L²⟩ | NO |
-|---|---|---|---|---|---|---|---|
-| 3d | (4,5) | 50 | −848.054 | 6.000 | — | — | — |
-| 3d4s | (4,6) | 120 | −848.395 | 12.000 | −848.405 | 0.000 | −848.399 |
-| 3d4d | (4,10) | 1,200 | −848.232 | 6.000 | — | — | — |
-| 3d4s4p | (4,9) | 756 | −848.429 | 12.000 | — | — | −848.432 |
-| 3d4s4d | (4,11) | 1,815 | −848.409 | 12.000 | −848.414 | 0.010 | — |
-| 3d4s4p4d | (4,14) | 5,096 | **−848.438** | 12.000 | −848.420 | 0.201 | **−848.438** |
-| 3d4s4p4d5d | (4,19) | 18,411 | −848.439 | 12.000 | — | — | — |
-| 3d4s4p4d4f | (4,21) | 27,930 | **−848.446** | 12.000 | — | — | — |
-
-What it says, in one pass: the AO lattice descends monotonically below
+The per-series tables (d² and 3d²4s², construction columns, pending
+slots): `elements/Ti/TABLES.md` (Window lattice). What it says, in one
+pass: the AO lattice descends monotonically below
 ROHF at exact ⟨L²⟩ (the d-atom window already correlates); the MO
 column wins only the smallest pair — its window contains the reference
 determinant (representability) — then saturates with ⟨L²⟩ never
