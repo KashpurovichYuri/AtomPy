@@ -350,6 +350,13 @@ landscape has several. Start and converged windows are compared by the
 **span overlap** (smallest principal cosine between the two spans —
 did the window become a different space?).
 
+**Precaution (both objectives).** The free mask can rotate a core
+orbital into the window — the partition then changes, totals stop
+being comparable, and our fold's re-evaluation of such an endpoint is
+not an energy of the original problem (the bookkeeping double-counts
+the moved core orbital). The run's own total is quoted and the row is
+compared with care — flagged by the fold shift.
+
 Naming bridge for the tables: the frozen-window mask is what the tables
 call **core-relax** — the window span is untouched (closure preserved
 whatever the core), only core↔virtual rotations re-optimize the core's
