@@ -26,11 +26,11 @@ CASCI, CAS(2,5), averaged
 
 ## Window lattice
 CASCI, different CAS, averaged; ROHF reference −848.406 Eh; the d-atom window already correlates.
-Constructions (the start axis): shell = raw AOs; PySCF MO = PySCF's
-canonical pick; NO = natural orbitals; custom = our constructed window
+Constructions (the start axis): AOs = raw shell AOs; PySCF MO =
+PySCF's canonical pick; NO = natural orbitals; custom = our constructed window
 (core-orthogonalized / radial products). — = not yet run.
 
-| window | CAS | dets | shell, Eh | ⟨L²⟩ | PySCF MO, Eh | ⟨L²⟩ | NO, Eh | ⟨L²⟩ | custom, Eh | ⟨L²⟩ |
+| window | CAS | dets | AOs, Eh | ⟨L²⟩ | PySCF MO, Eh | ⟨L²⟩ | NO, Eh | ⟨L²⟩ | custom, Eh | ⟨L²⟩ |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 3d | (2,5) | 50 | −848.3959 | 12.000 | — | — | — | — | — | — |
 | 3d4s | (4,6) | 120 | −848.3950 | 12.000 | −848.4050 | 0.000 | −848.3990 | 12.000 | — | — |
@@ -43,76 +43,66 @@ canonical pick; NO = natural orbitals; custom = our constructed window
 
 ## Methods compared at CAS(4,6)
 
-The full factor space: objective × start × mask × substrate. Pending
-rows = planned runs (filled after enable).
+| method | start | mask | substrate | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | fold shift | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ROHF (anchor) | — | — | — | −848.4065 | 0 | −23086.3167 | +0.0000 | — | — | — | — | 0 | — |
+| CASCI | AOs {3d,4s} | — | raw fold | −848.3959 | +10.5 | −23086.0285 | +0.2857 | 12.0000 | 4.000000 | 4.9e-02 | 2.6e-01 | ~0 | baseline (detector) |
+|  |  | — | averaged fold | −848.3959 | +10.5 | −23086.0285 | +0.2857 | 12.0000 | 4.880401* | 4.2e-09 | 2.3e-08 | 2.8 | exact |
+|  |  | — | averaged fold, pur | −848.3946 | +11.9 | −23085.9931 | +0.3238 | 12.0000 | 2.588300* | 8.9e-14 | 5.8e-13 | 0.0 | exact (pur) |
+|  |  | — | fractional fold | −848.3585 | +48.0 | −23085.0108 | +1.3061 | 12.0000 | 5.549245* | 1.1e-09 | 7.6e-09 | ~0 | different functional |
+| CASSCF | AOs {3d,4s} | free | polarized | −848.4377 | −31.3 | −23087.1660 | −0.8517 | 0.0503 | 0.016776 | 4.3e-01 | 1.1e+00 | 2.8 | escape |
+|  | PySCF MOs | free | polarized | −848.4377 | −31.3 | −23087.1660 | −0.8517 | 0.0503 | 0.016770 | 4.3e-01 | 1.1e+00 | 2.8 | escape (same minimum) |
+|  | NOs | free | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | virtual-mix | free | polarized | −848.4377 | −31.2 | −23087.1660 | −0.8490 | 0.0496 | 0.016549 | 4.3e-01 | 1.1e+00 | 2.8 | escape (diagnostic) |
+|  | AOs {3d,4s} | free | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | PySCF MOs | free | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | free | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | radial restriction | polarized | −848.4112 | −4.7 | −23086.4449 | −0.1279 | 6.9323 | 2.310214 | 3.2e+00 | 1.2e+01 | 2.7 | gauge |
+|  | PySCF MOs | radial restriction | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | radial restriction | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | radial restriction | purified | −848.4100 | −3.5 | −23086.4122 | −0.0952 | 6.9638 | 2.321395 | 3.2e+00 | 1.2e+01 | 0.0 | gauge |
+|  | PySCF MOs | radial restriction | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | radial restriction | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | frozen window | polarized | −848.3961 | +10.4 | −23086.0340 | +0.2830 | 12.0000 | 4.883845* | 4.2e-09 | 2.3e-08 | 2.7 | baseline |
+|  | PySCF MOs | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | frozen window | purified | −848.3961 | +10.4 | −23086.0340 | +0.2830 | 12.0000 | 8.904918* | 2.8e-14 | 3.7e-13 | 0.0 | exact |
+|  | PySCF MOs | frozen window | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | frozen window | purified | pending |  |  |  |  |  |  |  |  |  |
+| SA-CASSCF | AOs {3d,4s} | free | polarized | −848.4166 | −10.1 | −23086.5918 | −0.2748 | 12.0029 | 1.843788 | 1.1e+00 | 6.0e+00 | partition changed | swap |
+|  | PySCF MOs | free | polarized | −848.4316 | −25.1 | −23087.0000 | −0.6830 | 0.0255 | 0.008503 | 3.0e-01 | 7.4e-01 | 2.8 | escape |
+|  | NOs | free | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | free | purified | −848.4166 | −10.1 | −23086.5918 | −0.2748 | 12.0029 | 3.156660 | 1.0e+00 | 6.0e+00 | partition changed | swap (pur) |
+|  | PySCF MOs | free | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | free | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | radial restriction | polarized | −848.4069 | −0.4 | −23086.3278 | −0.0109 | 12.0000 | 3.999999* | 1.3e-03 | 6.9e-03 | 2.8 | floor |
+|  | PySCF MOs | radial restriction | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | radial restriction | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | radial restriction | purified | −848.4055 | +1.0 | −23086.2898 | +0.0272 | 12.0000 | 3.998082* | 1.3e-04 | 5.4e-04 | 0.0 | floor |
+|  | PySCF MOs | radial restriction | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | radial restriction | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | PySCF MOs | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | frozen window | purified | −848.3948 | +11.7 | −23085.9986 | +0.3184 | 12.0000 | 1.068719* | 1.0e-13 | 4.0e-13 | 0.0 | exact |
+|  | PySCF MOs | frozen window | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs | frozen window | purified | pending |  |  |  |  |  |  |  |  |  |
 
-| method | start | mask | substrate | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[Ĥ,L̂z]‖ | fold shift | verdict |
-|---|---|---|---|---|---|---|---|---|---|
-| ROHF (anchor) | — | — | — | −848.4065 | 0 | — | — | 0 | — |
-| CASCI | shell {3d,4s} | — | raw fold | −848.3959 | +10.5 | 12.0000 | 4.9e-02 | ~0 | baseline (detector) |
-| CASCI | shell {3d,4s} | — | averaged fold | −848.3959 | +10.5 | 12.0000 | 4.2e-09 | 2.8 | exact — the ruler |
-| CASCI | shell {3d,4s} | — | averaged fold, pur | −848.3946 | +11.9 | 12.0000 | 8.9e-14 | 0.0 | exact (purified core) |
-| CASCI | shell {3d,4s} | — | fractional fold | −848.3585 | +48.0 | 12.0000 | 1.1e-09 | ~0 | different functional |
-| CASSCF | shell | free | polarized | −848.4377 | −31.3 | 0.0503 | 4.3e-01 | 2.8 | escape — broken |
-| CASSCF | PySCF MOs | free | polarized | −848.4377 | −31.3 | 0.0503 | 4.3e-01 | 2.8 | escape — broken (same basin) |
-| CASSCF | virtual-mix | free | polarized | −848.4377 | −31.2 | 0.0496 | 4.3e-01 | 2.8 | escape — broken (diagnostic) |
-| CASSCF | customized MOs | free | polarized | pending | | | | | |
-| CASSCF | NOs | free | polarized | pending | | | | | |
-| CASSCF | shell | free | purified | pending | | | | | |
-| CASSCF | PySCF MOs | free | purified | pending | | | | | |
-| CASSCF | customized MOs | free | purified | pending | | | | | |
-| CASSCF | NOs | free | purified | pending | | | | | |
-| CASSCF | shell | radial restriction | polarized | −848.4112 | −4.7 | 6.9323 | 3.2e+00 | 2.7 | gauge — do not pin |
-| CASSCF | PySCF MOs | radial restriction | polarized | pending | | | | | |
-| CASSCF | customized MOs | radial restriction | polarized | pending | | | | | |
-| CASSCF | NOs | radial restriction | polarized | pending | | | | | |
-| CASSCF | shell | radial restriction | purified | −848.4100 | −3.5 | 6.9638 | 3.2e+00 | 0.0 | gauge — do not pin |
-| CASSCF | PySCF MOs | radial restriction | purified | pending | | | | | |
-| CASSCF | customized MOs | radial restriction | purified | pending | | | | | |
-| CASSCF | NOs | radial restriction | purified | pending | | | | | |
-| CASSCF | shell | frozen window | polarized | −848.3961 | +10.4 | 12.0000 | 4.2e-09 | 2.7 | baseline |
-| CASSCF | PySCF MOs | frozen window | polarized | pending | | | | | |
-| CASSCF | customized MOs | frozen window | polarized | pending | | | | | |
-| CASSCF | NOs | frozen window | polarized | pending | | | | | |
-| CASSCF | shell | frozen window | purified | −848.3961 | +10.4 | 12.0000 | 2.8e-14 | 0.0 | machine-exact |
-| CASSCF | PySCF MOs | frozen window | purified | pending | | | | | |
-| CASSCF | customized MOs | frozen window | purified | pending | | | | | |
-| CASSCF | NOs | frozen window | purified | pending | | | | | |
-| SA-CASSCF | shell | free | polarized | −848.4166 | −10.1 | 12.0029 | 1.1e+00 | partition changed | swap — broken |
-| SA-CASSCF | PySCF MOs | free | polarized | −848.4316 | −25.1 | 0.0255 | 3.0e-01 | 2.8 | escape — broken |
-| SA-CASSCF | customized MOs | free | polarized | pending | | | | | |
-| SA-CASSCF | NOs | free | polarized | pending | | | | | |
-| SA-CASSCF | shell | free | purified | −848.4166 | −10.1 | 12.0029 | 1.0e+00 | partition changed | swap survives purification |
-| SA-CASSCF | PySCF MOs | free | purified | pending | | | | | |
-| SA-CASSCF | customized MOs | free | purified | pending | | | | | |
-| SA-CASSCF | NOs | free | purified | pending | | | | | |
-| SA-CASSCF | shell | radial restriction | polarized | −848.4069 | −0.4 | 12.0000 | 1.3e-03 | 2.8 | flat-gauge floor |
-| SA-CASSCF | PySCF MOs | radial restriction | polarized | pending | | | | | |
-| SA-CASSCF | customized MOs | radial restriction | polarized | pending | | | | | |
-| SA-CASSCF | NOs | radial restriction | polarized | pending | | | | | |
-| SA-CASSCF | shell | radial restriction | purified | −848.4055 | +1.0 | 12.0000 | 1.3e-04 | 0.0 | flat-gauge floor |
-| SA-CASSCF | PySCF MOs | radial restriction | purified | pending | | | | | |
-| SA-CASSCF | customized MOs | radial restriction | purified | pending | | | | | |
-| SA-CASSCF | NOs | radial restriction | purified | pending | | | | | |
-| SA-CASSCF | shell | frozen window | polarized | pending | | | | | |
-| SA-CASSCF | PySCF MOs | frozen window | polarized | pending | | | | | |
-| SA-CASSCF | customized MOs | frozen window | polarized | pending | | | | | |
-| SA-CASSCF | NOs | frozen window | polarized | pending | | | | | |
-| SA-CASSCF | shell | frozen window | purified | −848.3948 | +11.7 | 12.0000 | 1.0e-13 | 0.0 | exact — certified |
-| SA-CASSCF | PySCF MOs | frozen window | purified | pending | | | | | |
-| SA-CASSCF | customized MOs | frozen window | purified | pending | | | | | |
-| SA-CASSCF | NOs | frozen window | purified | pending | | | | | |
-
-E = the as-run variational total; ΔE against the ROHF anchor. Fold
+The full factor space: objective × start × mask × substrate. A blank
+factor cell inherits from the row above. E = the as-run variational
+total; ΔE against the ROHF anchor. ⟨L̂z²⟩ = ground-root expectation in
+the rung's own fold; \* = degenerate-cluster gauge (not pinnable in an
+exact fold; the broken rows are definite and diagnostic — the raw-fold
+detector reads 4.000, an |M_L| = 2 root: the Λ branching). Fold
 shift = |E(own fold) − E(averaged fold)|, max over roots; the two swap
-rows read −849.27 in our fold — the partition changed (a core orbital
-rotated into the window), so totals only. Starts: shell = raw {3d,4s}
-AOs; PySCF MOs = PySCF's own pick; customized MOs = our constructed
-(core-orthogonalized, orthonormalized) window; NOs = occupation groups
-of the term-averaged CI; virtual-mix = the deliberately m-broken
-registry diagnostic. The single-root radial rows are chaotic gauges
-(fact-class: never pin them). Source: `ladder.json` (regenerated gated
-run, in-place).
+rows read −849.27 in our fold — the partition changed, so totals only.
+Starts: AOs {3d,4s} = raw shell AOs in the optimizer-runnable
+orthogonalized form; PySCF MOs = PySCF's own pick; NOs = occupation
+groups of the term-averaged CI; virtual-mix = the deliberately m-broken
+registry diagnostic. Pending rows = planned runs, filled after enable.
+Source: `ladder.json` (regenerated gated run, in-place) + the ⟨L̂z²⟩
+re-analysis (`scripts/lz2_analysis.py`).
+
 
 ### Methods compared at CAS(4,10) / {3d,4d} — planned
 
@@ -121,26 +111,26 @@ constrained partition, annotated here before the runs. Rows are filled
 by study cells (window × casci / relax / sa-casscf), the pattern of the
 Studies insert below.
 
-| treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | verdict |
-|---|---|---|---|---|---|
-| ROHF (anchor) | −848.4065 | 0 | — | — | — |
-| CASCI, averaged | pending | | | | |
-| CASSCF, free | pending | | | | |
-| CASSCF, core-relax | pending | | | | |
-| SA-CASSCF, frozen | pending | | | | |
+| treatment | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ‖[H,Lz]‖ | verdict |
+|---|---|---|---|---|---|---|---|
+| ROHF (anchor) | −848.4065 | 0 | −23086.3167 | +0.0000 | — | — | — |
+| CASCI, averaged | pending | | | | | | |
+| CASSCF, free | pending | | | | | | |
+| CASSCF, core-relax | pending | | | | | | |
+| SA-CASSCF, frozen | pending | | | | | | |
 
 ### Methods compared at CAS(4,14) / {3d,4s,4p,4d} — planned
 
 The physically complete valence window; frozen-CASCI reference values
 already in the window lattice above. Same study-cell filling.
 
-| treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | verdict |
-|---|---|---|---|---|---|
-| ROHF (anchor) | −848.4065 | 0 | — | — | — |
-| CASCI, averaged | −848.4380 | −31.5 | 12.0000 | pending | pending |
-| CASSCF, free | pending | | | | |
-| CASSCF, core-relax | pending | | | | |
-| SA-CASSCF, frozen | pending | | | | |
+| treatment | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ‖[H,Lz]‖ | verdict |
+|---|---|---|---|---|---|---|---|
+| ROHF (anchor) | −848.4065 | 0 | −23086.3167 | +0.0000 | — | — | — |
+| CASCI, averaged | −848.4380 | −31.5 | −23086.6477 | −0.8572 | 12.0000 | pending | pending |
+| CASSCF, free | pending | | | | | | |
+| CASSCF, core-relax | pending | | | | | | |
+| SA-CASSCF, frozen | pending | | | | | | |
 
 ## Frozen-scan verdicts (Motivation; curves in NOTES.md)
 
