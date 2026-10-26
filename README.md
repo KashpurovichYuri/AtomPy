@@ -257,8 +257,11 @@ it only labels the sector (its matrix is exactly M_S·**1**).
 reported beside ⟨L̂²⟩. In an isotropic fold the term roots are
 M_L-degenerate, so the value is a degenerate-cluster gauge (starred
 in the tables — anything in [0, L(L+1)] is admissible). On a broken
-fold the root is M_L-definite and the value is diagnostic: the raw
-fold's ground root reads exactly M_L² — the Λ branching made visible.
+fold M_L is not conserved (the real-AO SCF field breaks axial symmetry
+to D₂); the value measures the root's M_L² *content*, and the term's
+trace Σ⟨L̂z²⟩ = L(L+1) is conserved across the split — the raw-fold
+ground root reads 4.0000: dominant |M_L| = 2 content (Ti CAS(4,6),
+the Multiplet demonstration, Results).
 
 **ε — the core anisotropy** — is the relative weight of the non-scalar
 part of the frozen core density, ‖ρ_c − ρ̄_c‖_F / ‖ρ̄_c‖_F (ρ̄_c = the

@@ -25,6 +25,48 @@ CASCI, CAS(2,5), averaged
 | ¹G | 9 | −1.3982 | +0.0704 | −4…4 |
 | ¹S | 1 | −1.2951 | +0.1736 | 0 |
 
+### One run, three fields — CAS(4,6) Ms=1 per root (the split demonstration)
+
+The same CAS(4,6) Ms=1 CI read through three core fields, M_L resolved
+in the complex (|l,m⟩) basis (`scripts/multiplet_split.py`; transform
+validated by the ladder test — C CAS(2,3): 0,1,1; Ti CAS(2,5):
+0,0,1,1,1,1,4,4,9,9 — exact).
+
+**Isotropic fields** (averaged ρ̄_c and fractional AOC): M_L is a good
+quantum number; term degeneracies exact.
+
+| M_L | ⟨L̂z²⟩ | ³F/⁵F | E averaged, Eh | E fractional, Eh |
+|---|---|---|---|---|
+| −3 | 9 | ³F | −3.343644 | −3.462172 |
+| −2 | 4 | ³F | −3.343644 | −3.462172 |
+| −1 | 1 | ³F | −3.343644 | −3.462172 |
+| 0 | 0 | ³F | −3.343644 | −3.462172 |
+| +1 | 1 | ³F | −3.343644 | −3.462172 |
+| +2 | 4 | ³F | −3.343644 | −3.462172 |
+| +3 | 9 | ³F | −3.343644 | −3.462172 |
+| −3 | 9 | ⁵F | −3.296365 | −3.457635 |
+| −2 | 4 | ⁵F | −3.296365 | −3.457635 |
+
+Both isotropic fields give the exact M_L ladder; the term *gaps* are
+field-dependent (the ³F–⁵F gap: 47.3 mEh averaged vs 4.5 mEh
+fractional) — degeneracies validate, gaps belong to the field.
+
+**Raw (polarized) field**: M_L is not conserved (the real-AO SCF field
+breaks axial symmetry to D₂ — this is what the old 1/3/3/2 root-group
+pattern actually was); the septet splits and ⟨L̂z²⟩ measures each
+root's M_L² content. The septet trace Σ⟨L̂z²⟩ = 28 is conserved — the
+split redistributes it.
+
+| raw root | E, Eh | ⟨L̂z²⟩ |
+|---|---|---|
+| 1 | −3.346418 | 4.0000 |
+| 2 | −3.344106 | 3.9036 |
+| 3 | −3.344106 | 4.1928 |
+| 4 | −3.344106 | 3.9036 |
+| 5 | −3.342274 | 5.9020 |
+| 6 | −3.342274 | 0.1927 |
+| 7 | −3.342274 | 5.9020 |
+
 ## Window lattice
 CASCI, different CAS, averaged; ROHF reference −848.406 Eh.
 
