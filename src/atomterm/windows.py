@@ -252,7 +252,7 @@ def span_overlap(c_a: np.ndarray, c_b: np.ndarray, s: np.ndarray) -> float:
     """Smallest principal cosine between two spans in the S metric
     (1.0 = identical spans, 0.0 = orthogonal direction present).
 
-    The identity-change gauge of the ladder decomposition: sv_min of
+    The identity-change gauge of the rungs decomposition: sv_min of
     ``C_a^dag S C_b`` is 1 exactly when the converged window kept the
     shell span, and drops first when the window identity changes.
     """

@@ -3,7 +3,7 @@
 The question (ticket 23): can orbital RELAXATION recover what window
 GROWTH delivers -- and does the NO start (exactly closed, term-averaged,
 compressed) tame the free-CASSCF escape basins? The window axis is the
-measurement: every rung runs on the NO-group ladder nk = 1..4 and is
+measurement: every rung runs on the NO-group rungs nk = 1..4 and is
 read against the frozen NO-CASCI curve (elements/U/cache/u_run_no.log):
 
     nk=1   5 cols      5 dets   -49.660672   <L2>=6    (d4, 5D block)
@@ -200,7 +200,7 @@ def stage_casscf():
     mol, mf, closed, c_pur, e_core = setup()
     c_no, occ, groups, _ = build_nos(mol, mf, c_pur, e_core)
     rows = []
-    # (1) the NO ladder, cheap first: nk = 1, 2, 3
+    # (1) the NO rungs, cheap first: nk = 1, 2, 3
     for nk in (1, 2, 3):
         ncas = sum(len(groups[i]) for i in range(nk))
         mo, _ = no_start(mf, c_pur, c_no, groups, nk)

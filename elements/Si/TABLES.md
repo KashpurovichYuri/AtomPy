@@ -2,8 +2,9 @@
 
 cc-pVDZ. Reference **ROHF −288.846437 Eh**. Sectors Ms = 1 / Ms = 0 —
 as carbon, with its own numbers. Provenance: `sa_decomposition.md`; the Methods-compared regeneration
-(`scripts/regen_ladders.py Si`) is pending its first run. NOTES.md: the
-ticket-09 record, gauge draws, the fact-17 baseline.
+(`scripts/regen_rungs.py Si`) is pending its first run. Records:
+ticket-09 — AGENTS fact 13; gauge draws — fact 16a; fact-17 baseline —
+fact 17.
 
 ## Term table — the combinatorial contract
 
@@ -31,7 +32,7 @@ close everything to 0)
 | SA-CASSCF, free | −288.846398 | +0.0 | 2.0000 | 7.4e-10 | 0.0 |
 | SA-CASSCF, core-relax, pur | −288.628792 | +217.6 | 2.0000 | 0.0 | 0.0 |
 
-## Frozen-scan verdicts (Motivation; curves in NOTES.md)
+## Frozen-scan verdicts (Motivation; curves: `scripts/radial_scan.py`)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|

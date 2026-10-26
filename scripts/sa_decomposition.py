@@ -2,7 +2,7 @@
 + purified-core before/after (ticket 16 Phase 2, ticket 13).
 
 Renders, per atom (C / Si / Sc):
-1. the SA-family ladder rows with the four-way deviation attribution:
+1. the SA-family rungs rows with the four-way deviation attribution:
    - many-body commutators (what the term analysis sees),
    - one-particle span defects |[P,Lz]| / |[P,Lp]| (the window itself),
    - the same defects on the rung's INPUT window (the fact-17 baseline),
@@ -36,7 +36,7 @@ from atomterm.drivers import (
     select_valence_ao,
     span_overlap,
 )
-from atomterm.ladder import run_ladder
+from atomterm.treatments import run_rungs
 from atomterm.operators import build_operators, window_closure
 from atomterm.scans import scan_state, scan_window
 from atomterm.stages import stage_facts
@@ -71,7 +71,7 @@ def decompose(sym: str, workdir: Path) -> list[str]:
     spec = SPECS[sym]
     cfg = spec["cfg"]
     out = workdir
-    rungs = run_ladder(cfg, spec["patterns"], spec["nelec_act"],
+    rungs = run_rungs(cfg, spec["patterns"], spec["nelec_act"],
                        workdir=str(out), sa_weights=spec["sa_weights"],
                        frac_nelec_open=spec["frac"][0],
                        frac_n_open=spec["frac"][1], purified=True,

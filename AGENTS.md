@@ -32,16 +32,16 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, Sz, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19); the explicit ladder operators (`spin_ladders`, `l_ladder_operator`, `spin_ladder_matrix`) power the L²/S² twin-construction tests |
-| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_ladder(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README · Methods) |
+| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_rungs(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README · Methods) |
 | `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the one deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters; `mc_opts` = per-run optimizer knobs (budgets); all checkpointed (`.chk`); labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source) |
 | `src/atomterm/windows.py` | `Window(.columns)`, `window_shell/primitive/scf_mo/no`, `SELECTORS`, `select_*`, `primitive_chain`, `shell_weights`, `build_full_mo`, `complete_orthonormal`, `lm_sectors`, `radial_basis`, `radial_mask`, `avas_window`, `span_overlap`, `lowdin(tol=)` | window construction + selection + the kind registry: `Window.columns(mf, ncore, closed=, c_core=)` materializes any kind to the full MO substrate (bounded-slice contract owned here); `lowdin` raises a named error on near-linearly-dependent blocks (the needle class, fact 16e) instead of NaN-ing downstream |
 | `src/atomterm/core.py` | `purified_s_core`, `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
-| `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and ladder share — callers only render (report text / flat json payload) |
+| `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and rungs share — callers only render (report text / flat json payload) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
 | `src/atomterm/cases.py` | `CaseSpec`, `run_case`, `run_atom`, `run_carbon` | the DECLARED per-atom campaign (the intent manifest): `CaseSpec` fixes atom/reference-data/window/sectors/want before anything runs; `run_case(spec)` executes; `run_atom` = the staged implementation; `pipeline.py` remains a compat shim |
-| `src/atomterm/treatments.py` | `Rung`, `run_ladder`, `run_carbon_ladder` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); `purified=True` appends the `*_pur` rungs (same treatments on the exactly-closed purified core substrate, fact 20 — incl. `sa_relax_pur`, the exact-symmetry SA rung); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
-| `src/atomterm/study.py` | `StudySpec`, `plan_study`, `run_study`, `render` | the declared window × treatment study runner (ticket 20): declared product, per-cell budget knobs, per-cell failure quarantine, exact-eigh labels in full-diagnostics mode; writes `results/<tag>_study.json` + the generated insert between the study markers of `elements/<Atom>/TABLES.md`; `ladder.py`/`pipeline.py`/`drivers.py` are compat shims |
+| `src/atomterm/treatments.py` | `Rung`, `run_rungs`, `run_carbon_rungs` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); `purified=True` appends the `*_pur` rungs (same treatments on the exactly-closed purified core substrate, fact 20 — incl. `sa_relax_pur`, the exact-symmetry SA rung); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
+| `src/atomterm/study.py` | `StudySpec`, `plan_study`, `run_study`, `render` | the declared window × treatment study runner (ticket 20): declared product, per-cell budget knobs, per-cell failure quarantine, exact-eigh labels in full-diagnostics mode; writes `<out>/<tag>_study.json` + the generated insert between the study markers of `elements/<Atom>/TABLES.md`; `pipeline.py`/`drivers.py` are compat shims |
 | `src/atomterm/natural.py` | `ci_rdm1`, `natural_orbitals`, `occupation_groups`, `select_no_window` | the NO mathematics (ticket 22): spin-summed 1-RDM from CI roots (secondquant signs), NOs = density eigenvectors in the orthonormal span, occupation-GROUP selection never splits an m-set; symmetry-safe only from a term-AVERAGED root set (a single \|L,M_L⟩ density is m-diagonal but m-unequal — pinned); the Window object + selectors live in `windows.py` |
 | `src/atomterm/drivers.py` | (compat facade) | re-exports the historic surface over reference/windows/core/casscf — existing imports keep working; NEW code imports the owning module |
 
@@ -103,7 +103,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
    Sector chkfile tags label M_S = (na−nb)/2 (`casci_ms1`, `casci_ms0`,
    `casci_ms0p5` for a doublet) — na−nb itself would collide. New atoms =
    a new row in `tests/test_atoms.py` `CASES`, no new code.
-12. **Carbon ladder facts** (ticket 08, `ladder.py`): raw (un-averaged) core
+12. **Carbon rungs facts** (ticket 08, `treatments.py`): raw (un-averaged) core
    field → [H, Lz] ≈ 5.6e-6 and the ³P multiplet split 4.4e-5 Eh in the
    {M_L=0} vs {±1} pattern (quadrupole k=2, m=0; dipole excluded by parity);
    core-density anisotropy norm ≈ 2.4e-3 relative. In a sector that is a
@@ -128,7 +128,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     variational bound, C†SC − I ~ 1). With the block-safe construction Si
     behaves exactly like carbon: CASSCF ³P with −0.127 Eh correlation, SA
     restores ⟨L²⟩ = 2.000000. Lesson: check C†SC − I of anything fed to an
-    optimizer — every ladder rung carries `ortho_err`.
+    optimizer — every rung carries `ortho_err`.
 14. **`build_full_mo` is block-safe** (ticket 09): core block Löwdin'd
     within its own span (span- and density-preserving); active raw AOs
     projected against the core span and renormalized. The correction is
@@ -152,7 +152,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     runs away to {4s, 4p, ~2d} — a converged but p-containing ensemble,
     not 3d1 4s2. The projection weight must be the S-projector
     (Sc)_o† S_oo^{-1} (Sc)_o (a bare quadratic form c_o†S_oo c_o is
-    unbounded for diffuse bases). (d) TM ladder fingerprints: the raw
+    unbounded for diffuse bases). (d) TM rungs fingerprints: the raw
     [Ar] core polarizes at the PERCENT level (anisotropy 1.3e-2 rel,
     [H,Lz] 2.7e-2, 2D quintet split 1.9e-3 in PySCF's raw fold); free
     CASSCF from every start collapses to an 2S-like basin +52 mEh with a
@@ -246,7 +246,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     `span_overlap`): ‖[P,Lz]‖ and ‖[P,L⊥]‖ of the window SPAN projector
     (S-metric) close the fact-18c blind spots — [P,L⊥] sees EVERY
     member asymmetry; both ≈ 0 certifies closure completely. Carried by
-    every ladder row (|[P,Lz]|, |[P,Lp]|) and StageFacts payloads.
+    every rungs row (|[P,Lz]|, |[P,Lp]|) and StageFacts payloads.
     Span overlap is the IDENTITY axis, independent of closure (Sc's
     AVAS window: 0.9855 overlap yet O(0.5) closure defects — overlap
     says nothing about closure). AVAS verdict: right size,
@@ -377,7 +377,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 ## Tests
 
 `pytest` runs 128 tests in ~13 min (chkfile caching; ROHF computed once per
-session; the Ti ladder is the slowest block, ~7 min cold; the Sc ladders
+session; the Ti rungs block is the slowest, ~7 min cold; the Sc rungs
 ~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
 anywhere in the fixture chain, sub-second); `pytest -m slow` = the
 SCF-bearing chemistry. Run the full suite before committing changes to

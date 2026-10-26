@@ -1,9 +1,9 @@
-"""Regenerate the campaign ladders under the unified convention
-(ticket 25/27): run_ladder per atom into elements/<Atom>/ladder
+"""Regenerate the campaign rungs under the unified convention
+(ticket 25/27): run_rungs per atom into elements/<Atom>/rungs
 (the committed artifact; chkfiles land there too and are gitignored),
 then print the cross-check values (max_de_vs_pyscf) for the tables.
 
-Usage: python scripts/regen_ladders.py [Ti C Si Sc]
+Usage: python scripts/regen_rungs.py [Ti C Si Sc]
 Threads: OPENBLAS_NUM_THREADS=64 OMP_NUM_THREADS=64 PYSCF_NUM_THREADS=64.
 """
 
@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, "src")
 from atomterm.reference import ReferenceSpec
 from atomterm.system import AtomConfig
-from atomterm.ladder import run_ladder
+from atomterm.treatments import run_rungs
 
 # the atom's reference data (AGENTS fact 21; identical to tests/conftest.TI_REF)
 REFS = {
@@ -34,14 +34,14 @@ only = sys.argv[1:] or None
 for name, (cfg, patterns, nelec, saw, fo, no) in CASES.items():
     if only and name not in only:
         continue
-    print(f"\n===== ladder {name} =====", flush=True)
+    print(f"\n===== rungs {name} =====", flush=True)
     out = Path("elements") / name / "ladder"
-    res = run_ladder(cfg, patterns, nelec, workdir=str(out),
+    res = run_rungs(cfg, patterns, nelec, workdir=str(out),
                      sa_weights=saw, frac_nelec_open=fo, frac_n_open=no,
                      purified=True, ref=REFS.get(name))
     import shutil
     for ext in ("md", "json"):
-        src = out / f"{cfg.label}_ccpvdz_s{cfg.spin}_ladder.{ext}"
+        src = out / f"{cfg.label}_ccpvdz_s{cfg.spin}_rungs.{ext}"
         if src.exists():
             shutil.move(str(src), str(out.parent / f"ladder.{ext}"))
     rohf_e = None

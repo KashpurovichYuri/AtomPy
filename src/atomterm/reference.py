@@ -63,7 +63,7 @@ def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
 class ReferenceSpec:
     """How the ROHF reference is produced when plain aufbau filling fails
     (fact 21a). One object bundling character-forced occupations and the
-    basin gate, threaded through run_rohf / run_ladder / run_atom.
+    basin gate, threaded through run_rohf / run_rungs / run_atom.
 
     occ_closed, occ_open : AO span patterns (label prefixes as
         :func:`select_shell_ao`, or ``"l0".."l9"`` for a WHOLE angular

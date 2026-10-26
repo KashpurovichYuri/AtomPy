@@ -2,9 +2,9 @@
 
 Stuttgart RLC ECP78 + cut-Dyall valence basis; reference **ROHF
 −50.381852 Eh** (gated Newton; the reference determinant is a
-numerically pure ⁵S° state — NOTES). Sector M_S = 2; pur substrate
+numerically pure ⁵S° state). Sector M_S = 2; pur substrate
 mandatory. Provenance: `logs/u_run*.log` (window lattice), `logs/u_sa*.log`,
-`logs/u_six13.log` (Methods compared). NOTES.md: the ticket-23 narrative.
+`logs/u_six13.log` (Methods compared). Records: ticket 23.
 
 ## Window lattice — direct CASCI at matched cost (frozen CASCI; ROHF reference
 −50.382 Eh; the first five rows are equal-determinant pairs)

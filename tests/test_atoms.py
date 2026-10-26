@@ -56,7 +56,7 @@ CASES = {
     # (2,1) is the ONLY Ms sector (odd active count) and holds the complete
     # free-ion term table of 3d1 4s2 + 3d2 4s1 + 3d3. Single-root CASSCF is
     # off: on a TM it collapses to an 2S-like basin with the window escaped
-    # into p -- the full rung-by-rung story lives in test_ladder.py.
+    # into p -- the full rung-by-rung story lives in test_treatments.py.
     "Sc": dict(
         comm_band=1e-2,
         cfg=AtomConfig("Sc", "ccpvdz", spin=1),

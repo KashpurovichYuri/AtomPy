@@ -1,9 +1,10 @@
 # Ti — titanium
 
 cc-pVDZ. Reference **ROHF −848.406489 Eh** (3d²4s², gated good-basin).
-M_S = 1. Ground term ³F. Provenance: `ladder.json` (Methods compared — regenerated in-place),
-the lattice logs (window lattice), `report.md/json`, `scan.md`. NOTES.md: the gated reference, escape/swap,
-JT, ⟨L²⟩ = 0 MO windows.
+M_S = 1. Ground term ³F. Provenance: `rungs.json` (Methods compared — regenerated in-place),
+the lattice logs (window lattice), `report.md/json`, `scan.md`. Records: the gated reference —
+AGENTS fact 21a; escape/swap/JT — the manifest verdicts + README ·
+Motivation; ⟨L²⟩ = 0 MO windows — open, elements/U/.
 
 ## Term table — the combinatorial contract
 
@@ -94,7 +95,7 @@ shift: ~0 = fold consistency, mEh = the averaging effect,
 totals only there. Starts: AOs = shell AOs in the optimizer-runnable
 orthogonalized form; MOs = the stock low-energy slice (PySCF default;
 other picks admissible); NOs = term-averaged CI occupation groups.
-Pending rows = planned runs. Source: `ladder.json` +
+Pending rows = planned runs. Source: `rungs.json` +
 `scripts/lz2_analysis.py`.
 
 ### CAS(4,10) / {3d,4s,4d} — planned
@@ -117,7 +118,7 @@ Pending rows = planned runs. Source: `ladder.json` +
 | CASSCF, core-relax | pending | | | | | | |
 | SA-CASSCF, frozen | pending | | | | | | |
 
-## Frozen-scan verdicts (Motivation; curves in NOTES.md)
+## Frozen-scan verdicts (Motivation; curves in `scan.md`)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|

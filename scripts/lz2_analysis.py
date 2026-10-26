@@ -60,7 +60,7 @@ def _load_mo(tag):
 only = sys.argv[1:] or ["Ti"]
 for name in only:
     cfg, patterns, nelec, sa_w, frac_nelec, frac_n, ref = CASES[name]
-    out = Path("elements") / name / "ladder"
+    out = Path("elements") / name / "rungs"
     label, spin = cfg.label, cfg.spin
     chk = lambda tag: str(out / f"{label}_{tag}.chk")  # noqa: E731
 
@@ -76,7 +76,7 @@ for name in only:
     registry = _registry(mf, mf_f, ncore, ncas, (na, nb), act_idx,
                          ndet, sa_w, chk, c_pur=c_pur)
 
-    payload = json.load(open(out.parent / "ladder.json"))
+    payload = json.load(open(out.parent / "rungs.json"))
     print(f"\n===== {name}: ground-root <Lz^2> in the rung's own fold =====")
     print(f"{'rung':<20} {'<Lz^2>':>12} {'v|L2|v':>12} "
           f"{'stored L2':>12} {'diff':>9}")

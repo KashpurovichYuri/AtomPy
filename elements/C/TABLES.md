@@ -3,9 +3,9 @@
 cc-pVDZ. Reference **ROHF −37.682418 Eh** (raw core = averaged fold).
 Sectors Ms = 1 and Ms = 0. Provenance: `report.md/json` (term tables),
 `scan.md`, `sa_decomposition.md`, `basin_map.md`; the Methods-compared
-regeneration (`scripts/regen_ladders.py C`) is pending its first run.
-NOTES.md: the confinement finding, the flat-gauge census, the
-free-CASSCF tilt anatomy.
+regeneration (`scripts/regen_rungs.py C`) is pending its first run.
+Records: the confinement finding and tilt anatomy — README ·
+Motivation; the flat-gauge census — AGENTS fact 16a.
 
 ## Term table — the combinatorial contract
 
@@ -28,10 +28,10 @@ the 2p shell is exactly S-orthogonal to the core — no window offset)
 | treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | note |
 |---|---|---|---|---|---|
 | ROHF (anchor) | −37.682418 | 0 | — | — | |
-| CASCI, averaged | −37.431611 | +250.8 | 2.0000 | 1.3e-15 | the confinement cost (NOTES) |
+| CASCI, averaged | −37.431611 | +250.8 | 2.0000 | 1.3e-15 | the confinement cost |
 | CASCI, raw | −37.431611 | +250.8 | 2.0000 | 9.8e-06 | same run; the polarized-core detector |
 | CASCI, fractional | −37.440244 | +242.2 | 2.0000 | 0.0 | a different functional |
-| CASSCF, free | −37.682418 | +0.0 | 1.6864 | 2.3e-02 | member-tilted gauge (NOTES) |
+| CASSCF, free | −37.682418 | +0.0 | 1.6864 | 2.3e-02 | member-tilted gauge |
 | CASSCF, core-relax | −37.440394 | +242.0 | 2.0000 | 7.6e-17 | |
 | SA-CASSCF, free | −37.682391 | +0.0 | 2.0000 | 1.0e-10 | lands symmetric |
 | SA-CASSCF, core-relax, pur | −37.440382 | +242.0 | 2.0000 | 0.0 | the certified rung |
@@ -51,7 +51,7 @@ the meters). This is why the protocol certifies (SA + frozen window +
 purified core) instead of trusting convergence. Runner:
 `scripts/basin_map.py`.
 
-## Frozen-scan verdicts (Motivation; curves in NOTES.md)
+## Frozen-scan verdicts (Motivation; curves in `scan.md`)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|

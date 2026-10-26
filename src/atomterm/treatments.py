@@ -34,7 +34,7 @@ Rungs, in order of increasing orbital freedom:
                    the raw-shell start; constrained to radial rotations
                    (imposed symmetry -- does SA + the constraint drive BOTH
                    commutators to zero?); free from the canonical start.
-10. *_pur rungs (optional, ``run_ladder(..., purified=True)``) -- the same
+10. *_pur rungs (optional, ``run_rungs(..., purified=True)``) -- the same
                    treatments on the PURIFIED core substrate
                    (:func:`purified_core_orbitals`: an exactly L-closed
                    core span): the fact-17 input-window baseline is gone,
@@ -108,12 +108,12 @@ from atomterm.drivers import (
 )
 from atomterm.stages import StageFacts, stage_facts
 
-__all__ = ["Rung", "run_carbon_ladder", "run_ladder"]
+__all__ = ["Rung", "run_carbon_rungs", "run_rungs"]
 
 
 @dataclass(frozen=True)
 class Rung:
-    """One ladder rung: a stage to run plus how to fold-and-report it.
+    """One rung: a stage to run plus how to fold-and-report it.
 
     tag : rung name (report row, chkfile suffix, payload key).
     kind : reporting kind ("casci" / "casscf") -- CASCI rungs also report
@@ -150,7 +150,7 @@ def _rung_payload(rung: Rung, cas, mol, ncore: int, na: int, nb: int) -> dict:
 def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
               act_idx: list[int], ndet: int, sa_weights, chk,
               c_pur: np.ndarray = None) -> list[Rung]:
-    """The ladder as data. ``chk`` maps a rung tag to its chkfile.
+    """The rungs as data. ``chk`` maps a rung tag to its chkfile.
 
     ``c_pur`` (optional): purified core columns
     (:func:`purified_core_orbitals`) -- appends the ``*_pur`` rungs, the
@@ -322,13 +322,13 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
     return rungs
 
 
-def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
-               workdir: str = "results", sa_weights: list[float] | None = None,
+def run_rungs(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
+               workdir: str = "elements", sa_weights: list[float] | None = None,
                frac_nelec_open: int | None = None, frac_n_open: int | None = None,
                rung_tags: list[str] | None = None,
                purified: bool = False,
                ref: ReferenceSpec | None = None) -> dict:
-    """Run ladder rungs for one atom's primary Ms sector, print and persist
+    """Run the rungs for one atom's primary Ms sector, print and persist
     the all-vs-all comparison. Returns ``{rung_tag: payload}``.
 
     rung_tags : optional subset of rung tags to run (e.g. window studies
@@ -383,9 +383,9 @@ def run_ladder(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
     return rungs
 
 
-def run_carbon_ladder(cfg: AtomConfig | None = None, workdir: str = "results") -> dict:
-    """The carbon ladder (ticket 08): 2p^2 through every rung."""
-    return run_ladder(cfg or AtomConfig(), ["2p"], 2, workdir=workdir,
+def run_carbon_rungs(cfg: AtomConfig | None = None, workdir: str = "elements") -> dict:
+    """The carbon rungs (ticket 08): 2p^2 through every rung."""
+    return run_rungs(cfg or AtomConfig(), ["2p"], 2, workdir=workdir,
                       sa_weights=[1 / 3] * 3, frac_nelec_open=2, frac_n_open=3)
 
 
@@ -396,7 +396,7 @@ def _report(rungs: dict, out: Path, label: str, mf) -> None:
     tags = list(rungs)
     ref = rungs.get("casci_avg")
 
-    lines = [f"# Orbital-treatment ladder: {label}", "",
+    lines = [f"# Orbital-treatment rungs: {label}", "",
              f"ROHF reference energy: {mf.e_tot:.8f} Eh", "",
              f"{'rung':<14} {'E_ground':>16} {'dE_vs_avg':>10} {'<L^2>':>9} "
              f"{'|[H,Lz]|':>10} {'|[H,L2]|':>10} {'|[P,Lz]|':>9} {'|[P,Lp]|':>9} "
@@ -430,6 +430,6 @@ def _report(rungs: dict, out: Path, label: str, mf) -> None:
 
     text = "\n".join(lines)
     print(text)
-    (out / f"{label}_ladder.md").write_text(text + "\n", encoding="utf-8")
-    (out / f"{label}_ladder.json").write_text(
+    (out / f"{label}_rungs.md").write_text(text + "\n", encoding="utf-8")
+    (out / f"{label}_rungs.json").write_text(
         json.dumps(rungs, indent=2), encoding="utf-8")

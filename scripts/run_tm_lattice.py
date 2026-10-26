@@ -20,7 +20,7 @@ Two kinds:
 
 Every sector is tiny (<= ~1.2k dets contracted, <= ~1k decontracted):
 exact eigh + PySCF pspace-exact cross-check, seconds-to-minutes each.
-Anchors: the campaign ladder json (casci_avg_pur = the same-substrate
+Anchors: the campaign rungs json (casci_avg_pur = the same-substrate
 CASCI the lattice's {3d,4s}/{3d,4s} point must reproduce; casscf_pyscf =
 the escaped single-root basin; casscf_radial = the radial ceiling).
 
@@ -46,7 +46,7 @@ from atomterm.operators import build_operators, window_closure
 from atomterm.system import AtomConfig
 
 HERE = Path(__file__).resolve().parent
-RES = HERE.parent / "results"
+RES = HERE.parent / "elements"
 EXACT_MAX = 12000
 
 SHELL_TIERS = [
@@ -88,8 +88,8 @@ def smearing(mol, mf, win_rows, c_core):
 
 
 def anchors(atom, spin):
-    """Campaign ladder rung energies (Eh) + names, for the delta print."""
-    p = RES / f"{atom}_ccpvdz_s{spin}_ladder.json"
+    """Campaign rung energies (Eh) + names, for the delta print."""
+    p = RES / atom / "rungs.json"
     if not p.exists():
         return {}
     d = json.load(open(p))
@@ -249,7 +249,7 @@ def main():
             anc = anchors(sym, spin)
 
         if anc:
-            print("anchors (campaign ladder, Eh):",
+            print("anchors (campaign rungs, Eh):",
                   "  ".join(f"{k}:{v:.6f}" for k, v in sorted(anc.items())))
         base = anc.get("casci_avg_pur")
         print(f"{'tier':>7} {'ncas':>4} {'ndet':>6} {'E_ground':>16} "

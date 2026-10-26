@@ -288,8 +288,8 @@ multi-dimensional blocks the tilt splits the degenerate block
 symmetrically about its trace, so the lowest level *descends*
 (Jahn–Teller-like) — the optimizer is driven to break M; and the state
 average is stationary with zero curvature — no restoring force. The
-frozen-scan verdicts (deterministic, no optimizer; curves in
-`elements/*/NOTES.md`): on p² the entire CASSCF gain is one m-symmetric
+frozen-scan verdicts (deterministic, no optimizer; curves per atom in
+`elements/<Atom>/scan.md`): on p² the entire CASSCF gain is one m-symmetric
 radial rotation at exact closure (C −250.8, Si −126.7 mEh) and tilts
 are exactly flat — breaking never buys energy; on d atoms radial
 rises, tilts descend — and the large free-run gains are
@@ -334,8 +334,7 @@ kept honest by character-forced occupations (orbital type measured by
 S-projector weight, not energy order), an energy gate over cycled
 starting guesses, and cached trusted references — E_ref and the AO
 spans are the atom's data. It is also the source of ε; the fold
-variants are raw, averaged, fractional. Records:
-`elements/*/NOTES.md`.
+variants are raw, averaged, fractional.
 
 **CASCI — at fixed core and window.** Diagonalizes one sector; the
 window is the raw shell AOs (rotation-closed by construction). The core
@@ -413,7 +412,7 @@ CASCI — deterministic, no optimizer. This shows *where the optimizer's
 gain lives*: on the m-symmetric radial channel (symmetry-preserving) or
 on member tilts (symmetry-breaking), and whether tilts are flat
 (breaking is free) or descend (breaking is driven). Per-atom curves:
-`elements/*/NOTES.md`.
+`elements/<Atom>/scan.md`.
 
 **Running.** Every stage checkpointed (chkfiles cached and trusted);
 tests in two tiers (`-m fast`, sub-second; the full suite ~13 min); a
@@ -603,14 +602,13 @@ reference determinant that is a numerically pure ⁵S° state
 **The files.** Everything human-readable lives committed in
 `elements/<Atom>/`: `TABLES.md` (term content, spectrum, methods
 compared, window lattice, study inserts), `report.md/json` (the term
-tables), `ladder.json` (the full rung registry — Methods compared),
+tables), `rungs.json` (the full rung registry — Methods compared),
 `scan.md`, `sa_decomposition.md`, `basin_map.md`, `NOTES.md` (dated
 specifics). New atom = new element file, not README growth; the
-regenerators write straight into these files (`scripts/regen_ladders.py
-Ti` -> `elements/Ti/ladder.json`; chkfiles land next to them and are
+regenerators write straight into these files (`scripts/regen_rungs.py Ti` -> `elements/Ti/rungs.json`; chkfiles land next to them and are
 gitignored). Regeneration: term tables — `scripts/run_c.py` and the
 per-atom `run_atom` calls (recorded in each report header); rungs — the
-per-atom `run_ladder` calls; scans — `scripts/radial_scan.py`; the
+per-atom `run_rungs` calls; scans — `scripts/radial_scan.py`; the
 lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
 `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
 suite (128 tests) — term tables, exact-class closure pins, basin

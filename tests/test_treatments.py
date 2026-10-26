@@ -1,6 +1,6 @@
 """Ladder tests: per-rung symmetry fingerprints, parameterized over atoms.
 
-Each case runs the full orbital-treatment ladder (ticket 08 on carbon,
+Each case runs the full orbital-treatment rungs (ticket 08 on carbon,
 ticket 09 on Si) and asserts the MEASURED pattern, with per-atom chaotic
 bands -- never assumed exactness:
 
@@ -31,7 +31,7 @@ import pytest
 from conftest import SC_EXACT_TERMS, TI_EXACT_TERMS, TI_REF
 
 from atomterm.drivers import build_full_mo, run_casci
-from atomterm.treatments import run_ladder
+from atomterm.treatments import run_rungs
 from atomterm.stages import stage_facts
 from atomterm.system import AtomConfig
 
@@ -121,7 +121,7 @@ def ladders(tmp_path_factory):
     out = {}
     for name, case in LADDER_CASES.items():
         workdir = tmp_path_factory.mktemp(f"ladder_{name}")
-        out[name] = run_ladder(
+        out[name] = run_rungs(
             case["cfg"], case["patterns"], case["nelec_act"],
             workdir=str(workdir), sa_weights=[1 / 3] * 3,
             frac_nelec_open=2, frac_n_open=3, purified=True)
@@ -331,7 +331,7 @@ def test_divergence_guard_fires_on_broken_orthonormality(carbon, tmp_path):
 
 @pytest.fixture(scope="session")
 def sc_ladder(tmp_path_factory):
-    return run_ladder(
+    return run_rungs(
         AtomConfig("Sc", "ccpvdz", spin=1), ["3d", "4s"], 3,
         workdir=str(tmp_path_factory.mktemp("ladder_Sc")),
         sa_weights=[1 / 5] * 5, frac_nelec_open=3, frac_n_open=6,
@@ -578,7 +578,7 @@ def test_sc_radial_rung_blocks_the_escape(sc_ladder):
 def sc_big_window_ladder(tmp_path_factory):
     """CAS(3,9) over the complete {3d, 4s, 4p} window (324 dets): is the
     escape just 4p correlation hunger?"""
-    return run_ladder(
+    return run_rungs(
         AtomConfig("Sc", "ccpvdz", spin=1), ["3d", "4s", "4p"], 3,
         workdir=str(tmp_path_factory.mktemp("ladder_Sc_cas311")),
         sa_weights=[1 / 5] * 5, rung_tags=["casci_avg", "casscf_shell"])
@@ -617,7 +617,7 @@ def test_sc_complete_window_still_escapes(sc_ladder, sc_big_window_ladder):
 
 @pytest.fixture(scope="session")
 def ti_ladder(tmp_path_factory):
-    return run_ladder(
+    return run_rungs(
         AtomConfig("Ti", "ccpvdz", spin=2), ["3d", "4s"], 4,
         workdir=str(tmp_path_factory.mktemp("ladder_Ti")),
         sa_weights=[1 / 7] * 7, frac_nelec_open=4, frac_n_open=6,

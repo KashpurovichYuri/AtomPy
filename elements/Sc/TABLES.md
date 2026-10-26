@@ -1,9 +1,10 @@
 # Sc — scandium (d¹)
 
 cc-pVDZ. Reference **ROHF −759.736255 Eh** (3d¹4s²; M_S = ½; S
-half-integer). Provenance: `ladder.json` (Methods compared; regeneration pending),
-the lattice logs (window lattice), `scan.md`, `sa_decomposition.md`. NOTES.md: escape/swap
-basins, bimodal SA, frac septet, AVAS cross-check.
+half-integer). Provenance: `rungs.json` (Methods compared; regeneration pending),
+the lattice logs (window lattice), `scan.md`, `sa_decomposition.md`. Records: escape/swap
+basins, bimodal SA — AGENTS facts 15/20; frac septet — fact 21d; AVAS
+cross-check — fact 19.
 
 ## Term table — the combinatorial contract
 
@@ -49,7 +50,7 @@ rows)
 | CASCI, pur | −759.728891 | +7.4 | 6.0000 | 6.6e-15 | 0.0 | pur substrate |
 | SA-CASSCF, core-relax, pur | −759.728978 | +7.3 | 6.0000 | 3.5e-14 | 0.0 | the certified rung |
 
-## Frozen-scan verdicts (Motivation; curves in NOTES.md)
+## Frozen-scan verdicts (Motivation; curves in `scan.md`)
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|

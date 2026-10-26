@@ -1,4 +1,4 @@
-# Orbital-treatment ladder: Ti_ccpvdz_s2
+# Orbital-treatment rungs: Ti_ccpvdz_s2
 
 ROHF reference energy: -848.40648875 Eh
 

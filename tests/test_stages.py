@@ -1,6 +1,6 @@
 """Tests of atomterm.stages: the one-pass fold-and-analyze facts module.
 
-The physics content is pinned end-to-end by test_ladder/test_atoms; these
+The physics content is pinned end-to-end by test_treatments/test_atoms; these
 tests pin the MODULE's contract: what stage_facts computes, the payload
 shape every persisted rung shares, and the divergence-guard property.
 """
@@ -41,7 +41,7 @@ def test_stage_facts_payload_and_invariants(carbon, tmp_path):
         assert key in payload, key
     assert payload["e_ground"] == facts.e_ground
     assert payload["diverged"] == (facts.ortho_err > ORTHO_TOL)
-    # the payload is json-serializable (the ladder persists it verbatim)
+    # the payload is json-serializable (the rungs persist it verbatim)
     import json
 
     json.dumps(payload)

@@ -2,9 +2,9 @@
 rung/stage reports, independent of presentation.
 
 Single owner of the fold-and-analyze bookkeeping that used to live in both
-``pipeline.stage_analysis`` and ``ladder._rung`` (identical physics, two
+``pipeline.stage_analysis`` and ``treatments._rung_payload`` (identical physics, two
 divergent dressings -- and ``core_anisotropy`` bolted on outside the fold).
-``stage_facts`` computes; callers render (pipeline: report text; ladder: the
+``stage_facts`` computes; callers render (pipeline: report text; rungs: the
 flat json payload). New rung types cannot forget a field anymore.
 
 The fold uses the stage's OWN core columns (``cas.mo_coeff[:, :ncore]``):

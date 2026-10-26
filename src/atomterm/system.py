@@ -71,7 +71,7 @@ def ncore_of(nelectron: int, nelec_act: int) -> int:
 
     Pass ``mol.nelectron`` — never recompute it from nuclear charge: an
     ECP removes core electrons, so Z - charge overcounts (the shared
-    definition keeps pipeline and ladder honest under future ECPs)."""
+    definition keeps pipeline and rungs honest under future ECPs)."""
     return (nelectron - nelec_act) // 2
 
 
