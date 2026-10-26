@@ -1,6 +1,6 @@
 """AtomTerm: atomic term-symbol (L-multiplicity) analysis on top of PySCF.
 
-Pipeline: ROHF -> CASCI -> CASSCF -> SA-CASSCF for an atom, then classification
+Pipeline: ROHF -> CASCI / CASSCF / SA-CASSCF for an atom, then classification
 of the obtained states by exact Lz / L^2 / Sz / S^2 operator matrices built in the
 Slater-determinant basis (first quantization, no second quantization anywhere).
 """
