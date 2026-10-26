@@ -454,3 +454,19 @@ scan verdicts folded in, 2.5 levels/resolutions); §3 methods no-math;
 §8 verification program. External pointers remapped (AGENTS facts,
 RUNGS, elements, docstrings). Waves 2 (TABLES.md semantic renaming)
 and 3 (verifications) wait for the review.]
+
+[2026-10-26: README restructure LANDED (the Acts narrative:
+Motivation/Methods/Results, name-based refs, unnumbered) + Wave 2
+(TABLES.md semantic renames; pointer sweep; basin map Stage A: C free,
+5 starts -> ONE energy, five tilted gauges) + the gated Ti ladder
+regenerated in place (elements/Ti/ladder.json) with the value audit:
+the SA-free row's E was our fold's partition-inconsistent reading
+(-849.27); the honest as-run total is -848.4166 (dE -10.1, xchk 851 =
+the partition break). CASCI-above-ROHF = representability, normal.
+The 2.77 mEh cross-check = the raw fold's Lambda branching (solved).
+Real AOs are ±|m| combinations — M_L bookkeeping needs the
+real->complex transform. HANDOFF: message.txt (task list: multiplet
+M_L labels, README 4-axis Methods, frozen-window naming sweep, series
+layout d2 2,5/8/13 + 3d2s2 4,6/9/14, basin Stages B/C, the 0.9 mEh
+trace, full suite). Next-wave candidates: the linear-molecule
+crystal-field test (the Lambda-branching cross-check).]
