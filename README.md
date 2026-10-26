@@ -357,6 +357,29 @@ not an energy of the original problem (the bookkeeping double-counts
 the moved core orbital). The run's own total is quoted and the row is
 compared with care — flagged by the fold shift.
 
+**Partition bookkeeping.** For a partition (C, W) — core columns C,
+window W — the folded energy is exactly
+
+    E(C, W) = E_core[C] + min_Ψ∈W ⟨Ψ| Ĥ[h₁(ρ_C)] |Ψ⟩,
+
+by the Slater–Condon resolution: integrals with an index in C are
+absorbed into the folded field h₁(ρ_C) = h + J[ρ_C] − K[ρ_C] (our
+fold: `build_operators`), pairs in C into E_core[C] (`_core_energy`),
+and the remainder acts inside W — machine-exact against PySCF's own
+fold `get_h1eff` (`scripts/diag_fold.py`, 1e-15). This is a statement
+about the *partition*, not about any column order: it transfers to our
+analysis (which takes the split `mo[:, :ncore] | mo[:, ncore:]`,
+`stage_facts`) if and only if that split coincides with the run's
+partition. A free-mask optimizer may exchange core and window
+orbitals; the kernel's final canonicalization then orders columns by
+energy, and the split no longer equals the partition — the moved
+orbital φ is folded into ρ_C *and* correlated inside W at once. The
+printed number double-counts φ's mean field and displaces its partner:
+it is not an energy of any partition and reads *below* the kernel's
+own total. The fold shift exists to catch this: ~0 = fold
+consistency; mEh = the averaging effect; large-and-below = partition
+changed — such rows are compared in the kernel's own totals only.
+
 Naming bridge for the tables: the frozen-window mask is what the tables
 call **core-relax** — the window span is untouched (closure preserved
 whatever the core), only core↔virtual rotations re-optimize the core's

@@ -1,4 +1,4 @@
-# Ti — titanium (d²)
+# Ti — titanium
 
 cc-pVDZ. Reference **ROHF −848.406489 Eh** (3d²4s², gated good-basin).
 M_S = 1. Ground term ³F. Provenance: `ladder.json` (Methods compared — regenerated in-place),
@@ -25,10 +25,7 @@ CASCI, CAS(2,5), averaged
 | ¹S | 1 | −1.2951 | +0.1736 | 0 |
 
 ## Window lattice
-CASCI, different CAS, averaged; ROHF reference −848.406 Eh; the d-atom window already correlates.
-Constructions (the start axis): AOs = raw shell AOs; PySCF MO =
-PySCF's canonical pick; NO = natural orbitals; custom = our constructed window
-(core-orthogonalized / radial products). — = not yet run.
+CASCI, different CAS, averaged; ROHF reference −848.406 Eh.
 
 | window | CAS | dets | AOs, Eh | ⟨L²⟩ | PySCF MO, Eh | ⟨L²⟩ | NO, Eh | ⟨L²⟩ | custom, Eh | ⟨L²⟩ |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -41,75 +38,66 @@ PySCF's canonical pick; NO = natural orbitals; custom = our constructed window
 | 3d4s4p4d5d | (4,19) | 18,411 | −848.4390 | 12.000 | — | — | — | — | — | — |
 | 3d4s4p4d4f | (4,21) | 27,930 | **−848.446** | 12.000 | — | — | — | — | — | — |
 
-## Methods compared at CAS(4,6)
+## CAS(4,6) / {3d,4s}
 
 | method | start | mask | substrate | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | fold shift | verdict |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | −848.4065 | 0 | −23086.3167 | +0.0000 | — | — | — | — | 0 | — |
-| CASCI | AOs {3d,4s} | — | raw fold | −848.3959 | +10.5 | −23086.0285 | +0.2857 | 12.0000 | 4.000000 | 4.9e-02 | 2.6e-01 | ~0 | baseline (detector) |
-|  |  | — | averaged fold | −848.3959 | +10.5 | −23086.0285 | +0.2857 | 12.0000 | 4.880401* | 4.2e-09 | 2.3e-08 | 2.8 | exact |
-|  |  | — | averaged fold, pur | −848.3946 | +11.9 | −23085.9931 | +0.3238 | 12.0000 | 2.588300* | 8.9e-14 | 5.8e-13 | 0.0 | exact (pur) |
-|  |  | — | fractional fold | −848.3585 | +48.0 | −23085.0108 | +1.3061 | 12.0000 | 5.549245* | 1.1e-09 | 7.6e-09 | ~0 | different functional |
-| CASSCF | AOs {3d,4s} | free | polarized | −848.4377 | −31.3 | −23087.1660 | −0.8517 | 0.0503 | 0.016776 | 4.3e-01 | 1.1e+00 | 2.8 | escape |
-|  | PySCF MOs | free | polarized | −848.4377 | −31.3 | −23087.1660 | −0.8517 | 0.0503 | 0.016770 | 4.3e-01 | 1.1e+00 | 2.8 | escape (same minimum) |
-|  | NOs | free | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | virtual-mix | free | polarized | −848.4377 | −31.2 | −23087.1660 | −0.8490 | 0.0496 | 0.016549 | 4.3e-01 | 1.1e+00 | 2.8 | escape (diagnostic) |
-|  | AOs {3d,4s} | free | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | PySCF MOs | free | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | free | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | AOs {3d,4s} | radial restriction | polarized | −848.4112 | −4.7 | −23086.4449 | −0.1279 | 6.9323 | 2.310214 | 3.2e+00 | 1.2e+01 | 2.7 | gauge |
-|  | PySCF MOs | radial restriction | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | radial restriction | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | AOs {3d,4s} | radial restriction | purified | −848.4100 | −3.5 | −23086.4122 | −0.0952 | 6.9638 | 2.321395 | 3.2e+00 | 1.2e+01 | 0.0 | gauge |
-|  | PySCF MOs | radial restriction | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | radial restriction | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | AOs {3d,4s} | frozen window | polarized | −848.3961 | +10.4 | −23086.0340 | +0.2830 | 12.0000 | 4.883845* | 4.2e-09 | 2.3e-08 | 2.7 | baseline |
-|  | PySCF MOs | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | AOs {3d,4s} | frozen window | purified | −848.3961 | +10.4 | −23086.0340 | +0.2830 | 12.0000 | 8.904918* | 2.8e-14 | 3.7e-13 | 0.0 | exact |
-|  | PySCF MOs | frozen window | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | frozen window | purified | pending |  |  |  |  |  |  |  |  |  |
-| SA-CASSCF | AOs {3d,4s} | free | polarized | −848.4166 | −10.1 | −23086.5918 | −0.2748 | 12.0029 | 1.843788 | 1.1e+00 | 6.0e+00 | partition changed | swap |
-|  | PySCF MOs | free | polarized | −848.4316 | −25.1 | −23087.0000 | −0.6830 | 0.0255 | 0.008503 | 3.0e-01 | 7.4e-01 | 2.8 | escape |
-|  | NOs | free | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | AOs {3d,4s} | free | purified | −848.4166 | −10.1 | −23086.5918 | −0.2748 | 12.0029 | 3.156660 | 1.0e+00 | 6.0e+00 | partition changed | swap (pur) |
-|  | PySCF MOs | free | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | free | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | AOs {3d,4s} | radial restriction | polarized | −848.4069 | −0.4 | −23086.3278 | −0.0109 | 12.0000 | 3.999999* | 1.3e-03 | 6.9e-03 | 2.8 | floor |
-|  | PySCF MOs | radial restriction | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | radial restriction | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | AOs {3d,4s} | radial restriction | purified | −848.4055 | +1.0 | −23086.2898 | +0.0272 | 12.0000 | 3.998082* | 1.3e-04 | 5.4e-04 | 0.0 | floor |
-|  | PySCF MOs | radial restriction | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | radial restriction | purified | pending |  |  |  |  |  |  |  |  |  |
+| CASCI | AOs {3d,4s} | — | raw fold | −848.3959 | +10.5 | −23086.0285 | +0.2857 | 12.0000 | 4.0000 | 4.9e-02 | 2.6e-01 | ~0 | baseline (detector) |
+|  |  | — | averaged fold | −848.3959 | +10.5 | −23086.0285 | +0.2857 | 12.0000 | 4.8804* | 4.2e-09 | 2.3e-08 | 2.8 | exact |
+|  |  | — | averaged fold, pur | −848.3946 | +11.9 | −23085.9931 | +0.3238 | 12.0000 | 2.5883* | 8.9e-14 | 5.8e-13 | 0.0 | exact (pur) |
+|  |  | — | fractional fold | −848.3585 | +48.0 | −23085.0108 | +1.3061 | 12.0000 | 5.5492* | 1.1e-09 | 7.6e-09 | ~0 | different functional |
+| CASSCF | AOs {3d,4s} | free | polarized | −848.4377 | −31.3 | −23087.1660 | −0.8517 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | 2.8 | escape |
+|  | PySCF MOs |  |  | −848.4377 | −31.3 | −23087.1660 | −0.8517 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | 2.8 | escape (same minimum) |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | virtual-mix |  |  | −848.4377 | −31.2 | −23087.1660 | −0.8490 | 0.0496 | 0.0165 | 4.3e-01 | 1.1e+00 | 2.8 | escape (diagnostic) |
+|  | AOs {3d,4s} |  | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | radial | polarized | −848.4112 | −4.7 | −23086.4449 | −0.1279 | 6.9323 | 2.3102 | 3.2e+00 | 1.2e+01 | 2.7 | gauge |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} |  | purified | −848.4100 | −3.5 | −23086.4122 | −0.0952 | 6.9638 | 2.3214 | 3.2e+00 | 1.2e+01 | 0.0 | gauge |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | frozen window | polarized | −848.3961 | +10.4 | −23086.0340 | +0.2830 | 12.0000 | 4.8838* | 4.2e-09 | 2.3e-08 | 2.7 | baseline |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} |  | purified | −848.3961 | +10.4 | −23086.0340 | +0.2830 | 12.0000 | 8.9049* | 2.8e-14 | 3.7e-13 | 0.0 | exact |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+| SA-CASSCF | AOs {3d,4s} | free | polarized | −848.4166 | −10.1 | −23086.5918 | −0.2748 | 12.0029 | 1.8438 | 1.1e+00 | 6.0e+00 | partition changed | swap |
+|  | PySCF MOs |  |  | −848.4316 | −25.1 | −23087.0000 | −0.6830 | 0.0255 | 0.0085 | 3.0e-01 | 7.4e-01 | 2.8 | escape |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} |  | purified | −848.4166 | −10.1 | −23086.5918 | −0.2748 | 12.0029 | 3.1567 | 1.0e+00 | 6.0e+00 | partition changed | swap (pur) |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} | radial | polarized | −848.4069 | −0.4 | −23086.3278 | −0.0109 | 12.0000 | 4.0000* | 1.3e-03 | 6.9e-03 | 2.8 | floor |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} |  | purified | −848.4055 | +1.0 | −23086.2898 | +0.0272 | 12.0000 | 3.9981* | 1.3e-04 | 5.4e-04 | 0.0 | floor |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
 |  | AOs {3d,4s} | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | PySCF MOs | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | frozen window | polarized | pending |  |  |  |  |  |  |  |  |  |
-|  | AOs {3d,4s} | frozen window | purified | −848.3948 | +11.7 | −23085.9986 | +0.3184 | 12.0000 | 1.068719* | 1.0e-13 | 4.0e-13 | 0.0 | exact |
-|  | PySCF MOs | frozen window | purified | pending |  |  |  |  |  |  |  |  |  |
-|  | NOs | frozen window | purified | pending |  |  |  |  |  |  |  |  |  |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | AOs {3d,4s} |  | purified | −848.3948 | +11.7 | −23085.9986 | +0.3184 | 12.0000 | 1.0687* | 1.0e-13 | 4.0e-13 | 0.0 | exact |
+|  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
+|  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
 
-The full factor space: objective × start × mask × substrate. A blank
+The full factor space: objective × start × mask × substrate; a blank
 factor cell inherits from the row above. E = the as-run variational
 total; ΔE against the ROHF anchor. ⟨L̂z²⟩ = ground-root expectation in
-the rung's own fold; \* = degenerate-cluster gauge (not pinnable in an
-exact fold; the broken rows are definite and diagnostic — the raw-fold
-detector reads 4.000, an |M_L| = 2 root: the Λ branching). Fold
-shift = |E(own fold) − E(averaged fold)|, max over roots; the two swap
-rows read −849.27 in our fold — the partition changed, so totals only.
-Starts: AOs {3d,4s} = raw shell AOs in the optimizer-runnable
-orthogonalized form; PySCF MOs = PySCF's own pick; NOs = occupation
-groups of the term-averaged CI; virtual-mix = the deliberately m-broken
-registry diagnostic. Pending rows = planned runs, filled after enable.
-Source: `ladder.json` (regenerated gated run, in-place) + the ⟨L̂z²⟩
-re-analysis (`scripts/lz2_analysis.py`).
+the rung's own fold, * = degenerate-cluster gauge (exact folds). Fold
+shift: ~0 = fold consistency, mEh = the averaging effect,
+"partition changed" = see Partition bookkeeping (README · Methods) —
+totals only there. Starts: AOs = shell AOs in the optimizer-runnable
+orthogonalized form; MOs = the stock low-energy slice (PySCF default;
+other picks admissible); NOs = term-averaged CI occupation groups.
+Pending rows = planned runs. Source: `ladder.json` +
+`scripts/lz2_analysis.py`.
 
-
-### Methods compared at CAS(4,10) / {3d,4d} — planned
-
-No 4s in the window: the 4s² electrons are forced into 3d/4d — a
-constrained partition, annotated here before the runs. Rows are filled
-by study cells (window × casci / relax / sa-casscf), the pattern of the
-Studies insert below.
+### CAS(4,10) / {3d,4s,4d} — planned
 
 | treatment | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ‖[H,Lz]‖ | verdict |
 |---|---|---|---|---|---|---|---|
@@ -119,10 +107,7 @@ Studies insert below.
 | CASSCF, core-relax | pending | | | | | | |
 | SA-CASSCF, frozen | pending | | | | | | |
 
-### Methods compared at CAS(4,14) / {3d,4s,4p,4d} — planned
-
-The physically complete valence window; frozen-CASCI reference values
-already in the window lattice above. Same study-cell filling.
+### CAS(4,14) / {3d,4s,4p,4d} — planned
 
 | treatment | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ‖[H,Lz]‖ | verdict |
 |---|---|---|---|---|---|---|---|
