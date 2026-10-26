@@ -486,8 +486,8 @@ anatomy.
 
 All raw-shell windows and the averaged fold unless stated; every number
 is this project's measurement. **Every other atom lives in
-`elements/<Atom>/TABLES.md`** (+ `NOTES.md` for the dated specifics;
-C and Si mirror each other throughout, Sc and U carry the
+`elements/<Atom>/TABLES.md`**
+(C and Si mirror each other throughout, Sc and U carry the
 transition-metal and f-scale stories); the artifacts are under
 `elements/Ti/` (regeneration: Files, below). Ti: ROHF reference
 −848.406489 Eh (3d²4s², the gated reference), M_S = 1, ground term ³F.
@@ -603,8 +603,7 @@ reference determinant that is a numerically pure ⁵S° state
 `elements/<Atom>/`: `TABLES.md` (term content, spectrum, methods
 compared, window lattice, study inserts), `report.md/json` (the term
 tables), `rungs.json` (the full rung registry — Methods compared),
-`scan.md`, `sa_decomposition.md`, `basin_map.md`, `NOTES.md` (dated
-specifics). New atom = new element file, not README growth; the
+`scan.md`, `sa_decomposition.md`, `basin_map.md`. New atom = new element file, not README growth; the
 regenerators write straight into these files (`scripts/regen_rungs.py Ti` -> `elements/Ti/rungs.json`; chkfiles land next to them and are
 gitignored). Regeneration: term tables — `scripts/run_c.py` and the
 per-atom `run_atom` calls (recorded in each report header); rungs — the
