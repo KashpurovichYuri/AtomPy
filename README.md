@@ -356,6 +356,18 @@ landscape has several. Start and converged windows are compared by the
 **span overlap** (smallest principal cosine between the two spans —
 did the window become a different space?).
 
+**The start axis and the manifest tables.** The third grid coordinate,
+beside substrate and mask: the **start** — *AOs* (shell AOs in the
+optimizer-runnable orthogonalized form), *MOs* (canonical MOs with a
+stated picking rule; the stock default is PySCF's low-energy slice,
+other picks admissible per slot), *NOs* (occupation groups of the
+term-averaged CI — the default start, rotation-closed by
+construction); *virtual-mix* appears only as a registry diagnostic.
+The **objective** is the fourth axis: the single root (CASSCF) or the
+ground term's M_L average (SA-CASSCF). The manifest tables read
+mechanically: a blank factor cell inherits from the row above, and a
+pending row is a planned run.
+
 **Partition bookkeeping (the free-mask risk, made precise).** For a
 partition (C, W) — core columns C, window W — the folded energy is exactly
 

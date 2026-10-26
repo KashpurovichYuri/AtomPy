@@ -416,13 +416,6 @@ def _report(rungs: dict, out: Path, label: str, mf) -> None:
             f"{r['configurations'][0]}{flag}"
         )
 
-    lines += ["", "pairwise ground-energy differences (E_i - E_j), Eh:",
-              "            " + " ".join(f"{t[:11]:>12}" for t in tags)]
-    for ti in tags:
-        row = [f"{rungs[ti]['e_ground'] - rungs[tj]['e_ground']:>12.3e}"
-               for tj in tags]
-        lines.append(f"{ti:<12}" + " ".join(row))
-
     lines += ["", "configurations per root:"]
     for tag in tags:
         for i, cfg_str in enumerate(rungs[tag]["configurations"]):

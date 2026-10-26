@@ -86,18 +86,9 @@ CASCI, different CAS, averaged; ROHF reference −848.406 Eh.
 |  | PySCF MOs |  |  | pending |  |  |  |  |  |  |  |  |  |
 |  | NOs |  |  | pending |  |  |  |  |  |  |  |  |  |
 
-The full factor space: objective × start × mask × substrate; a blank
-factor cell inherits from the row above. E = the as-run variational
-total; ΔE against the ROHF anchor. ⟨L̂z²⟩ = ground-root expectation in
-the rung's own fold, * = degenerate-cluster gauge (exact folds). Fold
-shift: ~0 = fold consistency, mEh = the averaging effect,
-"partition changed" = see Partition bookkeeping (README · Methods) —
-totals only there. Starts: AOs = shell AOs in the optimizer-runnable
-orthogonalized form; MOs = the stock low-energy slice (PySCF default;
-other picks admissible); NOs = term-averaged CI occupation groups.
-Pending rows = planned runs. Source: `rungs.json` (ground_lz2 embedded
-natively as of the Lz2 operator; values pre-dating the regen from the
-equivalent standalone analysis).
+The full factor space: objective × start × mask × substrate — the
+reading (axes, inheritance, fold shift, ⟨L̂z²⟩ gauge) is README ·
+Methods. Source: `rungs.json`.
 
 ### CAS(4,10) / {3d,4s,4d} — planned
 
