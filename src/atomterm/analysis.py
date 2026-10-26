@@ -75,6 +75,7 @@ class StateSummary:
     s2: float
     s: float  # half-integer allowed (odd-electron states)
     term: str
+    lz: float = 0.0  # <L_z> of the root (the M_L label, per root)
 
 
 @dataclass
@@ -110,6 +111,7 @@ def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, secto
 
     l2_exp = _expectation(evecs, l2)
     s2_exp = _expectation(evecs, s2)
+    lz_exp = _expectation(evecs, lz)
     states = [
         StateSummary(
             index=i,
@@ -119,6 +121,7 @@ def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, secto
             s2=float(s2_exp[i]),
             s=spin_quantum_number(s2_exp[i]),
             term=term_symbol(s2_exp[i], l2_exp[i]),
+            lz=float(lz_exp[i]),
         )
         for i in range(len(evals))
     ]
