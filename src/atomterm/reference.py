@@ -1,7 +1,7 @@
 """The SCF reference engine: ROHF with character-forced occupations and
 the reference-basin gate, plus the fractional-occupation ensemble.
 
-Improper convergence at SCF level has two measured faces (README 2.1):
+Improper convergence at SCF level has two measured faces (README · Methods):
 the wrong configuration (aufbau runaway) and a metastable basin at
 fixed occupations. The toolbox: character-forced filling (projector
 weights, never energy order), the S-projector character metric for
@@ -110,7 +110,7 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
         optional basin gate). Occupations are assigned each cycle by
         S-projector weight on the ``occ_closed``/``occ_open`` AO spans,
         never by energy order -- mandatory on aufbau-runaway atoms
-        (Ti: +123.07 mEh runaway, fact 21a / README §4.5). Even forced,
+        (Ti: +123.07 mEh runaway, fact 21a / README · Motivation). Even forced,
         a degenerate open shell is multi-basin (Ti: +11.2 mEh
         metastable), so with ``occ_e_ref`` set a FRESH run is retried
         over cycled init guesses until |E - occ_e_ref| <= 1e-4, else
@@ -183,7 +183,7 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
     makes the converged Fock exactly spherical -- the scalar-core
     reference that density averaging reproduces, but a DIFFERENT physical
     reference from ROHF (smeared vs localized valence exchange; the
-    measured energy relation: README §2.2, fact 15f).
+    measured energy relation: README · Motivation, fact 15f).
 
     Control mechanism: ``get_occ`` is PySCF's occupation hook, called
     every SCF cycle; the density and Fock are built from whatever it

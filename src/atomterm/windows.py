@@ -225,7 +225,7 @@ def select_primitives(mol, l: int, count: int = None,
 def avas_window(mf, labels: list[str], ncore: int, threshold: float = None):
     """Window chosen by AVAS (pyscf.mcscf.avas, arXiv:1701.07862): an
     independent ecosystem window selector for cross-validating our raw
-    shell AOs (verdicts: fact 19, README §6.3).
+    shell AOs (verdicts: fact 19, README · Results (Methods compared)).
 
     AVAS projects the target AO span (``labels``, e.g. ``["Sc 3d",
     "Sc 4s"]``) out of the converged MOs and keeps eigenvectors of the
@@ -604,7 +604,7 @@ def window_scf_mo(mol, mf, ncore: int, *, open_cols, rank, k: int) -> Window:
     MOs plus the ``k`` top-``rank`` virtuals (the caller owns the
     ranking metric -- atom-specific valence-band rows live in the
     scripts). NEVER rotation-closed: the span certificate measures 7-9
-    at every practical size (README 6.5)."""
+    at every practical size (README · Results (window lattice))."""
     cols = list(open_cols) + list(rank[:k])
     return Window(f"scf_mo +{k}", None, mf.mo_coeff[:, cols], False)
 

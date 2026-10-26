@@ -209,7 +209,7 @@ def run_casscf_virtual_mix(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CA
     borrows radial/polarization character from the virtuals (real
     dynamic correlation; appears as radial correlation in the natural
     orbitals) but the state's identity cannot change. relax < virtmix <
-    free CASSCF brackets the contributions (README §2.3).
+    free CASSCF brackets the contributions (README · Motivation).
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               mask=no_core_window_exchange_mask,

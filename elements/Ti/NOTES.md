@@ -12,7 +12,7 @@
 - **Swap basin.** Free SA: the exact 4s↔3p trade (window p = 1/6),
   totals −10.1 mEh, ⟨L²⟩ 12.003, commutator O(1), term table scrambles
   (³F 38 vs 35, ³G 25 vs 18) — a different partition; totals only.
-- **JT class.** d² member tilts descend (mechanism: README §1.4
+- **JT class.** d² member tilts descend (mechanism: README · Motivation
   deformations block); sa_radial_pur stops above its floor
   (1.4e-4/5.3e-4) — flat gauge, no restoring force.
 - **Raw-core caveat.** Ground ⟨L²⟩ UNSHIFTED at percent-class

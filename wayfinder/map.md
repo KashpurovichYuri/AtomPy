@@ -113,13 +113,13 @@ green, reports written.
   (0/94.7/88.0/85.4/463.4 mEh).
 - [26: elements tables T3a/T3b](tickets/26-elements-tables.md) — mostly
   DONE: T3a/T3b landed for all five atoms with verified values;
-  README §6.3 = summary + pointer. Remainder: the study markers in the
+  README · Results = summary + pointer. Remainder: the study markers in the
   element files (needed by ticket 28's inserts), C/Si T3a rows, the
   per-atom study provenance notes.
 - [27: launch & naming polish](tickets/27-launch-naming.md) —
   conv_accelerator DONE; sa-casscf naming DONE (want keys, treatment
   values, tables); ladder.py → treatments.py + sweep.py → study.py
-  DONE (shims in place, tests renamed); the v4 diagram in README §4
+  DONE (shims in place, tests renamed); the v4 diagram in README · The pipeline
   DONE. Remainder: none blocking — close at the wave review.
 - [28: completion runs](tickets/28-completion-runs.md) — OPEN, the
   runner is ready: U SA-24 / relax-24 / SA-(6,13); Sc/Ti NO-start
@@ -241,10 +241,10 @@ agreement — frozen-7s² CAS(4,12) tier first, sparse O·v mode deferred.
   windows only (≤30 min/sector; heavy runs postponed by user rule);
   the Sc plateau-vs-escape question (fact 16b's +25 mEh must melt in a
   wide-enough m-complete window — full-space intuition); delivers the
-  README §6.x lattice section (table + per-block ΔE matrix with
+  README · Results (window lattice) section (table + per-block ΔE matrix with
   explicit references + the representability comment, brief).
 - [23: U SA wave](tickets/23-u-sa-wave.md) — RESOLVED 2026-10-24
-  (README §6.5 ticket-23 block): SA over the 17×⁵L block from NO-12 =
+  (README §6.4 ticket-23 block): SA over the 17×⁵L block from NO-12 =
   −50.4238 at exactly quantized ⁵L — 42 mEh below the ⁵S° ROHF
   reference, the first U object below the mean field at certified
   symmetry. Mechanism: RADIAL relaxation (l-content preserved, weight
@@ -439,3 +439,18 @@ Recorded, not fixed:
 - **Full suite before commit** — deferred at the user's request
   (busy threads); fast tier green (56). operators/stages/analysis/
   cases all changed, so the run is mandatory at commit time.
+
+[2026-10-25 Wave 1: README restructured on the Acts narrative (plan:
+.opencode/plan/readme-acts-restructure.md; uncommitted, awaiting the
+user's paragraph-by-paragraph review — THE spine of this wave). §1
+language (1.1 symmetries/certified, 1.2 operators+ladders, 1.3 window
+machinery, 1.4 classes+meters); §2 physics NEW (2.1 restriction+fold,
+2.2 stabilizer/Λ-branching with carbon as the marked instance, 2.3
+causal chain + L-dies-twice with the SU(2) label protection +
+cut-feedback-loop + polarization corollary, 2.4 optimizer side +
+scan verdicts folded in, 2.5 levels/resolutions); §3 methods no-math;
+§4 pipeline diagram; §6 Ti-only (scans section deleted — verdicts in
+§2.4; cross-atom tables → element files); §7 module table moved in;
+§8 verification program. External pointers remapped (AGENTS facts,
+RUNGS, elements, docstrings). Waves 2 (TABLES.md semantic renaming)
+and 3 (verifications) wait for the review.]

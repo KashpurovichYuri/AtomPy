@@ -32,7 +32,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, Sz, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19); the explicit ladder operators (`spin_ladders`, `l_ladder_operator`, `spin_ladder_matrix`) power the L²/S² twin-construction tests |
-| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_ladder(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README 2.1) |
+| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_ladder(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README · Methods) |
 | `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the one deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters; `mc_opts` = per-run optimizer knobs (budgets); all checkpointed (`.chk`); labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source) |
 | `src/atomterm/windows.py` | `Window(.columns)`, `window_shell/primitive/scf_mo/no`, `SELECTORS`, `select_*`, `primitive_chain`, `shell_weights`, `build_full_mo`, `complete_orthonormal`, `lm_sectors`, `radial_basis`, `radial_mask`, `avas_window`, `span_overlap`, `lowdin(tol=)` | window construction + selection + the kind registry: `Window.columns(mf, ncore, closed=, c_core=)` materializes any kind to the full MO substrate (bounded-slice contract owned here); `lowdin` raises a named error on near-linearly-dependent blocks (the needle class, fact 16e) instead of NaN-ing downstream |
 | `src/atomterm/core.py` | `purified_s_core`, `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
@@ -240,7 +240,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     cannot see an m=0-member or equal-±pair tilt; multi-term sectors
     catch those via [H,L²], maximal-Ms single-irrep sectors catch
     NOTHING — the projector pair (fact 19) has no blind spots.
-    Numbers/curves: README §6.4; anatomy: §2.6.
+    Numbers/curves: README · Motivation; anatomy: elements.
 19. **The one-particle closure meter is the universal certificate**
     (ticket 16 P2; `operators.window_closure`, `avas_window`,
     `span_overlap`): ‖[P,Lz]‖ and ‖[P,L⊥]‖ of the window SPAN projector
@@ -253,7 +253,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     mean-field-inherited span; raw shells strictly dominate. SA
     deviations decompose 100% window / 0% core-fold (witness: refold
     the converged core with the raw shell window; artifacts
-    results/*_sa_decomposition.md). Verdict tables: README §6.3.
+    results/*_sa_decomposition.md). Verdict tables: README · Results (Methods compared).
 20. **The closed core span** (ticket 13; `purified_core_orbitals`, the
     `*_pur` rungs — fact 17's fix, verified C/Si/Sc/Ti): per l, take the
     member-resolved radial blocks R of the core MOs; E_l = top-k span of
@@ -277,7 +277,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     offset vs raw-fold CASCI rows (Sc +88.7 mEh — the projected window
     is the honest common definition WITHIN the pur family);
     relax-family max|dE| ~1e-3 vs unpolarized CASCI is fold bookkeeping
-    (bound, don't pin). Narrative: README §4.3, §6.3.
+    (bound, don't pin). Narrative: README · Methods, · Results.
 
 21. **Ti: d², the aufbau runaway, and the basin gate** (ticket 12):
     (a) THE REFERENCE IS TWO-LAYERED CHAOS. Default ROHF on Ti/ccpvdz
@@ -315,7 +315,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     machine-exact (6.2e-14). (d) Test-band lessons: leave real headroom
     on degenerate-but-numerical quantities (the frac septet 6.5e-11 vs
     a 1e-10 bound flaked once) and on basin-mixed ⟨L²⟩. Narrative:
-    README §4.5, §6.2–6.3, §6.4.
+    README · Methods, · Results, · Motivation.
 
 
 22. **U campaign: matched cost, the ⁵S° reference, and the window
@@ -359,8 +359,9 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 ## Conventions
 
 - Per-atom tables live in `elements/<Atom>/TABLES.md` (committed,
-  log-provenanced); README §6 carries cross-atom comparisons and one
-  worked example (U). New atom = new element file + a data row, not
+  log-provenanced); README · Results carries the Ti worked example; cross-atom
+  comparisons live in the element files. New atom = new element file + a
+  data row, not
   README growth.
 - Atomic units, ℏ = 1. Spin-orbitals: alpha = `0..norb-1`, beta = `norb..2norb-1`.
 - Determinants: sorted tuples of occupied spin-orbitals.
