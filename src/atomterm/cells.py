@@ -72,7 +72,10 @@ __all__ = [
     "CellKey",
     "CellData",
     "cell_chk",
+    "cell_payload",
     "load_cell",
+    "run_cell",
+    "analyze_cell",
     "pyscf_ci_permutation",
     "ci_in_detbasis_order",
 ]
@@ -300,3 +303,157 @@ def ci_in_detbasis_order(v: np.ndarray, norb: int, na: int, nb: int) -> np.ndarr
     w = np.empty_like(v)
     w[pyscf_ci_permutation(norb, na, nb)] = v
     return w
+
+
+# --------------------------------------------------------------- execution
+
+
+def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
+             fresh: bool = False, verbose: int = 0,
+             workdir: str | Path = "elements") -> "StageFacts":
+    """Execute one cell: resolve every axis through its OWNER, run, persist,
+    analyze. The unit of the run queue.
+
+    mf : the atom's converged reference (REQUIRED -- reference
+        construction, including Ti's character-forced occupations and
+        basin gate, belongs to cases/reference, not to cells).
+    frac_mf : the fractional-occupation reference; required iff
+        ``key.fold == "frac"`` (that fold is a different reference SCF
+        -- the run AND the fold use it).
+    budgets : per-run knobs that are NOT cell identity:
+        ``mc_opts``/``fci_opts`` (optimizer/solver), ``sa_weights``
+        (default: uniform over the MEASURED ground block of the start
+        window -- study.ground_block, the SA-anchoring rule), ``verbose``.
+    fresh : ignore a stored cell and re-run (a cache hit otherwise
+        re-analyzes the stored run -- budgets are then ignored).
+
+    Returns the stage's :class:`~atomterm.stages.StageFacts`; persist
+        with :func:`cell_payload` (which embeds the address).
+    """
+    budgets = dict(budgets or {})
+    if key.fold == "frac":
+        if frac_mf is None:
+            raise ValueError("fold='frac' needs the fractional-occupation "
+                             "reference (frac_mf=...)")
+        mf = frac_mf
+        mol = mol if mol is not None else mf.mol
+    mol = mf.mol if mol is None else mol
+
+    chk = cell_chk(key, workdir)
+    if chk.exists() and not fresh:
+        return analyze_cell(key, mol, mf, workdir=workdir)
+    chk.parent.mkdir(parents=True, exist_ok=True)
+
+    from atomterm.casscf import (constrained_casscf, core_virtual_only_mask,
+                                 no_core_window_exchange_mask, run_casci)
+    from atomterm.core import purified_core_orbitals
+    from atomterm.system import ncore_of
+    from atomterm.windows import (build_full_mo, occupied_core_idx,
+                                  radial_basis, radial_mask, select_valence_ao)
+
+    na, nb = key.sector
+    ncore = ncore_of(mol.nelectron, na + nb)
+    act_idx = select_valence_ao(mol, key.shell_patterns)
+    ncas = len(act_idx)
+    c_pur = (purified_core_orbitals(mol, mf, ncore)[0]
+             if key.substrate == "pur" else None)
+
+    # start x mask -> the substrate MO matrix + the optimizer mask
+    mask = None
+    if key.start == "ao":
+        if key.mask == "radial":
+            mo_full, labels = radial_basis(
+                mf, occupied_core_idx(mf, ncore), act_idx, c_core=c_pur)
+            mask = radial_mask(labels, ncore, ncas)
+        else:
+            mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
+                                    act_idx, c_core=c_pur)
+            if key.mask == "frozen":
+                mask = core_virtual_only_mask
+            elif key.mask == "virtmix":
+                mask = no_core_window_exchange_mask
+    elif key.start == "mo":
+        # PySCF's default start (canonical MOs, canonical window): the
+        # substrate axis is moot -- the start carries its own core
+        mo_full = mf.mo_coeff
+    else:  # pragma: no cover -- guarded by the vocabulary
+        raise NotImplementedError(
+            "start='no' needs the parent-prefix policy (which NO group "
+            "window a nominal label selects); lands with the run queue")
+
+    verbose = budgets.get("verbose", verbose)
+    common = dict(mc_opts=budgets.get("mc_opts"),
+                  fci_opts=budgets.get("fci_opts"), verbose=verbose)
+    if key.method == "casci":
+        from math import comb
+
+        ndet = comb(ncas, na) * comb(ncas, nb)
+        cas = run_casci(mf, ncas, (na, nb), mo_full, str(chk),
+                        nroots=min(9, ndet), name=key.address,
+                        verbose=verbose, fci_opts=common["fci_opts"])
+    else:
+        weights = budgets.get("sa_weights")
+        if key.method == "sa" and weights is None:
+            from atomterm.study import ground_block  # the SA-anchoring rule
+
+            c_act0 = mo_full[:, ncore:ncore + ncas]
+            _, _, weights = ground_block(mol, mf, ncore, c_act0, na, nb,
+                                         c_core=c_pur)
+            weights = list(weights)
+        cas = constrained_casscf(mf, ncas, (na, nb), str(chk),
+                                 mo_full=mo_full, mask=mask, weights=weights,
+                                 name=key.address, **common)
+
+    _persist_cell(chk, key, cas)
+    return _facts(key, mol, mf, cas, ncore, ncas, na, nb)
+
+
+def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
+    """Re-analyze a stored cell (load + one facts pass) -- no mol/mf-bound
+    optimizer re-run, no re-solving. The two-function lean: loading is
+    pure data (:func:`load_cell`), analysis needs the live reference.
+
+    ``converged`` defaults True (a trusted cached stage).
+    """
+    from atomterm.casscf import CASResult
+    from atomterm.system import ncore_of
+    from atomterm.windows import select_valence_ao
+
+    data = load_cell(key, workdir)
+    cas = CASResult(key.method, data.energies, data.ci, data.mo_coeff,
+                    None, data.core_energy)
+    na, nb = key.sector
+    ncore = ncore_of(mol.nelectron, na + nb)
+    ncas = len(select_valence_ao(mol, key.shell_patterns))
+    return _facts(key, mol, mf, cas, ncore, ncas, na, nb)
+
+
+def cell_payload(key: CellKey, facts) -> dict:
+    """The persisted payload of a cell: the stage facts + the address."""
+    out = facts.payload(key.method)
+    out["cell"] = key.address
+    return out
+
+
+def _persist_cell(chk: Path, key: CellKey, cas) -> None:
+    """Complete the cell store: energies/ci were persisted by the run;
+    add the pieces only the cell layer owns."""
+    from pyscf import lib
+
+    lib.chkfile.save(str(chk), f"atomterm/{key.address}/core_energy",
+                     float(cas.core_energy))
+    lib.chkfile.save(str(chk), f"atomterm/{key.address}/mo_coeff",
+                     np.asarray(cas.mo_coeff))
+
+
+def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
+           na: int, nb: int):
+    from atomterm.stages import stage_facts
+
+    c_act = cas.mo_coeff[:, ncore:ncore + ncas]
+    return stage_facts(
+        mol, mf, cas, c_act, ncore, na, nb, tag=key.address,
+        spherical_core=key.fold != "raw",
+        anisotropy_ref=(mf, None)
+        if (key.method == "casci" and key.fold == "raw") else None,
+    )

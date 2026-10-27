@@ -12,6 +12,7 @@ permutation automorphism, so a wrong mapping cannot satisfy it.
 
 import numpy as np
 import pytest
+import re
 
 from atomterm.cells import (
     CellData,
@@ -23,11 +24,17 @@ from atomterm.cells import (
 )
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
 
-pytestmark = pytest.mark.fast
+# mixed tiers in one module (1:1 with src): the key/bridge/store tests
+# are fast; the carbon run pins are slow -- marked per test, so the
+# module-level mark would leak SCF fixtures into `pytest -m fast`
+
+fast = pytest.mark.fast
+slow = pytest.mark.slow
 
 
 # --------------------------------------------------------------- the key
 
+@fast
 def test_address_round_trip():
     keys = [
         CellKey("C", "2p", (1, 1)),
@@ -48,6 +55,7 @@ def test_address_round_trip():
     assert keys[3].address == "ti_3d4s_3-1_sa_mo_radial_pur_avg"
 
 
+@fast
 def test_key_validation_and_canonicalization():
     # the pur-fold degeneracy rule: raw on pur canonicalizes to avg
     k = CellKey("C", "2p", (1, 1), substrate="pur", fold="raw")
@@ -76,6 +84,7 @@ def test_key_validation_and_canonicalization():
 SECTORS = [(3, 1, 1), (4, 2, 1), (5, 3, 1), (6, 3, 2), (6, 4, 2)]
 
 
+@fast
 def test_ci_permutation_is_a_permutation():
     from math import comb
 
@@ -85,6 +94,7 @@ def test_ci_permutation_is_a_permutation():
         assert np.array_equal(np.sort(perm), np.arange(len(perm)))
 
 
+@fast
 def test_orders_coincide_only_in_trivial_sectors():
     """The empirical fact that kept the bug invisible: carbon's norb=3
     window forces pyscf's integer-ascending string order to coincide
@@ -112,6 +122,7 @@ def _random_eri(norb, rng):
     return eri
 
 
+@fast
 @pytest.mark.parametrize("norb,na,nb", SECTORS)
 def test_bridge_certified_by_eigen_equation(norb, na, nb):
     """THE bridge certificate: a PySCF-solved CI vector, mapped into
@@ -142,6 +153,7 @@ def test_bridge_certified_by_eigen_equation(norb, na, nb):
     assert np.linalg.norm(resid) / np.linalg.norm(ham) < 1e-10
 
 
+@fast
 def test_configuration_summary_uses_the_bridge(tmp_path):
     """The consumer fix: a pyscf-ordered unit amplitude must label the
     determinant at ITS string address, not dets[k]."""
@@ -178,6 +190,7 @@ def test_configuration_summary_uses_the_bridge(tmp_path):
 
 # -------------------------------------------------------- the store layer
 
+@fast
 def test_load_cell_synthetic_roundtrip(tmp_path):
     from pyscf import lib
 
@@ -203,6 +216,7 @@ def test_load_cell_synthetic_roundtrip(tmp_path):
     assert np.allclose(data.ci[1], ci[1])
 
 
+@fast
 def test_load_cell_prefers_sa_roots_and_reports_missing(tmp_path):
     from pyscf import lib
 
@@ -221,3 +235,101 @@ def test_load_cell_prefers_sa_roots_and_reports_missing(tmp_path):
 
     with pytest.raises(FileNotFoundError, match="run it first"):
         load_cell(CellKey("Xe", "5p", (2, 0)), tmp_path)
+
+
+# ------------------------------------------------- the run pins (carbon)
+
+def _same_facts(a, b, tol=1e-12):
+    """Two facts objects describe the same run: energies, meters, labels."""
+    assert a.tag == b.tag
+    assert np.allclose(a.energies, b.energies, atol=tol), (a.energies, b.energies)
+    assert np.allclose(a.energies_pyscf, b.energies_pyscf, atol=tol)
+    for f in ("comm_norm_h_lz", "max_de_vs_pyscf",
+              "ortho_err", "n_dev", "win_lz", "win_lperp",
+              "ground_l2", "ground_lz2"):
+        assert abs(getattr(a, f) - getattr(b, f)) <= tol, (f, getattr(a, f),
+                                                           getattr(b, f))
+    assert a.ground_term == b.ground_term
+    assert a.terms == b.terms
+    # configuration labels modulo the |c| amplitudes: inside a degenerate
+    # cluster the Davidson gauge is chaotic even on pinned inputs (the
+    # run_casci straggle note) -- the l-mass content is the invariant
+    strip = lambda cs: [re.sub(r" \(\|c\|=[0-9.]+\)", "", c) for c in cs]
+    assert strip(a.configurations) == strip(b.configurations)
+    assert a.analysis.comm_norm_h_l2 == pytest.approx(
+        b.analysis.comm_norm_h_l2, abs=tol)
+
+
+@slow
+def test_run_cell_matches_direct_path(carbon, tmp_path):
+    """run_cell(casci cell) == the direct run_casci + stage_facts path --
+    the same construction the rungs registry uses, byte-comparable on a
+    pinned reference (fact 10: CASCI on pinned MOs is deterministic)."""
+    from atomterm.casscf import run_casci
+    from atomterm.stages import stage_facts
+    from atomterm.system import ncore_of
+    from atomterm.windows import build_full_mo, occupied_core_idx
+    from atomterm.cells import run_cell, cell_payload
+
+    _, mol, mf, act_idx = carbon
+    na = nb = 1
+    ncore = ncore_of(mol.nelectron, 2)
+    mo = build_full_mo(mf, occupied_core_idx(mf, ncore), act_idx)
+    direct = run_casci(mf, len(act_idx), (na, nb), mo,
+                       str(tmp_path / "direct.chk"), nroots=9, name="casci_avg")
+    key = CellKey("C", "2p", (na, nb))       # casci/ao/-/pol/avg
+    facts_direct = stage_facts(
+        mol, mf, direct, direct.mo_coeff[:, ncore:ncore + len(act_idx)],
+        ncore, na, nb, tag=key.address, spherical_core=True)
+
+    facts = run_cell(key, mf, workdir=tmp_path)
+    assert facts.tag == key.address == "c_2p_1-1_casci_ao_-_pol_avg"
+    _same_facts(facts, facts_direct)
+    payload = cell_payload(key, facts)
+    assert payload["cell"] == key.address
+
+    # the cache hit re-analyzes the stored run -- same facts again
+    _same_facts(run_cell(key, mf, workdir=tmp_path), facts)
+
+
+@slow
+def test_analyze_cell_matches_insession(carbon, tmp_path):
+    """THE store certificate: analyze_cell (load_cell + facts) reproduces
+    the in-session run exactly -- energies, meters, AND the stored-CI
+    configurations (the bridge applied to real stored data)."""
+    from atomterm.cells import analyze_cell, run_cell
+
+    _, mol, mf, _ = carbon
+    key = CellKey("C", "2p", (1, 1), fold="raw")   # the detector cell
+    insession = run_cell(key, mf, workdir=tmp_path, fresh=True)
+    reloaded = analyze_cell(key, mol, mf, workdir=tmp_path)
+    _same_facts(reloaded, insession)
+    assert reloaded.core_anisotropy == insession.core_anisotropy
+
+
+@slow
+def test_posthoc_properties_from_stored_run(carbon, tmp_path):
+    """Post-hoc physics from the STORED run alone (load_cell + the
+    bridge): the ground root's <L^2>/<S^2> from the stored PySCF CI and
+    the energy from the stored window reproduce the payload. Gauge-safe
+    observables only -- <Lz^2> is member-gauge-dependent inside a
+    degenerate cluster (fact 16) and is NOT compared."""
+    from atomterm.cells import cell_payload, load_cell, run_cell
+    from atomterm.operators import build_operators
+    from atomterm.system import ncore_of
+
+    _, mol, mf, _ = carbon
+    key = CellKey("C", "2p", (1, 1))
+    facts = run_cell(key, mf, workdir=tmp_path)
+    data = load_cell(key, tmp_path)
+    ncore = ncore_of(mol.nelectron, 2)
+    c_act = data.mo_coeff[:, ncore:ncore + 3]
+    ops = build_operators(mol, mf, c_act, ncore, 1, 1)
+    w = ci_in_detbasis_order(data.ci[0], 3, 1, 1)
+    l2 = float(np.real(w @ ops["L2"].real @ w))
+    s2 = float(np.real(w @ ops["S2"].real @ w))
+    e = float(np.real(w @ ops["H"] @ w)) + data.core_energy
+    p = cell_payload(key, facts)
+    assert abs(l2 - p["ground_l2"]) < 1e-9      # 2.0: gauge-safe in the 3P cluster
+    assert abs(s2 - 2.0) < 1e-9                 # S=1 across the whole sector
+    assert abs(e - p["e_ground"]) < 1e-9
