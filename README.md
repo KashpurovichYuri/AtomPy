@@ -601,15 +601,20 @@ reference determinant that is a numerically pure ⁵S° state
 **The files.** Everything human-readable lives committed in
 `elements/<Atom>/`: `TABLES.md` (term content, spectrum, methods
 compared, window lattice, study inserts), `report.md/json` (the term
-tables), `rungs.json` (the full rung registry — Methods compared),
-`scan.md`, `sa_decomposition.md`, `basin_map.md`. New atom = new element file, not README growth; the
-regenerators write straight into these files (`scripts/regen_rungs.py Ti` -> `elements/Ti/rungs.json`; chkfiles land next to them and are
+tables), `cells.json/md` (the full treatment cell set, key-addressed —
+Methods compared), `scan.md`, `sa_decomposition.md`, `basin_map.md`.
+New atom = new element file, not README growth; the
+regenerators write straight into these files (`scripts/regen_cells.py Ti`
+-> `elements/Ti/cells.{json,md}`; chkfiles land under `rungs/` and are
 gitignored). Regeneration: term tables — `scripts/run_c.py` and the
-per-atom `run_atom` calls (recorded in each report header); rungs — the
-per-atom `run_rungs` calls; scans — `scripts/radial_scan.py`; the
+per-atom `run_atom` calls (recorded in each report header); cells — the
+declared key-set of `scripts/regen_cells.py`; the methods tables —
+`scripts/build_methods_tables.py` (renders the factor grid from
+`cells.json` + the audit verdicts); scans —
+`scripts/radial_scan.py`; the
 lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
 `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
-suite (145 tests) — term tables, exact-class closure pins, basin
+suite (148 tests) — term tables, exact-class closure pins, basin
 branches.
 
 ### Status and directions

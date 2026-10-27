@@ -2,7 +2,7 @@
 
 cc-pVDZ. Reference **ROHF −288.846437 Eh**. Sectors Ms = 1 / Ms = 0 —
 as carbon, with its own numbers. Provenance: `sa_decomposition.md`; the Methods-compared regeneration
-(`scripts/regen_rungs.py Si`) is pending its first run. Records:
+(`scripts/regen_cells.py Si`; `cells.json/md`, key-addressed). Records:
 ticket-09 — AGENTS fact 13; gauge draws — fact 16a; fact-17 baseline —
 fact 17.
 

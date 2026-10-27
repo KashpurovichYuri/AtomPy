@@ -3,7 +3,7 @@
 cc-pVDZ. Reference **ROHF −37.682418 Eh** (raw core = averaged fold).
 Sectors Ms = 1 and Ms = 0. Provenance: `report.md/json` (term tables),
 `scan.md`, `sa_decomposition.md`, `basin_map.md`; the Methods-compared
-regeneration (`scripts/regen_rungs.py C`) is pending its first run.
+regeneration (`scripts/regen_cells.py C`; `cells.json/md`, key-addressed).
 Records: the confinement finding and tilt anatomy — README ·
 Motivation; the flat-gauge census — AGENTS fact 16a.
 

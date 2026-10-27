@@ -41,8 +41,10 @@ RUNGS.md, dissolved here 2026-10-27):
                    virtual character: the active pair's radial correlation,
                    isolated from identity-changing rotations.
                    Question: is the TM escape reachable through virtuals
-                   alone? (Yes -- blocking core exchange does not prevent
-                   it; blocking l-change does.)
+                   alone? Basin-dependent (one Sc draw escapes through the
+                   virtuals, another -- 2026-10-27 regen -- borrows radially
+                   at clean closure); blocking l-change (the radial mask)
+                   always blocks it.
 7. casscf_shell -- free CASSCF from the raw-shell start.
 8. casscf_pyscf -- free CASSCF from PySCF's default start (start dependence).
                    Question (7+8): where does an unconstrained optimizer

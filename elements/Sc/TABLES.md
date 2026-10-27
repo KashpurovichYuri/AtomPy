@@ -1,7 +1,7 @@
 # Sc — scandium (d¹)
 
 cc-pVDZ. Reference **ROHF −759.736255 Eh** (3d¹4s²; M_S = ½; S
-half-integer). Provenance: `rungs.json` (Methods compared; regeneration pending),
+half-integer). Provenance: `cells.json` (Methods compared; key-addressed),
 the lattice logs (window lattice), `scan.md`, `sa_decomposition.md`. Records: escape/swap
 basins, bimodal SA — AGENTS facts 15/20; frac septet — fact 21d; AVAS
 cross-check — fact 19.

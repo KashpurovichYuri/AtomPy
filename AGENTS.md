@@ -398,13 +398,18 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 145 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 148 tests in ~13 min (chkfile caching; ROHF computed once per
 session; the Ti rungs block is the slowest, ~7 min cold; the Sc rungs
 ~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
 anywhere in the fixture chain, sub-second); `pytest -m slow` = the
 SCF-bearing chemistry. Run the full suite before committing changes to
 physics-bearing modules (drivers/operators/stages/treatments/scans); targeted
-files or `-m fast` are fine for everything else. Test files map
+files or `-m fast` are fine for everything else. Suite flakes: the rungs
+fixtures are session-scoped — ONE chaotic SCF draw per run can fail
+whichever tight band grazes it (rotating failures across runs, each
+isolation-green on redraw); widen only a grazed band, and only with the
+observed fresh-draw value in a comment (precedent: sa_pur 2.2e-2,
+2026-10-27). Test files map
 1:1 to src modules (`test_drivers.py` exercises the
 reference/windows/core/casscf quartet through the drivers facade -- the
 split kept its tests in place); tests are named for the
