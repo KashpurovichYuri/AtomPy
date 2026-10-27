@@ -41,7 +41,7 @@ def test_address_round_trip():
         CellKey("C", "2p", (1, 1)),
         CellKey("C", "2p", (1, 1), fold="raw"),
         CellKey("c", "2p", (2, 0), method="sa", mask=None, substrate="pur"),
-        CellKey("Ti", "3d4s", (3, 1), method="sa", start="mo",
+        CellKey("Ti", "3d4s", (3, 1), method="sa", start="ao",
                 mask="radial", substrate="pur", fold="avg"),
         CellKey("Ti", "3d4s", (2, 2), method="casscf", start="ao",
                 mask="virtmix"),
@@ -53,7 +53,7 @@ def test_address_round_trip():
         assert CellKey.from_address(k.address) == k
         assert k.address.count("_") == 7
     assert keys[0].address == "c_2p_1-1_casci_ao_-_pol_avg"
-    assert keys[3].address == "ti_3d4s_3-1_sa_mo_radial_pur_avg"
+    assert keys[3].address == "ti_3d4s_3-1_sa_ao_radial_pur_avg"
 
 
 @fast
@@ -67,6 +67,13 @@ def test_key_validation_and_canonicalization():
     # a mask needs an optimizer method
     with pytest.raises(ValueError, match="mask"):
         CellKey("C", "2p", (1, 1), method="casci", mask="radial")
+    # the radial mask rotates member-labeled AO slots: ao-start only
+    with pytest.raises(ValueError, match="radial mask"):
+        CellKey("C", "2p", (1, 1), method="casscf", start="mo",
+                mask="radial")
+    with pytest.raises(ValueError, match="radial mask"):
+        CellKey("C", "2pno1", (1, 1), method="casscf", start="no",
+                mask="radial")
     for bad in [dict(method="fci"), dict(start="aos"), dict(mask="relax"),
                 dict(substrate="polarized"), dict(fold="averaged")]:
         with pytest.raises(ValueError, match="not in"):
@@ -392,3 +399,23 @@ def test_run_cell_no_start_same_subspace(carbon, tmp_path):
     assert np.allclose(ao.energies, no.energies, atol=1e-9)
     assert no.win_lz == pytest.approx(0.0, abs=1e-12)   # m-set: closed span
     assert no.win_lperp == pytest.approx(0.0, abs=1e-12)
+
+
+@fast
+def test_select_no_window_selects_by_group_number():
+    """k counts GROUPS (window identity), but no_group_windows returns
+    a COMPACT list -- prefixes too small to open the sector are
+    skipped, so labels can be non-contiguous. Selection is by label,
+    never by index (the Ti {3d,4s}/(3,1) lattice failure class: the
+    1-column s prefix skipped, no2 = the full 6-column span)."""
+    from atomterm.cells import _select_no_window
+    from atomterm.windows import Window
+
+    wins = [Window("no2", None, np.eye(6, 6), True),
+            Window("no4", None, np.eye(6, 6), True)]   # no1/no3 skipped
+    assert _select_no_window(wins, 2).label == "no2"
+    assert _select_no_window(wins, 4).c_win.shape[1] == 6
+    with pytest.raises(ValueError, match="usable group prefixes"):
+        _select_no_window(wins, 1)
+    with pytest.raises(ValueError, match="no3 is not among them"):
+        _select_no_window(wins, 3)

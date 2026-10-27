@@ -159,6 +159,11 @@ class CellKey:
                 raise ValueError(f"mask {self.mask!r} not in {MASKS} (None = free)")
             if self.method == "casci":
                 raise ValueError("a mask needs an optimizer method (casscf/sa)")
+            if self.mask == "radial" and self.start != "ao":
+                raise ValueError(
+                    "the radial mask rotates member-labeled AO slots; it "
+                    "needs start='ao' (MO and NO columns carry no member "
+                    "labels)")
         # the pur-fold degeneracy rule: on the purified substrate the
         # core density is exactly m-scalar, so raw == avg (fact 20) --
         # canonicalize instead of storing two addresses for one cell;
@@ -335,6 +340,22 @@ def ci_in_detbasis_order(v: np.ndarray, norb: int, na: int, nb: int) -> np.ndarr
 # --------------------------------------------------------------- execution
 
 
+def _select_no_window(wins, k: int):
+    """The k-GROUP-PREFIX window from no_group_windows's COMPACT list.
+
+    k counts occupation groups (window identity: ``3d4sno2`` = the
+    2-group prefix), but the returned list skips prefixes too small to
+    open the sector ({3d,4s} over (3,1): the 1-column s prefix) -- so
+    labels can be non-contiguous. Select by label, never by index."""
+    for w in wins:
+        if w.label == f"no{k}":
+            return w
+    raise ValueError(
+        f"the source's usable group prefixes are {[w.label for w in wins]}; "
+        f"no{k} is not among them (absent, or skipped as too small to "
+        "open the sector)")
+
+
 def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
              fresh: bool = False, verbose: int = 0,
              workdir: str | Path = "elements") -> "StageFacts":
@@ -385,7 +406,10 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     c_pur = (purified_core_orbitals(mol, mf, ncore)[0]
              if key.substrate == "pur" else None)
 
-    # start x mask -> the substrate MO matrix + the optimizer mask
+    # start x mask -> the substrate MO matrix + the optimizer mask.
+    # frozen/virtmix are START-INDEPENDENT (they pin the window columns
+    # whatever substrate they came from); radial needs the
+    # member-labeled AO substrate and is ao-only (validated at the key).
     mask = None
     if key.start == "no":
         # the parent-prefix policy: the label names the SOURCE window,
@@ -393,25 +417,15 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         # is the window (never splits an m-set; exactly closed when the
         # density was m-scalar -- natural.no_group_windows verifies)
         from atomterm.natural import no_group_windows
-        from atomterm.windows import Window
 
-        if key.mask == "radial":
-            raise ValueError("the radial mask needs member-labeled AO "
-                             "columns (start='ao'); NO columns carry none")
         mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act_idx,
                                c_core=c_pur)
         c_src = mo_src[:, ncore:ncore + ncas]
         wins = no_group_windows(mol, mf, ncore, c_src, na, nb,
                                 c_core=c_pur, cap=budgets.get("no_cap", 12000))
-        _, k = key.no_source
-        if k > len(wins):
-            raise ValueError(
-                f"window {key.window!r}: the source has {len(wins)} group "
-                f"prefixes; k <= {len(wins)} required")
-        c_win = wins[k - 1].c_win
-        ncas = c_win.shape[1]
-        mo_full = Window(f"no{k}", None, c_win, True).columns(
-            mf, ncore, c_core=c_pur)
+        win = _select_no_window(wins, key.no_source[1])
+        ncas = win.c_win.shape[1]
+        mo_full = win.columns(mf, ncore, c_core=c_pur)
     elif key.start == "ao":
         if key.mask == "radial":
             mo_full, labels = radial_basis(
@@ -420,14 +434,14 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         else:
             mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
                                     act_idx, c_core=c_pur)
-            if key.mask == "frozen":
-                mask = core_virtual_only_mask
-            elif key.mask == "virtmix":
-                mask = no_core_window_exchange_mask
     else:  # start == "mo": PySCF's default start (canonical MOs,
         # canonical window); the substrate axis is moot -- the start
         # carries its own core
         mo_full = mf.mo_coeff
+    if key.mask == "frozen":
+        mask = core_virtual_only_mask
+    elif key.mask == "virtmix":
+        mask = no_core_window_exchange_mask
 
     verbose = budgets.get("verbose", verbose)
     common = dict(mc_opts=budgets.get("mc_opts"),
