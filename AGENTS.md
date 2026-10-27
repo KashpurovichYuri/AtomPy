@@ -351,7 +351,14 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     spin-summed) ⇒ by Schur γ = R ⊗ c·𝟙_{2l+1}: NOs arrive as
     complete l-pure m-sets, occupation groups never split them
     (natural.occupation_groups), and windows are exactly
-    rotation-closed. Measured: U groups d/f/d/f = 5/7/5/7 (occ
+    rotation-closed. GROUPING AMENDMENT (2026-10-27, the d² lattice):
+    the m-set equality is only as good as the source window — the
+    fact-17 input defect leaks into γ as a WITHIN-m-set occupation
+    spread (measured: Ti {3d,4p} d-shell 2.7e-7 at occ 0.4); the
+    grouping tolerance is scale-aware (max(1e-7, 1e-4·occ_max)) —
+    genuine group gaps (U's tightest: 3e-4) stay resolved, defect
+    leakage cannot split a set (a split silently builds a
+    rotation-defective window). Measured: U groups d/f/d/f = 5/7/5/7 (occ
     0.399/0.286/5e-4/2e-4); every group window at ~1e-13 certificate
     with exact ⟨L²⟩; 12 NO cols (495 dets) within 4.6 mEh of the full
     10,626-det window; Sc/Ti NO beats the shell lattice at every
@@ -398,7 +405,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 148 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 149 tests in ~13 min (chkfile caching; ROHF computed once per
 session; the Ti rungs block is the slowest, ~7 min cold; the Sc rungs
 ~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
 anywhere in the fixture chain, sub-second); `pytest -m slow` = the

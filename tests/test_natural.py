@@ -118,6 +118,22 @@ def test_m_scalar_density_yields_whole_m_sets():
         assert c_win.shape[1] == want
 
 
+def test_defect_leakage_never_splits_an_m_set():
+    """The grouping tolerance is scale-aware: the source window's
+    input defect (fact 17) leaks into the term-averaged density as a
+    WITHIN-m-set occupation spread (measured: Ti {3d,4p}, d-shell
+    2.7e-7 at occ 0.4) -- a fixed 1e-7 split the five-member set into
+    [2,3] and silently built a rotation-defective window. Genuine
+    group gaps (U's tightest measured: 3e-4) stay resolved."""
+    leaky = np.array([0.40000016, 0.40000016, 0.39999989, 0.39999989,
+                      0.39999989, 3.9e-12, 3.9e-12, 3.9e-12])
+    assert [len(g) for g in occupation_groups(leaky)] == [5, 3]
+    tight = np.array([5.0e-4, 5.0e-4, 5.0e-4, 5.0e-4, 5.0e-4,
+                      2.0e-4, 2.0e-4, 2.0e-4])
+    # occ[0]-relative window = 5e-8 < the 3e-4 gap: still two groups
+    assert [len(g) for g in occupation_groups(tight)] == [5, 3]
+
+
 def test_single_ml_root_breaks_the_m_set():
     """The single determinant (p m=0 alpha, p m=0 beta) -- an M_S = 0,
     M_L = 0 state of p^2 (not a term eigenstate; any single det makes

@@ -452,7 +452,9 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                                  mo_full=mo_full, mask=mask, weights=weights,
                                  name=key.address, **common)
 
-    _persist_cell(chk, key, cas, ncas)
+    _persist_cell(chk, key, cas, ncas,
+                  store_name=f"{key.address}_roots" if key.method == "sa"
+                  else None)
     return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_pur=c_pur)
 
 
@@ -486,21 +488,30 @@ def cell_payload(key: CellKey, facts) -> dict:
     return out
 
 
-def _persist_cell(chk: Path, key: CellKey, cas, ncas: int) -> None:
+def _persist_cell(chk: Path, key: CellKey, cas, ncas: int,
+                  store_name: str | None = None) -> None:
     """Complete the cell store: energies were persisted by the run; add
     the pieces only the cell layer owns. ``ci_stack`` is a plain
     (nroots, ndet) float array -- PySCF's chkfile serializes object
     arrays as nested ``__from_list__`` groups that do not round-trip
-    for 2-D roots, so the cell layer owns its own CI serialization."""
+    for 2-D roots, so the cell layer owns its own CI serialization.
+
+    ``store_name``: the kernel store the returned ``cas`` corresponds
+    to. SA runs create TWO (the ensemble pass under ``<address>``, the
+    per-root pass under ``<address>_roots``) and return the roots one
+    -- completing ``<address>`` instead would pair the ensemble's
+    energies with the roots' CI. :func:`load_cell` prefers the roots
+    store for SA; ``mo_coeff``/``ncas`` live under ``<address>``."""
     from pyscf import lib
 
-    lib.chkfile.save(str(chk), f"atomterm/{key.address}/core_energy",
+    name = store_name or key.address
+    lib.chkfile.save(str(chk), f"atomterm/{name}/core_energy",
                      float(cas.core_energy))
+    lib.chkfile.save(str(chk), f"atomterm/{name}/ci_stack",
+                     np.asarray([np.asarray(c).ravel() for c in cas.ci]))
     lib.chkfile.save(str(chk), f"atomterm/{key.address}/mo_coeff",
                      np.asarray(cas.mo_coeff))
     lib.chkfile.save(str(chk), f"atomterm/{key.address}/ncas", int(ncas))
-    lib.chkfile.save(str(chk), f"atomterm/{key.address}/ci_stack",
-                     np.asarray([np.asarray(c).ravel() for c in cas.ci]))
 
 
 def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,

@@ -610,11 +610,12 @@ gitignored). Regeneration: term tables — `scripts/run_c.py` and the
 per-atom `run_atom` calls (recorded in each report header); cells — the
 declared key-set of `scripts/regen_cells.py`; the methods tables —
 `scripts/build_methods_tables.py` (renders the factor grid from
-`cells.json` + the audit verdicts); scans —
+`cells.json` + the audit verdicts); the cell-sourced lattice sections —
+`scripts/build_lattice_tables.py`; scans —
 `scripts/radial_scan.py`; the
 lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
 `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
-suite (148 tests) — term tables, exact-class closure pins, basin
+suite (149 tests) — term tables, exact-class closure pins, basin
 branches.
 
 ### Status and directions

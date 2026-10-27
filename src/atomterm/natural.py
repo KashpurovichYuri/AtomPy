@@ -119,11 +119,21 @@ def occupation_groups(occ, deg_tol: float = 1e-7) -> list[list[int]]:
     For an m-scalar density each group IS an m-set (2l+1 equal
     occupations per radial); window selection must never split one
     (the fact-19 AVAS lesson: per-member thresholds build
-    rotation-defective spans)."""
+    rotation-defective spans).
+
+    The tolerance is scale-aware: ``max(deg_tol, 1e-4 * occ[0])``. The
+    source window's input defect (fact 17: core-orthogonalization
+    leakage, win certificates at 1e-3) leaks into the term-averaged
+    density as a WITHIN-m-set occupation spread (measured: Ti {3d,4p}
+    d-shell 2.7e-7 at occ 0.4) -- a fixed 1e-7 splits the set into
+    [2,3] and silently builds a rotation-defective window. Genuine
+    group gaps are orders wider (measured: 3e-4, U's tightest) than
+    the 1e-4 relative window."""
     occ = np.asarray(occ)
+    tol = max(deg_tol, 1e-4 * float(occ[0]))
     groups: list[list[int]] = [[0]]
     for k in range(1, len(occ)):
-        if occ[k] >= occ[groups[-1][0]] - deg_tol:
+        if occ[k] >= occ[groups[-1][0]] - tol:
             groups[-1].append(k)
         else:
             groups.append([k])
