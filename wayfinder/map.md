@@ -514,6 +514,18 @@ Recorded (candidates + declinations):
    retirement (Rung registry tags -> axis values, StudySpec over
    key-sets, orphaned U scripts). start="no" waits for the
    parent-prefix policy (which NO group a nominal label selects).
+   ==> P3 ALSO RESOLVED 2026-10-27 (b) (6f22dfe + 63adf28): the
+   no-start policy landed (window grammar <source>no<k>); regen_cells
+   regenerates C/Si/Sc/Ti through run_cell (Sc gained a
+   character-forced ReferenceSpec after a broken-basin draw);
+   build_methods_tables renders the Ti manifest from cells.json (the
+   table/provenance cannot diverge; unified method-column tables per
+   the user's spec). Two run bugs found+fixed en route: the
+   budgets->weights leak (CASSCF cells ran as SA) and the ci
+   object-array serialization (ci_stack now). Suite 148 green.
+   REMAINING: P4 only; plus the campaign continuation through the
+   seam (lattice cells incl. NO starts, optimizer manifest cells,
+   pass curves) -- gated per run as before.
 2. stage_io loader (user-proposed): the atomterm/<name>/{ci,energies}
    chk groups are WRITE-ONLY today; ci is PySCF FCI-ordered, not
    detbasis-ordered. A small loader + ordering bridge unlocks post-hoc
@@ -541,9 +553,14 @@ Recorded (candidates + declinations):
    not coded); making _report public (the fast test pinning it is
    acceptable; revisit if a second renderer appears).
 
-Suite state: 145 green (was 130 at the survey; +15 = test_cells.py.
+Suite state: 148 green (was 130 at the survey; +18 = test_cells.py.
 Two earlier full-suite failures —
 test_atom_term_tables[Sc], test_ti_free_casscf_escapes_the_shell —
 did not reproduce in isolation nor in rerun; recorded as fresh-draw
 basin flakes, facts 10/15g; no band change: no observed values to
-cite).
+cite). FLAKE MECHANISM IDENTIFIED 2026-10-27 (b): the rungs fixtures
+are SESSION-scoped — one chaotic SCF draw per suite run fails
+whichever tight band grazes it (rotating failures across runs: Sc
+tables, the ladders fixture, Sc complete-window, Ti sa_pur 2.2e-2
+captured+widened, Ti casci closure, C virtmix uncaptured transient).
+Protocol recorded in AGENTS · Tests.
