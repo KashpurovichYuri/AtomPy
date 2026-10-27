@@ -58,8 +58,8 @@ DASH = "—"
 # the anchor is the separately-specified ΔE reference).
 WINDOWS = [
     ("## CAS(4,6) / {3d,4s}", "3d4s", "3d4sno2", [
-        "Reading — README · Methods. ROHF anchor: −848.4065 Eh "
-        "(−23086.3167 eV)."]),
+        "Reading — README · Methods (⟨L̂z²⟩ is a gauge diagnostic, not a"
+        " label). ROHF anchor: −848.4065 Eh (−23086.3167 eV)."]),
     ("### CAS(4,10) / {3d,4d} — planned (constrained)", "3d4d", "3d4dno2", [
         "No 4s (constrained partition). Pending = declared, not yet run; "
         "the CASCI anchor lives in the 3d²4s² lattice above."]),

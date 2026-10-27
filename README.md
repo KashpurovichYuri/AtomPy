@@ -526,9 +526,17 @@ converged window's shell composition (S-metric weights; fractions of
 the window's columns per l — the *span*, not the electron
 configuration: the swap reads s→0, the escapes show their f content);
 **Elec (Lowdin)** — the ground root's electron count per l (partitions
-the active electrons: what the electrons *do* inside the span). The
-fold-shift bookkeeping (|E(analysis fold) − E(as run)|) is not a table
-column; its reading: Partition bookkeeping, Methods.
+the active electrons: what the electrons *do* inside the span).
+⟨L̂z²⟩ is a **gauge diagnostic**: in an exactly closed fold the ground
+is a degenerate M_L multiplet and the solver returns an arbitrary
+member mix (fractional values, draw-dependent); it quantizes to M²
+only when a field lifts the degeneracy — the raw fold's Λ-branching
+picking |M_L| = 2 on Ti. The term labels come from ⟨L²⟩/⟨S²⟩; the
+M_L-resolved reading (L̂z diagonalized inside the ground eigenspace:
+⟨L̂z²⟩ = 9, 4, 1, 0, 1, 4, 9 for ³F) is the multiplet demonstration,
+`elements/Ti/TABLES.md`. The fold-shift bookkeeping
+(|E(analysis fold) − E(as run)|) is not a table column; its reading:
+Partition bookkeeping, Methods.
 
 Verdicts (the classes of the
 failure inventory, Motivation): **exact** — commutators and span

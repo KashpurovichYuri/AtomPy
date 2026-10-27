@@ -73,7 +73,7 @@ Reading — README · Results (window lattice). Source: `cells.json` (`*_2-0_*`)
 
 ## CAS(4,6) / {3d,4s}
 
-Reading — README · Methods. ROHF anchor: −848.4065 Eh (−23086.3167 eV).
+Reading — README · Methods (⟨L̂z²⟩ is a gauge diagnostic, not a label). ROHF anchor: −848.4065 Eh (−23086.3167 eV).
 
 | method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | Span (Lowdin) | Elec (Lowdin) | verdict |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
