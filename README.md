@@ -520,14 +520,15 @@ column from the sector Lz spectra. The ordering matches the free-ion
 
 ### Methods compared
 
-Every row: E — the run's variational total (Eh and eV); the ROHF
-anchor is stated in each table's caption, not as a per-row ΔE column;
-**Span (Lowdin)** — the converged window's shell composition
-(S-metric weights; fractions of the window's columns per l — the
-*span*, not the electron configuration: the swap reads s→0, the
-escapes show their f content); **fold shift** =
-|E(analysis fold) − E(as run)|, max over roots (the convention and
-the PySCF anchor: Partition bookkeeping, Methods).
+Every row: E — the run's variational total (Eh and eV); ΔE vs the ROHF
+anchor (also stated in each caption); **Span (Lowdin)** — the
+converged window's shell composition (S-metric weights; fractions of
+the window's columns per l — the *span*, not the electron
+configuration: the swap reads s→0, the escapes show their f content);
+**Elec (Lowdin)** — the ground root's electron count per l (partitions
+the active electrons: what the electrons *do* inside the span). The
+fold-shift bookkeeping (|E(analysis fold) − E(as run)|) is not a table
+column; its reading: Partition bookkeeping, Methods.
 
 Verdicts (the classes of the
 failure inventory, Motivation): **exact** — commutators and span
@@ -541,20 +542,20 @@ re-run.
 The certified rungs sit mEh-tight around frozen CASCI (+10.5):
 orbital optimization buys ≈ nothing on the as-run window. Every other
 row of the manifest is a *classified* window-identity change — escape,
-swap, gauge — flagged by the fold shift (Partition bookkeeping).
-Values, certificates: `elements/Ti/TABLES.md`; other atoms:
-their element files.
+swap, gauge — the class the fold-shift bookkeeping flags (Partition
+bookkeeping, Methods). Values, certificates: `elements/Ti/TABLES.md`;
+other atoms: their element files.
 
-| treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | fold shift | verdict |
-|---|---|---|---|---|---|---|---|
-| ROHF (anchor) | −848.4065 | 0 | — | — | — | 0 | — |
-| CASCI, averaged | −848.3959 | +10.5 | 12.0000 | 4.2e-09 | 2.3e-08 | 2.8 | exact |
-| CASCI, raw | −848.3959 | +10.5 | 12.0000 | 4.9e-02 | 2.6e-01 | ~0 | baseline (detector) |
-| CASCI, fractional | −848.3585 | +48.0 | 12.0000 | 1.1e-09 | 7.6e-09 | ~0 | exact |
-| CASSCF, free | −848.4377 | −31.3 | 0.0503 | 4.3e-01 | 1.1e+00 | 2.8 | escape |
-| CASSCF, frozen window | −848.3961 | +10.4 | 12.0000 | 4.2e-09 | 2.3e-08 | 2.7 | baseline |
-| SA-CASSCF, free | −848.4166 | −10.1 | 12.0029 | 1.1e+00 | 6.0e+00 | partition changed | swap |
-| SA-CASSCF, frozen, pur | −848.3948 | +11.7 | 12.0000 | 1.0e-13 | 4.0e-13 | 0.0 | exact |
+| treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | verdict |
+|---|---|---|---|---|---|---|
+| ROHF (anchor) | −848.4065 | 0 | — | — | — | — |
+| CASCI, averaged | −848.3959 | +10.5 | 12.0000 | 4.2e-09 | 2.3e-08 | exact |
+| CASCI, raw | −848.3959 | +10.5 | 12.0000 | 4.9e-02 | 2.6e-01 | baseline (detector) |
+| CASCI, fractional | −848.3585 | +48.0 | 12.0000 | 1.1e-09 | 7.6e-09 | exact |
+| CASSCF, free | −848.4377 | −31.3 | 0.0503 | 4.3e-01 | 1.1e+00 | escape |
+| CASSCF, frozen window | −848.3961 | +10.4 | 12.0000 | 4.2e-09 | 2.3e-08 | baseline |
+| SA-CASSCF, free | −848.4166 | −10.1 | 12.0029 | 1.1e+00 | 6.0e+00 | swap |
+| SA-CASSCF, frozen, pur | −848.3948 | +11.7 | 12.0000 | 1.0e-13 | 4.0e-13 | exact |
 
 ### The window lattice — the span question, at exact symmetry
 

@@ -118,3 +118,55 @@ def test_report_carries_the_sz_spectrum_line():
     # without the matrix the line is omitted, not broken
     _, text_none = report(3, 2, 0, pass_sz=False)
     assert "Sz eigenvalues" not in text_none
+
+
+def test_shell_occupations_electron_scale(carbon):
+    """n_l partitions the active electrons EXACTLY: a p² determinant
+    over the raw 2p window gives n_p = 2; a column rotated between 2s
+    and a 2p member (exactly S-orthogonal, different l) splits the
+    pair's electrons s:1 / p:1. The S-CONTRACTION is load-bearing: a
+    same-l non-orthogonal mix (2s carrying a 1s tail -- cc-pVDZ s
+    shells overlap) must still split by the S-metric weights, which
+    the bare AO diagonal of C gamma C^dag gets wrong."""
+    from atomterm.analysis import shell_occupations
+    from atomterm.windows import select_valence_ao
+
+    _, mol, mf, act_idx = carbon
+    s = mf.get_ovlp()
+    c_p = np.eye(mol.nao_nr())[:, act_idx]          # the three 2p AOs
+    dets = determinant_basis(3, 1, 1)
+    k = dets.index((0, 3))                          # p0-alpha p0-beta
+    ci = np.zeros(len(dets))
+    ci[k] = 1.0
+
+    n = shell_occupations(mol, s, c_p, ci, 1, 1)
+    assert n["p"] == pytest.approx(2.0, abs=1e-12)
+    assert n["s"] == pytest.approx(0.0, abs=1e-12)
+    assert sum(n.values()) == pytest.approx(2.0, abs=1e-12)
+
+    # the mixed first column takes the pair: s:1, p:1
+    mixed = c_p.copy()
+    v = np.zeros(mol.nao_nr())
+    v[select_valence_ao(mol, ["2s"])[0]] = np.sqrt(0.5)
+    v[act_idx[0]] = np.sqrt(0.5)
+    mixed[:, 0] = v
+    n2 = shell_occupations(mol, s, mixed, ci, 1, 1)
+    assert n2["s"] == pytest.approx(1.0, abs=1e-12)
+    assert n2["p"] == pytest.approx(1.0, abs=1e-12)
+
+    # same-l non-orthogonality: an s-column with a 1s tail, S-renormed,
+    # crossed with 2p0 -- the split stays s:1 / p:1 (the S weights),
+    # while the bare-diagonal reading would drift
+    vs = np.zeros(mol.nao_nr())
+    vs[select_valence_ao(mol, ["2s"])[0]] = 1.0
+    vs[select_valence_ao(mol, ["1s"])[0]] = 0.3
+    vs /= np.sqrt(vs @ s @ vs)                       # S-normalized
+    mixed2 = c_p.copy()
+    w = np.zeros(mol.nao_nr())
+    w[:] = vs / np.sqrt(2)
+    w[act_idx[0]] = np.sqrt(0.5)                     # s-block and p0
+    mixed2[:, 0] = w
+    n3 = shell_occupations(mol, s, mixed2, ci, 1, 1)
+    assert n3["s"] == pytest.approx(1.0, abs=1e-12)
+    assert n3["p"] == pytest.approx(1.0, abs=1e-12)
+    assert sum(n3.values()) == pytest.approx(2.0, abs=1e-12)

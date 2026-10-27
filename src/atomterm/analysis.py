@@ -227,3 +227,44 @@ def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
             parts.append(f"{label} (|c|={abs(v[i]):.2f})")
         labels.append("; ".join(parts))
     return labels
+
+
+def shell_occupations(mol, s, c_win: np.ndarray, ci_ground, na: int,
+                      nb: int) -> dict:
+    """Electron occupations per angular (l) AO subspace, ground root.
+
+    The ELECTRON scale of the window analysis (the span counterpart is
+    :func:`~atomterm.windows.shell_weights`): ``gamma`` = the ground
+    root's spin-summed 1-RDM in the window-MO basis of ``c_win``
+    (S-orthonormal columns); ``n_l = Tr[gamma . C^dag S_l C]`` with
+    ``S_l`` the l-block of the AO overlap -- the expectation of the
+    l-subspace number operator. The different-l AO blocks are exactly
+    S-orthogonal (one center), so ``sum_l S_l = S`` and the ``n_l``
+    partition the active electron count ``na + nb`` EXACTLY. (The
+    bare AO diagonal of ``C gamma C^dag`` is NOT it: same-l shells
+    are non-orthogonal -- it overshoots by the cross terms.)
+    Term-stable inside a degenerate cluster (same configuration
+    content).
+
+    ``ci_ground``: the ground root's CI vector in PYSCF order (the
+    ``cas.ci`` / cell-store convention) -- mapped through the ordering
+    bridge (fact 24). Returns ``{'s': .., 'p': .., ...}``.
+    """
+    import re
+
+    from atomterm.detbasis import determinant_basis
+    from atomterm.natural import ci_rdm1
+    from atomterm.cells import ci_in_detbasis_order  # lazy, as above
+
+    norb = c_win.shape[1]
+    dets = determinant_basis(norb, na, nb)
+    v = ci_in_detbasis_order(np.asarray(ci_ground).ravel(), norb, na, nb)
+    gamma = ci_rdm1(dets, v, norb)
+    g_ao = c_win @ gamma @ c_win.conj().T          # the AO-basis 1-RDM
+    ds = g_ao @ s                                   # Mulliken rows
+    out: dict[str, float] = {}
+    for i, lbl in enumerate(line.split()[-1] for line in mol.ao_labels()):
+        m = re.match(r"\d+([spdfgh])", lbl)
+        key = m.group(1) if m else lbl
+        out[key] = out.get(key, 0.0) + float(np.real(ds[i, i]))
+    return out

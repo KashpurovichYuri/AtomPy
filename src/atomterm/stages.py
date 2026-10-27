@@ -20,7 +20,8 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from atomterm.analysis import AnalysisResult, analyze, configuration_summary
+from atomterm.analysis import (AnalysisResult, analyze, configuration_summary,
+                               shell_occupations)
 from atomterm.drivers import shell_weights
 from atomterm.operators import build_operators, core_anisotropy, window_closure
 
@@ -48,6 +49,10 @@ class StageFacts:
     win_lz: float   # one-particle closure defects of the window SPAN
     win_lperp: float  # (operators.window_closure; 0 = exact certificate)
     configurations: list[str]
+    # the ground root's electron count per l (analysis.
+    # shell_occupations) -- the ELECTRON scale next to the SPAN
+    # weights of window_rows; partitions na+nb
+    shell_electrons: dict
 
     # the three analysis fields every renderer/payload reads, exposed so
     # callers need not reach into the analysis object (interface leak
@@ -112,6 +117,7 @@ class StageFacts:
             "win_lz": self.win_lz,
             "win_lperp": self.win_lperp,
             "window": self.window,
+            "electrons": self.shell_electrons,
             "n_dev": self.n_dev,
             "configurations": self.configurations,
         }
@@ -170,6 +176,8 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         window_rows=w,
         win_lz=closure["lz"],
         win_lperp=closure["lperp"],
+        shell_electrons=shell_occupations(mol, mf.get_ovlp(), c_act,
+                                          cas.ci[0], na, nb),
         configurations=configuration_summary(
             mol, mf.get_ovlp(), cas.ci[: len(e_mine)], c_act, na, nb),
         core_anisotropy=aniso,

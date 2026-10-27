@@ -11,14 +11,18 @@ Value conventions (the manifest contract, README · Methods):
 
 - E = the run's OWN total (``energies_pyscf[0]``), Eh + eV (×27.2114)
   -- the partition-changed class never shows our reconstruction
-  (finding 2); no ΔE column: the ROHF anchor is stated separately in
-  each caption;
+  (finding 2); ΔE vs the ROHF anchor (``rohf_energy``); the anchor
+  is also stated in each caption;
 - ⟨L²⟩, ⟨L̂z²⟩, the commutator norms: our analysis of the run (payload);
 - Span (Lowdin) = the converged window's S-metric shell weights
   (fractions of the window's columns per l -- the span, not the
   electron configuration; window identity is what the verdicts name);
-- fold shift = max|dE| vs PySCF: ``~0`` below 5e-5, mEh below 0.1 Eh,
-  ``partition changed`` above (a core orbital entered the window);
+- Elec (Lowdin) = the ground root's electron count per l
+  (analysis.shell_occupations) -- partitions the active electron
+  count; blank in payloads that predate the field;
+- the fold-shift bookkeeping (|E(analysis fold) − E(as run)|) is NOT a
+  column: its reading lives in README · Methods (Partition
+  bookkeeping);
 - verdict: the HUMAN step (AUDIT below) -- basin verdicts branch on
   window weights (facts 15g/20), never on noise. A cell renders filled
   only when BOTH payload and verdict exist; otherwise pending.
@@ -108,10 +112,10 @@ AUDIT = {
     "ti_3d4sno2_3-1_sa_no_frozen_pur_avg": "exact",
 }
 
-HEAD = ("| method | start | mask | substrate | fold | E, Eh | E, eV | "
-        "⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | Span (Lowdin) | "
-        "fold shift | verdict |")
-SEP = "|" + "---|" * 14
+HEAD = ("| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | "
+        "E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | "
+        "Span (Lowdin) | Elec (Lowdin) | verdict |")
+SEP = "|" + "---|" * 16
 
 # CASCI fold variants: (substrate axis, fold axis, display fold)
 CASCI_FOLDS = [("pol", "raw", "raw"), ("pol", "avg", "averaged"),
@@ -121,14 +125,6 @@ CASCI_FOLDS = [("pol", "raw", "raw"), ("pol", "avg", "averaged"),
 def key(atom, window, method, start, mask, substrate, fold):
     return CellKey(atom, window, SECTOR, method=method, start=start,
                    mask=mask, substrate=substrate, fold=fold)
-
-
-def _fmt_shift(maxde: float) -> str:
-    if maxde >= 0.1:
-        return "partition changed"
-    if maxde < 5e-5:
-        return "~0"
-    return f"{maxde * 1e3:.1f}"
 
 
 def _cfg(w: dict) -> str:
@@ -149,12 +145,28 @@ def _cfg(w: dict) -> str:
     return " ".join(out)
 
 
+def _elec(n: dict | None) -> str:
+    """The ground root's electron count per l (payload ``electrons``,
+    analysis.shell_occupations) -- partitions the active electron
+    count. Blank when the payload predates the field. Compact:
+    s1.2 p0 d2.8 f0."""
+    if n is None:
+        return ""
+    out = []
+    for l in ("s", "p", "d", "f"):
+        v = float(n.get(l, 0.0))
+        out.append(f"{l}{v:.1f}" if v >= 5e-3 else f"{l}0")
+    return " ".join(out)
+
+
 def _values(p: dict, anchor: float) -> list[str]:
     asrun = float(p["energies_pyscf"][0])
-    out = [f"{asrun:.4f}", f"{asrun * EV:.4f}", f"{p['ground_l2']:.4f}",
+    de_eh = asrun - anchor
+    out = [f"{asrun:.4f}", f"{de_eh * 1e3:+.1f}", f"{asrun * EV:.4f}",
+           f"{de_eh * EV:+.4f}", f"{p['ground_l2']:.4f}",
            f"{p['ground_lz2']:.4f}", f"{p['comm_norm_h_lz']:.1e}",
            f"{p['comm_norm_h_l2']:.1e}", _cfg(p["window"]),
-           _fmt_shift(p["max_de_vs_pyscf"])]
+           _elec(p.get("electrons"))]
     return [re.sub(r"(?<!e)-", "−", v) for v in out]   # sign minus only
 
 
@@ -163,7 +175,7 @@ def _row(cells, audit, addr, method, start, mask, substrate, fold, anchor):
     p = cells.get(addr)
     head = [method, start, mask, substrate, fold]
     if p is None or verdict is None:
-        return "| " + " | ".join(head + ["pending"] + [""] * 7
+        return "| " + " | ".join(head + ["pending"] + [""] * 9
                                  + ["pending"]) + " |"
     return "| " + " | ".join(head + _values(p, anchor) + [verdict]) + " |"
 
