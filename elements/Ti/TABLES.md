@@ -49,13 +49,18 @@ M_L is not conserved there).
 | ⁵F −2 | −3.296365 | 4 | −3.457635 | 4 | −3.297772 | 0.1927 |
 
 ## Window lattice — d² series
-CASCI, averaged; ROHF reference −848.406 Eh.
+
+CASCI, averaged; ROHF reference −848.4065 Eh. Constructions per row: the shell AOs (m-complete),
+the PySCF MO slice (non-integer ⟨L²⟩ = the span does not close), and
+the full-span NO group prefix of the same source (fact 23: equals the
+AOs by construction -- the certificate is the point). Source: `cells.json`
+(`*_2-0_*` addresses).
 
 | window | CAS | dets | AOs, Eh | ⟨L²⟩ | PySCF MO, Eh | ⟨L²⟩ | NO, Eh | ⟨L²⟩ | custom, Eh | ⟨L²⟩ |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 3d | (2,5) | 50 | −848.3959 | 12.000 | — | — | — | — | — | — |
-| 3d4p | (2,8) | pending | pending | | | | | | | |
-| 3d4p4d | (2,13) | pending | pending | | | | | | | |
+| 3d | CAS(2,5) | 10 | −848.3973 | 12.000 | −848.4037 | 0.000 | −848.3973 | 12.000 | — | — |
+| 3d4p | CAS(2,8) | 28 | −848.3973 | 12.000 | −848.4037 | 3.426 | −848.3973 | 12.000 | — | — |
+| 3d4p4d | CAS(2,13) | 78 | −848.4068 | 12.000 | −848.4037 | 5.150 | −848.4068 | 12.000 | — | — |
 
 ## Window lattice — 3d²4s² series
 

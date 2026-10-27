@@ -62,6 +62,28 @@ def cell_set(atom, window, sector) -> list[CellKey]:
     return list(seen.values())
 
 
+def lattice_keys(atom) -> list[CellKey]:
+    """The d² lattice cells (Ti): the free-ion series CAS(2,·) -- the
+    4s² pair closed in the core (ncore=10), sector (2,0) = Ms=1, over
+    the growing m-complete shell spans. Constructions per row: the raw
+    shell AOs (exactly closed), the PySCF canonical MO slice (the
+    m-delocalized control, fact 22d), and the full-span group-prefix
+    NOs of the source's own term-averaged density (fact 23: k=K spans
+    the whole source window -- NO == AOs by construction, the closure
+    certificate is the point; k=1 for {3d} doubles as the machinery
+    pin). All sectors are tiny (<= 78 dets): seconds each."""
+    sec = (2, 0)
+    keys = []
+    for w in ("3d", "3d4p", "3d4p4d"):
+        keys.append(CellKey(atom, w, sec, method="casci", fold="avg"))
+        keys.append(CellKey(atom, w, sec, method="casci", start="mo",
+                            fold="avg"))
+    for w in ("3dno1", "3d4pno2", "3d4p4dno3"):
+        keys.append(CellKey(atom, w, sec, method="casci", start="no",
+                            fold="avg"))
+    return keys
+
+
 def render(atom, rohf_e, cells: dict, ruler: str) -> str:
     ref = cells.get(ruler)
     lines = [f"# Orbital-treatment cells: {atom}", "",
@@ -69,8 +91,12 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
              f"{'cell':<44} {'E_ground':>16} {'dE_vs_avg':>10} {'<L^2>':>9} "
              f"{'|[H,Lz]|':>10} {'|[H,L2]|':>10} {'|[P,Lz]|':>9} {'|[P,Lp]|':>9} "
              f"{'win_l':>6} {'aniso':>9} {'max|dE|':>9} {'ortho':>9}  conv"]
+    ruler_sec = ruler.split("_")[2]
     for addr, r in cells.items():
-        d_e = r["e_ground"] - ref["e_ground"] if ref else 0.0
+        # ΔE vs the ruler only within its sector -- cross-sector rows
+        # (the d² lattice vs the 3d²4s² spine) have no common zero
+        d_e = (r["e_ground"] - ref["e_ground"]
+               if ref and addr.split("_")[2] == ruler_sec else float("nan"))
         purity = max(r["window"].values())
         aniso = r.get("core_anisotropy")
         flag = ""
@@ -109,7 +135,10 @@ for name, (cfg, window, nelec, saw, fo, no) in CASES.items():
                                fo, no, open_idx=act_idx)
 
     cells: dict[str, dict] = {}
-    for key in cell_set(name, window, sector):
+    queue = cell_set(name, window, sector)
+    if name == "Ti":  # the d² lattice rides the same reference + store
+        queue += lattice_keys(name)
+    for key in queue:
         print(f"  [cell] {key.address}", flush=True)
         facts = run_cell(key, mf, frac_mf=mf_f, workdir="elements",
                          budgets={"sa_weights": saw})
