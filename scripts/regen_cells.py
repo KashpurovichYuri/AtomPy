@@ -36,29 +36,32 @@ CASES = {
 
 
 def cell_set(atom, window, sector) -> list[CellKey]:
-    """The declared key-set: the spine (README · Methods) + the
-    diagnostics (radial x SA gauge anchor on both substrates, the MO
-    start, virtmix, the pur CASCI window-definition row). Mirrors the
-    historic rung registry one-to-one; P4 folds the registry away."""
+    """The declared key-set: the spine (README · Methods) + the FULL
+    manifest grid -- method x mask x substrate x start, the NOs start
+    under the radial mask VOID (the seam rejects it: NO columns carry
+    no member labels to rotate) -- + the virtmix diagnostic and the
+    CASCI pur row. The NOs start is the full-span group prefix
+    (<window>no2 for {3d,4s}: the d and s occupation groups); k is
+    window identity. Deduped by address; P4 folds the historic rung
+    names away entirely."""
     sec = tuple(sector)
     keys = spine_keys(atom, window, sec)
+    for m in ("casscf", "sa"):
+        for mask in (None, "radial", "frozen"):
+            for sub in ("pol", "pur"):
+                for st in ("ao", "mo", "no"):
+                    if mask == "radial" and st != "ao":
+                        continue  # radial rotates member-labeled AO slots
+                    keys.append(CellKey(atom, window if st != "no"
+                                        else f"{window}no2", sec, method=m,
+                                        start=st, mask=mask, substrate=sub))
     keys += [
-        CellKey(atom, window, sec, method="sa"),       # sa free, pol
-        CellKey(atom, window, sec, method="sa", mask="radial"),
-        CellKey(atom, window, sec, method="sa", mask="radial",
-                substrate="pur"),
-        CellKey(atom, window, sec, method="casscf", start="mo"),
-        CellKey(atom, window, sec, method="sa", start="mo"),
-        CellKey(atom, window, sec, method="casscf", mask="radial"),
         CellKey(atom, window, sec, method="casscf", mask="virtmix"),
-        CellKey(atom, window, sec, method="casscf", mask="frozen"),
         CellKey(atom, window, sec, substrate="pur"),  # casci pur row
-        CellKey(atom, window, sec, method="casscf", mask="radial",
-                substrate="pur"),
     ]
     seen: dict[str, CellKey] = {}
     for k in keys:
-        seen.setdefault(k.address, k)  # spine may overlap diagnostics
+        seen.setdefault(k.address, k)  # the spine overlaps the grid
     return list(seen.values())
 
 

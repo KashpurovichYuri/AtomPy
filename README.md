@@ -615,7 +615,7 @@ declared key-set of `scripts/regen_cells.py`; the methods tables —
 `scripts/radial_scan.py`; the
 lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
 `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
-suite (149 tests) — term tables, exact-class closure pins, basin
+suite (150 tests) — term tables, exact-class closure pins, basin
 branches.
 
 ### Status and directions
