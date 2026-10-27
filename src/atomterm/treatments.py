@@ -2,21 +2,31 @@
 analysis pass, compared all-vs-all (ticket 08 on carbon, ticket 09 on
 Si). The declared treatment axis of the study runner (:mod:`atomterm.study`).
 
-Rungs, in order of increasing orbital freedom:
+Rungs, in order of increasing orbital freedom. Each entry carries the
+one question it answers (the plain-language tour that used to live in
+RUNGS.md, dissolved here 2026-10-27):
 
 1. casci_raw    -- CASCI on the raw shell window, reference core folded as-is
                    (no spherical averaging): the deliberately symmetry-broken
-                   reference. Fingerprint: [H, Lz] ~ eps and the multiplet
-                   split {M_L=0} vs {+-1} (quadrupole k=2, m=0 core field;
-                   the dipole k=1 is excluded by parity). In a sector that
-                   is a complete single irrep L^2 = L(L+1)*Id identically,
-                   so [H, L^2] carries no information there.
+                   reference. Fingerprint: [H, Lz] ~ eps and an atom-dependent
+                   multiplet split (C: {M_L=0} vs {+-1}, the k=2 m=0
+                   quadrupole, dipole excluded by parity; Ti: D2 classes at
+                   percent-level anisotropy). In a sector that is a complete
+                   single irrep L^2 = L(L+1)*Id identically, so [H, L^2]
+                   carries no information there.
+                   Question: how big is the raw reference's symmetry breaking?
 2. casci_avg    -- spherically averaged core: exact zeros. The scalar
                    projection of the polarized reference core.
+                   Question: was the breaking entirely the core's anisotropy?
+                   (Yes, on C/Si/Sc.)
 3. casci_frac   -- average-of-configuration core (fractional-occupation SCF),
                    folded WITHOUT averaging: spherical at the source.
+                   Question: how much does the choice of reference itself
+                   matter? (A different functional, not the eps -> 0 limit.)
 4. casscf_relax -- window span frozen; only core<->virtual rotations: adds
                    the core's polarization by the correlated active density.
+                   Question: how much does plain core relaxation contribute,
+                   and at what symmetry cost?
 5. casscf_radial -- window slots may rotate ONLY with same-(l, m) partners
                    (pure radial mixing, member-preserving basis + mask):
                    how much correlation is radially reachable WITHOUT any
@@ -24,16 +34,27 @@ Rungs, in order of increasing orbital freedom:
                    the radial rotation applied identically to all m
                    partners; independent per-member radial mixing can leave
                    [H, Lz] at the member-radial-difference level (that is
-                   the measurement).
+                   the measurement). Question: how much correlation is
+                   radially reachable with zero angular freedom? (On C/Si:
+                   all of it.)
 6. casscf_virtmix -- core<->window exchange blocked; window may borrow
                    virtual character: the active pair's radial correlation,
                    isolated from identity-changing rotations.
+                   Question: is the TM escape reachable through virtuals
+                   alone? (Yes -- blocking core exchange does not prevent
+                   it; blocking l-change does.)
 7. casscf_shell -- free CASSCF from the raw-shell start.
 8. casscf_pyscf -- free CASSCF from PySCF's default start (start dependence).
+                   Question (7+8): where does an unconstrained optimizer
+                   actually go, and does the starting guess matter?
 9. sa / sa_radial / sa_pyscf -- SA-CASSCF over the given weights: free from
-                   the raw-shell start; constrained to radial rotations
-                   (imposed symmetry -- does SA + the constraint drive BOTH
-                   commutators to zero?); free from the canonical start.
+                   the raw-shell start (question: does averaging restore
+                   the symmetry?); constrained to radial rotations
+                   (question: with everything else frozen, does SA drive
+                   BOTH commutators to zero? C: yes, 8e-11; Sc: down to
+                   the input-window baseline ~1e-3); free from the
+                   canonical start (question: is SA's outcome
+                   start-dependent? Very much so on Sc).
 10. *_pur rungs (optional, ``run_rungs(..., purified=True)``) -- the same
                    treatments on the PURIFIED core substrate
                    (:func:`purified_core_orbitals`: an exactly L-closed
@@ -43,6 +64,9 @@ Rungs, in order of increasing orbital freedom:
                    exactly wherever the optimizer has a restoring force
                    (C/Si: yes; Sc: the flat member gauge leaves a ~1e-6
                    residual; the free-sa 4s<->3p swap attractor persists).
+                   Question: with the baseline gone, which optimized rungs
+                   close at machine precision? (All the frozen-window ones,
+                   on every atom.)
 
 Adding a rung = appending one :class:`Rung` to :func:`_registry` (data, not
 code): the runner executes it through :func:`stage_facts` and the report

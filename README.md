@@ -610,7 +610,7 @@ per-atom `run_rungs` calls; scans — `scripts/radial_scan.py`; the
 lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
 `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
 suite (130 tests) — term tables, exact-class closure pins, basin
-branches. Plain-language companion: `RUNGS.md`.
+branches.
 
 ### Status and directions
 
