@@ -14,7 +14,7 @@ ECP + cut-Dyall).
 ```bash
 conda activate pyscf          # PySCF 2.13 environment (any platform; in a bare
                               # shell: source <conda-root>/etc/profile.d/conda.sh first)
-pytest                        # 128 tests, ~13 min (chkfile caching); -m fast = sub-second tier
+pytest                        # 129 tests, ~13 min (chkfile caching); -m fast = sub-second tier
 python scripts/run_c.py       # writes elements/C/ (report.md/.json + chkfiles)
 ```
 
@@ -45,14 +45,16 @@ Sz eigenvalues (M_S content): [+1] x10   (exactly M_S·1 in a fixed sector)
 
 The textbook d² multiplet comes out exactly (Hund: ³F ground, ³P
 excited) — commutators at round-off, because the {3d} window is exactly
-rotation-closed. The Ŝz line documents the sector's M_S; it certifies
-nothing, since [Ĥ, Ŝz] ≡ 0 identically (Motivation). Details: Results
-(Term table, Multiplet energies); regeneration: Results (Files).
+rotation-closed. Every atom delivers this per Ms sector; any atom's
+tables: `elements/<Atom>/TABLES.md`. The Ŝz line documents the
+sector's M_S; it certifies nothing, since [Ĥ, Ŝz] ≡ 0 identically
+(Motivation). Details: Results (Term table, Multiplet energies);
+regeneration: Results (Files).
 
-**Treatment rungs** — every orbital treatment priced against the ROHF
-anchor, the free variant beside the symmetric one, each classified by
-its diagnostics. Titanium's manifest: Results (Methods compared); the
-full per-atom tables — `elements/<Atom>/TABLES.md`.
+**Treatment rungs** — every orbital treatment priced against the
+atom's ROHF anchor, the free variant beside the symmetric one, each
+classified by its diagnostics. The manifest: Results (Methods
+compared); the per-atom tables — `elements/<Atom>/TABLES.md.`
 
 ---
 
@@ -67,12 +69,12 @@ reference, confines the configurations to a small active set — the
 **window** — and represents the omitted core electrons by a folded mean
 field. The effective Hamiltonian is
 
-  Ĥ = Σ_pq h_pq a†_p a_q + ½ Σ_pqrs (pq|rs) a†_p a†_q a_s a_r.
+    Ĥ = Σ_pq h_pq a†_p a_q + ½ Σ_pqrs (pq|rs) a†_p a†_q a_s a_r.
 
 Splitting the orbitals into core (i — doubly occupied, frozen), active
 (t — the CAS window) and virtual (a — empty), the partition gives
 
-  Ĥ_CAS = E_c + Σ_tu f_tu Ê_tu + ½ Σ_tuvw (tu|vw) ê_tuvw,
+    Ĥ_CAS = E_c + Σ_tu f_tu Ê_tu + ½ Σ_tuvw (tu|vw) ê_tuvw,
 
 - **E_c** — the frozen core's own energy (constant).
 - **Ê_tu = Σ_σ a†_tσ a_uσ** — spin-summed excitation ("move an active
@@ -86,9 +88,7 @@ Splitting the orbitals into core (i — doubly occupied, frozen), active
   orbitals.
 
 CASCI is the exact diagonalization of this effective Hamiltonian; its
-only approximation is the frozen mean field of the inactive space —
-the mean-field approximation: core–active interaction kept static,
-core–active correlation dropped. The
+only approximation is the frozen mean field of the inactive space, so core–active interaction is kept static, core–active correlation is dropped. The
 partition is **exact iff the window is orthogonal to the core
 orbitals**: a window vector leaning into the core, w = w⊥ + w∥ with
 w∥ ∈ span(core), admits configurations with extra density in *occupied*
@@ -98,22 +98,26 @@ have priced. Every window is therefore built core-orthogonal.
 
 **Injection point 1 — the fold.** The active–active part (tu|vw) is a
 rotational scalar; **the folded part f carries whatever symmetry the
-core density ρ_c has**. ROHF's ρ_c is axial → f is axial → Ĥ_CAS is
-axial: the first entry of symmetry breaking. The same is seen through
-orbital rotations: the optimized core orbital sits in its polarized
-shape φ_c = 1s + λ·d₀ (λ = the polarization amplitude — the core, not
-the window, is the problematic object here); rotating it by 90° about x
-remixes Y₂₀ into dz² and dx²−y² combinations the frozen space
-{φ_c, 2s} does not contain. Since the frozen core sits inside Ĥ_CAS
+core density ρ_c has**. ROHF's ρ_c is axial (e.g., for Carbon atom) → 
+f is axial → Ĥ_CAS is axial: the first entry of symmetry breaking. The same
+is seen through orbital rotations: the valence open shell exerts a
+quadrupolar (rank-2, m = 0 about the axis) field on the core, and
+first-order perturbation theory mixes the s core orbital with what the
+selection rule allows — l → l ± 2, m fixed — the d shell's m = 0
+member d₀ (= dz²). The optimized core orbital sits in its polarized
+shape φ_c ≈ 1s + λ·d₀ (λ = the polarization amplitude); rotating by
+90° about x turns the needed admixture into a dz²/dx²−y² combination —
+a d direction the frozen space {φ_c, 2s} (an s span plus that one d₀
+direction) does not contain. Since the frozen core sits inside Ĥ_CAS
 through f_tu, the leak is inherited:
 
-  U(R)⁻¹ Ĥ_CAS U(R) = Ĥ_CAS[core on a new axis] ≠ Ĥ_CAS unless R is
-  about z.
+    U(R)⁻¹ Ĥ_CAS U(R) = Ĥ_CAS[core on a new axis] ≠ Ĥ_CAS unless R is
+    about z (in case of Carbon atom).
 
 The symmetry group of Ĥ_CAS is the stabilizer of the frozen core
-density — rotations about the torus axis, when such an axis exists.
-The cure is a symmetric ρ_c; three core treatments are compared in the
-project:
+density (e.g., rotations about the torus axis, when such an axis exists as for
+Carbon atom). The cure is a symmetric ρ_c; three core treatments are compared
+in the project:
 
 - **raw** — ρ_c as the SCF left it: ε unscreened, the detector.
 - **averaged** — ρ_c spherically averaged (its l = 0 part kept) before
@@ -131,22 +135,23 @@ to the numerical axiality of the converged ρ_c; [Ĥ_CAS, Ŝz] = [Ĥ_CAS,
 (real Hamiltonian). SO(3) descends to the stabilizer, and the term
 branches into its components — never "splits arbitrarily".
 
-**The worked instance — carbon 2p²** (an illustration, not the general
-theory). ROHF places the two ³P electrons in {px, py}: the open-shell
+**The worked instance — carbon 2p²** (illustration). ROHF places
+the two ³P electrons in {px, py}: the open-shell
 density is a torus, axial about z. The ³P multiplet branches by |M_L|
 into Π (M_L = ±1) and Σ (M_L = 0) — exactly the σ/π branching of a
-linear molecule or a ligand field, which makes the axial-field response
-testable against known crystal-field splittings (the verification
-program, Results). Other references have other, generally smaller
+linear molecule or a ligand field, measured on carbon (the ³P Σ/Π gap,
+the chain table below); a systematic cross-check against known
+crystal-field splittings belongs to the verification program (Status
+and directions). Other references have other, generally smaller
 stabilizers — hence measured raw-fold commutators from the 1e-5 class
 (C, an almost perfect axis) to percent class (Ti).
 
 **Injection point 2 — the window.** With P the projector onto the
 active configuration space, the exact commutator [Ĥ, L̂] = 0 gives
 
-  [PĤP, PL̂P] = PL̂(1−P)ĤP − PĤ(1−P)L̂P:
+    [PĤP, PL̂P] = PL̂(1−P)ĤP − PĤ(1−P)L̂P,
 
-if the space and its complement are rotation-closed ([P, L̂] = 0), the
+and if the space and its complement are rotation-closed ([P, L̂] = 0), the
 projected generators still close the algebra and Schur survives. This
 is what the code checks: ‖[P, L̂z]‖ and ‖[P, L̂⊥]‖ (`window_closure`).
 Carbon shows why the window must span the whole valence shell
@@ -154,17 +159,19 @@ Carbon shows why the window must span the whole valence shell
 stays inside the p span; a truncated set leaks. The active set — the
 **window** — is therefore always chosen shell-complete and built
 core-orthogonal: closure is imposed by design, never converged to.
-Windows are used in three kinds throughout, compared at matched
-determinant cost (Results): **m-complete AO shells and bands** —
-rotation-closed by design; **raw-ROHF MO selections** — the open
-reference orbitals plus valence virtuals, never rotation-closed (the
-SCF's open orbitals are m-delocalized); and **natural-orbital (NO)
-occupation groups** — NOs of the term-averaged density, which by
-Schur's lemma arrive as complete m-sets: rotation-closed by
-construction.
+Starts come in three kinds throughout, compared at matched determinant
+cost (Results); their spans are the windows: **m-complete AO shells
+and bands** — rotation-closed by design; **raw-ROHF MO picks** —
+energy order slices through the degenerate open shell, whose members
+are m-delocalized, so these never close (occupancy-guided picks from a
+symmetric reference — the fractional SCF, whose exactly degenerate
+shells are flagged by occupation — take whole blocks and close as
+naturally as shell spans); and **natural-orbital (NO) occupation
+groups** — NOs of the term-averaged density, which by Schur's lemma
+arrive as complete m-sets: rotation-closed by construction.
 
-**The chain, measured.** ε — the core anisotropy — against the
-splitting it produces (raw fold):
+**The chain, measured.** ε (the core anisotropy; defined with the
+meters, below) against the splitting it produces (raw fold):
 
 | Atom | ε (relative) | splitting (Eh) | splitting/ε (Eh) | ⟨L̂²⟩ of the ground term |
 |---|---|---|---|---|
@@ -174,18 +181,23 @@ splitting it produces (raw fold):
 | Sc | 1.259e-2 | 1.857e-3 (²D quintet) | 0.15 | 6.0001 |
 | U | — (not measured; U runs on the pur substrate) | | | |
 
-Two readings. The splitting is finite while ⟨L̂²⟩ stays exact: the fold
-is spin-free, so terms of different S never mix (¹D admixes ¹S; ³P can
-never admix ¹D) — the degeneracy dies (the branching), the high-spin
-label is SU(2)-protected. And the breaking is a frozen *response*: in
-the exact theory the core follows each M_L component and the
-degeneracy survives; freezing the core at the reference's polarization
-cuts that loop. Hence the splitting scales as (valence quadrupole) ×
-(core quadrupolar polarizability): no polarization functions — closed
-channel, accidental degeneracy; every shell added reopens it (the
-verification program, Results). The ratio splitting/ε is the effective
-coupling — an atomic property. Commutators and splittings are the
-detectors; a numerically pretty ⟨L̂²⟩ is not.
+Two readings of one measured number — the splitting:
+
+- *The labels survive; the degeneracy dies.* The fold is spin-free, so
+  different-S terms never mix (¹D ↔ ¹S only, never ³P — the spin-free
+  commutation, above): ⟨L̂²⟩ stays exact while the M_L degeneracy
+  branches. The splitting, not the label, is the signal.
+- *A frozen response.* In the exact solution the core repolarizes for
+  each M_L component and the degeneracy survives; freezing ρ_c at the
+  reference's shape cuts that loop. The splitting scales as valence
+  quadrupole × core quadrupolar polarizability — zero without
+  polarization functions (closed channel, accidental degeneracy),
+  reopened by every polarization shell (the verification program,
+  Status and directions). Splitting/ε is the effective coupling, an
+  atomic property.
+
+The detectors are the commutators and the splittings; a numerically
+pretty ⟨L̂²⟩ is not.
 
 Every remedy reports how it achieves this, and the energetic cost
 relative to the broken-symmetry solutions.
@@ -196,14 +208,14 @@ We work with spin-orbitals (α = 0..n−1, β = n..2n−1) and
 **determinants** — sorted occupation tuples. A **sector** fixes the
 numbers (n_α, n_β) of α/β electrons, hence M_S = (n_α−n_β)/2 and N. A
 **member** is one m-function of a shell (px, py, pz; the d and f sets
-below). The operators N̂, L̂z, L̂², Ŝz, Ŝ² all preserve sectors (each
+below). The operators N̂, L̂z, L̂z², L̂², Ŝz, Ŝ² all preserve sectors (each
 commutes with Ŝz and N̂), so every matrix lives inside one sector of
 fixed M_S.
 
 Every operator enters the determinant space as a **one-body part** and,
 where it has one, a **two-body part**,
 
-  O₁ = Σ_pq o_pq a†_p a_q,   O₂ = ½ Σ_pqrs g_pqrs a†_p a†_q a_s a_r,
+    O₁ = Σ_pq o_pq a†_p a_q,   O₂ = ½ Σ_pqrs g_pqrs a†_p a†_q a_s a_r,
 
 with these symbols (spin-orbitals ordered (α; β); L̂^a = C† L̂^a_AO C,
 a = x, y, z — the AO angular-momentum matrices transformed into the
@@ -212,6 +224,8 @@ window):
 ```
 N̂  :  o = 𝟙                                          (counts each electron once)
 L̂z :  o = L̂^z
+L̂z²:  o = (L̂^z)²
+      g = 2·(L̂^z)_pr (L̂^z)_qs
 L̂² :  o = Σ_a (L̂^a)²
       g = 2 Σ_a (L̂^a)_pr (L̂^a)_qs
 Ŝz :  o = diag(½·𝟙, −½·𝟙)
@@ -228,28 +242,18 @@ operators: L̂² = L̂z² + ½(L̂₊L̂₋ + L̂₋L̂₊), Ŝ² = Ŝz² + ½(S
 [L̂z, L̂±] = ±L̂±. Ŝz carries no certificate — [Ĥ, Ŝz] ≡ 0 identically;
 it only labels the sector (its matrix is exactly M_S·**1**).
 
-**⟨L̂z²⟩** — a per-root expectation of L̂z·L̂z in the run's own fold,
-reported beside ⟨L̂²⟩. In an isotropic fold the term roots are
-M_L-degenerate, so the value is a degenerate-cluster gauge (starred
-in the tables — anything in [0, L(L+1)] is admissible). On a broken
-fold M_L is not conserved (the real-AO SCF field breaks axial symmetry
-to D₂); the value measures the root's M_L² *content*, and the term's
-trace Σ⟨L̂z²⟩ = L(L+1) is conserved across the split — the raw-fold
-ground root reads 4.0000: dominant |M_L| = 2 content (Ti CAS(4,6),
-the Multiplet demonstration, Results).
-
 **ε — the core anisotropy** — is the relative weight of the non-scalar
 part of the frozen core density, ‖ρ_c − ρ̄_c‖_F / ‖ρ̄_c‖_F (ρ̄_c = the
 spherical average; measured directly from the SCF density by
-`core_anisotropy()`, no CI involved). The standing examination: sharp
-term labels per root, the commutator norms, the combinatorial term
-table. The meters, and what each is blind to:
+`core_anisotropy()`, no CI involved). The meters, and what each is
+blind to:
 
 | Diagnostic | What it measures | Sensitive to | Blind to |
 |---|---|---|---|
 | ‖[Ĥ, L̂z]‖_F, ‖[Ĥ, L̂²]‖_F | the assembled treatment (window + core fold) | everything, order ε | vacuous in single-irrep sectors (L̂²); ±pair structure (L̂z) |
 | ‖[P, L̂z]‖, ‖[P, L̂⊥]‖ | the window span alone | member asymmetry, missing members; no optimizer noise | — (as a pair) |
 | ⟨L̂²⟩, ⟨Ŝ²⟩ per root | term identity | order ε² | small defects |
+| ⟨L̂z²⟩ per root | the root's M_L² content | broken folds: each branch's composition | isotropic folds: degenerate-cluster gauge (starred) — not a per-root observable |
 | multiplet splitting | fold anisotropy | order ε | — |
 | orthonormality error | validity of the stage's MO matrix (C†SC = 1) — a guard, not a symmetry diagnostic | construction bugs | — |
 
@@ -266,49 +270,58 @@ a *gauge* (energetically indistinguishable descriptions); in
 multi-dimensional blocks the tilt splits the degenerate block
 symmetrically about its trace, so the lowest level *descends*
 (Jahn–Teller-like) — the optimizer is driven to break M; and the state
-average is stationary with zero curvature — no restoring force. The
-frozen-scan verdicts (deterministic, no optimizer; curves per atom in
-`elements/<Atom>/scan.md`): on p² the entire CASSCF gain is one m-symmetric
-radial rotation at exact closure (C −250.8, Si −126.7 mEh) and tilts
-are exactly flat — breaking never buys energy; on d atoms radial
-rises, tilts descend — and the large free-run gains are
-window-identity changes instead: the **escape** (window rebuilt from
-orbitals the configuration never implied; states describe no term) and
-the **swap** (a valence 4s for a core 3p — a different core/active
-partition; totals only). Every CASSCF start also carries the
-**start-window defect**, ‖[P_w̃, L̂]‖ ≲ ⟨window|core⟩·‖[P_core, L̂]‖,
-from core-orthogonalizing against a non-closed core — zeroed by the
-purified substrate (Methods).
+average (SA-CASSCF, Methods) is stationary with zero curvature — no
+restoring force. The frozen-scan verdicts (deterministic, no optimizer;
+curves where measured, `elements/<Atom>/scan.md`): on p² the entire
+CASSCF gain is one m-symmetric radial rotation at exact closure and
+tilts are exactly flat — breaking never buys energy; on d atoms radial
+rises, tilts descend — the drive behind their broken basins. The large
+free-run gains are window-identity changes instead: the **escape** —
+the optimizer rebuilds the window from orbitals the configuration
+never implied, and the converged states match no term; the **swap** —
+a valence orbital exchanged for a core one, a different core/active
+partition (totals only, Partition bookkeeping). Which basin a free run
+finds is start-dependent; instances and verdicts: Results (Methods
+compared) and the element files. Every CASSCF start also carries the
+**start-window defect** (closure lost at core-orthogonalization
+against a non-closed core) — zeroed by the purified substrate
+(Methods).
 
 ### The failure inventory
 
-| Level | Symptom (order of magnitude) | Mechanism | Fix | Cost |
-|---|---|---|---|---|
-| 1. Basis bookkeeping | labels mislead; shells fuse | wrong inputs → wrong constructions | label + metric discipline | none |
-| 2. Sector witnesses | ‖[Ĥ,L̂²]‖ = 0 with defects present | single-irrep sectors make L̂² = L(L+1)·**1**; ±pair blind spots | projector pair; multi-term sectors | sector size |
-| 3. Core field | splittings and commutators 1e-5…1e-1 | the polarization chain (above) | fold cures / purification (Methods) | ΔE per Results |
-| 4. Orbital optimization | tilted windows, floors, escape/swap | flat and descending directions; identity change | restrictions + substrate (Methods) | 0…~30 mEh above the deepest minimum |
-| 5. SCF reference | ~1e2 mEh wrong configuration; ~10 mEh metastable basin | energy-ordered filling; degenerate-open-shell basins | the Methods toolbox | per-atom reference data |
+Two injection points carry every symmetry failure — the fold (IP 1)
+and the window (IP 2); the SCF reference sits upstream of both, and
+the instrument (labels, sectors, orthonormality) can lie on its own.
 
-**Resolutions.** Every cure removes ε at its source: (i) state
-averaging over rotation-complete state sets — the polarizations of all
-M_L components average to a spherical core, and every state of the
-average shares one scalar Ĥ_CAS; (ii) term-adapted multi-determinant
-references; (iii) promoting the core into the active space; (iv)
-shell-complete active windows (m-complete by construction); (v)
-verification — ⟨L̂²⟩, the ±M_L pairing, the L̂₊ tests and the stabilizer
-test (the verification program, Results). Class mapping: *exact* —
-raw-window CASCI, frozen-window rungs on the isotropic substrate;
-*baseline* — the start-window defect and the flat-direction floor;
-*broken* — the escape and the swap.
+| Where | Failure | Symptom | Mechanism | Cure |
+|---|---|---|---|---|
+| the instrument | basis bookkeeping | labels mislead; shells fuse | wrong inputs → wrong constructions | label + metric discipline |
+| the instrument | sector witnesses | ‖[Ĥ,L̂²]‖ = 0 with defects present | single-irrep sectors make L̂² = L(L+1)·**1**; ±pair blind spots | projector pair; multi-term sectors |
+| upstream of both | SCF reference | ~1e2 mEh wrong configuration; ~10 mEh metastable basin | energy-ordered filling; degenerate-open-shell basins | character-forced occupations + energy gate (Methods) |
+| **IP 1 — the fold** | core field | splittings and commutators 1e-5…1e-1 | the polarization chain (above) | averaged fold / SA / purification (Methods) |
+| **IP 2 — the window** | orbital optimization | tilted windows, floors, escape/swap | flat and descending directions; identity change | shell-complete starts + masks (radial / frozen — imposed on CASSCF and SA alike) + substrate (Methods) |
+
+**Resolutions.** Every cure removes ε at its source, at its injection
+point: (i) state averaging over rotation-complete state sets (IP 1) —
+the polarizations of all M_L components average to a spherical core,
+and every state of the average shares one scalar Ĥ_CAS; (ii)
+term-adapted multi-determinant references (upstream); (iii) promoting
+the core into the active space (dissolves IP 1); (iv) shell-complete
+active windows, m-complete by construction (IP 2); (v) verification —
+⟨L̂²⟩, the ±M_L pairing, the L̂₊ tests and the stabilizer test (the
+instrument; the verification program, Status and directions). Class
+mapping: *exact* — raw-window CASCI, frozen-window rungs on the
+isotropic substrate; *baseline* — the start-window defect and the
+flat-direction floor; *broken* — the escape and the swap.
 
 ---
 
 ## Methods
 
 **ROHF — the reference that defines the core.** Everything downstream
-folds it. Where energy-ordered filling fails (a doubly-occupied-d
-runaway ~1e2 mEh wrong; a metastable polarized basin ~10 mEh up) it is
+folds it. Where energy-ordered filling fails (a runaway to a wrong
+closed-shell configuration, ~1e2 mEh too high; a metastable polarized
+basin, ~10 mEh up) it is
 kept honest by character-forced occupations (orbital type measured by
 S-projector weight, not energy order), an energy gate over cycled
 starting guesses, and cached trusted references — E_ref and the AO
@@ -316,14 +329,15 @@ spans are the atom's data. It is also the source of ε; the fold
 variants are the three core treatments above.
 
 **CASCI — at fixed core and window.** Diagonalizes one sector; the
-window is the raw shell AOs (rotation-closed by construction); the core
-enters through the fold (the three treatments above).
+window is a stated *start*'s span — AOs, MOs, or NOs (the start axis,
+below); closure is a property of the span. The core enters through the
+fold (the three treatments above).
 
 **CASSCF — letting the orbitals move.** Minimizes one root over orbital
-rotations — the relaxation CASCI cannot express. Run as a grid of
-*starts × restrictions*: the **substrate** (the starting MO matrix:
-block-safe, the window core-orthogonalized — the leak guard of the
-partition exactness, Motivation) and **masks** on rotation pairs:
+rotations — the relaxation CASCI cannot express. Run as a grid over
+*starts × masks × substrate*: the **substrate** is the starting MO
+matrix (block-safe, the window core-orthogonalized — the leak guard of
+the partition exactness, Motivation); **masks** on rotation pairs:
 
 1. window frozen (correlation through the core alone),
 2. radial restriction (same-(l, m) chains only — the
@@ -335,74 +349,102 @@ landscape has several. Start and converged windows are compared by the
 **span overlap** (smallest principal cosine between the two spans —
 did the window become a different space?).
 
-**The start axis and the manifest tables.** The third grid coordinate,
-beside substrate and mask: the **start** — *AOs* (shell AOs in the
-optimizer-runnable orthogonalized form), *MOs* (canonical MOs with a
-stated picking rule; the stock default is PySCF's low-energy slice,
-other picks admissible per slot), *NOs* (occupation groups of the
-term-averaged CI — the default start, rotation-closed by
-construction); *virtual-mix* appears only as a registry diagnostic.
-The **objective** is the fourth axis: the single root (CASSCF) or the
-ground term's M_L average (SA-CASSCF). The manifest tables read
-mechanically: a blank factor cell inherits from the row above, and a
-pending row is a planned run.
+**The start axis.** The columns that define the window span — the same
+axis CASCI's windows and the optimizer grid use: *AOs* (shell AOs in
+the optimizer-runnable orthogonalized form), *MOs* (canonical MOs with
+a stated picking rule; the stock default is PySCF's low-energy slice,
+other picks admissible per slot; closure is a property of the pick —
+Motivation), *NOs* (occupation groups of the term-averaged CI — the
+default start, rotation-closed by construction); *virtual-mix* appears
+only as a registry diagnostic. The manifest tables read mechanically:
+a blank factor cell inherits from the row above, and a pending row is
+a planned run.
 
-**Partition bookkeeping (the free-mask risk, made precise).** For a
-partition (C, W) — core columns C, window W — the folded energy is exactly
+**Partition bookkeeping (the free-mask risk, made precise).** The
+quantity at risk is the energy itself: a folded total is an energy *of
+a stated partition*. For a partition (C, W) — core columns C, window
+W —
 
     E(C, W) = E_core[C] + min_Ψ∈W ⟨Ψ| Ĥ[h₁(ρ_C)] |Ψ⟩,
 
-by the Slater–Condon resolution: integrals with an index in C are
-absorbed into the folded field h₁(ρ_C) = h + J[ρ_C] − K[ρ_C] (our
-fold: `build_operators`), pairs in C into E_core[C] (`_core_energy`),
-and the remainder acts inside W — machine-exact against PySCF's own
-fold `get_h1eff` (`scripts/diag_fold.py`, 1e-15). This is a statement
-about the *partition*, not about any column order: it transfers to our
-analysis (which takes the split `mo[:, :ncore] | mo[:, ncore:]`,
-`stage_facts`) if and only if that split coincides with the run's
-partition. A free-mask optimizer may exchange core and window
-orbitals; the kernel's final canonicalization then orders columns by
-energy, and the split no longer equals the partition — the moved
-orbital φ is folded into ρ_C *and* correlated inside W at once. The
-printed number double-counts φ's mean field and displaces its partner:
-it is not an energy of any partition and reads *below* the kernel's
-own total. The fold shift exists to catch this: ~0 = fold
-consistency; mEh = the averaging effect; large-and-below = partition
-changed — such rows are compared in the kernel's own totals only.
-
-The **frozen-window** mask: the window span is untouched (closure
-preserved whatever the core), only core↔virtual rotations re-optimize
-the core's description. Its purified twin (**frozen, pur**) runs the
-same mask on the purified core substrate, so the run inherits a scalar
-fold — the certified class. Single-root CASSCF stays gauge-chaotic even
-on the purified substrate (its breaking directions are its own), which
-is why the tables report the plain frozen-window row for CASSCF and the
-purified one for SA-CASSCF — the state average restores what a single
-root cannot.
+exactly (Slater–Condon: core-index integrals fold into
+h₁(ρ_C) = h + J[ρ_C] − K[ρ_C] — our fold, `build_operators`; pairs in
+C into E_core[C]; machine-exact against PySCF's own fold `get_h1eff`,
+1e-15, `scripts/diag_fold.py`). Our analysis splits
+`mo[:, :ncore] | mo[:, ncore:]` (`stage_facts`) — valid iff that split
+equals the run's partition. A free mask may exchange core and window
+orbitals; the kernel's final canonicalization then reorders columns by
+energy, and split ≠ partition: the moved orbital φ is folded into ρ_C
+*and* correlated inside W — double-counted. Such a number is an energy
+of no partition and reads *below* the kernel's own total. The **fold
+shift** catches it: ~0 consistent; mEh the averaging effect;
+large-and-below partition changed (compare kernel totals only).
 
 **SA-CASSCF — the multiplet average.** Replaces the single root by the
 average over the ground term's M_L components — the rotationally scalar
 object. It anchors the term identity but not the window. The certified
-variants:
+variants are similar to CASSCF theory.
 
-1. frozen window,
-2. frozen window on the **purified core substrate** — the core span
-   rebuilt as complete m-sets on shared radials, exactly isotropic.
-
-**Scans — the frozen landscape.** A diagnostic tool, not a deliverable:
-freeze everything, deform one window coordinate, re-diagonalize the
-CASCI — deterministic, no optimizer; the anatomy of the optimizer's
-gain (Motivation, above). Per-atom curves: `elements/<Atom>/scan.md`.
+**Scans — an optional, experimental diagnostic.** A tool, not a
+deliverable: freeze everything, deform one window coordinate,
+re-diagonalize the CASCI — deterministic, no optimizer; the anatomy of
+the optimizer's gain (Motivation, above). Curves where measured:
+`elements/<Atom>/scan.md`.
 
 **Running.** Every stage checkpointed (chkfiles cached and trusted);
 tests in two tiers (`-m fast`, sub-second; the full suite ~13 min); a
 new atom is per-atom data, not code (the pipeline, below).
 
-| Standard approach | Expected result | Explanation | Alternative |
-|---|---|---|---|
-| CASCI over canonical virtual MOs | closure defects at the 1e-1 level; term labels unreliable | canonical MOs diagonalize a Fock built from an anisotropic density; quasi-degenerate same-l members mix arbitrarily | raw shell windows, averaged fold |
-| free CASSCF, default start | p²: full gain with a silently member-tilted window; d-shells: escape/swap basins, ⟨L̂²⟩ off by units | flat directions (endpoint = noise) and descending directions; window identity free to change | restrictions + substrate control |
-| free SA-CASSCF | ⟨L̂²⟩ ≈ L(L+1) restored, closure not (Sc: 6.002 with ‖[H,L̂z]‖ ≈ 0.8) | the average is scalar to first order only; no restoring force on flat directions; other basins still reachable | frozen-window SA on the purified substrate |
+**The treatment grid.** Not a menu of standard approaches — one
+declared grid, priced and classified. Holding the atom's window fixed,
+the axes are:
+
+- the **fold** — raw / averaged / fractional (the core field; IP 1),
+- the **start** — AOs / MOs / NOs (the columns defining the window
+  span; IP 2),
+- the **mask** — free / radial / frozen (which rotations the optimizer
+  may use; IP 2, imposed on CASSCF and SA alike),
+- the **objective** — the single root or the ground term's M_L average,
+- the **substrate** — polarized / purified (the core span under the
+  fold; touches both injection points).
+
+Every cell is priced against the ROHF anchor and classified by the
+diagnostics; the grid localizes each failure by which axis flips it,
+and the certified cells prove restoration at a stated cost. Any run
+declares a **subset** of cells — the spine below is the default.
+
+**Which cells are needed.**
+
+- *The spine (default subset, every atom):*
+  - the three folds;
+  - frozen × purified under both objectives — the certified class;
+  - one free row per substrate — the basin detectors.
+- *Diagnostics, run as needed:*
+  - radial × purified × SA — the gauge anchor;
+  - the MOs start — representability, at the smallest windows;
+  - virtual-mix — a registry check.
+- *Redundant by design (optional):*
+  - extra starts under free — demonstrate basin identity;
+  - the single-root twin of a certified cell — reads the gauge.
+
+**Gates (what the code enforces).**
+
+1. the reference gate — character-forced occupations plus an energy
+   gate over cycled starting guesses (`run_rohf(ref=…)`);
+2. checkpoint trust — cached chkfiles reused as-is;
+3. the orthonormality guard — C†SC = 1 checked before any analysis
+   (the divergence guard);
+4. construction gates — block-safe core-orthogonalization;
+   near-linear dependence raises a named error rather than NaN-ing;
+5. basin branches — where SCF chaos is bimodal, verdicts branch on
+   window weights, never on noise.
+
+**Direct runs — analyzed, not avoided.** Gating is half the design; the
+other half runs the *ungated* variants (PySCF used directly:
+energy-ordered MO picks, free optimization, the raw fold) through the
+same analysis. The direct class is identifiable in the grid — stock MO
+starts under the free mask, raw fold — and every broken row of the
+manifest is one of these, classified rather than discarded.
 
 ### The pipeline
 
@@ -439,40 +481,20 @@ several starting guesses are tried, their solutions classified by
 character (the S-projector weight), and the passing basin's energy
 recorded.
 
-### The protocol card
-
-**Run all five deliverables, report all five** — the certified treatment
-and the direct values are complements, not alternatives. Each deliverable
-is a named configuration in the Methods space; each optimizer
-deliverable is reported as the pair *free variant / symmetric variant*.
-
-| Deliverable | Configuration | Purpose | Acceptance |
-|---|---|---|---|
-| ROHF reference | forced filling + gate | the anchor every ΔE hangs on | occupations & core purity by projection; E = E_ref |
-| CASCI anchor | raw shell window, averaged fold | the exact term tables | tables = combinatorial; commutators exact |
-| Certified treatment | SA-CASSCF + window frozen + purified core | exact-class symmetry with correlation | commutators & window spans exact; tables intact |
-| Direct CASSCF | free, shell substrate | the energy-seeking value + basin anatomy | classified (span overlap, window weights); totals quoted |
-| Direct SA-CASSCF | free SA-CASSCF, shell substrate | best direct value; term-readable even in the swap basin | term label; basin classified; totals quoted |
-
-For a new atom: (1) run the reference (spans and E_ref are the atom's
-data); (2) the CASCI anchor — term tables must come out exact (Results);
-(3) the certified treatment (expect the exact class); (4) both direct
-runs, classified; (5) optionally, frozen scans for the radial/tilt
-anatomy.
-
 ---
 
 ## Results
 
 All raw-shell windows and the averaged fold unless stated; every number
-is this project's measurement. **Every other atom lives in
-`elements/<Atom>/TABLES.md`**
-(C and Si mirror each other throughout, Sc and U carry the
-transition-metal and f-scale stories); the artifacts are under
-`elements/Ti/` (regeneration: Files, below). Ti: ROHF reference
-−848.406489 Eh (3d²4s², the gated reference), M_S = 1, ground term ³F.
-On symmetry-broken basins the term table itself scrambles — independent
-evidence beyond the commutators.
+is this project's measurement. **Every atom lives in
+`elements/<Atom>/TABLES.md`**, each file repeating this structure —
+term table, multiplet energies, the manifest, the lattice, others (C
+and Si mirror each other throughout, Sc and U carry the
+transition-metal and f-scale stories). The worked instance is Ti — the
+artifacts under `elements/Ti/` (regeneration: Files, below); its ROHF
+reference −848.406489 Eh (3d²4s², the gated reference), M_S = 1,
+ground term ³F. On symmetry-broken basins the term table itself
+scrambles — independent evidence beyond the commutators.
 
 ### Term table — the contract each sector must meet
 
@@ -481,10 +503,6 @@ evidence beyond the commutators.
 | CAS(2,5) / {3d} | Ms=1 | 10 | ³F: 7, ³P: 3 |
 | CAS(2,5) / {3d} | Ms=0 | 25 | ³F: 7, ¹D: 5, ³P: 3, ¹G: 9, ¹S: 1 |
 | CAS(4,6) / {3d,4s} | Ms=1 | 120 | ³D: 15, ³F: 35, ³G: 18, ³H: 22, ³P: 15, ⁵D: 5, ⁵F: 7, ⁵P: 3 |
-
-The combinatorial free-ion content — the exact stage reproduces it
-state-for-state (the Ms=1 block comes out exact in the showcase at the
-top of this note).
 
 ### Multiplet energies
 
@@ -504,18 +522,22 @@ column from the sector Lz spectra. The ordering matches the free-ion
 
 Every row: E — the run's variational total; ΔE vs the ROHF anchor;
 **fold shift** = |E(analysis fold) − E(as run)|, max over roots (the
-mEh-class averaging effect; the fold convention is machine-exact,
-1e-15 vs PySCF's get_h1eff). Verdicts (the classes of the
+convention and the PySCF anchor: Partition bookkeeping, Methods).
+
+Verdicts (the classes of the
 failure inventory, Motivation): **exact** — commutators and span
 certificates at the 1e-13 class; **baseline** — a named non-closure
 mechanism at its signature scale (the raw fold's percent-class
 commutators at unchanged energy make it the polarized-core detector);
 **escape / swap** — the window-identity basins, compared in totals
-only. The certified rungs sit mEh-tight around frozen CASCI (+10.5):
+only; **NOT CONVERGED** — the optimizer failed, the row waits for a
+re-run.
+
+The certified rungs sit mEh-tight around frozen CASCI (+10.5):
 orbital optimization buys ≈ nothing on the as-run window. Every other
 row of the manifest is a *classified* window-identity change — escape,
 swap, gauge — flagged by the fold shift (Partition bookkeeping).
-Values, certificates, verdicts: `elements/Ti/TABLES.md`; other atoms:
+Values, certificates: `elements/Ti/TABLES.md`; other atoms:
 their element files.
 
 | treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | fold shift | verdict |
@@ -529,25 +551,32 @@ their element files.
 | SA-CASSCF, free | −848.4166 | −10.1 | 12.0029 | 1.1e+00 | 6.0e+00 | partition changed | swap |
 | SA-CASSCF, frozen, pur | −848.3948 | +11.7 | 12.0000 | 1.0e-13 | 4.0e-13 | 0.0 | exact |
 
-### The window lattice — window kinds at matched determinant cost
+### The window lattice — the span question, at exact symmetry
 
-Three window kinds (Motivation), same mean field, compared at **equal
-determinant count** (equal cost). Every row carries the span
-certificate ‖[P,Lz]‖ / ‖[P,L⊥]‖: the AO and NO windows close at
-~1e-13; the raw-MO spans never close (O(1)–9 at every size measured,
-4–100 orbitals — the SCF's open orbitals are m-delocalized), so the
-certificate disqualifies them without running any CI.
+The lattice holds the method fixed (CASCI, symmetric folds) and grows
+the **window** — one nominal span per row (3d, 3d4s, 3d4s4p, …). Each
+row is realized through different **starts** (the construction
+columns): the AO span *is* the nominal window; MO and NO spans are
+different windows of the same size, compared at **equal determinant
+count**. The lattice asks: can the symmetric solution reach the broken
+ones' energies by growing the span instead of breaking symmetry?
+(Measured: yes — both transition metals cross below their escaped
+CASSCF basins; the escape ceilings are window statements, not method
+limits.) The treatment grid (Methods compared) asks the complementary
+question at fixed window: which optimizations break, and what restores
+them.
 
-The per-series tables (d² and 3d²4s², construction columns, pending
-slots): `elements/Ti/TABLES.md` (Window lattice). What it says, in one
-pass: the AO lattice descends monotonically below
-ROHF at exact ⟨L²⟩ (the d-atom window already correlates); the MO
-column wins only the smallest pair — its window contains the reference
-determinant (representability) — then saturates with ⟨L²⟩ never
-quantizing; the NO column matches the AO value at equal dets and
-exceeds it at the top. Both transition metals cross below their
-escaped CASSCF basins at exact symmetry — the escape ceilings are
-window statements, not method limits. U: the same at f-scale, with a
+Every row carries the span certificate ‖[P,Lz]‖ / ‖[P,L⊥]‖: the AO and
+NO spans close at ~1e-13; the raw-MO spans never close (O(1)–9 at
+every size measured, 4–100 orbitals — the SCF's open orbitals are
+m-delocalized), so the certificate disqualifies them without running
+any CI. Per-series tables (3d² and 3d²4s², construction columns,
+pending slots): `elements/Ti/TABLES.md`. The AO lattice descends
+monotonically below ROHF at exact ⟨L²⟩ (the d-atom window already
+correlates); the MO column wins only the smallest pair — its window
+contains the reference determinant (representability) — then saturates
+with ⟨L²⟩ never quantizing; the NO column matches the AO value at
+equal dets and exceeds it at the top. U: the same at f-scale, with a
 reference determinant that is a numerically pure ⁵S° state
 (`elements/U/`).
 
@@ -580,7 +609,7 @@ per-atom `run_atom` calls (recorded in each report header); rungs — the
 per-atom `run_rungs` calls; scans — `scripts/radial_scan.py`; the
 lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
 `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
-suite (128 tests) — term tables, exact-class closure pins, basin
+suite (129 tests) — term tables, exact-class closure pins, basin
 branches. Plain-language companion: `RUNGS.md`.
 
 ### Status and directions
