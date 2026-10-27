@@ -9,10 +9,14 @@ row above, and ``pending`` for declared-but-not-run cells.
 
 Value conventions (the manifest contract, README · Methods):
 
-- E = the run's OWN total (``energies_pyscf[0]``) -- the
-  partition-changed class never shows our reconstruction (finding 2);
-- ΔE vs the ROHF anchor (cells.json ``rohf_energy``); eV pair ×27.2114;
+- E = the run's OWN total (``energies_pyscf[0]``), Eh + eV (×27.2114)
+  -- the partition-changed class never shows our reconstruction
+  (finding 2); no ΔE column: the ROHF anchor is stated separately in
+  each caption;
 - ⟨L²⟩, ⟨L̂z²⟩, the commutator norms: our analysis of the run (payload);
+- Span (Lowdin) = the converged window's S-metric shell weights
+  (fractions of the window's columns per l -- the span, not the
+  electron configuration; window identity is what the verdicts name);
 - fold shift = max|dE| vs PySCF: ``~0`` below 5e-5, mEh below 0.1 Eh,
   ``partition changed`` above (a core orbital entered the window);
 - verdict: the HUMAN step (AUDIT below) -- basin verdicts branch on
@@ -46,24 +50,19 @@ DASH = "—"
 # The NO label is the full-span occupation-group prefix of the window's
 # own source density (k = its group count: {3d,4s} -> [s,d] = 2,
 # {3d,4s,4p,4d} -> [s,d,d',p] = 4) -- the NOs start at matched span.
+# Captions stay minimal (reading conventions live in README · Methods;
+# the anchor is the separately-specified ΔE reference).
 WINDOWS = [
     ("## CAS(4,6) / {3d,4s}", "3d4s", "3d4sno2", [
-        "One grid, one method column: CASCI (no optimizer — mask \"" + DASH
-        + "\",", "start fixed at the shell AOs; the fold is the treatment),",
-        "CASSCF (single root), SA-CASSCF (the term's M_L average); the",
-        "virtual-mix diagnostic row sits in the CASSCF block. The analysis",
-        "fold of every optimizer row is the averaged ruler. A blank factor",
-        "cell inherits from the row above; reading — README · Methods.",
-        "ROHF anchor: −848.4065 Eh (−23086.3167 eV)."]),
+        "Reading — README · Methods. ROHF anchor: −848.4065 Eh "
+        "(−23086.3167 eV)."]),
     ("### CAS(4,10) / {3d,4d} — planned (constrained)", "3d4d", "3d4dno2", [
-        "No 4s: the 4s² electrons are forced into 3d/4d. Same grid;",
-        "pending = declared, not yet run (the averaged-AOs CASCI energy",
-        "already lives in the window lattice above)."]),
+        "No 4s (constrained partition). Pending = declared, not yet run; "
+        "the CASCI anchor lives in the 3d²4s² lattice above."]),
     ("### CAS(4,14) / {3d,4s,4p,4d} — planned", "3d4s4p4d",
      "3d4s4p4dno4", [
-        "The physically complete valence window. Same grid; pending =",
-        "declared, not yet run (the averaged-AOs CASCI energy already",
-        "lives in the window lattice above)."]),
+        "The complete valence window. Pending = declared, not yet run; "
+        "the CASCI anchor lives in the 3d²4s² lattice above."]),
 ]
 
 # the audit verdicts (the human step): cell address -> verdict. Basins
@@ -109,10 +108,10 @@ AUDIT = {
     "ti_3d4sno2_3-1_sa_no_frozen_pur_avg": "exact",
 }
 
-HEAD = ("| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | "
-        "E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | "
-        "Config (Lowdin) | fold shift | verdict |")
-SEP = "|" + "---|" * 16
+HEAD = ("| method | start | mask | substrate | fold | E, Eh | E, eV | "
+        "⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | Span (Lowdin) | "
+        "fold shift | verdict |")
+SEP = "|" + "---|" * 14
 
 # CASCI fold variants: (substrate axis, fold axis, display fold)
 CASCI_FOLDS = [("pol", "raw", "raw"), ("pol", "avg", "averaged"),
@@ -133,8 +132,11 @@ def _fmt_shift(maxde: float) -> str:
 
 
 def _cfg(w: dict) -> str:
-    """The converged window's shell composition (S-metric Löwdin
-    weights, the payload ``window``), compact: s0 p.17 d.83 f4e-4."""
+    """The converged window's SPAN composition (S-metric Löwdin
+    weights, the payload ``window``) -- fractions of the window's
+    columns per l, summing to 1 (NOT the electron configuration):
+    the span is what diagnoses window identity (the swap reads
+    s -> 0). Compact: s0 p.17 d.83 f4e-4."""
     out = []
     for l in ("s", "p", "d", "f"):
         v = float(w.get(l, 0.0))
@@ -149,9 +151,7 @@ def _cfg(w: dict) -> str:
 
 def _values(p: dict, anchor: float) -> list[str]:
     asrun = float(p["energies_pyscf"][0])
-    de_eh = asrun - anchor
-    out = [f"{asrun:.4f}", f"{de_eh * 1e3:+.1f}", f"{asrun * EV:.4f}",
-           f"{de_eh * EV:+.4f}", f"{p['ground_l2']:.4f}",
+    out = [f"{asrun:.4f}", f"{asrun * EV:.4f}", f"{p['ground_l2']:.4f}",
            f"{p['ground_lz2']:.4f}", f"{p['comm_norm_h_lz']:.1e}",
            f"{p['comm_norm_h_l2']:.1e}", _cfg(p["window"]),
            _fmt_shift(p["max_de_vs_pyscf"])]
@@ -163,7 +163,7 @@ def _row(cells, audit, addr, method, start, mask, substrate, fold, anchor):
     p = cells.get(addr)
     head = [method, start, mask, substrate, fold]
     if p is None or verdict is None:
-        return "| " + " | ".join(head + ["pending"] + [""] * 9
+        return "| " + " | ".join(head + ["pending"] + [""] * 7
                                  + ["pending"]) + " |"
     return "| " + " | ".join(head + _values(p, anchor) + [verdict]) + " |"
 

@@ -520,12 +520,14 @@ column from the sector Lz spectra. The ordering matches the free-ion
 
 ### Methods compared
 
-Every row: E — the run's variational total; ΔE vs the ROHF anchor;
-**Config (Lowdin)** — the converged window's shell composition
-(S-metric weights; the swap reads s→0, the escapes show their f
-content); **fold shift** = |E(analysis fold) − E(as run)|, max over
-roots (the convention and the PySCF anchor: Partition bookkeeping,
-Methods).
+Every row: E — the run's variational total (Eh and eV); the ROHF
+anchor is stated in each table's caption, not as a per-row ΔE column;
+**Span (Lowdin)** — the converged window's shell composition
+(S-metric weights; fractions of the window's columns per l — the
+*span*, not the electron configuration: the swap reads s→0, the
+escapes show their f content); **fold shift** =
+|E(analysis fold) − E(as run)|, max over roots (the convention and
+the PySCF anchor: Partition bookkeeping, Methods).
 
 Verdicts (the classes of the
 failure inventory, Motivation): **exact** — commutators and span
@@ -594,8 +596,8 @@ reference determinant). Second, the **NO** source: the ROHF density
 is idempotent — its natural orbitals *are* the MOs with occupations
 exactly {0, 1, 2}, so fractional-occupancy selection from ROHF
 returns the MO window; the meaningful source is the term-averaged
-CASCI density on the ROHF-orthogonalized window (fact 23), whose
-occupation groups are l-pure m-sets plus correlating tails.
+CASCI density on the ROHF-orthogonalized window, whose occupation
+groups are l-pure m-sets plus correlating tails.
 
 ### Files and regeneration
 

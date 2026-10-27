@@ -90,20 +90,8 @@ def main(atom: str) -> None:
         HEADING,
         "",
         "CASCI; E = the run's own total (as-run). ROHF reference "
-        + re.sub(r"(?<!e)-", "−", f"{anchor:.4f}")
-        + " Eh; the MO rows sit exactly AT it (Brillouin-dead"
-        " singles,",
-        "same-l-only doubles -- fact 25), the AO rows are unbounded"
-        " (their span",
-        "does not contain the reference determinant). The p channel"
-        " is symmetry-dead",
-        "(parity for d¹p¹, the same-center different-l exchange"
-        " integral for p²):",
-        "{3d,4p} ≡ {3d} exactly; the first live channel is the"
-        " same-l double",
-        "shell (4d). The full-span NO prefix reproduces the AO span"
-        " (fact 23)",
-        "-- the machinery certificate, not a column. Source:"
+        + re.sub(r"(?<!e)-", "−", f"{anchor:.4f}") + " Eh.",
+        "Reading — README · Results (window lattice). Source:"
         " `cells.json` (`*_2-0_*`).",
         "",
         HEAD,
