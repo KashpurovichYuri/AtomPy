@@ -54,7 +54,7 @@ regeneration: Results (Files).
 **Treatment rungs** — every orbital treatment priced against the
 atom's ROHF anchor, the free variant beside the symmetric one, each
 classified by its diagnostics. The manifest: Results (Methods
-compared); the per-atom tables — `elements/<Atom>/TABLES.md.`
+compared); the per-atom tables — `elements/<Atom>/TABLES.md`.
 
 ---
 
@@ -530,7 +530,7 @@ certificates at the 1e-13 class; **baseline** — a named non-closure
 mechanism at its signature scale (the raw fold's percent-class
 commutators at unchanged energy make it the polarized-core detector);
 **escape / swap** — the window-identity basins, compared in totals
-only; **NOT CONVERGED** — the optimizer failed, the row waits for a
+only; **NOT-CONVERGED** — the optimizer failed, the row waits for a
 re-run.
 
 The certified rungs sit mEh-tight around frozen CASCI (+10.5):

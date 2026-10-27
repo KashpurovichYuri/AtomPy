@@ -412,7 +412,7 @@ def _report(rungs: dict, out: Path, label: str, mf) -> None:
         purity = max(r["window"].values())
         aniso = r.get("core_anisotropy")
         flag = " DIVERGED" if r["diverged"] else ""
-        if not r.get("converged", True):
+        if r.get("converged", True) is False:
             flag += " NOT-CONVERGED"
         lines.append(
             f"{tag:<14} {r['e_ground']:>16.8f} {d_e:>10.3e} {r['ground_l2']:>9.5f} "

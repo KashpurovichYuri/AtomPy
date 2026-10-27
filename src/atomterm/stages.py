@@ -69,8 +69,9 @@ class StageFacts:
         return float(self.analysis.comm_norm_h_lz)
     core_anisotropy: float | None = None  # CASCI reference rungs only
 
-    converged: bool = True  # the optimizer's own kernel report (getattr
-    # default True: CASCI stages and trusted cached stages never flag)
+    # converged: the optimizer's own kernel report; CASCI stages and
+    # trusted cached stages default True and never flag
+    converged: bool = True
 
     @property
     def diverged(self) -> bool:
