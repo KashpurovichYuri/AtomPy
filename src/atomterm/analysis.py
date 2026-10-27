@@ -202,6 +202,7 @@ def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
     """
     from atomterm.drivers import shell_weights
     from atomterm.detbasis import determinant_basis
+    from atomterm.cells import ci_in_detbasis_order  # lazy: cells -> stages -> analysis
 
     names, wl = shell_weights(mol, c_win, s)  # (ncas, n_l)
     norb = c_win.shape[1]
@@ -209,7 +210,9 @@ def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
 
     labels = []
     for v in ci_list:
-        v = np.asarray(v).ravel()
+        # pyscf FCI ordering -> detbasis ordering (they differ for
+        # norb >= 4 with >= 2 electrons in a block; the bridge certifies)
+        v = ci_in_detbasis_order(v, norb, na, nb)
         order = np.argsort(-np.abs(v))[:top]
         parts = []
         for i in order:

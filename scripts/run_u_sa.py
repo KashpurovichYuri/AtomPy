@@ -138,8 +138,11 @@ def report(mol, mf, c_pur, tag, cas, anchor):
     # the honest labels: exact diagonalization in the converged window.
     # mc.ci can be a Davidson-straggled mixture inside degenerate
     # clusters (the run_u.py disease) -- never trust it for <L^2>.
+    # (also: pyscf FCI ordering -> detbasis ordering before contracting
+    # our matrices -- they differ at this norb; the cells bridge)
+    from atomterm.cells import ci_in_detbasis_order
     ev_x, vec_x = np.linalg.eigh(ops_own["H"].real)
-    ci = np.asarray(cas.ci[0]).ravel()
+    ci = ci_in_detbasis_order(cas.ci[0], ncas, NA, NB)
     l2_ci = float(ci @ ops_pur["L2"].real @ ci)
     l2 = float(vec_x[:, 0] @ ops_pur["L2"].real @ vec_x[:, 0])
     s2 = float(vec_x[:, 0] @ ops_pur["S2"].real @ vec_x[:, 0])
@@ -249,6 +252,8 @@ def stage_sa(nk=2):
     wc = window_closure(mol, c_act)
     print(f"  span: |[P,Lz]| = {wc['lz']:.2e}  |[P,Lperp]| = {wc['lperp']:.2e}")
     print(f"  root          E, Eh      <L2>      <S2>    dE vs frozen (mEh)")
+    from atomterm.cells import ci_in_detbasis_order
+    # (pyscf FCI ordering -> detbasis ordering; see the bridge)
     # window-identity meter: total f/d S-weight over the converged
     # columns (start: 7.000 f / 5.000 d for the nk=2 group window) --
     # drift means the optimizer traded window columns with core/virtuals
@@ -268,7 +273,7 @@ def stage_sa(nk=2):
     print("  l-content of the converged window (S-weight): "
           + "  ".join(f"l{l}={v:.3f}" for l, v in sorted(tot.items())))
     for r in range(nroots):
-        ci = np.asarray(cas.ci[r]).ravel()
+        ci = ci_in_detbasis_order(cas.ci[r], ncas, NA, NB)
         l2 = float(ci @ ops["L2"].real @ ci)
         s2 = float(ci @ ops["S2"].real @ ci)
         d = (cas.energies[r] - (ev0[0] + e_core)) * 1e3

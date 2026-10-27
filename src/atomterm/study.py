@@ -194,7 +194,12 @@ def run_study(spec: StudySpec, mol, mf, out: str | Path,
                 if spec.diagnostics == "full":
                     ops = build_operators(mol, mf, c_act, spec.ncore,
                                           spec.na, spec.nb, c_core=c_core)
-                    ci = np.asarray(cas.ci[0]).ravel()
+                    # pyscf FCI ordering -> detbasis ordering before
+                    # contracting our operator matrices (they differ
+                    # for norb >= 4 with >= 2 electrons in a block)
+                    from atomterm.cells import ci_in_detbasis_order
+                    ci = ci_in_detbasis_order(cas.ci[0], ncas,
+                                              spec.na, spec.nb)
                     res["l2"] = float(ci @ ops["L2"].real @ ci)
                 cells[key] = res
             except Exception as exc:             # noqa: BLE001 (quarantine)
