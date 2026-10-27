@@ -385,6 +385,26 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     CASCI kernel writes NO chkfile (only CASSCF kernels dump the
     mcscf group) — the cell layer owns its complete store
     (atomterm/<address>/{energies, ci, core_energy, mo_coeff}).
+25. **The atomic-ROHF CASCI selection rules** (the 3d² lattice,
+    2026-10-27): CASCI over a window containing the ROHF determinant
+    is variational (≤ E_ROHF) with EXACT equality unless a live
+    coupling exists — singles are Brillouin-dead (stationarity),
+    doubles are dead unless same-l (the same-center different-l
+    EXCHANGE integral vanishes angularly; parity additionally kills
+    d¹p¹↔d²), so the only live channel is the same-l double shell.
+    Measured as-run (Ti 3d² Ms=1): MO windows {3d}/{3d,4p} +0.00 µEh
+    (the ROHF determinant IS the CI ground state), {3d,4p,4d}
+    −39.66 µEh (the 4d channel opens); AO windows are unbounded
+    (+6.44 mEh raw-shell offset; the −3.14 mEh crossing = the d′
+    channel minus the offset). The lattice E column is AS-RUN for
+    this reason — the averaged-fold reconstruction sits +2.8 mEh
+    above every as-run Ti CASCI total and bends every anchor
+    comparison by exactly that; it stays the ANALYSIS fold (the
+    meters are computed on it). NO-source corollary: the ROHF density
+    is idempotent, so NOs-from-ROHF ≡ the MO window (occupations
+    exactly {0,1,2}); fractional occupations need the term-averaged
+    CASCI density (fact 23) or the frac-occ SCF (uncorrelated → no
+    tail groups).
 ## Conventions
 
 - Per-atom tables live in `elements/<Atom>/TABLES.md` (committed,

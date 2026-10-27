@@ -48,19 +48,21 @@ M_L is not conserved there).
 | ⁵F −3 | −3.296365 | 9 | −3.457635 | 9 | −3.297772 | 5.9023 |
 | ⁵F −2 | −3.296365 | 4 | −3.457635 | 4 | −3.297772 | 0.1927 |
 
-## Window lattice — d² series
+## Window lattice — 3d² series
 
-CASCI, averaged; ROHF reference −848.4065 Eh. Constructions per row: the shell AOs (m-complete),
-the PySCF MO slice (non-integer ⟨L²⟩ = the span does not close), and
-the full-span NO group prefix of the same source (fact 23: equals the
-AOs by construction -- the certificate is the point). Source: `cells.json`
-(`*_2-0_*` addresses).
+CASCI; E = the run's own total (as-run). ROHF reference −848.4065 Eh; the MO rows sit exactly AT it (Brillouin-dead singles,
+same-l-only doubles -- fact 25), the AO rows are unbounded (their span
+does not contain the reference determinant). The p channel is symmetry-dead
+(parity for d¹p¹, the same-center different-l exchange integral for p²):
+{3d,4p} ≡ {3d} exactly; the first live channel is the same-l double
+shell (4d). The full-span NO prefix reproduces the AO span (fact 23)
+-- the machinery certificate, not a column. Source: `cells.json` (`*_2-0_*`).
 
-| window | CAS | dets | AOs, Eh | ⟨L²⟩ | PySCF MO, Eh | ⟨L²⟩ | NO, Eh | ⟨L²⟩ | custom, Eh | ⟨L²⟩ |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 3d | CAS(2,5) | 10 | −848.3973 | 12.000 | −848.4037 | 0.000 | −848.3973 | 12.000 | — | — |
-| 3d4p | CAS(2,8) | 28 | −848.3973 | 12.000 | −848.4037 | 3.426 | −848.3973 | 12.000 | — | — |
-| 3d4p4d | CAS(2,13) | 78 | −848.4068 | 12.000 | −848.4037 | 5.150 | −848.4068 | 12.000 | — | — |
+| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ | custom, Eh | ⟨L²⟩ |
+|---|---|---|---|---|---|---|---|---|
+| 3d | CAS(2,5) | 10 | −848.4001 | 12.000 | −848.4065 | 0.000 | — | — |
+| 3d4p | CAS(2,8) | 28 | −848.4001 | 12.000 | −848.4065 | 3.426 | — | — |
+| 3d4p4d | CAS(2,13) | 78 | −848.4096 | 12.000 | −848.4065 | 5.150 | — | — |
 
 ## Window lattice — 3d²4s² series
 
@@ -84,41 +86,41 @@ fold of every optimizer row is the averaged ruler. A blank factor
 cell inherits from the row above; reading — README · Methods.
 ROHF anchor: −848.4065 Eh (−23086.3167 eV).
 
-| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | fold shift | verdict |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **CASCI** | AOs {3d4s} | — | polarized | raw | −848.3959 | +10.5 | −23086.0413 | +0.2871 | 12.0000 | 4.0000 | 4.9e-02 | 2.6e-01 | ~0 | baseline (detector) |
-|  |  | — | polarized | averaged | −848.3959 | +10.5 | −23086.0413 | +0.2871 | 12.0000 | 4.8832 | 4.2e-09 | 2.3e-08 | 2.8 | exact |
-|  |  | — | purified | averaged | −848.3946 | +11.9 | −23086.0044 | +0.3239 | 12.0000 | 4.0214 | 3.4e-14 | 4.6e-13 | ~0 | exact (pur) |
-|  |  | — | polarized | fractional | −848.3585 | +48.0 | −23085.0230 | +1.3053 | 12.0000 | 5.5419 | 1.0e-09 | 7.6e-09 | ~0 | different functional |
-| **CASSCF** | AOs {3d4s} | free | polarized | averaged | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | 2.8 | escape |
-|  | PySCF MOs |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | 2.8 | escape (same minimum) |
-|  | NOs |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | 2.8 | escape (same minimum) |
-|  | AOs {3d4s} | virtual-mix |  |  | −848.4377 | −31.2 | −23087.1779 | −0.8496 | 0.0496 | 0.0165 | 4.3e-01 | 1.1e+00 | 2.8 | escape (diagnostic) |
-|  | AOs {3d4s} | free | purified | averaged | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | 2.8 | escape |
-|  | PySCF MOs |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | 2.8 | escape (same minimum) |
-|  | NOs |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | 2.8 | escape (same minimum) |
-|  | AOs {3d4s} | radial | polarized | averaged | −848.4112 | −4.7 | −23086.4576 | −0.1292 | 6.9323 | 2.3102 | 3.2e+00 | 1.3e+01 | 2.7 | gauge |
-|  | AOs {3d4s} | radial | purified | averaged | −848.4100 | −3.5 | −23086.4234 | −0.0951 | 6.9638 | 2.3214 | 3.2e+00 | 1.2e+01 | ~0 | gauge |
-|  | AOs {3d4s} | frozen window | polarized | averaged | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 4.8846 | 4.2e-09 | 2.3e-08 | 2.7 | baseline |
-|  | PySCF MOs |  |  |  | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | 2.8 | defective window |
-|  | NOs |  |  |  | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 4.8865 | 4.2e-09 | 2.3e-08 | 2.7 | baseline |
-|  | AOs {3d4s} | frozen window | purified | averaged | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 7.0253 | 3.4e-14 | 3.4e-13 | 2.7 | exact (pur) |
-|  | PySCF MOs |  |  |  | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | 2.8 | defective window |
-|  | NOs |  |  |  | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 3.8854 | 5.9e-14 | 1.0e-12 | 2.7 | exact (pur) |
-| **SA-CASSCF** | AOs {3d4s} | free | polarized | averaged | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 1.8438 | 1.1e+00 | 6.0e+00 | partition changed | swap |
-|  | PySCF MOs |  |  |  | −848.4316 | −25.1 | −23087.0118 | −0.6835 | 0.0255 | 0.0085 | 3.0e-01 | 7.4e-01 | 2.8 | escape |
-|  | NOs |  |  |  | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 1.5114 | 1.2e+00 | 6.0e+00 | partition changed | swap |
-|  | AOs {3d4s} | free | purified | averaged | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 3.1567 | 1.0e+00 | 6.0e+00 | partition changed | swap (pur) |
-|  | PySCF MOs |  |  |  | −848.4316 | −25.1 | −23087.0118 | −0.6835 | 0.0255 | 0.0085 | 3.0e-01 | 7.4e-01 | 2.8 | escape |
-|  | NOs |  |  |  | −848.4165 | −10.0 | −23086.6002 | −0.2719 | 12.0034 | 4.5601 | 9.1e-01 | 6.1e+00 | partition changed | swap (pur) |
-|  | AOs {3d4s} | radial | polarized | averaged | −848.4069 | −0.4 | −23086.3399 | −0.0115 | 12.0000 | 4.0000 | 1.3e-03 | 6.9e-03 | 2.8 | floor |
-|  | AOs {3d4s} | radial | purified | averaged | −848.4055 | +1.0 | −23086.3017 | +0.0266 | 12.0000 | 6.0951 | 1.1e-04 | 5.5e-04 | ~0 | floor |
-|  | AOs {3d4s} | frozen window | polarized | averaged | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 4.8835 | 4.2e-09 | 2.3e-08 | ~0 | baseline |
-|  | PySCF MOs |  |  |  | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | 2.8 | defective window |
-|  | NOs |  |  |  | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 4.8998 | 4.2e-09 | 2.3e-08 | ~0 | baseline |
-|  | AOs {3d4s} | frozen window | purified | averaged | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 0.9855 | 3.4e-14 | 6.1e-13 | ~0 | exact |
-|  | PySCF MOs |  |  |  | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | 2.8 | defective window |
-|  | NOs |  |  |  | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 2.3486 | 4.3e-14 | 4.4e-13 | ~0 | exact |
+| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | Config (Lowdin) | fold shift | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **CASCI** | AO {3d4s} | — | polarized | raw | −848.3959 | +10.5 | −23086.0413 | +0.2871 | 12.0000 | 4.0000 | 4.9e-02 | 2.6e-01 | s0.17 p0 d0.83 f0 | ~0 | baseline (detector) |
+|  |  | — | polarized | averaged | −848.3959 | +10.5 | −23086.0413 | +0.2871 | 12.0000 | 4.8832 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | 2.8 | exact |
+|  |  | — | purified | averaged | −848.3946 | +11.9 | −23086.0044 | +0.3239 | 12.0000 | 4.0214 | 3.4e-14 | 4.6e-13 | s0.17 p0 d0.83 f0 | ~0 | exact (pur) |
+|  |  | — | polarized | fractional | −848.3585 | +48.0 | −23085.0230 | +1.3053 | 12.0000 | 5.5419 | 1.0e-09 | 7.6e-09 | s0.17 p0 d0.83 f0 | ~0 | different functional |
+| **CASSCF** | AO {3d4s} | free | polarized | averaged | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | 2.8 | escape |
+|  | PySCF MO |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | 2.8 | escape (same minimum) |
+|  | NO |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | 2.8 | escape (same minimum) |
+|  | AO {3d4s} | virtual-mix |  |  | −848.4377 | −31.2 | −23087.1779 | −0.8496 | 0.0496 | 0.0165 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | 2.8 | escape (diagnostic) |
+|  | AO {3d4s} | free | purified | averaged | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | 2.8 | escape |
+|  | PySCF MO |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | 2.8 | escape (same minimum) |
+|  | NO |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | 2.8 | escape (same minimum) |
+|  | AO {3d4s} | radial | polarized | averaged | −848.4112 | −4.7 | −23086.4576 | −0.1292 | 6.9323 | 2.3102 | 3.2e+00 | 1.3e+01 | s0.17 p0 d0.83 f0 | 2.7 | gauge |
+|  | AO {3d4s} | radial | purified | averaged | −848.4100 | −3.5 | −23086.4234 | −0.0951 | 6.9638 | 2.3214 | 3.2e+00 | 1.2e+01 | s0.17 p0 d0.83 f0 | ~0 | gauge |
+|  | AO {3d4s} | frozen window | polarized | averaged | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 4.8846 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | 2.7 | baseline |
+|  | PySCF MO |  |  |  | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 | 2.8 | MO start was not closed |
+|  | NO |  |  |  | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 4.8865 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | 2.7 | baseline |
+|  | AO {3d4s} | frozen window | purified | averaged | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 7.0253 | 3.4e-14 | 3.4e-13 | s0.17 p0 d0.83 f0 | 2.7 | exact (pur) |
+|  | PySCF MO |  |  |  | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 | 2.8 | MO start was not closed |
+|  | NO |  |  |  | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 3.8854 | 5.9e-14 | 1.0e-12 | s0.17 p0 d0.83 f0 | 2.7 | exact (pur) |
+| **SA-CASSCF** | AO {3d4s} | free | polarized | averaged | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 1.8438 | 1.1e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 | partition changed | swap |
+|  | PySCF MO |  |  |  | −848.4316 | −25.1 | −23087.0118 | −0.6835 | 0.0255 | 0.0085 | 3.0e-01 | 7.4e-01 | s0.17 p0.50 d0.33 f0 | 2.8 | escape |
+|  | NO |  |  |  | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 1.5114 | 1.2e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 | partition changed | swap |
+|  | AO {3d4s} | free | purified | averaged | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 3.1567 | 1.0e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 | partition changed | swap (pur) |
+|  | PySCF MO |  |  |  | −848.4316 | −25.1 | −23087.0118 | −0.6835 | 0.0255 | 0.0085 | 3.0e-01 | 7.4e-01 | s0.17 p0.50 d0.33 f0 | 2.8 | escape |
+|  | NO |  |  |  | −848.4165 | −10.0 | −23086.6002 | −0.2719 | 12.0034 | 4.5601 | 9.1e-01 | 6.1e+00 | s4e-04 p0.17 d0.83 f0 | partition changed | swap (pur) |
+|  | AO {3d4s} | radial | polarized | averaged | −848.4069 | −0.4 | −23086.3399 | −0.0115 | 12.0000 | 4.0000 | 1.3e-03 | 6.9e-03 | s0.17 p0 d0.83 f0 | 2.8 | floor |
+|  | AO {3d4s} | radial | purified | averaged | −848.4055 | +1.0 | −23086.3017 | +0.0266 | 12.0000 | 6.0951 | 1.1e-04 | 5.5e-04 | s0.17 p0 d0.83 f0 | ~0 | floor |
+|  | AO {3d4s} | frozen window | polarized | averaged | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 4.8835 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | ~0 | baseline |
+|  | PySCF MO |  |  |  | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 | 2.8 | MO start was not closed |
+|  | NO |  |  |  | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 4.8998 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | ~0 | baseline |
+|  | AO {3d4s} | frozen window | purified | averaged | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 0.9855 | 3.4e-14 | 6.1e-13 | s0.17 p0 d0.83 f0 | ~0 | exact |
+|  | PySCF MO |  |  |  | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 | 2.8 | MO start was not closed |
+|  | NO |  |  |  | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 2.3486 | 4.3e-14 | 4.4e-13 | s0.17 p0 d0.83 f0 | ~0 | exact |
 
 Source: `cells.json` (this draw; verdicts — the AUDIT table of `scripts/build_methods_tables.py`).
 
@@ -129,41 +131,41 @@ No 4s: the 4s² electrons are forced into 3d/4d. Same grid;
 pending = declared, not yet run (the averaged-AOs CASCI energy
 already lives in the window lattice above).
 
-| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | fold shift | verdict |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **CASCI** | AOs {3d4d} | — | polarized | raw | pending |  |  |  |  |  |  |  |  | pending |
-|  |  | — | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  |  | — | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  |  | — | polarized | fractional | pending |  |  |  |  |  |  |  |  | pending |
-| **CASSCF** | AOs {3d4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | virtual-mix |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-| **SA-CASSCF** | AOs {3d4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
+| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | Config (Lowdin) | fold shift | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **CASCI** | AO {3d4d} | — | polarized | raw | pending |  |  |  |  |  |  |  |  |  | pending |
+|  |  | — | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  |  | — | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  |  | — | polarized | fractional | pending |  |  |  |  |  |  |  |  |  | pending |
+| **CASSCF** | AO {3d4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | virtual-mix |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+| **SA-CASSCF** | AO {3d4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
 
 
 ### CAS(4,14) / {3d,4s,4p,4d} — planned
@@ -172,41 +174,41 @@ The physically complete valence window. Same grid; pending =
 declared, not yet run (the averaged-AOs CASCI energy already
 lives in the window lattice above).
 
-| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | fold shift | verdict |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **CASCI** | AOs {3d4s4p4d} | — | polarized | raw | pending |  |  |  |  |  |  |  |  | pending |
-|  |  | — | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  |  | — | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  |  | — | polarized | fractional | pending |  |  |  |  |  |  |  |  | pending |
-| **CASSCF** | AOs {3d4s4p4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | virtual-mix |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-| **SA-CASSCF** | AOs {3d4s4p4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | AOs {3d4s4p4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
-|  | NOs |  |  |  | pending |  |  |  |  |  |  |  |  | pending |
+| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | Config (Lowdin) | fold shift | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **CASCI** | AO {3d4s4p4d} | — | polarized | raw | pending |  |  |  |  |  |  |  |  |  | pending |
+|  |  | — | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  |  | — | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  |  | — | polarized | fractional | pending |  |  |  |  |  |  |  |  |  | pending |
+| **CASSCF** | AO {3d4s4p4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | virtual-mix |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+| **SA-CASSCF** | AO {3d4s4p4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | AO {3d4s4p4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
 
 ## Open questions
 

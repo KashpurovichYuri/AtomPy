@@ -69,7 +69,7 @@ WINDOWS = [
 # the audit verdicts (the human step): cell address -> verdict. Basins
 # branch on window weights: this draw's free/virtmix CASSCF escaped
 # (s 1/6, p 1/2, d 1/3, f-bearing), the free SAs swapped 4s<->3p
-# (s -> 4e-6, p -> 1/6) -- facts 15g/20/21c. "defective window" = the
+# (s -> 4e-6, p -> 1/6) -- facts 15g/20/21c. "MO start was not closed" = the
 # construction's span never rotation-closes (the canonical MO slice,
 # fact 22d) -- not an optimizer outcome.
 AUDIT = {
@@ -95,24 +95,24 @@ AUDIT = {
     "ti_3d4s_3-1_casscf_mo_-_pur_avg": "escape (same minimum)",
     "ti_3d4sno2_3-1_casscf_no_-_pol_avg": "escape (same minimum)",
     "ti_3d4sno2_3-1_casscf_no_-_pur_avg": "escape (same minimum)",
-    "ti_3d4s_3-1_casscf_mo_frozen_pol_avg": "defective window",
-    "ti_3d4s_3-1_casscf_mo_frozen_pur_avg": "defective window",
+    "ti_3d4s_3-1_casscf_mo_frozen_pol_avg": "MO start was not closed",
+    "ti_3d4s_3-1_casscf_mo_frozen_pur_avg": "MO start was not closed",
     "ti_3d4sno2_3-1_casscf_no_frozen_pol_avg": "baseline",
     "ti_3d4sno2_3-1_casscf_no_frozen_pur_avg": "exact (pur)",
     "ti_3d4s_3-1_sa_mo_-_pur_avg": "escape",
     "ti_3d4sno2_3-1_sa_no_-_pol_avg": "swap",
     "ti_3d4sno2_3-1_sa_no_-_pur_avg": "swap (pur)",
     "ti_3d4s_3-1_sa_ao_frozen_pol_avg": "baseline",
-    "ti_3d4s_3-1_sa_mo_frozen_pol_avg": "defective window",
-    "ti_3d4s_3-1_sa_mo_frozen_pur_avg": "defective window",
+    "ti_3d4s_3-1_sa_mo_frozen_pol_avg": "MO start was not closed",
+    "ti_3d4s_3-1_sa_mo_frozen_pur_avg": "MO start was not closed",
     "ti_3d4sno2_3-1_sa_no_frozen_pol_avg": "baseline",
     "ti_3d4sno2_3-1_sa_no_frozen_pur_avg": "exact",
 }
 
 HEAD = ("| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | "
         "E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | "
-        "fold shift | verdict |")
-SEP = "|" + "---|" * 15
+        "Config (Lowdin) | fold shift | verdict |")
+SEP = "|" + "---|" * 16
 
 # CASCI fold variants: (substrate axis, fold axis, display fold)
 CASCI_FOLDS = [("pol", "raw", "raw"), ("pol", "avg", "averaged"),
@@ -132,13 +132,29 @@ def _fmt_shift(maxde: float) -> str:
     return f"{maxde * 1e3:.1f}"
 
 
+def _cfg(w: dict) -> str:
+    """The converged window's shell composition (S-metric Löwdin
+    weights, the payload ``window``), compact: s0 p.17 d.83 f4e-4."""
+    out = []
+    for l in ("s", "p", "d", "f"):
+        v = float(w.get(l, 0.0))
+        if v < 5e-5:
+            out.append(f"{l}0")
+        elif v < 0.001:
+            out.append(f"{l}{v:.0e}")
+        else:
+            out.append(f"{l}{v:.2f}")
+    return " ".join(out)
+
+
 def _values(p: dict, anchor: float) -> list[str]:
     asrun = float(p["energies_pyscf"][0])
     de_eh = asrun - anchor
     out = [f"{asrun:.4f}", f"{de_eh * 1e3:+.1f}", f"{asrun * EV:.4f}",
            f"{de_eh * EV:+.4f}", f"{p['ground_l2']:.4f}",
            f"{p['ground_lz2']:.4f}", f"{p['comm_norm_h_lz']:.1e}",
-           f"{p['comm_norm_h_l2']:.1e}", _fmt_shift(p["max_de_vs_pyscf"])]
+           f"{p['comm_norm_h_l2']:.1e}", _cfg(p["window"]),
+           _fmt_shift(p["max_de_vs_pyscf"])]
     return [re.sub(r"(?<!e)-", "−", v) for v in out]   # sign minus only
 
 
@@ -147,7 +163,7 @@ def _row(cells, audit, addr, method, start, mask, substrate, fold, anchor):
     p = cells.get(addr)
     head = [method, start, mask, substrate, fold]
     if p is None or verdict is None:
-        return "| " + " | ".join(head + ["pending"] + [""] * 8
+        return "| " + " | ".join(head + ["pending"] + [""] * 9
                                  + ["pending"]) + " |"
     return "| " + " | ".join(head + _values(p, anchor) + [verdict]) + " |"
 
@@ -161,7 +177,7 @@ def render_window(atom, window, no_label, cells, audit, anchor) -> list[str]:
         addr = key(atom, window, "casci", "ao", None, sub, fold).address
         out.append(_row(cells, audit, addr,
                         "**CASCI**" if i == 0 else "",
-                        f"AOs {{{window}}}" if i == 0 else "",
+                        f"AO {{{window}}}" if i == 0 else "",
                         DASH,
                         "polarized" if sub == "pol" else "purified",
                         fold_name, anchor))
@@ -179,9 +195,9 @@ def render_window(atom, window, no_label, cells, audit, anchor) -> list[str]:
                 sub_name = "polarized" if sub == "pol" else "purified"
                 starts = ("ao", "mo", "no") if mask != "radial" else ("ao",)
                 for st in starts:
-                    st_name = {"ao": f"AOs {{{window}}}",
-                               "mo": "PySCF MOs",
-                               "no": "NOs"}[st]
+                    st_name = {"ao": f"AO {{{window}}}",
+                               "mo": "PySCF MO",
+                               "no": "NO"}[st]
                     # the NOs row addresses the full-span group prefix
                     # of the source (k = the window's group count)
                     w = no_label if st == "no" else window
@@ -199,7 +215,7 @@ def render_window(atom, window, no_label, cells, audit, anchor) -> list[str]:
                     addr = key(atom, window, "casscf", "ao", "virtmix",
                                sub, "avg").address
                     out.append(_row(cells, audit, addr, "",
-                                    f"AOs {{{window}}}", "virtual-mix",
+                                    f"AO {{{window}}}", "virtual-mix",
                                     "", "", anchor))
     return out
 

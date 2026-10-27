@@ -9,19 +9,23 @@ hand-curated until their own cells run.
 
 Value conventions (the lattice contract):
 
-- E = payload ``e_ground`` -- the AVERAGED-fold reconstruction (the
-  ruler), matching the historic lattice numbers' semantics in
-  run_tm_lattice.run_tier. (The Methods tables instead show the run's
-  own total -- finding 2; the two differ by the raw↔avg fold, ~2.8
-  mEh on Ti CASCI cells.)
-- Δ reading vs the ROHF anchor (cells.json ``rohf_energy``), 4-decimal
-  Eh; ⟨L²⟩ 3 decimals; dets = payload ``n_det``.
-- constructions per row: AOs (the m-complete shell span), PySCF MO
-  (the canonical slice -- m-delocalized control; non-integer ⟨L²⟩ =
-  the span does not close), NO (the full-span occupation-group prefix
-  of the same source's term-averaged density, fact 23 -- equals AOs
-  by construction; its closure certificate is the point), custom
-  (declared empty this wave).
+- E = ``energies_pyscf[0]`` -- the run's OWN total (as-run), directly
+  comparable with the ROHF anchor (the variational reading: the MO
+  rows sit exactly AT it; the AO rows are unbounded, their span does
+  not contain the reference determinant). One convention per family:
+  tables show as-run; the AVERAGED-fold reconstruction stays the
+  analysis ruler the meters (commutators, ⟨L²⟩) are computed on --
+  it sits ~2.8 mEh above as-run on Ti CASCI cells and would bend
+  every anchor comparison by exactly that.
+- ⟨L²⟩ 3 decimals; dets = payload ``n_det``; no ΔE column -- the
+  anchor lives in the caption.
+- constructions per row: AO (the m-complete shell span), MO (the
+  canonical slice -- m-delocalized control; non-integer ⟨L²⟩ = the
+  span does not close), custom (declared empty this wave). The NO
+  construction is NOT a column here: the full-span group prefix of
+  the same source equals the AO span by construction (fact 23) --
+  the machinery certificate, not a methodology; the compression
+  ladder from a bigger source lives in the 3d²4s² section.
 
 TABLES edit protocol lives here (as in build_methods_tables):
 sections rebuilt from constructed blocks, structural assertions, temp
@@ -44,15 +48,20 @@ D2_SERIES = [            # (window label, CAS label)
     ("3d4p", "CAS(2,8)"),
     ("3d4p4d", "CAS(2,13)"),
 ]
-HEAD = ("| window | CAS | dets | AOs, Eh | ⟨L²⟩ | PySCF MO, Eh | ⟨L²⟩ | "
-        "NO, Eh | ⟨L²⟩ | custom, Eh | ⟨L²⟩ |")
-SEP = "|---|---|---|---|---|---|---|---|---|---|---|"
+HEAD = ("| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ | "
+        "custom, Eh | ⟨L²⟩ |")
+SEP = "|---|---|---|---|---|---|---|---|---|"
+HEADING = "## Window lattice — 3d² series"
+BOUNDARY = "## Window lattice — 3d²4s² series"
 
 
 def _e(p: dict) -> str:
     if not p:
         return "pending"
-    return re.sub(r"(?<!e)-", "−", f"{p['e_ground']:.4f}")  # sign minus only
+    # as-run: the run's own total (the averaged ruler would sit
+    # ~2.8 mEh above every one of these on Ti)
+    return re.sub(r"(?<!e)-", "−",
+                  f"{float(p['energies_pyscf'][0]):.4f}")
 
 
 def _l2(p: dict) -> str:
@@ -73,27 +82,29 @@ def main(atom: str) -> None:
     rows = []
     for w, cas in D2_SERIES:
         ao, mo = (payload(w, s) for s in ("ao", "mo"))
-        no_label = {"3d": "3dno1", "3d4p": "3d4pno2", "3d4p4d": "3d4p4dno3"}[w]
-        no = payload(no_label, "no")
         dets = f"{ao['n_det']:,}" if ao else "pending"
         rows.append(f"| {w} | {cas} | {dets} | {_e(ao)} | {_l2(ao)} | "
-                    f"{_e(mo)} | {_l2(mo)} | {_e(no)} | {_l2(no)} | "
-                    f"— | — |")
+                    f"{_e(mo)} | {_l2(mo)} | — | — |")
 
     section = [
-        "## Window lattice — d² series",
+        HEADING,
         "",
-        "CASCI, averaged; ROHF reference "
+        "CASCI; E = the run's own total (as-run). ROHF reference "
         + re.sub(r"(?<!e)-", "−", f"{anchor:.4f}")
-        + " Eh. Constructions per row: the shell AOs"
-        " (m-complete),",
-        "the PySCF MO slice (non-integer ⟨L²⟩ = the span does not"
-        " close), and",
-        "the full-span NO group prefix of the same source (fact 23:"
-        " equals the",
-        "AOs by construction -- the certificate is the point)."
-        " Source: `cells.json`",
-        "(`*_2-0_*` addresses).",
+        + " Eh; the MO rows sit exactly AT it (Brillouin-dead"
+        " singles,",
+        "same-l-only doubles -- fact 25), the AO rows are unbounded"
+        " (their span",
+        "does not contain the reference determinant). The p channel"
+        " is symmetry-dead",
+        "(parity for d¹p¹, the same-center different-l exchange"
+        " integral for p²):",
+        "{3d,4p} ≡ {3d} exactly; the first live channel is the"
+        " same-l double",
+        "shell (4d). The full-span NO prefix reproduces the AO span"
+        " (fact 23)",
+        "-- the machinery certificate, not a column. Source:"
+        " `cells.json` (`*_2-0_*`).",
         "",
         HEAD,
         SEP,
@@ -102,13 +113,14 @@ def main(atom: str) -> None:
     new_section = "\n".join(section)
 
     text = src.read_text()
-    b0, b1 = "## Window lattice — d² series", "## Window lattice — 3d²4s² series"
-    assert text.count(b0) == 1 and text.count(b1) == 1, "section boundaries"
-    new = text[:text.index(b0)] + new_section + "\n\n" + text[text.index(b1):]
+    # accept the pre-rename spelling on the first pass
+    m = re.search(r"^## Window lattice — (?:3d²|d²) series$", text, re.M)
+    assert m and text.count(BOUNDARY) == 1, "section boundaries"
+    new = text[:m.start()] + new_section + "\n\n" + text[text.index(BOUNDARY):]
 
     # structural assertions (the TABLES protocol)
-    assert new.count(b0) == 1 and new.count(b1) == 1
-    span = new[new.index(b0):new.index(b1)]
+    assert new.count(HEADING) == 1 and new.count(BOUNDARY) == 1
+    span = new[new.index(HEADING):new.index(BOUNDARY)]
     body = [r for r in span.splitlines() if r.startswith("|")]
     assert len(body) - 2 == len(D2_SERIES), body
     for r, (w, _) in zip(body[2:], D2_SERIES):
@@ -119,8 +131,8 @@ def main(atom: str) -> None:
     tmp.write_text(new)
     assert tmp.read_text() == new
     tmp.replace(src)
-    print(f"{src}: d² lattice rendered from cells.json "
-          f"({len(rows)} rows, anchor {anchor:.4f})")
+    print(f"{src}: 3d² lattice rendered from cells.json "
+          f"({len(rows)} rows, as-run, anchor {anchor:.4f})")
 
 
 if __name__ == "__main__":

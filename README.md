@@ -521,8 +521,11 @@ column from the sector Lz spectra. The ordering matches the free-ion
 ### Methods compared
 
 Every row: E — the run's variational total; ΔE vs the ROHF anchor;
-**fold shift** = |E(analysis fold) − E(as run)|, max over roots (the
-convention and the PySCF anchor: Partition bookkeeping, Methods).
+**Config (Lowdin)** — the converged window's shell composition
+(S-metric weights; the swap reads s→0, the escapes show their f
+content); **fold shift** = |E(analysis fold) − E(as run)|, max over
+roots (the convention and the PySCF anchor: Partition bookkeeping,
+Methods).
 
 Verdicts (the classes of the
 failure inventory, Motivation): **exact** — commutators and span
@@ -579,6 +582,20 @@ with ⟨L²⟩ never quantizing; the NO column matches the AO value at
 equal dets and exceeds it at the top. U: the same at f-scale, with a
 reference determinant that is a numerically pure ⁵S° state
 (`elements/U/`).
+
+Two construction facts, measured as-run on the 3d² series. First:
+**CASCI over the ROHF MO window equals the ROHF exactly** — singles
+are Brillouin-dead, and doubles are dead unless same-l (the
+same-center different-l exchange integral vanishes; parity kills
+d¹p¹↔d² as well), so the first live channel is the same-l double
+shell: +0.00 µEh on {3d} and {3d,4p}, −39.66 µEh once 4d enters,
+while the AO rows are unbounded (the raw span does not contain the
+reference determinant). Second, the **NO** source: the ROHF density
+is idempotent — its natural orbitals *are* the MOs with occupations
+exactly {0, 1, 2}, so fractional-occupancy selection from ROHF
+returns the MO window; the meaningful source is the term-averaged
+CASCI density on the ROHF-orthogonalized window (fact 23), whose
+occupation groups are l-pure m-sets plus correlating tails.
 
 ### Files and regeneration
 
