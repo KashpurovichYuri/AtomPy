@@ -801,3 +801,38 @@ def test_ti_sa_basins_and_radial_rung(ti_ladder):
     assert sar["ground_term"] == "3F"
     assert sar["ground_l2"] == pytest.approx(12.0, abs=1e-3)
     assert sar["comm_norm_h_lz"] < 5e-3
+
+
+@pytest.mark.fast
+def test_report_flags_not_converged(tmp_path):
+    """The rungs report flags a non-converged optimizer row NOT-CONVERGED.
+    ``converged`` rides the payload (from mc.converged via stage_facts);
+    CASCI stages and trusted cached stages default True and never flag --
+    the study cells carry the same status (study.render)."""
+    import json
+    import types
+
+    from atomterm.treatments import _report
+
+    base = dict(e_ground=-1.0, ground_l2=2.0, comm_norm_h_lz=1e-12,
+                comm_norm_h_l2=1e-12, win_lz=1e-13, win_lperp=1e-13,
+                window={"p": 1.0}, core_anisotropy=None,
+                max_de_vs_pyscf=1e-9, ortho_err=1e-12, diverged=False,
+                configurations=["2p2 (1)D"])
+    rungs = {"casci_avg": {**base, "converged": True},
+             "casscf_bad": {**base, "converged": False},
+             "casscf_old": dict(base)}  # no key: legacy payload, never flags
+    mf = types.SimpleNamespace(e_tot=-1.1)
+    _report(rungs, tmp_path, "test", mf)
+
+    text = (tmp_path / "test_rungs.md").read_text()
+    bad = [l for l in text.splitlines() if l.startswith("casscf_bad")][0]
+    assert "NOT-CONVERGED" in bad
+    for clean in ("casci_avg", "casscf_old"):
+        row = [l for l in text.splitlines() if l.startswith(clean)][0]
+        assert "NOT-CONVERGED" not in row
+
+    payload = json.loads((tmp_path / "test_rungs.json").read_text())
+    assert payload["casscf_bad"]["converged"] is False
+    assert payload["casci_avg"]["converged"] is True
+    assert "converged" not in payload["casscf_old"]

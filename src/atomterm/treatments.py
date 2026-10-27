@@ -56,6 +56,11 @@ where reported energies plunge BELOW the variational bound). Such rungs
 are flagged DIVERGED in the report and their numbers must not be read as
 physics.
 
+Optimizer convergence: a rung whose kernel reported non-convergence is
+flagged NOT-CONVERGED (``converged`` in the payload, from
+``mc.converged``; CASCI stages and trusted cached stages default True).
+The study cells carry the same status.
+
 One-particle columns: ``|[P,Lz]|`` and ``|[P,Lp]|`` are the closure
 defects of the window SPAN itself (operators.window_closure) -- no core
 fold, no CI. They attribute each rung's many-body commutators to the
@@ -407,6 +412,8 @@ def _report(rungs: dict, out: Path, label: str, mf) -> None:
         purity = max(r["window"].values())
         aniso = r.get("core_anisotropy")
         flag = " DIVERGED" if r["diverged"] else ""
+        if not r.get("converged", True):
+            flag += " NOT-CONVERGED"
         lines.append(
             f"{tag:<14} {r['e_ground']:>16.8f} {d_e:>10.3e} {r['ground_l2']:>9.5f} "
             f"{r['comm_norm_h_lz']:>10.2e} {r['comm_norm_h_l2']:>10.2e} "

@@ -69,6 +69,9 @@ class StageFacts:
         return float(self.analysis.comm_norm_h_lz)
     core_anisotropy: float | None = None  # CASCI reference rungs only
 
+    converged: bool = True  # the optimizer's own kernel report (getattr
+    # default True: CASCI stages and trusted cached stages never flag)
+
     @property
     def diverged(self) -> bool:
         return self.ortho_err > ORTHO_TOL
@@ -96,12 +99,13 @@ class StageFacts:
         return dict(Counter(s.term for s in self.analysis.states))
 
     def payload(self, kind: str) -> dict:
-        """Flat json-friendly dict (the ladder's persisted rung format)."""
+        """Flat json-friendly dict (the rungs' persisted payload format)."""
         out = {
             "tag": self.tag,
             "kind": kind,
             "n_det": self.analysis.n_det,
             "diverged": self.diverged,
+            "converged": self.converged,
             "ortho_err": self.ortho_err,
             "e_ground": self.e_ground,
             "energies_pyscf": np.asarray(self.energies_pyscf).tolist(),
@@ -176,4 +180,5 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         configurations=configuration_summary(
             mol, mf.get_ovlp(), cas.ci[: len(e_mine)], c_act, na, nb),
         core_anisotropy=aniso,
+        converged=bool(getattr(getattr(cas, "mc", None), "converged", True)),
     )
