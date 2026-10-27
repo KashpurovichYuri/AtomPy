@@ -14,7 +14,7 @@ ECP + cut-Dyall).
 ```bash
 conda activate pyscf          # PySCF 2.13 environment (any platform; in a bare
                               # shell: source <conda-root>/etc/profile.d/conda.sh first)
-pytest                        # 129 tests, ~13 min (chkfile caching); -m fast = sub-second tier
+pytest                        # 130 tests, ~13 min (chkfile caching); -m fast = sub-second tier
 python scripts/run_c.py       # writes elements/C/ (report.md/.json + chkfiles)
 ```
 
@@ -609,7 +609,7 @@ per-atom `run_atom` calls (recorded in each report header); rungs — the
 per-atom `run_rungs` calls; scans — `scripts/radial_scan.py`; the
 lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
 `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
-suite (129 tests) — term tables, exact-class closure pins, basin
+suite (130 tests) — term tables, exact-class closure pins, basin
 branches. Plain-language companion: `RUNGS.md`.
 
 ### Status and directions
