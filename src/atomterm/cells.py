@@ -36,7 +36,11 @@ with SINGULAR axis values throughout (``ao``/``mo``/``no``), the
 sector as ``na-nb`` (fixes Ms AND nelec), and ``-`` for no mask
 (free optimization; a mask exists only for optimizer methods --
 ``virtmix`` is a MASK -- :func:`atomterm.casscf.no_core_window_exchange_mask
--- not a start).
+-- not a start). NO windows append a prefix index to the label:
+``<source>no<k>`` (e.g. ``3d4sno2``) = the k-th occupation-group
+prefix of the source's term-averaged density -- the prefix is part of
+the window identity, so differently-sized NO cells of one source get
+different addresses.
 
 The store contract (one chkfile per cell,
 ``elements/<Atom>/rungs/<address>.chk``): everything ``load_cell`` needs
@@ -76,6 +80,7 @@ __all__ = [
     "load_cell",
     "run_cell",
     "analyze_cell",
+    "spine_keys",
     "pyscf_ci_permutation",
     "ci_in_detbasis_order",
 ]
@@ -144,6 +149,11 @@ class CellKey:
             if value not in vocab:
                 raise ValueError(
                     f"{axis} {value!r} not in {vocab}")
+        if (self.start == "no") != (self.no_source is not None):
+            raise ValueError(
+                f"start='no' and the window label must agree: NO windows "
+                "are '<source>no<k>' (e.g. '3d4sno2'), other starts take "
+                "a plain shell label")
         if self.mask is not None:
             if self.mask not in MASKS:
                 raise ValueError(f"mask {self.mask!r} not in {MASKS} (None = free)")
@@ -186,6 +196,18 @@ class CellKey:
         """The window label as shell selectors: ``"3d4s"`` -> ``["3d", "4s"]``."""
         return re.findall(r"\d+[spdfgh]", self.window)
 
+    @property
+    def no_source(self) -> tuple[str, int] | None:
+        """For NO windows: ``(source label, group prefix k)``. The label
+        grammar is ``<source>no<k>`` (e.g. ``"3d4sno2"`` = the second
+        occupation-group prefix of the 3d4s source's term-averaged
+        density) -- shell letters cannot contain "no", so the tail is
+        unambiguous. The prefix IS part of the window identity: two NO
+        cells of one source differ in k and get different addresses.
+        """
+        m = re.fullmatch(r"(.+?)no([1-9]\d*)", self.window)
+        return (m.group(1), int(m.group(2))) if m else None
+
 
 @dataclass
 class CellData:
@@ -202,6 +224,8 @@ class CellData:
     energies: np.ndarray          # total energies per root
     ci: list                      # per-root arrays, pyscf ordering
     core_energy: float            # E_tot - active part (the fold constant)
+    ncas: int = 0                 # window width (needed when it is not
+                                   # derivable from the label: NO windows)
 
 
 def cell_chk(key: CellKey, workdir: str | Path = "elements") -> Path:
@@ -212,6 +236,7 @@ def cell_chk(key: CellKey, workdir: str | Path = "elements") -> Path:
 def _read_store(chk: Path, name: str) -> tuple | None:
     """Read one ``atomterm/<name>/`` store: (energies, ci, core_energy).
 
+    ``ci`` comes from the cell layer's ``ci_stack`` (nroots, ndet).
     ``None`` = store absent (caller tries the next name).
     """
     from pyscf import lib
@@ -219,13 +244,13 @@ def _read_store(chk: Path, name: str) -> tuple | None:
     e = lib.chkfile.load(str(chk), f"atomterm/{name}/energies")
     if e is None:
         return None
-    ci = lib.chkfile.load(str(chk), f"atomterm/{name}/ci")
+    stack = lib.chkfile.load(str(chk), f"atomterm/{name}/ci_stack")
     core = lib.chkfile.load(str(chk), f"atomterm/{name}/core_energy")
-    if ci is None or core is None:
+    if stack is None or core is None:
         raise KeyError(
             f"cell store {chk}::{name} is incomplete (energies without "
-            "ci/core_energy); regenerate the cell")
-    return np.asarray(e), list(np.asarray(ci, dtype=object)), float(core)
+            "ci_stack/core_energy); regenerate the cell")
+    return np.asarray(e), list(np.asarray(stack)), float(core)
 
 
 def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
@@ -255,7 +280,9 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
             f"{chk} has no atomterm/{key.address}/mo_coeff (a pre-cell "
             "chkfile); regenerate the cell")
     energies, ci, core_energy = store
-    return CellData(key, np.asarray(mo), energies, ci, core_energy)
+    ncas = lib.chkfile.load(str(chk), f"atomterm/{key.address}/ncas")
+    return CellData(key, np.asarray(mo), energies, ci, core_energy,
+                    int(ncas) if ncas is not None else 0)
 
 
 # ---------------------------------------------------------------------
@@ -360,7 +387,32 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
 
     # start x mask -> the substrate MO matrix + the optimizer mask
     mask = None
-    if key.start == "ao":
+    if key.start == "no":
+        # the parent-prefix policy: the label names the SOURCE window,
+        # the k-th occupation-group prefix of its term-averaged density
+        # is the window (never splits an m-set; exactly closed when the
+        # density was m-scalar -- natural.no_group_windows verifies)
+        from atomterm.natural import no_group_windows
+        from atomterm.windows import Window
+
+        if key.mask == "radial":
+            raise ValueError("the radial mask needs member-labeled AO "
+                             "columns (start='ao'); NO columns carry none")
+        mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act_idx,
+                               c_core=c_pur)
+        c_src = mo_src[:, ncore:ncore + ncas]
+        wins = no_group_windows(mol, mf, ncore, c_src, na, nb,
+                                c_core=c_pur, cap=budgets.get("no_cap", 12000))
+        _, k = key.no_source
+        if k > len(wins):
+            raise ValueError(
+                f"window {key.window!r}: the source has {len(wins)} group "
+                f"prefixes; k <= {len(wins)} required")
+        c_win = wins[k - 1].c_win
+        ncas = c_win.shape[1]
+        mo_full = Window(f"no{k}", None, c_win, True).columns(
+            mf, ncore, c_core=c_pur)
+    elif key.start == "ao":
         if key.mask == "radial":
             mo_full, labels = radial_basis(
                 mf, occupied_core_idx(mf, ncore), act_idx, c_core=c_pur)
@@ -372,14 +424,10 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                 mask = core_virtual_only_mask
             elif key.mask == "virtmix":
                 mask = no_core_window_exchange_mask
-    elif key.start == "mo":
-        # PySCF's default start (canonical MOs, canonical window): the
-        # substrate axis is moot -- the start carries its own core
+    else:  # start == "mo": PySCF's default start (canonical MOs,
+        # canonical window); the substrate axis is moot -- the start
+        # carries its own core
         mo_full = mf.mo_coeff
-    else:  # pragma: no cover -- guarded by the vocabulary
-        raise NotImplementedError(
-            "start='no' needs the parent-prefix policy (which NO group "
-            "window a nominal label selects); lands with the run queue")
 
     verbose = budgets.get("verbose", verbose)
     common = dict(mc_opts=budgets.get("mc_opts"),
@@ -392,7 +440,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                         nroots=min(9, ndet), name=key.address,
                         verbose=verbose, fci_opts=common["fci_opts"])
     else:
-        weights = budgets.get("sa_weights")
+        weights = budgets.get("sa_weights") if key.method == "sa" else None
         if key.method == "sa" and weights is None:
             from atomterm.study import ground_block  # the SA-anchoring rule
 
@@ -404,8 +452,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                                  mo_full=mo_full, mask=mask, weights=weights,
                                  name=key.address, **common)
 
-    _persist_cell(chk, key, cas)
-    return _facts(key, mol, mf, cas, ncore, ncas, na, nb)
+    _persist_cell(chk, key, cas, ncas)
+    return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_pur=c_pur)
 
 
 def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
@@ -416,6 +464,7 @@ def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
     ``converged`` defaults True (a trusted cached stage).
     """
     from atomterm.casscf import CASResult
+    from atomterm.core import purified_core_orbitals
     from atomterm.system import ncore_of
     from atomterm.windows import select_valence_ao
 
@@ -424,8 +473,10 @@ def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
                     None, data.core_energy)
     na, nb = key.sector
     ncore = ncore_of(mol.nelectron, na + nb)
-    ncas = len(select_valence_ao(mol, key.shell_patterns))
-    return _facts(key, mol, mf, cas, ncore, ncas, na, nb)
+    ncas = data.ncas or len(select_valence_ao(mol, key.shell_patterns))
+    c_pur = (purified_core_orbitals(mol, mf, ncore)[0]
+             if key.substrate == "pur" else None)
+    return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_pur=c_pur)
 
 
 def cell_payload(key: CellKey, facts) -> dict:
@@ -435,25 +486,53 @@ def cell_payload(key: CellKey, facts) -> dict:
     return out
 
 
-def _persist_cell(chk: Path, key: CellKey, cas) -> None:
-    """Complete the cell store: energies/ci were persisted by the run;
-    add the pieces only the cell layer owns."""
+def _persist_cell(chk: Path, key: CellKey, cas, ncas: int) -> None:
+    """Complete the cell store: energies were persisted by the run; add
+    the pieces only the cell layer owns. ``ci_stack`` is a plain
+    (nroots, ndet) float array -- PySCF's chkfile serializes object
+    arrays as nested ``__from_list__`` groups that do not round-trip
+    for 2-D roots, so the cell layer owns its own CI serialization."""
     from pyscf import lib
 
     lib.chkfile.save(str(chk), f"atomterm/{key.address}/core_energy",
                      float(cas.core_energy))
     lib.chkfile.save(str(chk), f"atomterm/{key.address}/mo_coeff",
                      np.asarray(cas.mo_coeff))
+    lib.chkfile.save(str(chk), f"atomterm/{key.address}/ncas", int(ncas))
+    lib.chkfile.save(str(chk), f"atomterm/{key.address}/ci_stack",
+                     np.asarray([np.asarray(c).ravel() for c in cas.ci]))
 
 
 def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
-           na: int, nb: int):
+           na: int, nb: int, c_pur=None):
     from atomterm.stages import stage_facts
 
     c_act = cas.mo_coeff[:, ncore:ncore + ncas]
     return stage_facts(
         mol, mf, cas, c_act, ncore, na, nb, tag=key.address,
         spherical_core=key.fold != "raw",
-        anisotropy_ref=(mf, None)
-        if (key.method == "casci" and key.fold == "raw") else None,
+        # every CASCI rung reports its reference core's anisotropy (the
+        # raw fold's is the detector; the pur fold's is the ~0
+        # certificate; registry parity)
+        anisotropy_ref=(mf, c_pur) if key.method == "casci" else None,
     )
+
+
+def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]:
+    """The default cell subset per atom (README · Methods, "the spine"):
+    the three folds; frozen x purified under both objectives (the
+    certified class); one free row per substrate (the basin detectors).
+    Diagnostics beyond these run as needed.
+    """
+    sec = tuple(sector)
+    return [
+        CellKey(atom, window, sec, fold="raw"),
+        CellKey(atom, window, sec, fold="avg"),
+        CellKey(atom, window, sec, fold="frac"),
+        CellKey(atom, window, sec, method="casscf", mask="frozen",
+                substrate="pur"),
+        CellKey(atom, window, sec, method="sa", mask="frozen",
+                substrate="pur"),
+        CellKey(atom, window, sec, method="casscf"),
+        CellKey(atom, window, sec, method="sa", substrate="pur"),
+    ]

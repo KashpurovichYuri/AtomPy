@@ -21,6 +21,7 @@ from atomterm.cells import (
     ci_in_detbasis_order,
     load_cell,
     pyscf_ci_permutation,
+    spine_keys,
 )
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
 
@@ -77,6 +78,39 @@ def test_key_validation_and_canonicalization():
     # the window label parses to shell selectors
     assert CellKey("Ti", "3d4s", (3, 1)).shell_patterns == ["3d", "4s"]
     assert CellKey("C", "2p", (1, 1)).shell_patterns == ["2p"]
+
+
+@fast
+def test_no_window_grammar():
+    """NO windows: '<source>no<k>' -- the group prefix is part of the
+    window identity (differently-sized NO cells get different
+    addresses); start and label must agree."""
+    k = CellKey("Ti", "3d4sno2", (3, 1), start="no")
+    assert k.no_source == ("3d4s", 2)
+    assert k.shell_patterns == ["3d", "4s"]     # the SOURCE shells
+    assert CellKey.from_address(k.address) == k
+    assert k.address == "ti_3d4sno2_3-1_casci_no_-_pol_avg"
+    with pytest.raises(ValueError, match="agree"):
+        CellKey("Ti", "3d4s", (3, 1), start="no")
+    with pytest.raises(ValueError, match="agree"):
+        CellKey("Ti", "3d4sno2", (3, 1))        # ao start, no-tail label
+
+
+@fast
+def test_spine_keys_contract():
+    """The spine = README · Methods verbatim: the three folds; frozen x
+    purified under both objectives (the certified class); one free row
+    per substrate (the basin detectors)."""
+    keys = spine_keys("Ti", "3d4s", (3, 1))
+    assert [k.address for k in keys] == [
+        "ti_3d4s_3-1_casci_ao_-_pol_raw",
+        "ti_3d4s_3-1_casci_ao_-_pol_avg",
+        "ti_3d4s_3-1_casci_ao_-_pol_frac",
+        "ti_3d4s_3-1_casscf_ao_frozen_pur_avg",
+        "ti_3d4s_3-1_sa_ao_frozen_pur_avg",
+        "ti_3d4s_3-1_casscf_ao_-_pol_avg",
+        "ti_3d4s_3-1_sa_ao_-_pur_avg",
+    ]
 
 
 # ------------------------------------------------------------- the bridge
@@ -202,8 +236,9 @@ def test_load_cell_synthetic_roundtrip(tmp_path):
     energies = np.array([-1.0, -0.5, -0.25])
     ci = [rng.standard_normal(9), rng.standard_normal(9)]
     for name, val in (("energies", energies),
-                      ("ci", np.asarray(ci, dtype=object)),
-                      ("core_energy", 5.25), ("mo_coeff", mo)):
+                      ("ci_stack", np.asarray(ci)),
+                      ("core_energy", 5.25), ("mo_coeff", mo),
+                      ("ncas", 3)):
         lib.chkfile.save(str(chk), f"atomterm/{key.address}/{name}", val)
 
     data = load_cell(key, tmp_path)
@@ -212,6 +247,7 @@ def test_load_cell_synthetic_roundtrip(tmp_path):
     assert np.array_equal(data.mo_coeff, mo)
     assert np.array_equal(data.energies, energies)
     assert data.core_energy == 5.25
+    assert data.ncas == 3
     assert len(data.ci) == 2
     assert np.allclose(data.ci[1], ci[1])
 
@@ -226,8 +262,8 @@ def test_load_cell_prefers_sa_roots_and_reports_missing(tmp_path):
     for name in (key.address, f"{key.address}_roots"):
         lib.chkfile.save(str(chk), f"atomterm/{name}/energies",
                          np.array([-2.0 if "roots" in name else -1.0]))
-        lib.chkfile.save(str(chk), f"atomterm/{name}/ci",
-                         np.asarray([np.zeros(9)], dtype=object))
+        lib.chkfile.save(str(chk), f"atomterm/{name}/ci_stack",
+                         np.zeros((1, 9)))
         lib.chkfile.save(str(chk), f"atomterm/{name}/core_energy", 1.0)
     lib.chkfile.save(str(chk), f"atomterm/{key.address}/mo_coeff",
                      np.eye(6))
@@ -256,6 +292,8 @@ def _same_facts(a, b, tol=1e-12):
     # run_casci straggle note) -- the l-mass content is the invariant
     strip = lambda cs: [re.sub(r" \(\|c\|=[0-9.]+\)", "", c) for c in cs]
     assert strip(a.configurations) == strip(b.configurations)
+    if a.core_anisotropy is not None or b.core_anisotropy is not None:
+        assert a.core_anisotropy == pytest.approx(b.core_anisotropy, abs=1e-12)
     assert a.analysis.comm_norm_h_l2 == pytest.approx(
         b.analysis.comm_norm_h_l2, abs=tol)
 
@@ -280,7 +318,8 @@ def test_run_cell_matches_direct_path(carbon, tmp_path):
     key = CellKey("C", "2p", (na, nb))       # casci/ao/-/pol/avg
     facts_direct = stage_facts(
         mol, mf, direct, direct.mo_coeff[:, ncore:ncore + len(act_idx)],
-        ncore, na, nb, tag=key.address, spherical_core=True)
+        ncore, na, nb, tag=key.address, spherical_core=True,
+        anisotropy_ref=(mf, None))
 
     facts = run_cell(key, mf, workdir=tmp_path)
     assert facts.tag == key.address == "c_2p_1-1_casci_ao_-_pol_avg"
@@ -333,3 +372,23 @@ def test_posthoc_properties_from_stored_run(carbon, tmp_path):
     assert abs(l2 - p["ground_l2"]) < 1e-9      # 2.0: gauge-safe in the 3P cluster
     assert abs(s2 - 2.0) < 1e-9                 # S=1 across the whole sector
     assert abs(e - p["e_ground"]) < 1e-9
+
+
+@slow
+def test_run_cell_no_start_same_subspace(carbon, tmp_path):
+    """The NO start, end to end: on carbon's 2p source the term-averaged
+    density's occupation groups form ONE 3-column m-set, so the no1
+    window IS the source span in the NO gauge -- the CASCI must be
+    basis-invariant (exact diagonalization inside one subspace; fact:
+    CASCI is start-irrelevant, window-dependent)."""
+    from atomterm.cells import load_cell, run_cell
+
+    _, mol, mf, _ = carbon
+    ao = run_cell(CellKey("C", "2p", (1, 1)), mf, workdir=tmp_path)
+    no = run_cell(CellKey("C", "2pno1", (1, 1), start="no"), mf,
+                  workdir=tmp_path)
+    assert load_cell(CellKey("C", "2pno1", (1, 1), start="no"),
+                     tmp_path).ncas == 3
+    assert np.allclose(ao.energies, no.energies, atol=1e-9)
+    assert no.win_lz == pytest.approx(0.0, abs=1e-12)   # m-set: closed span
+    assert no.win_lperp == pytest.approx(0.0, abs=1e-12)
