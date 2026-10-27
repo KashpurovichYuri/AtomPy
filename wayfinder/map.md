@@ -526,6 +526,25 @@ Recorded (candidates + declinations):
    REMAINING: P4 only; plus the campaign continuation through the
    seam (lattice cells incl. NO starts, optimizer manifest cells,
    pass curves) -- gated per run as before.
+   ==> QUEUE STEPS 1+2 EXECUTED 2026-10-27 (c), commits aa21071..1d51de7:
+   the d2 lattice (9 cells, CAS(2,5/8/13) x AOs/MO/NO; section rendered
+   from cells.json by scripts/build_lattice_tables.py; the seeded anchor
+   row was wrong on both counts: 10 dets not 50, -848.3973 measured not
+   the (4,6) campaign number; {3d,4p,4d} crosses below the anchor) and
+   the FULL Ti manifest grid (33/33 cells + verdicts: the escape
+   attractor is start-invariant; the frozen-MOs rows are a new
+   'defective window' class with the energy-vs-certificate inversion).
+   THREE more seam bugs found by the queue, fixed+pinned: the
+   occupation-grouping m-set split (fact 23 amendment: scale-aware
+   tolerance; Ti d-shell leakage 2.7e-7), the SA store completion
+   (store_name=; the roots store is the loader's preferred one), and
+   the mask wiring (frozen/virtmix are start-independent; radial is
+   ao-only validated at the key -- mo/no-masked cells had silently run
+   FREE). NO-window selection is by group LABEL, not compact-list
+   index (k counts groups; sector-small prefixes are skipped). Suite
+   150 green. REMAINING QUEUE: C/Si/Sc grid completion (their cell_set
+   now declares the grid), the (4,10)/(4,14) planned windows, pass
+   curves, P4.
 2. stage_io loader (user-proposed): the atomterm/<name>/{ci,energies}
    chk groups are WRITE-ONLY today; ci is PySCF FCI-ordered, not
    detbasis-ordered. A small loader + ordering bridge unlocks post-hoc
