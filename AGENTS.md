@@ -42,6 +42,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/cases.py` | `CaseSpec`, `run_case`, `run_atom`, `run_carbon` | the DECLARED per-atom campaign (the intent manifest): `CaseSpec` fixes atom/reference-data/window/sectors/want before anything runs; `run_case(spec)` executes; `run_atom` = the staged implementation; `pipeline.py` remains a compat shim |
 | `src/atomterm/treatments.py` | `Rung`, `run_rungs`, `run_carbon_rungs` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); `purified=True` appends the `*_pur` rungs (same treatments on the exactly-closed purified core substrate, fact 20 — incl. `sa_relax_pur`, the exact-symmetry SA rung); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
 | `src/atomterm/study.py` | `StudySpec`, `plan_study`, `run_study`, `render` | the declared window × treatment study runner (ticket 20): declared product, per-cell budget knobs, per-cell failure quarantine, exact-eigh labels in full-diagnostics mode; writes `<out>/<tag>_study.json` + the generated insert between the study markers of `elements/<Atom>/TABLES.md`; `pipeline.py`/`drivers.py` are compat shims |
+| `src/atomterm/cells.py` | `CellKey`, `run_cell`, `load_cell`, `analyze_cell`, `cell_payload`, `pyscf_ci_permutation` | THE addressing layer: one frozen key per grid point (atom/window/sector/method/start/mask/substrate/fold; `substrate` = the core SPAN, `fold` = the core FIELD; pur canonicalizes fold=avg), the address grammar `<atom>_<window>_<na>-<nb>_<method>_<start>_<mask\|->_<substrate>_<fold>` as chk name/payload key; axes resolve through their OWNING modules; the cell store is self-owned (this PySCF's CASCI kernel writes no chkfile) + the PySCF-CI↔detbasis ordering bridge (fact 24); SA weights default to the measured ground block; cache hit ⇒ analyze path |
 | `src/atomterm/natural.py` | `ci_rdm1`, `natural_orbitals`, `occupation_groups`, `select_no_window` | the NO mathematics (ticket 22): spin-summed 1-RDM from CI roots (secondquant signs), NOs = density eigenvectors in the orthonormal span, occupation-GROUP selection never splits an m-set; symmetry-safe only from a term-AVERAGED root set (a single \|L,M_L⟩ density is m-diagonal but m-unequal — pinned); the Window object + selectors live in `windows.py` |
 | `src/atomterm/drivers.py` | (compat facade) | re-exports the historic surface over reference/windows/core/casscf — existing imports keep working; NEW code imports the owning module |
 
@@ -357,6 +358,26 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
     equal-det count. E_core from the closed-shell pur-core formula
     reproduces the campaign totals (validation built into the
     pilots).
+24. **PySCF FCI ordering ≠ detbasis ordering** (the cell wave,
+    `cells.pyscf_ci_permutation`): PySCF's direct_spin1 vectors are
+    indexed by (alpha-string address, beta-string address) with
+    strings in INTEGER-ASCENDING bit order; detbasis enumerates
+    lexicographic combinations. They coincide ONLY in trivial sectors
+    (norb ≤ 3, or ≤ 1 electron per spin block) — carbon's norb=3
+    window is why the difference went unnoticed for the whole
+    campaign — and differ everywhere else (first at norb=4, na=2).
+    Any consumer that indexes or contracts a PySCF CI vector against
+    detbasis-order objects (operator matrices, determinant
+    occupation lists) MUST map through the bridge first; certified
+    by the eigen-equation against an independently built
+    Slater–Condon H (generic integrals admit no permutation
+    automorphism). Fixed consumers: configuration_summary (labels
+    were scrambled on Ti/Sc/U mixed-l windows — the committed config
+    columns there pre-date the fix), study's diagnostics ⟨L²⟩,
+    run_u_sa's mc.ci cross-check. Related store fact: this PySCF's
+    CASCI kernel writes NO chkfile (only CASSCF kernels dump the
+    mcscf group) — the cell layer owns its complete store
+    (atomterm/<address>/{energies, ci, core_energy, mo_coeff}).
 ## Conventions
 
 - Per-atom tables live in `elements/<Atom>/TABLES.md` (committed,
@@ -377,7 +398,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 
 ## Tests
 
-`pytest` runs 130 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 145 tests in ~13 min (chkfile caching; ROHF computed once per
 session; the Ti rungs block is the slowest, ~7 min cold; the Sc rungs
 ~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
 anywhere in the fixture chain, sub-second); `pytest -m slow` = the
@@ -387,7 +408,16 @@ files or `-m fast` are fine for everything else. Test files map
 1:1 to src modules (`test_drivers.py` exercises the
 reference/windows/core/casscf quartet through the drivers facade -- the
 split kept its tests in place); tests are named for the
-invariant they pin. The critical invariants: `test_hamiltonian_matches_pyscf_fci`
+invariant they pin. The critical invariants: `test_cells.py`
+(the cell layer: address↔key round-trip + the pur-fold
+canonicalization; THE CI-ordering bridge certified by the
+eigen-equation against an independently built Slater–Condon H on five
+sectors, plus the identity-permutation pin of the carbon coincidence
+-- fact 24; the store round-trip incl. the SA `_roots` preference;
+run_cell ≡ the direct registry construction, analyze_cell(stored) ≡
+in-session -- the store certificate -- and post-hoc gauge-safe
+observables from the stored CI, all on carbon),
+`test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
 (second quantization ≡ first quantization, elementwise),
 `test_full_space_vs_pyscf_casci_core_explicit` (core-explicit CAS(6,5) vs

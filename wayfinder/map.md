@@ -503,12 +503,27 @@ Recorded (candidates + declinations):
    callable per cell. Subsumes the spine/run-order runner (the
    user's run-queue generalization) and the ticket-20 intent manifest.
    Design it DESIGN-IT-TWICE style before the U(14) wave.
+   ==> RESOLVED 2026-10-27 (b) as the CellKey wave, plan
+   ~/.opencode/plan/cellkey-wave.md: cells.py landed P0-P2 (commits
+   5f17df2 RUNGS.md dissolved, 09bdc28 key+bridge+load, 2a6132e
+   run_cell/analyze_cell; 145 tests green). The bridge found a REAL
+   bug on the way (fact 24: PySCF FCI ordering != detbasis ordering
+   for norb>=4 — configuration labels and study diagnostics were
+   scrambled on Ti/Sc/U windows). REMAINING: P3 the gated queue
+   through run_cell + cells.{json,md} rename; P4 the strangler
+   retirement (Rung registry tags -> axis values, StudySpec over
+   key-sets, orphaned U scripts). start="no" waits for the
+   parent-prefix policy (which NO group a nominal label selects).
 2. stage_io loader (user-proposed): the atomterm/<name>/{ci,energies}
    chk groups are WRITE-ONLY today; ci is PySCF FCI-ordered, not
    detbasis-ordered. A small loader + ordering bridge unlocks post-hoc
    analysis (RDMs, properties, transition moments, g-factors) from
    stored runs without re-running optimizers. Prerequisite for U(14)
    property work.
+   ==> RESOLVED 2026-10-27 (b): absorbed by entry 1 (load_cell/
+   analyze_cell + pyscf_ci_permutation; the write-only gap is closed
+   cell-addressed; old rung chks are not cell-addressed and stay
+   provenance-only).
 3. LADDER_CASES fixture rename in test_treatments.py (14 sites; the
    rungs rename is mid-flight there).
 4. TABLES.md repeats the reading key in four sections — data
@@ -526,7 +541,8 @@ Recorded (candidates + declinations):
    not coded); making _report public (the fast test pinning it is
    acceptable; revisit if a second renderer appears).
 
-Suite state: 130 green (two earlier full-suite failures —
+Suite state: 145 green (was 130 at the survey; +15 = test_cells.py.
+Two earlier full-suite failures —
 test_atom_term_tables[Sc], test_ti_free_casscf_escapes_the_shell —
 did not reproduce in isolation nor in rerun; recorded as fresh-draw
 basin flakes, facts 10/15g; no band change: no observed values to
