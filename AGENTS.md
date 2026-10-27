@@ -35,7 +35,7 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 | `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_rungs(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README · Methods) |
 | `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the one deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters; `mc_opts` = per-run optimizer knobs (budgets); all checkpointed (`.chk`); labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source) |
 | `src/atomterm/windows.py` | `Window(.columns)`, `window_shell/primitive/scf_mo/no`, `SELECTORS`, `select_*`, `primitive_chain`, `shell_weights`, `build_full_mo`, `complete_orthonormal`, `lm_sectors`, `radial_basis`, `radial_mask`, `avas_window`, `span_overlap`, `lowdin(tol=)` | window construction + selection + the kind registry: `Window.columns(mf, ncore, closed=, c_core=)` materializes any kind to the full MO substrate (bounded-slice contract owned here); `lowdin` raises a named error on near-linearly-dependent blocks (the needle class, fact 16e) instead of NaN-ing downstream |
-| `src/atomterm/core.py` | `purified_s_core`, `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
+| `src/atomterm/core.py` | `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
 | `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and rungs share — callers only render (report text / flat json payload) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
@@ -82,9 +82,10 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
    a_s a_r` with G in the detbasis (physicist) arrangement; annihilators run
    in reverse order (s before r). Elementwise identical to the Slater–Condon
    matrices (tests/test_secondquant.py, tier 1). For core-explicit tests use
-   `drivers.purified_s_core`: canonical core MOs projected onto the s-AO
-   subspace (dropping the SCF p/d tail) and Löwdin-reorthonormalized —
-   close to the SCF solution yet exactly l = 0. Raw s AOs work equally well;
+   `drivers.purified_core_orbitals`: canonical core MOs replaced by an
+   exactly rotation-closed span (per-l shared radials on all members,
+   one global Loewdin) — close to the SCF solution yet exactly l = 0.
+   Raw s AOs work equally well;
    unpurified canonical MOs break orthonormality and the [H, Lz] commutator
    at the 1e-4 level (measured contamination: 1s 1.9e-7, 2s 6.3e-6). The
    MO s-weight lives in the AO metric (`c†Sc = 1`), not the Euclidean norm.

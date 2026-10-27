@@ -268,7 +268,7 @@ def shell_weights(mol, c: np.ndarray, s: np.ndarray):
     because different-l subspaces are exactly orthogonal; grouping by
     (n, l) instead would NOT partition (2p and 3p AO subspaces overlap,
     weights double-count). Same AO-metric quantity as the
-    ``contamination`` of :func:`purified_s_core`. l-purity is NECESSARY
+    ``contamination`` of :func:`purified_core_orbitals`. l-purity is NECESSARY
     but not SUFFICIENT for rotational closure -- only the commutators
     measure closure itself (facts 8, 19).
     Returns ``(names, w)`` with ``names = ['s', 'p', 'd', ...]``.

@@ -470,3 +470,64 @@ M_L labels, README 4-axis Methods, frozen-window naming sweep, series
 layout d2 2,5/8/13 + 3d2s2 4,6/9/14, basin Stages B/C, the 0.9 mEh
 trace, full suite). Next-wave candidates: the linear-molecule
 crystal-field test (the Lambda-branching cross-check).]
+
+
+## Post-wave survey (2026-10-27, README review round + TABLES repair + survey fixes)
+
+Fixed now (commits da4e08c..HEAD of this wave): the round-8 TABLES
+defects (folds header + anchor-out, stale duplicate tail, planned-grid
+start labels, C/S legends); the 27-point README round (starts/windows
+unified — window = span, start = the columns defining it, one
+definition; injection-point failure inventory; treatment-grid block
+with spine/diagnostics/redundant lists + gates + direct-runs; lattice
+vs treatment-grid split; <Lz^2> block -> operator row + diagnostics
+row; epsilon single home; NOT-CONVERGED verdict token, plumbed
+converged -> StageFacts -> payload -> rungs report, study-consistent
+predicate); purified_s_core DELETED (retargeted test_secondquant to
+purified_core_orbitals — the l=0 "reduction" is span-exact but
+column-gauge-free (fact 16e); the span pin now scales its bound with
+the measured contamination); StageFacts duplicate ground_term/ground_l2
+properties deleted (later defs silently overrode — Duplicated Code);
+cases.py stale workdir="results" defaults -> "elements" (results/ died
+in round 1); no_group_windows MOVED study.py -> natural.py (the NO
+window factory belongs with the NO mathematics; lazy Window/
+build_operators imports — windows<->natural is a module-level cycle).
+
+Recorded (candidates + declinations):
+
+1. CELL-KEY SEAM (the wave's main design item, user-proposed): a
+   (window, method, start, mask, substrate, fold) key as the single
+   name of every run — payload field, chk store name, table row
+   address. StudySpec.cell_key(wtag, treatment) is the germ; promote
+   the grid coordinates into the declaration layer and make the runner
+   callable per cell. Subsumes the spine/run-order runner (the
+   user's run-queue generalization) and the ticket-20 intent manifest.
+   Design it DESIGN-IT-TWICE style before the U(14) wave.
+2. stage_io loader (user-proposed): the atomterm/<name>/{ci,energies}
+   chk groups are WRITE-ONLY today; ci is PySCF FCI-ordered, not
+   detbasis-ordered. A small loader + ordering bridge unlocks post-hoc
+   analysis (RDMs, properties, transition moments, g-factors) from
+   stored runs without re-running optimizers. Prerequisite for U(14)
+   property work.
+3. LADDER_CASES fixture rename in test_treatments.py (14 sites; the
+   rungs rename is mid-flight there).
+4. TABLES.md repeats the reading key in four sections — data
+   duplication is fine, prose duplication is not; one key + pointers.
+5. scripts/ audit: keep README-cited anchors (diag_fold, regen_rungs,
+   multiplet_split); retire/fold the orphaned U-campaign one-offs
+   (diag_s5, diag_mdecomp, run_u_* adapters) once the cell-key runner
+   exists.
+6. User-authored README sentences flagged by review, deferred to the
+   user's next pass: "The certified variants are similar to CASSCF
+   theory." (garbled; the pur variant no longer named), the three
+   "Carbon atom" hedges, the deleted free-ion term-table paragraph.
+7. Declined: table-structure regression tests (the safe-rebuild
+   assertions are process, not product; the markdown is regenerated,
+   not coded); making _report public (the fast test pinning it is
+   acceptable; revisit if a second renderer appears).
+
+Suite state: 130 green (two earlier full-suite failures —
+test_atom_term_tables[Sc], test_ti_free_casscf_escapes_the_shell —
+did not reproduce in isolation nor in rerun; recorded as fresh-draw
+basin flakes, facts 10/15g; no band change: no observed values to
+cite).

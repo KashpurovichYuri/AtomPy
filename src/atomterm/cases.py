@@ -93,7 +93,7 @@ class CaseSpec:
                           spin=self.spin, tag=self.tag or self.symbol)
 
 
-def run_case(spec: CaseSpec, workdir: str = "results") -> dict:
+def run_case(spec: CaseSpec, workdir: str = "elements") -> dict:
     """Execute a declared case. The launch entry for any atom, new or
     old: the spec is the intent manifest, the outputs land under
     ``workdir`` and (as generated inserts) in ``elements/<Atom>/``."""
@@ -123,8 +123,9 @@ def _treatments_arm(spec: "CaseSpec", workdir: str) -> dict:
     """The declared study: windows x treatments through the study
     runner; results injected into the element file (tickets 20/28)."""
     from atomterm.core import purified_core_orbitals
-    from atomterm.study import (StudySpec, inject_markers, no_group_windows,
-                                plan_study, render, run_study)
+    from atomterm.natural import no_group_windows
+    from atomterm.study import (StudySpec, inject_markers, plan_study,
+                                render, run_study)
     from atomterm.windows import (Window, build_full_mo, occupied_core_idx,
                                   select_valence_ao, window_primitive)
 
@@ -172,7 +173,7 @@ def run_atom(
     cfg: AtomConfig,
     shell_patterns: list[str],
     nelec_act: int,
-    workdir: str = "results",
+    workdir: str = "elements",
     sa_weights: list[float] | None = None,
     run_casscf: bool = True,
     nroots_primary: int = 9,
@@ -322,7 +323,7 @@ def run_atom(
     return results
 
 
-def run_carbon(cfg: AtomConfig | None = None, workdir: str = "results") -> dict:
+def run_carbon(cfg: AtomConfig | None = None, workdir: str = "elements") -> dict:
     """Carbon pilot (2p^2, CAS(2,3)): the generic pipeline with carbon data."""
     return run_atom(
         cfg or AtomConfig(),

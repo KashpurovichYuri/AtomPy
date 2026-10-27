@@ -37,7 +37,6 @@ from atomterm.windows import (  # noqa: F401
 from atomterm.core import (  # noqa: F401
     closed_shell_core_energy,
     purified_core_orbitals,
-    purified_s_core,
 )
 from atomterm.casscf import (  # noqa: F401
     CASResult,
@@ -62,7 +61,6 @@ __all__ = [
     "select_primitives",
     "occupied_core_idx",
     "shell_weights",
-    "purified_s_core",
     "purified_core_orbitals",
     "closed_shell_core_energy",
     "complete_orthonormal",

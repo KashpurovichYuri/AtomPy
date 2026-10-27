@@ -45,7 +45,7 @@ from atomterm.operators import build_operators, window_closure
 from atomterm.windows import Window, occupied_core_idx
 
 __all__ = ["StudySpec", "CellResult", "plan_study", "run_study",
-           "render", "ground_block", "no_group_windows", "inject_markers"]
+           "render", "ground_block", "inject_markers"]
 
 TREATMENTS = ("casci", "relax", "sa-casscf")
 
@@ -225,60 +225,6 @@ def render(cells: dict) -> str:
     lines.append("<!-- study:end -->")
     return "\n".join(lines) + "\n"
 
-
-def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
-                     c_core: np.ndarray = None, cap: int = 12000) -> list:
-    """@brief The NO arm: occupation-group windows from a source window's
-    term-averaged density.
-
-    Math: exact eigh of the source-window CASCI; the ground block (the
-    eigenspace at ev[0] with its own <L^2>) is term-AVERAGED into the
-    1-RDM gamma (a single |L,M_L> density is m-diagonal but m-unequal
-    -- never a window source); NOs = the density eigenvectors; the
-    occupation groups never split an m-set, and each group PREFIX
-    becomes a Window. By Schur, a term-averaged gamma gives l-pure
-    groups: the windows are exactly rotation-closed (the span
-    certificate verifies per cell).
-
-    @param mol, mf: the atom and its converged SCF.
-    @param ncore: the closed-shell count (the fold).
-    @param c_act: the SOURCE window columns (shell or primitive bands).
-    @param na, nb: the sector (skips prefixes too small to open it).
-    @param c_core: the core columns folded into the source CASCI.
-    @param cap: the exact-eigh cost stop in determinants (approved).
-    @returns: list[Window] -- the group prefixes no1..noK.
-    @note: the source eigh is the arm's cost (~ndet^2 build + eigh);
-        the returned windows are chk-free data.
-    @example: wins = no_group_windows(mol, mf, 9, c_shell, 2, 1,
-                                      c_core=c_pur)
-    """
-    ops = build_operators(mol, mf, c_act, ncore, na, nb, c_core=c_core)
-    dets = ops["dets"]
-    ev, vec = np.linalg.eigh(ops["H"].real)
-    nlow = min(48, len(dets))
-    l2r = np.array([vec[:, r] @ ops["L2"].real @ vec[:, r]
-                    for r in range(nlow)])
-    block = [r for r in range(nlow)
-             if abs(l2r[r] - l2r[0]) < 1e-6 and ev[r] - ev[0] < 1e-6]
-    w = np.zeros(nlow)
-    w[block] = 1.0 / len(block)
-    print(f"[no-arm] source ground block: {len(block)} roots, "
-          f"<L2> = {l2r[0]:.4f}")
-    gamma = ci_rdm1(dets, vec[:, :nlow], c_act.shape[1], weights=w)
-    c_no, occ = natural_orbitals(c_act, gamma)
-    groups = occupation_groups(occ)
-    print(f"[no-arm] occupation groups: {[len(g) for g in groups]}")
-    out = []
-    for nk in range(1, len(groups) + 1):
-        n_max = sum(len(groups[i]) for i in range(nk))
-        if n_max < max(na, nb):
-            continue          # fewer columns than electrons: no sector
-        c_win, _ = select_no_window(c_no, occ, n_max)
-        ndet = math.comb(c_win.shape[1], na) * math.comb(c_win.shape[1], nb)
-        assert ndet <= cap, (nk, ndet)   # cost stop (approved cap)
-        out.append(Window(f"no{nk}", None, c_win, True))
-    assert out, "no usable NO windows"
-    return out
 
 
 def inject_markers(path, block: str, tag: str = "study") -> None:

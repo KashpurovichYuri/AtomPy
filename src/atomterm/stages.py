@@ -82,14 +82,6 @@ class StageFacts:
         return float(self.energies[0])
 
     @property
-    def ground_term(self) -> str:
-        return self.analysis.states[0].term
-
-    @property
-    def ground_l2(self) -> float:
-        return self.analysis.states[0].l2
-
-    @property
     def window(self) -> dict[str, float]:
         """Mean l-weights of the window columns (the l-purity gauge)."""
         return {n: round(float(v), 6)

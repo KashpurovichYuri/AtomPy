@@ -15,46 +15,7 @@ import numpy as np
 from atomterm.windows import (lm_sectors, lowdin, occupied_core_idx,
                               shell_weights)
 
-__all__ = ["purified_s_core", "purified_core_orbitals",
-           "closed_shell_core_energy"]
-
-
-def purified_s_core(mol, mf, n_core: int):
-    """Canonical core MOs projected onto the s-AO subspace (l = 0 exactly).
-
-    The converged "s" MOs of an open-shell atom carry a tiny p/d tail
-    (measured on C/cc-pVDZ: 1s 1.9e-7, 2s 6.3e-6 weight deficit) which
-    breaks two preconditions at once -- orthonormality (<MO|2p_AO>
-    ~ 1e-3, so second quantization is ill-defined on such columns) and
-    rotational closure ([H, Lz] fails at ~1e-4 instead of machine
-    precision). Projection + a Loewdin inside the s subspace repairs
-    both at second-order cost (~1e-10 Eh) -- the orbital analog of the
-    density-space spherical average. Full causal chain: fact 9.
-
-    Returns ``(C, contamination)``: (nao, n_core) orthonormal columns
-    and the dropped fraction ``1 - <c_s|S|c>`` per canonical MO (the SCF
-    symmetry-breaking diagnostic; MO weights live in the AO metric,
-    c^dag S c = 1, not the Euclidean norm).
-    """
-    import re
-
-    labels = [line.split()[-1] for line in mol.ao_labels()]
-    s_idx = [i for i, lbl in enumerate(labels) if re.fullmatch(r"\d+s", lbl)]
-
-    c_can = mf.mo_coeff[:, occupied_core_idx(mf, n_core)]
-    c_s = c_can[s_idx, :]                                # drop the p/d tail
-    # MO normalization lives in the AO metric (c^dag S c = 1), so the
-    # s-subspace weight is c_s^dag S_ss c_s -- not the Euclidean norm.
-    s_ov = mf.get_ovlp()[np.ix_(s_idx, s_idx)]
-    weight = np.einsum("ij,ij->j", c_s, s_ov @ c_s)
-    contamination = np.clip(1.0 - weight, 0.0, None)     # fp noise can dip < 0
-    c_s = c_s / np.sqrt(weight)                          # renormalize the rest
-
-    c_s = lowdin(c_s, s_ov)
-
-    c = np.zeros((mol.nao_nr(), n_core), dtype=c_s.dtype)
-    c[s_idx, :] = c_s
-    return c, contamination
+__all__ = ["purified_core_orbitals", "closed_shell_core_energy"]
 
 
 def purified_core_orbitals(mol, mf, n_core: int):

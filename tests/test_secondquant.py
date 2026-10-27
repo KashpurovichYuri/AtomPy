@@ -121,10 +121,10 @@ def full_space(carbon):
     solution yet exactly orthonormal against the 2p shell AOs and exactly
     rotation-closed. (Raw s AOs work equally well; see wayfinder ticket 05.)
     """
-    from atomterm.drivers import purified_s_core
+    from atomterm.core import purified_core_orbitals
 
     _, mol, mf, act_idx = carbon
-    core, contamination = purified_s_core(mol, mf, 2)
+    core, contamination = purified_core_orbitals(mol, mf, 2)
     assert np.all(contamination < 1e-3)  # SCF noise, not physical mixing
     w = np.hstack([core, np.eye(mol.nao_nr())[:, act_idx]])
     assert np.allclose(w.conj().T @ mf.get_ovlp() @ w, np.eye(5), atol=1e-12)
@@ -184,23 +184,33 @@ def test_full_space_vs_pyscf_casci_core_explicit(full_space, carbon, na, nb):
 
 def test_purified_core_is_pure(carbon):
     """The purified core orbitals are exactly l = 0 (L^2 kills them),
-    orthonormal, and numerically almost identical to the canonical MOs.
+    S-orthonormal, and span the same space as the canonical core MOs.
     The dropped contamination quantifies the SCF symmetry breaking.
+    NOTE: columns are NOT MO-identical -- the within-l radial gauge of
+    the general construction is an arbitrary rotation (fact 16e), so the
+    pin is the SPAN (principal cosines), not per-column overlaps.
     """
     from atomterm.angular import l2_matrix
-    from atomterm.drivers import purified_s_core
+    from atomterm.core import purified_core_orbitals
 
     _, mol, mf, _ = carbon
-    core, contamination = purified_s_core(mol, mf, 2)
+    core, contamination = purified_core_orbitals(mol, mf, 2)
 
     # exact l = 0: L^2 annihilates pure s functions
     assert np.abs(l2_matrix(mol) @ core).max() < 1e-12
     # orthonormal in the AO metric
     s = mf.get_ovlp()
     assert np.allclose(core.conj().T @ s @ core, np.eye(2), atol=1e-12)
-    # numerically close to the canonical core (overlap ~ 1)
-    overlap = np.diag(mf.mo_coeff[:, :2].conj().T @ s @ core)
-    assert np.allclose(np.abs(overlap), 1.0, atol=1e-4)
+    # same span as the canonical core (principal cosines ~ 1; the
+    # column gauge is arbitrary -- fact 16e)
+    def _s_orth(c):
+        ev, u = np.linalg.eigh(c.conj().T @ s @ c)
+        return c @ (u / np.sqrt(ev)) @ u.conj().T
+    cosines = np.linalg.svd(_s_orth(mf.mo_coeff[:, :2]).conj().T @ s @ core,
+                            compute_uv=False)
+    # the span deficit is bounded by the dropped tails (cos^2 deficit
+    # <= contamination) -- scale the bound with the measurement itself
+    assert np.all(cosines > 1 - 2 * contamination.max())
     # dropped tail: nonzero (SCF noise is real) but tiny
     assert np.all(contamination > 0) and np.all(contamination < 1e-3)
     print(f"\ncore MO contamination (1 - s weight): {contamination}")
