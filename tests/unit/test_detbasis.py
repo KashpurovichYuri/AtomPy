@@ -21,7 +21,7 @@ from atomterm.operators import (
     spin_block_one_body,
     spin_block_two_body,
 )
-from conftest import random_integrals
+from helpers import random_integrals
 
 pytestmark = pytest.mark.fast
 

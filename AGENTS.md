@@ -433,13 +433,20 @@ module.
 
 ## Tests
 
-`pytest` runs 160 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 178 tests in ~13 min unloaded (chkfile caching; ROHF computed
+once per
 session; the Ti rungs block is the slowest, ~7 min cold; the Sc rungs
-~2.5 min). Layout: `tests/unit/` = the seconds tier (pure numpy/libcint,
+~2.5 min; under external load ~230 the same suite took 31 min, 2026-10-28).
+Layout: `tests/unit/` = the seconds tier (pure numpy/libcint,
 synthetic substrates, and at most the small carbon ROHF fixture);
 `tests/integration/` = the campaign chemistry (TM references, CASSCF/SA,
 term tables); conftest is split the same way (shared root, campaign
-fixtures in `integration/conftest.py`). Tiers: `pytest -m fast` = the
+fixtures in `integration/conftest.py`). Shared DATA and helpers live in
+plain modules with UNIQUE basenames (`integration/refs.py`,
+`unit/helpers.py`) -- never import the `conftest` basename directly:
+pytest claims it per-directory, and direct imports resolve
+order-dependently across tiers (the 2026-10-28 suite catch). Tiers:
+`pytest -m fast` = the
 unit-tier selection; `pytest -m slow` = the SCF-bearing chemistry (the
 fast/slow MARKS are the machine axis, the directories the human one;
 a few fast-marked functions still live inside integration modules --

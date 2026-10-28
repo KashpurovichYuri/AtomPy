@@ -14,7 +14,7 @@ import pytest
 
 from atomterm.pipeline import run_atom
 from atomterm.system import AtomConfig
-from conftest import TI_REF
+from refs import TI_REF
 
 pytestmark = pytest.mark.slow
 

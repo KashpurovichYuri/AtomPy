@@ -114,7 +114,7 @@ def test_parts_match_slater_condon_on_random_g():
     from atomterm.detbasis import two_body_matrix as sc_two
     from atomterm.secondquant import one_body_matrix as sq_one
     from atomterm.secondquant import two_body_matrix as sq_two
-    from conftest import random_integrals
+    from helpers import random_integrals
 
     rng = np.random.default_rng(29)
     h, g = random_integrals(rng, 4, "complex")

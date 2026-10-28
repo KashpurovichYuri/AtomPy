@@ -1,5 +1,5 @@
-"""Unit-tier test helpers (importable as ``conftest`` from the unit
-test files)."""
+"""Unit-tier test helpers (importable as ``helpers`` from the unit test
+files -- a unique basename; no conftest shadowing)."""
 
 import numpy as np
 

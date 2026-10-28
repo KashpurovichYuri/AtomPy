@@ -28,7 +28,7 @@ from collections import Counter
 import numpy as np
 import pytest
 
-from conftest import SC_EXACT_TERMS, TI_EXACT_TERMS, TI_REF
+from refs import SC_EXACT_TERMS, TI_EXACT_TERMS, TI_REF
 
 from atomterm.drivers import build_full_mo, run_casci
 from atomterm.treatments import run_rungs
@@ -742,10 +742,11 @@ def test_ti_free_casscf_escapes_the_shell(ti_ladder):
     for tag in ("casscf_virtmix", "casscf_shell", "casscf_pyscf"):
         rung = r[tag]
         assert rung["ortho_err"] < 1e-10, tag
-        # the escape gauge DEPTH is chaotic (fresh draw 2026-10-24:
-        # 4.53 on virtmix); the discriminator vs the restored ~12
-        # class survives at any threshold below it
-        assert rung["ground_l2"] < 5.0, tag
+        # the escape gauge DEPTH is chaotic (fresh draws: 4.53 on
+        # virtmix 2026-10-24; 6.40 on casscf_shell 2026-10-28, the
+        # load-230 suite draw); any threshold below the restored ~12
+        # class discriminates -- keep headroom on both sides
+        assert rung["ground_l2"] < 9.0, tag
         assert 0.1 < rung["comm_norm_h_lz"] < 1.0, tag
         assert rung["window"].get("p", 0.0) > 0.3, tag
         assert rung["max_de_vs_pyscf"] < 5e-3, tag

@@ -144,8 +144,8 @@ def test_sc_radial_structure_inverts(sc_rohf, tmp_path):
 @pytest.fixture(scope="session")
 def ti_scan_ref(tmp_path_factory):
     """Ti reference for the frozen scans: the character-forced, basin-gated
-    ROHF (conftest TI_REF) -- deterministic closure measurements."""
-    from conftest import TI_REF
+    ROHF (refs TI_REF) -- deterministic closure measurements."""
+    from refs import TI_REF
 
     cfg = AtomConfig("Ti", "ccpvdz", spin=2)
     mol, mf = run_rohf(cfg, str(tmp_path_factory.mktemp("scan_ti") / "rohf.chk"),
