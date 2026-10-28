@@ -117,7 +117,7 @@ from typing import Callable
 
 import numpy as np
 
-from atomterm.system import AtomConfig, ncore_of, sector_occupations
+from atomterm.system import AtomConfig, ncore_of, sector_na_nb
 from atomterm.reference import ReferenceSpec, run_frac_occ_scf, run_rohf
 from atomterm.windows import (build_full_mo, occupied_core_idx, radial_basis,
                               radial_mask, select_valence_ao)
@@ -375,7 +375,7 @@ def run_rungs(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
             open_idx=act_idx)
     ncas = len(act_idx)
     spin = cfg.spin
-    na, nb = sector_occupations(nelec_act, spin)
+    na, nb = sector_na_nb(nelec_act, spin)
     ncore = ncore_of(mol.nelectron, nelec_act)
     chk = lambda name: str(out / f"{label}_{name}.chk")  # noqa: E731
     ndet = math.comb(ncas, na) * math.comb(ncas, nb)

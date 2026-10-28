@@ -607,10 +607,10 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
 
     ``window=None`` -> the case's primary window (from ``shell_patterns``).
     """
-    from atomterm.system import sector_occupations
+    from atomterm.system import sector_na_nb
 
     w = window or "".join(spec.shell_patterns)
-    atom, sec = spec.symbol, sector_occupations(spec.nelec_act, spec.spin)
+    atom, sec = spec.symbol, sector_na_nb(spec.nelec_act, spec.spin)
     keys = [
         CellKey(atom, w, sec, fold="raw"),
         CellKey(atom, w, sec, fold="avg"),

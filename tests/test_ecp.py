@@ -9,7 +9,7 @@ import pytest
 
 from atomterm import analysis, drivers, operators
 from atomterm.drivers import ReferenceSpec
-from atomterm.system import AtomConfig, build_mol, ncore_of, sector_occupations
+from atomterm.system import AtomConfig, build_mol, ncore_of, sector_na_nb
 
 C_ECP = AtomConfig(symbol="C", basis="ccecpccpvdz", ecp="ccecp", spin=2)
 SI_ECP = AtomConfig(symbol="Si", basis="ccecpccpvdz", ecp="ccecp", spin=2)
@@ -39,7 +39,7 @@ def test_ecp_wiring_valence_bookkeeping():
         assert not mol.cart
         assert len(drivers.select_shell_ao(mol, pat)) == 3  # complete m-set
         assert ncore_of(mol.nelectron, 2) == ncore
-        assert sector_occupations(2, cfg.spin) == (2, 0)
+        assert sector_na_nb(2, cfg.spin) == (2, 0)
     mol = build_mol(SC_ECP)
     assert mol.nelectron == 11  # Ne-core ECP: 3s 3p 3d 4s explicit
     assert ncore_of(mol.nelectron, 3) == 4
@@ -130,15 +130,17 @@ def test_ecp_tm_references_and_basins():
     the explicit 3s3p core sits adjacent to the {3d,4s} window)."""
     from atomterm.operators import window_closure
 
-    for cfg, ref, e_pinned, defect_lo, defect_hi in [
-        (SC_ECP, SC_REF, -46.12052897, 1e-3, 1e-1),  # measured 1.4e-2
-        (TI_ECP, TI_REF, -57.60649802, 0.0, 1e-6),   # measured 1.4e-8
+    for cfg, ref, nelec, e_pinned, defect_lo, defect_hi in [
+        (SC_ECP, SC_REF, 3, -46.12052897, 1e-3, 1e-1),  # measured 1.38e-2
+        (TI_ECP, TI_REF, 4, -57.60649802, 0.0, 1e-6),  # measured 6.9e-9
     ]:
         mol, mf = drivers.run_rohf(
             cfg, f"elements/ecp/{cfg.label}/rungs/rohf.chk", ref=ref)
         assert abs(mf.e_tot - e_pinned) < 1e-6
         act = drivers.select_valence_ao(mol, ["3d", "4s"])
-        ncore = ncore_of(mol.nelectron, len(act))
+        # electrons, not len(act): pre-guard this passed the AO count
+        # (Sc ran ncore=2, Ti ncore=3 -- silently floored, ticket 19)
+        ncore = ncore_of(mol.nelectron, nelec)
         mo = drivers.build_full_mo(mf, list(range(ncore)), act)
         cl = window_closure(mol, mo[:, ncore:ncore + len(act)])
         assert defect_lo < cl["lz"] < defect_hi
@@ -158,7 +160,7 @@ def test_ecp_tm_multiplet_tables():
             cfg, f"elements/ecp/{cfg.label}/rungs/rohf.chk", ref=ref)
         act = drivers.select_valence_ao(mol, ["3d", "4s"])
         c_shell = np.eye(mol.nao_nr())[:, act]
-        na, nb = sector_occupations(nelec, spin)
+        na, nb = sector_na_nb(nelec, spin)
         ncore = ncore_of(mol.nelectron, nelec)
         ops = operators.build_operators(mol, mf, c_shell, ncore, na, nb)
         h, lz, l2, s2 = ops["H"], ops["Lz"], ops["L2"], ops["S2"]

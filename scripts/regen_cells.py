@@ -16,7 +16,7 @@ sys.path.insert(0, "src")
 from atomterm.cases import CAMPAIGN
 from atomterm.cells import CellKey, cell_payload, grid_keys, run_cell
 from atomterm.reference import run_frac_occ_scf, run_rohf
-from atomterm.system import sector_occupations
+from atomterm.system import sector_na_nb
 from atomterm.windows import select_valence_ao
 
 
@@ -88,7 +88,7 @@ for name, spec in CAMPAIGN.items():
     cfg = spec.atom_config()
     mol, mf = run_rohf(cfg, str(out / "rungs" / "rohf.chk"), ref=spec.ref)
     print(f"ROHF E = {mf.e_tot:.8f} Eh", flush=True)
-    sector = sector_occupations(spec.nelec_act, cfg.spin)
+    sector = sector_na_nb(spec.nelec_act, cfg.spin)
     base = CellKey(name, "".join(spec.shell_patterns), sector)
     act_idx = select_valence_ao(mol, base.shell_patterns)
     _, mf_f = run_frac_occ_scf(cfg, str(out / "rungs" / "fracocc.chk"),

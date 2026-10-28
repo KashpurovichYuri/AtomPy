@@ -38,7 +38,7 @@ mode restrictions lift). Mechanical enforcement: the global
 
 | Module | Interface | Notes |
 |---|---|---|
-| `src/atomterm/system.py` | `AtomConfig`, `build_mol`, `sector_occupations`, `ncore_of` | validates: single atom at origin, spherical basis; `AtomConfig.ecp` pairs basis+pseudopotential; the sector/core bookkeeping helpers take `mol.nelectron` (ECP-honest — never recompute from Z) |
+| `src/atomterm/system.py` | `AtomConfig`, `build_mol`, `sector_na_nb`, `ncore_of` | validates: single atom, spherical basis (origin by construction); `AtomConfig.ecp` pairs basis+pseudopotential; the sector/core helpers raise on parity violations and take `mol.nelectron` (ECP-honest — never recompute from Z) |
 | `src/atomterm/angular.py` | `l_matrices`, `l_ladder_matrices`, `l2_matrix`, `l_matrices_analytic` | one-electron `Lx/Ly/Lz` AO matrices. Primary: libcint `int1e_irp` (decoded layout in the docstring). Cross-check: exact tesseral algebra via overlaps. |
 | `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |

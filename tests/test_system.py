@@ -1,9 +1,8 @@
 """Tests of atomterm.system: configuration validation and labeling."""
 
-import numpy as np
 import pytest
 
-from atomterm.system import AtomConfig, build_mol
+from atomterm.system import AtomConfig, build_mol, ncore_of, sector_na_nb
 
 pytestmark = pytest.mark.fast
 
@@ -13,19 +12,29 @@ def test_atom_config_label_encodes_basis_and_spin():
     assert AtomConfig("Si", "ccpvdz", spin=0).label == "Si_ccpvdz_s0"
 
 
-def test_build_mol_rejects_off_origin_atom():
-    """Lz / L^2 are defined about r = 0 -- the constraint is load-bearing."""
-    with pytest.raises(ValueError, match="origin"):
-        build_mol(AtomConfig(coord=(0.0, 0.0, 0.1)))
+def test_label_includes_charge_when_nonzero():
+    assert AtomConfig("C", "ccpvdz", spin=2, charge=1).label == "C_ccpvdz_q1_s2"
 
 
-def test_build_mol_yields_origin_centered_spherical_atom():
+def test_build_mol_yields_spherical_atom():
     """The validated product: one atom, spherical basis, requested 2S."""
     mol = build_mol(AtomConfig())
     assert mol.natm == 1
     assert not mol.cart
     assert mol.spin == 2
-    assert np.allclose(mol.atom_coords()[0], 0.0, atol=1e-10)
+
+
+def test_sector_na_nb_primary_sector_and_parity_guard():
+    assert sector_na_nb(2, 2) == (2, 0)
+    assert sector_na_nb(3, 1) == (2, 1)
+    with pytest.raises(ValueError, match="no Ms sector"):
+        sector_na_nb(3, 2)  # 3 active electrons cannot carry 2S = 2
+
+
+def test_ncore_of_closed_core_and_parity_guard():
+    assert ncore_of(6, 2) == 2
+    with pytest.raises(ValueError, match="core not closed"):
+        ncore_of(9, 4)  # an odd electron cannot sit in a closed core
 
 
 def test_atom_config_raw_basis_passthrough_and_tag():

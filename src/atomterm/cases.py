@@ -16,7 +16,7 @@ from pathlib import Path
 
 import numpy as np
 
-from atomterm.system import AtomConfig, ncore_of, sector_occupations
+from atomterm.system import AtomConfig, ncore_of, sector_na_nb
 from atomterm.reference import ReferenceSpec, run_rohf
 from atomterm.windows import build_full_mo, occupied_core_idx, select_valence_ao
 from atomterm.casscf import (
@@ -177,7 +177,7 @@ def _treatments_arm(spec: "CaseSpec", workdir: str) -> dict:
         rows = select_valence_ao(mol, src["patterns"])
     else:
         rows = window_primitive(mol, mf, ncore, bands=src["bands"]).ao_rows
-    na, nb = sector_occupations(spec.nelec_act, cfg.spin)
+    na, nb = sector_na_nb(spec.nelec_act, cfg.spin)
 
     windows = []
     if "shell" in decl.get("windows", []):
@@ -255,7 +255,7 @@ def run_atom(
     ncas = len(act_idx)
 
     # Ms sectors: (na, nb, nroots) for each CASCI diagonalization
-    na_p, nb_p = sector_occupations(nelec_act, spin)
+    na_p, nb_p = sector_na_nb(nelec_act, spin)
     sector_defs = [(na_p, nb_p, min(nroots_primary, _ndet(ncas, na_p, nb_p)))]
     if nelec_act % 2 == 0 and spin > 0:
         na0 = nelec_act // 2
