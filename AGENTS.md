@@ -64,10 +64,10 @@ docstrings as the file-by-file review proceeds; an entry reduced to
 `N. <claim> -> <module>` is index-only -- the full text lives in that
 module.
 
-1. **PySCF AO labels are truthful** (`2px` really is px); shells may be fused
-   (`nctr > 1`): cc-pVDZ C shell 0 is one contracted s shell with two AOs.
-   Do not use `mol.search_ao_label` — patterns are regex-flavored (`"2p*"`
-   matches `"2s"`); prefix-match the labels instead.
+1. **AO labels are truthful but carry member suffixes** (`2px` is
+   really px); prefix-match labels, never regex patterns; fused
+   shells (`nctr > 1`) unpack through the shell walker →
+   `windows` (select_shell_ao, `_shell_slots`).
 2. **`int1e_irp`** (libcint, 9 components) is `T[3a+b] = <mu| r_a d_b |nu>`;
    `Lz = -i(T1 - T3)`, `Lx = -i(T5 - T7)`, `Ly = -i(T6 - T2)`. Pinned by tests.
 3. **Two integral conventions collide**: PySCF `int2e`/`ao2mo` are **chemist**
@@ -227,22 +227,13 @@ module.
     residuals are ≥8e-2 of S-weight, core tails ≤3e-6, and the
     near-linearly-dependent needles (Sc 6p: 1.7e-4) sit between — keep
     the strong directions labeled, pad the needles unlabeled.
-17. **The ~1e-3 CASSCF-rung commutator class is the INPUT window's
-    core-orthogonalization defect** (ticket 14; resolves the relax-rung
-    attribution left open in fact 12/15): the raw shell window is exactly
-    closed, but every CASSCF must START from its core-orthogonalized form
-    (build_full_mo), and that object already carries the defect BEFORE
-    any optimization (Sc: 6.8e-4 on the input window == the relax rung's
-    converged value; Si ~1e-3; C ~1e-9). Mechanism: projecting window AOs
-    against the canonical core span subtracts directions that are not
-    rotation-closed (canonical MOs carry m-asymmetric tails); the leak is
-    O(⟨window|core⟩ × core nonclosure) — Sc's 4s↔3p-MO overlap ~0.3 makes
-    it 1e-3. NOT core polarization (refolding the relax rung's optimized
-    core with the raw window commutes at 1e-13) and NOT the optimizer
-    (sa_radial, frozen canonical core, shows the same 1e-3). Removing the
-    baseline needs a rotation-closed projector — i.e. an l-purified core
-    span, which is exactly ticket 13. Read every Si/Sc CASSCF-family
-    commutator as baseline + optimizer gauge.
+17. **The ~1e-3 CASSCF-rung commutator class is the input window's
+    core-orthogonalization defect** — present on the CASSCF start
+    object before any optimization; the mechanism and the honest
+    re-orthogonalization: `windows.build_full_mo` Notes; the fix (the
+    rotation-closed purified span): `core`; the "baseline + optimizer
+    gauge" reading of every Si/Sc CASSCF-family commutator:
+    README · Methods.
 18. **Frozen-scan verdicts** (ticket 16, `scans.py`; optimizer-free,
     DETERMINISTIC — never pin optimizer output where a scan exists):
     (a) p² atoms: the full CASSCF gain is a ONE-parameter m-symmetric
@@ -534,45 +525,95 @@ labeling), `test_natural.py` (the γ-ladder claim: m-scalar densities yield whol
 ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 `test_analysis.py` (configuration labels), `test_system.py` (validation).
 
+## Refactor
+
+The rules every restructuring of src/ follows (formulated 2026-10-28;
+refined as the review walk proceeds; certifying the result is the
+Verification section's job):
+
+1. **Contract over tolerance.** Docstrings carry what a caller must
+   know: purpose and goal first -- the module docstring owns the
+   purpose, the shared contract, and the internal layering, each
+   contract stated once and referenced elsewhere; per function, a
+   one-line brief + Parameters / Returns / Raises / Notes / Examples.
+   Defaults are contract: state what the default physically is.
+   Tolerance envelopes and arrival history are comments at the point
+   of use, or commit-message material.
+2. **Names join their family.** Selectors take `select_*`, window
+   constructors take `window_*`, pure linear algebra takes plain
+   nouns. A name that misstates its function renames together with
+   its consumers in one commit.
+3. **One home per idea.** A formula or idiom written twice gets one
+   owner. The deletion test admits the extraction: complexity that
+   vanishes was a pass-through; complexity reappearing across several
+   callers earns the keep. A seam with one consumer stays
+   hypothetical.
+4. **Real separation over wrappers.** A wanted split divides the
+   code -- separate evaluators over one shared classification, not
+   forwarding shells. Twin modules expose identically-named parts so
+   the cross-checks are name-symmetric. A nested helper that is not
+   itself the product moves to module level; a closure that IS the
+   product stays.
+5. **Illegal states become unrepresentable.** Delete the fake degree
+   of freedom rather than guard it; guard what the interface can
+   still express, failing fast at the seam that owns the invariant,
+   the message stating why.
+6. **Lockstep.** A surface or behavior change updates the docstrings,
+   `__all__`, the layout row, consumers, and test imports in the same
+   commit -- documentation that lies is fixed in the commit that
+   broke it. Map the blast radius first (grep the consumers); prefer
+   whole-file moves to function surgery.
+7. **Sectioned grouping.** Functions sit under a marker naming the
+   role; new functions join their section.
+
+A restructuring pass ends by walking this list rule by rule; an
+unapplied rule is either applied or explicitly declined in the commit
+message.
+
 ## Verification
 
 The rules every change to physics-bearing code is verified by
-(formulated 2026-10-28, from the review wave):
+(formulated 2026-10-28; refined as the review walk proceeds). The
+stance: test as much as possible -- a doubt is a test waiting to be
+written, and the degenerate case is the strongest anchor.
 
-1. **Test shape.** Tests are named for the invariant they pin; name +
-   content state the purpose. Test docstrings are one line or absent —
-   never narrative (no motivation, no history: "the gap-closer" is a
-   commit message, not documentation). Explanations that ARE content
-   live as code comments at the point of use; fixture docstrings may
-   carry the construction.
+1. **Test shape.** Tests are named for the invariant they pin -- one
+   invariant per test; name + content state the purpose. Test
+   docstrings are one line or absent; narrative is commit-message
+   material. Explanations that are content live as code comments at
+   the point of use; fixture docstrings may carry the construction.
 2. **Interfaces first.** Tests exercise the owning module's public
-   surface (the layout table). Private functions get micro-pins only
-   when they ARE the module's product (the sign algebra) or the public
-   seam cannot reach them (a monkeypatched budget).
+   surface; private functions get micro-pins only when they are the
+   module's product or the public seam cannot reach them (a forced
+   parameter). Test helpers that repeat get one home in the tier
+   conftest.
 3. **Every code path reached.** A construction is verified only by
-   inputs that reach each branch: when production defaults hide a path
-   (one chunk at test sizes), force it and pin it.
+   inputs that reach each branch: when production defaults hide a
+   path at test sizes, force the parameter and pin it.
 4. **The three-layer chain** (numerical constructions): (a) elementwise
-   identity of independent constructions on inputs exercising every
-   term class — random complex non-particle-symmetric integrals;
-   (b) an external anchor for the SHARED conventions (PySCF
-   FCI/CASCI; both reference classes: open-shell ROHF and closed-shell
-   RHF); (c) exact analytic identities (spectra, commutators, sum
-   rules). Shared-convention errors cancel in (a); only (b)/(c) catch
-   them.
-5. **Degenerate anchors.** Exact-by-construction cases (H; null core;
-   the whole AO space as window — certificates exactly zero) anchor
-   correctness: any deviation is a bug, not physics.
-6. **Behavior-preserving refactors are certified, not assumed.**
-   Bitwise A/B against arrays saved from the pre-refactor code on
-   pinned references (deterministic constructions only); elementwise
-   pins for algorithm restructures; full suite before physics-bearing
-   commits. Trap: a mathematically idempotent step (a double Loewdin)
-   can still break bitwise A/B through a degenerate gauge.
-7. **Pins carry measured values.** Bands cite the observed fresh-draw
-   value in a comment; docstring examples are executed once before
-   being written; hand-derived micro-pins are welcome but the machine
-   certification arbitrates (a hand derivation has been wrong).
+   identity of independent constructions, on inputs that exercise
+   every term class -- random non-symmetric integrals, not only
+   physical ones; (b) an external anchor for the conventions the
+   constructions share, in more than one symmetry class (open-shell
+   and closed-shell references); (c) exact analytic identities
+   (spectra, commutators, sum rules). A shared-convention error
+   cancels in (a); only (b) and (c) catch it.
+5. **Degenerate anchors.** Exact-by-construction cases (one
+   electron; the empty core; the whole space as window) carry
+   answers known without reference: any deviation is a bug, not
+   physics.
+6. **Certified, not assumed.** A behavior-preserving refactor proves
+   it: bitwise A/B against pre-refactor arrays on pinned references
+   (deterministic constructions only); elementwise pins for algorithm
+   restructures; the full suite before physics-bearing commits.
+   Mathematically idempotent steps still count -- they perturb
+   degenerate gauges and break bit-exactness.
+7. **Measured pins.** Bands cite the observed fresh value in a
+   comment; docstring examples run once before being written; hand
+   derivations defer to the machine certification.
+
+A verification pass ends the same way: rule by rule, applied or
+explicitly declined.
 
 ## Planning
 
