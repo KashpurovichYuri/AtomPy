@@ -121,6 +121,11 @@ green, reports written.
   values, tables); ladder.py → treatments.py + sweep.py → study.py
   DONE (shims in place, tests renamed); the v4 diagram in README · The pipeline
   DONE. Remainder: none blocking — close at the wave review.
+- [30: The project walk](tickets/30-project-walk.md) — OPEN (2026-10-28):
+  the file-by-file review of every remaining src and test module per
+  the AGENTS module-walk protocol (Refactor + Verification rules;
+  facts homed and indexed as modules are walked). Phase 1 next:
+  operators -> analysis. T2/M/U measurement runs stay GATED inside it.
 - [29: Ti-first](tickets/29-ti-first.md) — OPEN, the agreed plan:
   T1 code-only (the build_full_mo column generalization IS the mo-pur
   second consumer; CaseSpec-driven key-set exported as spine/grid/
