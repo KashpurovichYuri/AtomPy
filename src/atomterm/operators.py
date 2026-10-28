@@ -1,36 +1,50 @@
-"""Assembly of physical operators as full many-electron matrices.
+"""First-quantized many-body operators for the determinant basis.
 
-Bridges PySCF (AO/MO integrals, angular.py) to detbasis (Slater-Condon rules).
-Everything is plain first quantization: an operator enters the determinant
-space as (one-body matrix, two-body integral tensor) and leaves as an
-``(ndet, ndet)`` matrix.
+Purpose: everything the term analysis reads -- H, Lz, Lz^2, L^2,
+S^2, Sz, N, the parity and population labels, and the closure
+certificate -- as plain ``(ndet, ndet)`` matrices over the Slater
+determinants of detbasis, built from PySCF's integrals and the exact
+angular matrices. First quantization throughout: an operator enters
+the determinant space as a (one-body matrix, two-body tensor) pair
+and is evaluated by either twin evaluator -- detbasis' Slater-Condon
+rules or secondquant's a+/a strings, elementwise identical behind
+``build_operators(method=...)``.
 
-Spin-orbital conventions follow atomterm.detbasis: alpha block first, beta
-block second, two-body integrals in chemist notation over spin-orbitals.
+Conventions
+-----------
+Spin orbitals follow detbasis (alpha block ``0..norb-1``, beta
+``norb..2norb-1``). Two-body tensors follow detbasis' PHYSICIST
+arrangement ``g[p,q,r,s] = <pq|rs> = int p(1) q(2) r(1) s(2)`` --
+equal to chemist ``(pr|qs)``. The boundary to PySCF's CHEMIST
+``int2e``/``ao2mo`` is transposed exactly once, inside
+:func:`active_space_integrals` / :func:`full_space_integrals`; every
+PySCF FCI consumer transposes back (``fci.direct_spin1`` takes
+chemist 4-fold input: pass ``g.transpose(0, 2, 1, 3)`` of ours).
 
-Operators provided
-------------------
-* Hamiltonian in the active space (core folded into the one-body part,
-  the same convention as PySCF's mcscf ``h1eff``; eigenvalues are directly
-  comparable to ``mc.e_cas``).
-* Lz (one-body); L^2 = Sum_i l^2(i) + 2 Sum_{i<j} l_j.l_i
-  (one-body ``Sum_a l_a.l_a`` + two-body ``2 Sum_a l_a (x) l_a``);
-* S^2 = Sum_i 3/4 + 2 Sum_{i<j} s_j.s_i;
-* number operator N.
-
-The matrix products ``l_a.l_a`` are exact when the one-particle space is
-rotation-closed (true for a shell of atomic AOs, and true up to the orbital
-optimization residual for CASSCF MOs -- which is exactly what the
-``[H, L]`` commutator norms measure).
+Layering
+--------
+the PySCF boundary (spin blocks, the MO transform, the core fold) ->
+one-body symbols -> operator parts -> the labels (outside the
+additive parts protocol) -> the certificates -> the assembly.
 """
 
 from __future__ import annotations
 
 import numpy as np
 
-from atomterm.detbasis import determinant_basis, frobenius_norm, slater_condon_matrix
 from atomterm.angular import l_ladder_matrices, l_matrices
-from atomterm.windows import s_metric_roots
+from atomterm.detbasis import (
+    determinant_basis,
+    frobenius_norm,
+    slater_condon_matrix,
+)
+from atomterm.secondquant import annihilate, create, secondquant_matrix
+from atomterm.windows import (
+    lm_sectors,
+    occupied_core_idx,
+    s_metric_roots,
+    shell_slots,
+)
 
 __all__ = [
     "spin_block_one_body",
@@ -44,6 +58,7 @@ __all__ = [
     "population_operator",
     "l2_operator_parts",
     "window_closure",
+    "core_anisotropy",
     "s2_operator_parts",
     "spin_ladders",
     "spin_ladder_matrix",
@@ -54,6 +69,9 @@ __all__ = [
 ]
 
 
+# -------------------------------------------------------- the PySCF boundary
+
+
 def spin_block_one_body(a_spatial: np.ndarray) -> np.ndarray:
     """Spatial one-body matrix -> spin-orbital (alpha | beta) block-diagonal."""
     z = np.zeros_like(a_spatial)
@@ -61,10 +79,12 @@ def spin_block_one_body(a_spatial: np.ndarray) -> np.ndarray:
 
 
 def spin_block_two_body(g_spatial: np.ndarray) -> np.ndarray:
-    """Spatial chemist integrals (pq|rs) -> spin-orbital chemist integrals.
+    """Physicist-arranged spatial tensor -> spin-orbital tensor.
 
-    Spin of electron 1 must match between bra and ket (p with r) and likewise
-    for electron 2 (q with s): blocks (aa;aa), (ab;ab), (ba;ba), (bb;bb).
+    Input and output both follow the detbasis arrangement
+    ``g[p,q,r,s] = <pq|rs>`` (p, r ride electron 1; q, s electron 2),
+    so spin conservation demands ``sigma_p = sigma_r`` and
+    ``sigma_q = sigma_s``: blocks (aa;aa), (ab;ab), (ba;ba), (bb;bb).
     """
     n = g_spatial.shape[0]
     gso = np.zeros((2 * n, 2 * n, 2 * n, 2 * n), dtype=g_spatial.dtype)
@@ -81,36 +101,43 @@ def _mo_transform(a_ao: np.ndarray, c_act: np.ndarray) -> np.ndarray:
     return c_act.conj().T @ a_ao @ c_act
 
 
+def _physicist_eri(eri: np.ndarray, c: np.ndarray) -> np.ndarray:
+    """AO chemist ERIs ``(uv|wx)`` -> the detbasis physicist tensor in
+    the orbital basis ``c``: ``g[p,q,r,s] = <pq|rs>`` = chemist
+    ``(pr|qs)`` -- THE one transpose at the PySCF convention boundary."""
+    return np.einsum(
+        "up,vq,wr,xs,uvwx->pqrs",
+        c.conj(),
+        c.conj(),
+        c,
+        c,
+        eri,
+        optimize=True,
+    ).transpose(0, 2, 1, 3)
+
+
 def _spherical_average_density(mol, p: np.ndarray) -> np.ndarray:
     """l=0 (totally symmetric) component of an AO density matrix.
 
-    Within every pair of same-l shells the density block is replaced by its
-    average over the shared m index: P[(c1,m),(c2,m')] -> delta_mm' * mean_m
-    P[(c1,m),(c2,m)]. Cross-l blocks vanish by exact symmetry and are zeroed.
+    Within every pair of same-l slots (:func:`windows.shell_slots`)
+    the density block is replaced by its average over the shared m
+    index: P[(c1,m),(c2,m')] -> delta_mm' * mean_m P[(c1,m),(c2,m)].
+    Cross-l blocks vanish by exact symmetry and are zeroed.
 
     For an atom the core density is spherical by construction; this removes
     nothing but numerical noise from the SCF solution and restores the exact
     rotational invariance of the analysis Hamiltonian.
     """
-    ao_loc = mol.ao_loc_nr()
-    shells = [
-        (mol.bas_angular(k), mol.bas_nctr(k), 2 * mol.bas_angular(k) + 1, ao_loc[k])
-        for k in range(mol.nbas)
-    ]
     ps = np.zeros_like(p)
-    for l1, nc1, nk1, o1 in shells:
-        for l2, nc2, nk2, o2 in shells:
+    slots = [(l, rows) for _, l, _, rows in shell_slots(mol)]
+    for l1, r1 in slots:
+        for l2, r2 in slots:
             if l1 != l2:
                 continue  # zero by exact symmetry
-            for c1 in range(nc1):
-                for c2 in range(nc2):
-                    blk = np.zeros((nk1, nk2), dtype=p.dtype)
-                    for m in range(nk1):
-                        blk[m, m] = np.mean(
-                            [p[o1 + c1 * nk1 + j, o2 + c2 * nk2 + j] for j in range(nk1)]
-                        )
-                    ps[o1 + c1 * nk1 : o1 + (c1 + 1) * nk1,
-                       o2 + c2 * nk2 : o2 + (c2 + 1) * nk2] = blk
+            nk = len(r1)
+            mean_m = np.mean([p[r1[j], r2[j]] for j in range(nk)])
+            for m in range(nk):
+                ps[r1[m], r2[m]] = mean_m
     return ps
 
 
@@ -125,12 +152,15 @@ def active_space_integrals(
     physical density of closed s shells in a central field) and
     ``V_eff[m,n] = sum_ls P[l,s] (mn|ls) - 0.5 (ml|ns)``.
 
-    ``c_core`` overrides the folded core columns (default ``mf.mo_coeff[:,
-    :ncore]``). Orbital-optimized stages (CASSCF/SA) must pass their OWN
-    converged inactive columns: the optimizer may legally reorganize the
-    core span (core-active swaps), and folding a different core than the
-    one the energies were computed with breaks the identity
-    ``E_tot = E_core + e_cas`` (observed as O(Eh) nonsense, not small drift).
+    ``c_core`` overrides the folded core columns (default: the ROHF
+    CLOSED BLOCK of ``mf``, ``occupied_core_idx`` -- canonical order
+    is junk on near-degenerate uncontracted bases, the trap that
+    helper guards). Orbital-optimized stages (CASSCF/SA) must pass
+    their OWN converged inactive columns: the optimizer may legally
+    reorganize the core span (core-active swaps), and folding a
+    different core than the one the energies were computed with
+    breaks the identity ``E_tot = E_core + e_cas`` (observed as
+    O(Eh) nonsense, not small drift).
 
     ``spherical_core=False`` skips the density averaging: this reproduces
     the raw SCF core field, which carries the reference's anisotropy (the
@@ -143,15 +173,10 @@ def active_space_integrals(
     averaged density is the ensemble average over the degenerate manifold
     -- the scalar projection -- so it restores exact invariance.
 
-    ``g`` follows the atomterm.detbasis convention (physicist arrangement):
-    ``g[p,q,r,s] = <pq|rs> = int p(1) q(2) r(1) s(2)`` = chemist ``(pr|qs)``.
-    CI eigenvalues of (h1, g) equal ``mc.e_cas``.
+    ``g`` is the physicist tensor of the module conventions
+    (detbasis arrangement); CI eigenvalues of (h1, g) equal
+    ``mc.e_cas``.
     """
-    # the ROHF CLOSED BLOCK, not canonical order (which is junk on
-    # near-degenerate uncontracted bases -- the trap occupied_core_idx
-    # guards; callers with their own core (stages, pur rungs) override)
-    from atomterm.windows import occupied_core_idx
-
     c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
               if c_core is None else c_core)
     d_raw = 2.0 * c_core @ c_core.conj().T
@@ -164,30 +189,146 @@ def active_space_integrals(
     )
     h1_ao = mf.get_hcore() + veff_core
     h1 = _mo_transform(h1_ao, c_act)
+    return h1, _physicist_eri(eri, c_act)
 
-    # detbasis convention: g[p,q,r,s] = <pq|rs> = int p(1) q(2) r(1) s(2)
-    # (physicist arrangement) = chemist (pr|qs), hence the transpose.
-    g = np.einsum(
-        "up,vq,wr,xs,uvwx->pqrs",
-        c_act.conj(),
-        c_act.conj(),
-        c_act,
-        c_act,
-        eri,
-        optimize=True,
-    ).transpose(0, 2, 1, 3)
+
+def full_space_integrals(mol, mf, w: np.ndarray):
+    """(h1, g) over the given orbital columns with NO core folding.
+
+    Raw one-electron h_core and raw two-electron ERIs (physicist
+    tensor, module conventions) in the orbital basis ``w`` -- for
+    core-explicit (all-electron active space) second-quantized
+    Hamiltonians.
+    """
+    h1 = _mo_transform(mf.get_hcore(), w)
+    g = _physicist_eri(mol.intor("int2e", aosym="s1"), w)
     return h1, g
 
 
-def _composite_two_body(a: np.ndarray, b: np.ndarray) -> np.ndarray:
-    """Chemist integrals of the two-electron operator A(1)B(2):
-    ``(pq|rs) = A[p, r] B[q, s]``."""
-    return np.einsum("pr,qs->pqrs", a, b)
+# --------------------------------------------------------- one-body symbols
 
 
 def lz_operator(mol, c_act: np.ndarray) -> np.ndarray:
     """Lz as a spin-orbital one-body matrix (spatially diagonal)."""
     return spin_block_one_body(_mo_transform(l_matrices(mol)["z"], c_act))
+
+
+def l_ladder_operator(mol, c_act: np.ndarray) -> dict:
+    """One-body symbols of the orbital ladders L± = Lx ± iLy in the
+    window basis, spin-blocked. Many-body L± are ordinary sector
+    operators (orbital ladders do not touch spin); they power the
+    twin construction L^2 = Lz^2 + (L+ L- + L- L+)/2 (pinned by test)."""
+    ladders = l_ladder_matrices(mol)
+    out = {}
+    for key in ("+", "-"):
+        out[key] = spin_block_one_body(_mo_transform(ladders[key], c_act))
+    return out
+
+
+def sz_operator(norb: int) -> np.ndarray:
+    """One-body S_z in spin-orbital space: +1/2 on alpha (0..norb-1),
+    -1/2 on beta (norb..2norb-1). Already spin-orbital-resolved (do not
+    spin_block); within a fixed-(na, nb) sector its many-body matrix is
+    exactly M_S * identity -- the sector label."""
+    sz = np.zeros((2 * norb, 2 * norb))
+    diag = np.arange(2 * norb)
+    sz[diag[:norb], diag[:norb]] = 0.5
+    sz[diag[norb:], diag[norb:]] = -0.5
+    return sz
+
+
+def spin_ladders(norb: int):
+    """One-body ŝ₊, ŝ₋ in spin-orbital space: ŝ₊ = |α⟩⟨β| (the β → α
+    flip, ⟨p α| s₊ |p β⟩ = 1), ŝ₋ = ŝ₊†. Building blocks of the Ŝ² pair
+    terms; bare ladders change M_S and are not sector operators."""
+    d = 2 * norb
+    s_plus = np.zeros((d, d), dtype=complex)
+    rows = np.arange(norb)
+    s_plus[rows, rows + norb] = 1.0  # <p alpha| s+ |p beta> = 1
+    return s_plus, s_plus.conj().T
+
+
+def number_operator(norb: int) -> np.ndarray:
+    """Electron number N (one-body identity in spin-orbital space)."""
+    return spin_block_one_body(np.eye(norb))
+
+
+def spin_ladder_matrix(norb: int, dets_from, dets_to, plus: bool = True) -> np.ndarray:
+    """Many-body S± as an explicit INTER-SECTOR map:
+    S+ : (na, nb) -> (na+1, nb-1) (the beta -> alpha flip),
+    S- : (na, nb) -> (na-1, nb+1).
+
+    S+ = Sum_i a+(i alpha) a(i beta); returned dense
+    ``(len(dets_to), len(dets_from))``. The one operator class in the
+    project that does NOT preserve a sector -- an inter-sector map has
+    no (one_body, two_body) representation, so this applies a+/a
+    directly (the documented convention exception); built for the twin
+    construction S^2 = Sz^2 + (S- S+ + S+ S-)/2 (pinned by test)."""
+    out = np.zeros((len(dets_to), len(dets_from)))
+    index = {d: k for k, d in enumerate(dets_to)}
+    for col, occ in enumerate(dets_from):
+        for i in range(norb):
+            p, q = (i, i + norb) if plus else (i + norb, i)
+            if q not in occ or p in occ:
+                continue
+            sg1, mid = annihilate(occ, q)
+            sg2, new = create(mid, p)
+            out[index[new], col] = sg1 * sg2
+    return out
+
+
+# --------------------------------------------------------- operator parts
+
+
+def _composite_two_body(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Physicist tensor of the product operator A(1)B(2):
+    ``g[p,q,r,s] = A[p, r] B[q, s]``."""
+    return np.einsum("pr,qs->pqrs", a, b)
+
+
+def l2_operator_parts(mol, c_act: np.ndarray):
+    """(one_body, two_body) parts of the total
+    L^2 = Sum_i l^2(i) + 2 Sum_{i<j} l_j.l_i:
+    one-body ``Sum_a l_a.l_a`` + two-body ``2 Sum_a l_a (x) l_a``.
+
+    Notes
+    -----
+    The products are the WINDOW-restricted one-particle operators --
+    exact as such in any S-orthonormal window basis. Whether the
+    restricted L^2 equals the full one is the window's closure
+    (:func:`window_closure`); the many-body ``[H, L^2]`` commutators
+    measure it.
+    """
+    n = c_act.shape[1]
+    one = np.zeros((n, n), dtype=complex)
+    two = np.zeros((n, n, n, n), dtype=complex)
+    for a in "xyz":
+        la = _mo_transform(l_matrices(mol)[a], c_act)
+        one += la @ la
+        two += 2.0 * _composite_two_body(la, la)
+    return spin_block_one_body(one), spin_block_two_body(two)
+
+
+def s2_operator_parts(norb: int):
+    """(one_body, two_body) parts of the total S^2.
+
+    S^2 = Sz^2 + (S+ S- + S- S+)/2 built from first-quantized composites
+    ``Sum_{i<j} A(i) B(j)``; equivalently ``Sum_i 3/4 + 2 Sum_{i<j} s_j.s_i``.
+    """
+    d = 2 * norb
+    sz = sz_operator(norb)
+    s_plus, s_minus = spin_ladders(norb)
+
+    one = 0.75 * np.eye(d, dtype=complex)
+    two = 2.0 * (
+        _composite_two_body(sz, sz)
+        + 0.5 * _composite_two_body(s_plus, s_minus)
+        + 0.5 * _composite_two_body(s_minus, s_plus)
+    )
+    return one, two
+
+
+# ---------------------------------------------------------------- the labels
 
 
 def parity_one_body(mol, c_act: np.ndarray) -> np.ndarray:
@@ -198,8 +339,6 @@ def parity_one_body(mol, c_act: np.ndarray) -> np.ndarray:
     rotated same-(l, m) combinations, false for optimized windows that
     mix l within a column -- parity labels live on l-pure window stages.
     """
-    from atomterm.windows import lm_sectors
-
     sectors = lm_sectors(mol)
     s = mol.intor_symmetric("int1e_ovlp")
     signs = np.zeros(c_act.shape[1])
@@ -238,8 +377,6 @@ def parity_operator(mol, c_act: np.ndarray, na: int, nb: int) -> np.ndarray:
     multiplicative -- so this is a direct construction over the
     determinant occupations, not a Slater-Condon evaluation.
     """
-    from atomterm.detbasis import determinant_basis
-
     signs = np.diag(parity_one_body(mol, c_act))
     norb = c_act.shape[1]
     dets = determinant_basis(norb, na, nb)
@@ -273,15 +410,19 @@ def population_operator(mol, c_act: np.ndarray, rows: list[int], na: int,
     return slater_condon_matrix(dets, one_body=one, two_body=None)
 
 
+# --------------------------------------------------------- the certificates
+
+
 def window_closure(mol, c_win: np.ndarray) -> dict[str, float]:
     """One-particle rotational-closure defects of a window SPAN.
 
     The span of the S-orthonormal columns ``c_win`` is rotation-closed
     iff its projector commutes with all three rotation generators. In
-    the symmetrically orthonormalized AO basis (fact 4 metric dance) the
-    projector is ``P = Q Q^dag`` with ``Q = S^(1/2) c_win`` (QR-cleaned)
-    and the generators act as ``S^(-1/2) l_a S^(-1/2)``. Reported as
-    Frobenius norms of the commutators:
+    the symmetrically orthonormalized AO basis (the
+    :func:`windows.s_metric_roots` transport) the projector is
+    ``P = Q Q^dag`` with ``Q = S^(1/2) c_win`` (QR-cleaned) and the
+    generators act as ``S^(-1/2) l_a S^(-1/2)``. Reported as Frobenius
+    norms of the commutators:
 
     ``lz``    = ||[P, Lz]||  -- exactly the part the many-body ``[H, Lz]``
     can see: Lz mixes only within +-m pairs, so m=0-member tilts and
@@ -310,108 +451,11 @@ def window_closure(mol, c_win: np.ndarray) -> dict[str, float]:
     }
 
 
-def l2_operator_parts(mol, c_act: np.ndarray):
-    """(one_body, two_body) parts of the total L^2."""
-    n = c_act.shape[1]
-    one = np.zeros((n, n), dtype=complex)
-    two = np.zeros((n, n, n, n), dtype=complex)
-    for a in "xyz":
-        la = _mo_transform(l_matrices(mol)[a], c_act)
-        one += la @ la
-        two += 2.0 * _composite_two_body(la, la)
-    return spin_block_one_body(one), spin_block_two_body(two)
-
-
-def sz_operator(norb: int) -> np.ndarray:
-    """One-body S_z in spin-orbital space: +1/2 on alpha (0..norb-1),
-    -1/2 on beta (norb..2norb-1). Already spin-orbital-resolved (do not
-    spin_block); within a fixed-(na, nb) sector its many-body matrix is
-    exactly M_S * identity -- the sector label."""
-    sz = np.zeros((2 * norb, 2 * norb))
-    diag = np.arange(2 * norb)
-    sz[diag[:norb], diag[:norb]] = 0.5
-    sz[diag[norb:], diag[norb:]] = -0.5
-    return sz
-
-
-def spin_ladders(norb: int):
-    """One-body ŝ₊, ŝ₋ in spin-orbital space: ŝ₊ = |α⟩⟨β| (the β → α
-    flip, ⟨p α| s₊ |p β⟩ = 1), ŝ₋ = ŝ₊†. Building blocks of the Ŝ² pair
-    terms; bare ladders change M_S and are not sector operators."""
-    d = 2 * norb
-    s_plus = np.zeros((d, d), dtype=complex)
-    rows = np.arange(norb)
-    s_plus[rows, rows + norb] = 1.0  # <p alpha| s+ |p beta> = 1
-    return s_plus, s_plus.conj().T
-
-
-def s2_operator_parts(norb: int):
-    """(one_body, two_body) parts of the total S^2.
-
-    S^2 = Sz^2 + (S+ S- + S- S+)/2 built from first-quantized composites
-    ``Sum_{i<j} A(i) B(j)``; equivalently ``Sum_i 3/4 + 2 Sum_{i<j} s_j.s_i``.
-    """
-    d = 2 * norb
-    sz = sz_operator(norb)
-    s_plus, s_minus = spin_ladders(norb)
-
-    one = 0.75 * np.eye(d, dtype=complex)
-    two = 2.0 * (
-        _composite_two_body(sz, sz)
-        + 0.5 * _composite_two_body(s_plus, s_minus)
-        + 0.5 * _composite_two_body(s_minus, s_plus)
-    )
-    return one, two
-
-
-def number_operator(norb: int) -> np.ndarray:
-    """Electron number N (one-body identity in spin-orbital space)."""
-    return spin_block_one_body(np.eye(norb))
-
-
-def l_ladder_operator(mol, c_act: np.ndarray) -> dict:
-    """One-body symbols of the orbital ladders L± = Lx ± iLy in the
-    window basis, spin-blocked. Many-body L± are ordinary sector
-    operators (orbital ladders do not touch spin); they power the
-    twin construction L^2 = Lz^2 + (L+ L- + L- L+)/2 (pinned by test)."""
-    ladders = l_ladder_matrices(mol)
-    out = {}
-    for key in ("+", "-"):
-        out[key] = spin_block_one_body(_mo_transform(ladders[key], c_act))
-    return out
-
-
-def spin_ladder_matrix(norb: int, dets_from, dets_to, plus: bool = True) -> np.ndarray:
-    """Many-body S± as an explicit INTER-SECTOR map:
-    S+ : (na, nb) -> (na+1, nb-1) (the beta -> alpha flip),
-    S- : (na, nb) -> (na-1, nb+1).
-
-    S+ = Sum_i a+(i alpha) a(i beta); returned dense
-    ``(len(dets_to), len(dets_from))``. The one operator class in the
-    project that does NOT preserve a sector -- built for the twin
-    construction S^2 = Sz^2 + (S- S+ + S+ S-)/2 (pinned by test)."""
-    from atomterm.secondquant import annihilate, create
-
-    out = np.zeros((len(dets_to), len(dets_from)))
-    index = {d: k for k, d in enumerate(dets_to)}
-    for col, occ in enumerate(dets_from):
-        for i in range(norb):
-            p, q = (i, i + norb) if plus else (i + norb, i)
-            if q not in occ or p in occ:
-                continue
-            sg1, mid = annihilate(occ, q)
-            sg2, new = create(mid, p)
-            out[index[new], col] = sg1 * sg2
-    return out
-
-
 def core_anisotropy(mol, mf, ncore: int, c_core: np.ndarray = None) -> float:
     """Relative Frobenius norm of the discarded core-density anisotropy
     ``||rho - rho_sph||_F / ||rho_sph||_F`` -- the ``eps`` weight of the
     internal-field term in ``H_eff = H0 + eps*W`` (see
     :func:`active_space_integrals`)."""
-    from atomterm.windows import occupied_core_idx
-
     c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
               if c_core is None else c_core)
     d = 2.0 * c_core @ c_core.conj().T
@@ -419,25 +463,7 @@ def core_anisotropy(mol, mf, ncore: int, c_core: np.ndarray = None) -> float:
     return float(frobenius_norm(d - d_sph) / frobenius_norm(d_sph))
 
 
-def full_space_integrals(mol, mf, w: np.ndarray):
-    """(h1, g) over the given orbital columns with NO core folding.
-
-    Raw one-electron h_core and raw two-electron ERIs (detbasis physicist
-    convention) in the orbital basis ``w`` -- for core-explicit (all-electron
-    active space) second-quantized Hamiltonians.
-    """
-    h1 = _mo_transform(mf.get_hcore(), w)
-    eri = mol.intor("int2e", aosym="s1")
-    g = np.einsum(
-        "up,vq,wr,xs,uvwx->pqrs",
-        w.conj(),
-        w.conj(),
-        w,
-        w,
-        eri,
-        optimize=True,
-    ).transpose(0, 2, 1, 3)
-    return h1, g
+# -------------------------------------------------------------- the assembly
 
 
 def build_operator_parts(
@@ -446,6 +472,9 @@ def build_operator_parts(
 ) -> dict:
     """Operator content of build_operators as raw parts, evaluation-agnostic:
     ``{name: (one_body, two_body)}`` plus the determinant basis and integrals.
+
+    The seam behind ``build_operators(method=...)``: both evaluators
+    consume these parts unchanged.
     """
     h1, g = active_space_integrals(mol, mf, c_act, ncore, spherical_core, c_core)
     dets = determinant_basis(c_act.shape[1], na, nb)
@@ -491,13 +520,9 @@ def build_operators(
     integrals = (parts.pop("h1"), parts.pop("g"))
 
     if method == "slater_condon":
-        from atomterm.detbasis import slater_condon_matrix
-
         def build(ob, tb):
             return slater_condon_matrix(dets, one_body=ob, two_body=tb)
     elif method == "secondquant":
-        from atomterm.secondquant import secondquant_matrix
-
         def build(ob, tb):
             return secondquant_matrix(dets, one_body=ob, two_body=tb)
     else:

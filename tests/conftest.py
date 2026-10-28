@@ -3,6 +3,7 @@ by design -- "we can build C even within unit") and the synthetic
 no-SCF substrates. Campaign fixtures (Sc/Ti gated ROHF, term tables)
 live in integration/conftest.py."""
 
+import numpy as np
 import pytest
 
 from atomterm.system import AtomConfig
@@ -16,6 +17,20 @@ def carbon(tmp_path_factory):
     chk = str(tmp_path_factory.mktemp("carbon") / "rohf.chk")
     mol, mf = run_rohf(cfg, chk)
     return cfg, mol, mf, select_shell_ao(mol, "2p")
+
+
+@pytest.fixture(scope="module")
+def shell_ops(carbon):
+    """Operators in the pure 2p-shell determinant spaces (Ms=1 and Ms=0)."""
+    from atomterm.operators import build_operators
+
+    _, mol, mf, act_idx = carbon
+    iao = np.eye(mol.nao_nr())
+    c_act = iao[:, act_idx]
+    ncore = (mol.nelectron - 2) // 2  # 2 for both (2,0) and (1,1)
+    ops1 = build_operators(mol, mf, c_act, ncore, na=2, nb=0)
+    ops0 = build_operators(mol, mf, c_act, ncore, na=1, nb=1)
+    return mol, mf, ops1, ops0
 
 
 @pytest.fixture(scope="session")

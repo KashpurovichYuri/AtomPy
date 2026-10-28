@@ -12,9 +12,11 @@ Conventions
   sparse form of an occupation bit string over the ``2*norb`` slots.
 * One-body operator: matrix ``h[p, q] = <p|h|q>``, shape
   ``(2*norb, 2*norb)``.
-* Two-body integrals, chemist notation:
-  ``G[p, q, r, s] = (pq|rs) = Integral p(1) q(2) r(1) s(2)``, shape
-  ``(2*norb,)*4``; the operator is ``Sum_{i<j} g(i, j)``.
+* Two-body integrals, the physicist tensor:
+  ``G[p, q, r, s] = <pq|rs> = Integral p(1) q(2) r(1) s(2)``
+  (p, r ride electron 1, q, s electron 2; equal to chemist
+  ``(pr|qs)``), shape ``(2*norb,)*4``; the operator is
+  ``Sum_{i<j} g(i, j)``.
 
 The determinant ordering here (lexicographic over the (alpha, beta)
 combinations) is NOT PySCF's FCI string order -- they differ from
