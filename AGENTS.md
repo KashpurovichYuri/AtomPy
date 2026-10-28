@@ -23,6 +23,15 @@ python scripts/run_c.py [workdir]
 Python 3.12, PySCF 2.13, numpy 2.5, scipy 1.18 (note: `scipy.special.sph_harm`
 is gone; use `sph_harm_y(n, m, polar, azim)`).
 
+**Filesystem rule (user-set, 2026-10-28)**: using ANY directory outside
+this project directory is restricted without the user's explicit
+permission — no scratch files, tool caches, or artifacts in `/tmp`, the
+home dir, or elsewhere. Temporary files live inside the repo (e.g. a
+`*.tmp` beside its target, removed once used). The one current
+exception: plan-mode plan files, which the harness assigns to
+`~/.opencode/plan` (mechanical enforcement: the global
+`external_directory: ask` permission rule, user-side).
+
 ## Layout (deep modules, small interfaces)
 
 | Module | Interface | Notes |
