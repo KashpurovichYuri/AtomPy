@@ -534,9 +534,13 @@ only when a field lifts the degeneracy — the raw fold's Λ-branching
 picking |M_L| = 2 on Ti. The term labels come from ⟨L²⟩/⟨S²⟩; the
 M_L-resolved reading (L̂z diagonalized inside the ground eigenspace:
 ⟨L̂z²⟩ = 9, 4, 1, 0, 1, 4, 9 for ³F) is the multiplet demonstration,
-`elements/Ti/TABLES.md`. The fold-shift bookkeeping
-(|E(analysis fold) − E(as run)|) is not a table column; its reading:
-Partition bookkeeping, Methods.
+`elements/Ti/TABLES.md`. What is exact without any canonicalization
+is the sector's **L̂z spectrum** — the M_L content of the determinant
+space itself (carbon's triplet sector: [+1, 0, −1]), reported with
+each sector's term analysis (`report.md`): a property of the space,
+not of the solver's vector — gauge-free and fold-free. The fold-shift
+bookkeeping (|E(analysis fold) − E(as run)|) is not a table column;
+its reading: Partition bookkeeping, Methods.
 
 Verdicts (the classes of the
 failure inventory, Motivation): **exact** — commutators and span
