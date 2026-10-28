@@ -1,6 +1,8 @@
-"""Unit pins of atomterm.windows: build_full_mo's two representations
-(AO rows, column vectors) on a synthetic substrate, plus the STO-3G
-degenerate substrates (null core, whole space as window)."""
+"""Unit pins of atomterm.windows: the selection/meter layer (pure
+numpy: span_projector, select_span, shell_weights) and build_full_mo's
+two representations (AO rows, column vectors) on a synthetic
+substrate, plus the STO-3G degenerate substrates (null core, whole
+space as window)."""
 
 import numpy as np
 import pytest
@@ -8,9 +10,47 @@ import pytest
 from pyscf import gto
 
 from atomterm.windows import (Window, build_full_mo, complete_orthonormal,
-                              lm_sectors, lowdin, select_valence_ao)
+                              lm_sectors, lowdin, select_span,
+                              select_valence_ao, shell_weights,
+                              span_projector)
 
 pytestmark = pytest.mark.fast
+
+
+# ------------------------------------------------------ the selection layer
+
+def test_span_projector_weights_one_in_span_zero_orthogonal():
+    mol = gto.M(atom="C 0 0 0", basis="ccpvdz", spin=2, verbose=0)
+    s = mol.intor_symmetric("int1e_ovlp")
+    rows = select_valence_ao(mol, ["2p"])
+    p = span_projector(s, rows)
+    assert np.abs(p - p.T).max() < 1e-12          # symmetric form
+    c_in = lowdin(np.eye(mol.nao_nr())[:, rows], s)[:, 0]
+    assert abs(float(np.real(c_in @ p @ c_in)) - 1.0) < 1e-10
+    c_d = np.eye(mol.nao_nr())[:, select_valence_ao(mol, ["3d"])[0]]
+    assert abs(float(c_d @ p @ c_d)) < 1e-12      # different l: exactly 0
+
+
+def test_select_span_l_vocabulary_and_label_prefix():
+    import re
+
+    mol = gto.M(atom="C 0 0 0", basis="ccpvdz", spin=2, verbose=0)
+    labels = [line.split()[-1] for line in mol.ao_labels()]
+    # spherical p labels carry the member suffix (2px, 2py, 2pz, ...)
+    l1 = [i for i, lbl in enumerate(labels) if re.match(r"\d+p", lbl)]
+    assert select_span(mol, "l1") == sorted(l1)  # the whole l subspace
+    assert select_span(mol, "2p") == select_valence_ao(mol, ["2p"])
+    with pytest.raises(ValueError, match="matched no AO labels"):
+        select_span(mol, "9x")
+
+
+def test_shell_weights_rows_sum_to_one_for_s_orthonormal_columns():
+    mol = gto.M(atom="C 0 0 0", basis="ccpvdz", spin=2, verbose=0)
+    s = mol.intor_symmetric("int1e_ovlp")
+    c = lowdin(np.eye(mol.nao_nr()), s)  # a complete S-orthonormal set
+    names, w = shell_weights(mol, c, s)
+    assert names[0] == "s"
+    assert np.abs(w.sum(axis=1) - 1.0).max() < 1e-12
 
 
 class _FakeMf:

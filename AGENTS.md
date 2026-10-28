@@ -534,6 +534,46 @@ labeling), `test_natural.py` (the γ-ladder claim: m-scalar densities yield whol
 ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 `test_analysis.py` (configuration labels), `test_system.py` (validation).
 
+## Verification
+
+The rules every change to physics-bearing code is verified by
+(formulated 2026-10-28, from the review wave):
+
+1. **Test shape.** Tests are named for the invariant they pin; name +
+   content state the purpose. Test docstrings are one line or absent —
+   never narrative (no motivation, no history: "the gap-closer" is a
+   commit message, not documentation). Explanations that ARE content
+   live as code comments at the point of use; fixture docstrings may
+   carry the construction.
+2. **Interfaces first.** Tests exercise the owning module's public
+   surface (the layout table). Private functions get micro-pins only
+   when they ARE the module's product (the sign algebra) or the public
+   seam cannot reach them (a monkeypatched budget).
+3. **Every code path reached.** A construction is verified only by
+   inputs that reach each branch: when production defaults hide a path
+   (one chunk at test sizes), force it and pin it.
+4. **The three-layer chain** (numerical constructions): (a) elementwise
+   identity of independent constructions on inputs exercising every
+   term class — random complex non-particle-symmetric integrals;
+   (b) an external anchor for the SHARED conventions (PySCF
+   FCI/CASCI; both reference classes: open-shell ROHF and closed-shell
+   RHF); (c) exact analytic identities (spectra, commutators, sum
+   rules). Shared-convention errors cancel in (a); only (b)/(c) catch
+   them.
+5. **Degenerate anchors.** Exact-by-construction cases (H; null core;
+   the whole AO space as window — certificates exactly zero) anchor
+   correctness: any deviation is a bug, not physics.
+6. **Behavior-preserving refactors are certified, not assumed.**
+   Bitwise A/B against arrays saved from the pre-refactor code on
+   pinned references (deterministic constructions only); elementwise
+   pins for algorithm restructures; full suite before physics-bearing
+   commits. Trap: a mathematically idempotent step (a double Loewdin)
+   can still break bitwise A/B through a degenerate gauge.
+7. **Pins carry measured values.** Bands cite the observed fresh-draw
+   value in a comment; docstring examples are executed once before
+   being written; hand-derived micro-pins are welcome but the machine
+   certification arbitrates (a hand derivation has been wrong).
+
 ## Planning
 
 `wayfinder/map.md` holds the effort map (destination, decisions, fog) and

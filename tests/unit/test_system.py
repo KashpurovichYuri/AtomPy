@@ -17,35 +17,44 @@ def test_label_includes_charge_when_nonzero():
 
 
 def test_build_mol_yields_spherical_atom():
-    """The validated product: one atom, spherical basis, requested 2S."""
     mol = build_mol(AtomConfig())
     assert mol.natm == 1
     assert not mol.cart
     assert mol.spin == 2
 
 
-def test_sector_na_nb_primary_sector_and_parity_guard():
+def test_build_mol_rejects_multi_atom_symbol():
+    with pytest.raises(ValueError, match="single atom"):
+        build_mol(AtomConfig(symbol="H 0 0 0; H 0 0 1.5"))
+
+
+def test_sector_na_nb_primary_sector():
     assert sector_na_nb(2, 2) == (2, 0)
     assert sector_na_nb(3, 1) == (2, 1)
-    with pytest.raises(ValueError, match="no Ms sector"):
-        sector_na_nb(3, 2)  # 3 active electrons cannot carry 2S = 2
+
+
+def test_sector_na_nb_rejects_impossible_sectors():
     with pytest.raises(ValueError, match="exceeds"):
         sector_na_nb(2, 4)  # spin above the electron count: nb < 0
+    with pytest.raises(ValueError, match="no Ms sector"):
+        sector_na_nb(3, 2)  # odd difference: no such sector
 
 
-def test_ncore_of_closed_core_and_parity_guard():
+def test_ncore_of_counts_closed_core_orbitals():
     assert ncore_of(6, 2) == 2
-    with pytest.raises(ValueError, match="core not closed"):
-        ncore_of(9, 4)  # an odd electron cannot sit in a closed core
+    assert ncore_of(11, 3) == 4  # Sc/ccECP: the explicit 3s2 3p6
+
+
+def test_ncore_of_rejects_open_core():
     with pytest.raises(ValueError, match="exceed"):
         ncore_of(2, 6)  # more active than total electrons: ncore < 0
+    with pytest.raises(ValueError, match="core not closed"):
+        ncore_of(9, 4)  # an odd electron cannot sit in a closed core
 
 
-def test_atom_config_raw_basis_passthrough_and_tag():
-    """Custom (dict) basis specs go straight to mol.basis (PySCF parses
-    raw input); ``tag`` keeps the label path-safe for dict bases. Raw
-    ECP-string passthrough is exercised on the real U block in the
-    campaign tests (a fake minimal ECP block does not parse)."""
+def test_atom_config_raw_basis_and_tag():
+    """Raw basis specs pass through to mol.basis; tag keeps the label
+    path-safe (the multiline-ECP case)."""
     from pyscf import gto
 
     basis = {"H": gto.parse("H S\n 1.0 1.0")}  # minimal raw spec
@@ -54,7 +63,5 @@ def test_atom_config_raw_basis_passthrough_and_tag():
     mol = build_mol(cfg)
     assert cfg.label == "custom_pairing"
     assert mol.nelectron == 0  # charge=1 on one-electron H
-    # a multi-line ECP string is not path-safe in the fallback label --
-    # custom bases want tag (documented in the AtomConfig docstring)
     assert "\n" not in AtomConfig(
         symbol="H", basis=basis, ecp="ECP\nH nelec 0\nEND").label
