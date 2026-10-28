@@ -121,6 +121,16 @@ green, reports written.
   values, tables); ladder.py → treatments.py + sweep.py → study.py
   DONE (shims in place, tests renamed); the v4 diagram in README · The pipeline
   DONE. Remainder: none blocking — close at the wave review.
+- [29: Ti-first](tickets/29-ti-first.md) — OPEN, the agreed plan:
+  T1 code-only (the build_full_mo column generalization IS the mo-pur
+  second consumer; CaseSpec-driven key-set exported as spine/grid/
+  diagnostics/planned groups, renderers consume; byte-diff guard),
+  T2 the gated Ti batch (the 4 mo-pur cells, the (4,10)/(4,14)
+  anchors, pass curves), then C/Si/Sc migration, then the AGENTS
+  protocol round + the treatments/study retirement ticket (the
+  test-pin migration is its deliverable). Supersedes the cellkey-wave
+  queue ordering; deep refactor/generalize is mandated WHILE Ti work
+  runs, with the second-consumer guardrail.
 - [28: completion runs](tickets/28-completion-runs.md) — OPEN, the
   runner is ready: U SA-24 / relax-24 / SA-(6,13); Sc/Ti NO-start
   ladders; the approved stop rules (certificate / saturation / cost).

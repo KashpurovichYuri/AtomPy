@@ -27,10 +27,11 @@ is gone; use `sph_harm_y(n, m, polar, azim)`).
 this project directory is restricted without the user's explicit
 permission — no scratch files, tool caches, or artifacts in `/tmp`, the
 home dir, or elsewhere. Temporary files live inside the repo (e.g. a
-`*.tmp` beside its target, removed once used). The one current
-exception: plan-mode plan files, which the harness assigns to
-`~/.opencode/plan` (mechanical enforcement: the global
-`external_directory: ask` permission rule, user-side).
+`*.tmp` beside its target, removed once used). Plans live in-repo as
+`wayfinder/tickets/` (plan-mode DRAFTS are confined to
+`~/.opencode/plan` by the harness and move into the repo as soon as
+mode restrictions lift). Mechanical enforcement: the global
+`external_directory: ask` permission rule (user-side, 2026-10-28).
 
 ## Layout (deep modules, small interfaces)
 
