@@ -4,3 +4,4 @@ __pycache__/
 *.chk
 message.txt
 elements/*/cache/
+*.log.tmp
