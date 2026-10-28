@@ -135,3 +135,52 @@ def test_window_columns_assemble_through_build_full_mo():
     err = np.abs(mo.conj().T @ s @ mo - np.eye(mo.shape[1])).max()
     assert err < 1e-12
     assert np.allclose(mo[:, ncore:ncore + 3], c_win, atol=1e-12)
+
+
+# ---------------------------------------------------------------------
+# degenerate substrates (STO-3G): null core, the whole AO space as the
+# window -- trivially rotation-closed, so the certificates are exact
+# BY CONSTRUCTION; any deviation is a bug, not physics.
+
+def test_h_sto3g_null_core_full_window():
+    """One electron, one AO: the empty-core path of build_full_mo
+    (lowdin of zero columns; the complement-empty early return) and
+    an exactly-zero closure certificate."""
+    from pyscf import scf
+    from atomterm.operators import window_closure
+
+    mol = gto.M(atom="H 0 0 0", basis="sto-3g", spin=1, verbose=0)
+    mf = scf.RHF(mol).run(verbose=0)
+    n = mol.nao_nr()
+    s = mol.intor_symmetric("int1e_ovlp")
+    mo = build_full_mo(mf, [], list(range(n)))
+    assert mo.shape == (n, n)
+    assert np.abs(mo.conj().T @ s @ mo - np.eye(n)).max() < 1e-12
+    cl = window_closure(mol, mo)
+    assert cl["lz"] < 1e-14 and cl["lperp"] < 1e-14
+
+
+def test_c_sto3g_null_core_full_window():
+    """The strongest degenerate case: C/STO-3G with NO core and the
+    whole AO space as the window (CAS(6,5), 50 dets in the Ms=1
+    sector (4, 2)). The full space is trivially rotation-closed: the
+    closure certificate is exactly zero, [H, Lz] / [H, L2] vanish at
+    machine precision -- and the ground term is still 3P."""
+    from pyscf import scf
+    from atomterm.operators import build_operators, window_closure
+
+    mol = gto.M(atom="C 0 0 0", basis="sto-3g", spin=2, verbose=0)
+    mf = scf.ROHF(mol).run(verbose=0)
+    n = mol.nao_nr()
+    mo = build_full_mo(mf, [], list(range(n)))
+    cl = window_closure(mol, mo)
+    assert cl["lz"] < 1e-13 and cl["lperp"] < 1e-13
+
+    ops = build_operators(mol, mf, mo, 0, 4, 2)
+    h, lz, l2, s2 = ops["H"], ops["Lz"], ops["L2"], ops["S2"]
+    assert np.linalg.norm(h @ lz - lz @ h) < 1e-11
+    assert np.linalg.norm(h @ l2 - l2 @ h) < 1e-11
+    ev, evec = np.linalg.eigh(h)
+    v = evec[:, 0]
+    assert abs(float(np.real(v.conj() @ l2 @ v)) - 2.0) < 1e-8  # 3P ground
+    assert abs(float(np.real(v.conj() @ s2 @ v)) - 2.0) < 1e-8

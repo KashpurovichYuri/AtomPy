@@ -16,7 +16,7 @@ from dataclasses import dataclass
 import numpy as np
 from pyscf import lib, scf
 
-from atomterm.windows import ao_span_projector, span_rows
+from atomterm.windows import select_span, span_projector
 
 __all__ = ["ReferenceSpec", "run_rohf", "run_frac_occ_scf"]
 
@@ -33,10 +33,10 @@ def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
     core-like MOs be found (the Sc/Ti leakage case).
     """
     s_mat = mol.intor_symmetric("int1e_ovlp")
-    p_closed = ao_span_projector(
-        s_mat, sum((span_rows(mol, p) for p in occ_closed), []))
-    p_open = ao_span_projector(
-        s_mat, sum((span_rows(mol, p) for p in occ_open), []))
+    p_closed = span_projector(
+        s_mat, sum((select_span(mol, p) for p in occ_closed), []))
+    p_open = span_projector(
+        s_mat, sum((select_span(mol, p) for p in occ_open), []))
     n_closed = (mol.nelectron - mol.spin) // 2
     n_open = mol.spin
 
@@ -217,7 +217,7 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
             f"open_idx has {len(open_idx)} AOs but n_open={n_open}")
         s_mat = mol.intor_symmetric("int1e_ovlp")
         # S-projector metric on the open-shell AO span (bounded by 1 for
-        # S-orthonormal MOs, unlike a bare quadratic form): _ao_span_projector
+        # S-orthonormal MOs, unlike a bare quadratic form): span_projector
         g_inv = np.linalg.inv(s_mat[np.ix_(open_idx, open_idx)])
 
     def _frac_occ(mo_energy, mo_coeff=None):

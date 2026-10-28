@@ -622,14 +622,14 @@ def test_occupied_core_idx_selects_the_closed_block_not_canonical_order():
         warnings.simplefilter("always")
         core = occupied_core_idx(mf, 5)
     assert core == [2, 5, 6, 8, 9]
-    assert any("NOT the first" in str(w.message) for w in rec)
+    assert any("not the first" in str(w.message).lower() for w in rec)
 
     # contracted-style coincidence: closed block IS the canonical head
     mf = FakeMF([2.0, 2.0, 2.0, 1.0, 0.0])
     with warnings.catch_warnings(record=True) as rec:
         warnings.simplefilter("always")
         assert occupied_core_idx(mf, 3) == [0, 1, 2]
-    assert not any("NOT the first" in str(w.message) for w in rec)
+    assert not any("not the first" in str(w.message).lower() for w in rec)
 
     # asking for more closed orbitals than exist is refused loudly
     with pytest.raises(ValueError, match="closed block has"):

@@ -1,18 +1,49 @@
-"""Windows: construction, selection, and the window-kind registry.
+"""Windows: the active-space selection layer.
 
-A *window* is the active space. Three construction kinds, one guarantee
-each: contracted shells and primitive bands (AO rows -- m-complete by
-construction), raw-SCF MO spans (never rotation-closed), and
-natural-orbital occupation groups (exact from a term-averaged density;
-`atomterm.natural` builds those from a parent CASCI). A
-:class:`Window` object carries the construction result and materializes
-to a full MO substrate through :meth:`Window.columns`; the
-bounded-slice contract (``ncas`` from ``mc.ncas``; active columns at
-``[ncore : ncore + ncas]``) is owned here.
+PURPOSE: the window is the approximation dial of a correlated run --
+it fixes which orbitals are correlated and which are frozen into the
+core. GOAL: construct windows with a KNOWN rotational-closure
+guarantee and materialize them onto the full MO substrate, so exact
+term classification (the [H, L] certificates) is possible wherever
+the construction promises it.
+
+The shared contract: a window is exactly rotation-closed iff it is
+m-complete -- every (n, l) shell present with its whole 2l+1 m-set on
+one shared radial. The certificate (operators.window_closure), not
+the construction story, is the criterion. The kinds:
+
+* AO windows -- the generic name for the two AO-row vocabularies:
+  - shell: contracted valence shells; labels are true (n,l) names.
+    Use on contracted bases (cc-pVnZ family).
+  - primitive: the exponent-ranked radial lattice beneath the
+    shells; labels are shell COUNTERS there. Use on uncontracted
+    bases, where shell labels lie about n.
+  Both are m-complete by construction.
+* scf_mo -- converged MO columns: open MOs + k virtuals ranked by
+  the CALLER (campaign metric: descending valence-row S-weight,
+  never energy order). NEVER rotation-closed.
+* no -- occupation groups of a term-averaged density; closed iff
+  the source density was m-scalar.
+* custom -- any S-orthonormal columns (your MO selection, a
+  hand-built window): build_full_mo takes them directly.
+
+Layering inside: _shell_slots is the ONE shell walker (lm_sectors,
+primitive_chain and the l-vocabulary of select_span sit on it);
+lowdin / span_projector / complete_orthonormal are the S-metric
+algebra; build_full_mo and radial_basis are the two substrate
+builders (same core treatment, different window gauge); Window +
+SELECTORS are the registry on top.
+
+SELECTORS maps kind names to constructors; :class:`Window` carries
+the construction result and materializes it through
+:meth:`Window.columns`; the bounded-slice contract (active columns at
+``[ncore : ncore + ncas]``) is owned here. AVAS (:func:`avas_window`)
+is the ecosystem cross-validator -- a candidate future kind.
 """
 
 from __future__ import annotations
 
+import warnings
 from typing import NamedTuple
 
 import numpy as np
@@ -25,11 +56,13 @@ __all__ = [
     "occupied_core_idx",
     "select_shell_ao",
     "select_valence_ao",
+    "select_span",
     "primitive_chain",
     "select_primitives",
     "shell_weights",
     "avas_window",
     "span_overlap",
+    "span_projector",
     "complete_orthonormal",
     "build_full_mo",
     "lm_sectors",
@@ -44,95 +77,225 @@ __all__ = [
 ]
 
 
-def ao_span_projector(s_mat: np.ndarray, rows: list[int]) -> np.ndarray:
-    """S-metric projector onto an AO row span: ``P = S[:, o] S_oo^{-1} S[o, :]``.
+# ------------------------------------------------------- the S-metric algebra
 
-    The weight of an S-orthonormal MO column ``c`` on the span is
-    ``c^dag P c`` -- bounded by 1 (a true projector weight), unlike the
-    bare quadratic form ``c_o^dag S_oo c_o`` which is unbounded for
-    diffuse bases (fact 15c).
+def span_projector(s_mat: np.ndarray, rows: list[int]) -> np.ndarray:
+    """S-metric projector onto the span of selected basis rows.
+
+    Parameters
+    ----------
+    s_mat : the AO overlap matrix (the metric).
+    rows : indices of the rows spanning the target subspace.
+
+    Returns
+    -------
+    ``P = S[:, o] S_oo^{-1} S[o, :]``. The S-weight of an
+    S-orthonormal column ``c`` on the span is ``c^dag P c`` --
+    bounded by 1, unlike the bare quadratic form ``c_o^dag S_oo c_o``
+    which is unbounded for diffuse bases.
     """
     s_oo = s_mat[np.ix_(rows, rows)]
     return s_mat[:, rows] @ np.linalg.inv(s_oo) @ s_mat[rows, :]
 
 
 def lowdin(c: np.ndarray, s: np.ndarray, tol: float = 1e-10) -> np.ndarray:
-    """S-metric Loewdin orthonormalization of the columns of ``c``.
+    """S-metric symmetric orthonormalization of the columns of ``c``.
 
-    Raises ValueError when the column overlap is near-singular (the
-    needle class of fact 16e: a nearly-linearly-dependent admission)
-    instead of silently NaN-ing everything downstream -- pad or drop
-    the needle directions, or raise ``tol``.
+    Parameters
+    ----------
+    c : (n, k) columns (spans, not necessarily independent-free).
+    s : (n, n) the metric.
+    tol : singularity threshold (see Raises).
+
+    Returns
+    -------
+    (n, k) columns with ``c^dag s c = I``: with
+    ``ov = c^dag s c = U diag(ev) U^T`` the result is
+    ``c U diag(ev)^{-1/2} U^T``.
+
+    Raises
+    ------
+    ValueError
+        If ``min(ev) <= tol``: near-linearly-dependent columns. Pad or
+        drop those directions (or raise ``tol``) instead of NaN-ing
+        everything downstream.
     """
+    if c.shape[1] == 0:
+        return np.asarray(c)  # degenerate: nothing to orthonormalize
     ov = c.T @ s @ c
     ev, u = np.linalg.eigh(ov)
     if ev.min() <= tol:
         raise ValueError(
             f"Lowdin on a near-linearly-dependent block: min overlap "
             f"eigenvalue {ev.min():.2e} <= tol {tol:.0e}; pad/drop the "
-            f"needle directions (fact 16e) or raise tol")
+            f"needle directions or raise tol")
     return c @ (u / np.sqrt(ev)) @ u.T
 
 
-def occupied_core_idx(mf, ncore: int) -> list[int]:
-    """Indices of the ``ncore`` doubly-occupied MOs -- the honest core
-    block for every build_full_mo/radial_basis call.
+def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
+    """Append an S-orthonormal complement to the columns of ``v``.
 
-    Canonical MO ORDER is meaningless on near-degenerate uncontracted
-    bases (U: the first canonical MOs are virtual junk at eps ~ 0.02,
-    while the closed block sits at 22/61/88/120/143); ``range(ncore)``
-    then silently folds five garbage columns (measured: max|dE| = 14.5
-    Eh). On contracted bases the two coincide -- this makes the
-    coincidence a checked invariant instead of an assumption.
+    Parameters
+    ----------
+    v : (nao, k) S-orthonormal columns (the substrate so far).
+    s : (nao, nao) the metric.
+
+    Returns
+    -------
+    (nao, nao): ``v`` plus a basis of its S-orthogonal complement.
+
+    Notes
+    -----
+    ``S^{1/2}`` is an isometry from the S metric to the Euclidean one
+    (``<a|b>_S = (S^{1/2} a)^dag (S^{1/2} b)``): project the
+    complement in the Euclidean picture (``I - vx vx^dag`` with
+    ``vx = S^{1/2} v``, itself orthonormal there) and map it back
+    through ``S^{-1/2}``. The singular-value filter (``sv > 1e-8``)
+    counts the complement exactly only for a CLEAN ``v`` -- input
+    columns that are near-dependent bleed the spectrum into (0, 1)
+    and the count goes wrong (keep ``v`` clean at the source;
+    :func:`radial_basis` does).
     """
-    closed = np.flatnonzero(np.asarray(mf.mo_occ) == 2.0)
-    if len(closed) < ncore:
-        raise ValueError(
-            f"asked for {ncore} core orbitals; ROHF closed block has "
-            f"{len(closed)}")
-    if not np.array_equal(closed[:ncore], np.arange(ncore)):
-        import warnings
-
-        warnings.warn(
-            f"core block is NOT the first {ncore} canonical MOs "
-            f"(closed at {closed[:ncore].tolist()}); folding the "
-            f"occupied block instead", stacklevel=2)
-    return closed[:ncore].tolist()
+    ev, u = np.linalg.eigh(s)
+    s_half = (u * np.sqrt(ev)) @ u.T
+    s_ihalf = (u / np.sqrt(ev)) @ u.T
+    vx = s_half @ v
+    resid = np.eye(v.shape[0]) - vx @ vx.conj().T
+    p, sv, _ = np.linalg.svd(resid)
+    c = s_ihalf @ p[:, sv > 1e-8]
+    return np.hstack([v, c])
 
 
-def span_rows(mol, pattern: str) -> list[int]:
-    """AO rows of one occupation-span pattern: ``"l0".."l9"`` selects a
-    WHOLE angular-momentum subspace (the honest vocabulary for uncontracted
-    bases, where labels are shell counters -- fact 1); anything else is a
-    label prefix (:func:`select_shell_ao`)."""
-    if len(pattern) == 2 and pattern[0] == "l" and pattern[1].isdigit():
-        l = int(pattern[1])
-        return sorted(r for (ll, m), rws in lm_sectors(mol).items()
-                      if ll == l for r in rws)
-    rows = select_shell_ao(mol, pattern)
-    if not rows:
-        raise ValueError(
-            f"span pattern {pattern!r} matched no AO labels; available: "
-            f"{[line.split()[-1] for line in mol.ao_labels()]}")
-    return rows
+def _block_projector(cols: np.ndarray, s: np.ndarray) -> np.ndarray:
+    """S-metric projector onto an S-orthonormal block:
+    ``P = cols cols^dag s`` (``P x`` removes the block's span)."""
+    return cols @ cols.conj().T @ s
 
+
+# -------------------------------------------------------- the shell substrate
+
+def _shell_slots(mol):
+    """The ONE shell walker: yields ``(shell, l, slot, rows)`` per
+    contraction slot of every shell, ``rows`` = the slot's 2l+1
+    member rows. The fused-shell addressing (contraction-outer,
+    m-inner) lives here and only here."""
+    loc = mol.ao_loc_nr()
+    for ib in range(mol.nbas):
+        l = abs(mol.bas_angular(ib))
+        width = 2 * l + 1
+        for c in range(mol.bas_nctr(ib)):
+            base = loc[ib] + c * width
+            yield ib, l, c, [base + m for m in range(width)]
+
+
+def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
+    """AO rows grouped by (l, member) over :func:`_shell_slots`.
+
+    Returns
+    -------
+    ``{(l, m): rows}`` -- the exactly S-orthogonal sectors of a
+    one-center spherical basis: same-sector functions of different n
+    OVERLAP, different-sector functions never do (angular
+    orthogonality). The decomposition that makes per-sector
+    treatments (:func:`radial_basis`, the l-vocabulary of
+    :func:`select_span`) globally consistent by construction.
+    """
+    sectors: dict[tuple[int, int], list[int]] = {}
+    for _ib, l, _c, rows in _shell_slots(mol):
+        for m, r in enumerate(rows):
+            sectors.setdefault((l, m), []).append(r)
+    return sectors
+
+
+def shell_weights(mol, c: np.ndarray, s: np.ndarray):
+    """S-metric angular-momentum (l) weights of each column.
+
+    Parameters
+    ----------
+    mol : the molecule (the l decomposition comes from
+        :func:`lm_sectors` -- the one l-vocabulary, no label parsing).
+    c : (nao, k) columns (a window, a converged MO set).
+    s : (nao, nao) the metric.
+
+    Returns
+    -------
+    ``(names, w)``: ``w[i, k]`` is the S-weight of column ``i`` on
+    all AOs of angular momentum ``l_k``; ``names = ['s', 'p', ...]``.
+
+    Notes
+    -----
+    S-orthonormal columns make every row of ``w`` sum to 1 -- valid
+    because different-l subspaces are exactly orthogonal; grouping by
+    (n, l) instead would NOT partition (same-l shells overlap and
+    double-count). l-purity is necessary but NOT sufficient for
+    rotational closure -- only the certificates measure closure.
+    """
+    l_names = {0: "s", 1: "p", 2: "d", 3: "f", 4: "g", 5: "h", 6: "i"}
+    groups: dict[int, list[int]] = {}
+    for (l, _m), rows in lm_sectors(mol).items():
+        groups.setdefault(l, []).extend(rows)
+    order = sorted(groups)
+    w = np.zeros((c.shape[1], len(order)))
+    for k, l in enumerate(order):
+        idx = sorted(groups[l])  # row order fixes the summation order
+        ss = s[np.ix_(idx, idx)]
+        w[:, k] = np.einsum("ij,ij->j", c[idx, :], ss @ c[idx, :]).real
+    return [l_names[l] for l in order], w
+
+
+# --------------------------------------------------------- the AO vocabulary
 
 def select_shell_ao(mol, pattern: str) -> list[int]:
-    """AO indices of a named valence shell, e.g. pattern="2p" -> [3, 4, 5].
+    """AO indices of a named shell, by plain label prefix.
 
-    Plain prefix matching on PySCF's AO labels (``search_ao_label`` patterns
-    are regex-flavored and over-match: "2p*" also hits "2s").
+    Parameters
+    ----------
+    mol : the molecule (its AO labels are truthful, but PySCF's
+        ``search_ao_label`` patterns are regex-flavored and
+        over-match: ``"2p*"`` also hits ``"2s"`` -- hence prefix
+        matching).
+    pattern : label prefix, e.g. ``"2p"``.
+
+    Examples
+    --------
+    On C/cc-pVDZ (the fused s shell occupies rows 0-2):
+
+    >>> select_shell_ao(mol, "2p")
+    [3, 4, 5]
     """
     labels = [line.split()[-1] for line in mol.ao_labels()]
     return [i for i, lbl in enumerate(labels) if lbl.startswith(pattern)]
 
 
 def select_valence_ao(mol, patterns: list[str]) -> list[int]:
-    """AO indices of several valence shells, concatenated in pattern order,
-    e.g. ``["3d", "4s"]`` -> the five 3d AOs followed by the 4s AO.
+    """AO indices of several shells, concatenated in pattern order --
+    the concatenation IS the active space (its order is the window
+    slot order).
 
-    The concatenation defines the active space; it is rotation-closed when
-    each pattern contributes a complete m-set of one (n, l) shell.
+    Parameters
+    ----------
+    mol : the molecule.
+    patterns : label prefixes, one per shell.
+
+    Returns
+    -------
+    Rotation-closed when every pattern contributes a complete m-set
+    of one (n, l) shell.
+
+    Raises
+    ------
+    ValueError
+        If a pattern matches no AO label (the message lists the
+        available labels).
+
+    Examples
+    --------
+    On Sc/cc-pVDZ -- note 4s is row 3: PySCF lists shells by basis
+    block (all s contractions first), NOT by energy; label selection,
+    never positions:
+
+    >>> select_valence_ao(mol, ["3d", "4s"])
+    [21, 22, 23, 24, 25, 3]
     """
     idx: list[int] = []
     for pattern in patterns:
@@ -146,61 +309,104 @@ def select_valence_ao(mol, patterns: list[str]) -> list[int]:
     return idx
 
 
-def primitive_chain(mol, l: int) -> list[tuple[float, list[int]]]:
-    """The radial primitives of angular momentum ``l`` as ``(exponent,
-    ao_rows)`` pairs, sorted by exponent ASCENDING (diffuse end first) --
-    the honest radial coordinate of an uncontracted basis, where PySCF's
-    AO labels number shells from the TIGHT end starting at the valence
-    name ("5f" = the exp-36.8 primitive on U; fact-1 amendment).
+def select_span(mol, pattern: str) -> list[int]:
+    """AO rows of one span pattern -- the occupation-span vocabulary.
 
-    Walks the basis exactly as :func:`lm_sectors` does (``bas_angular``
-    checked, ``nctr`` unpacked): a primitive's m-set occupies the rows
-    ``loc[ib] + c*(2l+1) + m`` of its shell. A contraction slot is a
-    RAW primitive iff its ``bas_ctr_coeff`` column carries exactly one
-    exponent; true contractions (several exponents combined into one
-    function) have no single exponent and RAISE -- for them use
-    :func:`select_valence_ao` (a contracted shell is one pre-converged
-    radial) or MO/NO-based window selection.
+    Parameters
+    ----------
+    mol : the molecule.
+    pattern : ``"l0".."l9"`` selects a WHOLE angular-momentum
+        subspace (via :func:`lm_sectors`): the honest vocabulary on
+        uncontracted bases, where AO labels are shell counters and
+        lie about ``n`` -- only ``l`` itself is trustworthy there.
+        Anything else is a label prefix (:func:`select_shell_ao`).
+
+    Raises
+    ------
+    ValueError
+        If a non-``l`` pattern matches no AO label.
     """
-    loc = mol.ao_loc_nr()
-    width = 2 * l + 1
+    if len(pattern) == 2 and pattern[0] == "l" and pattern[1].isdigit():
+        l = int(pattern[1])
+        return sorted(r for (ll, m), rws in lm_sectors(mol).items()
+                      if ll == l for r in rws)
+    rows = select_shell_ao(mol, pattern)
+    if not rows:
+        raise ValueError(
+            f"span pattern {pattern!r} matched no AO labels; available: "
+            f"{[line.split()[-1] for line in mol.ao_labels()]}")
+    return rows
+
+
+def primitive_chain(mol, l: int) -> list[tuple[float, list[int]]]:
+    """The radial primitives of one angular momentum, as a chain.
+
+    Parameters
+    ----------
+    mol : the molecule (walked via :func:`_shell_slots`).
+    l : the angular momentum.
+
+    Returns
+    -------
+    ``[(exponent, ao_rows)]`` sorted by exponent ASCENDING (diffuse
+    end first) -- the honest radial coordinate of an uncontracted
+    basis, where AO labels number shells from the TIGHT end starting
+    at the valence name.
+
+    Raises
+    ------
+    ValueError
+        On a true contraction slot (a ``bas_ctr_coeff`` column
+        combining several exponents has no single exponent); for
+        contracted bases use :func:`select_valence_ao` (a contracted
+        shell is one pre-converged radial) or MO/NO selection.
+    """
     chain: list[tuple[float, list[int]]] = []
-    for ib in range(mol.nbas):
-        if abs(mol.bas_angular(ib)) != l:
+    for ib, ll, c, rows in _shell_slots(mol):
+        if ll != l:
             continue
         exps = np.asarray(mol.bas_exp(ib))
         coeff = mol.bas_ctr_coeff(ib)  # (nprim, nctr)
-        for c in range(coeff.shape[1]):
-            nz = np.flatnonzero(np.abs(coeff[:, c]) > 1e-12)
-            if len(nz) != 1:
-                raise ValueError(
-                    f"shell {ib} (l={l}) contraction slot {c} combines "
-                    f"{len(nz)} exponents -- exponent-ranked selection is "
-                    "undefined for contractions; use select_valence_ao "
-                    "(a contracted shell is one pre-converged radial) or "
-                    "MO/NO-based window selection"
-                )
-            rows = [loc[ib] + c * width + m for m in range(width)]
-            chain.append((float(exps[nz[0]]), rows))
+        nz = np.flatnonzero(np.abs(coeff[:, c]) > 1e-12)
+        if len(nz) != 1:
+            raise ValueError(
+                f"shell {ib} (l={l}) contraction slot {c} combines "
+                f"{len(nz)} exponents -- exponent-ranked selection is "
+                "undefined for contractions; use select_valence_ao "
+                "(a contracted shell is one pre-converged radial) or "
+                "MO/NO-based window selection"
+            )
+        chain.append((float(exps[nz[0]]), rows))
     chain.sort(key=lambda t: t[0])
     return chain
 
 
-def select_primitives(mol, l: int, count: int = None,
-                      exponent_band: tuple[float, float] = None) -> list[int]:
-    """AO rows of radial primitives of angular momentum ``l``, selected
-    by EXPONENT on the :func:`primitive_chain` -- m-complete by
-    construction (each primitive contributes its whole 2l+1 m-set), so
-    the window is exactly rotation-closed.
+def select_primitives(mol, l: int, count: int | None = None,
+                      exponent_band: tuple[float, float] | None = None
+                      ) -> list[int]:
+    """AO rows of l-primitives selected on the :func:`primitive_chain`
+    -- m-complete by construction (each primitive contributes its
+    whole 2l+1 m-set): exactly rotation-closed windows.
 
-    Exactly one of ``count`` / ``exponent_band``:
-    * ``exponent_band=(lo, hi)``: every primitive with ``lo <= exp <=
-      hi``. The scan protocol: bands are CONTIGUOUS sets built from the
-      measured open-MO primitive weights, never hand-picked intervals,
-      and conclusions require neighboring-band stability (admit one
-      more / one fewer primitive on each side -> same ordering).
-    * ``count``: the ``count`` most diffuse primitives (convenience
-      shorthand for the diffuse end of the chain).
+    Parameters
+    ----------
+    mol : the molecule.
+    l : the angular momentum.
+    count : the ``count`` most diffuse primitives (shorthand for the
+        diffuse end of the chain). Exactly one of ``count`` /
+        ``exponent_band``.
+    exponent_band : ``(lo, hi)`` -- every primitive with
+        ``lo <= exp <= hi``. The scan protocol: bands are CONTIGUOUS
+        sets built from the measured open-MO primitive weights, never
+        hand-picked intervals; conclusions require neighboring-band
+        stability (admit one more / one fewer primitive on each side
+        -> same ordering).
+
+    Raises
+    ------
+    ValueError
+        If not exactly one selection argument is given, the band is
+        empty, or ``count`` exceeds the chain length.
     """
     chain = primitive_chain(mol, l)
     if (count is None) == (exponent_band is None):
@@ -222,23 +428,33 @@ def select_primitives(mol, l: int, count: int = None,
     return sorted(r for rows in picked for r in rows)
 
 
+# ------------------------------------------------------------- the meters
+
 def avas_window(mf, labels: list[str], ncore: int, threshold: float = None):
-    """Window chosen by AVAS (pyscf.mcscf.avas, arXiv:1701.07862): an
-    independent ecosystem window selector for cross-validating our raw
-    shell AOs (verdicts: fact 19, README · Results (Methods compared)).
+    """Window chosen by AVAS (pyscf.mcscf.avas, arXiv:1701.07862) --
+    the independent ecosystem selector, used to cross-validate the
+    shell windows (a candidate future Window kind).
 
-    AVAS projects the target AO span (``labels``, e.g. ``["Sc 3d",
-    "Sc 4s"]``) out of the converged MOs and keeps eigenvectors of the
-    projected overlap above ``threshold`` (its default 0.2). Because
-    the construction PROJECTS onto the target span, a full
-    shell-dimension AVAS window IS the shell span exactly -- closed by
-    construction; a threshold that drops members of an m-set gives a
-    rotation-DEFECTIVE span (the negative-control case for the closure
-    meters).
+    Parameters
+    ----------
+    mf : converged SCF.
+    labels : target AO span, pyscf label list, e.g.
+        ``["Sc 3d", "Sc 4s"]``.
+    ncore : number of core orbitals.
+    threshold : projected-overlap cutoff (AVAS default 0.2).
 
-    Returns ``(mo_full, ncas, nelecas)`` with the AVAS active span at
-    ``[ncore : ncore+ncas]`` (ready for run_casci; electron bookkeeping
-    stays ours -- pass the sector you want).
+    Returns
+    -------
+    ``(mo_full, ncas, nelecas)`` with the active span at
+    ``[ncore : ncore+ncas]`` (ready for run_casci; electron
+    bookkeeping stays ours -- pass the sector you want).
+
+    Notes
+    -----
+    A full-shell-dimension AVAS window IS the shell span exactly --
+    closed by construction; a threshold that drops members of an
+    m-set gives a rotation-DEFECTIVE span (the negative-control case
+    for the closure meters).
     """
     from pyscf.mcscf import avas
 
@@ -249,210 +465,187 @@ def avas_window(mf, labels: list[str], ncore: int, threshold: float = None):
 
 
 def span_overlap(c_a: np.ndarray, c_b: np.ndarray, s: np.ndarray) -> float:
-    """Smallest principal cosine between two spans in the S metric
-    (1.0 = identical spans, 0.0 = orthogonal direction present).
-
-    The identity-change gauge of the rungs decomposition: sv_min of
-    ``C_a^dag S C_b`` is 1 exactly when the converged window kept the
-    shell span, and drops first when the window identity changes.
+    """Smallest principal cosine between two spans in the S metric --
+    the identity-change gauge of the rungs decomposition: 1.0 exactly
+    when the spans are identical, dropping first when a window's
+    identity changes (independent of closure).
     """
     sv = np.linalg.svd(c_a.conj().T @ s @ c_b, compute_uv=False)
     return float(sv.min())
 
 
-def shell_weights(mol, c: np.ndarray, s: np.ndarray):
-    """S-metric projection norms of columns onto angular (l) AO subspaces.
+# ------------------------------------------------------- the substrate builders
 
-    ``w[i, k] = c[:, i]^dag S_l c[:, i]`` over ALL AOs of angular momentum
-    l_k. S-orthonormal columns make every row of ``w`` sum to 1 -- valid
-    because different-l subspaces are exactly orthogonal; grouping by
-    (n, l) instead would NOT partition (2p and 3p AO subspaces overlap,
-    weights double-count). Same AO-metric quantity as the
-    ``contamination`` of :func:`purified_core_orbitals`. l-purity is NECESSARY
-    but not SUFFICIENT for rotational closure -- only the commutators
-    measure closure itself (facts 8, 19).
-    Returns ``(names, w)`` with ``names = ['s', 'p', 'd', ...]``.
+def occupied_core_idx(mf, ncore: int) -> list[int]:
+    """Indices of the ``ncore`` doubly-occupied MOs -- the honest core
+    block for every :func:`build_full_mo` / :func:`radial_basis` call.
+
+    Parameters
+    ----------
+    mf : converged ROHF (its ``mo_occ``).
+    ncore : number of core orbitals wanted.
+
+    Returns
+    -------
+    The first ``ncore`` entries of the doubly-occupied block.
+
+    Raises
+    ------
+    ValueError
+        If the closed block is smaller than ``ncore``.
+
+    Notes
+    -----
+    Warns when the closed block is NOT ``range(ncore)``: canonical MO
+    ORDER is meaningless on near-degenerate uncontracted bases (U:
+    the first canonical MOs are virtual junk while the closed block
+    sits at 22/61/88/120/143; ``range(ncore)`` silently folds five
+    garbage columns, measured max|dE| = 14.5 Eh). On contracted bases
+    the two coincide -- this makes the coincidence a checked
+    invariant instead of an assumption.
     """
-    import re
-
-    labels = [line.split()[-1] for line in mol.ao_labels()]
-    groups: dict[str, list[int]] = {}
-    for i, lbl in enumerate(labels):
-        m = re.match(r"\d+([spdfgh])", lbl)
-        groups.setdefault(m.group(1) if m else lbl, []).append(i)
-
-    names = list(groups)
-    w = np.zeros((c.shape[1], len(names)))
-    for k, name in enumerate(names):
-        idx = groups[name]
-        ss = s[np.ix_(idx, idx)]
-        w[:, k] = np.einsum("ij,ij->j", c[idx, :], ss @ c[idx, :]).real
-    return names, w
+    closed = np.flatnonzero(np.asarray(mf.mo_occ) == 2.0)
+    if len(closed) < ncore:
+        raise ValueError(
+            f"asked for {ncore} core orbitals; ROHF closed block has "
+            f"{len(closed)}")
+    if not np.array_equal(closed[:ncore], np.arange(ncore)):
+        warnings.warn(
+            f"core block is not the first {ncore} MOs (closed at "
+            f"{closed[:ncore].tolist()}); folding the occupied block",
+            stacklevel=2)
+    return closed[:ncore].tolist()
 
 
-def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
-    """@brief Append an S-orthonormal complement to the columns of `v`.
+def _core_block(mf, core_idx, c_core, s):
+    """Resolve (canonical MOs or ``c_core``) and Loewdin the core."""
+    core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
+    return lowdin(core, s)
 
-    Given S-orthonormal v (nao x k; v^dag S v = I), return all nao
-    columns: v plus its S-orthogonal complement -- a complete
-    S-orthonormal basis of the AO space.
 
-    Math: the map T = S^(1/2) is an isometry from the S metric to the
-    Euclidean one, <a|b>_S = (T a)^dag (T b). In the T picture
-    vx = T v is Euclidean-orthonormal, so P = vx vx^dag is the
-    Euclidean projector onto span(vx) (Hermitian, idempotent:
-    P^2 = P), and I - P projects onto its Euclidean complement.
-    T transports that complement back to the S-orthogonal
-    complement of span(v): c = S^(-1/2) p satisfies
-    c^dag S c = p^dag p = I and c^dag S v = p^dag vx = 0.
+def _to_columns(act, n: int) -> np.ndarray:
+    """The representation adapter: AO-row indices -> raw AO columns;
+    column matrices pass through unchanged."""
+    return act if isinstance(act, np.ndarray) else np.eye(n)[:, act]
 
-    @param v: (nao, k) S-orthonormal columns (the substrate).
-    @param s: (nao, nao) AO overlap matrix.
-    @returns: (nao, nao) -- the first k columns equal v; the remaining
-        nao-k columns span the S-orthogonal complement.
-    @note: the singular-value filter (sv > 1e-8) counts the complement
-        exactly only for a CLEAN v; a substrate carrying
-        near-dependent columns bleeds the spectrum into (0, 1) and
-        the count goes wrong (the underfill flake, ticket 20).
-        radial_basis keeps v clean at the source (strong-only
-        admission).
-    @example: c = complete_orthonormal(v, s)
+
+def _core_window_block(s: np.ndarray, core: np.ndarray,
+                       window: np.ndarray) -> np.ndarray:
+    """The project-renormalize-assemble treatment (pure numpy). The
+    core block must ALREADY be S-orthonormal (:func:`_core_block`'s
+    output): project the window columns against its span, re-Loewdin,
+    return the stacked block.
     """
-
-    ev, u = np.linalg.eigh(s)
-    s_half = (u * np.sqrt(ev)) @ u.T
-    s_ihalf = (u / np.sqrt(ev)) @ u.T
-    vx = s_half @ v
-    resid = np.eye(v.shape[0]) - vx @ vx.conj().T
-    p, sv, _ = np.linalg.svd(resid)
-    c = s_ihalf @ p[:, sv > 1e-8]
-    return np.hstack([v, c])
+    window = window - _block_projector(core, s) @ window
+    window = lowdin(window, s)
+    return np.hstack([core, window])
 
 
-def build_full_mo(mf, core_idx: list[int], act, c_core: np.ndarray = None) -> np.ndarray:
-    """Full orthonormal MO matrix with chosen core and window columns
-    placed so that CASCI/CASSCF's window ``[ncore : ncore+ncas]`` selects
-    the active space.
+def build_full_mo(mf, core_idx: list[int], act,
+                  c_core: np.ndarray = None) -> np.ndarray:
+    """Complete S-orthonormal MO matrix whose ``[ncore : ncore+ncas]``
+    block is the requested window on the requested core -- the object
+    CASCI/CASSCF consume.
 
-    ``act`` -- the WINDOW, in either of the two representations
-    :class:`Window` itself carries: AO-row indices (list[int]; the
-    m-complete shell selectors, the common case -- adapted to the raw AO
-    columns inside) or explicit S-orthonormal column vectors (nao, ncas):
-    a Window's ``c_win``, or the canonical MO columns of the mo start on
-    the pur substrate (``atomterm.cells.run_cell``). ONE treatment for
-    both -- project-renormalize-assemble -- never a sibling builder.
+    Parameters
+    ----------
+    mf : converged SCF (the overlap; canonical MOs).
+    core_idx : MO column indices of the core block.
+    act : the WINDOW -- AO-row indices (the m-complete selectors, the
+        common case; adapted to raw AO columns inside) or explicit
+        S-orthonormal column vectors (a Window's ``c_win``, canonical
+        MO columns, any custom window). ONE treatment for both.
+    c_core : alternative core columns -- chiefly the exactly-closed
+        purified core (:func:`atomterm.core.purified_core_orbitals`).
 
-    Core columns are canonical SCF MOs by default; ``c_core`` supplies
-    alternative columns -- chiefly the pur substrate
-    (:func:`atomterm.core.purified_core_orbitals`): the exactly
-    rotation-closed core span, E_l (x) the full m-set per l, built from
-    the per-l S-metric COLUMN Gram of the member-resolved radial blocks
-    (never the S-generalized form -- its eigenvectors come back
-    S^{-1}-warped; fact 20).
+    Returns
+    -------
+    (nao, nao) S-orthonormal; the window sits at
+    ``[len(core_idx) : len(core_idx) + ncas]``.
 
-    Construction is block-safe in the AO metric S (fact 14): (1) the core
-    block is Loewdin-orthonormalized within its own span (span- and
-    density-preserving); (2) the window columns are projected against the
-    core span and renormalized. For raw AO columns the projection is the
-    same-l, m-diagonal correction of fact 14 (<2p_MO|3p_AO> reaches ~0.3;
-    l-purity and m-set structure survive); for MO columns it is the
-    honest re-orthogonalization on an alternative substrate -- canonical
-    columns are S-orthonormal against the core they were SOLVED in, not
-    against the pur one (the two spans differ by the core's m-asymmetric
-    tail content), and unprojected they would seed the fact-17-class
-    input defect into the run. For columns already orthogonal to the core
-    (the NO windows, constructed against it) the projection is a
-    machine-precision no-op. (3) The complement is appended through an
-    exact projector -- the naive `I - P` filter is exact only for
-    S-orthonormal v and silently returns extra columns otherwise
-    (observed: (nao, nao+6) on Si).
+    Raises
+    ------
+    ValueError
+        Propagated from :func:`lowdin` on near-linearly-dependent
+        core or window blocks.
 
-    Honest expectation for MO columns on pur (fact 22d): the projection
-    cleans the CORE-side defect only -- the canonical window's own
-    m-delocalization survives, so the mo-start span never
-    rotation-closes; those cells are the measured version of that
-    statement on an honest substrate, not a fix for it.
+    Notes
+    -----
+    The treatment is block-safe in the AO metric
+    (:func:`_core_window_block`): the core block is Loewdin'd within
+    its own span (span- and density-preserving); the window columns
+    are projected against the core span and renormalized -- for raw
+    AO columns the same-l, m-diagonal correction; for MO columns on
+    an alternative core the honest re-orthogonalization (canonical
+    columns are S-orthonormal against the core they were SOLVED in,
+    not against a different one); for core-orthogonal columns a
+    machine-precision no-op. The complement is appended exactly
+    (:func:`complete_orthonormal`).
     """
-    v = _core_window_block(mf, core_idx, act, c_core)
-    if v.shape[1] == mf.mo_coeff.shape[0]:
-        return v
-    return complete_orthonormal(v, mf.get_ovlp())
-
-
-def _core_window_block(mf, core_idx: list[int], act,
-                       c_core: np.ndarray = None) -> np.ndarray:
-    """Steps (1)+(2) of :func:`build_full_mo`: the S-orthonormal
-    core+window block. ``act`` takes AO-row indices or column vectors --
-    the AO-row form is adapted to the raw AO columns here (the one thin
-    adapter; see :func:`build_full_mo`)."""
     n = mf.mo_coeff.shape[0]
     s = mf.get_ovlp()
-    core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
-    cols = act if isinstance(act, np.ndarray) else np.eye(n)[:, act]
-
-    core = lowdin(core, s)
-
-    p_core = core @ core.conj().T @ s
-    cols = cols - p_core @ cols
-    cols = lowdin(cols, s)
-
-    return np.hstack([core, cols])
+    v = _core_window_block(s, _core_block(mf, core_idx, c_core, s),
+                           _to_columns(act, n))
+    if v.shape[1] == n:
+        return v
+    return complete_orthonormal(v, s)
 
 
-def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
-    """AO rows grouped by (l, member): the EXACTLY S-orthogonal sectors of
-    a one-center spherical basis -- the AO space is a direct sum of radial
-    chains, one per (l, member); same-sector functions of different n
-    OVERLAP, different-sector functions never do (angular orthogonality,
-    fact 16e). This decomposition is what makes a per-sector treatment
-    (:func:`radial_basis`) globally S-orthonormal by construction.
+def _sgs(cols, base, s):
+    """S-metric sequential Gram-Schmidt (two refinement passes) of the
+    columns in ``cols`` on top of the S-orthonormal block(s) in
+    ``base`` -- member-preserving: column identity survives (a
+    symmetric Loewdin would rotate within degenerate member sets).
     """
-    sectors: dict[tuple[int, int], list[int]] = {}
-    loc = mol.ao_loc_nr()
-    for ib in range(mol.nbas):
-        l = abs(mol.bas_angular(ib))
-        nctr = mol.bas_nctr(ib)
-        for c in range(nctr):
-            for member in range(2 * l + 1):
-                # fused shells (nctr > 1) are contraction-outer, m-inner
-                sectors.setdefault((l, member), []).append(
-                    loc[ib] + c * (2 * l + 1) + member)
-    return sectors
+    out = []
+    cur = np.hstack(base) if base else None
+    for c in cols:
+        c = np.asarray(c).reshape(-1, 1)  # uniform (n, 1) columns
+        for _ in range(2):
+            if cur is not None:
+                c = c - cur @ (cur.conj().T @ s @ c)
+            c = c / float(np.real(np.sqrt((c.conj().T @ s @ c)[0, 0])))
+        out.append(c)
+        cur = c if cur is None else np.hstack([cur, c])
+    return out
 
 
 def radial_basis(mf, core_idx: list[int], act_idx: list[int],
                  c_core: np.ndarray = None):
-    """@brief Build the full MO matrix with per-slot (l, member) labels --
-    the labeled substrate that :func:`radial_mask` reads.
+    """:func:`build_full_mo`'s sibling with the member-preserving
+    gauge: the full MO matrix WITH per-column (l, member) labels --
+    the labeled substrate :func:`radial_mask` reads.
 
-    Math: the (l, member) sectors of :func:`lm_sectors` are exactly
-    S-orthogonal on one center, so a slot's label is well defined only
-    if the basis is built MEMBER-PRESERVING: sequential S-metric
-    Gram-Schmidt (two refinement passes), not a symmetric Löwdin --
-    within a degenerate member set the Löwdin gauge is an arbitrary
-    rotation, span-preserving but identity-reassigning, and here
-    column identity IS the product (fact 16e). Window slots carry
-    their AO's sector label; sector residuals join by S-weight:
-    strong ones with their label (C 3s: 8.5e-2; core tails <= 3e-6),
-    near-linearly-dependent needles (Sc 6p: 1.7e-4) unlabeled through
-    :func:`complete_orthonormal` -- never rotation partners.
-
-    @param mf: converged SCF object (the AO substrate + the overlap).
-    @param core_idx: MO column indices of the core block
-        (``mf.mo_coeff[:, core_idx]``).
-    @param act_idx: AO-row indices of the window slots, one per
+    Parameters
+    ----------
+    mf : converged SCF (mol + the overlap).
+    core_idx : MO column indices of the core block (same resolution
+        and Loewdin as :func:`build_full_mo`).
+    act_idx : AO-row indices of the window slots, one per
         (l, member); column j of the window IS the (l, m) of
         ``act_idx[j]`` by construction.
-    @param c_core: optional core MO columns overriding ``mf.mo_coeff``;
-        pass :func:`purified_core_orbitals` output for the
-        exactly-closed substrate (the fact-17 fix).
-    @returns: ``(mo_full, labels)`` -- the full (nao, nao) S-orthonormal
-        MO matrix and ``labels[i] = (l, member) | None`` per column.
-    @note: the gauge check below demotes any labeled column whose
-        sector weight collapsed to unlabeled padding (rare; storm
-        draws) -- it says so on stdout when it fires.
-    @example: mo, lab = radial_basis(mf, core_idx, act_idx)
-        mask = radial_mask(lab, ncore, ncas)
+    c_core : alternative core columns; pass the purified core for
+        the exactly-closed substrate.
+
+    Returns
+    -------
+    ``(mo_full, labels)`` -- the full (nao, nao) S-orthonormal MO
+    matrix and ``labels[i] = (l, member) | None`` per column.
+
+    Notes
+    -----
+    Window slots are built with :func:`_sgs` (sequential
+    Gram-Schmidt), NOT a symmetric Loewdin: within a degenerate
+    member set the Loewdin gauge is an arbitrary rotation --
+    span-preserving but identity-reassigning, and here column
+    identity IS the product. Sector residuals join by S-weight:
+    strong ones with their label (genuine radial residuals ~8e-2;
+    core tails ~3e-6), near-linearly-dependent needles (the 1e-4
+    admission) unlabeled through :func:`complete_orthonormal` --
+    never rotation partners (a strong-only 1e-3 cutoff was tried and
+    reverted: the excluded band destabilizes PySCF's SA kernel). A
+    labeled column whose sector weight collapsed is demoted to
+    unlabeled padding (rare; printed when it fires).
     """
     mol = mf.mol
     n = mf.mo_coeff.shape[0]
@@ -460,66 +653,40 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
     sec = lm_sectors(mol)
     row_sector = {row: key for key, rows in sec.items() for row in rows}
 
-    core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
-    core = lowdin(core, s)
-
-    def sgs(cols, base):
-        """S-metric Gram-Schmidt (two refinement passes) of the columns in
-        ``cols`` on top of the S-orthonormal block(s) in ``base``;
-        preserves column identity (unlike a symmetric Loewdin)."""
-        out = []
-        cur = np.hstack(base) if base else None
-        for c in cols:
-            c = np.asarray(c).reshape(-1, 1)  # uniform (n, 1) columns
-            for _ in range(2):
-                if cur is not None:
-                    c = c - cur @ (cur.conj().T @ s @ c)
-                c = c / float(np.real(np.sqrt((c.conj().T @ s @ c)[0, 0])))
-            out.append(c)
-            cur = c if cur is None else np.hstack([cur, c])
-        return out
+    core = _core_block(mf, core_idx, c_core, s)
 
     # window in member order: raw AO minus the core span, sequentially
-    # orthogonalized -- column j IS the (l, m) of act_idx[j] by construction
-    p_core = core @ core.conj().T @ s
-    window = sgs([np.eye(n)[:, ao] - p_core @ np.eye(n)[:, ao]
-                  for ao in act_idx], [core])
+    # orthogonalized -- column j IS the (l, m) of act_idx[j]
+    p_core = _block_projector(core, s)
+    window = _sgs([np.eye(n)[:, ao] - p_core @ np.eye(n)[:, ao]
+                   for ao in act_idx], [core], s)
     v = np.hstack([core] + window)
     labels: list = [None] * len(core_idx) + [row_sector[ao] for ao in act_idx]
 
-    # strong sector residuals, same member-preserving treatment. Strength
-    # cutoff 8e-2 / needle class 1.7e-4: docstring + fact 16e (the 3s of
-    # cc-pVDZ C survives at 0.085; the Sc 6p needle does not)
-    p_v = v @ v.conj().T @ s
+    # strong sector residuals, same member-preserving treatment;
+    # the admission threshold separates genuine radials from needles
+    p_v = _block_projector(v, s)
     strong, strong_labels = [], []
     for key, rows in sorted(sec.items()):
         block = np.eye(n)[:, rows]
         r = block - p_v @ block
         gr = r.conj().T @ s @ r
         ev, u = np.linalg.eigh(gr)
-        # fact 16e: the residual spectrum spans strong (C 3s: 8.5e-2),
-        # needles (Sc 6p: 1.7e-4) and dust; the 1e-4 admission keeps
-        # everything above dust -- the needles ride along as UNLABELED
-        # padding (never rotation partners) and the gauge check below
-        # demotes any whose sector content did not survive. NOTE: a
-        # strong-only cutoff (1e-3) was tried and REVERTED -- the
-        # excluded band destabilizes PySCF's SA kernel on C/Si
-        # (NaN in rotate_orb_cc; ticket 20 holds the redesign spec).
         keep = ev > 1e-4
         if keep.any():
-            strong += [r @ (u[:, j] / np.sqrt(ev[j])) for j in np.where(keep)[0]]
+            strong += [r @ (u[:, j] / np.sqrt(ev[j]))
+                       for j in np.where(keep)[0]]
             strong_labels += [key] * int(keep.sum())
     if strong:
-        v = np.hstack([v] + sgs(strong, [v]))
+        v = np.hstack([v] + _sgs(strong, [v], s))
         labels += strong_labels
 
     mo = v if v.shape[1] == n else complete_orthonormal(v, s)
     labels += [None] * (mo.shape[1] - len(labels))
 
-    # gauge check + needle demotion (fact 16e): a labeled column whose
-    # sector weight collapsed is a needle that the threshold could not
-    # separate -- DEMOTE it to unlabeled padding (never a rotation
-    # partner) and say so. Rare, but storm draws produce it.
+    # gauge check + needle demotion: a labeled column whose sector
+    # weight collapsed is a needle the threshold could not separate
+    # -- demote to unlabeled padding (never a rotation partner)
     demoted = []
     for i, lab in enumerate(labels):
         if lab is None:
@@ -532,22 +699,35 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
             demoted.append((i, lab, round(w, 3)))
     if demoted:
         print(f"radial_basis: needle directions demoted to unlabeled "
-              f"(fact 16e): {demoted}")
+              f"padding: {demoted}")
     assert mo.shape[1] == n
     return mo, labels
 
 
 def radial_mask(labels: list, ncore: int, ncas: int):
-    """``uniq_var_indices`` mask allowing ONLY same-(l, member) rotations
-    into a window slot: pure RADIAL mixing (3d_m may borrow 4d_m/5d_m; the
-    4s any s), l-content and m-membership of every slot untouchable, and
-    no core<->window exchange at all (core slots carry no label).
+    """``uniq_var_indices`` mask allowing ONLY same-(l, member)
+    rotations into a window slot: pure RADIAL mixing.
 
-    Physics caveat (measured, fact 16): exact rotational closure of the
-    window additionally requires the radial rotation applied IDENTICALLY
-    to all m partners; independent per-member radial mixing leaves
-    [H, Lz] nonzero at the member-difference level. SA over the term's
-    M_L set is the symmetry-restoring companion rung.
+    Parameters
+    ----------
+    labels : the per-column labels of a :func:`radial_basis`
+        substrate (``(l, member) | None``).
+    ncore, ncas : the active-space geometry the mask is built for.
+
+    Returns
+    -------
+    A mask callable for ``constrained_casscf`` (the closure captures
+    ``labels``): 3d_m may borrow 4d_m/5d_m and the 4s any s; the
+    l-content, the m-membership of every slot, and the core are
+    untouchable (core slots carry no label).
+
+    Notes
+    -----
+    Caveat (measured): exact rotational closure additionally requires
+    the radial rotation applied IDENTICALLY to all m partners --
+    independent per-member radial mixing leaves [H, Lz] nonzero at
+    the member-difference level; SA over the term's M_L set is the
+    symmetry-restoring companion rung.
     """
     lab = list(labels)
 
@@ -563,16 +743,19 @@ def radial_mask(labels: list, ncore: int, ncas: int):
     return mask
 
 
+# ------------------------------------------------------------- the registry
+
 class Window(NamedTuple):
     """A candidate active space in one of two representations.
 
     ``ao_rows``: AO indices -- m-complete by construction (shell /
     primitive selectors); materialize through :meth:`columns`.
-    ``c_win``: orthonormal orbital columns (SCF-MO / NO selectors);
-    used directly as the active columns. Exactly one is not None.
-    ``m_complete``: the construction's closure GUARANTEE (shell /
-    primitive: exact; scf_mo: never; no: only if the source density was
-    m-scalar -- verify with window_closure, this flag records intent).
+    ``c_win``: orthonormal orbital columns (SCF-MO / NO selectors,
+    custom windows); used directly as the active columns. Exactly one
+    is not None. ``m_complete``: the construction's closure GUARANTEE
+    (shell / primitive: exact; scf_mo: never; no: only if the source
+    density was m-scalar -- verify with window_closure, this flag
+    records intent).
     """
 
     label: str
@@ -582,23 +765,27 @@ class Window(NamedTuple):
 
     def columns(self, mf, ncore: int, closed: list[int] | None = None,
                 c_core: np.ndarray = None) -> np.ndarray:
-        """Full MO substrate with this window's active columns placed at
+        """Full MO substrate with this window's active columns at
         ``[ncore : ncore + ncas]`` -- the object CASCI/CASSCF consume.
 
-        Both representations assemble through :func:`build_full_mo`'s
-        ONE treatment (project-renormalize-assemble): AO rows arrive as
-        the raw AO columns; ``c_win`` columns are projected against the
-        core span -- a machine-precision no-op for columns constructed
-        orthogonal to that core (the NO windows), the honest
-        re-orthogonalization for columns that were not (canonical MO
-        columns on the pur substrate).
-
+        Parameters
+        ----------
+        mf : converged SCF.
+        ncore : number of core orbitals.
         closed : the OCCUPIED core indices (canonical order is
-            meaningless on near-degenerate bases — defaults to
-            ``occupied_core_idx(mf, ncore)`` for BOTH representations;
+            meaningless on near-degenerate bases -- defaults to
+            :func:`occupied_core_idx` for BOTH representations;
             never ``range(ncore)``).
-        c_core : alternative core columns (e.g. the pur substrate);
-            defaults to the occupied canonical block.
+        c_core : alternative core columns (e.g. the pur substrate).
+
+        Notes
+        -----
+        Both representations assemble through :func:`build_full_mo`'s
+        ONE treatment: AO rows arrive as the raw AO columns;
+        ``c_win`` columns are projected against the core span -- a
+        machine-precision no-op for columns constructed orthogonal to
+        that core (the NO windows), the honest re-orthogonalization
+        for columns that were not.
         """
         closed = closed if closed is not None else occupied_core_idx(mf, ncore)
         act = self.ao_rows if self.ao_rows is not None else self.c_win
@@ -606,17 +793,17 @@ class Window(NamedTuple):
 
 
 def window_shell(mol, mf, ncore: int, *, patterns) -> Window:
-    """Contracted-shell window (AO rows; drivers.select_valence_ao)."""
+    """Contracted-shell window (AO rows) -- :func:`select_valence_ao`
+    wrapped as a :class:`Window`; m-complete."""
     return Window(f"shell {patterns}", select_valence_ao(mol, patterns),
                   None, True)
 
 
 def window_primitive(mol, mf, ncore: int, *, bands) -> Window:
-    """Primitive-band window (AO rows), ``bands = {l: count | (lo, hi)}``.
-
-    Bands must be contiguous sets of the measured open-MO primitive
-    weights (the scan protocol); select_primitives enforces m-completeness
-    per primitive."""
+    """Primitive-band window (AO rows), ``bands = {l: count | (lo, hi)}``
+    -- :func:`select_primitives` wrapped as a :class:`Window`;
+    m-complete per primitive. Bands follow the scan protocol
+    (contiguous sets of the measured open-MO primitive weights)."""
     rows: list[int] = []
     for l in sorted(bands):
         sel = bands[l]
@@ -628,23 +815,45 @@ def window_primitive(mol, mf, ncore: int, *, bands) -> Window:
 
 
 def window_scf_mo(mol, mf, ncore: int, *, open_cols, rank, k: int) -> Window:
-    """Raw-SCF-MO window (ticket 24 methodology B): the open reference
-    MOs plus the ``k`` top-``rank`` virtuals (the caller owns the
-    ranking metric -- atom-specific valence-band rows live in the
-    scripts). NEVER rotation-closed: the span certificate measures 7-9
-    at every practical size (README · Results (window lattice))."""
+    """Raw-SCF-MO window: the open reference MOs plus the ``k``
+    top-``rank`` virtuals.
+
+    Parameters
+    ----------
+    open_cols : MO column indices of the open reference MOs.
+    rank : the caller's virtual ordering -- the campaign metric is
+        DESCENDING valence-row S-weight (character, never energy
+        order: energy-slice picking runs away on TMs).
+    k : how many virtuals to admit.
+
+    Notes
+    -----
+    NEVER rotation-closed: the span certificate measures 7-9 at
+    every practical size (the SCF's orbitals are m-delocalized).
+    """
     cols = list(open_cols) + list(rank[:k])
     return Window(f"scf_mo +{k}", None, mf.mo_coeff[:, cols], False)
 
 
 def window_no(mol, mf, ncore: int, *, c_act, dets, vec, n_max: int,
               weights=None, deg_tol: float = 1e-7) -> Window:
-    """NO window: term-average roots -> 1-RDM -> top-occupation NOs.
+    """NO window: term-average roots -> 1-RDM -> top-occupation NOs
+    (the NO mathematics lives in :mod:`atomterm.natural`).
 
-    ``vec``/``weights`` select and average the roots (pass the whole
-    term's multiplet for an m-scalar density; a single root yields an
-    m-split window -- legal but NOT rotation-closed, see the module
-    docstring). Verify every output with operators.window_closure.
+    Parameters
+    ----------
+    c_act, dets, vec : the parent CASCI's active columns,
+        determinant basis, and CI vectors.
+    n_max : how many occupation groups to keep.
+    weights : root weights for the average -- pass the whole term's
+        multiplet for an m-scalar density (a single root yields an
+        m-split window: legal but NOT rotation-closed).
+    deg_tol : occupation-grouping tolerance (scale-aware inside
+        :func:`atomterm.natural.select_no_window`).
+
+    Notes
+    -----
+    Verify every output with operators.window_closure.
     """
     norb = c_act.shape[1]
     gamma = ci_rdm1(dets, vec, norb, weights)
