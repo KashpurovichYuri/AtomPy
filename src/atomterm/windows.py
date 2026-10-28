@@ -142,7 +142,7 @@ def s_metric_roots(s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
 
     Returns
     -------
-    ``(s_half, s_ihalf)``: ``s_ihalf @ s @ s_ihalf = I``. Matrix
+    ``(s_sqrt, s_isqrt)``: ``s_isqrt @ s @ s_isqrt = I``. Matrix
     products of AO operators are exact only in an orthonormal basis;
     this pair is the standard transport between the two.
     """
@@ -174,11 +174,11 @@ def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
     and the count goes wrong (keep ``v`` clean at the source;
     :func:`radial_basis` does).
     """
-    s_half, s_ihalf = s_metric_roots(s)
-    vx = s_half @ v
+    s_sqrt, s_isqrt = s_metric_roots(s)
+    vx = s_sqrt @ v
     resid = np.eye(v.shape[0]) - vx @ vx.conj().T
     p, sv, _ = np.linalg.svd(resid)
-    c = s_ihalf @ p[:, sv > 1e-8]
+    c = s_isqrt @ p[:, sv > 1e-8]
     return np.hstack([v, c])
 
 

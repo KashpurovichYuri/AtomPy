@@ -297,12 +297,12 @@ def window_closure(mol, c_win: np.ndarray) -> dict[str, float]:
     energy responds at O(defect^2) at stationary points (facts 16/18).
     """
     s = mol.intor("int1e_ovlp")
-    s_half, s_ihalf = s_metric_roots(s)
-    q, _ = np.linalg.qr(s_half @ c_win)
+    s_sqrt, s_isqrt = s_metric_roots(s)
+    q, _ = np.linalg.qr(s_sqrt @ c_win)
     p = q @ q.conj().T
     defect = {}
     for axis, l_ao in l_matrices(mol).items():
-        a = s_ihalf @ l_ao @ s_ihalf
+        a = s_isqrt @ l_ao @ s_isqrt
         defect[axis] = frobenius_norm(p @ a - a @ p)
     return {
         "lz": float(defect["z"]),

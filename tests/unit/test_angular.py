@@ -125,6 +125,32 @@ def test_real_basis_lz_from_transform(synthetic_p_operators):
     assert np.abs(lz_real - synthetic_p_operators["z"]).max() < 1e-12
 
 
+def test_complex_generators_l2_ladder_clebsch_factors():
+    """Reference knowledge: the l=2 ladder factors L+|2,m> are
+    2, sqrt(6), sqrt(6), 2 -- sqrt(l(l+1) - m(m+1))."""
+    g = _complex_generators(2)
+    lp = g["x"] + 1j * g["y"]
+    vals = [lp[row + 1, row] for row in range(4)]
+    assert np.allclose(vals, [2.0, np.sqrt(6), np.sqrt(6), 2.0])
+
+
+def test_real_basis_spectrum_and_l2_survive_the_transport():
+    """Coincident paths: the U-transported real-basis generators keep
+    the complex-basis facts -- Lz spectrum -l..+l, L^2 = l(l+1)."""
+    for l in (2, 3):
+        u = real_to_complex(l)
+        real = {a: u.conj().T @ g @ u
+                for a, g in _complex_generators(l).items()}
+        vals = np.sort(np.real(np.linalg.eigvals(real["z"])))
+        assert np.allclose(vals, np.arange(-l, l + 1), atol=1e-12)
+        l2 = sum(real[a] @ real[a] for a in "xyz")
+        assert np.allclose(l2, l * (l + 1) * np.eye(2 * l + 1), atol=1e-12)
+
+
+def test_real_to_complex_l0_identity():
+    assert np.array_equal(real_to_complex(0), np.array([[1.0 + 0j]]))
+
+
 # ------------------------------------------------------ degenerate anchors
 
 def test_l_matrices_vanish_on_s_only_basis():

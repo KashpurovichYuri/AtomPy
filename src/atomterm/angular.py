@@ -26,17 +26,16 @@ origin.
 
 The analytic cross-check
 ------------------------
-For a single center at the origin every AO is a radial function
-times a real spherical harmonic, so the generators act only within
-each (l, slot) block (slots walked by ``windows.shell_slots`` -- fused
-shells included). The real-to-complex harmonic transform ``U^(l)``
-follows from exact tesseral algebra in the Condon-Shortley convention
-(with PySCF's p-shell ordering),
-
-    gen^(l) = U^dag gen_c^(l) U,   gen_c = generators in the |l,m> basis
-
-``Lz|mu> = Sum_k blk[k, pos_mu] |chi_k>`` for k in the same slot, hence
-``<mu|Lz|nu> = Sum_k blk[k, pos_nu] S[mu, k]``.  For ``L^2`` see
+Goal: a second, INDEPENDENT construction of the same operators --
+different algorithm entirely -- whose elementwise agreement with the
+libcint path certifies both. Valid because a single center at the
+origin makes every AO a radial times a real spherical harmonic, so
+each generator acts only within one (l, slot) block. The generators
+are simple in the complex |l,m> basis (Lz diagonal, L+ a Clebsch
+ladder); :func:`real_to_complex` transports them to the real tesseral
+basis, and the overlaps S carry each block into the AO space:
+``<mu|L|nu> = Sum_k blk[k, pos_nu] S[mu, k]``. The transport encodes
+PySCF's real-harmonic ordering (px, py, pz). For ``L^2`` see
 :func:`l2_matrix`.
 
 Layering: `l_matrices` (libcint) is primary; `l_ladder_matrices` and
@@ -65,8 +64,9 @@ __all__ = [
 
 def _check_single_center(mol) -> None:
     """The L operators are defined about r = 0 on spherical functions
-    of ONE center (atoms built through system.build_mol satisfy this;
-    direct mol consumers are checked here)."""
+    of ONE center. Exists for DIRECT mol consumers (tests build mols
+    with ``gto.M``); ``system.build_mol`` validates its own path at
+    construction."""
     if mol.cart:
         raise ValueError("spherical (pure) basis required")
     if mol.natm != 1 or not np.allclose(mol.atom_coords()[0], 0.0, atol=1e-10):
@@ -122,12 +122,12 @@ def l2_matrix(mol) -> np.ndarray:
     """
     _check_single_center(mol)
     s = mol.intor("int1e_ovlp")
-    s_half, s_ihalf = s_metric_roots(s)
+    s_sqrt, s_isqrt = s_metric_roots(s)
     l_ops = l_matrices(mol)
     l2_orth = sum(
-        (s_ihalf @ l @ s_ihalf) @ (s_ihalf @ l @ s_ihalf) for l in l_ops.values()
+        (s_isqrt @ l @ s_isqrt) @ (s_isqrt @ l @ s_isqrt) for l in l_ops.values()
     )
-    return s_half @ l2_orth @ s_half
+    return s_sqrt @ l2_orth @ s_sqrt
 
 
 # ------------------------------------------- the analytic cross-check
@@ -149,6 +149,12 @@ def real_to_complex(l: int) -> np.ndarray:
     Returns
     -------
     Unitary ``(2l+1, 2l+1)``: ``real_k = sum_m U[m, k] Y_l^m``.
+
+    Notes
+    -----
+    The columns follow PySCF's spherical AO ordering within each l
+    (p: px, py, pz; the d-set order; labels carry member suffixes) --
+    a different library's real basis needs a different U.
     """
     k = 2 * l + 1
     u = np.zeros((k, k), dtype=complex)

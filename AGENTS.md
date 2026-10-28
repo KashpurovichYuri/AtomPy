@@ -526,14 +526,24 @@ labeling), `test_natural.py` (the γ-ladder claim: m-scalar densities yield whol
 ticket-09 regression guard — shell_weights partition, frac-occ ordering),
 `test_analysis.py` (configuration labels), `test_system.py` (validation).
 
+### The module walk
+
+The review proceeds module by module: read the module and its test
+file together; restructure per Refactor; certify per Verification;
+collapse any facts whose homes the module now owns to index lines;
+update the layout row in the same commit.
+
 ## Refactor
 
 The rules every restructuring of src/ follows (formulated 2026-10-28;
 refined as the review walk proceeds; certifying the result is the
 Verification section's job):
 
-1. **Contract over tolerance.** Docstrings carry what a caller must
-   know: purpose and goal first -- the module docstring owns the
+1. **Contract over tolerance.** The goal-sentence comes before any
+   math: state what we want and why, then the equations as the
+   realization. Evaluate every line: conceptual or incidental --
+   would a caller or tester miss it? Docstrings carry what a caller
+   must know: purpose and goal first -- the module docstring owns the
    purpose, the shared contract, and the internal layering, each
    contract stated once and referenced elsewhere; per function, a
    one-line brief + Parameters / Returns / Raises / Notes / Examples.
@@ -599,10 +609,13 @@ written, and the degenerate case is the strongest anchor.
    and closed-shell references); (c) exact analytic identities
    (spectra, commutators, sum rules). A shared-convention error
    cancels in (a); only (b) and (c) catch it.
-5. **Degenerate anchors.** Exact-by-construction cases (one
-   electron; the empty core; the whole space as window) carry
-   answers known without reference: any deviation is a bug, not
-   physics.
+5. **Degenerate anchors and known answers.** Seek degenerate cases
+   actively -- as many as constructible. Pin answers known from
+   reference knowledge (textbook spectra, Clebsch factors) and
+   coincidences expected across paths (two representations, two
+   constructions). Exact-by-construction cases (one electron; the
+   empty core; the whole space as window) carry answers without any
+   reference: any deviation is a bug, not physics.
 6. **Certified, not assumed.** A behavior-preserving refactor proves
    it: bitwise A/B against pre-refactor arrays on pinned references
    (deterministic constructions only); elementwise pins for algorithm
