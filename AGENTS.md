@@ -39,13 +39,13 @@ mode restrictions lift). Mechanical enforcement: the global
 | Module | Interface | Notes |
 |---|---|---|
 | `src/atomterm/system.py` | `AtomConfig`, `build_mol`, `sector_na_nb`, `ncore_of` | validates: single atom, spherical basis (origin by construction); `AtomConfig.ecp` pairs basis+pseudopotential; the sector/core helpers raise on parity violations and take `mol.nelectron` (ECP-honest — never recompute from Z) |
-| `src/atomterm/angular.py` | `l_matrices`, `l_ladder_matrices`, `l2_matrix`, `l_matrices_analytic` | one-electron `Lx/Ly/Lz` AO matrices. Primary: libcint `int1e_irp` (decoded layout in the docstring). Cross-check: exact tesseral algebra via overlaps. |
+| `src/atomterm/angular.py` | `l_matrices`, `l_ladder_matrices`, `l2_matrix`, `l_matrices_analytic`, `real_to_complex` | one-electron `Lx/Ly/Lz/L²` AO matrices, TWO independent constructions certifying each other (libcint `int1e_irp` primary — the decoding lives in the module docstring; exact tesseral algebra via overlaps the cross-check — per-slot through `windows.shell_slots`, so fused shells work: the whole-shell-block form never ran on Sc's fused p); `real_to_complex` = the per-shell real→\|l,m⟩ transform every M_L bookkeeping needs |
 | `src/atomterm/detbasis.py` | `determinant_basis`, `one_body_matrix`, `two_body_matrix`, `slater_condon_matrix`, `commutator`, `frobenius_norm` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants; `slater_condon_matrix` = the fused one-pass production path (10^5 dets), `one_body_matrix`/`two_body_matrix` = the parts, name-twinned with secondquant (the cross-certification is name-symmetric); `_slater_condon_slow` = the pinned reference loop; ordering ≠ PySCF FCI strings (bridge lives in cells) |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `apply_one_body`, `apply_two_body`, `one_body_matrix`, `two_body_matrix`, `secondquant_matrix` | **pure numpy, no pyscf** — the same matrices via explicit a+/a application on occupation vectors (ket application + scattering, sign tracking); `one_body_matrix`/`two_body_matrix` twin the detbasis names; the random non-particle-symmetric-G pin certifies the string contraction terms that physical integrals are blind to |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, Sz, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19); the explicit ladder operators (`spin_ladders`, `l_ladder_operator`, `spin_ladder_matrix`) power the L²/S² twin-construction tests |
 | `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_rungs(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README · Methods) |
 | `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the one deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters; `mc_opts` = per-run optimizer knobs (budgets); all checkpointed (`.chk`); labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source) |
-| `src/atomterm/windows.py` | `Window(.columns)`, `SELECTORS`, `window_shell/primitive/scf_mo/no`, `select_*` (incl. `select_span`, `select_primitives`), `primitive_chain`, `shell_weights`, `window_avas`, `span_overlap`, `span_projector`, `lowdin(tol=)`, `complete_orthonormal`, `build_full_mo`, `lm_sectors`, `radial_basis`, `radial_mask` | window construction + selection + the kind registry (the module docstring owns the statement: purpose, the m-completeness contract, the five kinds incl. custom columns, the internal layering — `_shell_slots` is the one shell walker, the S-metric algebra beneath, the two substrate builders); `build_full_mo` takes AO rows OR column vectors through ONE project-renormalize-assemble treatment (`_core_block` resolves+Loewdins the core — once; a double Loewdin is gauge-idempotent but breaks bitwise A/B through the degenerate complement); `lowdin` raises on near-linear dependence instead of NaN-ing downstream; `shell_weights` groups by `lm_sectors` (no label parsing; row order fixed for bitwise-stable payloads) |
+| `src/atomterm/windows.py` | `Window(.columns)`, `SELECTORS`, `window_shell/primitive/scf_mo/no`, `select_*` (incl. `select_span`, `select_primitives`), `primitive_chain`, `shell_weights`, `window_avas`, `span_overlap`, `span_projector`, `s_metric_roots`, `shell_slots`, `lowdin(tol=)`, `complete_orthonormal`, `build_full_mo`, `lm_sectors`, `radial_basis`, `radial_mask` | window construction + selection + the kind registry (the module docstring owns the statement: purpose, the m-completeness contract, the five kinds incl. custom columns, the internal layering — `shell_slots` is the one shell walker [consumed by angular too], the S-metric algebra [`s_metric_roots` = the S^{±1/2} transport] beneath, the two substrate builders); `build_full_mo` takes AO rows OR column vectors through ONE project-renormalize-assemble treatment; `lowdin` raises on near-linear dependence instead of NaN-ing downstream; `shell_weights` groups by `lm_sectors` (no label parsing; row order fixed for bitwise-stable payloads) |
 | `src/atomterm/core.py` | `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
 | `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and rungs share — callers only render (report text / flat json payload) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
@@ -67,18 +67,19 @@ module.
 1. **AO labels are truthful but carry member suffixes** (`2px` is
    really px); prefix-match labels, never regex patterns; fused
    shells (`nctr > 1`) unpack through the shell walker →
-   `windows` (select_shell_ao, `_shell_slots`).
-2. **`int1e_irp`** (libcint, 9 components) is `T[3a+b] = <mu| r_a d_b |nu>`;
-   `Lz = -i(T1 - T3)`, `Lx = -i(T5 - T7)`, `Ly = -i(T6 - T2)`. Pinned by tests.
+   `windows` (select_shell_ao, shell_slots).
+2. **`int1e_irp` decoding** — `T[3a+b] = <mu| r_a d_b |nu>`, `L = -i` ×
+   the antisymmetric part → `angular` (module docstring). Pinned by tests.
 3. **Two integral conventions collide**: PySCF `int2e`/`ao2mo` are **chemist**
    `(pq|rs) = int p(1) r(1) q(2) s(2)`; `detbasis` uses **physicist**
    `<pq|rs> = int p(1) q(2) r(1) s(2)` = chemist `(pr|qs)`.
    `active_space_integrals` returns physicist (transpose(0,2,1,3) applied).
    `fci.direct_spin1.kernel` 4-fold input is chemist; pass `g.transpose(0,2,1,3)`.
    The textbook hand-check `E(3P det) = 2 h_2p + J - K` is the arbiter.
-4. **Matrix products are exact only in an orthonormal basis** (`l2_matrix`
-   needs the `S^{±1/2}` metric dance). Shell AOs of one contracted shell are
-   self-orthonormal, so the active space is exactly rotation-closed.
+4. **Matrix products are exact only in an orthonormal basis** — the
+   `S^{±1/2}` transport (`windows.s_metric_roots`); shell AOs of one
+   contracted shell are self-orthonormal → `angular.l2_matrix` Notes +
+   the windows m-completeness contract.
 5. **Core density must be spherically averaged** (`_spherical_average_density`):
    the SCF core carries ~1e-5 numerical p-contamination that would otherwise
    split the ³P multiplet by ~4e-5 Eh. Physical (l=0) component, not a hack.

@@ -4,7 +4,7 @@ fractional folds, with exact M_L labels.
 
 Real shell AOs are +-|m| combinations, NOT m eigenstates (finding 5),
 so determinant-sum labeling over real AOs is invalid. Instead the
-per-shell unitary U^(l) = angular._real_to_complex(l) is embedded in
+per-shell unitary U^(l) = angular.real_to_complex(l) is embedded in
 the window-orbital basis and lifted to the Fock space through its
 one-body Slater-Condon matrix W (the second-quantized transform).
 H_complex = W^dag H W lives in the |l,m> basis where Lz is diagonal:
@@ -28,7 +28,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from atomterm.angular import _real_to_complex
+from atomterm.angular import real_to_complex
 from atomterm.detbasis import determinant_basis
 from atomterm.drivers import occupied_core_idx
 from atomterm.operators import build_operators
@@ -53,7 +53,7 @@ def shell_u(mol, act_idx: list[int]) -> np.ndarray:
 
     The active AOs are grouped by angular momentum l (each shell's AOs
     contiguous, in PySCF real order); each group is transformed by
-    U^(l) = angular._real_to_complex(l).
+    U^(l) = angular.real_to_complex(l).
     """
     n = len(act_idx)
     u = np.zeros((n, n), dtype=complex)
@@ -65,7 +65,7 @@ def shell_u(mol, act_idx: list[int]) -> np.ndarray:
         j = i
         while j < n and l_vals[j] == l:
             j += 1
-        u[i:j, i:j] = _real_to_complex(l)
+        u[i:j, i:j] = real_to_complex(l)
         i = j
     assert np.allclose(u.conj().T @ u, np.eye(n), atol=1e-12), "U not unitary"
     return u

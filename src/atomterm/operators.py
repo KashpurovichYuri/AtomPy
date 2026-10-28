@@ -30,6 +30,7 @@ import numpy as np
 
 from atomterm.detbasis import determinant_basis, frobenius_norm, slater_condon_matrix
 from atomterm.angular import l_ladder_matrices, l_matrices
+from atomterm.windows import s_metric_roots
 
 __all__ = [
     "spin_block_one_body",
@@ -296,9 +297,7 @@ def window_closure(mol, c_win: np.ndarray) -> dict[str, float]:
     energy responds at O(defect^2) at stationary points (facts 16/18).
     """
     s = mol.intor("int1e_ovlp")
-    ev, u = np.linalg.eigh(s)
-    s_half = (u * np.sqrt(ev)) @ u.T
-    s_ihalf = (u / np.sqrt(ev)) @ u.T
+    s_half, s_ihalf = s_metric_roots(s)
     q, _ = np.linalg.qr(s_half @ c_win)
     p = q @ q.conj().T
     defect = {}

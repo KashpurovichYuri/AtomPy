@@ -27,10 +27,11 @@ the construction story, is the criterion. The kinds:
 * custom -- any S-orthonormal columns (your MO selection, a
   hand-built window): build_full_mo takes them directly.
 
-Layering inside: _shell_slots is the ONE shell walker (lm_sectors,
-primitive_chain and the l-vocabulary of select_span sit on it);
-lowdin / span_projector / complete_orthonormal are the S-metric
-algebra; build_full_mo and radial_basis are the two substrate
+Layering inside: `shell_slots` is the ONE shell walker (lm_sectors,
+primitive_chain, the l-vocabulary of select_span, and angular's
+analytic path sit on it); `lowdin` / `span_projector` /
+`s_metric_roots` / `complete_orthonormal` are the S-metric algebra;
+`build_full_mo` and `radial_basis` are the two substrate
 builders (same core treatment, different window gauge); Window +
 SELECTORS are the registry on top.
 
@@ -63,6 +64,8 @@ __all__ = [
     "window_avas",
     "span_overlap",
     "span_projector",
+    "s_metric_roots",
+    "shell_slots",
     "complete_orthonormal",
     "build_full_mo",
     "lm_sectors",
@@ -132,6 +135,21 @@ def lowdin(c: np.ndarray, s: np.ndarray, tol: float = 1e-10) -> np.ndarray:
     return c @ (u / np.sqrt(ev)) @ u.T
 
 
+def s_metric_roots(s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """The root pair ``(S^{1/2}, S^{-1/2})`` of an overlap matrix --
+    the isometry between the S metric and the Euclidean one
+    (``<a|b>_S = (S^{1/2} a)^dag (S^{1/2} b)``).
+
+    Returns
+    -------
+    ``(s_half, s_ihalf)``: ``s_ihalf @ s @ s_ihalf = I``. Matrix
+    products of AO operators are exact only in an orthonormal basis;
+    this pair is the standard transport between the two.
+    """
+    ev, u = np.linalg.eigh(s)
+    return (u * np.sqrt(ev)) @ u.T, (u / np.sqrt(ev)) @ u.T
+
+
 def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
     """Append an S-orthonormal complement to the columns of ``v``.
 
@@ -156,9 +174,7 @@ def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
     and the count goes wrong (keep ``v`` clean at the source;
     :func:`radial_basis` does).
     """
-    ev, u = np.linalg.eigh(s)
-    s_half = (u * np.sqrt(ev)) @ u.T
-    s_ihalf = (u / np.sqrt(ev)) @ u.T
+    s_half, s_ihalf = s_metric_roots(s)
     vx = s_half @ v
     resid = np.eye(v.shape[0]) - vx @ vx.conj().T
     p, sv, _ = np.linalg.svd(resid)
@@ -174,11 +190,13 @@ def _block_projector(cols: np.ndarray, s: np.ndarray) -> np.ndarray:
 
 # -------------------------------------------------------- the shell substrate
 
-def _shell_slots(mol):
+def shell_slots(mol):
     """The ONE shell walker: yields ``(shell, l, slot, rows)`` per
     contraction slot of every shell, ``rows`` = the slot's 2l+1
     member rows. The fused-shell addressing (contraction-outer,
-    m-inner) lives here and only here."""
+    m-inner) lives here and only here; consumers: lm_sectors,
+    primitive_chain, select_span's l-vocabulary, and angular's
+    analytic construction."""
     loc = mol.ao_loc_nr()
     for ib in range(mol.nbas):
         l = abs(mol.bas_angular(ib))
@@ -189,7 +207,7 @@ def _shell_slots(mol):
 
 
 def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
-    """AO rows grouped by (l, member) over :func:`_shell_slots`.
+    """AO rows grouped by (l, member) over :func:`shell_slots`.
 
     Returns
     -------
@@ -201,7 +219,7 @@ def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
     :func:`select_span`) globally consistent by construction.
     """
     sectors: dict[tuple[int, int], list[int]] = {}
-    for _ib, l, _c, rows in _shell_slots(mol):
+    for _ib, l, _c, rows in shell_slots(mol):
         for m, r in enumerate(rows):
             sectors.setdefault((l, m), []).append(r)
     return sectors
@@ -343,7 +361,7 @@ def primitive_chain(mol, l: int) -> list[tuple[float, list[int]]]:
 
     Parameters
     ----------
-    mol : the molecule (walked via :func:`_shell_slots`).
+    mol : the molecule (walked via :func:`shell_slots`).
     l : the angular momentum.
 
     Returns
@@ -362,7 +380,7 @@ def primitive_chain(mol, l: int) -> list[tuple[float, list[int]]]:
         shell is one pre-converged radial) or MO/NO selection.
     """
     chain: list[tuple[float, list[int]]] = []
-    for ib, ll, c, rows in _shell_slots(mol):
+    for ib, ll, c, rows in shell_slots(mol):
         if ll != l:
             continue
         exps = np.asarray(mol.bas_exp(ib))

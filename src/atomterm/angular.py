@@ -1,46 +1,72 @@
-"""One-electron angular momentum operators Lx, Ly, Lz, L^2 in the AO basis.
+"""One-electron angular momentum operators Lx, Ly, Lz, L^2 in the AO
+basis -- the angular-momentum layer every term classification and
+symmetry certificate rests on.
 
-Primary construction (libcint, via PySCF)
------------------------------------------
-PySCF exposes the libcint integral ``int1e_irp`` with 9 components; decoding
-(verified empirically and pinned by tests) gives
+PURPOSE: exact one-electron L matrices for a single atom. GOAL: TWO
+independent constructions that certify each other elementwise, so
+the operator layer is never the weak link: the libcint integral path
+(primary) and the exact tesseral algebra via overlaps (cross-check).
+
+The primary construction (libcint, via PySCF)
+---------------------------------------------
+PySCF exposes the libcint integral ``int1e_irp`` with 9 components;
+decoding (verified empirically and pinned by tests) gives
 
     T[3*a + b] = Integral mu | r_a d_b nu      (a, b = 0..2 for x, y, z)
 
-The angular momentum operator ``L = -i r x grad`` is the antisymmetric part:
+The angular momentum operator ``L = -i r x grad`` is the antisymmetric
+part:
 
     Lz = -i (x dy - y dx) = -i (T[1] - T[3])
     Lx = -i (y dz - z dy) = -i (T[5] - T[7])
     Ly = -i (z dx - x dz) = -i (T[6] - T[2])
 
-Exact for any pure-spherical AO basis on a single center at the origin.
+Exact for any pure-spherical AO basis on a single center at the
+origin.
 
-Analytic cross-check construction
----------------------------------
-For a single center at the origin every AO is a radial function times a real
-spherical harmonic, so the generators act only within each (l, shell) block.
-The real-to-complex harmonic transform ``U^(l)`` follows from exact tesseral
-algebra in the Condon-Shortley convention (with PySCF's p-shell ordering),
+The analytic cross-check
+------------------------
+For a single center at the origin every AO is a radial function
+times a real spherical harmonic, so the generators act only within
+each (l, slot) block (slots walked by ``windows.shell_slots`` -- fused
+shells included). The real-to-complex harmonic transform ``U^(l)``
+follows from exact tesseral algebra in the Condon-Shortley convention
+(with PySCF's p-shell ordering),
 
     gen^(l) = U^dag gen_c^(l) U,   gen_c = generators in the |l,m> basis
 
-``Lz|mu> = Sum_k blk[k, pos_mu] |chi_k>`` for k in the same shell, hence
-``<mu|Lz|nu> = Sum_k blk[k, pos_nu] S[mu, k]``.  For ``L^2`` simply
-``L^2 = Lx.Lx + Ly.Ly + Lz.Lz`` (matrix product in the orthonormalized AO
-basis), which is exact because the single-center space is closed under L.
+``Lz|mu> = Sum_k blk[k, pos_mu] |chi_k>`` for k in the same slot, hence
+``<mu|Lz|nu> = Sum_k blk[k, pos_nu] S[mu, k]``.  For ``L^2`` see
+:func:`l2_matrix`.
 
-Limitation: valid for a single atom at the origin with spherical basis
-(enforced by atomterm.system.build_mol).
+Layering: `l_matrices` (libcint) is primary; `l_ladder_matrices` and
+`l2_matrix` derive from it; `real_to_complex` +
+`_complex_generators` + the shell walker build the independent
+analytic path. Valid for a single atom at the origin with a spherical
+basis (enforced here and by ``system.build_mol``).
 """
 
 from __future__ import annotations
 
 import numpy as np
 
-__all__ = ["l_matrices", "l_ladder_matrices", "l2_matrix", "l_matrices_analytic"]
+from atomterm.windows import s_metric_roots, shell_slots
 
+__all__ = [
+    "l_matrices",
+    "l_ladder_matrices",
+    "l2_matrix",
+    "l_matrices_analytic",
+    "real_to_complex",
+]
+
+
+# ------------------------------------------------- the libcint construction
 
 def _check_single_center(mol) -> None:
+    """The L operators are defined about r = 0 on spherical functions
+    of ONE center (atoms built through system.build_mol satisfy this;
+    direct mol consumers are checked here)."""
     if mol.cart:
         raise ValueError("spherical (pure) basis required")
     if mol.natm != 1 or not np.allclose(mol.atom_coords()[0], 0.0, atol=1e-10):
@@ -48,7 +74,19 @@ def _check_single_center(mol) -> None:
 
 
 def l_matrices(mol) -> dict[str, np.ndarray]:
-    """AO matrices of Lx, Ly, Lz (complex, Hermitian, imaginary) via libcint."""
+    """AO matrices of Lx, Ly, Lz via the libcint ``int1e_irp``
+    integrals (the decoding: the module docstring).
+
+    Returns
+    -------
+    ``{"x", "y", "z"}``: complex Hermitian matrices, purely imaginary
+    on a real AO basis.
+
+    Raises
+    ------
+    ValueError
+        For a cartesian basis, several atoms, or an off-origin atom.
+    """
     _check_single_center(mol)
     t = mol.intor("int1e_irp", comp=9)
     img = -1j
@@ -60,25 +98,31 @@ def l_matrices(mol) -> dict[str, np.ndarray]:
 
 
 def l_ladder_matrices(mol) -> dict[str, np.ndarray]:
-    """AO matrices of the orbital ladders L± = Lx ± iLy (built explicitly;
-    the analytic path assembles its Lx/Ly FROM these ladders in the
-    |l,m> basis -- :func:`_complex_generators`)."""
+    """AO matrices of the orbital ladders ``L± = Lx ± i Ly`` (built
+    from :func:`l_matrices`; the analytic path assembles its Lx/Ly
+    FROM these ladders in the |l,m> basis -- :func:`_complex_generators`).
+    """
     l = l_matrices(mol)
     return {"+": l["x"] + 1j * l["y"], "-": l["x"] - 1j * l["y"]}
 
 
-def l2_matrix(mol) -> np.ndarray:
-    """AO matrix of the one-electron L^2 = Lx.Lx + Ly.Ly + Lz.Lz (exact).
+# ------------------------------------------------------------------- L^2
 
-    Matrix products are exact only in an orthonormal basis, so the product is
-    taken in the symmetrically orthonormalized AO basis and transformed back:
-    L2_ao = S^(1/2) [ sum_a (S^-1/2 l_a S^-1/2)^2 ] S^(1/2).
+def l2_matrix(mol) -> np.ndarray:
+    """AO matrix of the one-electron ``L^2 = Lx.Lx + Ly.Ly + Lz.Lz``
+    (exact).
+
+    Notes
+    -----
+    Matrix products are exact only in an orthonormal basis, so the
+    product is taken in the symmetrically orthonormalized AO basis
+    and transported back (:func:`windows.s_metric_roots`):
+
+    ``L2_ao = S^(1/2) [ sum_a (S^-1/2 l_a S^-1/2)^2 ] S^(1/2)``.
     """
     _check_single_center(mol)
     s = mol.intor("int1e_ovlp")
-    ev, u = np.linalg.eigh(s)
-    s_half = (u * np.sqrt(ev)) @ u.T
-    s_ihalf = (u / np.sqrt(ev)) @ u.T
+    s_half, s_ihalf = s_metric_roots(s)
     l_ops = l_matrices(mol)
     l2_orth = sum(
         (s_ihalf @ l @ s_ihalf) @ (s_ihalf @ l @ s_ihalf) for l in l_ops.values()
@@ -86,26 +130,25 @@ def l2_matrix(mol) -> np.ndarray:
     return s_half @ l2_orth @ s_half
 
 
-def _shell_blocks(mol):
-    """Yield (l, first_ao_index, n_components) for every shell."""
-    ao_loc = mol.ao_loc_nr()
-    for k in range(mol.nbas):
-        l = mol.bas_angular(k)
-        yield l, ao_loc[k], ao_loc[k + 1] - ao_loc[k]
+# ------------------------------------------- the analytic cross-check
 
+def real_to_complex(l: int) -> np.ndarray:
+    """``U^(l)``: real harmonics (PySCF AO order) -> complex
+    ``|l,m>``, ``m = -l..l`` -- the per-shell transform every M_L
+    bookkeeping of real AOs needs (real shell AOs are ``+-|m|``
+    combinations, not m eigenstates).
 
-def _real_to_complex(l: int) -> np.ndarray:
-    """U^(l): real-harmonic (PySCF AO order) -> complex |l,m>, m=-l..l.
-
-    Exact tesseral algebra (Condon-Shortley complex harmonics, the same
-    convention as scipy/PySCF):
+    Exact tesseral algebra (Condon-Shortley complex harmonics, the
+    same convention as scipy/PySCF):
 
         sine slot (column l-m): (-1)^(m+1) * sqrt(2) * Im Y_l^m
         cos  slot (column l+m): (-1)^m     * sqrt(2) * Re Y_l^m
 
-    with PySCF's p-shell reordering (px, py, pz) applied for l = 1.
-    Columns are the coefficients of each real harmonic in the complex |l,m>
-    basis, i.e. real_k = sum_m U[m, k] Y_l^m.
+    with PySCF's p-shell reordering (px, py, pz) applied for ``l = 1``.
+
+    Returns
+    -------
+    Unitary ``(2l+1, 2l+1)``: ``real_k = sum_m U[m, k] Y_l^m``.
     """
     k = 2 * l + 1
     u = np.zeros((k, k), dtype=complex)
@@ -125,7 +168,10 @@ def _real_to_complex(l: int) -> np.ndarray:
 
 
 def _complex_generators(l: int) -> dict[str, np.ndarray]:
-    """Lx, Ly, Lz in the complex |l,m> basis, m = -l..l."""
+    """Lx, Ly, Lz in the complex |l,m> basis, m = -l..l:
+    Lz diagonal, the ladder L+ strictly upper with the
+    ``sqrt((l-m)(l+m+1))`` Clebsch factors, Lx/Ly its symmetric
+    combinations."""
     k = 2 * l + 1
     m_vals = np.arange(-l, l + 1)
     lz = np.diag(m_vals).astype(complex)
@@ -141,9 +187,16 @@ def _complex_generators(l: int) -> dict[str, np.ndarray]:
 
 
 def l_matrices_analytic(mol) -> dict[str, np.ndarray]:
-    """AO matrices of Lx, Ly, Lz built from overlaps + solid-harmonic blocks.
+    """AO matrices of Lx, Ly, Lz built from overlaps and exact
+    solid-harmonic blocks -- the INDEPENDENT second construction that
+    certifies :func:`l_matrices` elementwise (pinned by tests).
 
-    Independent of the libcint path; used to cross-validate ``l_matrices``.
+    Notes
+    -----
+    Works per contraction slot (``windows.shell_slots``): fused shells
+    (``nctr > 1``) are handled exactly like segmented ones -- each
+    slot is one radial times its m-set, so the generators act within
+    the slot and the overlap does the transport.
     """
     _check_single_center(mol)
     nao = mol.nao_nr()
@@ -151,17 +204,17 @@ def l_matrices_analytic(mol) -> dict[str, np.ndarray]:
     l_ops = {a: np.zeros((nao, nao), dtype=complex) for a in "xyz"}
 
     gen_cache: dict[int, dict[str, np.ndarray]] = {}
-    for l, ao0, ncomp in _shell_blocks(mol):
+    for _ib, l, _c, rows in shell_slots(mol):
         if l == 0:
             continue
         if l not in gen_cache:
-            u = _real_to_complex(l)
+            u = real_to_complex(l)
             gen_cache[l] = {
                 a: u.conj().T @ g @ u for a, g in _complex_generators(l).items()
             }
         for a in "xyz":
             blk = gen_cache[l][a]
-            # Lz |nu> = sum_k blk[k, pos_nu] |chi_k>  (same shell => same radial)
-            l_ops[a][:, ao0 : ao0 + ncomp] += s[:, ao0 : ao0 + ncomp] @ blk
+            # L|nu> = sum_k blk[k, pos_nu] |chi_k>  (same slot => same radial)
+            l_ops[a][:, rows] += s[:, rows] @ blk
 
     return l_ops
