@@ -129,7 +129,8 @@ green, reports written.
   anchors, pass curves), then C/Si/Sc migration, then the AGENTS
   protocol round + the treatments/study retirement ticket (the
   test-pin migration is its deliverable). Supersedes the cellkey-wave
-  queue ordering; deep refactor/generalize is mandated WHILE Ti work
+  queue ordering (archived: `archive/cellkey-wave.md`); deep
+  refactor/generalize is mandated WHILE Ti work
   runs, with the second-consumer guardrail.
 - [28: completion runs](tickets/28-completion-runs.md) — OPEN, the
   runner is ready: U SA-24 / relax-24 / SA-(6,13); Sc/Ti NO-start
@@ -514,7 +515,7 @@ Recorded (candidates + declinations):
    user's run-queue generalization) and the ticket-20 intent manifest.
    Design it DESIGN-IT-TWICE style before the U(14) wave.
    ==> RESOLVED 2026-10-27 (b) as the CellKey wave, plan
-   ~/.opencode/plan/cellkey-wave.md: cells.py landed P0-P2 (commits
+   `archive/cellkey-wave.md`: cells.py landed P0-P2 (commits
    5f17df2 RUNGS.md dissolved, 09bdc28 key+bridge+load, 2a6132e
    run_cell/analyze_cell; 145 tests green). The bridge found a REAL
    bug on the way (fact 24: PySCF FCI ordering != detbasis ordering

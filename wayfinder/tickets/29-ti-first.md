@@ -1,8 +1,9 @@
 # Ti-first: completion, declaration unification, deep generalization
 
 Agreed in conversation 2026-10-28 (plan mode). This file is the record;
-it supersedes the queue/P4 ordering of `cellkey-wave.md` (that file
-stays as history; its QUEUE UPDATE is the state up to df6ec4f/dde6071).
+it supersedes the queue/P4 ordering of `cellkey-wave.md` (archived at
+`wayfinder/archive/cellkey-wave.md`; its QUEUE UPDATE is the state up
+to df6ec4f/dde6071).
 
 ## The protocol (user-settled)
 
@@ -122,5 +123,6 @@ deliverable).
 - map.md · Post-wave survey 2026-10-28 (the review + design round
   that produced this plan's findings).
 - message.txt handoff (h) = state at dde6071 (review + survey landed).
-- cellkey-wave.md = the wave's history (P0–P3 done, queue steps a/b
+- cellkey-wave.md (archived: `wayfinder/archive/`) = the wave's
+  history (P0–P3 done, queue steps a/b
   done, its NEXT superseded by this file).
