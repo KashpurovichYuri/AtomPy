@@ -74,6 +74,12 @@ def test_key_validation_and_canonicalization():
     with pytest.raises(ValueError, match="radial mask"):
         CellKey("C", "2pno1", (1, 1), method="casscf", start="no",
                 mask="radial")
+    # the MO start carries its own canonical core -- pur substrate is
+    # moot for it (the review's finding: the four ti mo x pur cells
+    # were the same experiment under two addresses)
+    with pytest.raises(ValueError, match="canonical core"):
+        CellKey("Ti", "3d4s", (3, 1), method="casscf", start="mo",
+                substrate="pur")
     for bad in [dict(method="fci"), dict(start="aos"), dict(mask="relax"),
                 dict(substrate="polarized"), dict(fold="averaged")]:
         with pytest.raises(ValueError, match="not in"):
@@ -399,6 +405,52 @@ def test_run_cell_no_start_same_subspace(carbon, tmp_path):
     assert np.allclose(ao.energies, no.energies, atol=1e-9)
     assert no.win_lz == pytest.approx(0.0, abs=1e-12)   # m-set: closed span
     assert no.win_lperp == pytest.approx(0.0, abs=1e-12)
+
+
+@slow
+def test_sa_run_completes_the_roots_store(carbon, tmp_path):
+    """store_name= pins the WRITER side of the SA store (the aa21071
+    bug): the SA run returns the per-ROOTS pass, and the cell-layer
+    completion must land under ``<address>_roots`` -- completing
+    ``<address>`` instead pairs the ensemble's energies with the
+    roots' CI, and the loader's preferred store then fails loud
+    (missing ci_stack)."""
+    from pyscf import lib
+
+    from atomterm.cells import run_cell
+
+    _, mol, mf, _ = carbon
+    key = CellKey("C", "2p", (1, 1), method="sa")
+    facts = run_cell(key, mf, workdir=tmp_path)
+    data = load_cell(key, tmp_path)          # prefers <address>_roots
+    assert np.allclose(data.energies, facts.energies_pyscf, atol=1e-10)
+    chk = cell_chk(key, tmp_path)
+    ci = lib.chkfile.load(str(chk), f"atomterm/{key.address}_roots/ci_stack")
+    assert ci is not None and len(ci) == len(facts.energies_pyscf)
+
+
+@slow
+def test_frozen_mask_applies_to_the_mo_start(carbon, tmp_path):
+    """Masks are START-INDEPENDENT (the 141c1b8 wiring): a frozen-window
+    MO-start cell must converge WITH its start columns -- if the mask
+    resolution slipped back into the ao branch, this cell would run
+    free and the window would rotate away (carbon's radial relaxation,
+    the theta* gain)."""
+    from atomterm.cells import run_cell
+    from atomterm.system import ncore_of
+
+    _, mol, mf, _ = carbon
+    key = CellKey("C", "2p", (1, 1), method="casscf", start="mo",
+                  mask="frozen")
+    run_cell(key, mf, workdir=tmp_path)
+    ncore = ncore_of(mol.nelectron, 2)
+    start = mf.mo_coeff[:, ncore:ncore + 3]
+    conv = load_cell(key, tmp_path).mo_coeff[:, ncore:ncore + 3]
+    s = mf.get_ovlp()
+    for i in range(3):
+        # |<start_i|S|conv_i>| == 1: the same column up to phase
+        assert abs(start[:, i] @ (s @ conv[:, i])) == pytest.approx(
+            1.0, abs=1e-8), f"window column {i} moved under a frozen mask"
 
 
 @fast

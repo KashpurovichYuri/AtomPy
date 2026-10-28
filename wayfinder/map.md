@@ -583,3 +583,63 @@ whichever tight band grazes it (rotating failures across runs: Sc
 tables, the ladders fixture, Sc complete-window, Ti sa_pur 2.2e-2
 captured+widened, Ti casci closure, C virtmix uncaptured transient).
 Protocol recorded in AGENTS · Tests.
+
+## Post-wave survey (2026-10-28, CellKey wave two-axis review + design round)
+
+Review span: d8cd792..df6ec4f (the CellKey wave P0-P3 + queue steps
+a/b + the reading passes), two-axis per protocol (Standards/Spec
+sub-agents over AGENTS.md + the plan file + the handoff specs).
+
+Fixed now:
+1. (Spec, the substantive one) The substrate axis was a silent no-op
+   for start="mo": run_cell's mo branch sets mo_full = mf.mo_coeff
+   regardless of substrate (documented "moot" in the branch), yet
+   cell_set declared four (mo,pur) optimizer cells -- the same
+   experiment under two addresses (energies/window digit-identical;
+   the meter differences between the twins were pure rerun chaos --
+   two independent runs of one cell). Fix: the key REJECTS mo x pur
+   (void, like radial x mo); cell_set + the manifest renderer pruned;
+   the four stale chks deleted; Ti regenerated cache-hit (29/29
+   manifest cells; the diff is PURE DELETIONS -- the analyze path
+   reproduced everything else byte-stable). Door left open: a
+   pur-core MO start is a real experiment needing the
+   window-projection machinery (one new builder + relaxed validator)
+   -- not built, not wanted yet.
+2. (Spec) Two of the three seam-bug fixes were unpinned. Pinned on
+   carbon: test_sa_run_completes_the_roots_store (the store_name=
+   WRITER side -- completing <address> instead of <address>_roots
+   pairs ensemble energies with roots CI and the preferred-store
+   load fails loud) and test_frozen_mask_applies_to_the_mo_start
+   (mask start-independence: the converged window columns == the
+   canonical MO slice up to phase; a free run rotates them away).
+3. (Standards, hard) AGENTS analysis.py row missing shell_occupations;
+   the store-contract docs (cells.py docstring + fact 24) named `ci`
+   where the key is `ci_stack`. Both fixed.
+4. (Standards, judgement) regen's render parsed addresses positionally
+   (ruler.split("_")[2], twice) -- now through CellKey.from_address.
+
+Declined:
+5. AUDIT hardcodes address strings (Primitive Obsession flag): the
+   AUDIT dict is human verdict DATA; addresses are its natural keys.
+   The renderer's key() helper covers constructed addresses.
+6. REFS re-states the conftest TI_REF numbers: known-declined class
+   (2026-10-23 precedent) -- the runner stays self-contained
+   gate-wise; accepted duplication.
+
+Candidates (recorded, not now):
+7. THE manifest grid is declared twice: regen_cells.cell_set vs
+   build_methods_tables' loops + CASCI_FOLDS. Run-side drift renders
+   as pending (caught); policy drift between the two stays silent.
+   The fix -- export the grid declaration beside spine_keys in
+   cells.py -- belongs to P4 (StudySpec-over-key-sets gives it a
+   natural home). Flagged again by the design round below.
+8. run_cell's nroots=min(9, ndet) magic 9 (the term-table root cap):
+   name it when cells.py is next touched.
+9. verbose is both a run_cell kwarg and a budgets key -- two knobs
+   for one thing; collapse at P4.
+
+Suite state: 153 collected (+2: the SA store-writer pin, the
+frozen-mask wiring pin); one rotating-draw flake in the full
+run (test_ti_casci_exact_closure_and_term_table, isolation-
+green on rerun -- the session-draw class, AGENTS Tests; no
+band change, no observed value captured).

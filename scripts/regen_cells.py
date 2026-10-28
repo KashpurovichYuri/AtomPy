@@ -39,8 +39,10 @@ def cell_set(atom, window, sector) -> list[CellKey]:
     """The declared key-set: the spine (README · Methods) + the FULL
     manifest grid -- method x mask x substrate x start, the NOs start
     under the radial mask VOID (the seam rejects it: NO columns carry
-    no member labels to rotate) -- + the virtmix diagnostic and the
-    CASCI pur row. The NOs start is the full-span group prefix
+    no member labels to rotate) and the MO start on pur VOID (the
+    start carries its own canonical core; the substrate axis cannot
+    enter the run) -- + the virtmix diagnostic and the CASCI pur row.
+    The NOs start is the full-span group prefix
     (<window>no2 for {3d,4s}: the d and s occupation groups); k is
     window identity. Deduped by address; P4 folds the historic rung
     names away entirely."""
@@ -52,6 +54,9 @@ def cell_set(atom, window, sector) -> list[CellKey]:
                 for st in ("ao", "mo", "no"):
                     if mask == "radial" and st != "ao":
                         continue  # radial rotates member-labeled AO slots
+                    if st == "mo" and sub == "pur":
+                        continue  # VOID at the key: the mo start carries
+                        # its own canonical core (substrate moot)
                     keys.append(CellKey(atom, window if st != "no"
                                         else f"{window}no2", sec, method=m,
                                         start=st, mask=mask, substrate=sub))
@@ -94,12 +99,13 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
              f"{'cell':<44} {'E_ground':>16} {'dE_vs_avg':>10} {'<L^2>':>9} "
              f"{'|[H,Lz]|':>10} {'|[H,L2]|':>10} {'|[P,Lz]|':>9} {'|[P,Lp]|':>9} "
              f"{'win_l':>6} {'aniso':>9} {'max|dE|':>9} {'ortho':>9}  conv"]
-    ruler_sec = ruler.split("_")[2]
+    ruler_sec = CellKey.from_address(ruler).sector
     for addr, r in cells.items():
         # ΔE vs the ruler only within its sector -- cross-sector rows
         # (the d² lattice vs the 3d²4s² spine) have no common zero
         d_e = (r["e_ground"] - ref["e_ground"]
-               if ref and addr.split("_")[2] == ruler_sec else float("nan"))
+               if ref and CellKey.from_address(addr).sector == ruler_sec
+               else float("nan"))
         purity = max(r["window"].values())
         aniso = r.get("core_anisotropy")
         flag = ""

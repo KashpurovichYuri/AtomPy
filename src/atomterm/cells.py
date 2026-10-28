@@ -44,11 +44,12 @@ different addresses.
 
 The store contract (one chkfile per cell,
 ``elements/<Atom>/rungs/<address>.chk``): everything ``load_cell`` needs
-under ``atomterm/<address>/`` -- ``energies``, ``ci``, ``core_energy``,
-``mo_coeff`` (SA runs: per-root energies under ``<address>_roots``).
-The PySCF ``mcscf`` group is NOT load-bearing: this PySCF's CASCI
-kernel never dumps a chkfile, so the cell layer owns a complete,
-method-uniform store.
+under ``atomterm/<address>/`` -- ``energies``, ``ci_stack`` (a plain
+``(nroots, ndet)`` array; PySCF's object-array serialization does not
+round-trip for 2-D roots), ``core_energy``, ``mo_coeff`` (SA runs:
+per-root energies under ``<address>_roots``). The PySCF ``mcscf``
+group is NOT load-bearing: this PySCF's CASCI kernel never dumps a
+chkfile, so the cell layer owns a complete, method-uniform store.
 
 The CI ordering bridge: PySCF FCI vectors are indexed by
 ``(alpha-string address, beta-string address)`` with strings in
@@ -164,6 +165,12 @@ class CellKey:
                     "the radial mask rotates member-labeled AO slots; it "
                     "needs start='ao' (MO and NO columns carry no member "
                     "labels)")
+        if self.start == "mo" and self.substrate == "pur":
+            raise ValueError(
+                "the mo start carries its own canonical core (the "
+                "substrate axis is moot for it); a pur-core MO start "
+                "would need the window-projection machinery -- not "
+                "built")
         # the pur-fold degeneracy rule: on the purified substrate the
         # core density is exactly m-scalar, so raw == avg (fact 20) --
         # canonicalize instead of storing two addresses for one cell;
@@ -435,8 +442,9 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
             mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
                                     act_idx, c_core=c_pur)
     else:  # start == "mo": PySCF's default start (canonical MOs,
-        # canonical window); the substrate axis is moot -- the start
-        # carries its own core
+        # canonical window) -- the start carries its own canonical core,
+        # so the substrate axis cannot enter the run (the key rejects
+        # mo x pur for exactly this reason)
         mo_full = mf.mo_coeff
     if key.mask == "frozen":
         mask = core_virtual_only_mask

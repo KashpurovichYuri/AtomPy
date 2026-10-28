@@ -95,19 +95,15 @@ AUDIT = {
     "ti_3d4s_3-1_sa_ao_frozen_pur_avg": "exact",
     # ---- the grid completion (this draw) ----
     "ti_3d4s_3-1_casscf_ao_-_pur_avg": "escape",
-    "ti_3d4s_3-1_casscf_mo_-_pur_avg": "escape (same minimum)",
     "ti_3d4sno2_3-1_casscf_no_-_pol_avg": "escape (same minimum)",
     "ti_3d4sno2_3-1_casscf_no_-_pur_avg": "escape (same minimum)",
     "ti_3d4s_3-1_casscf_mo_frozen_pol_avg": "MO start was not closed",
-    "ti_3d4s_3-1_casscf_mo_frozen_pur_avg": "MO start was not closed",
     "ti_3d4sno2_3-1_casscf_no_frozen_pol_avg": "baseline",
     "ti_3d4sno2_3-1_casscf_no_frozen_pur_avg": "exact (pur)",
-    "ti_3d4s_3-1_sa_mo_-_pur_avg": "escape",
     "ti_3d4sno2_3-1_sa_no_-_pol_avg": "swap",
     "ti_3d4sno2_3-1_sa_no_-_pur_avg": "swap (pur)",
     "ti_3d4s_3-1_sa_ao_frozen_pol_avg": "baseline",
     "ti_3d4s_3-1_sa_mo_frozen_pol_avg": "MO start was not closed",
-    "ti_3d4s_3-1_sa_mo_frozen_pur_avg": "MO start was not closed",
     "ti_3d4sno2_3-1_sa_no_frozen_pol_avg": "baseline",
     "ti_3d4sno2_3-1_sa_no_frozen_pur_avg": "exact",
 }
@@ -197,8 +193,9 @@ def render_window(atom, window, no_label, cells, audit, anchor) -> list[str]:
     # are explicit on each group head (mask x substrate, the AOs row)
     # and blank-inherited after. RADIAL rows exist only for start=ao
     # (the mask rotates member-labeled AO slots; MO/NO columns carry
-    # none) and NOs rows appear everywhere else -- each declared cell
-    # is executable through the seam.
+    # none), and MO x pur is VOID at the key (the MO start carries its
+    # own canonical core; the substrate axis cannot enter the run) --
+    # every declared cell is executable through the seam.
     for method, m in (("CASSCF", "casscf"), ("SA-CASSCF", "sa")):
         first = True
         for mask, mask_name in ((None, "free"), ("radial", "radial"),
@@ -207,6 +204,8 @@ def render_window(atom, window, no_label, cells, audit, anchor) -> list[str]:
                 sub_name = "polarized" if sub == "pol" else "purified"
                 starts = ("ao", "mo", "no") if mask != "radial" else ("ao",)
                 for st in starts:
+                    if st == "mo" and sub == "pur":
+                        continue  # VOID at the key (substrate moot for MO)
                     st_name = {"ao": f"AO {{{window}}}",
                                "mo": "PySCF MO",
                                "no": "NO"}[st]
@@ -258,10 +257,11 @@ def main(atom: str) -> None:
     span = new[new.index("## CAS(4,6)"):new.index("## Open questions")]
     assert "C E, Eh" not in span and "S E, Eh" not in span
     assert not re.search(r"\d\*", span)          # no starred gauge numbers
-    # row count per window: 4 CASCI folds + per method (free 2 substrates
-    # x 3 starts + radial 2 x 1 (ao only) + frozen 2 x 3) + the virtmix
+    # row count per window: 4 CASCI folds + per method (free: pol x 3
+    # starts + pur x {ao,no}; radial: ao only x 2 substrates; frozen:
+    # same shape as free -- MO x pur is void at the key) + the virtmix
     # diagnostic once (CASSCF free pol)
-    per_method = 2 * 3 + 2 * 1 + 2 * 3
+    per_method = 3 + 2 + 2 + 5
     expect = len(CASCI_FOLDS) + 2 * per_method + 1
     for chunk in span.split("\n### ")[1:]:
         chunk = chunk.split("\n#")[0]
