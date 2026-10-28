@@ -26,6 +26,7 @@ complete isolation.
 from __future__ import annotations
 
 from itertools import combinations
+from typing import NamedTuple
 import bisect
 
 import numpy as np
@@ -66,14 +67,14 @@ def determinant_basis(norb: int, na: int, nb: int) -> list[tuple[int, ...]]:
 
 def _pop_sign(occ: list[int], orb: int) -> int:
     """Sign of annihilating ``orb`` from the ordered occupation
-    ``occ``: (-1)^(its position)."""
+    ``occ``: ``(-1)^(its position)``."""
     i = occ.index(orb)
     return -1 if i % 2 else 1
 
 
 def _insert_sign(occ: list[int], orb: int) -> int:
     """Sign of creating ``orb`` into the ordered occupation ``occ``:
-    (-1)^(# orbitals before it)."""
+    ``(-1)^(# orbitals before it)``."""
     n_before = sum(1 for o in occ if o < orb)
     return -1 if n_before % 2 else 1
 
@@ -96,21 +97,177 @@ def _transition_sign(occ_j: list[int], ann: list[int], cre: list[int]) -> int:
     return sign
 
 
+# ------------------------------------------- the shared pair classification
+
+class _Pairs(NamedTuple):
+    """One memory-bounded chunk of classified determinant pairs -- the
+    machinery both rule-set evaluators consume."""
+
+    ii: np.ndarray        # (P,) row determinants (absolute index)
+    jj: np.ndarray        # (P,) column determinants
+    m1: np.ndarray        # (P,) k == 1 mask
+    ann: np.ndarray       # (P, 2) annihilated orbitals, ascending
+    cre: np.ndarray       # (P, 2) created orbitals, ascending
+    sign: np.ndarray      # (P,) closed-form transition signs
+    occ_i: np.ndarray     # (P, n2) occupation rows of I
+    occ_j: np.ndarray     # (P, n2) occupation rows of J
+
+
+def _pair_chunks(occ: np.ndarray, cum: np.ndarray, nelec: int):
+    """Yield the determinant pairs a two-body operator connects, in
+    memory-bounded chunks: every pair with excitation rank ``k <= 2``
+    (beyond double excitations the elements vanish), with per-pair
+    excitation indices and closed-form transition signs.
+    """
+    n, n2 = occ.shape
+    chunk = max(1, min(n, int(2e7) // (n * n2)))
+    for lo in range(0, n, chunk):
+        hi = min(n, lo + chunk)
+        occ_i = occ[lo:hi]
+        k = nelec - (occ_i[:, None, :] & occ[None, :, :]).sum(-1)
+        rows, cols = np.nonzero((k == 1) | (k == 2))
+        if rows.size == 0:
+            continue
+        ii = rows + lo
+        jj = cols
+        occ_j_c = occ[jj]
+        occ_i_c = occ[ii]
+        ann_mask = occ_j_c & ~occ_i_c
+        cre_mask = occ_i_c & ~occ_j_c
+        k_c = k[rows, cols]
+
+        # per-pair excitation indices, ascending within each set;
+        # _pair_slot: 0 = smaller member, 1 = larger (k=1 leaves the
+        # second slot as a dummy)
+        ann_r, ann_c = np.nonzero(ann_mask)
+        cre_r, cre_c = np.nonzero(cre_mask)
+        ann = np.zeros((ii.size, 2), dtype=np.int64)
+        cre = np.zeros((ii.size, 2), dtype=np.int64)
+        ann[ann_r, _pair_slot(ann_r, ann_c)] = ann_c
+        cre[cre_r, _pair_slot(cre_r, cre_c)] = cre_c
+
+        sign = np.ones(ii.size)
+        m1 = k_c == 1
+        if m1.any():
+            sign[m1] = _sign_single(cum[jj][m1], ann[m1, 0], cre[m1, 0])
+        m2 = ~m1
+        if m2.any():
+            sign[m2] = _sign_double(cum[jj][m2], ann[m2, 0], ann[m2, 1],
+                                    cre[m2, 0], cre[m2, 1])
+
+        yield _Pairs(ii, jj, m1, ann, cre, sign, occ_i_c, occ_j_c)
+
+
+# ------------------------------------------------------- the two rule sets
+
+def _scatter_one_body(mat: np.ndarray, pairs: _Pairs, h: np.ndarray) -> None:
+    """The one-body off-diagonal rule: on k=1 pairs,
+    ``<I| h[a, i] a+_a a_i |J>`` -- scattered into ``mat`` in place."""
+    if not pairs.m1.any():
+        return
+    val = h[pairs.cre[pairs.m1, 0], pairs.ann[pairs.m1, 0]]
+    nz = val != 0
+    mat[pairs.ii[pairs.m1][nz], pairs.jj[pairs.m1][nz]] += (
+        pairs.sign[pairs.m1][nz] * val[nz])
+
+
+def _scatter_two_body(mat: np.ndarray, pairs: _Pairs,
+                      g: np.ndarray) -> None:
+    """The two-body off-diagonal rules, scattered into ``mat`` in
+    place (chemists' ``G`` throughout):
+
+    * k=1: the contraction over the orbitals common to I and J (the
+      four-term antisymmetrized gather);
+    * k=2: the direct-exchange pair value.
+    """
+    n2 = pairs.occ_i.shape[1]
+    orb = np.arange(n2)
+    if pairs.m1.any():
+        i1, a1 = pairs.ann[pairs.m1, 0], pairs.cre[pairs.m1, 0]
+        common = pairs.occ_j[pairs.m1] & pairs.occ_i[pairs.m1]
+        tb = 0.5 * (
+            g[a1[:, None], orb[None, :], i1[:, None], orb[None, :]]
+            + g[orb[None, :], a1[:, None], orb[None, :], i1[:, None]]
+            - g[orb[None, :], a1[:, None], i1[:, None], orb[None, :]]
+            - g[a1[:, None], orb[None, :], orb[None, :], i1[:, None]]
+        )
+        val = (tb * common).sum(axis=1)
+        nz = val != 0
+        mat[pairs.ii[pairs.m1][nz], pairs.jj[pairs.m1][nz]] += (
+            pairs.sign[pairs.m1][nz] * val[nz])
+    m2 = ~pairs.m1
+    if m2.any():
+        i2, j2 = pairs.ann[m2, 0], pairs.ann[m2, 1]
+        a2, b2 = pairs.cre[m2, 0], pairs.cre[m2, 1]
+        val = 0.5 * (
+            g[a2, b2, i2, j2] + g[b2, a2, j2, i2]
+            - g[b2, a2, i2, j2] - g[a2, b2, j2, i2]
+        )
+        nz = val != 0
+        mat[pairs.ii[m2][nz], pairs.jj[m2][nz]] += pairs.sign[m2][nz] * val[nz]
+
+
+def _diag_one_body(dets, occ, h, dtype) -> np.ndarray:
+    """Diagonal one-body elements: ``Sum_p <p|h|p>`` per determinant."""
+    return occ @ np.diag(h).astype(dtype)
+
+
+def _diag_two_body(dets, g, dtype) -> np.ndarray:
+    """Diagonal two-body elements: the antisymmetrized sum over all
+    occupied pairs ``1/2 (G[pqpq] + G[qpqp] - G[qppq] - G[pqqp])``."""
+    nelec = len(dets[0])
+    if nelec < 2:
+        return np.zeros(len(dets), dtype=dtype)
+    occ_idx = np.array([list(d) for d in dets])          # (n, nelec)
+    comb = np.array(list(combinations(range(nelec), 2)))
+    p = occ_idx[:, comb[:, 0]]                            # (n, nc)
+    q = occ_idx[:, comb[:, 1]]
+    return 0.5 * (
+        g[p, q, p, q] + g[q, p, q, p]
+        - g[q, p, p, q] - g[p, q, q, p]
+    ).sum(axis=1)
+
+
+# ----------------------------------------------------------- the public API
+
 def one_body_matrix(
     dets: list[tuple[int, ...]], one_body: np.ndarray
 ) -> np.ndarray:
-    """The ``O1 = Sum_pq h[p,q] a+_p a_q`` matrix over ``dets``
-    (conventions and dtype: :func:`slater_condon_matrix`)."""
-    return slater_condon_matrix(dets, one_body=one_body)
+    """The matrix of ``O1 = Sum_pq h[p,q] a+_p a_q`` over ``dets`` --
+    the one-body rule set alone (the name-twin of
+    :func:`atomterm.secondquant.one_body_matrix`).
+
+    Parameters
+    ----------
+    dets : determinant basis (see :func:`determinant_basis`).
+    one_body : ``(2*norb, 2*norb)`` matrix ``h[p, q]``.
+
+    Returns
+    -------
+    ``(len(dets), len(dets))`` matrix ``M[I, J] = <I|O1|J>``; dtype
+    follows the input (real ``h`` stays real).
+    """
+    return _build(dets, one_body, None)
 
 
 def two_body_matrix(
     dets: list[tuple[int, ...]], two_body: np.ndarray
 ) -> np.ndarray:
-    """The ``O2 = 1/2 Sum_pqrs G[p,q,r,s] a+_p a+_q a_s a_r`` matrix
-    over ``dets``, ``G`` in the module's chemist notation
-    (conventions and dtype: :func:`slater_condon_matrix`)."""
-    return slater_condon_matrix(dets, two_body=two_body)
+    """The matrix of ``O2 = 1/2 Sum_pqrs G[p,q,r,s] a+_p a+_q a_s a_r``
+    over ``dets``, ``G`` in the module's chemist notation -- the
+    two-body rule set alone (the name-twin of
+    :func:`atomterm.secondquant.two_body_matrix`).
+
+    Parameters
+    ----------
+    dets : determinant basis (see :func:`determinant_basis`).
+    two_body : ``(2*norb,)*4`` chemist-notation integrals.
+
+    Returns
+    -------
+    ``(len(dets), len(dets))`` matrix; dtype follows the input.
+    """
+    return _build(dets, None, two_body)
 
 
 def slater_condon_matrix(
@@ -118,9 +275,10 @@ def slater_condon_matrix(
     one_body: np.ndarray | None = None,
     two_body: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Full many-electron matrix of ``Sum_i h(i) + Sum_{i<j} g(i, j)``
-    in ONE fused pass -- the production path (handles the 10^5-detector
-    sectors; :func:`_slater_condon_slow`, the O(ndet^2) Python loop it
+    """The full matrix of ``Sum_i h(i) + Sum_{i<j} g(i, j)`` over
+    ``dets``: both rule sets scattered over ONE pair classification --
+    the production path (the 10^5-detector sectors;
+    :func:`_slater_condon_slow`, the O(ndet^2) Python loop it
     replaced, stays as the elementwise reference pinned by tests).
 
     Parameters
@@ -132,17 +290,32 @@ def slater_condon_matrix(
     Returns
     -------
     ``(len(dets), len(dets))`` matrix, ``M[I, J] = <I|O|J>``; dtype
-    follows the inputs (real operators stay real -- a complex container
-    would double memory traffic and slow the eigendecomposition). For
-    the parts separately: :func:`one_body_matrix` /
-    :func:`two_body_matrix`.
+    follows the inputs (real operators stay real -- a complex
+    container would double memory traffic and slow the
+    eigendecomposition). For the parts separately:
+    :func:`one_body_matrix` / :func:`two_body_matrix`.
+
+    Raises
+    ------
+    ValueError
+        If both operator parts are ``None``.
     """
     if one_body is None and two_body is None:
         raise ValueError("at least one of one_body / two_body is required")
+    return _build(dets, one_body, two_body)
+
+
+def _build(
+    dets: list[tuple[int, ...]],
+    one_body: np.ndarray | None,
+    two_body: np.ndarray | None,
+) -> np.ndarray:
+    """Assemble the matrix: occupation table and prefix counts once,
+    diagonals from the active rule sets, then ONE chunked pair
+    classification consumed by both off-diagonal evaluators."""
     n = len(dets)
-    nelec = len(dets[0])
-    # the operator fixes the spin-orbital dimension: sectors without beta
-    # electrons never index the beta block (max det index < norb)
+    # the operator fixes the spin-orbital dimension: sectors without
+    # beta electrons never index the beta block (max det index < norb)
     n2 = (one_body if one_body is not None else two_body).shape[0]
     occ = np.zeros((n, n2), dtype=bool)
     for i, d in enumerate(dets):
@@ -154,88 +327,22 @@ def slater_condon_matrix(
                                         else two_body)) else float
     mat = np.zeros((n, n), dtype=dtype)
 
-    # ---- diagonal (k = 0) ------------------------------------------------
     diag = np.zeros(n, dtype=dtype)
     if one_body is not None:
-        diag += occ @ np.diag(one_body).astype(dtype)
+        diag += _diag_one_body(dets, occ, one_body, dtype)
     if two_body is not None:
-        if nelec >= 2:
-            occ_idx = np.array([list(d) for d in dets])      # (n, nelec)
-            comb = np.array(
-                list(combinations(range(nelec), 2)))          # (nc, 2)
-            p = occ_idx[:, comb[:, 0]]                        # (n, nc)
-            q = occ_idx[:, comb[:, 1]]
-            diag += 0.5 * (
-                two_body[p, q, p, q] + two_body[q, p, q, p]
-                - two_body[q, p, p, q] - two_body[p, q, q, p]
-            ).sum(axis=1)
+        diag += _diag_two_body(dets, two_body, dtype)
     mat[np.diag_indices(n)] = diag
 
-    # ---- off-diagonal (k = 1, 2), chunked over rows ----------------------
-    chunk = max(1, min(n, int(2e7) // (n * n2)))
-    orb = np.arange(n2)
-    for lo in range(0, n, chunk):
-        hi = min(n, lo + chunk)
-        occ_i = occ[lo:hi]                                    # (m, n2)
-        k = nelec - (occ_i[:, None, :] & occ[None, :, :]).sum(-1)
-        rows, cols = np.nonzero((k == 1) | (k == 2))
-        if rows.size == 0:
-            continue
-        ii = rows + lo
-        jj = cols
-        occ_j_c = occ[jj]                                     # (P, n2)
-        occ_i_c = occ[ii]
-        ann_mask = occ_j_c & ~occ_i_c                         # k entries
-        cre_mask = occ_i_c & ~occ_j_c
-        k_c = k[rows, cols]
-
-        # per-pair excitation indices, ascending within each set
-        ann_r, ann_c = np.nonzero(ann_mask)
-        cre_r, cre_c = np.nonzero(cre_mask)
-        ann = np.zeros((ii.size, 2), dtype=np.int64)
-        cre = np.zeros((ii.size, 2), dtype=np.int64)
-        ann[ann_r, _pair_slot(ann_r, ann_c)] = ann_c
-        cre[cre_r, _pair_slot(cre_r, cre_c)] = cre_c
-        # _pair_slot: 0 for the first (smaller) member of the excitation
-        # set, 1 for the second; k=1 pairs use only slot 0 (slot 1 stays
-        # 0 = dummy)
-
-        sign = np.ones(ii.size)
-        pref_j = cum[jj]                                      # (P, n2)
-        m1 = k_c == 1
-        if m1.any():
-            sign[m1] = _sign_single(pref_j[m1], ann[m1, 0], cre[m1, 0])
-        m2 = ~m1
-        if m2.any():
-            sign[m2] = _sign_double(pref_j[m2], ann[m2, 0], ann[m2, 1],
-                                    cre[m2, 0], cre[m2, 1])
-
-        val = np.zeros(ii.size, dtype=dtype)
+    for pairs in _pair_chunks(occ, cum, len(dets[0])):
         if one_body is not None:
-            val[m1] += one_body[cre[m1, 0], ann[m1, 0]]
+            _scatter_one_body(mat, pairs, one_body)
         if two_body is not None:
-            if m1.any():
-                i1, a1 = ann[m1, 0], cre[m1, 0]
-                common = occ_j_c[m1] & occ_i_c[m1]            # (P1, n2)
-                g = two_body                                 # shorthand
-                tb = 0.5 * (
-                    g[a1[:, None], orb[None, :], i1[:, None], orb[None, :]]
-                    + g[orb[None, :], a1[:, None], orb[None, :], i1[:, None]]
-                    - g[orb[None, :], a1[:, None], i1[:, None], orb[None, :]]
-                    - g[a1[:, None], orb[None, :], orb[None, :], i1[:, None]]
-                )
-                val[m1] += (tb * common).sum(axis=1)
-            if m2.any():
-                i2, j2 = ann[m2, 0], ann[m2, 1]
-                a2, b2 = cre[m2, 0], cre[m2, 1]
-                val[m2] += 0.5 * (
-                    two_body[a2, b2, i2, j2] + two_body[b2, a2, j2, i2]
-                    - two_body[b2, a2, i2, j2] - two_body[a2, b2, j2, i2]
-                )
-        nz = val != 0
-        mat[ii[nz], jj[nz]] = sign[nz] * val[nz]
+            _scatter_two_body(mat, pairs, two_body)
     return mat
 
+
+# ------------------------------------------------------ the sign machinery
 
 def _sign_single(pj: np.ndarray, i: np.ndarray, a: np.ndarray) -> np.ndarray:
     """Closed-form k=1 transition sign (annihilate ``i``, create
@@ -293,8 +400,8 @@ def _slater_condon_slow(
     two_body: np.ndarray | None = None,
 ) -> np.ndarray:
     """The original O(ndet^2) Python loop -- kept as the elementwise
-    reference for the vectorized :func:`slater_condon_matrix`
-    (pinned by tests; sign engine: :func:`_transition_sign`)."""
+    reference for the vectorized path (pinned by tests; sign engine:
+    :func:`_transition_sign`)."""
     ndet = len(dets)
     mat = np.zeros((ndet, ndet), dtype=complex)
 
