@@ -1,15 +1,16 @@
-"""L-multiplicity (term-symbol) analysis of many-electron states.
+"""Term-symbol analysis of many-electron states.
 
-Input: full matrices in the determinant basis (atomterm.operators) for the
-Hamiltonian H, Lz, L^2, S^2. The states are the eigenstates of H; each is
-classified by
+Purpose: classify the eigenstates of a determinant-basis Hamiltonian
+by their exact angular-momentum and spin content -- each state gets
+L, S and the term symbol ``^(2S+1)L`` from
+``<L^2> = L(L+1)``, ``<S^2> = S(S+1)`` -- and quantify how exactly
+the CI space preserves rotational symmetry.
 
-    <L^2> = L(L+1),  <S^2> = S(S+1)  =>  term symbol  ^(2S+1)L
-
-and the Lz eigenvalue spectrum reveals the M_L content of the space.
-Symmetry preservation is quantified by the Frobenius norms of the
-commutators [H, Lz] and [H, L^2]: exact rotational invariance means both
-vanish (up to numerics / basis-set closure of the active space).
+Inputs are the full matrices of :mod:`atomterm.operators` (H, Lz,
+L^2, S^2; optionally Sz and Lz^2). The Lz eigenvalue spectrum reports
+the M_L content of the space. Exact rotational invariance means the
+Frobenius norms of the commutators [H, Lz] and [H, L^2] vanish (up
+to numerics / basis-set closure of the active space).
 """
 
 from __future__ import annotations
@@ -19,12 +20,14 @@ import json
 
 import numpy as np
 
-from atomterm.detbasis import commutator, frobenius_norm
+from atomterm.detbasis import commutator, determinant_basis, frobenius_norm
+from atomterm.windows import lm_sectors, shell_weights
 
 __all__ = [
     "quantum_number",
     "spin_quantum_number",
     "term_symbol",
+    "StateSummary",
     "AnalysisResult",
     "analyze",
     "configuration_summary",
@@ -36,6 +39,9 @@ _L_LETTERS = "SPDFGHIKLMNOQRTUVWXYZ"  # J skipped, and the second P and
 # second S skipped, by spectroscopic convention (S P D F G H I K L M N
 # O Q R T ...); length 21 covers L <= 20: f^3 d^1 reaches L = 8, f^4
 # terms reach L = 12 (Q) -- both manifolds live in the uranium window
+
+
+# --------------------------------------------------------- the term labels
 
 
 def quantum_number(observed: float) -> int:
@@ -66,6 +72,9 @@ def term_symbol(s2: float, l2: float) -> str:
     return f"{int(round(2 * s + 1))}{_L_LETTERS[l]}"
 
 
+# -------------------------------------------------------------- the records
+
+
 @dataclass
 class StateSummary:
     index: int
@@ -92,6 +101,9 @@ class AnalysisResult:
     sz_spectrum: list[float] | None = None  # Sz = M_S*1 exactly: constant
 
 
+# -------------------------------------------------------------- the analysis
+
+
 def _expectation(evecs: np.ndarray, op: np.ndarray) -> np.ndarray:
     """Diagonal of evecs^dag op evecs (i.e. <state|op|state>)."""
     mat = evecs.conj().T @ op @ evecs
@@ -105,6 +117,8 @@ def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, secto
     ``sz`` (optional): the delivered Ŝz matrix. Its spectrum is the
     sector's M_S, exactly -- reported for the record, certifying nothing
     (Ĥ is spin-free, so [Ĥ, Ŝz] ≡ 0 identically).
+    ``lz2`` (optional): the delivered Lz^2 matrix; its per-root
+    expectation is recorded on every state (StateSummary.lz2).
     """
     if frobenius_norm(h.imag) > 1e-9 * max(frobenius_norm(h.real), 1.0):
         raise ValueError("Hamiltonian matrix should be real")
@@ -147,7 +161,12 @@ def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, secto
     )
 
 
+# --------------------------------------------------------------- the reports
+
+
 def format_report(res: AnalysisResult, title: str) -> str:
+    """Human-readable report: the state table, the M_L / M_S content,
+    and the two commutator norms (absolute and relative)."""
     lines = [title, "-" * len(title)]
     lines.append(f"sector: {res.sector}   ({res.n_det} determinants)")
     lines.append("")
@@ -178,9 +197,13 @@ def format_report(res: AnalysisResult, title: str) -> str:
 
 
 def save_report(res: AnalysisResult, path: str) -> None:
+    """The full AnalysisResult as JSON (asdict dump)."""
     payload = asdict(res)
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(payload, fh, indent=2)
+
+
+# ------------------------------------------------- the configuration readers
 
 
 def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
@@ -189,7 +212,7 @@ def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
 
     Method-agnostic: works for ANY window and CI vectors. Each window
     column's l-character comes from the S-metric projection
-    (:func:`atomterm.drivers.shell_weights`); a determinant's configuration
+    (:func:`atomterm.windows.shell_weights`); a determinant's configuration
     is the l-mass of its occupied columns; each root is labeled by its
     ``top`` dominant determinants.
 
@@ -199,10 +222,13 @@ def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
     label then reports the dominant character (enough to tell a 3p^2 state
     from an escaped 3s^2 one). Returns one string per root, e.g.
     ``"p^2.00 (|c|=0.98)"``.
+
+    ``ci_list`` entries are PySCF-order CI vectors (fact 24: the FCI
+    string order differs from detbasis' from norb >= 4 -- the ordering
+    bridge runs inside).
     """
-    from atomterm.windows import shell_weights
-    from atomterm.detbasis import determinant_basis
-    from atomterm.cells import ci_in_detbasis_order  # lazy: cells -> stages -> analysis
+    from atomterm.cells import ci_in_detbasis_order  # lazy on purpose:
+    # cells -> stages -> analysis is a module-level cycle
 
     names, wl = shell_weights(mol, c_win, s)  # (ncas, n_l)
     norb = c_win.shape[1]
@@ -250,11 +276,9 @@ def shell_occupations(mol, s, c_win: np.ndarray, ci_ground, na: int,
     ``cas.ci`` / cell-store convention) -- mapped through the ordering
     bridge (fact 24). Returns ``{'s': .., 'p': .., ...}``.
     """
-    import re
-
-    from atomterm.detbasis import determinant_basis
     from atomterm.natural import ci_rdm1
-    from atomterm.cells import ci_in_detbasis_order  # lazy, as above
+    from atomterm.cells import ci_in_detbasis_order  # lazy: the
+    # cells -> stages -> analysis module cycle
 
     norb = c_win.shape[1]
     dets = determinant_basis(norb, na, nb)
@@ -262,9 +286,14 @@ def shell_occupations(mol, s, c_win: np.ndarray, ci_ground, na: int,
     gamma = ci_rdm1(dets, v, norb)
     g_ao = c_win @ gamma @ c_win.conj().T          # the AO-basis 1-RDM
     ds = g_ao @ s                                   # Mulliken rows
+    # l per AO row from the shell walker (lm_sectors) -- NO label
+    # parsing (fact 1: labels carry member suffixes; the walker is the
+    # fused-shell-honest source)
+    l_of_row = {row: l
+                for (l, m), rows in lm_sectors(mol).items() for row in rows}
+    letters = "spdfgh"
     out: dict[str, float] = {}
-    for i, lbl in enumerate(line.split()[-1] for line in mol.ao_labels()):
-        m = re.match(r"\d+([spdfgh])", lbl)
-        key = m.group(1) if m else lbl
+    for i in range(mol.nao_nr()):
+        key = letters[l_of_row[i]]
         out[key] = out.get(key, 0.0) + float(np.real(ds[i, i]))
     return out

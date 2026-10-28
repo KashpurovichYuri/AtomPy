@@ -1,6 +1,7 @@
 """Tests of atomterm.analysis: term-symbol helpers and configuration labels."""
 
 import numpy as np
+import pytest
 
 from atomterm.analysis import (
     configuration_summary,
@@ -8,10 +9,9 @@ from atomterm.analysis import (
     spin_quantum_number,
     term_symbol,
 )
-
-import pytest
-pytestmark = pytest.mark.fast
 from atomterm.detbasis import determinant_basis
+
+pytestmark = pytest.mark.fast
 
 
 def test_quantum_number_round_trips_measured_momenta():
@@ -84,6 +84,39 @@ def test_configuration_summary_reads_shell_configurations(carbon):
     c_pol[:, 0] = 0.9 * c_win[:, 0] + 0.3 * mf.mo_coeff[:, 1]  # 2s admixture
     labels = configuration_summary(mol, s, [ci], c_pol, na=2, nb=0)
     assert "s^" in labels[0]
+
+
+def test_configuration_summary_maps_pyscf_ci_order(carbon):
+    """The ordering bridge inside configuration_summary, on the smallest
+    sector where the orders differ (norb=4, na=2: PySCF's ascending bit
+    strings give (0,1),(0,2),(1,2),(0,3),(1,3),(2,3); detbasis is
+    lexicographic (0,1),(0,2),(0,3),...). A vector on PySCF address 3 =
+    detbasis (0,3) = the 2s+2pz determinant must label s^1 p^1 -- without
+    the bridge it would read detbasis index 3 = (1,2) = p^2."""
+    _, mol, mf, act_idx = carbon
+    from atomterm.windows import select_valence_ao
+
+    sp = select_valence_ao(mol, ["2s", "2p"])
+    c_sp = np.eye(mol.nao_nr())[:, sp]
+    dets = determinant_basis(4, 2, 0)
+    assert len(dets) == 6
+
+    ci = np.zeros(6)
+    ci[3] = 1.0                                   # PYSCF address 3
+    labels = configuration_summary(mol, mf.get_ovlp(), [ci], c_sp, 2, 0)
+    assert "s^1.00" in labels[0] and "p^1.00" in labels[0]
+
+
+def test_analyze_rejects_a_complex_hamiltonian():
+    """The reality guard: a Hamiltonian with non-noise imaginary part is
+    a construction error upstream, not physics to diagonalize."""
+    import pytest
+    from atomterm.analysis import analyze
+
+    n = 4
+    h = np.eye(n) + 1e-3j * np.ones((n, n))
+    with pytest.raises(ValueError, match="should be real"):
+        analyze(h, np.eye(n), np.eye(n), np.eye(n), "test")
 
 
 def test_report_carries_the_sz_spectrum_line():

@@ -49,7 +49,7 @@ mode restrictions lift). Mechanical enforcement: the global
 | `src/atomterm/core.py` | `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
 | `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and rungs share — callers only render (report text / flat json payload) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
-| `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `shell_occupations`, `format_report` | term symbols from `<L^2>`, `<S^2>`; commutator norms; approximate configuration labels per root |
+| `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `shell_occupations`, `format_report`, `save_report` | term symbols from `<L^2>`, `<S^2>` (half-integer S grid; L-letter table to L=20); commutator norms; configuration labels per root — PySCF-order CI in (the fact-24 bridge runs inside), l-grouping via `lm_sectors` (no label parsing) |
 | `src/atomterm/cases.py` | `CaseSpec`, `CAMPAIGN`, `run_case`, `run_atom`, `run_carbon` | the DECLARED per-atom campaign (the intent manifest): `CaseSpec` fixes atom/reference-data/window/sectors/want before anything runs — `planned_windows` declares not-yet-run windows, and the gated reference specs (Ti/Sc character-forced + basin gate) are `CAMPAIGN` data (the ONE declaration: the cell grid, regen, and the renderers all derive from it — regen_cells' REFS/CASES dicts are retired); `run_case(spec)` executes; `run_atom` = the staged implementation; `pipeline.py` remains a compat shim |
 | `src/atomterm/treatments.py` | `Rung`, `run_rungs`, `run_carbon_rungs` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); `purified=True` appends the `*_pur` rungs (same treatments on the exactly-closed purified core substrate, fact 20 — incl. `sa_relax_pur`, the exact-symmetry SA rung); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
 | `src/atomterm/study.py` | `StudySpec`, `plan_study`, `run_study`, `render` | the declared window × treatment study runner (ticket 20): declared product, per-cell budget knobs, per-cell failure quarantine, exact-eigh labels in full-diagnostics mode; writes `<out>/<tag>_study.json` + the generated insert between the study markers of `elements/<Atom>/TABLES.md`; `pipeline.py`/`drivers.py` are compat shims |
@@ -531,7 +531,8 @@ Lz-blind ±pair pattern — deterministic, no optimizer),
 `test_half_integer_spin_labels` (doublet
 labeling), `test_natural.py` (the γ-ladder claim: m-scalar densities yield whole m-sets, single roots do not; the 1-RDM pinned against a brute-force pair sum; real-AO certificates), `test_drivers.py` (build_full_mo block properties — the
 ticket-09 regression guard — shell_weights partition, frac-occ ordering),
-`test_analysis.py` (configuration labels), `test_system.py` (validation).
+`test_analysis.py` (configuration labels, the PySCF-order bridge pin,
+the complex-H guard), `test_system.py` (validation).
 
 ### The module walk
 
