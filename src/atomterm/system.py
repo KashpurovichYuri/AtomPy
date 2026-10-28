@@ -75,13 +75,17 @@ def sector_na_nb(nelec_act: int, spin: int) -> tuple[int, int]:
     Raises
     ------
     ValueError
-        If ``nelec_act - spin`` is odd: no such sector exists.
+        If ``nelec_act < spin`` or ``nelec_act - spin`` is odd: no
+        such sector exists.
 
     Examples
     --------
     >>> sector_na_nb(2, 2)
     (2, 0)
     """
+    if nelec_act < spin:
+        raise ValueError(
+            f"no Ms sector: spin {spin} exceeds {nelec_act} active electrons")
     if (nelec_act - spin) % 2:
         raise ValueError(
             f"no Ms sector: {nelec_act} active electrons with spin {spin}")
@@ -107,8 +111,13 @@ def ncore_of(nelectron: int, nelec_act: int) -> int:
     Raises
     ------
     ValueError
-        If the difference is odd: the core would not be closed.
+        If ``nelec_act > nelectron`` or the difference is odd: the
+        core would not be closed.
     """
+    if nelec_act > nelectron:
+        raise ValueError(
+            f"core not closed: {nelec_act} active electrons exceed "
+            f"{nelectron} total")
     if (nelectron - nelec_act) % 2:
         raise ValueError(
             f"core not closed: {nelectron} - {nelec_act} is odd")

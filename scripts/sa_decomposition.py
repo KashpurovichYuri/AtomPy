@@ -28,7 +28,7 @@ from pyscf import lib
 
 from atomterm.detbasis import commutator, frobenius_norm
 from atomterm.drivers import (
-    avas_window,
+    window_avas,
     build_full_mo,
     purified_core_orbitals,
     radial_basis,
@@ -178,7 +178,7 @@ def decompose(sym: str, workdir: Path) -> list[str]:
     # ---- AVAS row
     from atomterm.drivers import run_casci
 
-    mo_avas, ncas_a, _ = avas_window(mf, spec["avas_labels"], ncore)
+    mo_avas, ncas_a, _ = window_avas(mf, spec["avas_labels"], ncore)
     if ncas_a:
         w = mo_avas[:, ncore:ncore + ncas_a]
         cas = run_casci(mf, ncas_a, (na, nb), mo_avas,

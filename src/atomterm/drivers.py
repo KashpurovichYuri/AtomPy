@@ -20,7 +20,7 @@ from atomterm.reference import (  # noqa: F401
     run_rohf,
 )
 from atomterm.windows import (  # noqa: F401
-    avas_window,
+    window_avas,
     build_full_mo,
     complete_orthonormal,
     lm_sectors,
@@ -77,7 +77,7 @@ __all__ = [
     "run_casscf_core_relax",
     "run_casscf_virtual_mix",
     "run_casscf_pyscf_start",
-    "avas_window",
+    "window_avas",
     "span_overlap",
     "CASResult",
 ]

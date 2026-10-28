@@ -37,7 +37,7 @@ SELECTORS are the registry on top.
 SELECTORS maps kind names to constructors; :class:`Window` carries
 the construction result and materializes it through
 :meth:`Window.columns`; the bounded-slice contract (active columns at
-``[ncore : ncore + ncas]``) is owned here. AVAS (:func:`avas_window`)
+``[ncore : ncore + ncas]``) is owned here. AVAS (:func:`window_avas`)
 is the ecosystem cross-validator -- a candidate future kind.
 """
 
@@ -60,7 +60,7 @@ __all__ = [
     "primitive_chain",
     "select_primitives",
     "shell_weights",
-    "avas_window",
+    "window_avas",
     "span_overlap",
     "span_projector",
     "complete_orthonormal",
@@ -430,40 +430,6 @@ def select_primitives(mol, l: int, count: int | None = None,
 
 # ------------------------------------------------------------- the meters
 
-def avas_window(mf, labels: list[str], ncore: int, threshold: float = None):
-    """Window chosen by AVAS (pyscf.mcscf.avas, arXiv:1701.07862) --
-    the independent ecosystem selector, used to cross-validate the
-    shell windows (a candidate future Window kind).
-
-    Parameters
-    ----------
-    mf : converged SCF.
-    labels : target AO span, pyscf label list, e.g.
-        ``["Sc 3d", "Sc 4s"]``.
-    ncore : number of core orbitals.
-    threshold : projected-overlap cutoff (AVAS default 0.2).
-
-    Returns
-    -------
-    ``(mo_full, ncas, nelecas)`` with the active span at
-    ``[ncore : ncore+ncas]`` (ready for run_casci; electron
-    bookkeeping stays ours -- pass the sector you want).
-
-    Notes
-    -----
-    A full-shell-dimension AVAS window IS the shell span exactly --
-    closed by construction; a threshold that drops members of an
-    m-set gives a rotation-DEFECTIVE span (the negative-control case
-    for the closure meters).
-    """
-    from pyscf.mcscf import avas
-
-    kw = {} if threshold is None else {"threshold": threshold}
-    ncas, nelecas, mo = avas.avas(mf, labels, ncore=ncore, **kw)
-    nelecas = np.atleast_1d(np.asarray(nelecas)).ravel()
-    return mo, int(ncas), nelecas
-
-
 def span_overlap(c_a: np.ndarray, c_b: np.ndarray, s: np.ndarray) -> float:
     """Smallest principal cosine between two spans in the S metric --
     the identity-change gauge of the rungs decomposition: 1.0 exactly
@@ -646,6 +612,11 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
     reverted: the excluded band destabilizes PySCF's SA kernel). A
     labeled column whose sector weight collapsed is demoted to
     unlabeled padding (rare; printed when it fires).
+
+    Examples
+    --------
+    >>> mo, lab = radial_basis(mf, core_idx, act_idx)
+    >>> mask = radial_mask(lab, ncore, ncas)
     """
     mol = mf.mol
     n = mf.mo_coeff.shape[0]
@@ -781,11 +752,9 @@ class Window(NamedTuple):
         Notes
         -----
         Both representations assemble through :func:`build_full_mo`'s
-        ONE treatment: AO rows arrive as the raw AO columns;
-        ``c_win`` columns are projected against the core span -- a
-        machine-precision no-op for columns constructed orthogonal to
-        that core (the NO windows), the honest re-orthogonalization
-        for columns that were not.
+        ONE treatment (its Notes own the details); ``c_win`` columns
+        constructed orthogonal to the core (the NO windows) pass
+        through the projection unchanged.
         """
         closed = closed if closed is not None else occupied_core_idx(mf, ncore)
         act = self.ao_rows if self.ao_rows is not None else self.c_win
@@ -861,6 +830,41 @@ def window_no(mol, mf, ncore: int, *, c_act, dets, vec, n_max: int,
     c_win, kept = select_no_window(c_no, occ, n_max, deg_tol)
     n_cols = sum(len(g) for g in kept)
     return Window(f"no {n_cols} cols", None, c_win, False)
+
+
+def window_avas(mf, labels: list[str], ncore: int, threshold: float = None):
+    """Window chosen by AVAS (pyscf.mcscf.avas, arXiv:1701.07862) --
+    the independent ecosystem selector, used to cross-validate the
+    shell windows (a candidate future registry kind).
+
+    Parameters
+    ----------
+    mf : converged SCF.
+    labels : target AO span, pyscf label list, e.g.
+        ``["Sc 3d", "Sc 4s"]``.
+    ncore : number of core orbitals.
+    threshold : projected-overlap cutoff (AVAS default 0.2).
+
+    Returns
+    -------
+    ``(mo_full, ncas, nelecas)`` with the active span at
+    ``[ncore : ncore+ncas]`` -- an interface stranger to the Window
+    constructors (raw pyscf output; electron bookkeeping stays ours
+    -- pass the sector you want).
+
+    Notes
+    -----
+    A full-shell-dimension AVAS window IS the shell span exactly --
+    closed by construction; a threshold that drops members of an
+    m-set gives a rotation-DEFECTIVE span (the negative-control case
+    for the closure meters).
+    """
+    from pyscf.mcscf import avas
+
+    kw = {} if threshold is None else {"threshold": threshold}
+    ncas, nelecas, mo = avas.avas(mf, labels, ncore=ncore, **kw)
+    nelecas = np.atleast_1d(np.asarray(nelecas)).ravel()
+    return mo, int(ncas), nelecas
 
 
 SELECTORS = {

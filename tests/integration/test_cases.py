@@ -1,5 +1,6 @@
 """Cases: the declared per-atom campaign and the new-atom launch
-(CaseSpec / run_case). Fast tier -- no SCF anywhere."""
+(CaseSpec / run_case). Integration tier: run_case executes SCF/CASCI
+stages."""
 
 import dataclasses
 

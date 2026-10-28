@@ -29,12 +29,16 @@ def test_sector_na_nb_primary_sector_and_parity_guard():
     assert sector_na_nb(3, 1) == (2, 1)
     with pytest.raises(ValueError, match="no Ms sector"):
         sector_na_nb(3, 2)  # 3 active electrons cannot carry 2S = 2
+    with pytest.raises(ValueError, match="exceeds"):
+        sector_na_nb(2, 4)  # spin above the electron count: nb < 0
 
 
 def test_ncore_of_closed_core_and_parity_guard():
     assert ncore_of(6, 2) == 2
     with pytest.raises(ValueError, match="core not closed"):
         ncore_of(9, 4)  # an odd electron cannot sit in a closed core
+    with pytest.raises(ValueError, match="exceed"):
+        ncore_of(2, 6)  # more active than total electrons: ncore < 0
 
 
 def test_atom_config_raw_basis_passthrough_and_tag():

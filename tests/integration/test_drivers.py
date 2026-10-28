@@ -426,7 +426,7 @@ def test_avas_cross_validates_the_shell_window(sc_rohf, carbon):
         assert sv.min() > 0.9, (labels, sv)
 
 
-def test_avas_window_reproduces_the_shell_cascade(sc_rohf, carbon, tmp_path):
+def test_window_avas_reproduces_the_shell_cascade(sc_rohf, carbon, tmp_path):
     """Fact 19 (AVAS verdict, VERIFIED not assumed): AVAS selects the same
     window SIZE and a span-CLOSE overlap, but the span is NOT the closed
     shell span -- and the two axes (overlap vs closure) are independent:
@@ -436,7 +436,7 @@ def test_avas_window_reproduces_the_shell_cascade(sc_rohf, carbon, tmp_path):
     inherited relaxation is exactly the fact-18 theta* radial mixing
     (E = -250.8 mEh vs raw shell = the full frozen-scan gain) with
     near-m-symmetry. Raw shell AOs: overlap 1, closure 1e-15."""
-    from atomterm.drivers import avas_window, span_overlap
+    from atomterm.drivers import window_avas, span_overlap
     from atomterm.operators import window_closure
     from atomterm.stages import stage_facts
 
@@ -450,7 +450,7 @@ def test_avas_window_reproduces_the_shell_cascade(sc_rohf, carbon, tmp_path):
         c_shell = eye[:, act_idx]
         s = mf.get_ovlp()
 
-        mo, ncas, _ = avas_window(mf, labels, ncore)
+        mo, ncas, _ = window_avas(mf, labels, ncore)
         assert ncas == len(act_idx), labels
         w = mo[:, ncore:ncore + ncas]
         sv = span_overlap(c_shell, w, s)
