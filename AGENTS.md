@@ -441,11 +441,18 @@ module.
 
 ## Tests
 
-`pytest` runs 150 tests in ~13 min (chkfile caching; ROHF computed once per
+`pytest` runs 160 tests in ~13 min (chkfile caching; ROHF computed once per
 session; the Ti rungs block is the slowest, ~7 min cold; the Sc rungs
-~2.5 min). Tiers: `pytest -m fast` = the pure-numpy/libcint tier (no SCF
-anywhere in the fixture chain, sub-second); `pytest -m slow` = the
-SCF-bearing chemistry. Run the full suite before committing changes to
+~2.5 min). Layout: `tests/unit/` = the seconds tier (pure numpy/libcint,
+synthetic substrates, and at most the small carbon ROHF fixture);
+`tests/integration/` = the campaign chemistry (TM references, CASSCF/SA,
+term tables); conftest is split the same way (shared root, campaign
+fixtures in `integration/conftest.py`). Tiers: `pytest -m fast` = the
+unit-tier selection; `pytest -m slow` = the SCF-bearing chemistry (the
+fast/slow MARKS are the machine axis, the directories the human one;
+a few fast-marked functions still live inside integration modules --
+split them out when their file is next touched). Run the full suite
+before committing changes to
 physics-bearing modules (drivers/operators/stages/treatments/scans); targeted
 files or `-m fast` are fine for everything else. Suite flakes: the rungs
 fixtures are session-scoped — ONE chaotic SCF draw per run can fail

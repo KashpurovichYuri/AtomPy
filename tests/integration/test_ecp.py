@@ -28,23 +28,6 @@ TI_REF = ReferenceSpec(
 # -- the fact-21a phenomenology, reversed: under ECP the DEFAULT is bad.
 
 
-@pytest.mark.fast
-def test_ecp_wiring_valence_bookkeeping():
-    """mol.nelectron is ECP-honest (valence only) and the sector geometry
-    derives from it: C/Si -> 4 e (ncore=1, the explicit ns^2), Sc -> 11 e
-    (ncore=4, the explicit 3s^2 3p^6)."""
-    for cfg, pat, nelec, ncore in [(C_ECP, "2p", 4, 1), (SI_ECP, "3p", 4, 1)]:
-        mol = build_mol(cfg)
-        assert mol.nelectron == nelec
-        assert not mol.cart
-        assert len(drivers.select_shell_ao(mol, pat)) == 3  # complete m-set
-        assert ncore_of(mol.nelectron, 2) == ncore
-        assert sector_na_nb(2, cfg.spin) == (2, 0)
-    mol = build_mol(SC_ECP)
-    assert mol.nelectron == 11  # Ne-core ECP: 3s 3p 3d 4s explicit
-    assert ncore_of(mol.nelectron, 3) == 4
-
-
 @pytest.mark.slow
 def test_ecp_c_multiplet_exact():
     """C/ccECP p^2: the textbook table at machine precision -- 3P x3

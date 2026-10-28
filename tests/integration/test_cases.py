@@ -8,6 +8,8 @@ import pytest
 from atomterm.cases import CaseSpec, run_case
 from atomterm.system import AtomConfig
 
+pytestmark = pytest.mark.slow
+
 
 def _spec(**kw):
     base = dict(symbol="C", basis={}, nelec_act=2, ncore=1,
