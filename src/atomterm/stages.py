@@ -22,7 +22,7 @@ import numpy as np
 
 from atomterm.analysis import (AnalysisResult, analyze, configuration_summary,
                                shell_occupations)
-from atomterm.drivers import shell_weights
+from atomterm.windows import shell_weights
 from atomterm.operators import build_operators, core_anisotropy, window_closure
 
 __all__ = ["StageFacts", "stage_facts"]

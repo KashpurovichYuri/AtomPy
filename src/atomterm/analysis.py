@@ -200,7 +200,7 @@ def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
     from an escaped 3s^2 one). Returns one string per root, e.g.
     ``"p^2.00 (|c|=0.98)"``.
     """
-    from atomterm.drivers import shell_weights
+    from atomterm.windows import shell_weights
     from atomterm.detbasis import determinant_basis
     from atomterm.cells import ci_in_detbasis_order  # lazy: cells -> stages -> analysis
 

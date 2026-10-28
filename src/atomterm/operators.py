@@ -149,7 +149,7 @@ def active_space_integrals(
     # the ROHF CLOSED BLOCK, not canonical order (which is junk on
     # near-degenerate uncontracted bases -- the trap occupied_core_idx
     # guards; callers with their own core (stages, pur rungs) override)
-    from atomterm.drivers import occupied_core_idx
+    from atomterm.windows import occupied_core_idx
 
     c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
               if c_core is None else c_core)
@@ -197,7 +197,7 @@ def parity_one_body(mol, c_act: np.ndarray) -> np.ndarray:
     rotated same-(l, m) combinations, false for optimized windows that
     mix l within a column -- parity labels live on l-pure window stages.
     """
-    from atomterm.drivers import lm_sectors
+    from atomterm.windows import lm_sectors
 
     sectors = lm_sectors(mol)
     s = mol.intor_symmetric("int1e_ovlp")
@@ -411,7 +411,7 @@ def core_anisotropy(mol, mf, ncore: int, c_core: np.ndarray = None) -> float:
     ``||rho - rho_sph||_F / ||rho_sph||_F`` -- the ``eps`` weight of the
     internal-field term in ``H_eff = H0 + eps*W`` (see
     :func:`active_space_integrals`)."""
-    from atomterm.drivers import occupied_core_idx
+    from atomterm.windows import occupied_core_idx
 
     c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
               if c_core is None else c_core)

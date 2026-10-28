@@ -643,3 +643,39 @@ frozen-mask wiring pin); one rotating-draw flake in the full
 run (test_ti_casci_exact_closure_and_term_table, isolation-
 green on rerun -- the session-draw class, AGENTS Tests; no
 band change, no observed value captured).
+Design round (same date, the codebase-design vocabulary over src/):
+
+1. FIXED NOW -- THE INWARD FACADE: operators/stages/analysis/treatments
+   imported through drivers -- their own compat facade -- keeping it
+   mid-cycle (drivers -> windows -> natural -> operators -> drivers,
+   held together by lazy imports). Owners import owners now
+   (windows/core/reference/casscf directly, lazy sites stay lazy);
+   drivers is OUTWARD-ONLY (scripts/tests), as its docstring always
+   claimed. Deletion test on the inward usage: the complexity never
+   lived in the facade -- pure misdirection.
+2. THE CAMPAIGN DECLARATION HAS TWO OWNERS (sharpens P4 + review
+   candidate 7): cases.CaseSpec declares the per-atom campaign;
+   regen_cells re-declares it (per-atom window/sector + REFS), and
+   the manifest grid is declared twice more (cell_set vs the
+   renderer's loops). The product declaration belongs behind ONE
+   interface -- a declared key-set exported beside spine_keys,
+   consuming CaseSpec's references; runners and renderers CONSUME
+   it. P4 = "one declaration, many renderers", not just "fold the
+   scripts".
+3. treatments.py FAILS THE DELETION TEST POST-P4, by design: once
+   cell keys carry the axis values, deleting it makes the rung loop
+   reappear as cells' key-set iteration (which already exists).
+   study.py likewise becomes a render contract over key-sets. Both
+   already the plan; the survey confirms the direction.
+4. windows.py carries the widest interface in src/ (22 defs): window
+   naming/selection vs substrate construction (radial_basis/
+   lm_sectors/lowdin) is a visible internal seam -- but no second
+   adapter justifies splitting today (one adapter = hypothetical
+   seam). DECLINED; revisit if a second consumer of the substrate
+   machinery appears (the pur-core MO builder would be one).
+5. cells.py is the wave's deep module done right: a 5-name external
+   seam, the store format hidden, axis resolution through owners,
+   and the test surface == the interface (run == direct, analyze ==
+   in-session, store round-trip). The budgets dict (five knob names)
+   is the one interface leak -- documented, acceptable. stages.py is
+   exemplary depth (2 public names).
