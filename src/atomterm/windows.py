@@ -329,49 +329,74 @@ def complete_orthonormal(v: np.ndarray, s: np.ndarray) -> np.ndarray:
     return np.hstack([v, c])
 
 
-def build_full_mo(mf, core_idx: list[int], act_idx: list[int], c_core: np.ndarray = None) -> np.ndarray:
-    """Full orthonormal MO matrix with chosen core and active columns placed
-    so that CASCI/CASSCF's window ``[ncore : ncore+ncas]`` selects the active
-    space.
+def build_full_mo(mf, core_idx: list[int], act, c_core: np.ndarray = None) -> np.ndarray:
+    """Full orthonormal MO matrix with chosen core and window columns
+    placed so that CASCI/CASSCF's window ``[ncore : ncore+ncas]`` selects
+    the active space.
+
+    ``act`` -- the WINDOW, in either of the two representations
+    :class:`Window` itself carries: AO-row indices (list[int]; the
+    m-complete shell selectors, the common case -- adapted to the raw AO
+    columns inside) or explicit S-orthonormal column vectors (nao, ncas):
+    a Window's ``c_win``, or the canonical MO columns of the mo start on
+    the pur substrate (``atomterm.cells.run_cell``). ONE treatment for
+    both -- project-renormalize-assemble -- never a sibling builder.
 
     Core columns are canonical SCF MOs by default; ``c_core`` supplies
-    alternative columns (e.g. fractional-occupation core). Active columns
-    are the RAW AO functions of the target shell -- exactly rotation-closed,
-    essential for the L-quantum-number analysis.
+    alternative columns -- chiefly the pur substrate
+    (:func:`atomterm.core.purified_core_orbitals`): the exactly
+    rotation-closed core span, E_l (x) the full m-set per l, built from
+    the per-l S-metric COLUMN Gram of the member-resolved radial blocks
+    (never the S-generalized form -- its eigenvectors come back
+    S^{-1}-warped; fact 20).
 
     Construction is block-safe in the AO metric S (fact 14): (1) the core
     block is Loewdin-orthonormalized within its own span (span- and
-    density-preserving); (2) the active columns are projected against the
-    core span and renormalized (raw valence AOs overlap the canonical
-    core's same-l members: <2p_MO|3p_AO> can reach ~0.3) -- a same-l,
-    m-diagonal correction, so window l-purity and m-set structure
-    survive; (3) the complement is appended through an exact projector --
-    the naive `I - P` filter is exact only for S-orthonormal v and
-    silently returns extra columns otherwise (observed: (nao, nao+6)
-    on Si).
+    density-preserving); (2) the window columns are projected against the
+    core span and renormalized. For raw AO columns the projection is the
+    same-l, m-diagonal correction of fact 14 (<2p_MO|3p_AO> reaches ~0.3;
+    l-purity and m-set structure survive); for MO columns it is the
+    honest re-orthogonalization on an alternative substrate -- canonical
+    columns are S-orthonormal against the core they were SOLVED in, not
+    against the pur one (the two spans differ by the core's m-asymmetric
+    tail content), and unprojected they would seed the fact-17-class
+    input defect into the run. For columns already orthogonal to the core
+    (the NO windows, constructed against it) the projection is a
+    machine-precision no-op. (3) The complement is appended through an
+    exact projector -- the naive `I - P` filter is exact only for
+    S-orthonormal v and silently returns extra columns otherwise
+    (observed: (nao, nao+6) on Si).
+
+    Honest expectation for MO columns on pur (fact 22d): the projection
+    cleans the CORE-side defect only -- the canonical window's own
+    m-delocalization survives, so the mo-start span never
+    rotation-closes; those cells are the measured version of that
+    statement on an honest substrate, not a fix for it.
     """
-    v = _core_window_block(mf, core_idx, act_idx, c_core)
+    v = _core_window_block(mf, core_idx, act, c_core)
     if v.shape[1] == mf.mo_coeff.shape[0]:
         return v
     return complete_orthonormal(v, mf.get_ovlp())
 
 
-def _core_window_block(mf, core_idx: list[int], act_idx: list[int],
+def _core_window_block(mf, core_idx: list[int], act,
                        c_core: np.ndarray = None) -> np.ndarray:
     """Steps (1)+(2) of :func:`build_full_mo`: the S-orthonormal
-    core+window block that both it and :func:`radial_basis` start from."""
+    core+window block. ``act`` takes AO-row indices or column vectors --
+    the AO-row form is adapted to the raw AO columns here (the one thin
+    adapter; see :func:`build_full_mo`)."""
     n = mf.mo_coeff.shape[0]
     s = mf.get_ovlp()
     core = mf.mo_coeff[:, core_idx] if c_core is None else c_core
-    act = np.eye(n)[:, act_idx]
+    cols = act if isinstance(act, np.ndarray) else np.eye(n)[:, act]
 
     core = lowdin(core, s)
 
     p_core = core @ core.conj().T @ s
-    act = act - p_core @ act
-    act = lowdin(act, s)
+    cols = cols - p_core @ cols
+    cols = lowdin(cols, s)
 
-    return np.hstack([core, act])
+    return np.hstack([core, cols])
 
 
 def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
@@ -560,21 +585,24 @@ class Window(NamedTuple):
         """Full MO substrate with this window's active columns placed at
         ``[ncore : ncore + ncas]`` -- the object CASCI/CASSCF consume.
 
+        Both representations assemble through :func:`build_full_mo`'s
+        ONE treatment (project-renormalize-assemble): AO rows arrive as
+        the raw AO columns; ``c_win`` columns are projected against the
+        core span -- a machine-precision no-op for columns constructed
+        orthogonal to that core (the NO windows), the honest
+        re-orthogonalization for columns that were not (canonical MO
+        columns on the pur substrate).
+
         closed : the OCCUPIED core indices (canonical order is
-            meaningless on near-degenerate bases — pass
-            ``occupied_core_idx(mf, ncore)`` for AO windows).
+            meaningless on near-degenerate bases — defaults to
+            ``occupied_core_idx(mf, ncore)`` for BOTH representations;
+            never ``range(ncore)``).
         c_core : alternative core columns (e.g. the pur substrate);
-            defaults to the first ``ncore`` columns of ``mf``.
+            defaults to the occupied canonical block.
         """
-        if self.ao_rows is not None:
-            # canonical MO order is meaningless on near-degenerate bases:
-            # always the OCCUPIED block (the U trap -- fact 21a)
-            closed = closed if closed is not None \
-                else occupied_core_idx(mf, ncore)
-            return build_full_mo(mf, closed, self.ao_rows, c_core=c_core)
-        core = c_core if c_core is not None else mf.mo_coeff[:, :ncore]
-        return complete_orthonormal(np.hstack([core, self.c_win]),
-                                    mf.get_ovlp())
+        closed = closed if closed is not None else occupied_core_idx(mf, ncore)
+        act = self.ao_rows if self.ao_rows is not None else self.c_win
+        return build_full_mo(mf, closed, act, c_core=c_core)
 
 
 def window_shell(mol, mf, ncore: int, *, patterns) -> Window:

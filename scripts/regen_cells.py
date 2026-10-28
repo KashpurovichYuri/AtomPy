@@ -1,8 +1,8 @@
-"""Regenerate the campaign cells under the CellKey seam (the cell wave,
-P3): the declared key-set per atom through ``run_cell``, payloads keyed
-by cell address, artifacts ``elements/<Atom>/cells.{json,md}`` (the
-rungs.json rename -- content became key-addressed). Chkfiles land under
-``elements/<Atom>/rungs/<address>.chk`` (gitignored).
+"""Regenerate the campaign cells under the CellKey seam: the declared
+key-set per atom (``cells.grid_keys`` -- derived from ``cases.CAMPAIGN``,
+the one declaration) through ``run_cell``, payloads keyed by cell
+address, artifacts ``elements/<Atom>/cells.{json,md}``. Chkfiles land
+under ``elements/<Atom>/rungs/<address>.chk`` (gitignored).
 
 Usage: python scripts/regen_cells.py [Ti C Si Sc]
 Threads: OPENBLAS_NUM_THREADS=64 OMP_NUM_THREADS=64 PYSCF_NUM_THREADS=64.
@@ -13,61 +13,11 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, "src")
-from atomterm.cells import CellKey, cell_payload, run_cell, spine_keys
-from atomterm.reference import ReferenceSpec, run_rohf, run_frac_occ_scf
-from atomterm.system import AtomConfig, sector_occupations
+from atomterm.cases import CAMPAIGN
+from atomterm.cells import CellKey, cell_payload, grid_keys, run_cell
+from atomterm.reference import run_frac_occ_scf, run_rohf
+from atomterm.system import sector_occupations
 from atomterm.windows import select_valence_ao
-
-# the atom's reference data (AGENTS fact 21; Ti identical to tests/conftest.TI_REF;
-# Sc wired after a broken-basin fresh draw 2026-10-27: only 5 closed MOs)
-REFS = {
-    "Ti": ReferenceSpec(occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
-                        occ_open=("3d",), occ_e_ref=-848.40648875),
-    "Sc": ReferenceSpec(occ_closed=("1s", "2s", "2p", "3s", "3p", "4s"),
-                        occ_open=("3d",), occ_e_ref=-759.73625510),
-}
-
-CASES = {
-    "C": (AtomConfig(), "2p", 2, [1 / 3] * 3, 2, 3),
-    "Si": (AtomConfig("Si", "ccpvdz", spin=2), "3p", 2, [1 / 3] * 3, 2, 3),
-    "Sc": (AtomConfig("Sc", "ccpvdz", spin=1), "3d4s", 3, [1 / 5] * 5, 3, 6),
-    "Ti": (AtomConfig("Ti", "ccpvdz", spin=2), "3d4s", 4, [1 / 7] * 7, 4, 6),
-}
-
-
-def cell_set(atom, window, sector) -> list[CellKey]:
-    """The declared key-set: the spine (README · Methods) + the FULL
-    manifest grid -- method x mask x substrate x start, the NOs start
-    under the radial mask VOID (the seam rejects it: NO columns carry
-    no member labels to rotate) and the MO start on pur VOID (the
-    start carries its own canonical core; the substrate axis cannot
-    enter the run) -- + the virtmix diagnostic and the CASCI pur row.
-    The NOs start is the full-span group prefix
-    (<window>no2 for {3d,4s}: the d and s occupation groups); k is
-    window identity. Deduped by address; P4 folds the historic rung
-    names away entirely."""
-    sec = tuple(sector)
-    keys = spine_keys(atom, window, sec)
-    for m in ("casscf", "sa"):
-        for mask in (None, "radial", "frozen"):
-            for sub in ("pol", "pur"):
-                for st in ("ao", "mo", "no"):
-                    if mask == "radial" and st != "ao":
-                        continue  # radial rotates member-labeled AO slots
-                    if st == "mo" and sub == "pur":
-                        continue  # VOID at the key: the mo start carries
-                        # its own canonical core (substrate moot)
-                    keys.append(CellKey(atom, window if st != "no"
-                                        else f"{window}no2", sec, method=m,
-                                        start=st, mask=mask, substrate=sub))
-    keys += [
-        CellKey(atom, window, sec, method="casscf", mask="virtmix"),
-        CellKey(atom, window, sec, substrate="pur"),  # casci pur row
-    ]
-    seen: dict[str, CellKey] = {}
-    for k in keys:
-        seen.setdefault(k.address, k)  # the spine overlaps the grid
-    return list(seen.values())
 
 
 def lattice_keys(atom) -> list[CellKey]:
@@ -129,28 +79,30 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
 
 
 only = sys.argv[1:] or None
-for name, (cfg, window, nelec, saw, fo, no) in CASES.items():
+for name, spec in CAMPAIGN.items():
     if only and name not in only:
         continue
     print(f"\n===== cells {name} =====", flush=True)
     out = Path("elements") / name
     (out / "rungs").mkdir(parents=True, exist_ok=True)
-    mol, mf = run_rohf(cfg, str(out / "rungs" / "rohf.chk"), ref=REFS.get(name))
+    cfg = spec.atom_config()
+    mol, mf = run_rohf(cfg, str(out / "rungs" / "rohf.chk"), ref=spec.ref)
     print(f"ROHF E = {mf.e_tot:.8f} Eh", flush=True)
-    sector = sector_occupations(nelec, cfg.spin)
-    base = CellKey(name, window, sector)
+    sector = sector_occupations(spec.nelec_act, cfg.spin)
+    base = CellKey(name, "".join(spec.shell_patterns), sector)
     act_idx = select_valence_ao(mol, base.shell_patterns)
     _, mf_f = run_frac_occ_scf(cfg, str(out / "rungs" / "fracocc.chk"),
-                               fo, no, open_idx=act_idx)
+                               spec.nelec_act, len(act_idx),
+                               open_idx=act_idx)
 
     cells: dict[str, dict] = {}
-    queue = cell_set(name, window, sector)
+    queue = grid_keys(spec)     # the one declaration (cases.CAMPAIGN)
     if name == "Ti":  # the d² lattice rides the same reference + store
         queue += lattice_keys(name)
     for key in queue:
         print(f"  [cell] {key.address}", flush=True)
         facts = run_cell(key, mf, frac_mf=mf_f, workdir="elements",
-                         budgets={"sa_weights": saw})
+                         budgets={"sa_weights": spec.sa_weights})
         cells[key.address] = cell_payload(key, facts)
 
     (out / "cells.json").write_text(
@@ -158,7 +110,8 @@ for name, (cfg, window, nelec, saw, fo, no) in CASES.items():
                     "cells": cells}, indent=2), encoding="utf-8")
     (out / "cells.md").write_text(
         render(name, mf.e_tot, cells,
-               ruler=CellKey(name, window, sector, fold="avg").address),
+               ruler=CellKey(name, base.window, sector,
+                             fold="avg").address),
         encoding="utf-8")
     # the rungs.json/md era ends here: content is key-addressed now
     for ext in ("json", "md"):

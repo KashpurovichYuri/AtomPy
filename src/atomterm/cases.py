@@ -4,7 +4,8 @@ optionally, the optimizer stages) and the new-atom launch entry.
 A case is DECLARED, not guessed: a :class:`CaseSpec` fixes the atom, the
 reference data, the valence window, the sectors, and which deliverables
 are wanted -- the intent manifest (ticket 20). :func:`run_case` executes
-the declaration; nothing auto-generates.
+the declaration; nothing auto-generates. ``CAMPAIGN`` is the per-atom
+registry the cell layer and the runners derive from (ticket 29 T1b).
 """
 
 from __future__ import annotations
@@ -26,7 +27,8 @@ from atomterm.casscf import (
 from atomterm.stages import stage_facts
 from atomterm.analysis import format_report
 
-__all__ = ["CaseSpec", "run_case", "run_atom", "run_carbon", "main"]
+__all__ = ["CaseSpec", "CAMPAIGN", "run_case", "run_atom", "run_carbon",
+           "main"]
 
 
 def _ndet(ncas: int, na: int, nb: int) -> int:
@@ -51,13 +53,19 @@ def _ms_label(na: int, nb: int) -> str:
 class CaseSpec:
     """The declaration of one atom case -- what to run and what not.
 
-    symbol/basis/ecp/spin : the atom (system.AtomConfig inputs).
+    symbol/basis/ecp/spin : the atom (system.AtomConfig inputs; ``basis``
+        is the AtomConfig basis -- a label like ``"ccpvdz"`` or a dict).
     nelec_act / ncore : the active-electron count and the closed-shell
         count (the fold).
     shell_patterns : the valence-shell label prefixes of the standard
         window (e.g. ["2p"]; ["3d", "4s"]).
+    planned_windows : further window labels of the campaign, declared
+        but not yet run (Ti: the (4,10)/(4,14) partitions) -- the cell
+        grid derives their full factor grids (cells.planned).
     ref : the ReferenceSpec (character-forced occupations + basin gate)
         where default SCF filling fails; None lets plain aufbau run.
+        The gated references are CAMPAIGN data now (regen_cells.REFS
+        is retired).
     sa_weights : state-average weights for the primary sector
         (uniform over the ground term's M_L set by convention).
     run_casscf : the single-root stage (off on multi-solution atoms).
@@ -74,7 +82,7 @@ class CaseSpec:
     """
 
     symbol: str
-    basis: dict
+    basis: str | dict
     nelec_act: int
     ncore: int
     shell_patterns: list[str]
@@ -87,10 +95,37 @@ class CaseSpec:
     nroots_primary: int = 9
     want: frozenset = frozenset({"terms", "casscf", "sa-casscf"})
     study: dict | None = None
+    planned_windows: tuple[str, ...] = ()
 
     def atom_config(self) -> AtomConfig:
         return AtomConfig(symbol=self.symbol, basis=self.basis, ecp=self.ecp,
                           spin=self.spin, tag=self.tag or self.symbol)
+
+
+# The declared campaign (one spec per atom) -- THE intent manifest: the
+# cell grid (cells.window_grid/grid_keys/planned), the regen runner, and
+# the table renderers all derive from these; nothing else re-declares
+# atoms, windows, or the gated references (the one-declaration rule,
+# ticket 29 T1b). New atom = new row here.
+CAMPAIGN: dict[str, CaseSpec] = {
+    "C": CaseSpec("C", "ccpvdz", nelec_act=2, ncore=2,
+                  shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3),
+    "Si": CaseSpec("Si", "ccpvdz", nelec_act=2, ncore=6,
+                   shell_patterns=["3p"], spin=2, sa_weights=[1 / 3] * 3),
+    "Sc": CaseSpec("Sc", "ccpvdz", nelec_act=3, ncore=9,
+                   shell_patterns=["3d", "4s"], spin=1,
+                   sa_weights=[1 / 5] * 5,
+                   ref=ReferenceSpec(
+                       occ_closed=("1s", "2s", "2p", "3s", "3p", "4s"),
+                       occ_open=("3d",), occ_e_ref=-759.73625510)),
+    "Ti": CaseSpec("Ti", "ccpvdz", nelec_act=4, ncore=9,
+                   shell_patterns=["3d", "4s"], spin=2,
+                   sa_weights=[1 / 7] * 7,
+                   ref=ReferenceSpec(
+                       occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
+                       occ_open=("3d",), occ_e_ref=-848.40648875),
+                   planned_windows=("3d4d", "3d4s4p4d")),
+}
 
 
 def run_case(spec: CaseSpec, workdir: str = "elements") -> dict:

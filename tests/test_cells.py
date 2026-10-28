@@ -19,11 +19,16 @@ from atomterm.cells import (
     CellKey,
     cell_chk,
     ci_in_detbasis_order,
+    diagnostics,
+    grid_keys,
     load_cell,
+    planned,
     pyscf_ci_permutation,
     spine_keys,
+    window_grid,
 )
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
+from atomterm.windows import span_overlap
 
 # mixed tiers in one module (1:1 with src): the key/bridge/store tests
 # are fast; the carbon run pins are slow -- marked per test, so the
@@ -74,12 +79,13 @@ def test_key_validation_and_canonicalization():
     with pytest.raises(ValueError, match="radial mask"):
         CellKey("C", "2pno1", (1, 1), method="casscf", start="no",
                 mask="radial")
-    # the MO start carries its own canonical core -- pur substrate is
-    # moot for it (the review's finding: the four ti mo x pur cells
-    # were the same experiment under two addresses)
-    with pytest.raises(ValueError, match="canonical core"):
-        CellKey("Ti", "3d4s", (3, 1), method="casscf", start="mo",
-                substrate="pur")
+    # mo x pur: VALID since the window-projection builder (T1a) -- the
+    # canonical columns are re-orthogonalized on the pur core span; the
+    # pur-fold canonicalization applies to it like every pur key
+    k = CellKey("Ti", "3d4s", (3, 1), method="casscf", start="mo",
+                substrate="pur", fold="raw")
+    assert k.fold == "avg"
+    assert k.address == "ti_3d4s_3-1_casscf_mo_-_pur_avg"
     for bad in [dict(method="fci"), dict(start="aos"), dict(mask="relax"),
                 dict(substrate="polarized"), dict(fold="averaged")]:
         with pytest.raises(ValueError, match="not in"):
@@ -124,6 +130,51 @@ def test_spine_keys_contract():
         "ti_3d4s_3-1_casscf_ao_-_pol_avg",
         "ti_3d4s_3-1_sa_ao_-_pur_avg",
     ]
+
+
+@fast
+def test_window_grid_is_the_one_declaration():
+    """The declared key-set derived from CaseSpec (T1b): the full grid in
+    render order, the spine a subset of it, the named groups filters.
+    mo x pur IS in the grid (the projection builder, T1a); radial stays
+    ao-only; the NO start addresses the full-span group prefix with
+    k = the window's shell count."""
+    from atomterm.cases import CAMPAIGN
+
+    spec = CAMPAIGN["Ti"]
+    grid = grid_keys(spec)
+    addrs = [k.address for k in grid]
+    # the manifest count: 29 established + the 4 mo x pur cells
+    assert len(grid) == 33
+    assert len(set(addrs)) == 33
+    assert addrs[:4] == [           # the CASCI fold block, pur third
+        "ti_3d4s_3-1_casci_ao_-_pol_raw",
+        "ti_3d4s_3-1_casci_ao_-_pol_avg",
+        "ti_3d4s_3-1_casci_ao_-_pur_avg",
+        "ti_3d4s_3-1_casci_ao_-_pol_frac",
+    ]
+    mopur = [a for a in addrs if a.split("_")[4] == "mo"
+             and a.split("_")[6] == "pur"]
+    assert mopur == [                   # method-major, like every block
+        "ti_3d4s_3-1_casscf_mo_-_pur_avg",
+        "ti_3d4s_3-1_casscf_mo_frozen_pur_avg",
+        "ti_3d4s_3-1_sa_mo_-_pur_avg",
+        "ti_3d4s_3-1_sa_mo_frozen_pur_avg",
+    ]
+    # no radial x mo/no keys ever (void at the key)
+    assert not [a for a in addrs if "_radial_" in a and "_ao_" not in a]
+    # the NO windows: full-span group prefixes, k = shell count
+    assert "ti_3d4sno2_3-1_casscf_no_-_pol_avg" in addrs
+    # the spine is a subset view; diagnostics = the virtmix filter
+    spine = {k.address for k in spine_keys("Ti", "3d4s", (3, 1))}
+    assert spine <= set(addrs)
+    assert [k.mask for k in diagnostics(spec)] == ["virtmix"]
+    # planned: the declared windows' full grids, same shape as the primary
+    pl = planned(spec)
+    assert len(pl) == 2 * len(grid)
+    assert {k.window for k in pl} == {
+        "3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4"}
+    assert all(k.address not in addrs for k in pl)   # disjoint windows
 
 
 # ------------------------------------------------------------- the bridge
@@ -451,6 +502,38 @@ def test_frozen_mask_applies_to_the_mo_start(carbon, tmp_path):
         # |<start_i|S|conv_i>| == 1: the same column up to phase
         assert abs(start[:, i] @ (s @ conv[:, i])) == pytest.approx(
             1.0, abs=1e-8), f"window column {i} moved under a frozen mask"
+
+
+@slow
+def test_run_cell_mo_start_on_pur_substrate(carbon, tmp_path):
+    """The mo x pur cell end to end (T1a): canonical window+virtual
+    columns re-orthogonalized on the pur core through build_full_mo's
+    one treatment. On carbon the s-core x p-window are exactly
+    S-orthogonal (different l) -- the projection is the no-op case; the
+    defect-scale case is Ti's, measured when the gated batch runs.
+    Machinery pins: the S-orthonormal substrate, the pur core block,
+    CASCI internal consistency."""
+    from atomterm.cells import load_cell, run_cell
+    from atomterm.core import purified_core_orbitals
+    from atomterm.system import ncore_of
+
+    _, mol, mf, _ = carbon
+    key = CellKey("C", "2p", (1, 1), start="mo", substrate="pur")
+    facts = run_cell(key, mf, workdir=tmp_path)
+    assert facts.ortho_err < 1e-10
+    assert facts.max_de_vs_pyscf < 1e-9
+    ncore = ncore_of(mol.nelectron, 2)
+    c_pur, _ = purified_core_orbitals(mol, mf, ncore)
+    data = load_cell(key, tmp_path)
+    s = mf.get_ovlp()
+    err = np.abs(data.mo_coeff.conj().T @ s @ data.mo_coeff
+                 - np.eye(mol.nao_nr())).max()
+    assert err < 1e-10
+    # substrate = the core SPAN (PySCF canonicalizes the inactive block
+    # WITHIN its span -- the fact-6 mutation, span-preserving; it hits
+    # the ao-pur cells identically): the stored core spans the pur core
+    assert span_overlap(data.mo_coeff[:, :ncore], c_pur, s) == \
+        pytest.approx(1.0, abs=1e-10)
 
 
 @fast

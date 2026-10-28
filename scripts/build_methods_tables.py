@@ -27,9 +27,17 @@ Value conventions (the manifest contract, README · Methods):
   window weights (facts 15g/20), never on noise. A cell renders filled
   only when BOTH payload and verdict exist; otherwise pending.
 
-Applicability: the Ti-style factor-grid tables (WINDOWS below). The
-study inserts stay with atomterm.study.render; the per-atom summary
-tables (C/Si/Sc) stay hand-curated until their manifests migrate.
+Applicability: the Ti-style factor-grid tables (WINDOWS below; the
+window set and every cell address come from the declaration --
+``cases.CAMPAIGN`` via ``cells.grid_keys``/``cells.planned``; this file
+owns presentation only: headings, notes, value formatting). The study
+inserts stay with atomterm.study.render; the per-atom summary tables
+(C/Si/Sc) stay hand-curated until their manifests migrate.
+
+THE BRANCH RULE (ticket 29 T1b): rows branch on key IDENTITY only
+(method/start/mask/substrate/fold); order and grouping live once in the
+declaration builder (cells.window_grid) -- this renderer receives
+ready-made key lists and formats.
 
 TABLES edit protocol lives here: sections are rebuilt from constructed
 blocks, structural assertions checked (each heading once, row counts,
@@ -44,27 +52,26 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, "src")
-from atomterm.cells import CellKey
+from atomterm.cases import CAMPAIGN
+from atomterm.cells import grid_keys, window_grid
 
 EV = 27.2114
-SECTOR = (3, 1)          # Ti CAS(4,x), Ms=1
 DASH = "—"
 
-# the declared windows: (heading, window label, NO label, note lines).
-# The NO label is the full-span occupation-group prefix of the window's
-# own source density (k = its group count: {3d,4s} -> [s,d] = 2,
-# {3d,4s,4p,4d} -> [s,d,d',p] = 4) -- the NOs start at matched span.
+# the declared windows this file renders, with their presentation
+# (headings + note lines). The window list MUST equal the declaration's
+# (primary + planned) -- asserted in main; the NO full-span prefix and
+# every cell address derive from the declaration, not from here.
 # Captions stay minimal (reading conventions live in README · Methods;
 # the anchor is the separately-specified ΔE reference).
 WINDOWS = [
-    ("## CAS(4,6) / {3d,4s}", "3d4s", "3d4sno2", [
+    ("## CAS(4,6) / {3d,4s}", "3d4s", [
         "Reading — README · Methods (⟨L̂z²⟩ is a gauge diagnostic, not a"
         " label). ROHF anchor: −848.4065 Eh (−23086.3167 eV)."]),
-    ("### CAS(4,10) / {3d,4d} — planned (constrained)", "3d4d", "3d4dno2", [
+    ("### CAS(4,10) / {3d,4d} — planned (constrained)", "3d4d", [
         "No 4s (constrained partition). Pending = declared, not yet run; "
         "the CASCI anchor lives in the 3d²4s² lattice above."]),
-    ("### CAS(4,14) / {3d,4s,4p,4d} — planned", "3d4s4p4d",
-     "3d4s4p4dno4", [
+    ("### CAS(4,14) / {3d,4s,4p,4d} — planned", "3d4s4p4d", [
         "The complete valence window. Pending = declared, not yet run; "
         "the CASCI anchor lives in the 3d²4s² lattice above."]),
 ]
@@ -113,14 +120,14 @@ HEAD = ("| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | "
         "Span (Lowdin) | Elec (Lowdin) | verdict |")
 SEP = "|" + "---|" * 16
 
-# CASCI fold variants: (substrate axis, fold axis, display fold)
-CASCI_FOLDS = [("pol", "raw", "raw"), ("pol", "avg", "averaged"),
-               ("pur", "avg", "averaged"), ("pol", "frac", "fractional")]
-
-
-def key(atom, window, method, start, mask, substrate, fold):
-    return CellKey(atom, window, SECTOR, method=method, start=start,
-                   mask=mask, substrate=substrate, fold=fold)
+# identity -> display (the ONLY branching the renderer does)
+METHOD_NAMES = {"casci": "**CASCI**", "casscf": "**CASSCF**",
+                "sa": "**SA-CASSCF**"}
+START_NAMES = {"mo": "PySCF MO", "no": "NO"}
+MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen window",
+              "virtmix": "virtual-mix"}
+SUBSTRATE_NAMES = {"pol": "polarized", "pur": "purified"}
+FOLD_NAMES = {"raw": "raw", "avg": "averaged", "frac": "fractional"}
 
 
 def _cfg(w: dict) -> str:
@@ -166,80 +173,64 @@ def _values(p: dict, anchor: float) -> list[str]:
     return [re.sub(r"(?<!e)-", "−", v) for v in out]   # sign minus only
 
 
-def _row(cells, audit, addr, method, start, mask, substrate, fold, anchor):
-    verdict = audit.get(addr)
-    p = cells.get(addr)
-    head = [method, start, mask, substrate, fold]
+def _row(cells, audit, k, prev, anchor):
+    """One table row from a declared key; every presentation choice
+    (bold method heads, blank factor inheritance, the CASCI dash)
+    derives from the key's identity and its predecessor's."""
+    verdict = audit.get(k.address)
+    p = cells.get(k.address)
+    m_new = prev is None or prev.method != k.method
+    # the head-row rule: factor cells fill on AO-start rows (and every
+    # CASCI row names its substrate/fold -- blank inheritance would
+    # misread row 2 as raw); the virtual-mix diagnostic names only its
+    # mask; CASCI repeats the mask dash (no optimizer)
+    head = [
+        METHOD_NAMES[k.method] if m_new else "",
+        "" if (k.method == "casci" and not m_new) else
+        (f"AO {{{''.join(k.shell_patterns)}}}" if k.start == "ao"
+         else START_NAMES[k.start]),
+        DASH if k.method == "casci" else
+        (MASK_NAMES[k.mask] if k.start == "ao" else ""),
+        SUBSTRATE_NAMES[k.substrate]
+        if k.method == "casci" or (k.start == "ao" and k.mask != "virtmix")
+        else "",
+        FOLD_NAMES[k.fold]
+        if k.method == "casci" or (k.start == "ao" and k.mask != "virtmix")
+        else "",
+    ]
     if p is None or verdict is None:
         return "| " + " | ".join(head + ["pending"] + [""] * 9
                                  + ["pending"]) + " |"
     return "| " + " | ".join(head + _values(p, anchor) + [verdict]) + " |"
 
 
-def render_window(atom, window, no_label, cells, audit, anchor) -> list[str]:
-    out = []
-    # CASCI block: the fold IS the row's treatment -- substrate and fold
-    # explicit on EVERY row (blank inheritance would misread row 2 as
-    # raw); the mask dash repeats (the CASCI non-axis)
-    for i, (sub, fold, fold_name) in enumerate(CASCI_FOLDS):
-        addr = key(atom, window, "casci", "ao", None, sub, fold).address
-        out.append(_row(cells, audit, addr,
-                        "**CASCI**" if i == 0 else "",
-                        f"AO {{{window}}}" if i == 0 else "",
-                        DASH,
-                        "polarized" if sub == "pol" else "purified",
-                        fold_name, anchor))
-    # optimizer blocks: method x mask x substrate x start. Factor cells
-    # are explicit on each group head (mask x substrate, the AOs row)
-    # and blank-inherited after. RADIAL rows exist only for start=ao
-    # (the mask rotates member-labeled AO slots; MO/NO columns carry
-    # none), and MO x pur is VOID at the key (the MO start carries its
-    # own canonical core; the substrate axis cannot enter the run) --
-    # every declared cell is executable through the seam.
-    for method, m in (("CASSCF", "casscf"), ("SA-CASSCF", "sa")):
-        first = True
-        for mask, mask_name in ((None, "free"), ("radial", "radial"),
-                                ("frozen", "frozen window")):
-            for sub in ("pol", "pur"):
-                sub_name = "polarized" if sub == "pol" else "purified"
-                starts = ("ao", "mo", "no") if mask != "radial" else ("ao",)
-                for st in starts:
-                    if st == "mo" and sub == "pur":
-                        continue  # VOID at the key (substrate moot for MO)
-                    st_name = {"ao": f"AO {{{window}}}",
-                               "mo": "PySCF MO",
-                               "no": "NO"}[st]
-                    # the NOs row addresses the full-span group prefix
-                    # of the source (k = the window's group count)
-                    w = no_label if st == "no" else window
-                    addr = key(atom, w, m, st, mask, sub, "avg").address
-                    head_row = st == "ao"
-                    out.append(_row(
-                        cells, audit, addr,
-                        f"**{method}**" if first else "",
-                        st_name,
-                        mask_name if head_row else "",
-                        sub_name if head_row else "",
-                        "averaged" if head_row else "", anchor))
-                    first = False
-                if method == "CASSCF" and mask is None and sub == "pol":
-                    addr = key(atom, window, "casscf", "ao", "virtmix",
-                               sub, "avg").address
-                    out.append(_row(cells, audit, addr, "",
-                                    f"AO {{{window}}}", "virtual-mix",
-                                    "", "", anchor))
-    return out
+def render_window(keys, cells, audit, anchor) -> list[str]:
+    """Format one window's ready-made key list (the declaration's order
+    -- cells.window_grid); the renderer never constructs addresses."""
+    return [_row(cells, audit, k, prev, anchor)
+            for prev, k in zip([None] + keys[:-1], keys)]
 
 
 def main(atom: str) -> None:
     src = Path(f"elements/{atom}/TABLES.md")
     data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
     cells, audit, anchor = data["cells"], AUDIT, data["rohf_energy"]
+    spec = CAMPAIGN[atom]
+
+    # the declaration's per-window grids (primary + planned). Render
+    # contract: this file's WINDOWS cover EXACTLY the declared windows,
+    # primary first -- presentation here, content from the declaration.
+    primary = "".join(spec.shell_patterns)
+    per_window = {primary: grid_keys(spec)}
+    per_window.update({w: window_grid(spec, w)
+                       for w in spec.planned_windows})
+    assert [w for _, w, _ in WINDOWS] == [primary, *spec.planned_windows], \
+        "the renderer's WINDOWS and cases.CAMPAIGN diverged"
 
     sections = []
-    for heading, window, no_label, notes in WINDOWS:
+    for heading, window, notes in WINDOWS:
         sec = [heading, ""] + notes + ["", HEAD, SEP]
-        sec += render_window(atom, window, no_label, cells, audit, anchor)
+        sec += render_window(per_window[window], cells, audit, anchor)
         if heading.startswith("## "):
             sec += ["", "Source: `cells.json` (this draw; verdicts — the "
                     "AUDIT table of `scripts/build_methods_tables.py`)."]
@@ -257,12 +248,12 @@ def main(atom: str) -> None:
     span = new[new.index("## CAS(4,6)"):new.index("## Open questions")]
     assert "C E, Eh" not in span and "S E, Eh" not in span
     assert not re.search(r"\d\*", span)          # no starred gauge numbers
-    # row count per window: 4 CASCI folds + per method (free: pol x 3
-    # starts + pur x {ao,no}; radial: ao only x 2 substrates; frozen:
-    # same shape as free -- MO x pur is void at the key) + the virtmix
-    # diagnostic once (CASSCF free pol)
-    per_method = 3 + 2 + 2 + 5
-    expect = len(CASCI_FOLDS) + 2 * per_method + 1
+    # row count per window: 4 CASCI folds + per method (free: 3 starts x
+    # 2 substrates; radial: ao only x 2 substrates; frozen: 3 starts x 2
+    # substrates -- mo x pur IS in the grid since the projection
+    # builder) + the virtmix diagnostic once (CASSCF free pol)
+    per_method = 3 + 3 + 2 + 6
+    expect = 4 + 2 * per_method + 1
     for chunk in span.split("\n### ")[1:]:
         chunk = chunk.split("\n#")[0]
         rows = [r for r in chunk.splitlines() if r.startswith("|")]

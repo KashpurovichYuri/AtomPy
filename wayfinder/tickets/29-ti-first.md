@@ -92,6 +92,32 @@ Generalize where Ti's completion exposes it — with guardrails:
 
 ## T2 — the gated Ti batch (cheapest-first, on user enable)
 
+### PROGRESS (T1, 2026-10-28) — DONE
+
+- T1a landed, NO sibling: `build_full_mo` takes window columns (AO
+  rows stay the shorthand — the one adapter inside; AO-rows ≡
+  AO-columns pinned byte-equal on a synthetic substrate). The
+  SECOND consumer arrived with it (run_cell's mo-pur branch), and the
+  collapse went one step further than ticketed: `Window.columns`
+  routes BOTH representations through the one treatment — the c_win
+  sibling assembly (hstack + complement, with its latent
+  `mf.mo_coeff[:, :ncore]` U-trap default) is gone; for NO columns
+  the projection is a machine-precision no-op (pinned). mo×pur valid
+  at the key; the four cells declared, rendering pending.
+- T1b landed: `cases.CAMPAIGN` is the one declaration (REFS/CASES/
+  cell_set in regen_cells retired); `cells.window_grid` owns the one
+  render order, `grid_keys`/`diagnostics`/`planned` the named groups;
+  the renderer formats by key identity only (address construction
+  deleted; WINDOWS-vs-CAMPAIGN coverage asserted). Byte-diff of the
+  Ti render: 12 insertions, 0 deletions — exactly the 4 mo-pur
+  pending rows per table.
+- Found en route (the unification paying for itself): the retired
+  cell_set hard-coded `<window>no2` — wrong for single-shell windows
+  (C/Si would have raised "no2 is not among them" at their pending
+  grid completion); the derived label (`k = shell count`) fixes it —
+  carbon's existing `2pno1` pin confirms.
+- Suite green (158); AGENTS rows + tests section updated.
+
 1. The four (mo, pur) cells (optimizer runs; expectations above).
 2. The (4,10)/(4,14) CASCI anchors, then their optimizer cells.
 3. Pass curves (the basin landscape program).

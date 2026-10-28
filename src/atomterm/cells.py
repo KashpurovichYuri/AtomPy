@@ -68,10 +68,14 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from atomterm.detbasis import determinant_basis
+
+if TYPE_CHECKING:  # the declaration groups consume the intent manifest;
+    from atomterm.cases import CaseSpec  # annotation-only (no cycle)
 
 __all__ = [
     "CellKey",
@@ -82,6 +86,10 @@ __all__ = [
     "run_cell",
     "analyze_cell",
     "spine_keys",
+    "window_grid",
+    "grid_keys",
+    "diagnostics",
+    "planned",
     "pyscf_ci_permutation",
     "ci_in_detbasis_order",
 ]
@@ -165,12 +173,9 @@ class CellKey:
                     "the radial mask rotates member-labeled AO slots; it "
                     "needs start='ao' (MO and NO columns carry no member "
                     "labels)")
-        if self.start == "mo" and self.substrate == "pur":
-            raise ValueError(
-                "the mo start carries its own canonical core (the "
-                "substrate axis is moot for it); a pur-core MO start "
-                "would need the window-projection machinery -- not "
-                "built")
+        # (mo, pur) is valid since the window-projection builder (ticket
+        # 29 T1a): run_cell re-orthogonalizes the canonical columns
+        # against the pur core span -- see the mo branch there.
         # the pur-fold degeneracy rule: on the purified substrate the
         # core density is exactly m-scalar, so raw == avg (fact 20) --
         # canonicalize instead of storing two addresses for one cell;
@@ -442,10 +447,18 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
             mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
                                     act_idx, c_core=c_pur)
     else:  # start == "mo": PySCF's default start (canonical MOs,
-        # canonical window) -- the start carries its own canonical core,
-        # so the substrate axis cannot enter the run (the key rejects
-        # mo x pur for exactly this reason)
-        mo_full = mf.mo_coeff
+        # canonical window). On pol the canonical MO matrix IS the
+        # substrate; on pur the canonical columns are re-orthogonalized
+        # against the pur core span (S-orthonormal against the core they
+        # were SOLVED in, not the pur one -- the fact-17-class defect,
+        # removed at the source by build_full_mo's projection). Honest
+        # expectation: the window's own m-delocalization survives
+        # (fact 22d) -- these cells measure that, they do not fix it.
+        if key.substrate == "pur":
+            mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
+                                    mf.mo_coeff[:, ncore:], c_core=c_pur)
+        else:
+            mo_full = mf.mo_coeff
     if key.mask == "frozen":
         mask = core_virtual_only_mask
     elif key.mask == "virtmix":
@@ -555,7 +568,9 @@ def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]
     """The default cell subset per atom (README · Methods, "the spine"):
     the three folds; frozen x purified under both objectives (the
     certified class); one free row per substrate (the basin detectors).
-    Diagnostics beyond these run as needed.
+    Diagnostics beyond these run as needed. A SUBSET view of the grid
+    (every spine key is in :func:`window_grid`'s product); pinned here
+    because README quotes it verbatim.
     """
     sec = tuple(sector)
     return [
@@ -569,3 +584,71 @@ def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]
         CellKey(atom, window, sec, method="casscf"),
         CellKey(atom, window, sec, method="sa", substrate="pur"),
     ]
+
+
+def _no_label(window: str) -> str:
+    """The full-span occupation-group prefix label of a window: k = its
+    shell count ({3d,4s} -> the [s,d] groups -> ``3d4sno2``; each shell's
+    m-set is one occupation group of the term-averaged density)."""
+    return f"{window}no{len(re.findall(r'\d+[spdfgh]', window))}"
+
+
+def window_grid(spec, window: str | None = None) -> list[CellKey]:
+    """One window's full factor grid, in canonical render order.
+
+    The ORDER is presentation and lives HERE, once -- renderers receive
+    this list ready-made and format (branching on key identity only):
+    the CASCI fold block first (identity: method=casci, start=ao; the
+    pur fold third), then the optimizer product method x mask x
+    substrate x start with the virtual-mix diagnostic after the CASSCF
+    free/polarized starts, and the NO start addressing the full-span
+    group prefix (:func:`_no_label`). mo x pur IS part of the grid (the
+    projection builder); radial stays ao-only (validated at the key).
+
+    ``window=None`` -> the case's primary window (from ``shell_patterns``).
+    """
+    from atomterm.system import sector_occupations
+
+    w = window or "".join(spec.shell_patterns)
+    atom, sec = spec.symbol, sector_occupations(spec.nelec_act, spec.spin)
+    keys = [
+        CellKey(atom, w, sec, fold="raw"),
+        CellKey(atom, w, sec, fold="avg"),
+        CellKey(atom, w, sec, substrate="pur"),   # the CASCI pur fold
+        CellKey(atom, w, sec, fold="frac"),
+    ]
+    for m in ("casscf", "sa"):
+        for mask in (None, "radial", "frozen"):
+            for sub in ("pol", "pur"):
+                starts = ("ao", "mo", "no") if mask != "radial" else ("ao",)
+                for st in starts:
+                    keys.append(CellKey(atom, _no_label(w) if st == "no"
+                                        else w, sec, method=m, start=st,
+                                        mask=mask, substrate=sub))
+                if m == "casscf" and mask is None and sub == "pol":
+                    keys.append(CellKey(atom, w, sec, method="casscf",
+                                        mask="virtmix", substrate=sub))
+    return keys
+
+
+def grid_keys(spec) -> list[CellKey]:
+    """The case's runnable set: the primary window's full grid
+    (:func:`window_grid`) -- the spine folds, the optimizer product, the
+    CASCI pur fold, and the virtual-mix diagnostic; every key distinct
+    by construction (the spine is a subset view). What regen executes;
+    planned windows are :func:`planned`."""
+    return window_grid(spec)
+
+
+def diagnostics(spec) -> list[CellKey]:
+    """The virtual-mix diagnostic rows (no core<->window exchange) --
+    the subset of the grid tagged mask='virtmix'."""
+    return [k for k in grid_keys(spec) if k.mask == "virtmix"]
+
+
+def planned(spec) -> list[CellKey]:
+    """The planned windows' full grids (declared, not yet run): each of
+    ``spec.planned_windows`` gets the same factor grid as the primary
+    window (:func:`window_grid`) -- CASCI anchors first when the runs
+    come, then the optimizer cells."""
+    return [k for w in spec.planned_windows for k in window_grid(spec, w)]
