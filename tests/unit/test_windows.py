@@ -1,14 +1,6 @@
-"""Fast (SCF-free) pins of atomterm.windows: the generalized
-``build_full_mo`` -- window COLUMNS as a first-class input (ticket 29
-T1a) -- and the ``Window.columns`` collapse (both representations
-assemble through the ONE project-renormalize-assemble treatment; the
-c_win sibling builder is gone).
-
-The substrate is synthetic: a gto molecule + per-l S-orthonormal
-"canonical" blocks + a hand-built exactly-closed pur core (the fact-20
-construction in miniature: one radial replicated on every member). No
-SCF anywhere -- sub-second.
-"""
+"""Unit pins of atomterm.windows: build_full_mo's two representations
+(AO rows, column vectors) on a synthetic substrate, plus the STO-3G
+degenerate substrates (null core, whole space as window)."""
 
 import numpy as np
 import pytest
@@ -35,19 +27,19 @@ class _FakeMf:
 
 
 def _substrate():
-    """C/cc-pvdz + the synthetic reference. The pur core is the fact-20
-    construction in miniature (2 s radials + one p radial replicated on
-    every member); the canonical MOs are the pur core theta-rotated
-    against its S-orthogonal complement -- canonical core columns carry
-    window content and canonical window columns carry pur-core content
-    at sin(theta), exactly the physical situation the mo-pur projection
-    exists for. (A naive 'two independent l-pure blocks' substrate is
-    degenerate: the projected window Gram has a STRUCTURAL null where
-    the two 3-dim p subspaces of the 6-dim p space meet.)"""
+    """C/cc-pvdz + a synthetic reference: per-l S-orthonormal
+    "canonical" MOs and a hand-built exactly-closed pur core (one p
+    radial replicated on every member), theta-rotated against each
+    other so canonical columns carry cross-span content at a planted
+    scale (sin 0.3) -- the physical situation the projections exist
+    for."""
     mol = gto.M(atom="C 0 0 0", basis="ccpvdz", spin=2, verbose=0)
     s = mol.intor_symmetric("int1e_ovlp")
     n = mol.nao_nr()
     sec = lm_sectors(mol)
+    # NOTE: two independent l-pure blocks would make the projected
+    # window Gram STRUCTURALLY singular -- the theta-rotation against
+    # the complement is what keeps the substrate non-degenerate
     rows = {l: sorted(r for (ll, _), rs in sec.items() if ll == l
                       for r in rs)
             for l in sorted({ll for ll, _ in sec})}
@@ -78,9 +70,6 @@ def _substrate():
 
 
 def test_build_full_mo_ao_rows_equal_ao_columns():
-    """THE adapter pin: AO-row indices and the explicit AO columns are
-    the same window -- byte-equal assemblies (the strangler guarantee
-    for every existing AO-index caller)."""
     mf, mol, s, c_pur, rows = _substrate()
     ncore = c_pur.shape[1]
     act = select_valence_ao(mol, ["2p"])
@@ -90,12 +79,8 @@ def test_build_full_mo_ao_rows_equal_ao_columns():
 
 
 def test_build_full_mo_window_columns_on_pur_core():
-    """The mo-pur path (ticket 29 T1a): canonical window+virtual columns
-    re-orthogonalized against the pur core span. The assembly is
-    S-orthonormal, the core block IS the pur core, the window is exactly
-    S-orthogonal to it, and the projection has real work to do (the
-    planted rotation left pur-core content in the canonical columns --
-    the fact-17 class, removed here at the source)."""
+    """Canonical columns on the pur core: orthonormal assembly, the
+    pur block intact, the planted cross-span leak removed."""
     mf, mol, s, c_pur, rows = _substrate()
     ncore = c_pur.shape[1]
     mo = build_full_mo(mf, list(range(ncore)), mf.mo_coeff[:, ncore:],
@@ -118,11 +103,8 @@ def test_build_full_mo_window_columns_on_pur_core():
 
 
 def test_window_columns_assemble_through_build_full_mo():
-    """The sibling-death pin: Window.columns routes BOTH representations
-    through build_full_mo's one treatment -- for c_win columns
-    constructed S-orthogonal to the core (the NO windows) the assembly
-    is the no-op it must be, and identical to calling build_full_mo
-    directly."""
+    """Window.columns(c_win) == build_full_mo directly; columns already
+    orthogonal to the core pass through unchanged."""
     mf, mol, s, c_pur, rows = _substrate()
     ncore = c_pur.shape[1]
     # an S-orthonormal window orthogonal to the pur core: the d block
@@ -139,13 +121,12 @@ def test_window_columns_assemble_through_build_full_mo():
 
 # ---------------------------------------------------------------------
 # degenerate substrates (STO-3G): null core, the whole AO space as the
-# window -- trivially rotation-closed, so the certificates are exact
-# BY CONSTRUCTION; any deviation is a bug, not physics.
+# window -- rotation-closed by construction, so the certificates are
+# exact; any deviation is a bug.
 
 def test_h_sto3g_null_core_full_window():
-    """One electron, one AO: the empty-core path of build_full_mo
-    (lowdin of zero columns; the complement-empty early return) and
-    an exactly-zero closure certificate."""
+    """Empty core + full window: the zero-column paths and an
+    exactly-zero closure certificate."""
     from pyscf import scf
     from atomterm.operators import window_closure
 
@@ -161,11 +142,9 @@ def test_h_sto3g_null_core_full_window():
 
 
 def test_c_sto3g_null_core_full_window():
-    """The strongest degenerate case: C/STO-3G with NO core and the
-    whole AO space as the window (CAS(6,5), 50 dets in the Ms=1
-    sector (4, 2)). The full space is trivially rotation-closed: the
-    closure certificate is exactly zero, [H, Lz] / [H, L2] vanish at
-    machine precision -- and the ground term is still 3P."""
+    """Null core, whole AO space as window (CAS(6,5), sector (4,2)):
+    certificates exactly zero, [H, Lz]/[H, L2] at machine precision,
+    3P ground."""
     from pyscf import scf
     from atomterm.operators import build_operators, window_closure
 

@@ -99,6 +99,11 @@ def _transition_sign(occ_j: list[int], ann: list[int], cre: list[int]) -> int:
 
 # ------------------------------------------- the shared pair classification
 
+# elements per pair chunk (the memory budget); tests shrink it to pin
+# the multi-chunk offsets -- at test sizes the budget yields ONE chunk
+_PAIR_BUDGET = 2e7
+
+
 class _Pairs(NamedTuple):
     """One memory-bounded chunk of classified determinant pairs -- the
     machinery both rule-set evaluators consume."""
@@ -120,7 +125,7 @@ def _pair_chunks(occ: np.ndarray, cum: np.ndarray, nelec: int):
     excitation indices and closed-form transition signs.
     """
     n, n2 = occ.shape
-    chunk = max(1, min(n, int(2e7) // (n * n2)))
+    chunk = max(1, min(n, int(_PAIR_BUDGET) // (n * n2)))
     for lo in range(0, n, chunk):
         hi = min(n, lo + chunk)
         occ_i = occ[lo:hi]

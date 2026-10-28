@@ -1,12 +1,8 @@
-"""Second-quantized operator construction, validated against Carbon.
-
-Three validation tiers:
-1. elementwise identity with the first-quantized Slater-Condon matrices;
-2. core-explicit full-space Hamiltonian (CAS(6,5), no folding) vs PySCF
-   CASCI with ncore=0 -- identical integrals on both sides;
-3. the fixed-core sector of the full-space H equals the folded active-space
-   result plus the core energy (validates the folding conventions).
-"""
+"""Second-quantized operator construction: the sign rules, the
+elementwise identity with the Slater-Condon construction (physical
+carbon integrals and random non-particle-symmetric g, part by part),
+the core-explicit full-space bridge to PySCF CASCI (carbon ROHF; the
+closed-shell Be RHF variant), and the folded-core bookkeeping."""
 
 import numpy as np
 import pytest
@@ -85,8 +81,6 @@ def test_annihilators_anticommute():
 
 @pytest.mark.parametrize("na, nb", [(2, 0), (1, 1)])
 def test_elementwise_identical_to_slater_condon(carbon, na, nb):
-    """Both constructions consume identical parts and produce identical
-    matrices -- elementwise, for every operator."""
     _, mol, mf, act_idx = carbon
     c_act = np.eye(mol.nao_nr())[:, act_idx]
     m1 = build_operators(mol, mf, c_act, 2, na, nb, method="slater_condon")
@@ -110,44 +104,40 @@ def test_textbook_spectra_through_secondquant(carbon, na, nb):
         assert np.allclose(np.sort(s2), [0.0] * 6 + [2.0] * 3)
 
 
-# ------------------------------- tier 0: random integrals, parts separated
+# -------------------------- tier 0: random integrals, parts separated
 
-def test_elementwise_identity_on_random_nonsymmetric_integrals():
-    """The gap-closer: random COMPLEX, non-particle-symmetric G fed to
-    BOTH constructions, part by part -- the a+_p a+_q a_s a_r
-    contraction terms (which cancel identically on particle-symmetric
-    kernels) are certified here; every physical-integrals test above
-    is blind to exactly those terms."""
+def test_parts_match_slater_condon_on_random_g():
+    # raw complex g: non-particle-symmetric -- exercises the string
+    # contraction terms, which cancel identically on the
+    # particle-symmetric g of every physical-integrals test
     from atomterm.detbasis import one_body_matrix as sc_one
     from atomterm.detbasis import two_body_matrix as sc_two
     from atomterm.secondquant import one_body_matrix as sq_one
     from atomterm.secondquant import two_body_matrix as sq_two
+    from conftest import random_integrals
 
     rng = np.random.default_rng(29)
-    norb = 4
-    h = rng.standard_normal((2 * norb, 2 * norb)) \
-        + 1j * rng.standard_normal((2 * norb, 2 * norb))
-    g = rng.standard_normal((2 * norb,) * 4) \
-        + 1j * rng.standard_normal((2 * norb,) * 4)
-    for na, nb in [(2, 0), (2, 1), (2, 2), (3, 1)]:
-        dets = determinant_basis(norb, na, nb)
-        o1 = np.allclose(sc_one(dets, h), sq_one(dets, h), atol=1e-12)
-        o2 = np.allclose(sc_two(dets, g), sq_two(dets, g), atol=1e-12)
-        assert o1, (na, nb)
-        assert o2, (na, nb)
+    h, g = random_integrals(rng, 4, "complex")
+    h6, g6 = random_integrals(rng, 6, "complex")  # the mixed-l window shape
+    for hi, gi, norb, sectors in [
+        (h, g, 4, [(2, 0), (2, 1), (2, 2), (3, 1)]),
+        (h6, g6, 6, [(3, 1)]),
+    ]:
+        for na, nb in sectors:
+            dets = determinant_basis(norb, na, nb)
+            assert np.allclose(sc_one(dets, hi), sq_one(dets, hi),
+                               atol=1e-12), (norb, na, nb)
+            assert np.allclose(sc_two(dets, gi), sq_two(dets, gi),
+                               atol=1e-12), (norb, na, nb)
 
 
 # ------------------------------- tier 2: core-explicit full space, CAS(6,5)
 
 @pytest.fixture(scope="module")
 def full_space(carbon):
-    """(h1, g, w) for the all-electron CAS(6,5) space.
-
-    Core columns are the canonical core MOs *purified* to exact l = 0
-    (p/d tail dropped, pair Loewdin-orthonormalized): close to the SCF
-    solution yet exactly orthonormal against the 2p shell AOs and exactly
-    rotation-closed. (Raw s AOs work equally well; see wayfinder ticket 05.)
-    """
+    """(h1, g, w) for the all-electron CAS(6,5) space: the canonical
+    core MOs purified to exact l=0 -- close to the SCF solution yet
+    exactly orthonormal against the 2p shell AOs."""
     from atomterm.core import purified_core_orbitals
 
     _, mol, mf, act_idx = carbon
@@ -161,8 +151,8 @@ def full_space(carbon):
 
 @pytest.mark.parametrize("na, nb", [(4, 2), (3, 3)])
 def test_full_space_vs_pyscf_casci_core_explicit(full_space, carbon, na, nb):
-    """Core-explicit second-quantized H (raw integrals, no folding) vs PySCF
-    CASCI with ncore=0: identical integrals -> solver-precision agreement."""
+    """Core-explicit H vs PySCF CASCI ncore=0, identical integrals on
+    both sides."""
     from pyscf import mcscf
 
     mol, mf, w, h1, g = full_space
@@ -210,13 +200,9 @@ def test_full_space_vs_pyscf_casci_core_explicit(full_space, carbon, na, nb):
 # ------------------------------------------------------- tier 3: folded core
 
 def test_purified_core_is_pure(carbon):
-    """The purified core orbitals are exactly l = 0 (L^2 kills them),
-    S-orthonormal, and span the same space as the canonical core MOs.
-    The dropped contamination quantifies the SCF symmetry breaking.
-    NOTE: columns are NOT MO-identical -- the within-l radial gauge of
-    the general construction is an arbitrary rotation (fact 16e), so the
-    pin is the SPAN (principal cosines), not per-column overlaps.
-    """
+    """Exactly l=0, S-orthonormal, same SPAN as the canonical core
+    (column identity is gauge -- the pins are principal cosines; the
+    dropped tail quantifies the SCF symmetry breaking)."""
     from atomterm.angular import l2_matrix
     from atomterm.core import purified_core_orbitals
 
@@ -243,11 +229,9 @@ def test_purified_core_is_pure(carbon):
     print(f"\ncore MO contamination (1 - s weight): {contamination}")
 
 def test_fixed_core_sector_matches_folded(full_space, carbon):
-    """The doubly-occupied-core block of the full-space H equals the folded
-    active-space Hamiltonian shifted by the core energy. The core orbitals
-    are pure s functions, so both the explicit and the folded (actual
-    density) treatments are exactly spherical -> machine precision.
-    """
+    """The doubly-occupied-core block of the full-space H equals the
+    folded active-space H plus the core energy (both sides exactly
+    spherical -> machine precision)."""
     from pyscf import mcscf
 
     _, mol, mf, act_idx = carbon
@@ -297,11 +281,8 @@ def test_fixed_core_sector_matches_folded(full_space, carbon):
 # -------------------------------------- the closed-shell RHF bridge (Be)
 
 def test_rhf_closed_shell_bridge_be_sto3g():
-    """The PySCF bridge under MAXIMAL symmetry: Be/STO-3G RHF (closed
-    shell), the full space CAS(4,5) in the S=0 sector via the
-    pure-numpy construction vs PySCF CASCI with ncore=0 -- a different
-    symmetry class than the carbon ROHF bridge (real integrals,
-    singlet sector; masks different bugs)."""
+    """Closed-shell RHF bridge: full-space CAS(4,5) S=0 vs PySCF CASCI
+    ncore=0, ground state 1S."""
     from pyscf import gto, mcscf, scf
 
     mol = gto.M(atom="Be 0 0 0", basis="sto-3g", spin=0, verbose=0)

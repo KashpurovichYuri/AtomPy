@@ -125,10 +125,20 @@ def apply_two_body(
 def one_body_matrix(
     dets: list[tuple[int, ...]], one_body: np.ndarray
 ) -> np.ndarray:
-    """Matrix of ``O1 = sum_pq h[p,q] a+_p a_q`` over ``dets``: column
-    J holds ``O1|det_J>`` scattered onto the basis (states outside the
-    basis are dropped -- pass a complete basis for the full matrix).
-    The twin of :func:`atomterm.detbasis.one_body_matrix`."""
+    """Matrix of ``O1 = sum_pq h[p,q] a+_p a_q`` over ``dets``.
+
+    Parameters
+    ----------
+    dets : a COMPLETE determinant basis (states outside it are
+        dropped from the scattering).
+    one_body : ``(2*norb, 2*norb)`` matrix ``h[p, q]``.
+
+    Returns
+    -------
+    ``(len(dets), len(dets))`` complex matrix; column J holds
+    ``O1|det_J>`` scattered onto the basis. The name-twin of
+    :func:`atomterm.detbasis.one_body_matrix` (elementwise equal).
+    """
     index = {det: i for i, det in enumerate(dets)}
     mat = np.zeros((len(dets), len(dets)), dtype=complex)
     for j, occ in enumerate(dets):
@@ -143,9 +153,19 @@ def two_body_matrix(
     dets: list[tuple[int, ...]], two_body: np.ndarray
 ) -> np.ndarray:
     """Matrix of ``O2 = 1/2 sum_pqrs G[p,q,r,s] a+_p a+_q a_s a_r``
-    over ``dets`` (same scattering contract as
-    :func:`one_body_matrix`). The twin of
-    :func:`atomterm.detbasis.two_body_matrix`."""
+    over ``dets``.
+
+    Parameters
+    ----------
+    dets : a COMPLETE determinant basis (same scattering contract as
+        :func:`one_body_matrix`).
+    two_body : ``(2*norb,)*4`` integrals in the module convention.
+
+    Returns
+    -------
+    ``(len(dets), len(dets))`` complex matrix. The name-twin of
+    :func:`atomterm.detbasis.two_body_matrix` (elementwise equal).
+    """
     index = {det: i for i, det in enumerate(dets)}
     mat = np.zeros((len(dets), len(dets)), dtype=complex)
     nz = np.argwhere(two_body != 0)

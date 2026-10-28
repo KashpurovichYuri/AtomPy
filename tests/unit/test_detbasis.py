@@ -4,13 +4,16 @@ import numpy as np
 import pytest
 
 from atomterm.detbasis import (
+    _pair_slot,
+    _insert_sign,
+    _pop_sign,
+    _slater_condon_slow,
+    _transition_sign,
     commutator,
     determinant_basis,
     frobenius_norm,
     slater_condon_matrix,
 )
-
-pytestmark = pytest.mark.fast
 from atomterm.operators import (
     _composite_two_body,
     number_operator,
@@ -18,13 +21,16 @@ from atomterm.operators import (
     spin_block_one_body,
     spin_block_two_body,
 )
+from conftest import random_integrals
+
+pytestmark = pytest.mark.fast
 
 
 def _eigs(mat):
     return np.sort(np.real(np.linalg.eigvals(mat)))
 
 
-def test_number_operator():
+def test_number_operator_counts_electrons():
     for norb, na, nb in [(3, 2, 0), (3, 1, 1), (4, 2, 1)]:
         dets = determinant_basis(norb, na, nb)
         n_mat = slater_condon_matrix(dets, one_body=number_operator(norb))
@@ -36,7 +42,7 @@ def test_number_operator():
     [(2, 0, {2.0: 3}), (1, 1, {0.0: 6, 2.0: 3})],
 )
 def test_s2_spectrum_two_p_electrons(na, nb, counts):
-    """2p^2 textbook: Ms=1 -> 3P only (S=1); Ms=0 -> 1S+1D (S=0) + 3P (S=1)."""
+    """2p^2 textbook: Ms=1 -> 3P only; Ms=0 -> 1S+1D + 3P."""
     dets = determinant_basis(3, na, nb)
     one, two = s2_operator_parts(3)
     s2 = slater_condon_matrix(dets, one_body=one, two_body=two)
@@ -57,14 +63,10 @@ def test_sz_diagonal_matches_ms():
         assert np.allclose(np.diag(sz), (na - nb) / 2)
 
 
-def test_hermiticity_random_integrals():
+def test_matrix_hermitian_on_hermitian_random_integrals():
     rng = np.random.default_rng(7)
     norb, na, nb = 4, 2, 1
-    a = rng.normal(size=(2 * norb, 2 * norb))
-    h1 = 0.5 * (a + a.T)
-    g = rng.normal(size=(2 * norb,) * 4)
-    # Hermitian two-body operator: <pq|g|rs>* = <rs|g|pq>
-    g = 0.5 * (g + g.transpose(2, 3, 0, 1).conj())
+    h1, g = random_integrals(rng, norb, "hermitian")
     dets = determinant_basis(norb, na, nb)
     h = slater_condon_matrix(dets, one_body=h1, two_body=g)
     assert frobenius_norm(h - h.conj().T) < 1e-12
@@ -72,7 +74,7 @@ def test_hermiticity_random_integrals():
 
 @pytest.mark.parametrize("na, nb", [(2, 0), (1, 1)])
 def test_ladder_algebra_in_det_space(synthetic_p_operators, na, nb):
-    """[Lx, Ly] = i Lz must hold for the many-electron matrices as well."""
+    """[Lx, Ly] = i Lz for the many-electron matrices."""
     l_ops = synthetic_p_operators
     dets = determinant_basis(3, na, nb)
     mats = {
@@ -99,41 +101,42 @@ def test_composite_two_body_hermitian():
     assert frobenius_norm(m - m.conj().T) < 1e-12
 
 
-@pytest.mark.fast
-def test_vectorized_slater_condon_matches_reference():
-    """The vectorized slater_condon_matrix (chunked occupation
-    broadcasting + closed-form signs) is elementwise identical to the
-    reference loop implementation -- to summation-reassociation noise
-    (<1e-13) -- across sectors and operator kinds, including complex
-    NON-symmetric two-body kernels (the L.L composite class) and the
-    beta-free sector that fixes n2 from the operator, not the dets."""
-    from itertools import product
-
-    from atomterm.detbasis import (_slater_condon_slow,
-                                   determinant_basis, slater_condon_matrix)
-
+def test_vectorized_matches_slow_loop():
     rng = np.random.default_rng(11)
     norb = 5
-    h = rng.standard_normal((2 * norb, 2 * norb)) \
-        + 1j * rng.standard_normal((2 * norb, 2 * norb))
-    g = rng.standard_normal((2 * norb,) * 4) \
-        + 1j * rng.standard_normal((2 * norb,) * 4)
+    h, g = random_integrals(rng, norb, "complex")
     for na, nb in [(2, 0), (2, 1), (2, 2), (3, 1), (4, 0), (1, 0)]:
         dets = determinant_basis(norb, na, nb)
         for one, two in [(h, g), (h, None), (None, g)]:
             a = slater_condon_matrix(dets, one_body=one, two_body=two)
             b = _slater_condon_slow(dets, one_body=one, two_body=two)
+            # <1e-13 = summation-reassociation noise; the slow loop
+            # covers complex NON-symmetric two-body kernels (the L.L
+            # composite class) and the beta-free sector whose n2 comes
+            # from the operator, not the dets
             assert np.allclose(a, b, atol=1e-13), (na, nb, one is None)
+
+
+def test_vectorized_matches_slow_loop_multichunk(monkeypatch):
+    """The chunked pair loop's multi-chunk offsets (ii = rows + lo):
+    the production memory budget yields ONE chunk at test sizes, so
+    this test shrinks the budget to force eight chunks."""
+    import atomterm.detbasis as db
+
+    norb, na, nb = 4, 2, 1
+    monkeypatch.setattr(db, "_PAIR_BUDGET", 3 * (2 * norb) * 24)  # chunk=3
+    rng = np.random.default_rng(31)
+    h, g = random_integrals(rng, norb, "complex")
+    dets = determinant_basis(norb, na, nb)
+    assert len(dets) == 24
+    a = slater_condon_matrix(dets, one_body=h, two_body=g)
+    b = _slater_condon_slow(dets, one_body=h, two_body=g)
+    assert np.allclose(a, b, atol=1e-13)
 
 
 # ------------------------------------------------------- the sign algebra
 
-def test_sign_algebra_basics():
-    """Hand-computed pins of the elementary sign rules (mirrors
-    secondquant's create/annihilate micro-tier; _transition_sign is
-    the slow path's sign engine)."""
-    from atomterm.detbasis import _insert_sign, _pop_sign, _transition_sign
-
+def test_elementary_sign_rules():
     # parity of the annihilated position
     assert _pop_sign([0, 1], 0) == 1
     assert _pop_sign([0, 1], 1) == -1
@@ -151,12 +154,6 @@ def test_sign_algebra_basics():
 
 
 def test_pair_slot_maps_difference_members():
-    """np.nonzero yields ascending (pair, orbital) entries; _pair_slot
-    assigns slot 0 to the smaller, 1 to the larger member of each
-    (at most two-element) excitation set -- k > 2 pairs are filtered
-    upstream by the Slater-Condon cutoff."""
-    from atomterm.detbasis import _pair_slot
-
     rows = np.array([0, 0, 1, 2, 2])
     cols = np.array([3, 7, 5, 2, 9])
     assert _pair_slot(rows, cols).tolist() == [0, 1, 0, 0, 1]

@@ -482,11 +482,13 @@ spine a subset, `diagnostics`/`planned` the filters),
 `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
 (second quantization ≡ first quantization, elementwise) +
-`test_elementwise_identity_on_random_nonsymmetric_integrals` (the parts,
-name-twinned, on random complex non-particle-symmetric G — the string
-contraction terms physical integrals are blind to) +
-`test_rhf_closed_shell_bridge_be_sto3g` (the PySCF bridge under maximal
-symmetry: closed-shell RHF, S=0 sector),
+`test_parts_match_slater_condon_on_random_g` (the name-twinned parts on
+random complex non-particle-symmetric G — the string contraction terms
+physical integrals are blind to) +
+`test_rhf_closed_shell_bridge_be_sto3g` (closed-shell RHF bridge, S=0) +
+`test_vectorized_matches_slow_loop_multichunk` (the chunk-offset path:
+the production memory budget yields ONE chunk at test sizes, so the
+budget is monkeypatched),
 `test_full_space_vs_pyscf_casci_core_explicit` (core-explicit CAS(6,5) vs
 PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
