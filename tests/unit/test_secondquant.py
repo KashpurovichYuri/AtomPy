@@ -110,6 +110,33 @@ def test_textbook_spectra_through_secondquant(carbon, na, nb):
         assert np.allclose(np.sort(s2), [0.0] * 6 + [2.0] * 3)
 
 
+# ------------------------------- tier 0: random integrals, parts separated
+
+def test_elementwise_identity_on_random_nonsymmetric_integrals():
+    """The gap-closer: random COMPLEX, non-particle-symmetric G fed to
+    BOTH constructions, part by part -- the a+_p a+_q a_s a_r
+    contraction terms (which cancel identically on particle-symmetric
+    kernels) are certified here; every physical-integrals test above
+    is blind to exactly those terms."""
+    from atomterm.detbasis import one_body_matrix as sc_one
+    from atomterm.detbasis import two_body_matrix as sc_two
+    from atomterm.secondquant import one_body_matrix as sq_one
+    from atomterm.secondquant import two_body_matrix as sq_two
+
+    rng = np.random.default_rng(29)
+    norb = 4
+    h = rng.standard_normal((2 * norb, 2 * norb)) \
+        + 1j * rng.standard_normal((2 * norb, 2 * norb))
+    g = rng.standard_normal((2 * norb,) * 4) \
+        + 1j * rng.standard_normal((2 * norb,) * 4)
+    for na, nb in [(2, 0), (2, 1), (2, 2), (3, 1)]:
+        dets = determinant_basis(norb, na, nb)
+        o1 = np.allclose(sc_one(dets, h), sq_one(dets, h), atol=1e-12)
+        o2 = np.allclose(sc_two(dets, g), sq_two(dets, g), atol=1e-12)
+        assert o1, (na, nb)
+        assert o2, (na, nb)
+
+
 # ------------------------------- tier 2: core-explicit full space, CAS(6,5)
 
 @pytest.fixture(scope="module")
@@ -265,3 +292,38 @@ def test_fixed_core_sector_matches_folded(full_space, carbon):
     mc.canonicalization = False
     mc.kernel(mo5)
     assert np.allclose(np.sort(e_block) + mol.energy_nuc(), mc.e_tot, atol=1e-8)
+
+
+# -------------------------------------- the closed-shell RHF bridge (Be)
+
+def test_rhf_closed_shell_bridge_be_sto3g():
+    """The PySCF bridge under MAXIMAL symmetry: Be/STO-3G RHF (closed
+    shell), the full space CAS(4,5) in the S=0 sector via the
+    pure-numpy construction vs PySCF CASCI with ncore=0 -- a different
+    symmetry class than the carbon ROHF bridge (real integrals,
+    singlet sector; masks different bugs)."""
+    from pyscf import gto, mcscf, scf
+
+    mol = gto.M(atom="Be 0 0 0", basis="sto-3g", spin=0, verbose=0)
+    mf = scf.RHF(mol).run(verbose=0)
+    assert mol.nao_nr() == 5
+    w = mf.mo_coeff                                   # the complete MO set
+    h1, g = full_space_integrals(mol, mf, w)
+    dets = determinant_basis(5, 2, 2)                 # S=0 sector, 100 dets
+    H = secondquant_matrix(dets, one_body=spin_block_one_body(h1),
+                           two_body=spin_block_two_body(g))
+    evals = np.linalg.eigvalsh(H)
+
+    mc = mcscf.CASCI(mf, 5, (2, 2))
+    mc.canonicalization = False
+    mc.fcisolver.nroots = 5
+    mc.kernel(w)
+    e_pyscf = np.sort(np.atleast_1d(np.asarray(mc.e_cas)))[:5]
+    # electronic energies on both sides (nuclear repulsion excluded)
+    assert np.allclose(evals[:5], e_pyscf, atol=1e-8), (evals[:5], e_pyscf)
+
+    # the ground state is the closed-shell 1S: <S^2> = 0
+    _, evecs = np.linalg.eigh(H)
+    s2o, s2t = s2_operator_parts(5)
+    S2 = secondquant_matrix(dets, one_body=s2o, two_body=s2t)
+    assert abs(float(np.real(evecs[:, 0].conj() @ S2 @ evecs[:, 0]))) < 1e-8

@@ -109,7 +109,7 @@ def test_vectorized_slater_condon_matches_reference():
     beta-free sector that fixes n2 from the operator, not the dets."""
     from itertools import product
 
-    from atomterm.detbasis import (_slater_condon_reference,
+    from atomterm.detbasis import (_slater_condon_slow,
                                    determinant_basis, slater_condon_matrix)
 
     rng = np.random.default_rng(11)
@@ -122,5 +122,41 @@ def test_vectorized_slater_condon_matches_reference():
         dets = determinant_basis(norb, na, nb)
         for one, two in [(h, g), (h, None), (None, g)]:
             a = slater_condon_matrix(dets, one_body=one, two_body=two)
-            b = _slater_condon_reference(dets, one_body=one, two_body=two)
+            b = _slater_condon_slow(dets, one_body=one, two_body=two)
             assert np.allclose(a, b, atol=1e-13), (na, nb, one is None)
+
+
+# ------------------------------------------------------- the sign algebra
+
+def test_sign_algebra_basics():
+    """Hand-computed pins of the elementary sign rules (mirrors
+    secondquant's create/annihilate micro-tier; _transition_sign is
+    the slow path's sign engine)."""
+    from atomterm.detbasis import _insert_sign, _pop_sign, _transition_sign
+
+    # parity of the annihilated position
+    assert _pop_sign([0, 1], 0) == 1
+    assert _pop_sign([0, 1], 1) == -1
+    assert _pop_sign([0, 1, 2], 2) == 1
+    # parity of the creation position (# orbitals before it)
+    assert _insert_sign([1, 2], 0) == 1
+    assert _insert_sign([0, 2], 1) == -1
+    # <I| a+_1 a_2 |J>, J = (0, 2): ann 2 at position 1 (-1), then
+    # cre 1 with one orbital before it (-1) -> +1
+    assert _transition_sign([0, 2], [2], [1]) == 1
+    # double: J = (0, 1, 3), ann {1, 3}, cre {2, 4}: ann signs
+    # (-1)(-1), then cre 4 (orbital 0 precedes it: -1), then cre 2
+    # (orbital 0 precedes it: -1) -> +1
+    assert _transition_sign([0, 1, 3], [1, 3], [2, 4]) == 1
+
+
+def test_pair_slot_maps_difference_members():
+    """np.nonzero yields ascending (pair, orbital) entries; _pair_slot
+    assigns slot 0 to the smaller, 1 to the larger member of each
+    (at most two-element) excitation set -- k > 2 pairs are filtered
+    upstream by the Slater-Condon cutoff."""
+    from atomterm.detbasis import _pair_slot
+
+    rows = np.array([0, 0, 1, 2, 2])
+    cols = np.array([3, 7, 5, 2, 9])
+    assert _pair_slot(rows, cols).tolist() == [0, 1, 0, 0, 1]

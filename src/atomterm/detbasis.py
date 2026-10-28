@@ -1,24 +1,26 @@
-"""First-quantized many-electron operator matrices over a Slater-determinant basis.
-
-No second quantization: operators are specified by one-body matrices and
-two-electron integrals in the spin-orbital basis, and many-electron matrix
-elements follow from the explicit Slater-Condon rules applied to listed
-determinants.
+"""First-quantized many-electron operator matrices over a
+Slater-determinant basis: operators enter as one-body matrices and
+two-electron integrals in the spin-orbital basis, and the matrix
+elements follow from the explicit Slater-Condon rules.
 
 Conventions
 -----------
-* Spatial orbitals ``0..norb-1``. Spin-orbital ``p`` = spatial ``p`` with alpha
-  spin; ``norb + p`` = the same spatial orbital with beta spin.
-* A determinant is a sorted tuple of occupied spin-orbitals.
-* One-body operator: matrix ``h[p, q] = <p|h|q>``, shape ``(2*norb, 2*norb)``.
-* Two-body "integrals": chemist notation ``G[p, q, r, s] = (pq|rs) =
- Integral p(1) q(2) r(1) s(2)``, shape ``(2*norb,)*4``. The corresponding
-  two-electron operator is ``Sum_{i<j} g(i, j)``; ``G`` may be complex and
-  non-symmetric (e.g. the composite L.L operator), the rules only need the
-  matrix elements.
+* Spatial orbitals ``0..norb-1``. Spin-orbital ``p`` = spatial ``p``
+  with alpha spin; ``norb + p`` = the same spatial orbital with beta
+  spin.
+* A determinant is a sorted tuple of occupied spin-orbitals -- the
+  sparse form of an occupation bit string over the ``2*norb`` slots.
+* One-body operator: matrix ``h[p, q] = <p|h|q>``, shape
+  ``(2*norb, 2*norb)``.
+* Two-body integrals, chemist notation:
+  ``G[p, q, r, s] = (pq|rs) = Integral p(1) q(2) r(1) s(2)``, shape
+  ``(2*norb,)*4``; the operator is ``Sum_{i<j} g(i, j)``.
 
-This module is deliberately NumPy-only (no pyscf import) so that the
-Slater-Condon machinery is testable in complete isolation.
+The determinant ordering here (lexicographic over the (alpha, beta)
+combinations) is NOT PySCF's FCI string order -- they differ from
+``norb >= 4``; the mapping lives in ``cells.pyscf_ci_permutation``.
+This module is deliberately NumPy-only (no pyscf import), testable in
+complete isolation.
 """
 
 from __future__ import annotations
@@ -30,6 +32,8 @@ import numpy as np
 
 __all__ = [
     "determinant_basis",
+    "one_body_matrix",
+    "two_body_matrix",
     "slater_condon_matrix",
     "commutator",
     "frobenius_norm",
@@ -37,10 +41,21 @@ __all__ = [
 
 
 def determinant_basis(norb: int, na: int, nb: int) -> list[tuple[int, ...]]:
-    """All determinants with ``na`` alpha and ``nb`` beta electrons.
+    """All determinants with ``na`` alpha and ``nb`` beta electrons:
+    sorted tuples of occupied spin-orbitals.
 
-    Returns sorted tuples of occupied spin-orbitals (alpha block first in
-    index value, i.e. alpha orbitals are 0..norb-1, beta are norb..2norb-1).
+    Returns
+    -------
+    Lexicographic over the (alpha combination, beta combination);
+    alpha orbitals are ``0..norb-1``, beta are ``norb..2*norb-1``.
+
+    Examples
+    --------
+    One alpha and one beta electron on two spatial orbitals:
+
+    >>> determinant_basis(2, 1, 1)
+    [(0, 2), (0, 3), (1, 2), (1, 3)]
+    # (a0 b0)  (a0 b1)  (a1 b0)  (a1 b1)
     """
     dets = []
     for occ_a in combinations(range(norb), na):
@@ -50,23 +65,25 @@ def determinant_basis(norb: int, na: int, nb: int) -> list[tuple[int, ...]]:
 
 
 def _pop_sign(occ: list[int], orb: int) -> int:
-    """Sign of annihilating ``orb`` from the ordered occupation ``occ``."""
+    """Sign of annihilating ``orb`` from the ordered occupation
+    ``occ``: (-1)^(its position)."""
     i = occ.index(orb)
     return -1 if i % 2 else 1
 
 
 def _insert_sign(occ: list[int], orb: int) -> int:
-    """Sign of creating ``orb`` into the ordered occupation ``occ``."""
+    """Sign of creating ``orb`` into the ordered occupation ``occ``:
+    (-1)^(# orbitals before it)."""
     n_before = sum(1 for o in occ if o < orb)
     return -1 if n_before % 2 else 1
 
 
 def _transition_sign(occ_j: list[int], ann: list[int], cre: list[int]) -> int:
-    """Sign of <I| a+_c1 a+_c2 ... a_i2 a_i1 |J>.
+    """Sign of ``<I| a+_c1 a+_c2 ... a_i2 a_i1 |J>``.
 
-    Annihilations run in ascending orbital order (rightmost operator acts
-    first), creations in descending order, so that the paired Slater-Condon
-    values below follow the standard ``<ab||ij>`` ordering.
+    Annihilations run in ascending orbital order (rightmost operator
+    acts first), creations in descending order, so that the paired
+    Slater-Condon values follow the standard ``<ab||ij>`` ordering.
     """
     tmp = list(occ_j)
     sign = 1
@@ -79,12 +96,32 @@ def _transition_sign(occ_j: list[int], ann: list[int], cre: list[int]) -> int:
     return sign
 
 
+def one_body_matrix(
+    dets: list[tuple[int, ...]], one_body: np.ndarray
+) -> np.ndarray:
+    """The ``O1 = Sum_pq h[p,q] a+_p a_q`` matrix over ``dets``
+    (conventions and dtype: :func:`slater_condon_matrix`)."""
+    return slater_condon_matrix(dets, one_body=one_body)
+
+
+def two_body_matrix(
+    dets: list[tuple[int, ...]], two_body: np.ndarray
+) -> np.ndarray:
+    """The ``O2 = 1/2 Sum_pqrs G[p,q,r,s] a+_p a+_q a_s a_r`` matrix
+    over ``dets``, ``G`` in the module's chemist notation
+    (conventions and dtype: :func:`slater_condon_matrix`)."""
+    return slater_condon_matrix(dets, two_body=two_body)
+
+
 def slater_condon_matrix(
     dets: list[tuple[int, ...]],
     one_body: np.ndarray | None = None,
     two_body: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Full many-electron matrix of ``Sum_i h(i) + Sum_{i<j} g(i, j)``.
+    """Full many-electron matrix of ``Sum_i h(i) + Sum_{i<j} g(i, j)``
+    in ONE fused pass -- the production path (handles the 10^5-detector
+    sectors; :func:`_slater_condon_slow`, the O(ndet^2) Python loop it
+    replaced, stays as the elementwise reference pinned by tests).
 
     Parameters
     ----------
@@ -94,16 +131,11 @@ def slater_condon_matrix(
 
     Returns
     -------
-    complex ndarray of shape ``(len(dets), len(dets))`` with
-    ``M[I, J] = <I| O |J>``.
-
-    Vectorized: pair classification by chunked occupation broadcasting,
-    closed-form Slater signs from per-determinant prefix counts, and
-    gathered Slater-Condon values. Elementwise-identical to the
-    reference loop (:func:`_slater_condon_reference`, pinned by tests);
-    the loop version is O(ndet^2) Python per pair and dies in the
-    ~10^4-detector range, this handles 10^5 (the U campaign's sector
-    sizes).
+    ``(len(dets), len(dets))`` matrix, ``M[I, J] = <I|O|J>``; dtype
+    follows the inputs (real operators stay real -- a complex container
+    would double memory traffic and slow the eigendecomposition). For
+    the parts separately: :func:`one_body_matrix` /
+    :func:`two_body_matrix`.
     """
     if one_body is None and two_body is None:
         raise ValueError("at least one of one_body / two_body is required")
@@ -118,9 +150,6 @@ def slater_condon_matrix(
     # prefix counts: cum[j, t] = # occupied spin-orbitals < t in det j
     cum = np.zeros((n, n2), dtype=np.int64)
     np.cumsum(occ[:, :-1], axis=1, out=cum[:, 1:])
-    # real operators stay real: every operator of this project is
-    # real-valued, and the complex dtype costs 2x memory traffic plus a
-    # ~2.5x eigendecomposition at the 10^4-detector scale
     dtype = complex if (np.iscomplexobj(one_body if one_body is not None
                                         else two_body)) else float
     mat = np.zeros((n, n), dtype=dtype)
@@ -160,37 +189,26 @@ def slater_condon_matrix(
         cre_mask = occ_i_c & ~occ_j_c
         k_c = k[rows, cols]
 
-        # per-pair excitation indices, ascending within each pair
+        # per-pair excitation indices, ascending within each set
         ann_r, ann_c = np.nonzero(ann_mask)
         cre_r, cre_c = np.nonzero(cre_mask)
         ann = np.zeros((ii.size, 2), dtype=np.int64)
         cre = np.zeros((ii.size, 2), dtype=np.int64)
-        ann[ann_r, _within_rank(ann_r, ann_c)] = ann_c
-        cre[cre_r, _within_rank(cre_r, cre_c)] = cre_c
-        # _within_rank: 0 for the first (smaller) index of a pair, 1 for
-        # the second; k=1 pairs use only slot 0 (slot 1 stays 0 = dummy)
+        ann[ann_r, _pair_slot(ann_r, ann_c)] = ann_c
+        cre[cre_r, _pair_slot(cre_r, cre_c)] = cre_c
+        # _pair_slot: 0 for the first (smaller) member of the excitation
+        # set, 1 for the second; k=1 pairs use only slot 0 (slot 1 stays
+        # 0 = dummy)
 
-        # closed-form transition signs from prefix counts (cum):
-        #  k=1 (ann i, cre a): (-1)^{cum[j,i] + cum[j,a] - (i<a)}
-        #  k=2 (ann i<j, cre a<b, b inserted first):
-        #      (-1)^{cum[j,i] + cum[j,j_o] - 1 + cnt(i_or_j removed)(a|b)}
         sign = np.ones(ii.size)
         pref_j = cum[jj]                                      # (P, n2)
         m1 = k_c == 1
         if m1.any():
-            i1, a1 = ann[m1, 0], cre[m1, 0]
-            sign[m1] = (-1.0) ** (pref_j[m1, i1] + pref_j[m1, a1]
-                                  - (i1 < a1).astype(np.int64))
+            sign[m1] = _sign_single(pref_j[m1], ann[m1, 0], cre[m1, 0])
         m2 = ~m1
         if m2.any():
-            i2, j2 = ann[m2, 0], ann[m2, 1]                   # i2 < j2
-            a2, b2 = cre[m2, 0], cre[m2, 1]                   # a2 < b2
-            pj = pref_j[m2]
-            ar = np.arange(len(i2))
-            cnt = (lambda y: pj[ar, y]                        # noqa: E731
-                   - (i2 < y).astype(np.int64) - (j2 < y).astype(np.int64))
-            sign[m2] = (-1.0) ** (pj[ar, i2] + pj[ar, j2] - 1
-                                  + cnt(b2) + cnt(a2))
+            sign[m2] = _sign_double(pref_j[m2], ann[m2, 0], ann[m2, 1],
+                                    cre[m2, 0], cre[m2, 1])
 
         val = np.zeros(ii.size, dtype=dtype)
         if one_body is not None:
@@ -219,10 +237,47 @@ def slater_condon_matrix(
     return mat
 
 
-def _within_rank(rows: np.ndarray, cols: np.ndarray) -> np.ndarray:
-    """0 for an entry's first occurrence within its row, 1 for the
-    second (np.nonzero returns ascending column order per row; rows
-    have at most two entries because k <= 2)."""
+def _sign_single(pj: np.ndarray, i: np.ndarray, a: np.ndarray) -> np.ndarray:
+    """Closed-form k=1 transition sign (annihilate ``i``, create
+    ``a``) from determinant J's prefix counts ``pj`` (``cum`` rows):
+
+    ``(-1)^{cum[j,i] + cum[j,a] - (i < a)}``.
+    """
+    r = np.arange(len(i))
+    return (-1.0) ** (pj[r, i] + pj[r, a] - (i < a).astype(np.int64))
+
+
+def _sign_double(pj: np.ndarray, i: np.ndarray, j: np.ndarray,
+                 a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Closed-form k=2 transition sign (annihilate ``i < j``, create
+    ``a < b``, ``b`` inserted first) from determinant J's prefix
+    counts:
+
+    ``(-1)^{cum[j,i] + cum[j,j_o] - 1 + cnt(b) + cnt(a)}`` with
+    ``cnt(y) = cum[j,y] - (i < y) - (j < y)``.
+    """
+    r = np.arange(len(i))
+    cnt = (lambda y: pj[r, y]                        # noqa: E731
+           - (i < y).astype(np.int64) - (j < y).astype(np.int64))
+    return (-1.0) ** (pj[r, i] + pj[r, j] - 1 + cnt(b) + cnt(a))
+
+
+def _pair_slot(rows: np.ndarray, cols: np.ndarray) -> np.ndarray:
+    """Map each (pair, orbital) entry of ``np.nonzero`` output to its
+    slot in the ``(..., 2)`` excitation-index arrays: 0 = smaller
+    member of the pair, 1 = larger.
+
+    The excitation sets have at most TWO members because the pairs
+    were pre-filtered to k <= 2 (a two-body operator has zero matrix
+    elements beyond double excitations); ``np.nonzero`` returns
+    ascending column order within each row, so "first occurrence in
+    the row" = the smaller orbital.
+
+    Examples
+    --------
+    >>> _pair_slot(np.array([0, 0, 1, 2, 2]), np.array([3, 7, 5, 2, 9]))
+    array([0, 1, 0, 0, 1])
+    """
     out = np.zeros(len(rows), dtype=np.int64)
     order = np.lexsort((cols, rows))
     rs = rows[order]
@@ -232,13 +287,14 @@ def _within_rank(rows: np.ndarray, cols: np.ndarray) -> np.ndarray:
     return out
 
 
-def _slater_condon_reference(
+def _slater_condon_slow(
     dets: list[tuple[int, ...]],
     one_body: np.ndarray | None = None,
     two_body: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Original loop implementation -- kept as the elementwise-identity
-    reference for the vectorized :func:`slater_condon_matrix` (tests)."""
+    """The original O(ndet^2) Python loop -- kept as the elementwise
+    reference for the vectorized :func:`slater_condon_matrix`
+    (pinned by tests; sign engine: :func:`_transition_sign`)."""
     ndet = len(dets)
     mat = np.zeros((ndet, ndet), dtype=complex)
 

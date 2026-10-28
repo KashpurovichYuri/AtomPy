@@ -40,8 +40,8 @@ mode restrictions lift). Mechanical enforcement: the global
 |---|---|---|
 | `src/atomterm/system.py` | `AtomConfig`, `build_mol`, `sector_na_nb`, `ncore_of` | validates: single atom, spherical basis (origin by construction); `AtomConfig.ecp` pairs basis+pseudopotential; the sector/core helpers raise on parity violations and take `mol.nelectron` (ECP-honest — never recompute from Z) |
 | `src/atomterm/angular.py` | `l_matrices`, `l_ladder_matrices`, `l2_matrix`, `l_matrices_analytic` | one-electron `Lx/Ly/Lz` AO matrices. Primary: libcint `int1e_irp` (decoded layout in the docstring). Cross-check: exact tesseral algebra via overlaps. |
-| `src/atomterm/detbasis.py` | `determinant_basis`, `slater_condon_matrix`, `commutator` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants |
-| `src/atomterm/secondquant.py` | `annihilate`, `create`, `secondquant_matrix` | **pure numpy, no pyscf** — same matrices via explicit a+/a application on occupation vectors (correct operator application, sign tracking) |
+| `src/atomterm/detbasis.py` | `determinant_basis`, `one_body_matrix`, `two_body_matrix`, `slater_condon_matrix`, `commutator`, `frobenius_norm` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants; `slater_condon_matrix` = the fused one-pass production path (10^5 dets), `one_body_matrix`/`two_body_matrix` = the parts, name-twinned with secondquant (the cross-certification is name-symmetric); `_slater_condon_slow` = the pinned reference loop; ordering ≠ PySCF FCI strings (bridge lives in cells) |
+| `src/atomterm/secondquant.py` | `annihilate`, `create`, `apply_one_body`, `apply_two_body`, `one_body_matrix`, `two_body_matrix`, `secondquant_matrix` | **pure numpy, no pyscf** — the same matrices via explicit a+/a application on occupation vectors (ket application + scattering, sign tracking); `one_body_matrix`/`two_body_matrix` twin the detbasis names; the random non-particle-symmetric-G pin certifies the string contraction terms that physical integrals are blind to |
 | `src/atomterm/operators.py` | `build_operators`, `full_space_integrals`, `window_closure` | assembles H, Lz, L^2, S^2, Sz, N as full `(ndet, ndet)` matrices; core folded into h1 (mcscf convention, spherically averaged); `method="slater_condon"|"secondquant"` switches the many-body evaluation; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19); the explicit ladder operators (`spin_ladders`, `l_ladder_operator`, `spin_ladder_matrix`) power the L²/S² twin-construction tests |
 | `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_rungs(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README · Methods) |
 | `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the one deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters; `mc_opts` = per-run optimizer knobs (budgets); all checkpointed (`.chk`); labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source) |
@@ -481,7 +481,12 @@ the declaration groups: `window_grid` = the one render order, the
 spine a subset, `diagnostics`/`planned` the filters),
 `test_hamiltonian_matches_pyscf_fci`
 (Slater–Condon vs PySCF FCI), `test_elementwise_identical_to_slater_condon`
-(second quantization ≡ first quantization, elementwise),
+(second quantization ≡ first quantization, elementwise) +
+`test_elementwise_identity_on_random_nonsymmetric_integrals` (the parts,
+name-twinned, on random complex non-particle-symmetric G — the string
+contraction terms physical integrals are blind to) +
+`test_rhf_closed_shell_bridge_be_sto3g` (the PySCF bridge under maximal
+symmetry: closed-shell RHF, S=0 sector),
 `test_full_space_vs_pyscf_casci_core_explicit` (core-explicit CAS(6,5) vs
 PySCF ncore=0), `test_full_multiplet_ms0` (textbook ¹S/¹D/³P),
 `test_commutators_vanish_in_shell_space` (exact symmetry),
