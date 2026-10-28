@@ -8,7 +8,8 @@ Working agreement for coding agents on this repository.
 symbols (`^(2S+1)L`) using *exact* angular momentum operators. Pipeline:
 ROHF → CASCI → CASSCF → SA-CASSCF (PySCF), then a first-quantized analysis:
 `Lz`, `L^2`, `S^2`, `N` built as plain matrices in the Slater-determinant
-basis (no second quantization anywhere), symmetry quantified by
+basis (second quantization appears only as the elementwise
+cross-check twin), symmetry quantified by
 `||[H, Lz]||_F` and `||[H, L^2]||_F`.
 
 ## Environment
@@ -57,6 +58,11 @@ mode restrictions lift). Mechanical enforcement: the global
 | `src/atomterm/drivers.py` | (compat facade) | re-exports the historic surface over reference/windows/core/casscf — existing imports keep working; NEW code imports the owning module |
 
 ## Hard-won facts (do not re-derive)
+
+MIGRATION (2026-10-28): fact text is moving into the owning modules'
+docstrings as the file-by-file review proceeds; an entry reduced to
+`N. <claim> -> <module>` is index-only -- the full text lives in that
+module.
 
 1. **PySCF AO labels are truthful** (`2px` really is px); shells may be fused
    (`nctr > 1`): cc-pVDZ C shell 0 is one contracted s shell with two AOs.
