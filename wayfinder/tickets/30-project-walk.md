@@ -68,3 +68,14 @@ Verification walked (A/B where deterministic; degenerate / coincident
 / reference pins actively sought); homed facts collapsed to index
 lines; layout row updated; one lockstep commit. Sessions switch at
 phase boundaries via a message.txt handoff.
+
+## Naming watchlist (R2; spotted between phases -- each entry is
+## consumed at the owning file's phase, renamed WITH its consumers)
+
+- `_persist` (casscf.py) -- the module's own language is
+  "checkpointed (.chk)"; join that family (`_checkpoint`?) --
+  phase 2.
+- `_persist_cell` (cells.py) -- the store's language is store/load
+  (`load_cell`, `store_name=`): the writer wants to be `_store_cell`,
+  the natural pair of `load_cell` -- phase 4.
+- (add freely as spotted; an entry dies when consumed)
