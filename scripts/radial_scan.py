@@ -8,12 +8,13 @@ Writes elements/<label>_scan.md and prints it. No optimizer anywhere --
 every window is an explicit cos/sin construction (see atomterm.scans).
 """
 
+from atomterm.reference import run_rohf
+from atomterm.windows import select_shell_ao
 import sys
 from pathlib import Path
 
 import numpy as np
 
-from atomterm.drivers import run_rohf, select_shell_ao
 from atomterm.scans import member_tilt_map, radial_scan, scan_state, scan_window
 from atomterm.system import AtomConfig
 

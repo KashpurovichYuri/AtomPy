@@ -18,12 +18,12 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from atomterm.windows import occupied_core_idx
 
 from scipy.linalg import expm
 
 from atomterm.angular import l_matrices  # noqa: F401  (libcint init)
 from atomterm.casscf import constrained_casscf
-from atomterm.drivers import occupied_core_idx
 from atomterm.operators import build_operators
 from atomterm.reference import run_rohf
 from atomterm.system import AtomConfig, build_mol, ncore_of

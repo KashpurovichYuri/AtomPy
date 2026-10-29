@@ -4,7 +4,7 @@ from collections import Counter
 
 import numpy as np
 
-from atomterm.pipeline import run_carbon
+from atomterm.cases import run_carbon
 from atomterm.system import AtomConfig
 
 import pytest

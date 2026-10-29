@@ -4,7 +4,8 @@ files can import it by name at any time -- a ``conftest`` basename is
 claimed per-directory by pytest and direct imports of it are
 order-dependent across tiers."""
 
-from atomterm.drivers import ReferenceSpec
+from atomterm.reference import ReferenceSpec
+
 
 # Sc CAS(3,6)/{3d,4s}, Ms=1/2 sector: the complete free-ion term table of
 # 3d1 4s2 + 3d2 4s1 + 3d3 over the 90 determinants (ticket 11).

@@ -18,7 +18,8 @@ from pyscf import lib
 lib.num_threads(1)
 
 from atomterm.system import AtomConfig, build_mol  # noqa: E402
-from atomterm.drivers import run_rohf, select_shell_ao  # noqa: E402
+from atomterm.reference import run_rohf  # noqa: E402
+from atomterm.windows import select_shell_ao  # noqa: E402
 
 
 def block(name: str, array: np.ndarray) -> str:

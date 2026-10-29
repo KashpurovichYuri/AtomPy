@@ -4,11 +4,14 @@ the gated TM references, TM free-ion tables, and the fact-20 closure
 certificate at ncore=4. All bands carry the measured fresh-draw values in
 comments."""
 
+from atomterm.casscf import run_casci
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.windows import build_full_mo, radial_basis, select_valence_ao
 import numpy as np
 import pytest
 
-from atomterm import analysis, drivers, operators
-from atomterm.drivers import ReferenceSpec
+from atomterm import analysis, operators
 from atomterm.system import AtomConfig, build_mol, ncore_of, sector_na_nb
 
 C_ECP = AtomConfig(symbol="C", basis="ccecpccpvdz", ecp="ccecp", spin=2)
@@ -34,10 +37,10 @@ def test_ecp_c_multiplet_exact():
     (<L^2> = 2) < 1D x5 (6) < 1S (0), degenerate within each term, and
     the frozen-configuration spacing ratio (1S-3P)/(1D-3P) = 5/2 (the
     one-Slater-parameter structure of a pure p^2 window)."""
-    mol, mf = drivers.run_rohf(C_ECP, "elements/ecp/C_ccecp/rungs/rohf.chk")
-    act = drivers.select_valence_ao(mol, ["2p"])
+    mol, mf = run_rohf(C_ECP, "elements/ecp/C_ccecp/rungs/rohf.chk")
+    act = select_valence_ao(mol, ["2p"])
     c_shell = np.eye(mol.nao_nr())[:, act]
-    res = drivers.run_casci(mf, 3, (1, 1), drivers.build_full_mo(mf, [0], act),
+    res = run_casci(mf, 3, (1, 1), build_full_mo(mf, [0], act),
                             "elements/ecp/C_ccecp/rungs/rohf.chk",
                             nroots=9, name="casci_ms0")
     ops = operators.build_operators(mol, mf, c_shell, 1, 1, 1)
@@ -64,8 +67,8 @@ def test_ecp_raw_detector_louder():
     ns^2 explicit, the core sits closer to the open shell. Measured:
     ||[H,Lz]||_raw = 1.09e-4 (all-electron C: 6.1e-6) and the 3P split
     8.0e-5 Eh (AE: 4.4e-5)."""
-    mol, mf = drivers.run_rohf(C_ECP, "elements/ecp/C_ccecp/rungs/rohf.chk")
-    act = drivers.select_valence_ao(mol, ["2p"])
+    mol, mf = run_rohf(C_ECP, "elements/ecp/C_ccecp/rungs/rohf.chk")
+    act = select_valence_ao(mol, ["2p"])
     c_shell = np.eye(mol.nao_nr())[:, act]
     ops = operators.build_operators(mol, mf, c_shell, 1, 2, 0,
                                     spherical_core=False)
@@ -81,10 +84,10 @@ def test_ecp_si_multiplet_and_ncore0_fold():
     """Si/ccECP: same exact table; and the FULL-VALENCE CAS(4,4) at
     ncore=0 -- the empty-core fold must be an exact no-op (veff == 0)
     with the closure certificate intact."""
-    mol, mf = drivers.run_rohf(SI_ECP, "elements/ecp/Si_ccecp/rungs/rohf.chk")
-    act = drivers.select_valence_ao(mol, ["3p"])
+    mol, mf = run_rohf(SI_ECP, "elements/ecp/Si_ccecp/rungs/rohf.chk")
+    act = select_valence_ao(mol, ["3p"])
     c_shell = np.eye(mol.nao_nr())[:, act]
-    res = drivers.run_casci(mf, 3, (1, 1), drivers.build_full_mo(mf, [0], act),
+    res = run_casci(mf, 3, (1, 1), build_full_mo(mf, [0], act),
                             "elements/ecp/Si_ccecp/rungs/rohf.chk",
                             nroots=9, name="casci_ms0")
     ops = operators.build_operators(mol, mf, c_shell, 1, 1, 1)
@@ -95,7 +98,7 @@ def test_ecp_si_multiplet_and_ncore0_fold():
     assert 0.03 < ev[3] - ev[0] < 0.06  # measured 0.0406 Eh (AE 0.0594)
 
     # ncore=0: window {3s, 3p}, CAS(4,4), (3, 1)
-    fv = drivers.select_valence_ao(mol, ["3s", "3p"])
+    fv = select_valence_ao(mol, ["3s", "3p"])
     c_fv = np.eye(mol.nao_nr())[:, fv]
     h1, _g = operators.active_space_integrals(mol, mf, c_fv, 0)
     h1_direct = c_fv.conj().T @ mf.get_hcore() @ c_fv
@@ -117,14 +120,14 @@ def test_ecp_tm_references_and_basins():
         (SC_ECP, SC_REF, 3, -46.12052897, 1e-3, 1e-1),  # measured 1.38e-2
         (TI_ECP, TI_REF, 4, -57.60649802, 0.0, 1e-6),  # measured 6.9e-9
     ]:
-        mol, mf = drivers.run_rohf(
+        mol, mf = run_rohf(
             cfg, f"elements/ecp/{cfg.label}/rungs/rohf.chk", ref=ref)
         assert abs(mf.e_tot - e_pinned) < 1e-6
-        act = drivers.select_valence_ao(mol, ["3d", "4s"])
+        act = select_valence_ao(mol, ["3d", "4s"])
         # electrons, not len(act): pre-guard this passed the AO count
         # (Sc ran ncore=2, Ti ncore=3 -- silently floored, ticket 19)
         ncore = ncore_of(mol.nelectron, nelec)
-        mo = drivers.build_full_mo(mf, list(range(ncore)), act)
+        mo = build_full_mo(mf, list(range(ncore)), act)
         cl = window_closure(mol, mo[:, ncore:ncore + len(act)])
         assert defect_lo < cl["lz"] < defect_hi
 
@@ -139,9 +142,9 @@ def test_ecp_tm_multiplet_tables():
         (SC_ECP, SC_REF, 3, 1, 6.0, 0, 4, None),      # 2D x5 ground
         (TI_ECP, TI_REF, 4, 2, 12.0, 0, 6, 12.0),     # 3F x7, then 5F x7
     ]:
-        mol, mf = drivers.run_rohf(
+        mol, mf = run_rohf(
             cfg, f"elements/ecp/{cfg.label}/rungs/rohf.chk", ref=ref)
-        act = drivers.select_valence_ao(mol, ["3d", "4s"])
+        act = select_valence_ao(mol, ["3d", "4s"])
         c_shell = np.eye(mol.nao_nr())[:, act]
         na, nb = sector_na_nb(nelec, spin)
         ncore = ncore_of(mol.nelectron, nelec)
@@ -171,15 +174,15 @@ def test_ecp_tm_purified_core_closes_the_input_windows():
     from atomterm.operators import window_closure
 
     for cfg, ref, nelec in [(SC_ECP, SC_REF, 3), (TI_ECP, TI_REF, 4)]:
-        mol, mf = drivers.run_rohf(
+        mol, mf = run_rohf(
             cfg, f"elements/ecp/{cfg.label}/rungs/rohf.chk", ref=ref)
-        act = drivers.select_valence_ao(mol, ["3d", "4s"])
+        act = select_valence_ao(mol, ["3d", "4s"])
         ncore = ncore_of(mol.nelectron, nelec)
-        c_pur, contam = drivers.purified_core_orbitals(mol, mf, ncore)
+        c_pur, contam = purified_core_orbitals(mol, mf, ncore)
         assert contam.max() < 1e-3
         for mo in [
-            drivers.build_full_mo(mf, list(range(ncore)), act, c_core=c_pur),
-            drivers.radial_basis(mf, list(range(ncore)), act, c_core=c_pur)[0],
+            build_full_mo(mf, list(range(ncore)), act, c_core=c_pur),
+            radial_basis(mf, list(range(ncore)), act, c_core=c_pur)[0],
         ]:
             cl = window_closure(mol, mo[:, ncore:ncore + len(act)])
             assert cl["lz"] < 1e-12 and cl["lperp"] < 1e-12

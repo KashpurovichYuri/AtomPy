@@ -2,7 +2,7 @@
 references (Sc/Ti), the fractional-occupation ensemble, build_full_mo's
 block safety on real atoms, the radial substrate, and the purified
 core -- imported from the OWNING modules (reference/windows/core/
-casscf); the drivers facade stays for historic importers only.
+casscf).
 
 The build_full_mo tests are the regression guard for the ticket-09 bug:
 a naive complement projector silently returned a NON-orthonormal MO matrix

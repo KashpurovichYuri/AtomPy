@@ -33,10 +33,13 @@ from pathlib import Path
 
 sys.path.insert(0, "src")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atomterm.casscf import run_casci
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import run_rohf
+from atomterm.windows import primitive_chain, select_primitives
 import numpy as np
 
 from run_u import CFG, CHK, NCORE, REF
-from atomterm import drivers
 from atomterm.detbasis import commutator, frobenius_norm
 from atomterm.operators import (
     build_operators,
@@ -51,7 +54,7 @@ NTRACK = 24  # roots scanned for the 5L-deg-like (<L^2> ~ 72) member
 
 def f_rows(mol):
     """The f-chain AO rows (for <N_f>: the honest all-chain f population)."""
-    return [r for _, rs in drivers.primitive_chain(mol, 3) for r in rs]
+    return [r for _, rs in primitive_chain(mol, 3) for r in rs]
 
 
 def valence_rows(mol):
@@ -62,19 +65,19 @@ def valence_rows(mol):
     singles sit tens of Eh up and never mix -- the curve would be flat."""
     rows = []
     for l, band in [(3, (0.2, 4.0)), (2, (0.1, 0.5))]:
-        rows.extend(drivers.select_primitives(mol, l, exponent_band=band))
+        rows.extend(select_primitives(mol, l, exponent_band=band))
     return rows
 
 
 def main():
     wanted = [int(a) for a in sys.argv[1:]] or K_STEPS
-    mol, mf = drivers.run_rohf(CFG, CHK, ref=REF)
+    mol, mf = run_rohf(CFG, CHK, ref=REF)
     e_rohf = mf.e_tot
     print(f"reference: E = {e_rohf:.8f} Eh  (cached gated Newton)")
 
     closed = list(np.flatnonzero(mf.mo_occ == 2.0))
     assert len(closed) == NCORE, (len(closed), NCORE)
-    c_pur, contam = drivers.purified_core_orbitals(mol, mf, NCORE)
+    c_pur, contam = purified_core_orbitals(mol, mf, NCORE)
     print(f"pur core: max contamination {max(contam):.2e}")
 
     open_cols = list(np.flatnonzero(mf.mo_occ == 1.0))
@@ -116,7 +119,7 @@ def main():
 
         # PySCF side + core energy (same convention as the lattice run):
         # k=0 is a 1-det CASCI (exact trivially)
-        cas = drivers.run_casci(mf, ncas, (4, 0), mo, CHK,
+        cas = run_casci(mf, ncas, (4, 0), mo, CHK,
                                 nroots=min(NTRACK, ndet),
                                 name=f"mo_ne4_norb{ncas}")  # MO window: 4 active e-, ncas orbitals
         core = cas.core_energy

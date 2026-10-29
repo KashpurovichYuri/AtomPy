@@ -35,13 +35,15 @@ from pathlib import Path
 
 sys.path.insert(0, "src")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atomterm.casscf import run_casci
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.windows import build_full_mo, occupied_core_idx, select_valence_ao
 import numpy as np
 
 from run_u import prim_weights
-from atomterm import drivers
 from atomterm.analysis import term_symbol
 from atomterm.detbasis import commutator, frobenius_norm
-from atomterm.drivers import ReferenceSpec
 from atomterm.operators import build_operators, window_closure
 from atomterm.system import AtomConfig
 
@@ -98,15 +100,15 @@ def anchors(atom, spin):
 
 
 def run_tier(mol, mf, tag, act_rows, ncore, na, nb, chk):
-    closed = drivers.occupied_core_idx(mf, ncore)
-    c_pur, contam = drivers.purified_core_orbitals(mol, mf, ncore)
-    mo = drivers.build_full_mo(mf, closed, act_rows, c_core=c_pur)
+    closed = occupied_core_idx(mf, ncore)
+    c_pur, contam = purified_core_orbitals(mol, mf, ncore)
+    mo = build_full_mo(mf, closed, act_rows, c_core=c_pur)
     ncas = len(act_rows)
     ndet = math.comb(ncas, na) * math.comb(ncas, nb)
     sm = smearing(mol, mf, act_rows, mo[:, :ncore])
     fci_opts = ({"pspace_size": ndet} if ndet <= EXACT_MAX
                 else {"conv_tol": 1e-12})
-    cas = drivers.run_casci(mf, ncas, (na, nb), mo, chk, nroots=1,
+    cas = run_casci(mf, ncas, (na, nb), mo, chk, nroots=1,
                             name=tag, fci_opts=fci_opts)
     # build_full_mo returns [core | window | complement] (fact 7): the
     # analysis space is the WINDOW slice only
@@ -167,7 +169,7 @@ def main():
         if kind == "contracted":
             cfg = AtomConfig(sym, "ccpvdz", spin=spin)
             chk = str(RES / f"{sym}_ccpvdz_s{spin}_rohf.chk")
-            mol, mf = drivers.run_rohf(cfg, chk,
+            mol, mf = run_rohf(cfg, chk,
                                        ref=cfg_kw.get("ref_contract"))
             tier_spec = list(SHELL_TIERS)  # (tag, patterns); lazy resolve
             anc = anchors(sym, spin)
@@ -190,7 +192,7 @@ def main():
             # uncontracted s span smears the core over 20 primitives --
             # measured E = -737.2 vs -759.74; the fact-15c runaway was a
             # FRAC-OCC effect, and the contracted plain ROHF is clean)
-            mol, mf = drivers.run_rohf(cfg, chk)
+            mol, mf = run_rohf(cfg, chk)
             e_ref_contracted = {"Sc": -759.7362551, "Ti": -848.4064888}[sym]
             assert mf.e_tot < e_ref_contracted + 1e-4, (
                 "decontracted ROHF failed to reproduce the mean field: "
@@ -261,7 +263,7 @@ def main():
                 if tiers and t not in tiers:
                     continue
                 try:
-                    rows = drivers.select_valence_ao(mol, pats)
+                    rows = select_valence_ao(mol, pats)
                 except ValueError as exc:
                     print(f"{t:>7}: skipped ({exc})")
                     continue

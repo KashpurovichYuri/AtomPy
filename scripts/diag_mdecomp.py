@@ -17,15 +17,16 @@ from pathlib import Path
 
 sys.path.insert(0, "src")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import run_rohf
+from atomterm.windows import build_full_mo, lm_sectors
 import numpy as np
 
 from run_u import CFG, CHK, NCORE, REF, build_window
-from atomterm import drivers
 from atomterm.detbasis import determinant_basis
 from atomterm.operators import build_operators
-from atomterm.drivers import lm_sectors
 
-mol, mf = drivers.run_rohf(CFG, CHK, ref=REF)
+mol, mf = run_rohf(CFG, CHK, ref=REF)
 open_cols = list(np.flatnonzero(mf.mo_occ == 1.0))
 s = mol.intor_symmetric("int1e_ovlp")
 sectors = lm_sectors(mol)
@@ -61,9 +62,9 @@ for j, oc in enumerate(open_cols):
 
 # (c): the reference det expressed in the 3f+2d window
 closed = list(np.flatnonzero(mf.mo_occ == 2.0))
-c_pur, _ = drivers.purified_core_orbitals(mol, mf, NCORE)
+c_pur, _ = purified_core_orbitals(mol, mf, NCORE)
 f_rows, d_rows, win = build_window(mol, {"f": (0.2, 2.0), "d": (0.1, 0.5)})
-mo = drivers.build_full_mo(mf, closed, win, c_core=c_pur)
+mo = build_full_mo(mf, closed, win, c_core=c_pur)
 ncas = len(win)
 ops = build_operators(mol, mf, mo[:, NCORE:NCORE + ncas], NCORE, 4, 0,
                       c_core=mo[:, :NCORE])

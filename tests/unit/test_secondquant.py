@@ -4,6 +4,7 @@ carbon integrals and random non-particle-symmetric g, part by part),
 the core-explicit full-space bridge to PySCF CASCI (carbon ROHF; the
 closed-shell Be RHF variant), and the folded-core bookkeeping."""
 
+from atomterm.windows import build_full_mo, complete_orthonormal
 import numpy as np
 import pytest
 
@@ -25,7 +26,6 @@ from atomterm.operators import (
     spin_block_one_body,
     spin_block_two_body,
 )
-from atomterm.drivers import build_full_mo, complete_orthonormal
 
 
 # ---------------------------------------------------------------- sign rules

@@ -20,15 +20,17 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, "src")
+from atomterm.casscf import run_casci
+from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.windows import build_full_mo, occupied_core_idx, select_primitives, select_valence_ao
 import numpy as np
 from pyscf import mcscf
 
 from atomterm.system import AtomConfig
-from atomterm import drivers
 from atomterm.operators import active_space_integrals
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
 
-TI_REF = drivers.ReferenceSpec(
+TI_REF = ReferenceSpec(
     occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
     occ_open=("3d",),
     occ_e_ref=-848.40648875,
@@ -39,10 +41,10 @@ from run_u import BAS, ECP
 def compare(label, mol, mf, act_idx, ncore, na, nb):
     out = Path("elements/diag"); out.mkdir(parents=True, exist_ok=True)
     chk = str(out / f"{label}_diag.chk")
-    mo = drivers.build_full_mo(mf, drivers.occupied_core_idx(mf, ncore),
+    mo = build_full_mo(mf, occupied_core_idx(mf, ncore),
                                act_idx)
     ncas = len(act_idx)
-    cas = drivers.run_casci(mf, ncas, (na, nb), mo, chk, nroots=1)
+    cas = run_casci(mf, ncas, (na, nb), mo, chk, nroots=1)
     c_run = cas.mo_coeff[:, ncore:ncore + ncas]
     c_raw = np.eye(mol.nao_nr())[:, act_idx]
 
@@ -88,7 +90,7 @@ def compare(label, mol, mf, act_idx, ncore, na, nb):
 def main():
     Path("elements/diag").mkdir(parents=True, exist_ok=True)
     # gated U reference (ticket 21): whole-l spans + Newton
-    U_REF = drivers.ReferenceSpec(
+    U_REF = ReferenceSpec(
         occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
         occ_e_ref=-50.38185233, conv_accelerator="newton")
     U_BANDS = {"f": (0.5, 2.0), "d": (0.1, 0.5)}
@@ -107,13 +109,13 @@ def main():
     ]
     for (label, cfg, ref, patterns, nelec, na, nb, ncore) in cases:
         print(f"\n{label} (ROHF{' gated' if ref else ''}) ...", flush=True)
-        mol, mf = drivers.run_rohf(cfg, f"elements/diag/{label}_rohf.chk",
+        mol, mf = run_rohf(cfg, f"elements/diag/{label}_rohf.chk",
                                    ref=ref)
         if patterns is not None:
-            act = drivers.select_valence_ao(mol, patterns)
+            act = select_valence_ao(mol, patterns)
         else:
-            f_rows = drivers.select_primitives(mol, 3, exponent_band=U_BANDS["f"])
-            d_rows = drivers.select_primitives(mol, 2, exponent_band=U_BANDS["d"])
+            f_rows = select_primitives(mol, 3, exponent_band=U_BANDS["f"])
+            d_rows = select_primitives(mol, 2, exponent_band=U_BANDS["d"])
             act = f_rows + d_rows
         compare(label, mol, mf, act, ncore, na, nb)
 

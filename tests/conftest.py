@@ -3,11 +3,11 @@ by design -- "we can build C even within unit") and the synthetic
 no-SCF substrates. Campaign fixtures (Sc/Ti gated ROHF, term tables)
 live in integration/conftest.py."""
 
+from atomterm.windows import select_shell_ao
 import numpy as np
 import pytest
 
 from atomterm.system import AtomConfig, build_mol
-from atomterm.drivers import select_shell_ao
 
 
 @pytest.fixture(scope="session")

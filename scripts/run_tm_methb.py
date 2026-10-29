@@ -25,17 +25,19 @@ from pathlib import Path
 
 sys.path.insert(0, "src")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atomterm.casscf import run_casci
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.windows import occupied_core_idx, select_valence_ao
 import numpy as np
 
 from run_tm_lattice import RES, anchors
-from atomterm import drivers
 from atomterm.detbasis import commutator, frobenius_norm
 from atomterm.operators import build_operators
 from atomterm.system import AtomConfig
 
 def _ti_ref():
-    from atomterm.drivers import ReferenceSpec
-    return ReferenceSpec(
+        return ReferenceSpec(
         occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
         occ_open=("3d",), occ_e_ref=-848.40648875)
 
@@ -59,16 +61,16 @@ def main():
         print(f"\n{'#' * 70}\n# {sym} methodology B (matched cost)\n{'#' * 70}")
         cfg = AtomConfig(sym, "ccpvdz", spin=spin)
         chk = str(RES / f"{sym}_ccpvdz_s{spin}_rohf.chk")
-        mol, mf = drivers.run_rohf(
+        mol, mf = run_rohf(
             cfg, chk, ref=(kw["ref_factory"]() if kw.get("ref_factory") else None))
-        c_pur, contam = drivers.purified_core_orbitals(mol, mf, ncore)
+        c_pur, contam = purified_core_orbitals(mol, mf, ncore)
         print(f"pur core: max contamination {max(contam):.2e}")
 
-        closed = drivers.occupied_core_idx(mf, ncore)
+        closed = occupied_core_idx(mf, ncore)
         occ2 = list(np.flatnonzero(mf.mo_occ == 2.0))
         val_occ = occ2[ncore:] + list(np.flatnonzero(mf.mo_occ == 1.0))
         assert len(val_occ) == 1 + int(cfg.spin), val_occ
-        rows_v = drivers.select_valence_ao(mol, ["3d", "4s", "4d", "4p"])
+        rows_v = select_valence_ao(mol, ["3d", "4s", "4d", "4p"])
         s = mol.intor_symmetric("int1e_ovlp")
         virt = [k for k in range(mf.mo_coeff.shape[1]) if mf.mo_occ[k] == 0.0]
         char = {k: float(mf.mo_coeff[:, k][rows_v]
@@ -88,7 +90,7 @@ def main():
             mo = np.hstack([c_pur, mf.mo_coeff[:, cols]])
             ncas = len(cols)
             ndet = math.comb(ncas, na) * math.comb(ncas, nb)
-            cas = drivers.run_casci(mf, ncas, (na, nb), mo, chk, nroots=1,
+            cas = run_casci(mf, ncas, (na, nb), mo, chk, nroots=1,
                                     name=f"methb_w{w}",
                                     fci_opts={"pspace_size": ndet})
             ops = build_operators(mol, mf, mo[:, ncore:ncore + ncas],

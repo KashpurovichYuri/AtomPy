@@ -27,10 +27,10 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from atomterm.windows import occupied_core_idx
 
 from atomterm.angular import real_to_complex
 from atomterm.detbasis import determinant_basis
-from atomterm.drivers import occupied_core_idx
 from atomterm.operators import build_operators
 from atomterm.reference import run_frac_occ, run_rohf
 from atomterm.system import AtomConfig, build_mol, ncore_of

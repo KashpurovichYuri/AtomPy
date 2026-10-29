@@ -25,10 +25,12 @@ from pathlib import Path
 
 sys.path.insert(0, "src")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import run_rohf
+from atomterm.windows import build_full_mo
 import numpy as np
 
 from run_u import CFG, CHK, NCORE, REF, build_window
-from atomterm import drivers
 from atomterm.natural import (
     ci_rdm1,
     natural_orbitals,
@@ -61,17 +63,17 @@ def closed_shell_core_energy(mf, c_core):
 
 
 def main():
-    mol, mf = drivers.run_rohf(CFG, CHK, ref=REF)
+    mol, mf = run_rohf(CFG, CHK, ref=REF)
     closed = list(np.flatnonzero(mf.mo_occ == 2.0))
     assert len(closed) == NCORE, (len(closed), NCORE)
-    C_PUR, _ = drivers.purified_core_orbitals(mol, mf, NCORE)
+    C_PUR, _ = purified_core_orbitals(mol, mf, NCORE)
     e_core = closed_shell_core_energy(mf, C_PUR)
     print(f"pur core: {NCORE} orbitals, E_core = {e_core:.8f} Eh")
 
     f_rows, d_rows, win = build_window(mol, BANDS)
     ncas = len(win)
     print(f"window 2f+2d: {ncas} columns")
-    mo = drivers.build_full_mo(mf, closed, win, c_core=C_PUR)
+    mo = build_full_mo(mf, closed, win, c_core=C_PUR)
     c_act = mo[:, NCORE:NCORE + ncas]
 
     ops = build_operators(mol, mf, c_act, NCORE, 4, 0, c_core=C_PUR)

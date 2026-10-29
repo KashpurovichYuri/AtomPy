@@ -43,11 +43,14 @@ from pathlib import Path
 
 sys.path.insert(0, "src")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atomterm.casscf import constrained_casscf, run_sa_casscf
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import run_rohf
+from atomterm.windows import build_full_mo, complete_orthonormal, lm_sectors, occupied_core_idx
 import numpy as np
 
 from run_u import CFG, CHK, NCORE, REF, build_window
 from run_u_no import BANDS, CAMPAIGN_TOTAL, closed_shell_core_energy
-from atomterm import drivers
 from atomterm.casscf import constrained_casscf, mask_frozen_window
 from atomterm.detbasis import commutator, frobenius_norm
 from atomterm.natural import ci_rdm1, natural_orbitals, occupation_groups
@@ -66,10 +69,10 @@ ORTHOGUARD = 1e-8
 
 # ---------------------------------------------------------------- setup
 def setup():
-    mol, mf = drivers.run_rohf(CFG, CHK, ref=REF)
+    mol, mf = run_rohf(CFG, CHK, ref=REF)
     closed = list(np.flatnonzero(mf.mo_occ == 2.0))
     assert len(closed) == NCORE, (len(closed), NCORE)
-    c_pur, _ = drivers.purified_core_orbitals(mol, mf, NCORE)
+    c_pur, _ = purified_core_orbitals(mol, mf, NCORE)
     e_core = closed_shell_core_energy(mf, c_pur)
     return mol, mf, closed, c_pur, e_core
 
@@ -82,7 +85,7 @@ def build_nos(mol, mf, c_pur, e_core):
         return z["c_no"], z["occ"], list(z["groups"]), float(z["e_full"])
     closed = list(np.flatnonzero(mf.mo_occ == 2.0))
     _, _, win = build_window(mol, BANDS)
-    mo = drivers.build_full_mo(mf, closed, win, c_core=c_pur)
+    mo = build_full_mo(mf, closed, win, c_core=c_pur)
     c_act = mo[:, NCORE:NCORE + len(win)]
     ops = build_operators(mol, mf, c_act, NCORE, NA, NB, c_core=c_pur)
     ev, vec = np.linalg.eigh(ops["H"].real)
@@ -107,7 +110,7 @@ def no_start(mf, c_pur, c_no, groups, nk):
     """Block-safe full MO matrix: [pur core | first nk NO groups | complement]."""
     nact = sum(len(groups[i]) for i in range(nk))
     cols = np.hstack([c_pur, c_no[:, :nact]])
-    mo = drivers.complete_orthonormal(cols, mf.get_ovlp())
+    mo = complete_orthonormal(cols, mf.get_ovlp())
     err = float(np.abs(mo.conj().T @ mf.get_ovlp() @ mo - np.eye(mo.shape[1])).max())
     assert err < ORTHOGUARD, (nk, err)
     return mo, err
@@ -171,7 +174,7 @@ def report(mol, mf, c_pur, tag, cas, anchor):
 
 
 def free_casscf(mol, mf, closed, c_pur, tag, ncas, mo_full, name):
-    cas = drivers.constrained_casscf(mf, ncas, (NA, NB), CHK,
+    cas = constrained_casscf(mf, ncas, (NA, NB), CHK,
                                      mo_full=mo_full, name=name)
     return report(mol, mf, c_pur, tag, cas, ANCHOR[ncas])
 
@@ -212,13 +215,13 @@ def stage_casscf():
                                 ncas, mo, f"casscf_no{ncas}"))
     # (2) matched-cost shell pair at 12 cols: 1f-tier shell vs NO groups
     _, _, win12 = build_window(mol, SHELL12_BANDS)
-    mo = drivers.build_full_mo(mf, closed, win12, c_core=c_pur)
+    mo = build_full_mo(mf, closed, win12, c_core=c_pur)
     rows.append(free_casscf(mol, mf, closed, c_pur, "free/shell-12col",
                             len(win12), mo, "casscf_shell12"))
     # (3) the heavy 24-col pair, same span from two starts: shell (the
     # ticket-0 run) and NO -- the start-gauge check at fixed span
     _, _, win24 = build_window(mol, BANDS)
-    mo = drivers.build_full_mo(mf, closed, win24, c_core=c_pur)
+    mo = build_full_mo(mf, closed, win24, c_core=c_pur)
     rows.append(free_casscf(mol, mf, closed, c_pur, "free/shell-24col",
                             len(win24), mo, "casscf_shell24"))
     mo, _ = no_start(mf, c_pur, c_no, groups, 4)
@@ -243,7 +246,7 @@ def stage_sa(nk=2):
         mol, mf, c_pur, mo[:, NCORE:NCORE + ncas])
     print(f"[sa/no-{ncas}col] measured ground block: {nroots} roots, "
           f"<L2> = {l2_0:.4f}, E_frozen = {ev0[0] + e_core:.6f}")
-    cas = drivers.run_sa_casscf(mf, ncas, (NA, NB), mo,
+    cas = run_sa_casscf(mf, ncas, (NA, NB), mo,
                                 [1.0 / nroots] * nroots, CHK)
     print(f"[sa/no-{ncas}col] ensemble E = {cas.mc.e_tot:.6f}  "
           f"converged={cas.mc.converged}")
@@ -265,7 +268,7 @@ def stage_sa(nk=2):
     # which material entered/left: S-weight of the converged window in
     # each l of the AO space
     s_full = mol.intor_symmetric("int1e_ovlp")
-    sect = drivers.lm_sectors(mol)
+    sect = lm_sectors(mol)
     tot: dict = {}
     for (l, _m), rows in sorted(sect.items()):
         c = c_act[rows]
@@ -324,8 +327,8 @@ def stage_six13():
     # (occupied_core_idx -- canonical order is meaningless on this
     # basis, never mo_energy[:ncore]!) has the highest energy
     s = mf.get_ovlp()
-    sect = drivers.lm_sectors(mol)
-    occ_idx = drivers.occupied_core_idx(mf, NCORE)
+    sect = lm_sectors(mol)
+    occ_idx = occupied_core_idx(mf, NCORE)
     canon = mf.mo_coeff[:, occ_idx]
     ov = np.abs(c_pur.conj().T @ s @ canon)
     dom = ov.argmax(axis=1)              # pur col -> occupied canonical idx
@@ -347,7 +350,7 @@ def stage_six13():
     cols = np.hstack([c_core4,
                       c_no[:, :sum(len(groups[i]) for i in range(2))],
                       c_pur[:, [k7s]]])
-    mo = drivers.complete_orthonormal(cols, s)
+    mo = complete_orthonormal(cols, s)
     err = float(np.abs(mo.conj().T @ s @ mo - np.eye(mo.shape[1])).max())
     assert err < ORTHOGUARD, err
     ncore, ncas = 4, 13
@@ -407,7 +410,7 @@ def stage_diag():
     c_no, occ, groups, _ = build_nos(mol, mf, c_pur, e_core)
     ncas = sum(len(groups[i]) for i in range(2))
     mo, _ = no_start(mf, c_pur, c_no, groups, 2)
-    cas = drivers.constrained_casscf(
+    cas = constrained_casscf(
         mf, ncas, (NA, NB), CHK, mo_full=mo, name="casscf_no12_diag",
         mc_opts={"max_cycle_macro": 100}, verbose=4)
     print(f"\n[diag] converged = {cas.mc.converged}  "

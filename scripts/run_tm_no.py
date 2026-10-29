@@ -18,10 +18,12 @@ from pathlib import Path
 
 sys.path.insert(0, "src")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.windows import build_full_mo, select_valence_ao
 import numpy as np
 
 from run_tm_methb import CASES, RES
-from atomterm import drivers
 from atomterm.natural import (
     ci_rdm1,
     natural_orbitals,
@@ -36,8 +38,7 @@ NLOW = 24
 
 
 def _ti_ref():
-    from atomterm.drivers import ReferenceSpec
-    return ReferenceSpec(
+        return ReferenceSpec(
         occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
         occ_open=("3d",), occ_e_ref=-848.40648875)
 
@@ -64,17 +65,17 @@ def run_atom(name):
     print(f"\n{'#' * 70}\n# {sym} NO windows (ticket 22)\n{'#' * 70}")
     cfg = AtomConfig(sym, "ccpvdz", spin=spin)
     chk = str(RES / f"{sym}_ccpvdz_s{spin}_rohf.chk")
-    mol, mf = drivers.run_rohf(
+    mol, mf = run_rohf(
         cfg, chk, ref=(kw["ref_factory"]() if kw.get("ref_factory")
                        else None))
-    c_pur, contam = drivers.purified_core_orbitals(mol, mf, ncore)
+    c_pur, contam = purified_core_orbitals(mol, mf, ncore)
     print(f"pur core: max contamination {max(contam):.2e}")
     closed = list(np.flatnonzero(mf.mo_occ == 2.0))[:ncore]
     e_core = closed_shell_core_energy(mf, c_pur)
 
-    rows = drivers.select_valence_ao(mol, PATTERNS)
+    rows = select_valence_ao(mol, PATTERNS)
     ncas = len(rows)
-    mo = drivers.build_full_mo(mf, closed, rows, c_core=c_pur)
+    mo = build_full_mo(mf, closed, rows, c_core=c_pur)
     c_act = mo[:, ncore:ncore + ncas]
 
     ops = build_operators(mol, mf, c_act, ncore, na, nb, c_core=c_pur)
@@ -100,7 +101,7 @@ def run_atom(name):
     c_no, occ = natural_orbitals(c_act, gamma)
     groups = occupation_groups(occ)
     s = mol.intor_symmetric("int1e_ovlp")
-    shells = {pat: drivers.select_valence_ao(mol, [pat])
+    shells = {pat: select_valence_ao(mol, [pat])
               for pat in PATTERNS}
     print("NO occupation groups:")
     for gi, g in enumerate(groups):

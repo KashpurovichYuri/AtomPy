@@ -42,15 +42,17 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, "src")
+from atomterm.casscf import run_casci
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.windows import build_full_mo, primitive_chain, select_primitives
 import numpy as np
 from pyscf import gto
 from scipy.sparse.linalg import eigsh
 
 from atomterm.system import AtomConfig
-from atomterm import drivers
 from atomterm.analysis import analyze, term_symbol
 from atomterm.detbasis import commutator, frobenius_norm, slater_condon_matrix
-from atomterm.drivers import ReferenceSpec
 from atomterm.operators import (
     build_operator_parts,
     build_operators,
@@ -123,7 +125,7 @@ def prim_weights(mol, mf, l):
     """Open-MO Mulliken S-weight per primitive of angular momentum l,
     summed over the open (occ == 1) reference MOs: the measured quantity
     the exponent bands are contiguous sets of."""
-    chain = drivers.primitive_chain(mol, l)
+    chain = primitive_chain(mol, l)
     s = mol.intor_symmetric("int1e_ovlp")
     w = {}
     for exp, rows in chain:
@@ -138,8 +140,8 @@ def prim_weights(mol, mf, l):
 def build_window(mol, bands):
     """(f_rows, d_rows, win): AO rows of the {l: exponent_band} window,
     f rows first -- the column layout the configuration tables index."""
-    f_rows = drivers.select_primitives(mol, 3, exponent_band=bands["f"])
-    d_rows = drivers.select_primitives(mol, 2, exponent_band=bands["d"])
+    f_rows = select_primitives(mol, 3, exponent_band=bands["f"])
+    d_rows = select_primitives(mol, 2, exponent_band=bands["d"])
     return f_rows, d_rows, f_rows + d_rows
 
 
@@ -237,7 +239,7 @@ def run_sector(mol, mf, tier, bands, na, nb, nroots):
     ndet = math.comb(ncas, na) * math.comb(ncas, nb)
     nroots = min(nroots, ndet)
 
-    mo = drivers.build_full_mo(mf, CLOSED_IDX, win, c_core=C_PUR)
+    mo = build_full_mo(mf, CLOSED_IDX, win, c_core=C_PUR)
     # analyze the ORTHONORMALIZED window (build_full_mo Loewdin-rotates
     # overlapping same-l primitives): span- and closure-preserving, and
     # the basis the CASCI actually solved in; f/d blocks stay separate
@@ -248,7 +250,7 @@ def run_sector(mol, mf, tier, bands, na, nb, nroots):
     # the 2f2d clusters); above EXACT_MAX only a tight tolerance
     fci_opts = ({"pspace_size": ndet} if ndet <= EXACT_MAX
                 else {"conv_tol": 1e-12})
-    cas = drivers.run_casci(mf, ncas, (na, nb), mo, CHK, nroots=nroots,
+    cas = run_casci(mf, ncas, (na, nb), mo, CHK, nroots=nroots,
                             name=tag, fci_opts=fci_opts)
 
     if ndet <= LEAN_MIN:
@@ -283,7 +285,7 @@ def run_sector(mol, mf, tier, bands, na, nb, nroots):
 
 def main():
     wanted = sys.argv[1:]
-    mol, mf = drivers.run_rohf(CFG, CHK, ref=REF)
+    mol, mf = run_rohf(CFG, CHK, ref=REF)
     print(f"reference: E = {mf.e_tot:.8f} Eh  (5f^3 6d^1 7s^2, "
           f"Newton-gated)  threads: "
           f"{os.environ.get('OPENBLAS_NUM_THREADS', 'default')}")
@@ -293,7 +295,7 @@ def main():
     CLOSED_IDX = closed_idx
     # pur substrate: the canonical core's foreign-l tails break window
     # closure at the 1e-2 level on U (measured); pur closes at 5e-13
-    C_PUR, contam = drivers.purified_core_orbitals(mol, mf, NCORE)
+    C_PUR, contam = purified_core_orbitals(mol, mf, NCORE)
     print(f"pur core: max contamination {max(contam):.2e}")
 
     # the measurement the bands are contiguous sets of (never asserted

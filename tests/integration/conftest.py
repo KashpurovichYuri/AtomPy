@@ -4,10 +4,11 @@ ROHF). The pinned term tables and ReferenceSpec constants live in
 are order-dependent across tiers and broke the runtime fixture
 import); fixtures stay here."""
 
+from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.windows import select_valence_ao
 import pytest
 
 from atomterm.system import AtomConfig
-from atomterm.drivers import ReferenceSpec, run_rohf, select_valence_ao
 
 from refs import TI_REF
 

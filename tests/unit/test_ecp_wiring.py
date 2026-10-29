@@ -1,9 +1,9 @@
 """Unit tier of the ECP mode (ticket 18): ccECP pairing and the
 valence-electron bookkeeping -- mol-only, no SCF."""
 
+from atomterm.windows import select_shell_ao
 import pytest
 
-from atomterm import drivers
 from atomterm.system import AtomConfig, build_mol, ncore_of, sector_na_nb
 
 pytestmark = pytest.mark.fast
@@ -21,7 +21,7 @@ def test_ecp_wiring_valence_bookkeeping():
         mol = build_mol(cfg)
         assert mol.nelectron == nelec
         assert not mol.cart
-        assert len(drivers.select_shell_ao(mol, pat)) == 3  # complete m-set
+        assert len(select_shell_ao(mol, pat)) == 3  # complete m-set
         assert ncore_of(mol.nelectron, 2) == ncore
         assert sector_na_nb(2, cfg.spin) == (2, 0)
     mol = build_mol(SC_ECP)

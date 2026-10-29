@@ -12,17 +12,18 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, "src")
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import run_rohf
+from atomterm.windows import lm_sectors
 import numpy as np
 
 from run_u import CFG, CHK, NCORE, REF
-from atomterm import drivers
 from atomterm.detbasis import determinant_basis
 from atomterm.operators import build_operators
-from atomterm.drivers import lm_sectors
 
-mol, mf = drivers.run_rohf(CFG, CHK, ref=REF)
+mol, mf = run_rohf(CFG, CHK, ref=REF)
 open_cols = list(np.flatnonzero(mf.mo_occ == 1.0))
-c_pur, _ = drivers.purified_core_orbitals(mol, mf, NCORE)
+c_pur, _ = purified_core_orbitals(mol, mf, NCORE)
 
 # 1. m-composition of each open MO
 sectors = lm_sectors(mol)
