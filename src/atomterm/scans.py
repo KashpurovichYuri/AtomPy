@@ -1,6 +1,5 @@
 """Frozen-orbital scans: the radial-correlation mechanism and the
-flatness of the member direction, measured WITHOUT any optimizer
-(ticket 16, Phase 1).
+flatness of the member direction, measured WITHOUT any optimizer.
 
 Everything here is analysis-only: a scan window is an explicitly
 constructed set of columns -- per member, a rotation of one radial
@@ -20,13 +19,19 @@ Two families of scans:
   than the (nucleus + core) attraction rises.
 - PER-MEMBER (independent angles): closure fails at first order in the
   angle differences while the energy stays flat -- the direct,
-  optimizer-free demonstration of fact 16's
-  commutator = O(eps), energy = O(eps^2) at a stationary point.
+  optimizer-free demonstration that at a stationary point a
+  member-asymmetric deformation costs
+
+      ||[H, Lz]|| = O(eps)   but   dE = O(eps^2)
+
+  (the member direction is GAUGE, not physics: a flat direction of
+  the energy whose commutator cost is linear).
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import combinations
 
 import numpy as np
 
@@ -50,16 +55,27 @@ __all__ = ["ScanPoint", "scan_window", "scan_state", "radial_scan",
 
 @dataclass
 class ScanPoint:
-    """Ground state of one frozen window: energy parts + symmetry meters."""
+    """Ground state of one frozen window: energy parts + symmetry meters.
 
-    theta: float                 # the scan variable (radians)
-    e_active: float              # ground eigenvalue of the folded H
-    e_one: float                 # <H1> (nucleus + core field)
-    e_two: float                 # <H2> (active-active repulsion)
-    comm_h_lz: float             # ||[H, Lz]||_F in this window
-    ground_l2: float | None = None   # <L^2> of the ground state (with_l2)
-    comm_h_l2: float | None = None   # ||[H, L^2]||_F (with_l2; TRIVIAL=0 in
-                                     # maximal-Ms single-irrep sectors)
+    Attributes
+    ----------
+    theta : the scan variable (radians).
+    e_active : ground eigenvalue of the folded H.
+    e_one : ``<H1>`` (nucleus + core field).
+    e_two : ``<H2>`` (active-active repulsion).
+    comm_h_lz : ``||[H, Lz]||_F`` in this window.
+    ground_l2 : ``<L^2>`` of the ground state (``with_l2`` only).
+    comm_h_l2 : ``||[H, L^2]||_F`` (``with_l2`` only; TRIVIAL = 0 in
+        maximal-Ms single-irrep sectors -- see the rungs tests).
+    """
+
+    theta: float
+    e_active: float
+    e_one: float
+    e_two: float
+    comm_h_lz: float
+    ground_l2: float | None = None
+    comm_h_l2: float | None = None
 
     @property
     def e_total_minus_one_two(self) -> float:
@@ -70,14 +86,27 @@ class ScanPoint:
 def scan_window(mol, mf, thetas, fam_a, fam_b) -> np.ndarray:
     """Explicit window columns ``cos(t_m) A_m + sin(t_m) B_m``.
 
-    fam_a / fam_b : AO rows of the two radial families (same l, same
-    member ordering, e.g. the three 2p AOs and the three 3p AOs).
-    thetas : one mixing angle per member. Columns are S-normalized;
-    different members are exactly S-orthogonal, so the window is a
-    valid orthonormal one-particle set for any angles.
+    Parameters
+    ----------
+    mol, mf : the atom and its converged reference.
+    thetas : one mixing angle per member.
+    fam_a / fam_b : AO rows of the two radial families -- same l,
+        same member ordering (e.g. the three 2p AOs and the three 3p
+        AOs of one center).
+
+    Notes
+    -----
+    Columns are S-normalized; different members of one shell are
+    exactly S-orthogonal, so the window is a valid orthonormal
+    one-particle set for ANY angles -- the property that makes
+    per-member scans well-defined.
     """
     thetas = np.atleast_1d(thetas)
-    assert len(fam_a) == len(fam_b) == len(thetas)
+    if not (len(fam_a) == len(fam_b) == len(thetas)):
+        raise ValueError(
+            f"families of {len(fam_a)}/{len(fam_b)} columns with "
+            f"{len(thetas)} angles: the two radial families must carry the "
+            "same member count, one angle each")
     n = mol.nao_nr()
     s = mf.get_ovlp()
     cols = []
@@ -141,18 +170,30 @@ def radial_scan(mol, mf, ncore: int, na: int, nb: int, fam_a, fam_b,
 def member_tilt_map(mol, mf, ncore: int, na: int, nb: int, fam_a, fam_b,
                     theta: float, delta: float, extra_cols=None) -> dict:
     """Tilt subsets of members by ``delta`` around the symmetric point
-    ``theta`` -- the flatness measurement (fact 18).
+    ``theta`` -- the flatness measurement.
 
-    Returns ``{"tilted <indices>": ScanPoint}``. ``extra_cols``: columns
-    appended unscanned (e.g. Sc's untouched 4s slot; different-l columns
-    are exactly orthogonal to the scanned family).
+    Parameters
+    ----------
+    mol, mf, ncore, na, nb : as :func:`scan_state`.
+    fam_a, fam_b, theta : as :func:`scan_window`; ``theta`` is the
+        symmetric point all tilts start from.
+    delta : the tilt added to the selected members.
+    extra_cols : columns appended unscanned (e.g. Sc's untouched 4s
+        slot; different-l columns are exactly orthogonal to the
+        scanned family).
 
+    Returns
+    -------
+    ``{"tilt <indices>": ScanPoint}`` over all non-empty subsets.
+
+    Notes
+    -----
     Reading: on p2 atoms any SINGLE-member tilt costs exactly 0 Eh (the
     term's M_L degeneracy leaves one component untouched and the CI finds
     it) while the commutator grows linearly; tilting two or more members
     costs real energy. On Sc the structure inverts: the symmetric
     direction gains nothing, member-asymmetric tilts DESCEND (a genuine
-    instability of the degenerate 2D term -- see fact 18). NOTE [H, Lz]
+    instability of the degenerate 2D term). NOTE [H, Lz]
     is blind to tilts of the m=0 member and to equal tilts of a full
     +-m pair: Lz mixes only within +-m pairs, so those deformations leak
     only through L^2 (trivial in single-irrep maximal-Ms sectors).
@@ -171,6 +212,5 @@ def member_tilt_map(mol, mf, ncore: int, na: int, nb: int, fam_a, fam_b,
 
 
 def _subsets(n, count):
-    from itertools import combinations
-
+    """The member subsets of size ``count`` (the tilt map's axes)."""
     return combinations(range(n), count)

@@ -1,4 +1,4 @@
-"""Tests of atomterm.scans: frozen-orbital scans (ticket 16, Phase 1).
+"""Tests of atomterm.scans: frozen-orbital scans.
 
 Everything here is optimizer-free, so the numbers are DETERMINISTIC given
 the ROHF reference (no basin chaos): the pinned structure is the physics
@@ -9,7 +9,8 @@ import numpy as np
 import pytest
 
 from atomterm.analysis import analyze
-from atomterm.drivers import run_rohf, select_shell_ao
+from atomterm.reference import run_rohf
+from atomterm.windows import select_shell_ao
 from atomterm.operators import build_operators
 from atomterm.scans import member_tilt_map, radial_scan, scan_state, scan_window
 from atomterm.system import AtomConfig
@@ -36,7 +37,7 @@ def test_scan_windows_are_s_orthonormal(carbon):
 
 
 def test_radial_scan_carbon_full_gain_at_exact_symmetry(carbon):
-    """Fact 18 (a): the ONE-PARAMETER m-symmetric radial rotation recovers
+    """The ONE-PARAMETER m-symmetric radial rotation recovers
     the entire CASSCF correlation gain (theta* ~ 0.61 rad -> ~ -0.2508 Eh,
     vs the free/radial CASSCF gain of fact 16) with [H, Lz] = 0 at EVERY
     point of the curve -- the gain needs NO symmetry breaking. At theta=0
@@ -63,7 +64,7 @@ def test_radial_scan_carbon_full_gain_at_exact_symmetry(carbon):
 
 
 def test_member_tilts_exactly_flat_via_ml_dodge(carbon):
-    """Fact 18 (b): tilting ONE member by any amount costs EXACTLY zero
+    """Tilting ONE member by any amount costs EXACTLY zero
     energy -- the 3P multiplet's M_L components each avoid one member, so
     the CI finds an untouched component (rotational degeneracy = the flat
     direction of fact 16, here measured without an optimizer). Tilting
@@ -88,7 +89,7 @@ def test_member_tilts_exactly_flat_via_ml_dodge(carbon):
 
 
 def test_radial_scan_silicon_matches_casscf_gain(si_rohf):
-    """Fact 18 (a) on Si: same structure as carbon (theta* ~ 0.85,
+    """On Si, same structure as carbon (theta* ~ 0.85,
     full CASSCF gain ~ -0.127 Eh at exact symmetry; single-member tilts
     exactly flat, pairs cost real energy)."""
     mol, mf = si_rohf
@@ -111,7 +112,7 @@ def test_radial_scan_silicon_matches_casscf_gain(si_rohf):
 
 
 def test_sc_radial_structure_inverts(sc_rohf, tmp_path):
-    """Fact 18 (c) -- Sc is the opposite of C/Si: the m-SYMMETRIC d-shell
+    """Sc is the opposite of C/Si: the m-SYMMETRIC d-shell
     radial rotation gains NOTHING (the curve rises: radial diffusion of a
     one-electron d shell only loses nuclear attraction), while MEMBER-
     ASYMMETRIC tilts DESCEND (~ -0.3..-0.9 mEh at delta = 0.1): a genuine
@@ -154,7 +155,7 @@ def ti_scan_ref(tmp_path_factory):
 
 
 def test_ti_d2_tilts_descend_radial_rises(ti_scan_ref):
-    """Fact 21 (ticket 12): the d2 3F anatomy inverts the p2 story the
+    """The d2 3F anatomy inverts the p2 story the
     SAME way Sc 3d1 2D does, but ~2x weaker:
 
     - SINGLE-member tilts DESCEND (measured -163 uEh at delta = 0.1 vs
@@ -168,7 +169,7 @@ def test_ti_d2_tilts_descend_radial_rises(ti_scan_ref):
       breathing recovers the full CASSCF gain);
     - the {0,1,3,4} tilt pattern (everything but dz^2 = equal tilts of
       both +-m pairs) stays Lz-BLIND (|[H, Lz]| ~ 1e-13) while [H, L^2]
-      fires -- the fact-18c blind-spot structure on a 5-member shell.
+      fires -- the Lz blind-spot structure on a 5-member shell.
 
     Deterministic: no optimizer anywhere in the loop."""
     mol, mf = ti_scan_ref
