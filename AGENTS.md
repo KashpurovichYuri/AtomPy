@@ -46,7 +46,7 @@ mode restrictions lift). Mechanical enforcement: the global
 | `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_rungs(ref=)`/`run_case(ref=)`; the module Conventions own the caching-trust (cached chks TRUSTED, never re-gated) and the S-projector occupation-metric contracts (`span_projector` is the one home); the improper-convergence toolbox lives here (README · Methods) |
 | `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the one deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters; `mc_opts` = per-run optimizer knobs (budgets); all checkpointed (`.chk`); labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source) |
 | `src/atomterm/windows.py` | `Window(.columns)`, `SELECTORS`, `window_shell/primitive/scf_mo/no`, `select_*` (incl. `select_span`, `select_primitives`), `primitive_chain`, `shell_weights`, `window_avas`, `span_overlap`, `span_projector`, `s_metric_roots`, `shell_slots`, `lowdin(tol=)`, `complete_orthonormal`, `build_full_mo`, `lm_sectors`, `l_per_row`, `radial_basis`, `radial_mask` | window construction + selection + the kind registry (the module docstring owns the statement: purpose, the m-completeness contract, the five kinds incl. custom columns, the internal layering — `shell_slots` is the one shell walker [consumed by angular too], the S-metric algebra [`s_metric_roots` = the S^{±1/2} transport] beneath, the two substrate builders); `build_full_mo` takes AO rows OR column vectors through ONE project-renormalize-assemble treatment; `lowdin` raises on near-linear dependence instead of NaN-ing downstream; `shell_weights` groups by `lm_sectors` (no label parsing; row order fixed for bitwise-stable payloads) |
-| `src/atomterm/core.py` | `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
+| `src/atomterm/core.py` | `purified_core_orbitals`, `closed_shell_core_energy` | the exactly rotation-closed core span (fact 20's ONE home: the E ⊗ members construction + traps — the pur substrate fixing the fact-17 input-window baseline) and the closed-shell core energy (the pur-fold bookkeeping constant; J/K formula in its docstring) |
 | `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and rungs share — callers only render (report text / flat json payload) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `shell_occupations`, `format_report`, `save_report` | term symbols from `<L^2>`, `<S^2>` (half-integer S grid; L-letter table to L=20); commutator norms; configuration labels per root — PySCF-order CI in (the fact-24 bridge runs inside), l-grouping via `lm_sectors` (no label parsing) |
@@ -264,30 +264,18 @@ module.
     deviations decompose 100% window / 0% core-fold (witness: refold
     the converged core with the raw shell window; artifacts
     results/*_sa_decomposition.md). Verdict tables: README · Results (Methods compared).
-20. **The closed core span** (ticket 13; `purified_core_orbitals`, the
-    `*_pur` rungs — fact 17's fix, verified C/Si/Sc/Ti): per l, take the
-    member-resolved radial blocks R of the core MOs; E_l = top-k span of
-    the S-metric COLUMN Gram RᵀSR (eigenvalues = S-weight × member
-    multiplicity; the tail level is both the selection and the
-    certificate); replicate every radial on ALL members; one global
-    Löwdin (S = 0 between different l keeps l-purity). TRAPS: the
-    S-generalized eigenproblem of RRᵀ returns S⁻¹-warped radials — the
-    column Gram is the correct object; canonical core MOs are NOT
-    shell-confined (C 2s: 66% of S-weight off its shell) — per-shell
-    projection is WRONG. Result: both input windows (build_full_mo and
-    radial_basis) close at machine precision; the purified core density
-    is exactly m-scalar (avg fold == raw fold); frozen-window pur rungs
-    (relax_pur, sa_relax_pur) deliver CASSCF/SA-CASSCF with unbroken
-    Lz/L² on every atom incl. Ti (comm ~1e-13, max|dE| ≤ 1e-7). Free SA
-    is machine-exact on p² on this substrate; on Sc/Ti the member gauge
-    is exactly FLAT, so sa_radial_pur stops at its floor (~1e-6..1e-4
-    window tilt) that no convergence tightening removes, and the 4s↔3p
-    swap attractor SURVIVES purification (branch on window weights).
-    Energy bookkeeping: the pur family carries the window-definition
-    offset vs raw-fold CASCI rows (Sc +88.7 mEh — the projected window
-    is the honest common definition WITHIN the pur family);
-    relax-family max|dE| ~1e-3 vs unpolarized CASCI is fold bookkeeping
-    (bound, don't pin). Narrative: README · Methods, · Results.
+20. **The closed core span** — E_l ⊗ members (per l: top-k span of
+    the S-metric COLUMN Gram of the member-resolved radial blocks,
+    every radial replicated on ALL members, one global Löwdin) makes
+    both input windows close at machine precision and the core density
+    exactly m-scalar -> `core` (`purified_core_orbitals` owns the
+    construction + the traps). Rung phenomenology on this substrate
+    (pur rungs' machine-exact closure incl. Ti, the exactly FLAT
+    member gauge on Sc/Ti and sa_radial_pur's floor, the 4s↔3p swap
+    attractor surviving purification — branch on window weights, the
+    window-definition offset vs raw-fold CASCI Sc +88.7 mEh,
+    relax-family max|dE| ~1e-3 fold bookkeeping — bound, don't pin):
+    README · Methods, · Results; the rungs: `treatments`.
 
 21. **Ti: d², the aufbau runaway, and the basin gate** (ticket 12):
     (a) THE REFERENCE IS TWO-LAYERED CHAOS -- the aufbau runaway
