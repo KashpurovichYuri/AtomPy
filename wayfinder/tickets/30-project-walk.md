@@ -37,6 +37,29 @@ free-machine suites intermittently crash the C/Si purified rung's
 Davidson (NaN, cascade) while isolated reruns are green — a red suite
 is never the verdict without isolation reruns.
 
+Phase 2 DONE (2026-10-29, `ce978f2`/`20aa4c6`/`9e3015d`): `reference`
++ `core` + `casscf` walked. Headlines: the R3 one-home fix
+(run_frac_occ_scf's inline S-projector metric -> span_projector, the
+two occupation hooks now structurally parallel); core's STALE
+purified_s_core cites killed (the function died 2026-10-27; two
+docstring cites survived as documentation-that-lies) + the literal
+\u-escape text fixed; casscf's `_persist` -> `_checkpoint` (watchlist
+consumed), CASResult's type lies fixed, facts 6+7 owned by the module
+Conventions, the adapters block states the extension rule (a new rung
+= a new adapter, never a new kernel path). THE SA CONTRACT FOUND AND
+DOCUMENTED (not changed): constrained_casscf returns roots-pass
+energies with the SA KERNEL's ci; cells writes that SA ci as ci_stack
+under the roots store -- flagged below for phase 4. VERIFICATION
+PROTOCOL FINDING: cross-process bitwise A/B is INVALID for the CASCI
+kernel (canonicalization rotates degenerate blocks -- the mo/ci O(1)
+gauge class; energies wobble 7.1e-15 on buffer-alignment-dependent
+last bits) -- the valid protocol is same-process pre-vs-post modules
+(bitwise energies + core_energy). Tests: the unit split executed on
+touch -- tests/unit/test_reference.py NEW, five windows pins moved to
+test_windows.py, test_drivers thinned to the SCF chemistry (19->12)
+with owner-direct imports. Facts collapsed: 6, 7, 10, 15c, 20, 21a.
+Full suite at the boundary: 188/188 green on a free machine.
+
 DOCSTRING REMEDIATION (2026-10-29, user-directed, same day): the
 operators/analysis docstrings were re-judged against the exemplar
 passes (system/windows/secondquant/detbasis — the new R1 clause) and
