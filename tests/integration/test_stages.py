@@ -1,24 +1,27 @@
 """Tests of atomterm.stages: the one-pass fold-and-analyze facts module.
 
-The physics content is pinned end-to-end by test_treatments/test_atoms; these
-tests pin the MODULE's contract: what stage_facts computes, the payload
-shape every persisted rung shares, and the divergence-guard property.
+The physics content is pinned end-to-end by test_treatments/test_atoms;
+these pin the MODULE's contract on the frozen carbon reference (no SCF,
+seconds-fast): what stage_facts computes, the payload shape every
+persisted rung shares, and the divergence-guard property.
 """
 
+import json
+
 import numpy as np
-
-from atomterm.drivers import build_full_mo, run_casci
-from atomterm.stages import ORTHO_TOL, stage_facts
-
 import pytest
-pytestmark = pytest.mark.slow
+
+from atomterm.casscf import run_casci
+from atomterm.stages import ORTHO_TOL, stage_facts
+from atomterm.windows import build_full_mo
+
+pytestmark = pytest.mark.fast
 
 
 def test_stage_facts_payload_and_invariants(carbon, tmp_path):
-    """stage_facts owns the fold: CASCI on the raw 2p window in the Ms=0
-    sector reproduces the textbook 3P/1D/1S table with machine-precision
-    closure, vanishing N-deviation, and a payload carrying every persisted
-    rung key."""
+    """stage_facts owns the fold: the Ms=0 p^2 sector reproduces the
+    textbook 3P/1D/1S table with machine-precision closure, vanishing
+    N-deviation, and a payload carrying every persisted rung key."""
     _, mol, mf, act_idx = carbon
     ncore = (mol.nelectron - 2) // 2
     mo = build_full_mo(mf, list(range(ncore)), act_idx)
@@ -42,8 +45,6 @@ def test_stage_facts_payload_and_invariants(carbon, tmp_path):
     assert payload["e_ground"] == facts.e_ground
     assert payload["diverged"] == (facts.ortho_err > ORTHO_TOL)
     # the payload is json-serializable (the rungs persist it verbatim)
-    import json
-
     json.dumps(payload)
 
 

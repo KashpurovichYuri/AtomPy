@@ -70,6 +70,35 @@ Layering TOC dropped, archaeology out. Certified AST-identical
 body before it could land; the certificate is part of the method
 now, V6).
 
+Phase 3 DONE (2026-10-29): `stages` walked. Headlines: the two ruler
+readings HOMED (module Conventions + stage_facts Notes) -- the
+reconstruction is the ANALYSIS ruler (meters/labels computed on it;
+the tables' E columns carry the run's own totals; never compared),
+and max|dE| decomposes into core-field anisotropy / window definition
+/ bookkeeping, the last exactly 0 (the fold convention is
+machine-exact vs get_h1eff, 1e-15), the window-definition term
+dominating on core-overlapping shells (Ti ~85 mEh) -- fact 14's tail
++ fact 25's reading, content standing alone with no fact tags. The
+SA-ci CONSUMPTION documented: cas.ci labels the stage, and on SA
+runs it is the SA kernel's CI (the consumer-side half of the
+constrained_casscf contract wart; both label consumers bridge the
+ordering internally). StageFacts: fields regrouped (the defaulted
+fields were interleaved WITH the readout properties; the "three
+analysis fields" comment was a count lie over four), payload keys
+declared committed data (renaming one is a payload break), the
+window property's 1e-6 rounding stated (regen-diff stability), the
+dead `field` import dropped. stage_facts: proper
+Parameters/Returns/Notes; the ticket-25 NOTE moved out of the c_act
+description into Notes where the reading lives; the converged read
+commented at point of use. Tests: imports owner-direct (were through
+the drivers facade), V1 docstrings, DE-SLOWED whole-file to fast
+(frozen reference + norb=3 full diagonalization, 0.6 s wall,
+deterministic) -- fast tier 43 -> 45. AGENTS: the stages row carries
+the readings; the Tests count fixed 188 -> 189 (the phase-2 split's
+edit that never landed) and fast re-worded as the machine-light
+selection. Suite at the boundary: 188 green + 1 Sc complete-window
+session draw, isolation-green (the recorded class, no band change).
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE
@@ -148,7 +177,15 @@ UNIFY, and make similar approaches LOOK similar. Applied:
   the natural pair of `load_cell` -- phase 4.
 - (add freely as spotted; an entry dies when consumed)
 
-## Flags for later phases (spotted during phase 2)
+## Flags for later phases (spotted during phases 2-3)
+
+- The ordering bridge's HOME (phase 4, cells): `pyscf_ci_permutation`
+  + `ci_in_detbasis_order` live in cells, but analysis (a LOW layer)
+  consumes them via lazy imports against the cells->stages->analysis
+  cycle. detbasis owns the ordering statement ("ordering != PySCF FCI
+  strings") and sits BELOW both consumers -- consider homing the
+  bridge there when cells is walked (consumers: analysis x4, study x2,
+  test_cells x7).
 
 - SA store pairing (phase 4, cells): `constrained_casscf` returns
   roots-pass energies/core_energy with the SA KERNEL's ci; cells'

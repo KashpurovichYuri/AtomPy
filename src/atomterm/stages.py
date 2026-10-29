@@ -1,22 +1,27 @@
-"""One analysis pass over a finished calculation stage: the facts every
-rung/stage reports, independent of presentation.
+"""One analysis pass over a finished stage: the facts every renderer
+reports, independent of presentation.
 
-Single owner of the fold-and-analyze bookkeeping that used to live in both
-``pipeline.stage_analysis`` and ``treatments._rung_payload`` (identical physics, two
-divergent dressings -- and ``core_anisotropy`` bolted on outside the fold).
-``stage_facts`` computes; callers render (pipeline: report text; rungs: the
-flat json payload). New rung types cannot forget a field anymore.
+``stage_facts`` is the single owner of the fold-and-analyze bookkeeping;
+callers only render (cases: report text; treatments/cells: the flat json
+payload). One pass yields one :class:`StageFacts`, so every stage type
+reports the same fields.
 
-The fold uses the stage's OWN core columns (``cas.mo_coeff[:, :ncore]``):
-orbital optimization may legally reorganize the inactive span, and a
-different fold than the one PySCF's energies used breaks
-``E_tot = E_core + e_cas`` at O(Eh) (fact 12).
+Conventions
+-----------
+- The fold uses the stage's OWN core columns (``cas.mo_coeff[:, :ncore]``):
+  orbital optimization may legally reorganize the inactive span, and a
+  fold different from the one PySCF's energies used breaks
+  ``E_tot = E_core + e_cas`` at O(Eh).
+- The reconstruction (``eigvalsh(H) + core_energy``) is the ANALYSIS
+  ruler: meters, labels, and window facts are computed on it, while the
+  tables' E columns carry the run's own totals -- the two are never
+  compared in a table (README · Partition bookkeeping).
 """
 
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import numpy as np
 
@@ -35,28 +40,37 @@ ORTHO_TOL = 1e-6
 
 @dataclass
 class StageFacts:
-    """Everything a finished stage reports, presentation-free."""
+    """Everything a finished stage reports, presentation-free.
+
+    Values are computed by :func:`stage_facts`; the properties below the
+    fields are the thin readouts renderers share, and :meth:`payload`
+    flattens the object into the persisted rungs/cells dict -- whose
+    keys are committed data, so renaming one is a payload break.
+    """
 
     tag: str
     analysis: AnalysisResult  # states, lz_spectrum, commutators
-    energies: np.ndarray  # our reconstruction: eigvalsh(H) + core_energy
-    energies_pyscf: np.ndarray
-    max_de_vs_pyscf: float
+    energies: np.ndarray  # the reconstruction (analysis ruler): eigvalsh(H) + core_energy
+    energies_pyscf: np.ndarray  # the run's own totals, in the run's root order
+    max_de_vs_pyscf: float  # max |reconstruction - run| over the common root prefix
     n_dev: float  # particle-number sanity: |diag(N) - (na+nb)|
     ortho_err: float  # max |C^dag S C - I| over the stage's full MO matrix
     window_names: list[str]
     window_rows: np.ndarray  # per-orbital l-weights (rows sum to 1)
-    win_lz: float   # one-particle closure defects of the window SPAN
-    win_lperp: float  # (operators.window_closure; 0 = exact certificate)
+    win_lz: float  # one-particle closure defect ||[P, Lz]|| of the window span
+    win_lperp: float  # ||[P, L_perp]|| (window_closure; 0 = exact certificate)
     configurations: list[str]
     # the ground root's electron count per l (analysis.
     # shell_occupations) -- the ELECTRON scale next to the SPAN
     # weights of window_rows; partitions na+nb
     shell_electrons: dict
+    core_anisotropy: float | None = None  # CASCI reference rungs only
+    # converged: the optimizer's own kernel report; CASCI stages and
+    # trusted cached stages default True and never flag
+    converged: bool = True
 
-    # the three analysis fields every renderer/payload reads, exposed so
-    # callers need not reach into the analysis object (interface leak
-    # flagged by the design survey; kept as thin properties)
+    # --- shared readouts (thin pass-throughs: renderers never reach
+    # --- into the analysis object)
     @property
     def ground_term(self) -> str:
         return self.analysis.states[0].term
@@ -72,11 +86,6 @@ class StageFacts:
     @property
     def comm_norm_h_lz(self) -> float:
         return float(self.analysis.comm_norm_h_lz)
-    core_anisotropy: float | None = None  # CASCI reference rungs only
-
-    # converged: the optimizer's own kernel report; CASCI stages and
-    # trusted cached stages default True and never flag
-    converged: bool = True
 
     @property
     def diverged(self) -> bool:
@@ -88,7 +97,9 @@ class StageFacts:
 
     @property
     def window(self) -> dict[str, float]:
-        """Mean l-weights of the window columns (the l-purity gauge)."""
+        """Mean l-weights of the window columns (the l-purity gauge),
+        rounded to 1e-6 -- the values persist verbatim in payloads, and
+        the rounding keeps regen diffs stable."""
         return {n: round(float(v), 6)
                 for n, v in zip(self.window_names, self.window_rows.mean(axis=0))}
 
@@ -97,7 +108,14 @@ class StageFacts:
         return dict(Counter(s.term for s in self.analysis.states))
 
     def payload(self, kind: str) -> dict:
-        """Flat json-friendly dict (the rungs' persisted payload format)."""
+        """Flat json-friendly dict -- the persisted rungs/cells payload.
+
+        Parameters
+        ----------
+        kind : the method axis value ("casci" / "casscf" / "sa") --
+            recorded verbatim as ``"kind"``; CASCI kinds also carry
+            ``core_anisotropy`` when it was measured.
+        """
         out = {
             "tag": self.tag,
             "kind": kind,
@@ -129,25 +147,52 @@ class StageFacts:
 def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
                 *, tag: str, spherical_core: bool = True,
                 anisotropy_ref=None) -> StageFacts:
-    """Fold + analyze one finished stage.
+    """Fold and analyze one finished stage.
 
-    mol/mf : the atom's molecule and its reference mf object (integrals
-        are geometry-defined; ``mf`` supplies hcore and the overlap).
-    cas : the stage's CASResult (mo_coeff, energies, ci, core_energy).
-    c_act : window columns to analyze -- raw shell AOs for CASCI stages,
-        ``cas.mo_coeff[:, ncore:ncore+ncas]`` for optimized stages. NOTE
-        (ticket 25): the raw-AO choice is a deliberate window DEFINITION;
-        where the valence shell overlaps the core (Ti 4s|3s: overlap
-        ~0.1) it shifts the CI ground by ~85 mEh vs the run's projected
-        columns -- that offset, plus the mEh-class averaging effect, is
-        the whole content of max_de_vs_pyscf. The fold CONVENTION itself
-        is machine-exact vs PySCF's get_h1eff (1e-15, diag_fold.py).
+    Parameters
+    ----------
+    mol, mf : the atom's molecule and reference object (integrals are
+        geometry-defined; ``mf`` supplies hcore and the overlap).
+    cas : the stage's :class:`~atomterm.casscf.CASResult` (mo_coeff,
+        energies, ci, core_energy).
+    c_act : the window columns to analyze -- raw shell AOs for CASCI
+        stages, ``cas.mo_coeff[:, ncore:ncore+ncas]`` for optimized
+        stages.
+    ncore, na, nb : core size and spin sector of the stage.
     tag : stage label used throughout reports and chkfile stores.
-    spherical_core : fold with the spherically averaged core density (the
-        physical reference) or the raw one (the anisotropy detector rung).
-    anisotropy_ref : ``(mf_ref, c_core_or_None)`` -- reference object whose
-        core-density anisotropy should be reported (CASCI reference rungs;
-        e.g. the fractional-occupation mf with its own core columns).
+    spherical_core : fold with the spherically averaged core density
+        (the physical reference) or the raw one (the anisotropy
+        detector rung).
+    anisotropy_ref : ``(mf_ref, c_core_or_None)``, optional -- measure
+        the core-density anisotropy of that reference's core and report
+        it (the CASCI rungs' detector column); ``None`` leaves the
+        field absent.
+
+    Returns
+    -------
+    StageFacts
+        The one-pass facts; ``converged`` is read off the live mc
+        object when the stage carries one (the mutation discipline),
+        True otherwise.
+
+    Notes
+    -----
+    **The three contributions of max|dE| vs PySCF.** Up to three
+    effects separate the reconstruction from the run's totals: the
+    core-field anisotropy of the fold, the window DEFINITION
+    (``c_act``), and bookkeeping -- which must be exactly 0 (the fold
+    convention is machine-exact against PySCF's ``get_h1eff``, 1e-15;
+    scripts/diag_fold.py). The window-definition term is not small in
+    general: where the valence shell overlaps the core (Ti 4s|3s
+    overlap ~0.1), the raw-AO analysis window shifts the CI ground by
+    ~85 mEh against the run's projected columns -- on such atoms
+    max|dE| measures the window definition, not the fold.
+
+    **Which CI labels the stage.** ``cas.ci`` drives the configuration
+    labels and the shell electrons; both consumers map it through the
+    PySCF-ordering bridge internally. On SA stages ``cas.ci`` is the
+    SA kernel's CI (the constrained_casscf contract) -- the labels
+    describe the ensemble-optimized CI, not the exact per-root pass.
     """
     c_core = cas.mo_coeff[:, :ncore]
     ops = build_operators(mol, mf, c_act, ncore, na, nb,
@@ -181,5 +226,7 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         configurations=configuration_summary(
             mol, mf.get_ovlp(), cas.ci[: len(e_mine)], c_act, na, nb),
         core_anisotropy=aniso,
+        # the optimizer's own report, read off the live mc object (the
+        # mutation discipline); CASCI stages and cache hits carry no mc
         converged=bool(getattr(getattr(cas, "mc", None), "converged", True)),
     )

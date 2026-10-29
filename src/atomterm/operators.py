@@ -1,6 +1,8 @@
 """Operators: the first-quantized assembly layer.
 
-PURPOSE: bridge PySCF (AO/MO integrals) and angular (the exact L
+PURPOSE
+-----------
+bridge PySCF (AO/MO integrals) and angular (the exact L
 matrices) to detbasis' determinant space, producing every operator
 the term analysis reads as a plain ``(ndet, ndet)`` matrix -- H, Lz,
 Lz^2, L^2, S^2, Sz, N, the parity and population labels, and the
