@@ -92,6 +92,52 @@ Verification walked (A/B where deterministic; degenerate / coincident
 lines; layout row updated; one lockstep commit. Sessions switch at
 phase boundaries via a message.txt handoff.
 
+## Naming review round 3 + the phase-2 review wave (2026-10-29)
+
+The user's review lens, stated for the remaining phases: GENERALIZE,
+UNIFY, and make similar approaches LOOK similar. Applied:
+
+- MASKS: the `mask_` family, names stating the constraint --
+  `mask_frozen_window`, `mask_no_core_window_mix` ("exchange" retired:
+  collides with the exchange integral), `windows.mask_radial_rotations`
+  ("same-shell" rejected: shell = l here and same-l rotations mix
+  members). Serialized axis tokens (frozen/virtmix/radial) stay -- they
+  are committed data inside cell addresses; the mapping is stated once
+  at the cells layer. Round 2's three-way dictionary is SUPERSEDED.
+- `run_frac_occ_scf` -> `run_frac_occ` (name-sibling of run_rohf; the
+  formalism is closed-shell RHF, NOT ROHF -- run_rohf_frac_occ was
+  considered and rejected). MOM caveat recorded in its Notes (the
+  across-cycles anchoring weakness; the fix if a future atom
+  oscillates), no code added.
+- run_rohf's split acceleration dispatch unified: `solve` owns all
+  three policies ("newton"/"diis+newton"/"diis"), `fresh_mf` is pure
+  construction.
+
+## Deep reuse — what new methods will need from casscf (recorded per
+## the phase-2 agreement; NOT designed)
+
+- The ONE driver: `constrained_casscf(mo_full=, mask=, weights=,
+  mc_opts=, fci_opts=)` covers every start x constraint x averaging
+  combination. A new method (spin-orbit, g-factors, transition
+  moments, a new rung) arrives as a new `mask_` (data,
+  uniq_var_indices-shaped) or a thin adapter -- never a kernel fork.
+- Per-run knobs without subclasses: `mc_opts`/`fci_opts` dicts set
+  attributes pre-kernel (budgets, exact-diagonalization forcing).
+- The results seam: `CASResult` (results only) + the chkfile store
+  grammar `atomterm/<name>/`; the SA TWO-PASS pattern (ensemble kernel,
+  then the exact roots pass with canonicalization off) is the template
+  for any method needing exact per-root quantities in an optimized
+  window.
+- The mutation discipline (fact 6): read `converged` off the live mc,
+  nothing else; pass `mo` explicitly for integrals.
+- DESIGN VERDICT (the deletion test): the adapter layer except
+  `run_sa_casscf` (its one surviving consumer: cases) is a middle-man
+  -- delete it and no complexity reappears (every caller writes one
+  constrained_casscf line, as cells already does). RETIRE with
+  treatments/study in phase 5; do not migrate (their store keys
+  casscf_relax/casscf_virtmix are rungs-era data, replaced by cell
+  addresses).
+
 ## Naming watchlist (R2; spotted between phases -- each entry is
 ## consumed at the owning file's phase, renamed WITH its consumers)
 
