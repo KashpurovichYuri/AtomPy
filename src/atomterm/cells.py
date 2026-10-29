@@ -22,7 +22,7 @@ Axis semantics (two of them describe the CORE and are easily conflated):
 
   Composition: (raw, pol) detector; (avg, pol) ruler; (avg, pur) the
   certified fold; (frac, pol) own reference. On ``pur`` the density is
-  exactly m-scalar (fact 20), so ``raw`` degenerates with ``avg`` --
+  exactly m-scalar, so ``raw`` degenerates with ``avg`` --
   the key CANONICALIZES ``fold="raw"`` to ``"avg"`` there, and
   ``frac`` on ``pur`` is rejected. ``substrate`` is the span, ``fold``
   is the field.
@@ -128,6 +128,8 @@ class CellKey:
     fold: str = "avg"
 
     def __post_init__(self):
+        """Validate and canonicalize: axis vocabularies, void
+        combinations, and the pur fold rule (raw -> avg)."""
         if not (isinstance(self.atom, str) and self.atom.isalpha()
                 and len(self.atom) <= 2):
             raise ValueError(f"atom {self.atom!r} must be an element label")
@@ -275,8 +277,16 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
     """Load a stored cell -- pure data, no live mol/mf required.
 
     The re-analysis entry point (:func:`analyze_cell`) builds on this;
-    the point is re-reading a run (post-hoc properties, tables) without
-    re-running the optimizer.
+    the point is re-reading a run (post-hoc properties, tables)
+    without re-running the optimizer.
+
+    Raises
+    ------
+    FileNotFoundError
+        No chkfile for the address (run the cell first).
+    KeyError
+        The store is incomplete or predates the cell layer --
+        regenerate the cell.
     """
     chk = cell_chk(key, workdir)
     if not chk.exists():
@@ -415,9 +425,10 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     else:  # start == "mo": PySCF's default start (canonical MOs,
         # canonical window). On pol the canonical MO matrix IS the
         # substrate; on pur the canonical columns are re-orthogonalized
-        # against the pur core span (S-orthonormal against the core they
-        # were SOLVED in, not the pur one -- the fact-17-class defect,
-        # removed at the source by build_full_mo's projection). Honest
+        # against the pur core span (they are S-orthonormal against
+        # the core they were SOLVED in, not the pur one -- exactly the
+        # input-window defect build_full_mo's projection removes at the
+        # source). Honest
         # expectation: the window's own m-delocalization survives
         # (measured: raw-MO spans never rotation-close) -- these cells measure that, they do not fix it.
         if key.substrate == "pur":
@@ -517,6 +528,9 @@ def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
 
 def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
            na: int, nb: int, c_pur=None):
+    """The cell layer's one facts call: the fold's spherical convention
+    and the CASCI anisotropy report are the only cell-specific
+    choices; everything else is :func:`atomterm.stages.stage_facts`."""
     from atomterm.stages import stage_facts
 
     c_act = cas.mo_coeff[:, ncore:ncore + ncas]
@@ -562,6 +576,12 @@ def _no_label(window: str) -> str:
 def window_grid(spec, window: str | None = None) -> list[CellKey]:
     """One window's full factor grid, in canonical render order.
 
+    Parameters
+    ----------
+    spec : the :class:`~atomterm.cases.CaseSpec` (duck-typed: symbol,
+        shell_patterns, nelec_act, spin are read).
+    window : the window label; None = the case's primary window.
+
     The ORDER is presentation and lives HERE, once -- renderers receive
     this list ready-made and format (branching on key identity only):
     the CASCI fold block first (identity: method=casci, start=ao; the
@@ -571,7 +591,6 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     group prefix (:func:`_no_label`). mo x pur IS part of the grid (the
     projection builder); radial stays ao-only (validated at the key).
 
-    ``window=None`` -> the case's primary window (from ``shell_patterns``).
     """
     from atomterm.system import sector_na_nb
 

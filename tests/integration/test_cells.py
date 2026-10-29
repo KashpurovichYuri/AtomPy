@@ -238,7 +238,7 @@ def test_bridge_certified_by_eigen_equation(norb, na, nb):
                                         conv_tol=1e-13)
     dets = determinant_basis(norb, na, nb)
     # the owners' spin-orbital expansion; detbasis eats the PHYSICIST
-    # arrangement of the same eri (fact 3), pyscf the chemist one
+    # arrangement of the same eri; pyscf takes the chemist one
     ham = slater_condon_matrix(
         dets, one_body=spin_block_one_body(h1),
         two_body=spin_block_two_body(eri.transpose(0, 2, 1, 3)))
@@ -365,7 +365,7 @@ def _same_facts(a, b, tol=1e-12):
 def test_run_cell_matches_direct_path(carbon, tmp_path):
     """run_cell(casci cell) == the direct run_casci + stage_facts path --
     the same construction the rungs registry uses, byte-comparable on a
-    pinned reference (fact 10: CASCI on pinned MOs is deterministic)."""
+    pinned reference (CASCI on pinned MOs is deterministic)."""
     from atomterm.casscf import run_casci
     from atomterm.stages import stage_facts
     from atomterm.system import ncore_of
@@ -415,7 +415,7 @@ def test_posthoc_properties_from_stored_run(carbon, tmp_path):
     bridge): the ground root's <L^2>/<S^2> from the stored PySCF CI and
     the energy from the stored window reproduce the payload. Gauge-safe
     observables only -- <Lz^2> is member-gauge-dependent inside a
-    degenerate cluster (fact 16) and is NOT compared."""
+    degenerate cluster and is NOT compared."""
     from atomterm.cells import cell_payload, load_cell, run_cell
     from atomterm.operators import build_operators
     from atomterm.system import ncore_of
@@ -481,7 +481,7 @@ def test_sa_run_completes_the_roots_store(carbon, tmp_path):
 
 @slow
 def test_frozen_mask_applies_to_the_mo_start(carbon, tmp_path):
-    """Masks are START-INDEPENDENT (the 141c1b8 wiring): a frozen-window
+    """Masks are START-INDEPENDENT: a frozen-window
     MO-start cell must converge WITH its start columns -- if the mask
     resolution slipped back into the ao branch, this cell would run
     free and the window would rotate away (carbon's radial relaxation,
@@ -529,7 +529,7 @@ def test_run_cell_mo_start_on_pur_substrate(carbon, tmp_path):
                  - np.eye(mol.nao_nr())).max()
     assert err < 1e-10
     # substrate = the core SPAN (PySCF canonicalizes the inactive block
-    # WITHIN its span -- the fact-6 mutation, span-preserving; it hits
+    # WITHIN its span after the kernel (span-preserving; it hits
     # the ao-pur cells identically): the stored core spans the pur core
     assert span_overlap(data.mo_coeff[:, :ncore], c_pur, s) == \
         pytest.approx(1.0, abs=1e-10)

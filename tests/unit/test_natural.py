@@ -193,7 +193,7 @@ def test_registry_ao_selectors_uniform_signature():
     w = window_shell(mol, None, 2, patterns=["2p"])
     assert w.m_complete and w.ao_rows is not None and w.c_win is None
     assert len(w.ao_rows) == 3
-    # the fact-1 guard: exponent-ranked primitive selection is undefined
+    # the guard: exponent-ranked primitive selection is undefined
     # for contracted shells (ccpvdz carbon p is one 3-exponent
     # contraction) -- the primitive selector is for uncontracted bases
     with pytest.raises(ValueError, match="contraction slot"):

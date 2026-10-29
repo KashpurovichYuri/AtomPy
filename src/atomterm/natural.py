@@ -37,11 +37,19 @@ __all__ = [
 def ci_rdm1(dets, vec, norb: int, weights=None) -> np.ndarray:
     """Spin-summed spatial 1-RDM of CI root(s), active-orbital basis.
 
-    vec: (ndet,) or (ndet, nroots) in the ``dets`` ordering;
-    weights: per-root averaging weights (default: the first root only).
-    gamma[p, q] = <a+_p a_q> summed over alpha and beta. Signs come from
-    the tested secondquant rules; for a single determinant gamma is the
-    projector onto its occupied orbitals (tr = na + nb).
+    Parameters
+    ----------
+    dets : determinant tuples in the ordering ``vec`` is expressed in.
+    vec : ``(ndet,)`` or ``(ndet, nroots)`` CI amplitudes.
+    norb : number of spatial orbitals (the active-space width).
+    weights : per-root averaging weights (default: the first root
+        only).
+
+    Returns
+    -------
+    ``gamma[p, q] = <a+_p a_q>`` summed over alpha and beta. Signs come
+    from the tested secondquant rules; for a single determinant gamma
+    is the projector onto its occupied orbitals (tr = na + nb).
     """
     vec = np.asarray(vec)
     if vec.ndim == 1:
@@ -52,6 +60,7 @@ def ci_rdm1(dets, vec, norb: int, weights=None) -> np.ndarray:
     weights = np.asarray(weights, dtype=float)
 
     def split(det):
+        """(alpha orbitals, beta orbitals shifted to 0..norb-1)."""
         return (tuple(p for p in det if p < norb),
                 tuple(p - norb for p in det if p >= norb))
 

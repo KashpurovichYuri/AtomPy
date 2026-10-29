@@ -100,6 +100,8 @@ class CaseSpec:
     planned_windows: tuple[str, ...] = ()
 
     def atom_config(self) -> AtomConfig:
+        """The spec as an :class:`AtomConfig` (``tag`` defaults to the
+        symbol)."""
         return AtomConfig(symbol=self.symbol, basis=self.basis, ecp=self.ecp,
                           spin=self.spin, tag=self.tag or self.symbol)
 
@@ -224,6 +226,9 @@ def run_atom(
 ) -> dict:
     """End-to-end pipeline for any single atom.
 
+    Parameters
+    ----------
+    cfg : the :class:`AtomConfig` of the atom.
     shell_patterns : valence-shell label prefixes selecting the active AO
         space, concatenated in order (e.g. ``["2p"]`` for C 2p^2,
         ``["3d", "4s"]`` for Sc 3d^1 4s^2). Each pattern must match at least
@@ -242,6 +247,13 @@ def run_atom(
         -- the character-forced occupation patterns + reference-basin
         energy gate, mandatory where the default ROHF is an aufbau
         runaway (Ti; see :func:`run_rohf`).
+    workdir : where checkpoints and reports land.
+
+    Raises
+    ------
+    ValueError
+        ``spin`` negative or of unequal parity with ``nelec_act`` (no
+        such Ms sector exists).
 
     Every stage is checkpointed under ``workdir`` and analyzed with the exact
     L/S operator matrices; see :func:`run_carbon` for the carbon instance.
@@ -282,6 +294,10 @@ def run_atom(
     reports: list[str] = []
 
     def stage_analysis(tag: str, cas, c_act, na: int, nb: int):
+        """The shared per-stage render: fold + analyze through
+        :func:`stage_facts`, print the report block, accumulate the
+        results dict (one closure per run -- it captures the run's
+        mol/mf/reports)."""
         ncore = ncore_of(mol.nelectron, na + nb)
         # fold with the stage's OWN core (inside stage_facts: it uses
         # cas.mo_coeff[:, :ncore]): orbital optimization may legally
@@ -385,6 +401,7 @@ def run_carbon(cfg: AtomConfig | None = None, workdir: str = "elements") -> dict
 
 
 def main():
+    """Run the carbon pilot (the ``python -m`` entry)."""
     run_carbon()
 
 
