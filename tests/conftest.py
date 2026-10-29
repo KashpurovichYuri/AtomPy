@@ -6,16 +6,28 @@ live in integration/conftest.py."""
 import numpy as np
 import pytest
 
-from atomterm.system import AtomConfig
-from atomterm.drivers import run_rohf, select_shell_ao
+from atomterm.system import AtomConfig, build_mol
+from atomterm.drivers import select_shell_ao
 
 
 @pytest.fixture(scope="session")
-def carbon(tmp_path_factory):
-    """(cfg, mol, mf, act_idx) for C/cc-pVDZ triplet ROHF."""
+def carbon():
+    """(cfg, mol, mf, act_idx) for C/cc-pVDZ triplet ROHF -- the
+    FROZEN reference (``tests/carbon_reference.py``): bit-stable
+    across runs, NO SCF (the state loads from source; floats are
+    repr-round-trip exact)."""
+    from pyscf import scf
+
+    import carbon_reference as ref
+
     cfg = AtomConfig()
-    chk = str(tmp_path_factory.mktemp("carbon") / "rohf.chk")
-    mol, mf = run_rohf(cfg, chk)
+    mol = build_mol(cfg)
+    mf = scf.ROHF(mol)
+    mf.e_tot = ref.E_TOT
+    mf.mo_energy = ref.MO_ENERGY
+    mf.mo_occ = ref.MO_OCC
+    mf.mo_coeff = ref.MO_COEFF
+    mf.converged = True
     return cfg, mol, mf, select_shell_ao(mol, "2p")
 
 

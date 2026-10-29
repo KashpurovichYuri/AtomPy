@@ -441,7 +441,12 @@ once per
 session; the Ti rungs block is the slowest, ~7 min cold; the Sc rungs
 ~2.5 min; under external load ~230 the same suite took 31 min, 2026-10-28).
 Layout: `tests/unit/` = the seconds tier (pure numpy/libcint,
-synthetic substrates, and at most the small carbon ROHF fixture);
+synthetic substrates, and the FROZEN carbon ROHF --
+`tests/carbon_reference.py`, repr-round-trip-exact source, loaded by
+the root `carbon` fixture: NO SCF runs in the unit tier and the
+downstream is bit-stable across runs, certified by double-run
+sha256; regenerate only on basis/default changes via
+`scripts/freeze_carbon_reference.py`);
 `tests/integration/` = the campaign chemistry (TM references, CASSCF/SA,
 term tables); conftest is split the same way (shared root, campaign
 fixtures in `integration/conftest.py`). Shared DATA and helpers live in
