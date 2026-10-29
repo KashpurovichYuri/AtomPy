@@ -43,19 +43,16 @@ mode restrictions lift). Mechanical enforcement: the global
 | `src/atomterm/detbasis.py` | `determinant_basis`, `sector_dimension`, `one_body_matrix`, `two_body_matrix`, `slater_condon_matrix`, `commutator`, `frobenius_norm` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants; `slater_condon_matrix` = the fused one-pass production path (10^5 dets), `one_body_matrix`/`two_body_matrix` = the parts, name-twinned with secondquant (the cross-certification is name-symmetric); `_slater_condon_slow` = the pinned reference loop; ordering ≠ PySCF FCI strings (the mapping lives in operators; detbasis stays numpy-only) |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `apply_one_body`, `apply_two_body`, `one_body_matrix`, `two_body_matrix`, `secondquant_matrix` | **pure numpy, no pyscf** — the same matrices via explicit a+/a application on occupation vectors (ket application + scattering, sign tracking); `one_body_matrix`/`two_body_matrix` twin the detbasis names; the random non-particle-symmetric-G pin certifies the string contraction terms that physical integrals are blind to |
 | `src/atomterm/operators.py` | `build_operators`, `active_space_integrals`, `full_space_integrals`, `window_closure`, `core_anisotropy`, `ground_block`, `pyscf_ci_permutation`/`ci_in_detbasis_order` | the first-quantized assembly: H, Lz, Lz^2, L^2, S^2, Sz, N + the EXACT parity (`Pi = C^dag(signed S)C` via `l_per_row`; many-body = the exterior power, Cauchy–Binet minors — sharp ±1 on parity-closed windows, deviations are window data, no tolerance) and population labels as `(ndet, ndet)` matrices; owns BOTH PySCF↔ours convention boundaries (the chemist↔physicist integral transpose — ONE, fact 3 — and the CI-ordering bridge `pyscf_ci_permutation`, fact 24) plus the measured-block family (`window_closure`, `core_anisotropy`, `ground_block` = the SA-anchoring / NO-averaging rule, ops-first so no consumer repeats the eigh); core folded into h1 (mcscf convention, spherically averaged l=0 density; `c_core` contract for optimized stages); `method="slater_condon"|"secondquant"` switches the evaluator; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19); `core_anisotropy` = the ε of the discarded raw core field; the two convention exceptions: `spin_ladder_matrix` (inter-sector a†/a) and `parity_operator` (multiplicative exterior power) — both pin the L²/S² twins / parity exactness |
-| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_rungs(ref=)`/`run_case(ref=)`; the module Conventions own the caching-trust (cached chks TRUSTED, never re-gated) and the S-projector occupation-metric contracts (`span_projector` is the one home); the improper-convergence toolbox lives here (README · Methods) |
-| `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the ONE deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters over it (a new rung = a new adapter, never a new kernel path); mask names form the `mask_` family stating the constraint (`mask_frozen_window`, `mask_no_core_window_mix`, `windows.mask_radial_rotations`) — the serialized axis tokens (frozen/virtmix/radial) are data identifiers mapped once at the cells layer; the module Conventions own the mcscf mutation semantics (fact 6), the full-MO contract (fact 7), and the mask vocabulary; `mc_opts`/`fci_opts` = per-run knobs; all checkpointed (`.chk`) under `atomterm/<name>/`; labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source); SA runs return roots-pass energies with the SA kernel's CI (the `<name>_roots` store carries the exact per-root CI); `CASResult` carries results only — the stage identity flows through `stage_facts(tag=)`/store keys |
+| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_case(ref=)` (and the tests' `run_ladder(ref=)`); the module Conventions own the caching-trust (cached chks TRUSTED, never re-gated) and the S-projector occupation-metric contracts (`span_projector` is the one home); the improper-convergence toolbox lives here (README · Methods) |
+| `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf`, `run_sa_casscf`, `CASResult` | the ONE deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable; `run_casscf`/`run_sa_casscf` are the classic pipeline's one-line stage adapters over it, every other recipe a direct `constrained_casscf` call (as cells does — never a new kernel path); mask names form the `mask_` family stating the constraint (`mask_frozen_window`, `mask_no_core_window_mix`, `windows.mask_radial_rotations`) — the serialized axis tokens (frozen/virtmix/radial) are data identifiers mapped once at the cells layer; the module Conventions own the mcscf mutation semantics (fact 6), the full-MO contract (fact 7), and the mask vocabulary; `mc_opts`/`fci_opts` = per-run knobs; all checkpointed (`.chk`) under `atomterm/<name>/`; labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source); SA runs return roots-pass energies with the SA kernel's CI (the `<name>_roots` store carries the exact per-root CI); `CASResult` carries results only — the stage identity flows through `stage_facts(tag=)`/store keys |
 | `src/atomterm/windows.py` | `Window(.columns)`, `SELECTORS`, `window_shell/primitive/scf_mo/no`, `select_*` (incl. `select_span`, `select_primitives`), `primitive_chain`, `shell_weights`, `window_avas`, `span_overlap`, `span_projector`, `s_metric_roots`, `shell_slots`, `lowdin(tol=)`, `complete_orthonormal`, `build_full_mo`, `lm_sectors`, `l_per_row`, `radial_basis`, `mask_radial_rotations` | window construction + selection + the kind registry (the module docstring owns the statement: purpose, the m-completeness contract, the five kinds incl. custom columns, the internal layering — `shell_slots` is the one shell walker [consumed by angular too], the S-metric algebra [`s_metric_roots` = the S^{±1/2} transport] beneath, the two substrate builders); `build_full_mo` takes AO rows OR column vectors through ONE project-renormalize-assemble treatment; `lowdin` raises on near-linear dependence instead of NaN-ing downstream; `shell_weights` groups by `lm_sectors` (no label parsing; row order fixed for bitwise-stable payloads) |
 | `src/atomterm/core.py` | `purified_core_orbitals`, `closed_shell_core_energy` | the exactly rotation-closed core span (fact 20's ONE home: the E ⊗ members construction + traps — the pur substrate fixing the fact-17 input-window baseline) and the closed-shell core energy (the pur-fold bookkeeping constant; J/K formula in its docstring) |
-| `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline and rungs share — callers only render (report text / flat json payload); the module Conventions own the two ruler readings: the reconstruction (eigvalsh(H)+core_energy) is the ANALYSIS ruler (meters/labels computed on it; tables' E columns carry the run's own totals — never compared), and max\|dE\| vs PySCF decomposes into three contributions (core-field anisotropy, window definition, bookkeeping — the last must be 0; on core-overlapping shells the window-definition term dominates, Ti ~85 mEh); `cas.ci` labels the stage and on SA runs is the SA kernel's CI (the constrained_casscf contract) |
+| `src/atomterm/stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold (with the stage's own core) + analyze + energies vs PySCF + window purity + ortho divergence guard; the single owner of the bookkeeping pipeline every stage runner shares — callers only render (report text / flat json payload); the module Conventions own the two ruler readings: the reconstruction (eigvalsh(H)+core_energy) is the ANALYSIS ruler (meters/labels computed on it; tables' E columns carry the run's own totals — never compared), and max\|dE\| vs PySCF decomposes into three contributions (core-field anisotropy, window definition, bookkeeping — the last must be 0; on core-overlapping shells the window-definition term dominates, Ti ~85 mEh); `cas.ci` labels the stage and on SA runs is the SA kernel's CI (the constrained_casscf contract) |
 | `src/atomterm/scans.py` | `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free: explicit m-symmetric radial curves (exactly closed windows) + member-tilt maps; deterministic given the ROHF reference (fact 18) |
 | `src/atomterm/analysis.py` | `analyze`, `configuration_summary`, `shell_occupations`, `format_report`, `save_report` | term symbols from `<L^2>`, `<S^2>` (half-integer S grid; L-letter table to L=20); commutator norms; configuration labels per root — PySCF-order CI in (the fact-24 bridge runs inside), l-grouping via `lm_sectors` (no label parsing) |
-| `src/atomterm/cases.py` | `CaseSpec`, `CAMPAIGN`, `run_case`, `run_atom`, `run_carbon` | the DECLARED per-atom campaign (the intent manifest): `CaseSpec` fixes atom/reference-data/window/sectors before anything runs (the treatments arm only when a `study` is declared) — `planned_windows` declares not-yet-run windows, and the gated reference specs (Ti/Sc character-forced + basin gate) are `CAMPAIGN` data (the ONE declaration: the cell grid, regen, and the renderers all derive from it — regen_cells' REFS/CASES dicts are retired); `run_case(spec)` executes; `run_atom` = the staged implementation; `pipeline.py` remains a compat shim |
-| `src/atomterm/treatments.py` | `Rung`, `run_rungs`, `run_carbon_rungs` | orbital-treatment rungs as a DATA registry (`_registry` returns `list[Rung]`): new rung = new entry, report iterates the registry (cannot drop a rung); `rung_tags=` selects a subset (window studies); `purified=True` appends the `*_pur` rungs (same treatments on the exactly-closed purified core substrate, fact 20 — incl. `sa_relax_pur`, the exact-symmetry SA rung); all-vs-all matrix + per-rung comparison columns (win_l purity, core anisotropy), ortho_err divergence guard |
-| `src/atomterm/study.py` | `StudySpec`, `plan_study`, `run_study`, `render` | the declared window × treatment study runner (ticket 20): declared product, per-cell budget knobs, per-cell failure quarantine, exact-eigh labels in full-diagnostics mode; writes `<out>/<tag>_study.json` + the generated insert between the study markers of `elements/<Atom>/TABLES.md`; `pipeline.py`/`drivers.py` are compat shims |
+| `src/atomterm/cases.py` | `CaseSpec`, `CAMPAIGN`, `run_case`, `run_atom`, `run_carbon` | the DECLARED per-atom campaign (the intent manifest): `CaseSpec` fixes atom/reference-data/window/sectors before anything runs — `planned_windows` declares not-yet-run windows, and the gated reference specs (Ti/Sc character-forced + basin gate) are `CAMPAIGN` data (the ONE declaration: the cell grid, regen, and the renderers all derive from it — regen_cells' REFS/CASES dicts are retired); `run_case(spec)` executes; `run_atom` = the staged implementation |
 | `src/atomterm/cells.py` | `CellKey`, `run_cell`, `load_cell`, `analyze_cell`, `cell_payload`, `spine_keys`, `window_grid`/`grid_keys`/`diagnostics`/`planned` | THE addressing layer: one frozen key per grid point (atom/window/sector/method/start/mask/substrate/fold; `substrate` = the core SPAN, `fold` = the core FIELD; pur canonicalizes fold=avg), the address grammar `<atom>_<window>_<na>-<nb>_<method>_<start>_<mask\|->_<substrate>_<fold>` as chk name/payload key; VOID cells validated at the key (radial needs member-labeled AO columns — ao only; mo×pur is VALID since the projection builder — the canonical columns re-projected on the pur core span); the declared key-set derives from `CaseSpec` (`window_grid` owns the one render order; `grid_keys` = the runnable set, `diagnostics` = virtmix, `planned` = the planned windows' grids — renderers branch on key identity only, grouping lives once in the declaration); axes resolve through their OWNING modules; the cell store is self-owned (this PySCF's CASCI kernel writes no chkfile; `ci_stack` stays in PySCF order — the bridge lives in operators, fact 24); SA weights default to the measured ground block; cache hit ⇒ analyze path |
 | `src/atomterm/natural.py` | `ci_rdm1`, `natural_orbitals`, `occupation_groups`, `select_no_window`, `no_group_windows` | the NO mathematics: spin-summed 1-RDM from CI roots (secondquant signs), NOs = density eigenvectors in the orthonormal span, occupation-GROUP selection never splits an m-set (scale-aware tolerance); symmetry-safe only from a term-AVERAGED root set (a single \|L,M_L⟩ density is m-diagonal but m-unequal — pinned); `no_group_windows` = the NO arm (group-prefix windows from the term-averaged source density; the block measurement is `operators.ground_block`, the cost stop raises); the Window object + selectors live in `windows.py` |
-| `src/atomterm/drivers.py` | (compat facade) | re-exports the historic surface over reference/windows/core/casscf — existing imports keep working; NEW code imports the owning module |
 
 ## Hard-won facts (do not re-derive)
 
@@ -101,7 +98,7 @@ module.
    a_s a_r` with G in the detbasis (physicist) arrangement; annihilators run
    in reverse order (s before r). Elementwise identical to the Slater–Condon
    matrices (tests/test_secondquant.py, tier 1). For core-explicit tests use
-   `drivers.purified_core_orbitals`: canonical core MOs replaced by an
+   `core.purified_core_orbitals`: canonical core MOs replaced by an
    exactly rotation-closed span (per-l shared radials on all members,
    one global Loewdin) — close to the SCF solution yet exactly l = 0.
    Raw s AOs work equally well;
@@ -117,13 +114,13 @@ module.
    draw chaotically (root splittings wobble ~1e-2 Eh); signed zeros on
    noise-level Lz eigenvalues; never judge a refactor by diffing two
    from-scratch runs.
-11. **Generic pipeline** (`pipeline.run_atom`): Ms sectors derive from
+11. **Generic pipeline** (`cases.run_atom`): Ms sectors derive from
    `cfg.spin = 2S` + active-electron parity — primary `(na, nb) =
    ((n+2S)/2, (n−2S)/2)`, plus `(n/2, n/2)` when n is even and S > 0.
    Sector chkfile tags label M_S = (na−nb)/2 (`casci_ms1`, `casci_ms0`,
    `casci_ms0p5` for a doublet) — na−nb itself would collide. New atoms =
    a new row in `tests/test_atoms.py` `CASES`, no new code.
-12. **Carbon rungs facts** (ticket 08, `treatments.py`): raw (un-averaged) core
+12. **Carbon rungs facts** (ticket 08; the pins run through cell addresses in test_treatments.py): raw (un-averaged) core
    field → [H, Lz] ≈ 5.6e-6 and the ³P multiplet split 4.4e-5 Eh in the
    {M_L=0} vs {±1} pattern (quadrupole k=2, m=0; dipole excluded by parity);
    core-density anisotropy norm ≈ 2.4e-3 relative. In a sector that is a
@@ -263,8 +260,11 @@ module.
     says nothing about closure). AVAS verdict: right size,
     mean-field-inherited span; raw shells strictly dominate. SA
     deviations decompose 100% window / 0% core-fold (witness: refold
-    the converged core with the raw shell window; artifacts
-    results/*_sa_decomposition.md). Verdict tables: README · Results (Methods compared).
+    the converged core with the raw shell window; committed artifacts
+    results/*_sa_decomposition.md -- the one-shot generator retired
+    with the rungs, the attribution now rides every cells row as the
+    span-certificate + anisotropy columns). Verdict tables: README ·
+    Results (Methods compared).
 20. **The closed core span** — E_l ⊗ members (per l: top-k span of
     the S-metric COLUMN Gram of the member-resolved radial blocks,
     every radial replicated on ALL members, one global Löwdin) makes
@@ -276,7 +276,7 @@ module.
     attractor surviving purification — branch on window weights, the
     window-definition offset vs raw-fold CASCI Sc +88.7 mEh,
     relax-family max|dE| ~1e-3 fold bookkeeping — bound, don't pin):
-    README · Methods, · Results; the rungs: `treatments`.
+    README · Methods, · Results; the rungs pins: `tests/integration/test_treatments.py` (through cells).
 
 21. **Ti: d², the aufbau runaway, and the basin gate** (ticket 12):
     (a) THE REFERENCE IS TWO-LAYERED CHAOS -- the aufbau runaway
@@ -387,7 +387,7 @@ module.
 
 ## Tests
 
-`pytest` runs 189 tests in ~13 min unloaded (chkfile caching; ROHF computed
+`pytest` runs 184 tests in ~13 min unloaded (chkfile caching; ROHF computed
 once per
 session; the Ti rungs block is the slowest, ~7 min cold; the Sc rungs
 ~2.5 min; under external load ~230 the same suite took 31 min, 2026-10-28).
@@ -413,7 +413,7 @@ fast/slow MARKS are the machine axis, the directories the human one;
 a few fast-marked functions still live inside integration modules --
 split them out when their file is next touched). Run the full suite
 before committing changes to
-physics-bearing modules (drivers/operators/stages/treatments/scans); targeted
+physics-bearing modules (operators/stages/cells/casscf/scans); targeted
 files or `-m fast` are fine for everything else. Suite flakes: the rungs
 fixtures are session-scoped — a chaotic SCF draw can fail whichever tight
 band grazes it (rotating failures across runs, each isolation-green on
@@ -427,10 +427,10 @@ inside PySCF's Davidson (NaN CI overlaps; one fixture death cascades to
 NOT a regression; a red suite alone is never the verdict, isolation
 reruns are (measured: 2 red + 1 near-green suites on three identical
 consecutive runs). Test files map
-1:1 to src modules (`test_drivers.py` carries the quartet's
+1:1 to src modules (`test_substrate_chemistry.py` carries the quartet's
 SCF-bearing chemistry over reference/windows/core/casscf, imported
-OWNER-DIRECT since the phase-2 walk -- only historic importers go
-through the facade; `test_reference.py` + `test_windows.py` are the
+OWNER-DIRECT since the phase-2 walk -- the facade retired in phase 5;
+`test_reference.py` + `test_windows.py` are the
 unit tiers of reference and windows -- the latter: the selection
 layer, the window-columns generalization, the
 `Window.columns` one-treatment collapse, and the AO-rows ≡ AO-columns
@@ -469,7 +469,7 @@ operators built explicitly: L² = Lz² + ½(L₊L₋ + L₋L₊) and S² = Sz² 
 ½(S₋S₊ + S₊S₋) elementwise on every p² sector, S± as inter-sector
 maps),
 `test_atom_term_tables[*]` (generic pipeline per atom; new atoms = new rows),
-`test_treatments.py` (per-rung fingerprints, parameterized C/Si; Sc TM block:
+`test_treatments.py` (the treatment ladder through CELL ADDRESSES: per-rung fingerprints, parameterized C/Si; Sc TM block:
 exact closure + free-ion tables, relax honesty, S-basin escape, the bimodal
 SA basins, radial ceiling vs escape, complete-window still-escapes, and the
 purified-substrate block: machine-exact closure on C/Si, Sc's
@@ -500,7 +500,7 @@ symmetry, exactly-flat single-member tilts, the Lz blind spots, the Sc
 inversion, and the Ti d² verdict — tilts descend, radial rises, the
 Lz-blind ±pair pattern — deterministic, no optimizer),
 `test_half_integer_spin_labels` (doublet
-labeling), `test_natural.py` (the γ-ladder claim: m-scalar densities yield whole m-sets, single roots do not; the 1-RDM pinned against a brute-force pair sum; real-AO certificates), `test_drivers.py` (build_full_mo block properties — the
+labeling), `test_natural.py` (the γ-ladder claim: m-scalar densities yield whole m-sets, single roots do not; the 1-RDM pinned against a brute-force pair sum; real-AO certificates), `test_substrate_chemistry.py` (build_full_mo block properties — the
 ticket-09 regression guard — the frac-occ ordering; the
 selection/meter pins incl. shell_weights partition live in the unit
 `test_windows.py`),

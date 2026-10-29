@@ -109,7 +109,7 @@ class ReferenceSpec:
     """The declared recipe for an ROHF reference that plain aufbau
     filling cannot produce: which AO spans force the occupations (by
     character, never energy order), and which energy pins the target
-    basin. Threaded through run_rohf / run_rungs / run_atom.
+    basin. Threaded through run_rohf / run_case / run_atom.
 
     Attributes
     ----------

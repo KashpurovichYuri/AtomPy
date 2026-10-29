@@ -148,6 +148,64 @@ CAMPAIGN row (cases); new AXIS VALUE = vocabulary + one resolution
 branch through its owner (cells); new METHOD = a mask_ or a thin
 adapter over constrained_casscf (the deep-reuse paragraph above).
 
+Phase 5 DONE (2026-10-29, `1c2ee2f`/`40769fa`/`ad28d3a`/`4565e93` +
+the close): the retirement lens. DECISIONS (retire-or-keep BEFORE
+fact-homing, per the plan):
+
+- scans KEEP + walked: the optimizer-free deterministic anatomy
+  (fact 18) has no overlap with cells (which runs optimizers);
+  fact tags dissolved, ScanPoint Attributes, scan_window's assert
+  -> ValueError, test_scans owner-direct.
+- treatments RETIRED: zero src consumers; every rung maps onto a
+  CellKey address. THE PIN MIGRATION (user-directed actuality
+  review): 19 of 20 pins are ACTUAL (they pin measured campaign
+  physics, not the rungs machinery) and now run through run_cell --
+  LADDER_ADDRESSES in test_treatments.py is the rungs->cells
+  Rosetta stone; one pin DIED with its subject (_report's renderer
+  flag; the payload contract stays pinned in test_stages). One
+  grazed band widened with the observed value (Ti casci comm 1.1e-7,
+  isolation-green).
+- study RETIRED with the arm (CaseSpec.study deleted, R5): the arm
+  had NO declaring case; run_cell owns the budgets; the committed
+  NO-study inserts in C/Si/Sc/Ti/U TABLES.md are past one-shot
+  declarations kept as frozen data. The unexercised quarantine
+  dies -- if a big-window cells campaign ever needs failure
+  isolation, the try/except belongs at the runner (regen_cells),
+  not in the cell.
+- 3 casscf adapters RETIRED (core_relax/virtual_mix/pyscf_start);
+  run_casci/run_casscf/run_sa_casscf survive (cases + cells -- the
+  classic pipeline's stage names; the phase-2 verdict had missed
+  run_casscf's cases consumer).
+- drivers + pipeline RETIRED: 28 files rewired owner-direct; two
+  test files renamed honestly (test_drivers -> test_substrate_
+  chemistry, test_pipeline -> test_run_carbon -- the phase-6 rename
+  flag consumed early because a test file must not name a dead
+  module); run_u_sa's relax stage calls constrained_casscf directly.
+- sa_decomposition.py RETIRED (user: review actuality): its
+  attribution (window vs core-fold) rides every cells row as the
+  span-certificate + anisotropy columns; artifacts stay committed.
+
+DECIDED (the two-run-vocabularies question, raised at phase-4
+close): KEEP BOTH. The classic staged pipeline (stage tags, the
+T1/T2 term tables: all-Ms sectors, full spectra, human reports)
+and the cells grid (addresses: method comparisons on one window)
+are DIFFERENT DELIVERABLES at different speeds -- term tables are a
+stable contract (new atom = new row), the grid is under active
+development (ECP wave will add axes); unifying couples them so
+every cells change risks the committed tables' reproducibility.
+Cost of both: ~50 shared lines and two store vocabularies --
+bounded, stated in the division-of-labor docstrings. README's
+pipeline diagram de-lied (it still showed the phase-4-deleted
+`want` dispatch).
+
+SUITE AT THE BOUNDARY: 184 collected, 183 green + 1 Ti escape-draw
+flake, isolation-green on rerun -- the recorded rotating-flake
+class, no band change (phase-3 precedent). Fast tier 115 (measured;
+the handoff chain's "48" was a unit-tier figure). AGENTS: layout
+rows for the four dead modules deleted, facts 9/11/12/19/20
+re-pointed (drivers->owners, treatments->the migrated pins),
+reference.py's run_rungs cite -> run_case.
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE

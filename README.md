@@ -457,9 +457,10 @@ CaseSpec — the declaration
 │  atom, basis/ECP, spin, nelec_act, ncore, shell_patterns
 │  ref: ReferenceSpec (occ spans l0..l3 | label prefixes,
 │        conv_accelerator ∈ {"diis","newton","diis+newton"}, occ_e_ref)
-│  want: {terms, casci-variants, casscf, sa-casscf, treatments, scans}
+│  run_casscf: the single-root stage flag; planned_windows: the
+│        not-yet-run window labels (the cell grid derives from them)
 │
-└─ run_case(spec)
+└─ run_case(spec) — the classic staged pipeline (cases.py)
    ├─ 1. ROHF reference (reference.py)
    │      a cached checkpoint is reused as is; a fresh run applies
    │      character-forced filling, the declared acceleration, and
@@ -467,13 +468,15 @@ CaseSpec — the declaration
    ├─ 2. CASCI per sector — fold ∈ {averaged, raw, fractional}
    │      term tables produced and compared to the combinatorial
    │      contract; deviations are reported.
-   ├─ 3. if "casscf" → single-root CASSCF
-   ├─ 4. if "sa-casscf" → SA-CASSCF over the ground term's M_L set
-   ├─ 5. if "treatments" → the declared window × treatment product
-   │      (study.py, on the treatments.py registry): the windows are
-   │      walked for frozen CASCI as well as for the optimizer
-   │      treatments.
-   └─ 6. if "scans" → radial / tilt scans (scans.py)
+   ├─ 3. if run_casscf → single-root CASSCF
+   └─ 4. SA-CASSCF over the ground term's M_L set
+
+The methods grid is the OTHER deliverable path (cells.py): every
+treatment × start × mask × substrate × fold combination is one
+addressed CellKey derived from the same declaration — the rungs-era
+modules (treatments.py, study.py) retired 2026-10-29, their pins
+migrated to cell addresses. The frozen scans (scans.py) are the
+optimizer-free anatomy layer, run from scripts.
 ```
 
 The reference gate's energy `occ_e_ref` is self-calibrated atom data:
