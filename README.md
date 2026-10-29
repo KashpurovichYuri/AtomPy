@@ -637,7 +637,9 @@ groups are l-pure m-sets plus correlating tails.
 `elements/<Atom>/`: `TABLES.md` (term content, spectrum, methods
 compared, window lattice, study inserts), `report.md/json` (the term
 tables), `cells.json/md` (the full treatment cell set, key-addressed —
-Methods compared), `scan.md`, `sa_decomposition.md`, `basin_map.md`.
+Methods compared), `scan.md`, plus the frozen artifacts
+`sa_decomposition.md` / `basin_map.md` (their one-shot generators
+retired with the rungs era; committed data, not regenerable).
 New atom = new element file, not README growth; the
 regenerators write straight into these files (`scripts/regen_cells.py Ti`
 -> `elements/Ti/cells.{json,md}`; chkfiles land under `rungs/` and are
