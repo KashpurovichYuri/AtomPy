@@ -120,3 +120,22 @@ phase boundaries via a message.txt handoff.
 - test_drivers.py name (phase 6): after the phase-2 rewires it tests
   the owner modules, not the facade -- rename or split when the test
   mass is reorganized.
+
+## Naming review round 2 (2026-10-29, user-directed, phase 2)
+
+- Mask polarity verdict (do not relitigate in phases 4/5): the two
+  geometry masks deliberately carry OPPOSITE grammar --
+  `core_virtual_only_mask` names its single ALLOWED pair,
+  `no_core_window_exchange_mask` its single DENIED pair -- because the
+  allowed sets have complementary shapes; one polarity would make one
+  name wrong. Symmetry lives in the docstrings (allowed + denied +
+  axis token each) and the three-layer DICTIONARY lives in casscf's
+  module Conventions (geometry / purpose / axis).
+- `CASResult.kind` DELETED (never read anywhere; `rung.kind` in
+  treatments is a different object) -- the container carries results
+  only; stage identity flows via stage_facts(tag=)/store keys.
+- core.py `n_core` -> `ncore` (the spelling every other module uses;
+  no keyword callers existed).
+- reference.py re-audited clean: `occ_e_ref`, `conv_accelerator`,
+  `run_frac_occ_scf` match the established tokens (frac/pur axis
+  values, prose in facts/tickets); `_forced_rohf_occ` clear.

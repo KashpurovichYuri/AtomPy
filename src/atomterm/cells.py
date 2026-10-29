@@ -506,7 +506,7 @@ def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
     from atomterm.windows import select_valence_ao
 
     data = load_cell(key, workdir)
-    cas = CASResult(key.method, data.energies, data.ci, data.mo_coeff,
+    cas = CASResult(data.energies, data.ci, data.mo_coeff,
                     None, data.core_energy)
     na, nb = key.sector
     ncore = ncore_of(mol.nelectron, na + nb)

@@ -24,7 +24,7 @@ from atomterm.windows import (lm_sectors, lowdin, occupied_core_idx,
 __all__ = ["purified_core_orbitals", "closed_shell_core_energy"]
 
 
-def purified_core_orbitals(mol, mf, n_core: int):
+def purified_core_orbitals(mol, mf, ncore: int):
     """The canonical core MOs replaced by an exactly rotation-closed
     core span (the pur substrate; fact 20).
 
@@ -50,12 +50,12 @@ def purified_core_orbitals(mol, mf, n_core: int):
     ----------
     mol : the built Mole (the shell walker's substrate).
     mf : converged reference (its ``mo_coeff`` and ``get_ovlp``).
-    n_core : number of core orbitals (the closed block;
+    ncore : number of core orbitals (the closed block;
         :func:`atomterm.windows.occupied_core_idx` selects it).
 
     Returns
     -------
-    (C, contamination) : ``(nao, n_core)`` S-orthonormal columns, and
+    (C, contamination) : ``(nao, ncore)`` S-orthonormal columns, and
         per-MO ``1 - own-l weight`` of the canonical core it replaces
         (the foreign-l SCF tail diagnostic).
 
@@ -76,7 +76,7 @@ def purified_core_orbitals(mol, mf, n_core: int):
     """
     s = mf.get_ovlp()
     c_can = np.asarray(
-        mf.mo_coeff[:, occupied_core_idx(mf, n_core)])
+        mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
     sectors = lm_sectors(mol)
 
     # dominant l per core MO (lumped-l weights partition unity exactly;
@@ -86,8 +86,8 @@ def purified_core_orbitals(mol, mf, n_core: int):
     for i, wmax in enumerate(w_l.max(axis=1)):
         assert wmax > 0.95, (i, wmax)  # a mixed-l core MO = wrong core
 
-    c_pur = np.zeros((mol.nao_nr(), n_core), dtype=c_can.dtype)
-    contamination = np.zeros(n_core)
+    c_pur = np.zeros((mol.nao_nr(), ncore), dtype=c_can.dtype)
+    contamination = np.zeros(ncore)
     col = 0
     for k_col, l_name in enumerate(l_names):
         l_val = "spdfgh".index(l_name)
@@ -120,7 +120,7 @@ def purified_core_orbitals(mol, mf, n_core: int):
             for m in members:  # shared radial on EVERY member (m-complete)
                 c_pur[sectors[(l_val, m)], col] = v_all[:, j]
                 col += 1
-    assert col == n_core
+    assert col == ncore
 
     # one global Loewdin (S = 0 between different l -> l-purity survives;
     # within-l mixing is span-preserving)

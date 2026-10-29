@@ -19,6 +19,16 @@ Conventions
   diagonalization of our H in the converged window -- PySCF's ci
   vectors straggle inside degenerate clusters and are never a label
   source.
+- Mask vocabulary -- three layers by design, mapped once here: the
+  GEOMETRY names (what rotates; label-free, this module:
+  ``core_virtual_only_mask``, ``no_core_window_exchange_mask``; the
+  label-built ``windows.radial_mask`` is the third), the PURPOSE names
+  (the adapters: relax, virtmix -- what the rung gains), and the
+  campaign AXIS tokens (cells/treatments/store keys). Dictionary:
+  frozen = relax = ``core_virtual_only_mask``;
+  virtmix = ``run_casscf_virtual_mix`` =
+  ``no_core_window_exchange_mask``;
+  radial = ``windows.radial_mask``.
 """
 
 from __future__ import annotations
@@ -49,11 +59,12 @@ __all__ = [
 class CASResult:
     """Uniform result container for CASCI / CASSCF / SA-CASSCF.
 
+    The stage's identity (tag, store name) flows SEPARATELY through
+    stage_facts and the chkfile keys -- the container carries results
+    only.
+
     Attributes
     ----------
-    kind : str
-        The store name the run was persisted under (the stage's
-        identity in reports).
     energies : np.ndarray
         Total energies of the roots (active-space ``e_cas`` + the
         common core part). For SA runs: the exact per-root CASCI pass
@@ -72,7 +83,6 @@ class CASResult:
         the constant every per-root total shares.
     """
 
-    kind: str
     energies: np.ndarray  # total energies of the roots
     ci: list = field(default_factory=list)
     mo_coeff: np.ndarray | None = None
@@ -122,7 +132,7 @@ def _run(mc, nroots: int, chkfile: str, name: str, verbose: int) -> CASResult:
     energies = _root_energies(mc)  # nroots=1 reproduces float(mc.e_tot)
     ci = [mc.ci] if nroots == 1 else list(mc.ci)
     _checkpoint(chkfile, name, energies, ci)
-    return CASResult(name, energies, ci, mc.mo_coeff, mc, _core_energy(mc))
+    return CASResult(energies, ci, mc.mo_coeff, mc, _core_energy(mc))
 
 
 # --------------------------------------------------------------------- CASCI
@@ -166,16 +176,19 @@ def run_casci(mf, ncas, nelecas, mo_full, chkfile, nroots=1, verbose=0,
 
 
 def core_virtual_only_mask(self, nmo, ncore, ncas, frozen):
-    """ONLY inactive<->virtual rotations allowed (the relax rung)."""
+    """Allowed: ONLY inactive<->virtual rotations; every generator
+    touching the active block is blocked -- the window is frozen
+    outright (the relax rung; cells axis token ``frozen``)."""
     mask = np.zeros((nmo, nmo), dtype=bool)
     mask[ncore + ncas :, :ncore] = True
     return mask
 
 
 def no_core_window_exchange_mask(self, nmo, ncore, ncas, frozen):
-    """Everything EXCEPT active<->inactive rotations: no orbital ever
-    trades places between the core and the active window (the virtmix
-    rung)."""
+    """Allowed: every rotation INVOLVING a virtual (virtual<->core and
+    virtual<->active); blocked: active<->inactive alone -- no orbital
+    ever trades places between the core and the active window (the
+    virtmix rung; cells axis token ``virtmix``)."""
     mask = np.zeros((nmo, nmo), dtype=bool)
     mask[ncore + ncas :, : ncore + ncas] = True
     return mask
