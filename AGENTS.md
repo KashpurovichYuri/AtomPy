@@ -330,50 +330,20 @@ module.
     roots from raw-MO CASCI without running any CI. (e) Both TMs
     cross below their escaped CASSCF basins at exact symmetry
     (fact-16b ceilings are window statements).
-23. **The γ ladder and NO windows** (ticket 22): which density you
-    diagonalize decides what occupation selection can build.
-    [γ, L_z] = 0 (any single M_L root, any SCF reference) ⇒
-    m-DIAGONAL but m-UNEQUAL (p₀αp₀β of p²: occ = (2, 0, 0)) —
-    occupation cutoffs there commit the AVAS mistake. [γ, L_a] = 0
-    for all generators — the average over a whole term's M_L set
-    inside one M_S sector (spatial rotations don't touch spin; γ is
-    spin-summed) ⇒ by Schur γ = R ⊗ c·𝟙_{2l+1}: NOs arrive as
-    complete l-pure m-sets, occupation groups never split them
-    (natural.occupation_groups), and windows are exactly
-    rotation-closed. GROUPING AMENDMENT (2026-10-27, the d² lattice):
-    the m-set equality is only as good as the source window — the
-    fact-17 input defect leaks into γ as a WITHIN-m-set occupation
-    spread (measured: Ti {3d,4p} d-shell 2.7e-7 at occ 0.4); the
-    grouping tolerance is scale-aware (max(1e-7, 1e-4·occ_max)) —
-    genuine group gaps (U's tightest: 3e-4) stay resolved, defect
-    leakage cannot split a set (a split silently builds a
-    rotation-defective window). Measured: U groups d/f/d/f = 5/7/5/7 (occ
-    0.399/0.286/5e-4/2e-4); every group window at ~1e-13 certificate
-    with exact ⟨L²⟩; 12 NO cols (495 dets) within 4.6 mEh of the full
-    10,626-det window; Sc/Ti NO beats the shell lattice at every
-    equal-det count. E_core from the closed-shell pur-core formula
-    reproduces the campaign totals (validation built into the
-    pilots).
-24. **PySCF FCI ordering ≠ detbasis ordering** (the cell wave,
-    `cells.pyscf_ci_permutation`): PySCF's direct_spin1 vectors are
-    indexed by (alpha-string address, beta-string address) with
-    strings in INTEGER-ASCENDING bit order; detbasis enumerates
-    lexicographic combinations. They coincide ONLY in trivial sectors
-    (norb ≤ 3, or ≤ 1 electron per spin block) — carbon's norb=3
-    window is why the difference went unnoticed for the whole
-    campaign — and differ everywhere else (first at norb=4, na=2).
-    Any consumer that indexes or contracts a PySCF CI vector against
-    detbasis-order objects (operator matrices, determinant
-    occupation lists) MUST map through the bridge first; certified
-    by the eigen-equation against an independently built
-    Slater–Condon H (generic integrals admit no permutation
-    automorphism). Fixed consumers: configuration_summary (labels
-    were scrambled on Ti/Sc/U mixed-l windows — the committed config
-    columns there pre-date the fix), study's diagnostics ⟨L²⟩,
-    run_u_sa's mc.ci cross-check. Related store fact: this PySCF's
-    CASCI kernel writes NO chkfile (only CASSCF kernels dump the
-    mcscf group) — the cell layer owns its complete store
-    (atomterm/<address>/{energies, ci_stack, core_energy, mo_coeff}).
+23. **The γ ladder and NO windows** -> natural (the module docstring
+   owns the m-scalar criterion — term-averaged γ = R ⊗ c·𝟙_{2l+1} ⇒
+   whole m-sets; single-root γ is m-diagonal but m-UNEQUAL — and the
+   scale-aware grouping tolerance with the defect-leakage numbers;
+   measured campaign scale: U groups d/f/d/f = 5/7/5/7, every group
+   window ~1e-13 certificate, 12 NO cols within 4.6 mEh of the full
+   window) — index-only.
+
+24. **PySCF FCI ordering ≠ detbasis ordering** -> operators (the
+   bridge + the Conventions statement; certified by the
+   eigen-equation pins in test_cells) + cells (the store contract:
+   `ci_stack` stays PySCF order; this PySCF's CASCI kernel writes no
+   chkfile, the cell layer owns its complete store) — index-only.
+
 25. **The atomic-ROHF CASCI selection rules** (the 3d² lattice,
     2026-10-27): CASCI over a window containing the ROHF determinant
     is variational (≤ E_ROHF) with EXACT equality unless a live

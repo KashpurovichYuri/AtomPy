@@ -99,6 +99,42 @@ edit that never landed) and fast re-worded as the machine-light
 selection. Suite at the boundary: 188 green + 1 Sc complete-window
 session draw, isolation-green (the recorded class, no band change).
 
+Phase 4 DONE (2026-10-29, `549f202`/`197d8d2`/`fd48ad9`/`f2aafa0` +
+the close): `cases` -> `cells` -> `natural` walked (modules + test
+files together), in four commits: (1) cases -- `want` DELETED (the
+R5 fake degree: 'casscf'/'sa-casscf' read nowhere; a case without
+term tables now unrepresentable, the arm gates on spec.study),
+public-seam asserts -> ValueError, CaseSpec -> Attributes, test_cases
+moved to the UNIT tier (all SCF-free) with a parity pin replacing
+the dead demands-test, test_atoms owner-direct; (2) the ONE-HOME
+MOVES (the phase-3 flag + the layering flag, resolved structurally):
+the CI-ordering bridge cells -> OPERATORS (detbasis died as the
+candidate -- it is deliberately numpy-only and the bridge needs
+cistring; operators owns the other PySCF boundary + sits below every
+consumer; analysis's lazy anti-cycle imports became top-level),
+ground_block study -> OPERATORS ops-first (absorbing natural's inline
+duplicate found by the walk; vec returned so no consumer repeats the
+eigh; kills the cells->study smell), sector_dimension homed in
+detbasis (the comb formula's FOURTH copy found in natural; cases +
+study + cells copies deleted); (3) cells -- `_persist_cell` ->
+`_store_cell` (watchlist consumed), CellKey/CellData -> Attributes,
+mol documented in run_cell for the first time, the last src 'rung'
+retired; (4) natural -- the ONLY Doxygen docstring in src rewritten
+to NumPy, the stale registry header deleted, the cost-stop asserts ->
+ValueError, fact tags dissolved. Facts 23/24 collapsed to index
+lines. FAST TIER 45 -> 48.
+
+DECIDED-KEEP (SA ci_stack pairing, the phase-2 wart): the exact
+per-root CI is unreachable from `cas` without changing
+constrained_casscf's contract, no V6 certificate exists for optimizer
+paths, and no consumer asks for it -- phase 2's documented stance
+stands (constrained_casscf + _store_cell docstrings carry it).
+
+PHASE-5 INPUT (from the cases walk): the treatments arm has NO
+declaring case anywhere (src+scripts) -- `_treatments_arm` +
+CaseSpec.study are the only cases->study bridge; decide with study's
+retire-or-keep.
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE
@@ -172,34 +208,23 @@ UNIFY, and make similar approaches LOOK similar. Applied:
 
 - CONSUMED 2026-10-29 (phase 2): `_persist` (casscf.py) -> `_checkpoint`
   (the module's "checkpointed" family; one consumer, renamed with it).
-- `_persist_cell` (cells.py) -- the store's language is store/load
-  (`load_cell`, `store_name=`): the writer wants to be `_store_cell`,
-  the natural pair of `load_cell` -- phase 4.
+- CONSUMED 2026-10-29 (phase 4): `_persist_cell` (cells.py) ->
+  `_store_cell` (the store/load family; one caller, renamed with it).
 - (add freely as spotted; an entry dies when consumed)
 
 ## Flags for later phases (spotted during phases 2-3)
 
-- The ordering bridge's HOME (phase 4, cells): `pyscf_ci_permutation`
-  + `ci_in_detbasis_order` live in cells, but analysis (a LOW layer)
-  consumes them via lazy imports against the cells->stages->analysis
-  cycle. detbasis owns the ordering statement ("ordering != PySCF FCI
-  strings") and sits BELOW both consumers -- consider homing the
-  bridge there when cells is walked (consumers: analysis x4, study x2,
-  test_cells x7).
+- RESOLVED (phase 4): the ordering bridge lives in OPERATORS now
+  (detbasis was the candidate but is deliberately numpy-only; operators
+  owns the other PySCF convention boundary and sits below every
+  consumer -- analysis's lazy anti-cycle imports became top-level).
 
-- SA store pairing (phase 4, cells): `constrained_casscf` returns
-  roots-pass energies/core_energy with the SA KERNEL's ci; cells'
-  `_persist_cell` writes that SA ci as `ci_stack` under the
-  `<address>_roots` store (whose `energies` are the roots pass's).
-  Exact per-root CI exists only in the unread `<address>_roots/ci`
-  object-array key. Decide: switch `ci_stack` to the roots CI (changes
-  committed SA payloads' config labels at the l-mass margin; needs a
-  regen decision) -- documented honestly in constrained_casscf's
-  docstring meanwhile.
-- SA-weights default layering (phase 4/5): cells imports
-  `study.ground_block` for the SA-anchoring rule -- a declaration-layer
-  smell (study is a retired-lens module; the rule wants a home beside
-  the SA driver or in cases).
+- RESOLVED (phase 4): SA store pairing DECIDED-KEEP -- see the
+  DECIDED-KEEP paragraph in the phase-4 entry above.
+- RESOLVED (phase 4): `ground_block` lives in OPERATORS (the
+  measured-block family beside window_closure/core_anisotropy),
+  ops-first with vec returned -- natural's inline duplicate absorbed,
+  the cells->study lazy import gone.
 - test_drivers.py name (phase 6): after the phase-2 rewires it tests
   the owner modules, not the facade -- rename or split when the test
   mass is reorganized.
