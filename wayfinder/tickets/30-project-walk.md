@@ -72,10 +72,28 @@ phase boundaries via a message.txt handoff.
 ## Naming watchlist (R2; spotted between phases -- each entry is
 ## consumed at the owning file's phase, renamed WITH its consumers)
 
-- `_persist` (casscf.py) -- the module's own language is
-  "checkpointed (.chk)"; join that family (`_checkpoint`?) --
-  phase 2.
+- CONSUMED 2026-10-29 (phase 2): `_persist` (casscf.py) -> `_checkpoint`
+  (the module's "checkpointed" family; one consumer, renamed with it).
 - `_persist_cell` (cells.py) -- the store's language is store/load
   (`load_cell`, `store_name=`): the writer wants to be `_store_cell`,
   the natural pair of `load_cell` -- phase 4.
 - (add freely as spotted; an entry dies when consumed)
+
+## Flags for later phases (spotted during phase 2)
+
+- SA store pairing (phase 4, cells): `constrained_casscf` returns
+  roots-pass energies/core_energy with the SA KERNEL's ci; cells'
+  `_persist_cell` writes that SA ci as `ci_stack` under the
+  `<address>_roots` store (whose `energies` are the roots pass's).
+  Exact per-root CI exists only in the unread `<address>_roots/ci`
+  object-array key. Decide: switch `ci_stack` to the roots CI (changes
+  committed SA payloads' config labels at the l-mass margin; needs a
+  regen decision) -- documented honestly in constrained_casscf's
+  docstring meanwhile.
+- SA-weights default layering (phase 4/5): cells imports
+  `study.ground_block` for the SA-anchoring rule -- a declaration-layer
+  smell (study is a retired-lens module; the rule wants a home beside
+  the SA driver or in cases).
+- test_drivers.py name (phase 6): after the phase-2 rewires it tests
+  the owner modules, not the facade -- rename or split when the test
+  mass is reorganized.
