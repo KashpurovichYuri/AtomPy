@@ -20,7 +20,7 @@ import json
 import numpy as np
 
 from atomterm.detbasis import commutator, determinant_basis, frobenius_norm
-from atomterm.windows import lm_sectors, shell_weights
+from atomterm.windows import l_per_row, shell_weights
 
 __all__ = [
     "quantum_number",
@@ -364,14 +364,12 @@ def shell_occupations(mol, s, c_win: np.ndarray, ci_ground, na: int,
     gamma = ci_rdm1(dets, v, norb)
     g_ao = c_win @ gamma @ c_win.conj().T          # the AO-basis 1-RDM
     ds = g_ao @ s                                   # Mulliken rows
-    # l per AO row from the shell walker (lm_sectors) -- NO label
-    # parsing (fact 1: labels carry member suffixes; the walker is the
-    # fused-shell-honest source)
-    l_of_row = {row: l
-                for (l, m), rows in lm_sectors(mol).items() for row in rows}
+    # l per AO row from the shell walker -- no label parsing (fact 1:
+    # labels carry member suffixes; the walker is fused-shell-honest)
+    ell = l_per_row(mol)
     letters = "spdfgh"
     out: dict[str, float] = {}
     for i in range(mol.nao_nr()):
-        key = letters[l_of_row[i]]
+        key = letters[ell[i]]
         out[key] = out.get(key, 0.0) + float(np.real(ds[i, i]))
     return out

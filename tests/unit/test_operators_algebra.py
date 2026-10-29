@@ -13,35 +13,153 @@ from atomterm.windows import select_valence_ao
 pytestmark = pytest.mark.fast
 
 
-def test_parity_operator_diagonal_and_product():
-    """Parity: raw AO columns give (-1)^l per orbital; the determinant
-    operator is diagonal with eigenvalue = the PRODUCT over occupied
-    orbitals (multiplicative -- outside the additive parts protocol). A
-    p^2 sector is all-even; an {s,p} sector carries both parities."""
-    from atomterm.operators import parity_one_body, parity_operator
+def test_parity_one_body_exact_on_pure_windows():
+    """(-1)^l per column: the p window and an f column read -1, the
+    {s,p} window diag(+1, -1, -1, -1), off-diagonal exactly zero;
+    same-l rotations stay pure."""
+    from pyscf import gto
+
+    from atomterm.operators import parity_one_body
     from atomterm.system import AtomConfig, build_mol
 
     mol = build_mol(AtomConfig(verbose=0))
-    p_rows = select_valence_ao(mol, ["2p"])
-    c_p = np.eye(mol.nao_nr())[:, p_rows]
-    par_p = parity_one_body(mol, c_p)
-    assert np.allclose(np.diag(par_p), -1.0)            # l = 1 orbitals
+    c_p = np.eye(mol.nao_nr())[:, select_valence_ao(mol, ["2p"])]
+    assert np.allclose(parity_one_body(mol, c_p), -np.eye(3), atol=1e-12)
 
-    op = parity_operator(mol, c_p, 2, 0)                # p^2, Ms = 1
-    assert np.allclose(op, np.eye(op.shape[0]))         # two p -> even
+    c_sp = np.eye(mol.nao_nr())[:, select_valence_ao(mol, ["2s", "2p"])]
+    assert np.allclose(parity_one_body(mol, c_sp),
+                       np.diag([1.0, -1.0, -1.0, -1.0]), atol=1e-12)
 
-    sp = select_valence_ao(mol, ["2s", "2p"])
-    c_sp = np.eye(mol.nao_nr())[:, sp]
-    op_sp = parity_operator(mol, c_sp, 1, 1)            # {2s,2p}, Ms = 0
-    assert np.allclose(op_sp, np.diag(np.diag(op_sp)))  # det-diagonal
-    assert set(np.round(np.diag(op_sp), 9)) == {-1.0, 1.0}
-
-    mixed = 0.5 * c_sp[:, :1] + 0.5 * c_sp[:, 3:4]  # s/p l-MIX: no
-    with pytest.raises(ValueError):                 # definite parity
-        parity_one_body(mol, np.hstack([c_sp, mixed]))
     # same-l rotations (Loewdin of overlapping primitives) stay pure
     rot = 0.6 * c_p[:, :1] + 0.8 * c_p[:, 1:2]
     assert np.allclose(np.diag(parity_one_body(mol, rot)), -1.0)
+
+    # an f shell: odd l reads -1 (the shell walker, no label parsing)
+    mol_f = gto.M(atom="C 0 0 0",
+                  basis=[[0, [3.0, 1.0]], [3, [1.0, 1.0]]], verbose=0)
+    c_f = np.eye(mol_f.nao_nr())[:, 1:2]
+    assert np.allclose(parity_one_body(mol_f, c_f), -np.eye(1), atol=1e-12)
+
+
+def test_parity_one_body_mixed_columns_are_data():
+    """An l-mixed column is DATA, not an error: the window
+    [2s, (2s + 2p0)/sqrt(2)] gives the hand-derived
+    Pi = [[1, 1/sqrt(2)], [1/sqrt(2), 0]] with eigenvalues
+    (1 +- sqrt(3))/2."""
+    from atomterm.operators import parity_one_body
+    from atomterm.system import AtomConfig, build_mol
+
+    mol = build_mol(AtomConfig(verbose=0))
+    sp = select_valence_ao(mol, ["2s", "2p"])
+    eye = np.eye(mol.nao_nr())
+    w = np.hstack([eye[:, sp[:1]],
+                   (eye[:, sp[:1]] + eye[:, sp[3:4]]) / np.sqrt(2.0)])
+
+    pi = parity_one_body(mol, w)
+    expect = np.array([[1.0, 1 / np.sqrt(2)], [1 / np.sqrt(2), 0.0]])
+    assert np.allclose(pi, expect, atol=1e-12)
+    vals = np.sort(np.linalg.eigvalsh(pi))
+    assert np.allclose(vals, [(1 - np.sqrt(3)) / 2, (1 + np.sqrt(3)) / 2],
+                       atol=1e-12)
+
+
+def test_parity_operator_exterior_power_exact():
+    """Lambda^N(Pi): on l-pure windows diagonal with the PRODUCT of
+    occupied signs (the old construction, elementwise) and an exact
+    involution -- parity-closed is where +-1 is sharp. On the mixed
+    window [2s, (2s+2p0)/sqrt(2)] the full 4x4 sector matrix is
+    hand-derived from the minors: first row [1, r, r, 1/2],
+    r = 1/sqrt(2) -- the honest dense object."""
+    from atomterm.operators import parity_operator
+    from atomterm.system import AtomConfig, build_mol
+
+    mol = build_mol(AtomConfig(verbose=0))
+    eye = np.eye(mol.nao_nr())
+    c_p = eye[:, select_valence_ao(mol, ["2p"])]
+
+    op = parity_operator(mol, c_p, 2, 0)                # p^2: all even
+    assert np.allclose(op, np.eye(3), atol=1e-12)
+    assert np.allclose(op @ op, np.eye(3), atol=1e-12)  # closed: sharp
+
+    sp = select_valence_ao(mol, ["2s", "2p"])
+    c_sp = eye[:, sp]
+    op_sp = parity_operator(mol, c_sp, 1, 1)            # {2s,2p}, Ms = 0
+    signs = np.array([1.0, -1.0, -1.0, -1.0])           # the product form
+    dets = determinant_basis(4, 1, 1)
+    product = np.diag([float(np.prod([signs[d % 4] for d in det]))
+                       for det in dets])
+    assert np.allclose(op_sp, product, atol=1e-12)
+    assert np.allclose(op_sp @ op_sp, np.eye(len(op_sp)), atol=1e-12)
+
+    mixed_w = np.hstack([eye[:, sp[:1]],
+                         (eye[:, sp[:1]] + eye[:, sp[3:4]]) / np.sqrt(2.0)])
+    op_m = parity_operator(mol, mixed_w, 1, 1)
+    r = 1 / np.sqrt(2.0)
+    expect = np.array([
+        [1.0, r, r, 0.5],
+        [r, 0.0, 0.5, 0.0],
+        [r, 0.5, 0.0, 0.0],
+        [0.5, 0.0, 0.0, 0.0],
+    ])
+    assert np.allclose(op_m, expect, atol=1e-12)        # minors, by hand
+
+
+def test_one_electron_sector_is_exact_one_body():
+    """One electron -- the degenerate anchor: the many-body operators
+    ARE the one-body ones. p^1: L^2 = 2 I, Lz spectrum {-1, 0, 1},
+    S^2 = 3/4 I, N = I; s^1: L^2 = 0 identically."""
+    from atomterm.operators import (
+        l2_operator_parts,
+        lz_operator,
+        number_operator,
+        s2_operator_parts,
+    )
+    from atomterm.system import AtomConfig, build_mol
+
+    mol = build_mol(AtomConfig(verbose=0))
+    eye = np.eye(mol.nao_nr())
+
+    for cols, l2_expect, lz_vals in [
+        (select_valence_ao(mol, ["2p"]), 2.0, [-1, 0, 1]),
+        (select_valence_ao(mol, ["2s"]), 0.0, [0]),
+    ]:
+        c = eye[:, cols]
+        dets = determinant_basis(c.shape[1], 1, 0)
+        one, two = l2_operator_parts(mol, c)
+        l2 = slater_condon_matrix(dets, one_body=one, two_body=two)
+        s2_one, s2_two = s2_operator_parts(c.shape[1])
+        s2 = slater_condon_matrix(dets, one_body=s2_one, two_body=s2_two)
+        lz = slater_condon_matrix(dets, one_body=lz_operator(mol, c))
+        n = slater_condon_matrix(dets, one_body=number_operator(c.shape[1]))
+        eye_n = np.eye(len(dets))
+        assert np.allclose(l2, l2_expect * eye_n, atol=1e-12)
+        assert np.allclose(s2, 0.75 * eye_n, atol=1e-12)
+        assert np.allclose(n, eye_n, atol=1e-12)
+        assert np.allclose(np.sort(np.real(np.linalg.eigvals(lz))),
+                           lz_vals, atol=1e-12)
+
+
+def test_closure_of_the_whole_ao_space_is_exact(p_shell_mol):
+    """P = I on the full AO space: both closure defects exactly zero
+    -- the degenerate anchor of the meter."""
+    from atomterm.operators import window_closure
+
+    c = window_closure(p_shell_mol, np.eye(p_shell_mol.nao_nr()))
+    assert c["lz"] < 1e-12 and c["lperp"] < 1e-12
+
+
+def test_build_operators_method_seam_elementwise_identical(carbon):
+    """The public dispatch: both evaluators over the same parts give
+    elementwise-identical matrices (the evaluators are pinned on
+    random integrals; this pins the seam that feeds them)."""
+    from atomterm.operators import build_operators
+
+    _, mol, mf, act_idx = carbon
+    c_act = np.eye(mol.nao_nr())[:, act_idx]
+    a = build_operators(mol, mf, c_act, 2, 1, 1)
+    b = build_operators(mol, mf, c_act, 2, 1, 1, method="secondquant")
+    for k in ("H", "Lz", "Lz2", "L2", "S2", "Sz", "N"):
+        assert np.allclose(a[k], b[k], atol=1e-12), k
 
 
 def test_population_operator_partitions_the_window():

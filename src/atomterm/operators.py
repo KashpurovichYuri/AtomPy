@@ -35,7 +35,7 @@ from atomterm.detbasis import (
 )
 from atomterm.secondquant import annihilate, create, secondquant_matrix
 from atomterm.windows import (
-    lm_sectors,
+    l_per_row,
     occupied_core_idx,
     s_metric_roots,
     shell_slots,
@@ -386,62 +386,64 @@ def s2_operator_parts(norb: int):
 
 
 def parity_one_body(mol, c_act: np.ndarray) -> np.ndarray:
-    """Per-window-orbital parity signs ``(-1)^l`` (diagonal matrix).
+    """The parity operator ``(-1)^l`` in the window basis -- EXACT.
 
-    Requires l-PURE columns: all S-weight inside one angular sector.
-    True for raw AO columns and Loewdin-rotated same-(l, m)
-    combinations; false for optimized windows that mix l within a
-    column -- parity labels live on l-pure window stages.
+    On the one-particle space parity is ``sum_l (-1)^l P_l`` with
+    ``P_l`` the l-subspace projector; l-subspaces are exactly
+    S-orthogonal on one center, so in the AO basis
 
-    Raises
-    ------
-    ValueError
-        If a column's dominant l holds under 98% of its S-weight.
-        Tolerated below that: Loewdin-rotation tails (1e-4 class) and
-        core-orthogonalization tails (percent class) blur ``<P>`` to
-        ~0.98 without spoiling the label.
+    ``Pi_AO[m, n] = (-1)^{l(m)} S[m, n] delta_{l(m), l(n)}``
+
+    (every AO row has a definite l, :func:`windows.l_per_row`), and
+    the window compression is ``Pi_win = C^dag Pi_AO C``.
+
+    Notes
+    -----
+    l-pure columns give a diagonal +-1 matrix. An l-mixed column is
+    DATA, not an error: the eigenvalues leave +-1 (a column half s
+    half p pushes the window eigenvalues to ``(1 +- sqrt(3))/2``) --
+    the operator is exact, the deviation belongs to the window
+    object.
     """
-    sectors = lm_sectors(mol)
-    s = mol.intor_symmetric("int1e_ovlp")
-    signs = np.zeros(c_act.shape[1])
-    for j in range(c_act.shape[1]):
-        col = c_act[:, j]
-        # sector-resolved S-weights (sectors of one l sum to the
-        # l-subspace weight)
-        by_l: dict[int, float] = {}
-        for (l, m), rows in sectors.items():
-            ss = s[np.ix_(rows, rows)]
-            w = float(np.real(col[rows].conj() @ ss @ col[rows]))
-            if w > 1e-10:
-                by_l[l] = by_l.get(l, 0.0) + w
-        if len(by_l) != 1:
-            dom = max(by_l.values())
-            if dom < 1.0 - 2e-2:
-                raise ValueError(
-                    "parity_one_body needs l-pure columns (one angular "
-                    f"momentum per column); column {j} has weights {by_l}")
-            # the tail is tolerated (see docstring): keep the dominant l
-            by_l = {max(by_l, key=by_l.get): dom}
-        signs[j] = (-1.0) ** next(iter(by_l))
-    return np.diag(signs)
+    s = mol.intor("int1e_ovlp")
+    ell = l_per_row(mol)
+    same_l = ell[:, None] == ell[None, :]
+    pi_ao = np.where(same_l, (-1.0) ** ell[:, None] * s, 0.0)
+    return c_act.conj().T @ pi_ao @ c_act
 
 
 def parity_operator(mol, c_act: np.ndarray, na: int, nb: int) -> np.ndarray:
-    """Parity in the determinant basis: each determinant's eigenvalue
-    is the PRODUCT of its occupied orbitals' ``(-1)^l`` signs.
+    """Many-body parity: the exterior power ``Lambda^N(Pi)``, exact.
 
-    Multiplicative -- structurally outside the additive (one_body,
-    two_body) protocol, hence the direct construction over the
-    determinant occupations.
+    Matrix elements between determinants are the Cauchy-Binet minors
+
+    ``<D'|Lambda^N(Pi)|D> = det(Pi[D'_a, D_a]) det(Pi[D'_b, D_b])``
+
+    over the occupied spatial column sets (alpha and beta blocks
+    factor: Pi is spin-diagonal). On a parity-CLOSED window (Pi maps
+    the span into itself -- every l-pure window) this is diagonal
+    with the product of occupied signs, squares to I, and has
+    eigenvalues exactly ``+-1``. On a mixed window the object is the
+    honest ``Lambda^N`` of the compressed Pi: dense, eigenvalues off
+    ``+-1`` -- sharp parity is lost, and that loss is the window's
+    deviation, not the operator's. Like the spin ladders,
+    multiplicative -- outside the additive (one_body, two_body)
+    parts protocol, hence built directly over the determinants.
     """
-    signs = np.diag(parity_one_body(mol, c_act))
+    pi = parity_one_body(mol, c_act)
     norb = c_act.shape[1]
     dets = determinant_basis(norb, na, nb)
-    out = np.ones(len(dets))
-    for k, det in enumerate(dets):
-        for so in det:
-            out[k] *= signs[so % norb]
-    return np.diag(out)
+    out = np.zeros((len(dets), len(dets)))
+    cols = [
+        ([d % norb for d in det if d < norb],
+         [d % norb for d in det if d >= norb])
+        for det in dets
+    ]
+    for k2, (a2, b2) in enumerate(cols):
+        for k1, (a1, b1) in enumerate(cols):
+            out[k2, k1] = (np.linalg.det(pi[np.ix_(a2, a1)])
+                           * np.linalg.det(pi[np.ix_(b2, b1)]))
+    return out
 
 
 def population_operator(mol, c_act: np.ndarray, rows: list[int], na: int,

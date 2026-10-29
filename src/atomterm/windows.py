@@ -69,6 +69,7 @@ __all__ = [
     "complete_orthonormal",
     "build_full_mo",
     "lm_sectors",
+    "l_per_row",
     "radial_basis",
     "radial_mask",
     "window_shell",
@@ -223,6 +224,15 @@ def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
         for m, r in enumerate(rows):
             sectors.setdefault((l, m), []).append(r)
     return sectors
+
+
+def l_per_row(mol) -> np.ndarray:
+    """Angular momentum ``l`` of every AO row -- the shell walker's
+    l-grouping as one ``(nao,)`` int array (no label parsing)."""
+    out = np.empty(mol.nao_nr(), dtype=int)
+    for _ib, l, _c, rows in shell_slots(mol):
+        out[rows] = l
+    return out
 
 
 def shell_weights(mol, c: np.ndarray, s: np.ndarray):
