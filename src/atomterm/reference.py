@@ -1,12 +1,32 @@
 """The SCF reference engine: ROHF with character-forced occupations and
 the reference-basin gate, plus the fractional-occupation ensemble.
 
-Improper convergence at SCF level has two measured faces (README · Methods):
-the wrong configuration (aufbau runaway) and a metastable basin at
-fixed occupations. The toolbox: character-forced filling (projector
-weights, never energy order), the S-projector character metric for
-near-degenerate bases, an energy gate with cycled starting guesses,
-and trusted cached references.
+PURPOSE
+-------
+Every downstream stage consumes one (mol, mf) pair produced here, and
+the reference's honesty bounds every window statement made on it.
+Improper SCF convergence has two measured faces (README · Methods):
+the wrong configuration (the aufbau runaway) and a metastable basin at
+fixed occupations. The toolbox, escalating: character-forced filling
+(S-projector weights, never energy order -- :func:`run_rohf`), the
+basin gate (cycled guesses against a reference energy --
+:class:`ReferenceSpec`), and the fractional-occupation ensemble (the
+spherical reference with smeared valence -- :func:`run_frac_occ_scf`).
+
+Conventions
+-----------
+- Caching: each run is chkfile-cached and a cached chkfile is TRUSTED
+  (loaded, marked converged, never re-gated) -- the unit of
+  reproducibility, because from-scratch SCF is not bit-reproducible
+  (threaded BLAS draws last-digit-different MOs; fact 10). Equivalence
+  checks pin the same chkfile, never two fresh runs.
+- The occupation hook (``get_occ``) is part of the SCF object's
+  identity: attached BEFORE the cache branch, so cache hits carry it
+  too.
+- Occupation metrics are S-projector weights ``c^dag P c`` (bounded by
+  1 on S-orthonormal columns); the bare quadratic form is unbounded on
+  diffuse bases (fact 15c). One home:
+  :func:`atomterm.windows.span_projector`.
 """
 
 from __future__ import annotations
@@ -61,27 +81,39 @@ def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
 
 @dataclass(frozen=True)
 class ReferenceSpec:
-    """How the ROHF reference is produced when plain aufbau filling fails
-    (fact 21a). One object bundling character-forced occupations and the
-    basin gate, threaded through run_rohf / run_rungs / run_atom.
+    """How the ROHF reference is produced when plain aufbau filling
+    fails (fact 21). One object bundling character-forced occupations
+    and the basin gate, threaded through run_rohf / run_rungs /
+    run_atom.
 
-    occ_closed, occ_open : AO span patterns (label prefixes as
+    Attributes
+    ----------
+    occ_closed, occ_open : tuple[str, ...] | None
+        AO span patterns forcing the occupations by orbital CHARACTER
+        instead of energy order -- label prefixes as
         :func:`select_shell_ao`, or ``"l0".."l9"`` for a WHOLE angular
-        momentum subspace -- the honest vocabulary on uncontracted bases
-        where labels are shell counters) forcing the occupations by
-        orbital CHARACTER instead of energy order -- the integer analog
-        of :func:`run_frac_occ_scf`'s ``open_idx`` selection. MANDATORY
-        on atoms whose default ROHF is an aufbau runaway (Ti; U needs
-        whole-l spans plus Newton).
-    occ_e_ref : reference energy (Eh) of the target SCF basin; gates the
+        momentum subspace (the honest vocabulary on uncontracted
+        bases, where labels are shell counters). The integer analog of
+        :func:`run_frac_occ_scf`'s ``open_idx`` selection. MANDATORY
+        on aufbau-runaway atoms (Ti; U needs whole-l spans plus
+        Newton). Both or neither.
+    occ_e_ref : float | None
+        Reference energy (Eh) of the target SCF basin; gates the
         multi-basin chaos by guess cycling (see :func:`run_rohf`).
-    conv_accelerator : "diis" (default; the plain SCF), "newton"
-        (second-order SOSCF from the start), or "diis+newton" (DIIS
-        linearly first, then the Newton switch). On heavy uncontracted
-        bases with near-degenerate f/d/p valence shells, plain DIIS
-        with forced occupations can fail to converge from ANY start
-        (U: E > +1e3, garbage blocks), while Newton lands the target
-        basin deterministically from every guess tested.
+    conv_accelerator : str
+        "diis" (default; the plain SCF), "newton" (second-order SOSCF
+        from the start), or "diis+newton" (DIIS linearly first, then
+        the Newton switch). On heavy uncontracted bases with
+        near-degenerate f/d/p valence shells, plain DIIS with forced
+        occupations can fail to converge from ANY start (U: E > +1e3,
+        garbage blocks), while Newton lands the target basin
+        deterministically from every guess tested.
+
+    Raises
+    ------
+    ValueError
+        On a pattern given without its pair, a basin gate without
+        patterns, or an unknown accelerator.
     """
 
     occ_closed: tuple[str, ...] | None = None
@@ -101,22 +133,30 @@ class ReferenceSpec:
 
 
 def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
-    """ROHF for the configured atom, cached in ``chkfile``.
+    """ROHF for the configured atom, chkfile-cached.
 
-    If the chkfile exists, the converged MOs are loaded and no SCF is run.
-    Returns ``(mol, mf)``.
+    Parameters
+    ----------
+    cfg : AtomConfig
+        The atom (element, basis, charge, spin).
+    chkfile : str
+        Cache location. An existing chkfile is loaded and TRUSTED: no
+        SCF, no gate (the reproducibility unit, fact 10).
+    ref : ReferenceSpec, optional
+        Character-forced occupations + optional basin gate.
+        Occupations are assigned each cycle by S-projector weight on
+        the span patterns, never by energy order -- mandatory on
+        aufbau-runaway atoms (Ti: +123.07 mEh runaway, fact 21a). Even
+        forced, a degenerate open shell is multi-basin (Ti: +11.2 mEh
+        metastable basin at the SAME occupations): with ``occ_e_ref``
+        set, a fresh run retries over cycled init guesses (default,
+        then "atom", then "huckel") until |E - occ_e_ref| <= 1e-4,
+        else RuntimeError.
 
-    ref : a :class:`ReferenceSpec` (character-forced occupations +
-        optional basin gate). Occupations are assigned each cycle by
-        S-projector weight on the ``occ_closed``/``occ_open`` AO spans,
-        never by energy order -- mandatory on aufbau-runaway atoms
-        (Ti: +123.07 mEh runaway, fact 21a / README · Motivation). Even forced,
-        a degenerate open shell is multi-basin (Ti: +11.2 mEh
-        metastable), so with ``occ_e_ref`` set a FRESH run is retried
-        over cycled init guesses until |E - occ_e_ref| <= 1e-4, else
-        RuntimeError; cached chkfiles are trusted without the gate. The
-        occupation hook is part of the object's identity: set BEFORE
-        the cache branch (ticket-10 lesson).
+    Returns
+    -------
+    (mol, mf)
+        The built molecule and the converged (or cache-loaded) object.
     """
     from atomterm.system import build_mol
 
@@ -176,33 +216,45 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
 
 def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
                      open_idx: list[int] | None = None):
-    """Average-of-configuration (fractional-occupation) HF, chkfile-cached.
+    """Average-of-configuration (fractional-occupation) HF,
+    chkfile-cached.
 
-    The open shell is occupied fractionally (``nelec_open / n_open`` per
-    orbital, e.g. 2/3 per 2p AO for the carbon 2p^2 configuration), which
-    makes the converged Fock exactly spherical -- the scalar-core
-    reference that density averaging reproduces, but a DIFFERENT physical
-    reference from ROHF (smeared vs localized valence exchange; the
-    measured energy relation: README · Motivation, fact 15f).
+    The open shell is occupied fractionally (``nelec_open / n_open``
+    per orbital, e.g. 2/3 per 2p AO for the carbon 2p^2 configuration),
+    which makes the converged Fock exactly spherical -- the scalar-core
+    reference that density averaging reproduces, but a DIFFERENT
+    physical reference from ROHF (smeared vs localized valence
+    exchange; the measured energy relation: README · Motivation, fact
+    15f).
 
-    Control mechanism: ``get_occ`` is PySCF's occupation hook, called
-    every SCF cycle; the density and Fock are built from whatever it
-    returns, so the SCF converges self-consistently in the ensemble
-    density. The returned ``e_tot`` is the ensemble energy of the
-    averaged configuration -- use this object as a CORE PROVIDER, never
-    as a term energy.
+    Parameters
+    ----------
+    cfg, chkfile : as :func:`run_rohf` (same caching contract).
+    nelec_open, n_open : electrons in, and orbital count of, the open
+        shell.
+    open_idx : list[int], optional
+        AO indices of the open shell: the fractional block is selected
+        by S-projector CHARACTER weight on that span (one home:
+        :func:`atomterm.windows.span_projector`), never energy order --
+        mandatory where the valence is quasi-degenerate (on Sc the
+        aufbau block runs away to {4s, 4p, ~2d}, a converged but
+        p-containing ensemble; fact 15c). ``None`` = the HOMO block by
+        energy (fine for C/Si, where both rules select the same
+        orbitals).
 
-    ``open_idx`` selects the fractional block by CHARACTER (AO indices
-    of the open shell): the ``n_open`` non-core orbitals with the largest
-    S-projector weight on that shell get the fractional occupation.
-    This matters for transition metals: energy-ordered filling is
-    unstable where 3d/4p quasi-degenerate (on Sc the aufbau block runs
-    away to {4s, 4p, ~2d} -- fact 15c). Without ``open_idx`` the block
-    is the HOMO block (energy order; fine for C/Si, where it selects
-    the same orbitals as the projection would).
+    Returns
+    -------
+    (mol, mf)
+        Closed-shell RHF formalism; spin in ``cfg`` is ignored beyond
+        nelectron parity. ``e_tot`` is the ENSEMBLE energy of the
+        averaged configuration -- use the object as a core provider,
+        never as a term energy.
 
-    Closed-shell RHF formalism; spin in ``cfg`` is ignored (only its
-    nelectron/spin PARITY is used). Returns ``(mol, mf)``.
+    Notes
+    -----
+    Mechanism: ``get_occ`` is PySCF's per-cycle occupation hook; the
+    density and Fock are built from whatever it returns, so the SCF
+    converges self-consistently in the ensemble density.
     """
     from atomterm.system import build_mol
 
@@ -210,27 +262,25 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
     # occupations below define the density; the RHF formalism never sees
     # mol.spin.
     mol = build_mol(cfg)
-    s_mat = None
-    g_inv = None
+    p_open = None
     if open_idx is not None:
-        assert len(open_idx) == n_open, (
-            f"open_idx has {len(open_idx)} AOs but n_open={n_open}")
-        s_mat = mol.intor_symmetric("int1e_ovlp")
-        # S-projector metric on the open-shell AO span (bounded by 1 for
-        # S-orthonormal MOs, unlike a bare quadratic form): span_projector
-        g_inv = np.linalg.inv(s_mat[np.ix_(open_idx, open_idx)])
+        if len(open_idx) != n_open:
+            raise ValueError(
+                f"open_idx has {len(open_idx)} AOs but n_open={n_open}")
+        p_open = span_projector(
+            mol.intor_symmetric("int1e_ovlp"), list(open_idx))
 
     def _frac_occ(mo_energy, mo_coeff=None):
         occ = np.zeros(mo_energy.size)
         n_closed = (mol.nelectron - nelec_open) // 2
         occ[:n_closed] = 2.0
-        if open_idx is None:
+        if p_open is None:
             occ[n_closed : n_closed + n_open] = nelec_open / n_open
         else:
-            # valence weight of each MO: projection onto the open shell's
-            # AO span (rotation-invariant gauge for the fractional block)
-            r = s_mat[open_idx, :] @ np.asarray(mo_coeff)
-            w_v = np.einsum("ai,ab,bi->i", r.conj(), g_inv, r).real
+            # valence weight of each MO: S-projector weight on the open
+            # shell's AO span (rotation-invariant gauge for the block)
+            c = np.asarray(mo_coeff)
+            w_v = np.einsum("ai,ab,bi->i", c.conj(), p_open, c).real
             pick = np.argsort(w_v[n_closed:])[::-1][:n_open] + n_closed
             occ[pick] = nelec_open / n_open
         return occ
@@ -238,8 +288,6 @@ def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
     mf = scf.RHF(mol)
     mf.conv_tol = 1e-12
     mf.verbose = cfg.verbose
-    # the occupation hook is part of the object's identity: set BEFORE
-    # the cache branch (ticket-10 lesson)
     mf.get_occ = _frac_occ
     try:
         _, rec = scf.chkfile.load_scf(chkfile)

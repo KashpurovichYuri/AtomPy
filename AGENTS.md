@@ -43,7 +43,7 @@ mode restrictions lift). Mechanical enforcement: the global
 | `src/atomterm/detbasis.py` | `determinant_basis`, `one_body_matrix`, `two_body_matrix`, `slater_condon_matrix`, `commutator`, `frobenius_norm` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants; `slater_condon_matrix` = the fused one-pass production path (10^5 dets), `one_body_matrix`/`two_body_matrix` = the parts, name-twinned with secondquant (the cross-certification is name-symmetric); `_slater_condon_slow` = the pinned reference loop; ordering ≠ PySCF FCI strings (bridge lives in cells) |
 | `src/atomterm/secondquant.py` | `annihilate`, `create`, `apply_one_body`, `apply_two_body`, `one_body_matrix`, `two_body_matrix`, `secondquant_matrix` | **pure numpy, no pyscf** — the same matrices via explicit a+/a application on occupation vectors (ket application + scattering, sign tracking); `one_body_matrix`/`two_body_matrix` twin the detbasis names; the random non-particle-symmetric-G pin certifies the string contraction terms that physical integrals are blind to |
 | `src/atomterm/operators.py` | `build_operators`, `active_space_integrals`, `full_space_integrals`, `window_closure`, `core_anisotropy` | the first-quantized assembly: H, Lz, Lz^2, L^2, S^2, Sz, N + the EXACT parity (`Pi = C^dag(signed S)C` via `l_per_row`; many-body = the exterior power, Cauchy–Binet minors — sharp ±1 on parity-closed windows, deviations are window data, no tolerance) and population labels as `(ndet, ndet)` matrices; owns the PySCF chemist↔physicist boundary (ONE transpose, fact 3); core folded into h1 (mcscf convention, spherically averaged l=0 density; `c_core` contract for optimized stages); `method="slater_condon"|"secondquant"` switches the evaluator; `window_closure` = one-particle closure certificate ‖[P,Lz]‖/‖[P,L⊥]‖ of any window span (fact 19); `core_anisotropy` = the ε of the discarded raw core field; the two convention exceptions: `spin_ladder_matrix` (inter-sector a†/a) and `parity_operator` (multiplicative exterior power) — both pin the L²/S² twins / parity exactness |
-| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_rungs(ref=)`/`run_case(ref=)`; cached chkfiles trusted; the improper-convergence toolbox lives here (README · Methods) |
+| `src/atomterm/reference.py` | `ReferenceSpec`, `run_rohf`, `run_frac_occ_scf` | the SCF reference engine: character-forced occupations + basin gate thread `run_rohf(ref=)`/`run_rungs(ref=)`/`run_case(ref=)`; the module Conventions own the caching-trust (cached chks TRUSTED, never re-gated) and the S-projector occupation-metric contracts (`span_projector` is the one home); the improper-convergence toolbox lives here (README · Methods) |
 | `src/atomterm/casscf.py` | `run_casci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf_*`, `run_sa_casscf`, `CASResult` | the one deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable, the `run_casscf_*` names are one-line adapters; `mc_opts` = per-run optimizer knobs (budgets); all checkpointed (`.chk`); labels come from exact diagonalization (PySCF ci vectors straggle in degenerate clusters — never a label source) |
 | `src/atomterm/windows.py` | `Window(.columns)`, `SELECTORS`, `window_shell/primitive/scf_mo/no`, `select_*` (incl. `select_span`, `select_primitives`), `primitive_chain`, `shell_weights`, `window_avas`, `span_overlap`, `span_projector`, `s_metric_roots`, `shell_slots`, `lowdin(tol=)`, `complete_orthonormal`, `build_full_mo`, `lm_sectors`, `l_per_row`, `radial_basis`, `radial_mask` | window construction + selection + the kind registry (the module docstring owns the statement: purpose, the m-completeness contract, the five kinds incl. custom columns, the internal layering — `shell_slots` is the one shell walker [consumed by angular too], the S-metric algebra [`s_metric_roots` = the S^{±1/2} transport] beneath, the two substrate builders); `build_full_mo` takes AO rows OR column vectors through ONE project-renormalize-assemble treatment; `lowdin` raises on near-linear dependence instead of NaN-ing downstream; `shell_weights` groups by `lm_sectors` (no label parsing; row order fixed for bitwise-stable payloads) |
 | `src/atomterm/core.py` | `purified_core_orbitals`, `closed_shell_core_energy` | the exactly L-closed core span (fact 20: shared radial per closed shell, E ⊗ members) and the pur-fold energy (promoted from the scan scripts) |
@@ -109,13 +109,13 @@ module.
    MO s-weight lives in the AO metric (`c†Sc = 1`), not the Euclidean norm.
    Folded (active-space) H + explicit core energy == the fixed-core block
    of the full-space H (tier 3, machine precision).
-10. **From-scratch runs are not bit-reproducible**: threaded BLAS makes the
-   SCF converge to last-digit-different MOs, and orbital-optimized stages
-   (CASSCF/SA) amplify that chaotically (CASSCF root splittings wobble
-   ~1e-2 Eh between identical reruns). Behavior-equivalence checks MUST pin
-   the same ROHF chkfile as input — CASCI-stage reports are then
-   byte-identical (residual: signed zeros `0.0`/-`0.0` on noise-level Lz
-   eigenvalues). Never judge a refactor by diffing two from-scratch runs.
+10. **From-scratch runs are not bit-reproducible** -> `reference`
+   (the module Conventions own the caching/trust contract: cached chkfiles
+   TRUSTED, equivalence checks pin the same chkfile -- CASCI-stage reports
+   then byte-identical). Residuals: orbital-optimized stages amplify the
+   draw chaotically (root splittings wobble ~1e-2 Eh); signed zeros on
+   noise-level Lz eigenvalues; never judge a refactor by diffing two
+   from-scratch runs.
 11. **Generic pipeline** (`pipeline.run_atom`): Ms sectors derive from
    `cfg.spin = 2S` + active-electron parity — primary `(na, nb) =
    ((n+2S)/2, (n−2S)/2)`, plus `(n/2, n/2)` when n is even and S > 0.
@@ -166,12 +166,12 @@ module.
     HALF-integer: `spin_quantum_number` snaps S to the half-grid;
     integer rounding relabeled doublets/quartets as singlets/triplets
     with 1e-8 <S^2> noise deciding which (first doublet = Sc). (c) The
-    average-of-configuration SCF must select its fractional block by
-    CHARACTER (AO projection), not energy order: on Sc the aufbau block
-    runs away to {4s, 4p, ~2d} — a converged but p-containing ensemble,
-    not 3d1 4s2. The projection weight must be the S-projector
-    (Sc)_o† S_oo^{-1} (Sc)_o (a bare quadratic form c_o†S_oo c_o is
-    unbounded for diffuse bases). (d) TM rungs fingerprints: the raw
+    fractional-occupation block is selected by CHARACTER, never energy
+    order (on Sc the aufbau block runs away to a p-containing ensemble;
+    the metric must be the S-projector -- the bare quadratic form is
+    unbounded on diffuse bases) -> `reference` (`run_frac_occ_scf`'s
+    `open_idx` + the module Conventions' metric contract). (d) TM rungs
+    fingerprints: the raw
     [Ar] core polarizes at the PERCENT level (anisotropy 1.3e-2 rel,
     [H,Lz] 2.7e-2, 2D quintet split 1.9e-3 in PySCF's raw fold); free
     CASSCF from every start collapses to an 2S-like basin +52 mEh with a
@@ -290,24 +290,16 @@ module.
     (bound, don't pin). Narrative: README · Methods, · Results.
 
 21. **Ti: d², the aufbau runaway, and the basin gate** (ticket 12):
-    (a) THE REFERENCE IS TWO-LAYERED CHAOS. Default ROHF on Ti/ccpvdz
-    (spin=2) is an aufbau runaway (doubly-occupied 3d inside the
-    canonical core, +123.07 mEh above the physical 3d2 4s2 ³F);
-    energy-ordered get_occ falls back from EVERY start. Fix:
-    `run_rohf(ref=ReferenceSpec(occ_closed=, occ_open=, occ_e_ref=))` —
-    character-forced occupations
-    via the fact-15c S-projector metric; lands −848.40648875 with
-    pure-3d open MOs. Second layer: even with forced occupations the
-    SCF is MULTI-BASIN (orbitally degenerate open shell): a metastable
-    +11.2 mEh basin exists (same occupations; its polarized core smears
-    the build_full_mo input window at 1.6e-2 vs ~1e-8 in the good
-    basin; default minao/vsap guesses reach it, atom/huckel reliably do
-    not) — add the `occ_e_ref` energy gate (retried over cycled guesses
-    until |E−ref| ≤ 1e-4, else RuntimeError; cached chkfiles are
-    trusted). The gate also fixes the relax rung's substrate (good-basin
-    input defect ~1e-8, so casscf_relax sits at 2.3e-8 — NOT Sc's
-    fact-17 class; that class is basin/substrate-specific, not
-    atom-intrinsic). (b) Tables (pinned in tests): option A CAS(2,5)/{3d}
+    (a) THE REFERENCE IS TWO-LAYERED CHAOS -- the aufbau runaway
+    (+123.07 mEh, a doubly-occupied 3d inside the canonical core;
+    energy-ordered filling falls back from EVERY start) and, at fixed
+    occupations, a MULTI-BASIN degenerate open shell (+11.2 mEh
+    metastable basin, same occupations, guess-dependent) -> `reference`
+    (the character-forced hook + the `occ_e_ref` gate land
+    -848.40648875 with pure-3d open MOs; the gate also fixes the relax
+    rung's substrate: good-basin input defect ~1e-8, casscf_relax at
+    2.3e-8 -- not Sc's fact-17 class, that class is basin-specific).
+    (b) Tables (pinned in tests): option A CAS(2,5)/{3d}
     — Ms=1 ³F×7+³P×3; Ms=0 ¹S+¹D+³P+¹G×9+³F in NIST order ³F<¹D<³P<¹G<¹S
     (the `ms0_order` pin); first L=3 ground, first ¹G, first f-bearing
     basis (core f-tails ~1e-4). Option B CAS(4,6): TI_EXACT_TERMS in

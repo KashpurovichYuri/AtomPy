@@ -1,5 +1,8 @@
-"""Tests of atomterm.drivers: orbital selection, block-safe window
-construction, S-metric weights, and the fractional-occupation reference.
+"""The substrate engine's SCF-bearing chemistry: the campaign ROHF
+references (Sc/Ti), the fractional-occupation ensemble, build_full_mo's
+block safety on real atoms, the radial substrate, and the purified
+core -- imported from the OWNING modules (reference/windows/core/
+casscf); the drivers facade stays for historic importers only.
 
 The build_full_mo tests are the regression guard for the ticket-09 bug:
 a naive complement projector silently returned a NON-orthonormal MO matrix
@@ -15,19 +18,10 @@ import numpy as np
 import pytest
 
 from atomterm.system import AtomConfig
-from atomterm.drivers import (
-    ReferenceSpec,
-    build_full_mo,
-    lm_sectors,
-    radial_basis,
-    radial_mask,
-    run_casci,
-    run_frac_occ_scf,
-    run_rohf,
-    select_shell_ao,
-    select_valence_ao,
-    shell_weights,
-)
+from atomterm.reference import run_frac_occ_scf, run_rohf
+from atomterm.windows import (build_full_mo, lm_sectors, radial_basis,
+                              radial_mask, select_valence_ao, shell_weights)
+from atomterm.casscf import run_casci
 pytestmark = pytest.mark.slow
 
 
@@ -35,29 +29,6 @@ def _s_ortho_err(mo, s):
     """max |C^dag S C - I| of an orbital block (S-orthonormality error)."""
     mo = np.asarray(mo)
     return float(np.abs(mo.conj().T @ s @ mo - np.eye(mo.shape[1])).max())
-
-
-def test_select_valence_ao_concatenates_in_pattern_order(carbon):
-    _, mol, _, act_idx = carbon
-    assert select_valence_ao(mol, ["2p"]) == act_idx
-    assert select_valence_ao(mol, ["2s", "2p"]) == \
-        select_shell_ao(mol, "2s") + select_shell_ao(mol, "2p")
-
-
-def test_select_valence_ao_rejects_unknown_pattern(carbon):
-    _, mol, _, _ = carbon
-    with pytest.raises(ValueError, match="9f"):
-        select_valence_ao(mol, ["9f"])
-
-
-def test_shell_weights_partition_unity_and_group_by_l(carbon):
-    _, mol, mf, act_idx = carbon
-    s = mf.get_ovlp()
-    c = np.eye(mol.nao_nr())[:, act_idx]  # raw 2p AOs: exactly l = 1
-    names, w = shell_weights(mol, c, s)
-    assert names == ["s", "p", "d"]
-    assert np.allclose(w.sum(axis=1), 1.0, atol=1e-12)
-    assert np.allclose(w[:, names.index("p")], 1.0, atol=1e-12)
 
 
 @pytest.fixture(scope="session")
@@ -73,17 +44,6 @@ def build_full_mo_refs(tmp_path_factory):
         mol, mf = run_rohf(cfg, chk)
         out.append((cfg, mol, mf, patterns))
     return out
-
-
-def test_reference_spec_validation():
-    """ReferenceSpec owns the occ-pattern contract (fact 21a): the two
-    pattern lists come as a pair, and the basin gate needs them."""
-    ReferenceSpec()  # plain reference: all-None is the default run
-    ReferenceSpec(occ_closed=("4s",), occ_open=("3d",))
-    with pytest.raises(ValueError, match="together"):
-        ReferenceSpec(occ_closed=("4s",))
-    with pytest.raises(ValueError, match="needs the"):
-        ReferenceSpec(occ_e_ref=-848.40648875)
 
 
 def test_build_full_mo_blocks_orthonormal_and_span_preserving(build_full_mo_refs):
@@ -335,7 +295,7 @@ def test_purified_core_orbitals_exact_closed_span(build_full_mo_refs, sc_rohf):
     blind spots), the m-scalar density (shared radial: equal member
     blocks, zero cross-member coherences, zero anisotropy) and the tiny
     contamination / averaged-density-change scales."""
-    from atomterm.drivers import purified_core_orbitals
+    from atomterm.core import purified_core_orbitals
     from atomterm.operators import core_anisotropy, window_closure
 
     # measured 2026-10-15 (cold chkfiles): max contamination
@@ -389,7 +349,7 @@ def test_purified_substrate_closes_the_input_windows(build_full_mo_refs, sc_rohf
     Sc 5.7e-3 / 2.1e-2 -- the fact-17 baseline every CASSCF rung starts
     from; purified: machine precision, because the projector onto
     E (x) members commutes with L for ANY radial subspace E)."""
-    from atomterm.drivers import purified_core_orbitals
+    from atomterm.core import purified_core_orbitals
     from atomterm.operators import window_closure
 
     for sym, mol, mf, patterns, nelec in _pur_cases(build_full_mo_refs, sc_rohf):
@@ -436,7 +396,7 @@ def test_window_avas_reproduces_the_shell_cascade(sc_rohf, carbon, tmp_path):
     inherited relaxation is exactly the fact-18 theta* radial mixing
     (E = -250.8 mEh vs raw shell = the full frozen-scan gain) with
     near-m-symmetry. Raw shell AOs: overlap 1, closure 1e-15."""
-    from atomterm.drivers import window_avas, span_overlap
+    from atomterm.windows import window_avas, span_overlap
     from atomterm.operators import window_closure
     from atomterm.stages import stage_facts
 
@@ -478,159 +438,3 @@ def test_window_avas_reproduces_the_shell_cascade(sc_rohf, carbon, tmp_path):
             assert facts.analysis.comm_norm_h_lz > 0.1
             assert facts.analysis.comm_norm_h_l2 > 1.0
 
-
-@pytest.mark.fast
-def test_primitive_chain_and_select_primitives():
-    """The exponent-walk selector (kin proxy retired): the chain IS the
-    basis's radial coordinate (ascending exponent, one m-complete slot
-    per primitive), bands/counts select whole primitives, and contractions
-    -- which have no single exponent -- are rejected with the pointer to
-    label/MO selection."""
-    from pyscf import gto
-
-    from atomterm.drivers import primitive_chain, select_primitives
-    from atomterm.operators import window_closure
-
-    mol = gto.Mole()
-    mol.atom = "C 0 0 0"
-    mol.basis = gto.parse("""
-        C S
-             8.0  1.0
-        C S
-             1.0  1.0
-        C S
-             0.1  1.0
-        C P
-             2.0  1.0
-        C P
-             0.2  1.0
-        C D
-             0.5  1.0
-    """)
-    mol.spin = 2
-    mol.verbose = 0
-    mol.build()
-
-    # the chain: exponent ordering DIRECT, m-complete slots, row identity
-    chain = primitive_chain(mol, 1)
-    assert [e for e, _ in chain] == [0.2, 2.0]
-    assert chain[0][1] == [6, 7, 8]          # the exp-0.2 p shell
-    assert chain[1][1] == [3, 4, 5]          # the exp-2.0 p shell
-
-    # band semantics: exactly the exponents inside the interval
-    assert select_primitives(mol, 1, exponent_band=(0.5, 5.0)) == [3, 4, 5]
-    assert select_primitives(mol, 1, exponent_band=(0.1, 0.3)) == [6, 7, 8]
-    # count = the most diffuse end
-    assert select_primitives(mol, 1, count=1) == [6, 7, 8]
-    assert select_primitives(mol, 1, count=2) == [3, 4, 5, 6, 7, 8]
-
-    # the error surface: both/neither selector, over-count, empty band
-    with pytest.raises(ValueError, match="exactly one"):
-        select_primitives(mol, 1)
-    with pytest.raises(ValueError, match="exactly one"):
-        select_primitives(mol, 1, count=1, exponent_band=(0.0, 9.0))
-    with pytest.raises(ValueError, match="chain has"):
-        select_primitives(mol, 1, count=3)
-    with pytest.raises(ValueError, match="no l=1 primitive"):
-        select_primitives(mol, 1, exponent_band=(100.0, 200.0))
-
-    # the physics pin: a selected primitive m-set is exactly closed
-    cl = window_closure(mol, np.eye(mol.nao_nr())[
-        :, select_primitives(mol, 1, count=1)])
-    assert cl["lz"] < 1e-12 and cl["lperp"] < 1e-12
-
-    # contracted shells have no single exponent: clear error, and the
-    # message points at the label/MO routes instead
-    ccd = gto.Mole()
-    ccd.atom = "C 0 0 0"
-    ccd.basis = "cc-pvdz"
-    ccd.verbose = 0
-    ccd.build()
-    with pytest.raises(ValueError, match="contractions"):
-        primitive_chain(ccd, 1)
-
-
-@pytest.mark.fast
-def test_forced_occ_l_specifiers_and_open_premium():
-    """The occupation hook's span vocabulary and ranking: 'l0'..'l9'
-    select whole angular-momentum subspaces (the honest vocabulary on
-    uncontracted bases), and the open block is ranked by 2 w_open +
-    w_closed -- with whole-l spans a 1:1 sum lets closed-character
-    leftovers tie the open MOs (measured on U: DIIS then closed s/p
-    garbage, E > +1e3), while the premium keeps the early-cycle leakage
-    case (Sc/Ti) findable."""
-    from pyscf import gto
-
-    from atomterm.reference import _forced_rohf_occ
-
-    mol = gto.Mole()
-    mol.atom = "C 0 0 0"
-    mol.basis = gto.parse("""
-        C S
-             8.0  1.0
-        C S
-             1.0  1.0
-        C S
-             0.1  1.0
-        C P
-             2.0  1.0
-        C P
-             0.2  1.0
-        C D
-             0.5  1.0
-    """)
-    mol.spin = 2   # nelec = 6: closed = 2, open = 2
-    mol.verbose = 0
-    mol.build()
-
-    from atomterm.drivers import lm_sectors
-    rows_l = {l: sorted(r for (ll, m), rws in lm_sectors(mol).items()
-                        if ll == l for r in rws) for l in range(4)}
-    hook = _forced_rohf_occ(mol, ["l0", "l1"], ["l2"])
-    mo = np.eye(mol.nao_nr())
-    occ = hook(np.zeros(mol.nao_nr()), mo)
-    closed = set(np.flatnonzero(occ == 2.0))
-    open_ = set(np.flatnonzero(occ == 1.0))
-    assert all(i in rows_l[0] + rows_l[1] for i in closed)  # s/p-pure
-    assert open_ <= set(rows_l[2])                          # d wins the
-    # 2:1 premium even though closed leftovers tie at 1.0
-    with pytest.raises(ValueError, match="matched no AO labels"):
-        _forced_rohf_occ(mol, ["4z"], ["l2"])
-
-
-def test_occupied_core_idx_selects_the_closed_block_not_canonical_order():
-    """The core fold takes the DOUBLY-OCCUPIED MOs; canonical MO order
-    is meaningless on near-degenerate uncontracted bases (U: the first
-    canonical MOs are virtual junk at eps ~ 0.02 while the closed block
-    sits at 22/61/88/120/143 -- folding range(ncore) silently corrupted
-    the fold at max|dE| = 14.5 Eh). The contracted-basis coincidence is
-    a checked invariant, not an assumption."""
-    import warnings
-
-    from atomterm.drivers import occupied_core_idx
-
-    class FakeMF:
-        def __init__(self, mo_occ):
-            self.mo_occ = np.asarray(mo_occ, dtype=float)
-
-    # U-style: closed block scattered (canonical [0:5] are virtual junk)
-    occ = [0.0] * 10
-    for k in (2, 5, 6, 8, 9):
-        occ[k] = 2.0
-    mf = FakeMF(occ)
-    with warnings.catch_warnings(record=True) as rec:
-        warnings.simplefilter("always")
-        core = occupied_core_idx(mf, 5)
-    assert core == [2, 5, 6, 8, 9]
-    assert any("not the first" in str(w.message).lower() for w in rec)
-
-    # contracted-style coincidence: closed block IS the canonical head
-    mf = FakeMF([2.0, 2.0, 2.0, 1.0, 0.0])
-    with warnings.catch_warnings(record=True) as rec:
-        warnings.simplefilter("always")
-        assert occupied_core_idx(mf, 3) == [0, 1, 2]
-    assert not any("not the first" in str(w.message).lower() for w in rec)
-
-    # asking for more closed orbitals than exist is refused loudly
-    with pytest.raises(ValueError, match="closed block has"):
-        occupied_core_idx(mf, 4)

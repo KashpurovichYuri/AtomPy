@@ -1,8 +1,9 @@
 """Unit pins of atomterm.windows: the selection/meter layer (pure
-numpy: span_projector, select_span, shell_weights) and build_full_mo's
-two representations (AO rows, column vectors) on a synthetic
-substrate, plus the STO-3G degenerate substrates (null core, whole
-space as window)."""
+numpy: span_projector, select_span, shell_weights, occupied_core_idx,
+the primitive chain) and build_full_mo's two representations (AO rows,
+column vectors) on a synthetic substrate, plus the STO-3G degenerate
+substrates (null core, whole space as window) and the frozen-carbon
+selection pins (tests/carbon_reference.py -- no SCF)."""
 
 import numpy as np
 import pytest
@@ -10,8 +11,10 @@ import pytest
 from pyscf import gto
 
 from atomterm.windows import (Window, build_full_mo, complete_orthonormal,
-                              lm_sectors, lowdin, select_span,
-                              select_valence_ao, shell_weights,
+                              lm_sectors, lowdin, occupied_core_idx,
+                              primitive_chain, select_primitives,
+                              select_span, select_valence_ao,
+                              select_shell_ao, shell_weights,
                               span_projector)
 
 pytestmark = pytest.mark.fast
@@ -203,3 +206,131 @@ def test_c_sto3g_null_core_full_window():
     v = evec[:, 0]
     assert abs(float(np.real(v.conj() @ l2 @ v)) - 2.0) < 1e-8  # 3P ground
     assert abs(float(np.real(v.conj() @ s2 @ v)) - 2.0) < 1e-8
+
+
+# ------------------------------------------- the frozen-carbon selection pins
+
+def test_select_valence_ao_concatenates_in_pattern_order(carbon):
+    _, mol, _, act_idx = carbon
+    assert select_valence_ao(mol, ["2p"]) == act_idx
+    assert select_valence_ao(mol, ["2s", "2p"]) == \
+        select_shell_ao(mol, "2s") + select_shell_ao(mol, "2p")
+
+
+def test_select_valence_ao_rejects_unknown_pattern(carbon):
+    _, mol, _, _ = carbon
+    with pytest.raises(ValueError, match="9f"):
+        select_valence_ao(mol, ["9f"])
+
+
+def test_shell_weights_partition_unity_and_group_by_l(carbon):
+    _, mol, mf, act_idx = carbon
+    s = mf.get_ovlp()
+    c = np.eye(mol.nao_nr())[:, act_idx]  # raw 2p AOs: exactly l = 1
+    names, w = shell_weights(mol, c, s)
+    assert names == ["s", "p", "d"]
+    assert np.allclose(w.sum(axis=1), 1.0, atol=1e-12)
+    assert np.allclose(w[:, names.index("p")], 1.0, atol=1e-12)
+
+
+def test_occupied_core_idx_selects_the_closed_block_not_canonical_order():
+    """The core fold takes the DOUBLY-OCCUPIED MOs; canonical MO order
+    is meaningless on near-degenerate uncontracted bases (U: the first
+    canonical MOs are virtual junk at eps ~ 0.02 while the closed block
+    sits at 22/61/88/120/143 -- folding range(ncore) silently corrupted
+    the fold at max|dE| = 14.5 Eh). The contracted-basis coincidence is
+    a checked invariant, not an assumption."""
+    import warnings
+
+    class FakeMF:
+        def __init__(self, mo_occ):
+            self.mo_occ = np.asarray(mo_occ, dtype=float)
+
+    # U-style: closed block scattered (canonical [0:5] are virtual junk)
+    occ = [0.0] * 10
+    for k in (2, 5, 6, 8, 9):
+        occ[k] = 2.0
+    mf = FakeMF(occ)
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter("always")
+        core = occupied_core_idx(mf, 5)
+    assert core == [2, 5, 6, 8, 9]
+    assert any("not the first" in str(w.message).lower() for w in rec)
+
+    # contracted-style coincidence: closed block IS the canonical head
+    mf = FakeMF([2.0, 2.0, 2.0, 1.0, 0.0])
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter("always")
+        assert occupied_core_idx(mf, 3) == [0, 1, 2]
+    assert not any("not the first" in str(w.message).lower() for w in rec)
+
+    # asking for more closed orbitals than exist is refused loudly
+    with pytest.raises(ValueError, match="closed block has"):
+        occupied_core_idx(mf, 4)
+
+
+def test_primitive_chain_and_select_primitives():
+    """The exponent-walk selector (kin proxy retired): the chain IS the
+    basis's radial coordinate (ascending exponent, one m-complete slot
+    per primitive), bands/counts select whole primitives, and
+    contractions -- which have no single exponent -- are rejected with
+    the pointer to label/MO selection."""
+    from atomterm.operators import window_closure
+
+    mol = gto.Mole()
+    mol.atom = "C 0 0 0"
+    mol.basis = gto.parse("""
+        C S
+             8.0  1.0
+        C S
+              1.0  1.0
+        C S
+              0.1  1.0
+        C P
+              2.0  1.0
+        C P
+              0.2  1.0
+        C D
+              0.5  1.0
+    """)
+    mol.spin = 2
+    mol.verbose = 0
+    mol.build()
+
+    # the chain: exponent ordering DIRECT, m-complete slots, row identity
+    chain = primitive_chain(mol, 1)
+    assert [e for e, _ in chain] == [0.2, 2.0]
+    assert chain[0][1] == [6, 7, 8]          # the exp-0.2 p shell
+    assert chain[1][1] == [3, 4, 5]          # the exp-2.0 p shell
+
+    # band semantics: exactly the exponents inside the interval
+    assert select_primitives(mol, 1, exponent_band=(0.5, 5.0)) == [3, 4, 5]
+    assert select_primitives(mol, 1, exponent_band=(0.1, 0.3)) == [6, 7, 8]
+    # count = the most diffuse end
+    assert select_primitives(mol, 1, count=1) == [6, 7, 8]
+    assert select_primitives(mol, 1, count=2) == [3, 4, 5, 6, 7, 8]
+
+    # the error surface: both/neither selector, over-count, empty band
+    with pytest.raises(ValueError, match="exactly one"):
+        select_primitives(mol, 1)
+    with pytest.raises(ValueError, match="exactly one"):
+        select_primitives(mol, 1, count=1, exponent_band=(0.0, 9.0))
+    with pytest.raises(ValueError, match="chain has"):
+        select_primitives(mol, 1, count=3)
+    with pytest.raises(ValueError, match="no l=1 primitive"):
+        select_primitives(mol, 1, exponent_band=(100.0, 200.0))
+
+    # the physics pin: a selected primitive m-set is exactly closed
+    cl = window_closure(mol, np.eye(mol.nao_nr())[
+        :, select_primitives(mol, 1, count=1)])
+    assert cl["lz"] < 1e-12 and cl["lperp"] < 1e-12
+
+    # contracted shells have no single exponent: clear error, and the
+    # message points at the label/MO routes instead
+    ccd = gto.Mole()
+    ccd.atom = "C 0 0 0"
+    ccd.basis = "cc-pvdz"
+    ccd.verbose = 0
+    ccd.build()
+    with pytest.raises(ValueError, match="contractions"):
+        primitive_chain(ccd, 1)
