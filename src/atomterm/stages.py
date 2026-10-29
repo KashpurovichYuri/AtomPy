@@ -1,10 +1,15 @@
-"""One analysis pass over a finished stage: the facts every renderer
-reports, independent of presentation.
+"""The final analysis layer: one pass over a finished stage that
+yields the campaign's canonical measured object.
 
-``stage_facts`` is the single owner of the fold-and-analyze bookkeeping;
-callers only render (cases: report text; treatments/cells: the flat json
-payload). One pass yields one :class:`StageFacts`, so every stage type
-reports the same fields.
+Position in the architecture: the engines finish a stage (casscf
+returns a :class:`~atomterm.casscf.CASResult`); the consumers declare
+stages and render facts (cases: report text; treatments/cells: the
+flat json payload) -- none of them computes physics. :func:`stage_facts`
+is the seam between the two: the ONE composition point that folds
+(:mod:`atomterm.operators`), labels (:mod:`atomterm.analysis`), and
+measures the window (:mod:`atomterm.windows`) over a stage's own
+outputs. The guarantee: one pass, one :class:`StageFacts`, and every
+stage type reports the same fields.
 
 Conventions
 -----------
@@ -42,31 +47,66 @@ ORTHO_TOL = 1e-6
 class StageFacts:
     """Everything a finished stage reports, presentation-free.
 
-    Values are computed by :func:`stage_facts`; the properties below the
-    fields are the thin readouts renderers share, and :meth:`payload`
-    flattens the object into the persisted rungs/cells dict -- whose
-    keys are committed data, so renaming one is a payload break.
+    Computed by :func:`stage_facts`; the readout properties below the
+    fields are thin pass-throughs (renderers never reach into the
+    analysis object), and :meth:`payload` flattens the object into
+    the persisted dict whose keys are committed data -- renaming one
+    is a payload break.
+
+    Attributes
+    ----------
+    tag : str
+        Stage label, carried through to reports and stores.
+    analysis : AnalysisResult
+        The term-symbol analysis (states, lz_spectrum, commutators).
+    energies : np.ndarray
+        The reconstruction -- the analysis ruler
+        (``eigvalsh(H) + core_energy``).
+    energies_pyscf : np.ndarray
+        The run's own totals, in the run's root order.
+    max_de_vs_pyscf : float
+        Max |reconstruction - run| over the common root prefix (the
+        three-contributions reading: :func:`stage_facts` Notes).
+    n_dev : float
+        Particle-number sanity: |diag(N) - (na+nb)|.
+    ortho_err : float
+        Max |C^dag S C - I| over the stage's full MO matrix.
+    window_names : list[str]
+        The l names of the window's shell composition.
+    window_rows : np.ndarray
+        Per-orbital l-weights (rows sum to 1).
+    win_lz, win_lperp : float
+        The one-particle closure defects ||[P, Lz]|| and ||[P, L_perp]||
+        of the window span (:func:`atomterm.operators.window_closure`;
+        0 = the exact closure certificate).
+    configurations : list[str]
+        Valence-configuration label per root.
+    shell_electrons : dict
+        The ground root's electron count per l -- the ELECTRON scale
+        next to the SPAN weights of ``window_rows``; partitions
+        na + nb.
+    core_anisotropy : float or None
+        The discarded anisotropy of the fold core -- measured only
+        when ``anisotropy_ref`` was given, else absent.
+    converged : bool
+        The optimizer's own kernel report; CASCI stages and trusted
+        cached stages default True and never flag.
     """
 
     tag: str
-    analysis: AnalysisResult  # states, lz_spectrum, commutators
-    energies: np.ndarray  # the reconstruction (analysis ruler): eigvalsh(H) + core_energy
-    energies_pyscf: np.ndarray  # the run's own totals, in the run's root order
-    max_de_vs_pyscf: float  # max |reconstruction - run| over the common root prefix
-    n_dev: float  # particle-number sanity: |diag(N) - (na+nb)|
-    ortho_err: float  # max |C^dag S C - I| over the stage's full MO matrix
+    analysis: AnalysisResult
+    energies: np.ndarray
+    energies_pyscf: np.ndarray
+    max_de_vs_pyscf: float
+    n_dev: float
+    ortho_err: float
     window_names: list[str]
-    window_rows: np.ndarray  # per-orbital l-weights (rows sum to 1)
-    win_lz: float  # one-particle closure defect ||[P, Lz]|| of the window span
-    win_lperp: float  # ||[P, L_perp]|| (window_closure; 0 = exact certificate)
+    window_rows: np.ndarray
+    win_lz: float
+    win_lperp: float
     configurations: list[str]
-    # the ground root's electron count per l (analysis.
-    # shell_occupations) -- the ELECTRON scale next to the SPAN
-    # weights of window_rows; partitions na+nb
     shell_electrons: dict
-    core_anisotropy: float | None = None  # CASCI reference rungs only
-    # converged: the optimizer's own kernel report; CASCI stages and
-    # trusted cached stages default True and never flag
+    core_anisotropy: float | None = None
     converged: bool = True
 
     # --- shared readouts (thin pass-throughs: renderers never reach
@@ -108,13 +148,13 @@ class StageFacts:
         return dict(Counter(s.term for s in self.analysis.states))
 
     def payload(self, kind: str) -> dict:
-        """Flat json-friendly dict -- the persisted rungs/cells payload.
+        """Flat json-friendly dict -- the payload the stores persist.
 
         Parameters
         ----------
         kind : the method axis value ("casci" / "casscf" / "sa") --
-            recorded verbatim as ``"kind"``; CASCI kinds also carry
-            ``core_anisotropy`` when it was measured.
+            recorded verbatim as ``"kind"``; ``core_anisotropy``
+            appears whenever it was measured.
         """
         out = {
             "tag": self.tag,
@@ -161,11 +201,11 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     ncore, na, nb : core size and spin sector of the stage.
     tag : stage label used throughout reports and chkfile stores.
     spherical_core : fold with the spherically averaged core density
-        (the physical reference) or the raw one (the anisotropy
-        detector rung).
+        (the physical reference) or the raw one (the raw-fold
+        detector).
     anisotropy_ref : ``(mf_ref, c_core_or_None)``, optional -- measure
         the core-density anisotropy of that reference's core and report
-        it (the CASCI rungs' detector column); ``None`` leaves the
+        it (the raw-fold detector column); ``None`` leaves the
         field absent.
 
     Returns
@@ -193,6 +233,20 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     PySCF-ordering bridge internally. On SA stages ``cas.ci`` is the
     SA kernel's CI (the constrained_casscf contract) -- the labels
     describe the ensemble-optimized CI, not the exact per-root pass.
+
+    Examples
+    --------
+    On carbon, raw 2p window, Ms=0 sector (the textbook p^2 table;
+    values pinned by tests/integration/test_stages.py)::
+
+        cas = run_casci(mf, 3, (1, 1), mo, chk, nroots=9)
+        facts = stage_facts(mol, mf, cas, c_act, ncore, 1, 1, tag="c")
+        facts.terms
+        {'3P': 3, '1D': 5, '1S': 1}
+        facts.window["p"]          # the window is exactly l-pure
+        1.0
+        facts.win_lz, facts.n_dev  # closure + particle number exact
+        (6.5e-16, 0.0)
     """
     c_core = cas.mo_coeff[:, :ncore]
     ops = build_operators(mol, mf, c_act, ncore, na, nb,
