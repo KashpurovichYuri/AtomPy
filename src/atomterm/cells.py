@@ -98,18 +98,20 @@ _WINDOW_RE = re.compile(r"[0-9][0-9a-z]*\Z")
 class CellKey:
     """One grid point of the manifest: the unit of run, load, and report.
 
-    Every axis has an owner; the key only names the choice:
+    Every axis has an owner; the key only names the choice.
 
+    Attributes
+    ----------
     atom : element label, e.g. ``"Ti"`` (the ``elements/<Atom>/`` dir).
-    window : NOMINAL span label, e.g. ``"3d4s"`` -- names the table row;
-        the construction is the ``start`` axis (window = the span,
-        start = the columns defining it).
-    sector : ``(na, nb)`` -- alpha/beta active electrons; fixes Ms and
-        nelec together.
+    window : NOMINAL span label, e.g. ``"3d4s"`` -- names the table
+        row; the construction is the ``start`` axis (window = the
+        span, start = the columns defining it).
+    sector : ``(na, nb)`` -- alpha/beta active electrons; fixes Ms
+        and nelec together.
     method : ``"casci"`` | ``"casscf"`` | ``"sa"``.
     start : ``"ao"`` (shell AOs) | ``"mo"`` (canonical SCF slice) |
-        ``"no"`` (natural-orbital groups; needs the parent-prefix
-        policy, lands with the run queue).
+        ``"no"`` (natural-orbital groups; the label grammar is
+        ``<source>no<k>``, see :attr:`no_source`).
     mask : optimizer restriction -- ``None`` (free) | ``"radial"`` |
         ``"frozen"`` | ``"virtmix"``; only meaningful for optimizer
         methods (rejected for ``casci``).
@@ -162,11 +164,11 @@ class CellKey:
                     "the radial mask rotates member-labeled AO slots; it "
                     "needs start='ao' (MO and NO columns carry no member "
                     "labels)")
-        # (mo, pur) is valid since the window-projection builder (ticket
-        # 29 T1a): run_cell re-orthogonalizes the canonical columns
-        # against the pur core span -- see the mo branch there.
+        # (mo, pur) is valid since the window-projection builder: the
+        # canonical columns re-orthogonalized against the pur core span
+        # -- see the mo branch in run_cell.
         # the pur-fold degeneracy rule: on the purified substrate the
-        # core density is exactly m-scalar, so raw == avg (fact 20) --
+        # core density is exactly m-scalar, so raw == avg --
         # canonicalize instead of storing two addresses for one cell;
         # frac is a different REFERENCE, meaningless on pur
         if self.substrate == "pur":
@@ -220,18 +222,28 @@ class CellData:
     """What a stored cell holds -- pure data, no live mol/mf needed.
 
     ``ci`` stays in PYSCF FCI ordering over the active orbitals
-    (norb = ncas): map through :func:`ci_in_detbasis_order` before any
+    (norb = ncas): map through
+    :func:`atomterm.operators.ci_in_detbasis_order` before any
     detbasis-order use (indexing, contracting with our operator
     matrices, RDMs).
+
+    Attributes
+    ----------
+    key : the :class:`CellKey` this data belongs to.
+    mo_coeff : the run's full MO matrix (nao, nao).
+    energies : total energies per root.
+    ci : per-root CI arrays, PySCF ordering.
+    core_energy : ``E_tot`` minus the active part (the fold constant).
+    ncas : window width -- needed exactly when it is not derivable
+        from the label (NO windows); 0 = derive from the shell label.
     """
 
     key: CellKey
-    mo_coeff: np.ndarray          # the run's full MO matrix (nao, nao)
-    energies: np.ndarray          # total energies per root
-    ci: list                      # per-root arrays, pyscf ordering
-    core_energy: float            # E_tot - active part (the fold constant)
-    ncas: int = 0                 # window width (needed when it is not
-                                   # derivable from the label: NO windows)
+    mo_coeff: np.ndarray
+    energies: np.ndarray
+    ci: list
+    core_energy: float
+    ncas: int = 0
 
 
 def cell_chk(key: CellKey, workdir: str | Path = "elements") -> Path:
@@ -313,12 +325,19 @@ def _select_no_window(wins, k: int):
 def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
              fresh: bool = False, verbose: int = 0,
              workdir: str | Path = "elements") -> "StageFacts":
-    """Execute one cell: resolve every axis through its OWNER, run, persist,
-    analyze. The unit of the run queue.
+    """Execute one cell: resolve every axis through its OWNER, run,
+    store, analyze. The unit of the run queue.
 
+    Parameters
+    ----------
+    key : the cell to run.
     mf : the atom's converged reference (REQUIRED -- reference
         construction, including Ti's character-forced occupations and
-        basin gate, belongs to cases/reference, not to cells).
+        basin gate, belongs to cases/reference, not to cells). On
+        ``fold="frac"`` this is REPLACED by ``frac_mf``.
+    mol : the analysis mol; defaults to ``mf.mol``. Only a
+        ``fold="frac"`` run needs it stated separately (the run basis
+        is ``frac_mf.mol``).
     frac_mf : the fractional-occupation reference; required iff
         ``key.fold == "frac"`` (that fold is a different reference SCF
         -- the run AND the fold use it).
@@ -326,12 +345,16 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         ``mc_opts``/``fci_opts`` (optimizer/solver), ``sa_weights``
         (default: uniform over the MEASURED ground block of the start
         window -- :func:`atomterm.operators.ground_block`, the
-        SA-anchoring rule), ``verbose``.
+        SA-anchoring rule), ``verbose``, ``no_cap`` (the NO-source
+        cost stop).
     fresh : ignore a stored cell and re-run (a cache hit otherwise
         re-analyzes the stored run -- budgets are then ignored).
+    workdir : the store root (``<workdir>/<Atom>/rungs/``).
 
-    Returns the stage's :class:`~atomterm.stages.StageFacts`; persist
-        with :func:`cell_payload` (which embeds the address).
+    Returns
+    -------
+    The stage's :class:`~atomterm.stages.StageFacts`; persist with
+    :func:`cell_payload` (which embeds the address).
     """
     budgets = dict(budgets or {})
     if key.fold == "frac":
@@ -396,7 +419,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         # were SOLVED in, not the pur one -- the fact-17-class defect,
         # removed at the source by build_full_mo's projection). Honest
         # expectation: the window's own m-delocalization survives
-        # (fact 22d) -- these cells measure that, they do not fix it.
+        # (measured: raw-MO spans never rotation-close) -- these cells measure that, they do not fix it.
         if key.substrate == "pur":
             mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
                                     mf.mo_coeff[:, ncore:], c_core=c_pur)
@@ -429,7 +452,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                                  mo_full=mo_full, mask=mask, weights=weights,
                                  name=key.address, **common)
 
-    _persist_cell(chk, key, cas, ncas,
+    _store_cell(chk, key, cas, ncas,
                   store_name=f"{key.address}_roots" if key.method == "sa"
                   else None)
     return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_pur=c_pur)
@@ -465,10 +488,11 @@ def cell_payload(key: CellKey, facts) -> dict:
     return out
 
 
-def _persist_cell(chk: Path, key: CellKey, cas, ncas: int,
-                  store_name: str | None = None) -> None:
-    """Complete the cell store: energies were persisted by the run; add
-    the pieces only the cell layer owns. ``ci_stack`` is a plain
+def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
+                store_name: str | None = None) -> None:
+    """Complete the cell store (the writer half of the load_cell pair):
+    energies were stored by the run; add the pieces only the cell
+    layer owns. ``ci_stack`` is a plain
     (nroots, ndet) float array -- PySCF's chkfile serializes object
     arrays as nested ``__from_list__`` groups that do not round-trip
     for 2-D roots, so the cell layer owns its own CI serialization.
@@ -499,9 +523,9 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
     return stage_facts(
         mol, mf, cas, c_act, ncore, na, nb, tag=key.address,
         spherical_core=key.fold != "raw",
-        # every CASCI rung reports its reference core's anisotropy (the
+        # every CASCI cell reports its reference core's anisotropy (the
         # raw fold's is the detector; the pur fold's is the ~0
-        # certificate; registry parity)
+        # certificate; row parity across the fold block)
         anisotropy_ref=(mf, c_pur) if key.method == "casci" else None,
     )
 

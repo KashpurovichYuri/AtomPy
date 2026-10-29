@@ -272,7 +272,7 @@ def test_configuration_summary_uses_the_bridge(tmp_path):
     occ_a = [i for i in range(4) if sa >> i & 1]
     occ_b = [i for i in range(4) if sb >> i & 1]
     # expected label: the l-mass of exactly those columns
-    from atomterm.drivers import shell_weights
+    from atomterm.windows import shell_weights
     names, wl = shell_weights(mol, c_win, s)
     occ_cols = sorted(occ_a + occ_b)
     mass = {n: sum(wl[c, k] for c in occ_cols)
