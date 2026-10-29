@@ -1,6 +1,6 @@
-"""The cell layer: one key type addressing every calculation, its store
-contract, and the CI ordering bridge between PySCF and the determinant
-basis.
+"""The cell layer: one key type addressing every calculation, the
+run/load/analyze seam over the owning modules, and the self-owned
+store.
 
 A *cell* is THE unit of computation and analysis (one grid point of the
 manifest): the run, its checkpoint, its payload, and its table row are
@@ -9,6 +9,15 @@ all addressed by one :class:`CellKey`, serialized as the cell
 their OWNING modules (:mod:`atomterm.windows`, :mod:`atomterm.core`,
 :mod:`atomterm.casscf`, :mod:`atomterm.stages`) -- cells never
 re-implement physics.
+
+Division of labor with the declaration layer:
+:mod:`atomterm.cases` declares WHAT is studied (one spec per atom --
+windows, references, sectors); this module addresses HOW each single
+calculation runs -- one frozen key per combination of the axes, the
+declared key-sets (:func:`window_grid` and its filters) derived from
+those specs. A new axis value arrives here (vocabulary + one
+resolution branch through its owner); a new atom arrives there (one
+registry row).
 
 Axis semantics (two of them describe the CORE and are easily conflated):
 

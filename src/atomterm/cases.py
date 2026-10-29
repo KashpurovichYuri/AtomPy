@@ -9,6 +9,15 @@ runs only when declared); nothing auto-generates. ``CAMPAIGN`` is the
 per-atom registry the cell layer and the runners derive from --
 nothing else re-declares atoms, windows, or the gated references (the
 one-declaration rule).
+
+Division of labor with the cell layer: this module declares WHAT is
+studied and runs the classic staged pipeline (ROHF -> CASCI per Ms
+sector -> CASSCF -> SA-CASSCF, checkpointed under stage tags);
+:mod:`atomterm.cells` addresses HOW each single calculation of the
+methods grid runs -- one frozen :class:`~atomterm.cells.CellKey` per
+axis combination, its grids derived from these specs. The campaign's
+two run vocabularies (stage tags here, cell addresses there) are a
+recorded phase-5 consideration, not an accident.
 """
 
 from __future__ import annotations
