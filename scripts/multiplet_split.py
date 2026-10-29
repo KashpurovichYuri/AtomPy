@@ -32,7 +32,7 @@ from atomterm.angular import real_to_complex
 from atomterm.detbasis import determinant_basis
 from atomterm.drivers import occupied_core_idx
 from atomterm.operators import build_operators
-from atomterm.reference import run_frac_occ_scf, run_rohf
+from atomterm.reference import run_frac_occ, run_rohf
 from atomterm.system import AtomConfig, build_mol, ncore_of
 from atomterm.windows import build_full_mo, select_valence_ao
 
@@ -149,7 +149,7 @@ def main():
     folds = {"raw": np.real(ops_raw["H"]),
              "averaged": np.real(ops_avg["H"])}
     if args.window == "3d4s":
-        _, mf_frac = run_frac_occ_scf(
+        _, mf_frac = run_frac_occ(
             cfg, f"elements/{args.atom}/rungs/fracocc.chk", nelec, ncas,
             open_idx=act_idx)
         folds["fractional"] = np.real(build_operators(

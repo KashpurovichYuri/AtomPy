@@ -18,9 +18,9 @@ import numpy as np
 import pytest
 
 from atomterm.system import AtomConfig
-from atomterm.reference import run_frac_occ_scf, run_rohf
+from atomterm.reference import run_frac_occ, run_rohf
 from atomterm.windows import (build_full_mo, lm_sectors, radial_basis,
-                              radial_mask, select_valence_ao, shell_weights)
+                              mask_radial_rotations, select_valence_ao, shell_weights)
 from atomterm.casscf import run_casci
 pytestmark = pytest.mark.slow
 
@@ -85,7 +85,7 @@ def si_frac_chk(tmp_path_factory):
 def test_frac_occ_scf_open_block_ordering(si_frac_chk):
     """Average-of-configuration reference for Si: the fractional block must
     land on the 3p shell -- closed [Ne]+3s below (the ordering assumption
-    of run_frac_occ_scf, first nontrivial atom after carbon).
+    of run_frac_occ, first nontrivial atom after carbon).
 
     Runs twice deliberately: first call = fresh SCF, second = chkfile cache
     hit. Both returned objects must carry the ensemble occupation hook --
@@ -95,7 +95,7 @@ def test_frac_occ_scf_open_block_ordering(si_frac_chk):
     cfg = AtomConfig("Si", "ccpvdz", spin=2)
     Path(si_frac_chk).unlink(missing_ok=True)
     for k in range(2):  # 1st pass: fresh; 2nd pass: cache hit
-        mol_f, mf_f = run_frac_occ_scf(
+        mol_f, mf_f = run_frac_occ(
             dataclasses.replace(cfg, spin=0), str(si_frac_chk),
             nelec_open=2, n_open=3)
         assert mf_f.converged, k
@@ -171,7 +171,7 @@ def test_sc_frac_occ_selects_open_shell_by_projection(sc_rohf, tmp_path):
     n_open = len(act_idx)
 
     chk = tmp_path / "frac_proj.chk"
-    mol_p, mf_p = run_frac_occ_scf(
+    mol_p, mf_p = run_frac_occ(
         cfg, str(chk), nelec_open=3, n_open=n_open, open_idx=act_idx)
     assert mf_p.converged
     frac_cols = np.where(np.isclose(np.asarray(mf_p.mo_occ), 0.5))[0]
@@ -183,7 +183,7 @@ def test_sc_frac_occ_selects_open_shell_by_projection(sc_rohf, tmp_path):
     assert wd.get("p", 0.0) < 1e-3
 
     chk_e = tmp_path / "frac_energy_ordered.chk"
-    mol_e, mf_e = run_frac_occ_scf(
+    mol_e, mf_e = run_frac_occ(
         cfg, str(chk_e), nelec_open=3, n_open=n_open)  # legacy energy order
     if mf_e.converged:  # the documented failure mode has two faces:
         # (a) it converges to the WRONG ensemble (4p intrudes into the
@@ -235,7 +235,7 @@ def test_radial_basis_labels_and_partners(sc_rohf):
     row_sector = {r: k for k, rs in lm_sectors(mol).items() for r in rs}
     got = [labels[ncore + i] for i in range(len(act_idx))]
     assert got == [row_sector[a] for a in act_idx]
-    mask = radial_mask(labels, ncore, len(act_idx))(
+    mask = mask_radial_rotations(labels, ncore, len(act_idx))(
         None, mo.shape[1], ncore, len(act_idx), None)
     assert mask.sum() >= len(act_idx)  # every slot: >= 1 radial partner
     assert not mask[:ncore, :].any()   # core slots never pair

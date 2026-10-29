@@ -16,7 +16,7 @@ working; NEW code imports the owning module directly.
 
 from atomterm.reference import (  # noqa: F401
     ReferenceSpec,
-    run_frac_occ_scf,
+    run_frac_occ,
     run_rohf,
 )
 from atomterm.windows import (  # noqa: F401
@@ -27,7 +27,7 @@ from atomterm.windows import (  # noqa: F401
     occupied_core_idx,
     primitive_chain,
     radial_basis,
-    radial_mask,
+    mask_radial_rotations,
     select_primitives,
     select_shell_ao,
     select_valence_ao,
@@ -41,8 +41,8 @@ from atomterm.core import (  # noqa: F401
 from atomterm.casscf import (  # noqa: F401
     CASResult,
     constrained_casscf,
-    core_virtual_only_mask,
-    no_core_window_exchange_mask,
+    mask_frozen_window,
+    mask_no_core_window_mix,
     run_casci,
     run_casscf,
     run_casscf_core_relax,
@@ -54,7 +54,7 @@ from atomterm.casscf import (  # noqa: F401
 __all__ = [
     "ReferenceSpec",
     "run_rohf",
-    "run_frac_occ_scf",
+    "run_frac_occ",
     "select_shell_ao",
     "select_valence_ao",
     "primitive_chain",
@@ -67,11 +67,11 @@ __all__ = [
     "build_full_mo",
     "lm_sectors",
     "radial_basis",
-    "radial_mask",
+    "mask_radial_rotations",
     "run_casci",
     "constrained_casscf",
-    "core_virtual_only_mask",
-    "no_core_window_exchange_mask",
+    "mask_frozen_window",
+    "mask_no_core_window_mix",
     "run_casscf",
     "run_sa_casscf",
     "run_casscf_core_relax",

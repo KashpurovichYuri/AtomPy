@@ -71,7 +71,7 @@ __all__ = [
     "lm_sectors",
     "l_per_row",
     "radial_basis",
-    "radial_mask",
+    "mask_radial_rotations",
     "window_shell",
     "window_primitive",
     "window_scf_mo",
@@ -608,7 +608,7 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
                  c_core: np.ndarray = None):
     """:func:`build_full_mo`'s sibling with the member-preserving
     gauge: the full MO matrix WITH per-column (l, member) labels --
-    the labeled substrate :func:`radial_mask` reads.
+    the labeled substrate :func:`mask_radial_rotations` reads.
 
     Parameters
     ----------
@@ -644,7 +644,7 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
     Examples
     --------
     >>> mo, lab = radial_basis(mf, core_idx, act_idx)
-    >>> mask = radial_mask(lab, ncore, ncas)
+    >>> mask = mask_radial_rotations(lab, ncore, ncas)
     """
     mol = mf.mol
     n = mf.mo_coeff.shape[0]
@@ -703,7 +703,7 @@ def radial_basis(mf, core_idx: list[int], act_idx: list[int],
     return mo, labels
 
 
-def radial_mask(labels: list, ncore: int, ncas: int):
+def mask_radial_rotations(labels: list, ncore: int, ncas: int):
     """``uniq_var_indices`` mask allowing ONLY same-(l, member)
     rotations into a window slot: pure RADIAL mixing.
 

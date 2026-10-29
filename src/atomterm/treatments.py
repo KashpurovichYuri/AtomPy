@@ -118,11 +118,11 @@ from typing import Callable
 import numpy as np
 
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
-from atomterm.reference import ReferenceSpec, run_frac_occ_scf, run_rohf
+from atomterm.reference import ReferenceSpec, run_frac_occ, run_rohf
 from atomterm.windows import (build_full_mo, occupied_core_idx, radial_basis,
-                              radial_mask, select_valence_ao)
+                              mask_radial_rotations, select_valence_ao)
 from atomterm.core import purified_core_orbitals
-from atomterm.casscf import (constrained_casscf, core_virtual_only_mask,
+from atomterm.casscf import (constrained_casscf, mask_frozen_window,
                              run_casci, run_casscf, run_casscf_core_relax,
                              run_casscf_pyscf_start, run_casscf_virtual_mix,
                              run_sa_casscf)
@@ -215,7 +215,7 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
     # member-labeled basis + same-(l, member) rotation mask: the radial rungs
     mo_rad, lab_rad = radial_basis(
         mf, occupied_core_idx(mf, ncore), act_idx)
-    mask_rad = radial_mask(lab_rad, ncore, ncas)
+    mask_rad = mask_radial_rotations(lab_rad, ncore, ncas)
     rungs += [
         Rung(
             "casscf_relax", "casscf",
@@ -288,7 +288,7 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
         mo_shell_p = mo_of(mf, c_pur)
         mo_rad_p, lab_rad_p = radial_basis(
             mf, occupied_core_idx(mf, ncore), act_idx, c_core=c_pur)
-        mask_rad_p = radial_mask(lab_rad_p, ncore, ncas)
+        mask_rad_p = mask_radial_rotations(lab_rad_p, ncore, ncas)
         rungs += [
             Rung(
                 "casci_avg_pur", "casci",
@@ -321,7 +321,7 @@ def _registry(mf, mf_f, ncore: int, ncas: int, nelecas: tuple[int, int],
                     "sa_relax_pur", "casscf",
                     lambda: run_sa_casscf(
                         mf, ncas, nelecas, mo_shell_p, list(sa_weights),
-                        chk("sa_relax_pur"), mask=core_virtual_only_mask),
+                        chk("sa_relax_pur"), mask=mask_frozen_window),
                     c_win, lambda: mf,
                 ),
                 Rung(
@@ -370,7 +370,7 @@ def run_rungs(cfg: AtomConfig, shell_patterns: list[str], nelec_act: int,
         # open_idx: select the fractional block by CHARACTER (the active
         # shell AOs). Energy-ordered filling is fine for C/Si but runs away
         # on TMs where 3d/4p quasi-degenerate (Sc: p-containing ensemble).
-        mol_f, mf_f = run_frac_occ_scf(
+        mol_f, mf_f = run_frac_occ(
             cfg, str(out / f"{label}_fracocc.chk"), frac_nelec_open, frac_n_open,
             open_idx=act_idx)
     ncas = len(act_idx)

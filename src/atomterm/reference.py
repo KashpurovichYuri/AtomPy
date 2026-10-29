@@ -11,7 +11,7 @@ fixed occupations. The toolbox, escalating: character-forced filling
 (S-projector weights, never energy order -- :func:`run_rohf`), the
 basin gate (cycled guesses against a reference energy --
 :class:`ReferenceSpec`), and the fractional-occupation ensemble (the
-spherical reference with smeared valence -- :func:`run_frac_occ_scf`).
+spherical reference with smeared valence -- :func:`run_frac_occ`).
 
 Conventions
 -----------
@@ -38,7 +38,7 @@ from pyscf import lib, scf
 
 from atomterm.windows import select_span, span_projector
 
-__all__ = ["ReferenceSpec", "run_rohf", "run_frac_occ_scf"]
+__all__ = ["ReferenceSpec", "run_rohf", "run_frac_occ"]
 
 
 def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
@@ -94,7 +94,7 @@ class ReferenceSpec:
         :func:`select_shell_ao`, or ``"l0".."l9"`` for a WHOLE angular
         momentum subspace (the honest vocabulary on uncontracted
         bases, where labels are shell counters). The integer analog of
-        :func:`run_frac_occ_scf`'s ``open_idx`` selection. MANDATORY
+        :func:`run_frac_occ`'s ``open_idx`` selection. MANDATORY
         on aufbau-runaway atoms (Ti; U needs whole-l spans plus
         Newton). Both or neither.
     occ_e_ref : float | None
@@ -163,6 +163,8 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     mol = build_mol(cfg)
 
     def fresh_mf(guess: str | None = None):
+        """One unconverged ROHF object: occupation hook attached,
+        chkfile/verbosity set, optional starting guess."""
         m = scf.ROHF(mol)
         if ref is not None and ref.occ_closed is not None:
             m.get_occ = _forced_rohf_occ(mol, list(ref.occ_closed),
@@ -172,20 +174,19 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
         m.verbose = cfg.verbose
         if guess is not None:
             m.init_guess = guess
-        acc = ref.conv_accelerator if ref is not None else "diis"
-        if acc == "newton":
-            m = m.newton()
         return m
 
     def solve(m):
-        """Run one SCF under the declared acceleration policy
-        ("diis+newton": DIIS linearly first, then the Newton switch)."""
+        """Run one SCF under the declared acceleration policy -- the
+        ONE dispatch: "diis" plain, "newton" second-order from the
+        start, "diis+newton" DIIS linearly first, then the Newton
+        switch."""
         acc = ref.conv_accelerator if ref is not None else "diis"
-        if acc == "diis+newton":
+        if acc == "newton":
+            m = m.newton()
+        elif acc == "diis+newton":
             m.run()
-            m2 = m.newton()
-            m2.run()
-            return m2
+            m = m.newton()
         m.run()
         return m
 
@@ -214,7 +215,7 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     return mol, mf
 
 
-def run_frac_occ_scf(cfg, chkfile: str, nelec_open: int, n_open: int,
+def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
                      open_idx: list[int] | None = None):
     """Average-of-configuration (fractional-occupation) HF,
     chkfile-cached.

@@ -19,16 +19,16 @@ Conventions
   diagonalization of our H in the converged window -- PySCF's ci
   vectors straggle inside degenerate clusters and are never a label
   source.
-- Mask vocabulary -- three layers by design, mapped once here: the
-  GEOMETRY names (what rotates; label-free, this module:
-  ``core_virtual_only_mask``, ``no_core_window_exchange_mask``; the
-  label-built ``windows.radial_mask`` is the third), the PURPOSE names
-  (the adapters: relax, virtmix -- what the rung gains), and the
-  campaign AXIS tokens (cells/treatments/store keys). Dictionary:
-  frozen = relax = ``core_virtual_only_mask``;
-  virtmix = ``run_casscf_virtual_mix`` =
-  ``no_core_window_exchange_mask``;
-  radial = ``windows.radial_mask``.
+- Mask vocabulary: every mask name starts with ``mask_`` and states
+  the constraint (what is frozen / what never mixes / which rotations
+  survive). The geometry masks are label-free and live here
+  (``mask_frozen_window``, ``mask_no_core_window_mix``); the
+  label-built ``windows.mask_radial_rotations`` completes the family.
+  The serialized axis tokens of the cell addresses (``frozen``,
+  ``virtmix``, ``radial``) are DATA identifiers, not names -- their
+  mapping to these masks is stated once at the data layer (the cells
+  docstring). The rung-purpose prose (core relaxation, virtual
+  mixing) belongs to docstrings and README, anchored to these names.
 """
 
 from __future__ import annotations
@@ -43,8 +43,8 @@ __all__ = [
     "CASResult",
     "run_casci",
     "constrained_casscf",
-    "core_virtual_only_mask",
-    "no_core_window_exchange_mask",
+    "mask_frozen_window",
+    "mask_no_core_window_mix",
     "run_casscf",
     "run_sa_casscf",
     "run_casscf_core_relax",
@@ -175,7 +175,7 @@ def run_casci(mf, ncas, nelecas, mo_full, chkfile, nroots=1, verbose=0,
 # ---------------------------------------------------------------------------
 
 
-def core_virtual_only_mask(self, nmo, ncore, ncas, frozen):
+def mask_frozen_window(self, nmo, ncore, ncas, frozen):
     """Allowed: ONLY inactive<->virtual rotations; every generator
     touching the active block is blocked -- the window is frozen
     outright (the relax rung; cells axis token ``frozen``)."""
@@ -184,7 +184,7 @@ def core_virtual_only_mask(self, nmo, ncore, ncas, frozen):
     return mask
 
 
-def no_core_window_exchange_mask(self, nmo, ncore, ncas, frozen):
+def mask_no_core_window_mix(self, nmo, ncore, ncas, frozen):
     """Allowed: every rotation INVOLVING a virtual (virtual<->core and
     virtual<->active); blocked: active<->inactive alone -- no orbital
     ever trades places between the core and the active window (the
@@ -286,7 +286,7 @@ def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0,
                           mc_opts: dict = None) -> CASResult:
     """CASSCF with the active-window span frozen ("CASCI + core relaxation").
 
-    Mask :func:`core_virtual_only_mask`: only inactive<->virtual
+    Mask :func:`mask_frozen_window`: only inactive<->virtual
     rotations -- the core polarizes in response to the correlated CI
     density (real physics, typically ~mEh) but no orbital ever enters
     or leaves the window: state identity and window closure preserved
@@ -296,14 +296,14 @@ def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0,
     hidden. ``mc_opts``: per-run optimizer knobs (budgets).
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
-                              mask=core_virtual_only_mask, mc_opts=mc_opts,
+                              mask=mask_frozen_window, mc_opts=mc_opts,
                               name="casscf_relax", verbose=verbose)
 
 
 def run_casscf_virtual_mix(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
     """CASSCF with core<->window exchange blocked ("virtmix" rung).
 
-    Mask :func:`no_core_window_exchange_mask`: active<->virtual and
+    Mask :func:`mask_no_core_window_mix`: active<->virtual and
     inactive<->virtual allowed, active<->inactive blocked -- the window
     borrows radial/polarization character from the virtuals (real
     dynamic correlation; appears as radial correlation in the natural
@@ -311,7 +311,7 @@ def run_casscf_virtual_mix(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CA
     free CASSCF brackets the contributions (README · Motivation).
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
-                              mask=no_core_window_exchange_mask,
+                              mask=mask_no_core_window_mix,
                               name="casscf_virtmix", verbose=verbose)
 
 

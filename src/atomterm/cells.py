@@ -35,7 +35,7 @@ objective / the optimizer freedom / the core)::
 with SINGULAR axis values throughout (``ao``/``mo``/``no``), the
 sector as ``na-nb`` (fixes Ms AND nelec), and ``-`` for no mask
 (free optimization; a mask exists only for optimizer methods --
-``virtmix`` is a MASK -- :func:`atomterm.casscf.no_core_window_exchange_mask
+``virtmix`` is a MASK -- :func:`atomterm.casscf.mask_no_core_window_mix
 -- not a start). NO windows append a prefix index to the label:
 ``<source>no<k>`` (e.g. ``3d4sno2``) = the k-th occupation-group
 prefix of the source's term-averaged density -- the prefix is part of
@@ -404,12 +404,12 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         return analyze_cell(key, mol, mf, workdir=workdir)
     chk.parent.mkdir(parents=True, exist_ok=True)
 
-    from atomterm.casscf import (constrained_casscf, core_virtual_only_mask,
-                                 no_core_window_exchange_mask, run_casci)
+    from atomterm.casscf import (constrained_casscf, mask_frozen_window,
+                                 mask_no_core_window_mix, run_casci)
     from atomterm.core import purified_core_orbitals
     from atomterm.system import ncore_of
     from atomterm.windows import (build_full_mo, occupied_core_idx,
-                                  radial_basis, radial_mask, select_valence_ao)
+                                  radial_basis, mask_radial_rotations, select_valence_ao)
 
     na, nb = key.sector
     ncore = ncore_of(mol.nelectron, na + nb)
@@ -442,7 +442,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         if key.mask == "radial":
             mo_full, labels = radial_basis(
                 mf, occupied_core_idx(mf, ncore), act_idx, c_core=c_pur)
-            mask = radial_mask(labels, ncore, ncas)
+            mask = mask_radial_rotations(labels, ncore, ncas)
         else:
             mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
                                     act_idx, c_core=c_pur)
@@ -460,9 +460,9 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         else:
             mo_full = mf.mo_coeff
     if key.mask == "frozen":
-        mask = core_virtual_only_mask
+        mask = mask_frozen_window
     elif key.mask == "virtmix":
-        mask = no_core_window_exchange_mask
+        mask = mask_no_core_window_mix
 
     verbose = budgets.get("verbose", verbose)
     common = dict(mc_opts=budgets.get("mc_opts"),
