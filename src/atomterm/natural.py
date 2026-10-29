@@ -23,8 +23,6 @@ from __future__ import annotations
 
 import numpy as np
 
-import math
-
 from atomterm.secondquant import annihilate, create
 
 __all__ = [
@@ -196,22 +194,14 @@ def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
     @example: wins = no_group_windows(mol, mf, 9, c_shell, 2, 1,
                                       c_core=c_pur)
     """
-    from atomterm.operators import build_operators
+    from atomterm.detbasis import sector_dimension
+    from atomterm.operators import build_operators, ground_block
     from atomterm.windows import Window
 
     ops = build_operators(mol, mf, c_act, ncore, na, nb, c_core=c_core)
-    dets = ops["dets"]
-    ev, vec = np.linalg.eigh(ops["H"].real)
-    nlow = min(48, len(dets))
-    l2r = np.array([vec[:, r] @ ops["L2"].real @ vec[:, r]
-                    for r in range(nlow)])
-    block = [r for r in range(nlow)
-             if abs(l2r[r] - l2r[0]) < 1e-6 and ev[r] - ev[0] < 1e-6]
-    w = np.zeros(nlow)
-    w[block] = 1.0 / len(block)
-    print(f"[no-arm] source ground block: {len(block)} roots, "
-          f"<L2> = {l2r[0]:.4f}")
-    gamma = ci_rdm1(dets, vec[:, :nlow], c_act.shape[1], weights=w)
+    _, nroots, w, vec = ground_block(ops)  # term-average the ground block
+    print(f"[no-arm] source ground block: {nroots} roots")
+    gamma = ci_rdm1(ops["dets"], vec, c_act.shape[1], weights=w)
     c_no, occ = natural_orbitals(c_act, gamma)
     groups = occupation_groups(occ)
     print(f"[no-arm] occupation groups: {[len(g) for g in groups]}")
@@ -221,7 +211,7 @@ def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
         if n_max < max(na, nb):
             continue          # fewer columns than electrons: no sector
         c_win, _ = select_no_window(c_no, occ, n_max)
-        ndet = math.comb(c_win.shape[1], na) * math.comb(c_win.shape[1], nb)
+        ndet = sector_dimension(c_win.shape[1], na, nb)
         assert ndet <= cap, (nk, ndet)   # cost stop (approved cap)
         out.append(Window(f"no{nk}", None, c_win, True))
     assert out, "no usable NO windows"

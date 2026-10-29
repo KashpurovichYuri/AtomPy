@@ -35,17 +35,23 @@ from atomterm.casscf import (
     run_casscf_core_relax,
     run_casci,
 )
+from atomterm.detbasis import sector_dimension
 from atomterm.natural import (
     ci_rdm1,
     natural_orbitals,
     occupation_groups,
     select_no_window,
 )
-from atomterm.operators import build_operators, window_closure
+from atomterm.operators import (
+    build_operators,
+    ci_in_detbasis_order,
+    ground_block,
+    window_closure,
+)
 from atomterm.windows import Window, occupied_core_idx
 
 __all__ = ["StudySpec", "CellResult", "plan_study", "run_study",
-           "render", "ground_block", "inject_markers"]
+           "render", "inject_markers"]
 
 TREATMENTS = ("casci", "relax", "sa-casscf")
 
@@ -93,22 +99,6 @@ def _wtag(w) -> str:
     return "".join(ch if ch.isalnum() else "_" for ch in w.label).strip("_")
 
 
-def ground_block(mol, mf, ncore: int, c_act, na: int, nb: int,
-                 c_core: np.ndarray = None):
-    """The frozen ground-term block of a window, MEASURED: the exact
-    eigenspace at ev[0] with its own <L^2>. Returns (ev0, nroots,
-    weights) -- the SA anchoring rule (never hardcode a term)."""
-    ops = build_operators(mol, mf, c_act, ncore, na, nb, c_core=c_core)
-    ev, vec = np.linalg.eigh(ops["H"].real)
-    nchk = min(60, len(ev))
-    l2 = [vec[:, r] @ ops["L2"].real @ vec[:, r] for r in range(nchk)]
-    block = [r for r in range(nchk)
-             if abs(l2[r] - l2[0]) < 1e-6 and ev[r] - ev[0] < 1e-6]
-    w = np.zeros(len(ev))
-    w[block] = 1.0 / len(block)
-    return float(ev[0]), len(block), w
-
-
 def plan_study(spec: StudySpec, mol=None) -> str:
     """The intent manifest: exactly what will run, before anything runs."""
     lines = [f"STUDY {spec.label}: sector (na, nb) = ({spec.na}, {spec.nb});"
@@ -117,7 +107,7 @@ def plan_study(spec: StudySpec, mol=None) -> str:
     for w in spec.windows:
         ncas = (len(w.ao_rows) if w.ao_rows is not None
                 else w.c_win.shape[1])
-        ndet = _ndet(ncas, spec.na, spec.nb)
+        ndet = sector_dimension(ncas, spec.na, spec.nb)
         gb = ndet ** 2 * 16 / 2 ** 30
         lines.append(f"  [{w.label}] ncas = {ncas}, dets = {ndet}"
                      f" (eigh matrix ~{gb:.1f} GiB), m_complete ="
@@ -126,11 +116,6 @@ def plan_study(spec: StudySpec, mol=None) -> str:
     lines.append("  cells: " + "; ".join(
         f"{_wtag(w)}x{t}" for w in spec.windows for t in spec.treatments))
     return "\n".join(lines)
-
-
-def _ndet(ncas, na, nb):
-    from math import comb
-    return comb(ncas, na) * comb(ncas, nb)
 
 
 def run_study(spec: StudySpec, mol, mf, out: str | Path,
@@ -174,9 +159,9 @@ def run_study(spec: StudySpec, mol, mf, out: str | Path,
                     if spec.sa_weights is not None:
                         weights = list(spec.sa_weights)
                     else:
-                        _, nroots, wts = ground_block(
-                            mol, mf, spec.ncore, c_act, spec.na, spec.nb,
-                            c_core=c_core)
+                        _, nroots, wts, _ = ground_block(build_operators(
+                            mol, mf, c_act, spec.ncore, spec.na, spec.nb,
+                            c_core=c_core))
                         weights = list(wts)
                     cas = constrained_casscf(
                         mf, ncas, (spec.na, spec.nb), chk, mo_full=mo,
@@ -187,7 +172,7 @@ def run_study(spec: StudySpec, mol, mf, out: str | Path,
                     raise ValueError(t)
                 res = {"key": key, "status": "ok",
                        "energy": float(cas.energies[0]),
-                       "dets": int(_ndet(ncas, spec.na, spec.nb)),
+                       "dets": int(sector_dimension(ncas, spec.na, spec.nb)),
                        "span_lz": wc["lz"], "span_lperp": wc["lperp"],
                        "converged": bool(getattr(cas.mc, "converged",
                                                  True))}
@@ -197,7 +182,6 @@ def run_study(spec: StudySpec, mol, mf, out: str | Path,
                     # pyscf FCI ordering -> detbasis ordering before
                     # contracting our operator matrices (they differ
                     # for norb >= 4 with >= 2 electrons in a block)
-                    from atomterm.cells import ci_in_detbasis_order
                     ci = ci_in_detbasis_order(cas.ci[0], ncas,
                                               spec.na, spec.nb)
                     res["l2"] = float(ci @ ops["L2"].real @ ci)

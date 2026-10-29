@@ -14,12 +14,12 @@ one-declaration rule).
 from __future__ import annotations
 
 import json
-import math
 from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
 
+from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
 from atomterm.reference import ReferenceSpec, run_rohf
 from atomterm.windows import build_full_mo, occupied_core_idx, select_valence_ao
@@ -33,11 +33,6 @@ from atomterm.analysis import format_report
 
 __all__ = ["CaseSpec", "CAMPAIGN", "run_case", "run_atom", "run_carbon",
            "main"]
-
-
-def _ndet(ncas: int, na: int, nb: int) -> int:
-    """Determinants in a sector: C(norb, na) * C(norb, nb)."""
-    return math.comb(ncas, na) * math.comb(ncas, nb)
 
 
 def _ms_label(na: int, nb: int) -> str:
@@ -278,10 +273,10 @@ def run_atom(
 
     # Ms sectors: (na, nb, nroots) for each CASCI diagonalization
     na_p, nb_p = sector_na_nb(nelec_act, spin)
-    sector_defs = [(na_p, nb_p, min(nroots_primary, _ndet(ncas, na_p, nb_p)))]
+    sector_defs = [(na_p, nb_p, min(nroots_primary, sector_dimension(ncas, na_p, nb_p)))]
     if nelec_act % 2 == 0 and spin > 0:
         na0 = nelec_act // 2
-        sector_defs.append((na0, na0, _ndet(ncas, na0, na0)))
+        sector_defs.append((na0, na0, sector_dimension(ncas, na0, na0)))
 
     results: dict[str, dict] = {"rohf_energy": float(mf.e_tot)}
     reports: list[str] = []

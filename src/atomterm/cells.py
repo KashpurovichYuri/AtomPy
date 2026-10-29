@@ -45,22 +45,13 @@ different addresses.
 The store contract (one chkfile per cell,
 ``elements/<Atom>/rungs/<address>.chk``): everything ``load_cell`` needs
 under ``atomterm/<address>/`` -- ``energies``, ``ci_stack`` (a plain
-``(nroots, ndet)`` array; PySCF's object-array serialization does not
-round-trip for 2-D roots), ``core_energy``, ``mo_coeff`` (SA runs:
-per-root energies under ``<address>_roots``). The PySCF ``mcscf``
-group is NOT load-bearing: this PySCF's CASCI kernel never dumps a
-chkfile, so the cell layer owns a complete, method-uniform store.
-
-The CI ordering bridge: PySCF FCI vectors are indexed by
-``(alpha-string address, beta-string address)`` with strings in
-INTEGER-ASCENDING bit order, while :func:`atomterm.detbasis.determinant_basis`
-enumerates lexicographic combinations -- these coincide only for
-trivial sectors (norb=3, or nelec<=1 per block) and DIFFER everywhere
-else (first at norb=4, na=2). Every consumer that indexes or contracts
-a PySCF CI vector against detbasis-order objects must map through
-:func:`pyscf_ci_permutation` first; the bridge is certified by the
-eigen-equation test (generic integrals admit no permutation
-automorphism).
+``(nroots, ndet)`` array in PYSCF FCI ordering; PySCF's object-array
+serialization does not round-trip for 2-D roots -- map through
+:func:`atomterm.operators.ci_in_detbasis_order` before any
+detbasis-order use), ``core_energy``, ``mo_coeff`` (SA runs: per-root
+energies under ``<address>_roots``). The PySCF ``mcscf`` group is NOT
+load-bearing: this PySCF's CASCI kernel never dumps a chkfile, so the
+cell layer owns a complete, method-uniform store.
 """
 
 from __future__ import annotations
@@ -72,7 +63,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from atomterm.detbasis import determinant_basis
+from atomterm.detbasis import sector_dimension
 
 if TYPE_CHECKING:  # the declaration groups consume the intent manifest;
     from atomterm.cases import CaseSpec  # annotation-only (no cycle)
@@ -90,8 +81,6 @@ __all__ = [
     "grid_keys",
     "diagnostics",
     "planned",
-    "pyscf_ci_permutation",
-    "ci_in_detbasis_order",
 ]
 
 METHODS = ("casci", "casscf", "sa")
@@ -302,53 +291,6 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
                     int(ncas) if ncas is not None else 0)
 
 
-# ---------------------------------------------------------------------
-# The CI ordering bridge: pyscf FCI ordering <-> detbasis ordering.
-# ---------------------------------------------------------------------
-
-
-def pyscf_ci_permutation(norb: int, na: int, nb: int) -> np.ndarray:
-    """Map ravelled PySCF CI amplitudes onto the detbasis ordering.
-
-    PySCF's direct_spin1 vector ``v`` (shape ``(nalpha_strings,
-    nbeta_strings)``, ravelled alpha-major) indexes determinants by
-    string ADDRESSES (integer-ascending bit strings); detbasis
-    enumerates lexicographic combinations. These orders differ for
-    norb >= 4 once a block holds >= 2 electrons -- coinciding only in
-    trivial sectors (carbon's norb=3 window is why the difference went
-    unnoticed).
-
-    Returns ``perm`` with ``v[perm[k]] == w_detbasis[k]``-semantics:
-    the pyscf amplitude at ravelled index ``k`` belongs to determinant
-    ``determinant_basis(norb, na, nb)[perm[k]]``. Scatter with
-    ``w[perm] = v`` (or use :func:`ci_in_detbasis_order`).
-    """
-    from pyscf.fci import cistring
-
-    dets = determinant_basis(norb, na, nb)
-    index = {d: i for i, d in enumerate(dets)}
-    a_strs = cistring.make_strings(range(norb), na)  # index == address
-    b_strs = cistring.make_strings(range(norb), nb)
-    perm = np.empty(len(dets), dtype=np.int64)
-    k = 0
-    for sa in a_strs:
-        occ_a = [i for i in range(norb) if sa >> i & 1]  # orbital i = bit i
-        for sb in b_strs:
-            occ_b = [i for i in range(norb) if sb >> i & 1]
-            det = tuple(sorted(occ_a)) + tuple(o + norb for o in occ_b)
-            perm[k] = index[det]
-            k += 1
-    return perm
-
-
-def ci_in_detbasis_order(v: np.ndarray, norb: int, na: int, nb: int) -> np.ndarray:
-    """One ravelled PySCF CI vector, reordered to detbasis indexing."""
-    v = np.asarray(v).ravel()
-    w = np.empty_like(v)
-    w[pyscf_ci_permutation(norb, na, nb)] = v
-    return w
-
-
 # --------------------------------------------------------------- execution
 
 
@@ -383,7 +325,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     budgets : per-run knobs that are NOT cell identity:
         ``mc_opts``/``fci_opts`` (optimizer/solver), ``sa_weights``
         (default: uniform over the MEASURED ground block of the start
-        window -- study.ground_block, the SA-anchoring rule), ``verbose``.
+        window -- :func:`atomterm.operators.ground_block`, the
+        SA-anchoring rule), ``verbose``.
     fresh : ignore a stored cell and re-run (a cache hit otherwise
         re-analyzes the stored run -- budgets are then ignored).
 
@@ -468,20 +411,19 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     common = dict(mc_opts=budgets.get("mc_opts"),
                   fci_opts=budgets.get("fci_opts"), verbose=verbose)
     if key.method == "casci":
-        from math import comb
-
-        ndet = comb(ncas, na) * comb(ncas, nb)
+        ndet = sector_dimension(ncas, na, nb)
         cas = run_casci(mf, ncas, (na, nb), mo_full, str(chk),
                         nroots=min(9, ndet), name=key.address,
                         verbose=verbose, fci_opts=common["fci_opts"])
     else:
         weights = budgets.get("sa_weights") if key.method == "sa" else None
         if key.method == "sa" and weights is None:
-            from atomterm.study import ground_block  # the SA-anchoring rule
+            from atomterm.operators import build_operators, ground_block
 
             c_act0 = mo_full[:, ncore:ncore + ncas]
-            _, _, weights = ground_block(mol, mf, ncore, c_act0, na, nb,
-                                         c_core=c_pur)
+            ops0 = build_operators(mol, mf, c_act0, ncore, na, nb,
+                                   c_core=c_pur)
+            _, _, weights, _ = ground_block(ops0)  # the SA-anchoring rule
             weights = list(weights)
         cas = constrained_casscf(mf, ncas, (na, nb), str(chk),
                                  mo_full=mo_full, mask=mask, weights=weights,

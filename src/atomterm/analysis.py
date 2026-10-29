@@ -20,6 +20,7 @@ import json
 import numpy as np
 
 from atomterm.detbasis import commutator, determinant_basis, frobenius_norm
+from atomterm.operators import ci_in_detbasis_order
 from atomterm.windows import l_per_row, shell_weights
 
 __all__ = [
@@ -299,9 +300,6 @@ def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
     over radials/l -- the label then reports the dominant character
     (enough to tell a 3p^2 state from an escaped 3s^2 one).
     """
-    from atomterm.cells import ci_in_detbasis_order  # lazy on purpose:
-    # cells -> stages -> analysis is a module-level cycle
-
     names, wl = shell_weights(mol, c_win, s)  # (ncas, n_l)
     norb = c_win.shape[1]
     dets = determinant_basis(norb, na, nb)
@@ -355,8 +353,6 @@ def shell_occupations(mol, s, c_win: np.ndarray, ci_ground, na: int,
     content).
     """
     from atomterm.natural import ci_rdm1
-    from atomterm.cells import ci_in_detbasis_order  # lazy: the
-    # cells -> stages -> analysis module cycle
 
     norb = c_win.shape[1]
     dets = determinant_basis(norb, na, nb)

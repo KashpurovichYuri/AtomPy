@@ -23,6 +23,14 @@ Conventions
   ``fci.direct_spin1``). The transpose happens exactly ONCE, in
   ``_physicist_eri``; passing ``g`` to PySCF FCI needs
   ``g.transpose(0, 2, 1, 3)``.
+* PySCF FCI vectors order determinants by (alpha-string address,
+  beta-string address) in integer-ascending bit order, while detbasis
+  enumerates lexicographic combinations -- the two coincide only in
+  trivial sectors (norb <= 3, or <= 1 electron per spin block) and
+  differ everywhere else (first at norb=4, na=2).
+  :func:`pyscf_ci_permutation` is the ONE bridge: every consumer that
+  indexes or contracts a PySCF CI vector against detbasis-order
+  objects maps through it first.
 """
 
 from __future__ import annotations
@@ -56,6 +64,9 @@ __all__ = [
     "l2_operator_parts",
     "window_closure",
     "core_anisotropy",
+    "ground_block",
+    "pyscf_ci_permutation",
+    "ci_in_detbasis_order",
     "s2_operator_parts",
     "spin_ladders",
     "spin_ladder_matrix",
@@ -221,6 +232,55 @@ def full_space_integrals(mol, mf, w: np.ndarray):
     h1 = _mo_transform(mf.get_hcore(), w)
     g = _physicist_eri(mol.intor("int2e", aosym="s1"), w)
     return h1, g
+
+
+def pyscf_ci_permutation(norb: int, na: int, nb: int) -> np.ndarray:
+    """Map ravelled PySCF CI amplitudes onto the detbasis ordering.
+
+    PySCF's direct_spin1 vector ``v`` (shape ``(nalpha_strings,
+    nbeta_strings)``, ravelled alpha-major) indexes determinants by
+    string ADDRESSES (integer-ascending bit strings); detbasis
+    enumerates lexicographic combinations. These orders differ for
+    norb >= 4 once a block holds >= 2 electrons -- coinciding only in
+    trivial sectors (carbon's norb=3 window is why the difference went
+    unnoticed).
+
+    Returns ``perm`` with ``v[perm[k]] == w_detbasis[k]``-semantics:
+    the pyscf amplitude at ravelled index ``k`` belongs to determinant
+    ``determinant_basis(norb, na, nb)[perm[k]]``. Scatter with
+    ``w[perm] = v`` (or use :func:`ci_in_detbasis_order`).
+
+    Certified by the eigen-equation test: a PySCF-solved vector,
+    mapped and contracted against the independently built
+    Slater-Condon Hamiltonian, satisfies ``H w = e w`` -- generic
+    integrals admit no permutation automorphism, so a wrong mapping
+    cannot pass.
+    """
+    from pyscf.fci import cistring
+
+    dets = determinant_basis(norb, na, nb)
+    index = {d: i for i, d in enumerate(dets)}
+    a_strs = cistring.make_strings(range(norb), na)  # index == address
+    b_strs = cistring.make_strings(range(norb), nb)
+    perm = np.empty(len(dets), dtype=np.int64)
+    k = 0
+    for sa in a_strs:
+        occ_a = [i for i in range(norb) if sa >> i & 1]  # orbital i = bit i
+        for sb in b_strs:
+            occ_b = [i for i in range(norb) if sb >> i & 1]
+            det = tuple(sorted(occ_a)) + tuple(o + norb for o in occ_b)
+            perm[k] = index[det]
+            k += 1
+    return perm
+
+
+def ci_in_detbasis_order(v: np.ndarray, norb: int, na: int,
+                         nb: int) -> np.ndarray:
+    """One ravelled PySCF CI vector, reordered to detbasis indexing."""
+    v = np.asarray(v).ravel()
+    w = np.empty_like(v)
+    w[pyscf_ci_permutation(norb, na, nb)] = v
+    return w
 
 
 # --------------------------------------------------------- one-body symbols
@@ -533,6 +593,33 @@ def core_anisotropy(mol, mf, ncore: int, c_core: np.ndarray = None) -> float:
     d = 2.0 * c_core @ c_core.conj().T
     d_sph = _spherical_average_density(mol, d)
     return float(frobenius_norm(d - d_sph) / frobenius_norm(d_sph))
+
+
+def ground_block(ops: dict) -> tuple[float, int, np.ndarray, np.ndarray]:
+    """The frozen ground-term block of an operator set, MEASURED: the
+    exact eigenspace at ``ev[0]`` sharing its ``<L^2>``.
+
+    Returns ``(ev0, nroots, weights, vec)``: the ground energy, the
+    block size, uniform weights over the block, and the eigenvectors
+    of the solve (returned so callers that need them -- e.g. the NO
+    source density -- never repeat the eigh). One helper for every
+    consumer that needs "the ground term's states" rather than "the
+    lowest nroots states": the SA-anchoring rule and the NO-source
+    averaging rule (never hardcode a term).
+
+    Parameters
+    ----------
+    ops : a :func:`build_operators` dict -- the block is measured on
+        that operator set.
+    """
+    ev, vec = np.linalg.eigh(ops["H"].real)
+    nchk = min(60, len(ev))
+    l2 = [vec[:, r] @ ops["L2"].real @ vec[:, r] for r in range(nchk)]
+    block = [r for r in range(nchk)
+             if abs(l2[r] - l2[0]) < 1e-6 and ev[r] - ev[0] < 1e-6]
+    w = np.zeros(len(ev))
+    w[block] = 1.0 / len(block)
+    return float(ev[0]), len(block), w, vec
 
 
 # -------------------------------------------------------------- the assembly

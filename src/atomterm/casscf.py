@@ -72,7 +72,7 @@ class CASResult:
     ci : list
         CI vectors per root, PySCF order -- consumers indexing them
         against detbasis-order objects must map through
-        ``cells.pyscf_ci_permutation`` (the ordering bridge).
+        ``operators.pyscf_ci_permutation`` (the ordering bridge).
     mo_coeff : np.ndarray or None
         The converged FULL MO matrix.
     mc : object or None

@@ -140,7 +140,7 @@ def report(mol, mf, c_pur, tag, cas, anchor):
     # clusters (the run_u.py disease) -- never trust it for <L^2>.
     # (also: pyscf FCI ordering -> detbasis ordering before contracting
     # our matrices -- they differ at this norb; the cells bridge)
-    from atomterm.cells import ci_in_detbasis_order
+    from atomterm.operators import ci_in_detbasis_order
     ev_x, vec_x = np.linalg.eigh(ops_own["H"].real)
     ci = ci_in_detbasis_order(cas.ci[0], ncas, NA, NB)
     l2_ci = float(ci @ ops_pur["L2"].real @ ci)
@@ -252,7 +252,7 @@ def stage_sa(nk=2):
     wc = window_closure(mol, c_act)
     print(f"  span: |[P,Lz]| = {wc['lz']:.2e}  |[P,Lperp]| = {wc['lperp']:.2e}")
     print(f"  root          E, Eh      <L2>      <S2>    dE vs frozen (mEh)")
-    from atomterm.cells import ci_in_detbasis_order
+    from atomterm.operators import ci_in_detbasis_order
     # (pyscf FCI ordering -> detbasis ordering; see the bridge)
     # window-identity meter: total f/d S-weight over the converged
     # columns (start: 7.000 f / 5.000 d for the nk=2 group window) --

@@ -20,7 +20,8 @@ Conventions
 
 The determinant ordering here (lexicographic over the (alpha, beta)
 combinations) is NOT PySCF's FCI string order -- they differ from
-``norb >= 4``; the mapping lives in ``cells.pyscf_ci_permutation``.
+``norb >= 4``; the mapping lives in
+``operators.pyscf_ci_permutation`` (this module stays NumPy-only).
 This module is deliberately NumPy-only (no pyscf import), testable in
 complete isolation.
 """
@@ -30,11 +31,13 @@ from __future__ import annotations
 from itertools import combinations
 from typing import NamedTuple
 import bisect
+import math
 
 import numpy as np
 
 __all__ = [
     "determinant_basis",
+    "sector_dimension",
     "one_body_matrix",
     "two_body_matrix",
     "slater_condon_matrix",
@@ -65,6 +68,15 @@ def determinant_basis(norb: int, na: int, nb: int) -> list[tuple[int, ...]]:
         for occ_b in combinations(range(norb), nb):
             dets.append(tuple(sorted(occ_a)) + tuple(o + norb for o in occ_b))
     return dets
+
+
+def sector_dimension(norb: int, na: int, nb: int) -> int:
+    """The number of determinants of a sector: C(norb, na) * C(norb, nb).
+
+    Equals ``len(determinant_basis(norb, na, nb))`` without building the
+    basis -- the size budget every enumeration caller needs first.
+    """
+    return math.comb(norb, na) * math.comb(norb, nb)
 
 
 def _pop_sign(occ: list[int], orb: int) -> int:

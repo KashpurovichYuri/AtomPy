@@ -18,16 +18,15 @@ from atomterm.cells import (
     CellData,
     CellKey,
     cell_chk,
-    ci_in_detbasis_order,
     diagnostics,
     grid_keys,
     load_cell,
     planned,
-    pyscf_ci_permutation,
     spine_keys,
     window_grid,
 )
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
+from atomterm.operators import ci_in_detbasis_order, pyscf_ci_permutation
 from atomterm.windows import span_overlap
 
 # mixed tiers in one module (1:1 with src): the key/bridge/store tests
