@@ -48,6 +48,7 @@ import numpy as np
 from run_u import CFG, CHK, NCORE, REF, build_window
 from run_u_no import BANDS, CAMPAIGN_TOTAL, closed_shell_core_energy
 from atomterm import drivers
+from atomterm.casscf import constrained_casscf, mask_frozen_window
 from atomterm.detbasis import commutator, frobenius_norm
 from atomterm.natural import ci_rdm1, natural_orbitals, occupation_groups
 from atomterm.operators import (
@@ -297,7 +298,8 @@ def stage_relax():
     for nk in (1, 2, 3):
         ncas = sum(len(groups[i]) for i in range(nk))
         mo, _ = no_start(mf, c_pur, c_no, groups, nk)
-        cas = drivers.run_casscf_core_relax(mf, ncas, (NA, NB), mo, CHK)
+        cas = constrained_casscf(mf, ncas, (NA, NB), CHK, mo_full=mo,
+                                 mask=mask_frozen_window)
         report(mol, mf, c_pur, f"relax/no-{ncas}col", cas, ANCHOR[ncas])
 
 

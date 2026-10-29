@@ -45,9 +45,6 @@ from atomterm.casscf import (  # noqa: F401
     mask_no_core_window_mix,
     run_casci,
     run_casscf,
-    run_casscf_core_relax,
-    run_casscf_pyscf_start,
-    run_casscf_virtual_mix,
     run_sa_casscf,
 )
 
@@ -74,9 +71,6 @@ __all__ = [
     "mask_no_core_window_mix",
     "run_casscf",
     "run_sa_casscf",
-    "run_casscf_core_relax",
-    "run_casscf_virtual_mix",
-    "run_casscf_pyscf_start",
     "window_avas",
     "span_overlap",
     "CASResult",

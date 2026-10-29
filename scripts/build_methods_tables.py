@@ -31,7 +31,8 @@ Applicability: the Ti-style factor-grid tables (WINDOWS below; the
 window set and every cell address come from the declaration --
 ``cases.CAMPAIGN`` via ``cells.grid_keys``/``cells.planned``; this file
 owns presentation only: headings, notes, value formatting). The study
-inserts stay with atomterm.study.render; the per-atom summary tables
+inserts are frozen history (the study module retired 2026-10-29 --
+its generated sections stay as committed data); the per-atom summary tables
 (C/Si/Sc) stay hand-curated until their manifests migrate.
 
 THE BRANCH RULE (ticket 29 T1b): rows branch on key IDENTITY only

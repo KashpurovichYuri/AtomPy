@@ -1,6 +1,8 @@
 """The orbital-optimization engine: CASCI, CASSCF, and SA-CASSCF --
 one deep driver (constrained_casscf) with declarative restriction
-masks, plus the one-line rung adapters.
+masks, plus the classic pipeline's stage adapters (run_casscf,
+run_sa_casscf -- the cases stage names; every other recipe is a direct
+constrained_casscf call, as cells does).
 
 Conventions
 -----------
@@ -47,9 +49,6 @@ __all__ = [
     "mask_no_core_window_mix",
     "run_casscf",
     "run_sa_casscf",
-    "run_casscf_core_relax",
-    "run_casscf_virtual_mix",
-    "run_casscf_pyscf_start",
 ]
 
 
@@ -265,10 +264,11 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
     return res
 
 
-# ----------------------------------------------------------------- adapters
+# ------------------------------------------------------------ stage adapters
 # One line each: a named (start, mask, weights) recipe over the ONE
-# driver -- a new rung is a new adapter or a direct constrained_casscf
-# call, never a new kernel path.
+# driver. The two survivors are the classic pipeline's stage names
+# (cases); anything else calls constrained_casscf directly (cells) --
+# never a new kernel path.
 
 def run_casscf(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
     """Free CASSCF from the given start.
@@ -293,56 +293,5 @@ def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               weights=list(weights), mask=mask,
                               name="sa_casscf", verbose=verbose)
-
-
-def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0,
-                          mc_opts: dict | None = None) -> CASResult:
-    """CASSCF with the active-window span frozen ("CASCI + core relaxation").
-
-    Mask :func:`mask_frozen_window`: only inactive<->virtual
-    rotations -- the core polarizes in response to the correlated CI
-    density (real physics, typically ~mEh) but no orbital ever enters
-    or leaves the window: state identity and window closure preserved
-    by construction. Peculiarity: the relaxed core is slightly
-    anisotropic; the analysis fold averages it, so the rung's
-    ``max|dE|`` vs PySCF measures that anisotropy -- reported, not
-    hidden.
-
-    Parameters: as :func:`constrained_casscf` plus ``mc_opts``
-    (per-run optimizer budgets).
-    """
-    return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
-                              mask=mask_frozen_window, mc_opts=mc_opts,
-                              name="casscf_relax", verbose=verbose)
-
-
-def run_casscf_virtual_mix(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
-    """CASSCF with core<->window exchange blocked ("virtmix" rung).
-
-    Mask :func:`mask_no_core_window_mix`: active<->virtual and
-    inactive<->virtual allowed, active<->inactive blocked -- the window
-    borrows radial/polarization character from the virtuals (real
-    dynamic correlation; appears as radial correlation in the natural
-    orbitals) but the state's identity cannot change. relax < virtmix <
-    free CASSCF brackets the contributions (README · Motivation).
-
-    Parameters: as :func:`constrained_casscf`.
-    """
-    return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
-                              mask=mask_no_core_window_mix,
-                              name="casscf_virtmix", verbose=verbose)
-
-
-def run_casscf_pyscf_start(mf, ncas, nelecas, chkfile, verbose=0) -> CASResult:
-    """CASSCF from PySCF's own default guess (canonical ROHF MOs, active =
-    the canonical window ``[ncore:ncore+ncas]``), NOT the raw shell columns.
-    Isolates the start-dependence of the optimizer basin (compare with
-    :func:`run_casscf` on the same system).
-
-    Parameters: as :func:`constrained_casscf` with no ``mo_full`` --
-    PySCF's default start IS the experiment.
-    """
-    return constrained_casscf(mf, ncas, nelecas, chkfile,
-                              name="casscf_pyscf", verbose=verbose)
 
 
