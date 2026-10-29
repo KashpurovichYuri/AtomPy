@@ -224,6 +224,28 @@ comm band (test_treatments line ~817) failed in 2 of 4 full
 sessions on 2026-10-29, isolation-green 4/4, value uncaptured --
 no widening without the observed value; capture it if it recurs.
 
+ARCHITECTURE SNAPSHOT (2026-10-29, edge-verified by grep over the
+top-level imports -- the phase-7 design-survey input; corrects the
+conversation diagram that omitted windows/system and misplace
+natural at declaration level):
+
+    pure math      system · detbasis · secondquant · natural
+    substrate      windows (the hub: angular, operators, core,
+                   reference, stages, analysis, cases all import it)
+    1-particle     angular (uses windows' shell_slots)
+    assembly       operators (angular · detbasis · secondquant ·
+                   windows; both PySCF boundaries)
+    engines        reference · core · casscf
+    analysis       analysis · stages · scans
+    declaration    cases -> cells
+
+windows -> natural is correctly directed (the kind registry's 'no'
+kind needs the NO mathematics; natural is pure math, imports only
+secondquant). Division of labor over windows: declaration NAMES
+(labels), windows BUILDS (five kinds + substrate builders), cells
+BINDS (the start axis picks the builder). No cycles, no upward
+edges.
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE
