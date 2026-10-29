@@ -95,12 +95,12 @@ AUDIT = {
     "ti_3d4s_3-1_casscf_ao_radial_pur_avg": "gauge",
     "ti_3d4s_3-1_casscf_ao_frozen_pol_avg": "baseline",
     "ti_3d4s_3-1_casscf_ao_frozen_pur_avg": "exact (pur)",
-    "ti_3d4s_3-1_sa_ao_-_pol_avg": "swap",
-    "ti_3d4s_3-1_sa_ao_-_pur_avg": "swap (pur)",
-    "ti_3d4s_3-1_sa_mo_-_pol_avg": "escape",
-    "ti_3d4s_3-1_sa_ao_radial_pol_avg": "floor",
-    "ti_3d4s_3-1_sa_ao_radial_pur_avg": "floor",
-    "ti_3d4s_3-1_sa_ao_frozen_pur_avg": "exact",
+    "ti_3d4s_3-1_sa-casscf_ao_-_pol_avg": "swap",
+    "ti_3d4s_3-1_sa-casscf_ao_-_pur_avg": "swap (pur)",
+    "ti_3d4s_3-1_sa-casscf_mo_-_pol_avg": "escape",
+    "ti_3d4s_3-1_sa-casscf_ao_radial_pol_avg": "floor",
+    "ti_3d4s_3-1_sa-casscf_ao_radial_pur_avg": "floor",
+    "ti_3d4s_3-1_sa-casscf_ao_frozen_pur_avg": "exact",
     # ---- the grid completion (this draw) ----
     "ti_3d4s_3-1_casscf_ao_-_pur_avg": "escape",
     "ti_3d4sno2_3-1_casscf_no_-_pol_avg": "escape (same minimum)",
@@ -108,12 +108,12 @@ AUDIT = {
     "ti_3d4s_3-1_casscf_mo_frozen_pol_avg": "MO start was not closed",
     "ti_3d4sno2_3-1_casscf_no_frozen_pol_avg": "baseline",
     "ti_3d4sno2_3-1_casscf_no_frozen_pur_avg": "exact (pur)",
-    "ti_3d4sno2_3-1_sa_no_-_pol_avg": "swap",
-    "ti_3d4sno2_3-1_sa_no_-_pur_avg": "swap (pur)",
-    "ti_3d4s_3-1_sa_ao_frozen_pol_avg": "baseline",
-    "ti_3d4s_3-1_sa_mo_frozen_pol_avg": "MO start was not closed",
-    "ti_3d4sno2_3-1_sa_no_frozen_pol_avg": "baseline",
-    "ti_3d4sno2_3-1_sa_no_frozen_pur_avg": "exact",
+    "ti_3d4sno2_3-1_sa-casscf_no_-_pol_avg": "swap",
+    "ti_3d4sno2_3-1_sa-casscf_no_-_pur_avg": "swap (pur)",
+    "ti_3d4s_3-1_sa-casscf_ao_frozen_pol_avg": "baseline",
+    "ti_3d4s_3-1_sa-casscf_mo_frozen_pol_avg": "MO start was not closed",
+    "ti_3d4sno2_3-1_sa-casscf_no_frozen_pol_avg": "baseline",
+    "ti_3d4sno2_3-1_sa-casscf_no_frozen_pur_avg": "exact",
 }
 
 HEAD = ("| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | "
@@ -123,7 +123,7 @@ SEP = "|" + "---|" * 16
 
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "**CASCI**", "casscf": "**CASSCF**",
-                "sa": "**SA-CASSCF**"}
+                "sa-casscf": "**SA-CASSCF**"}
 START_NAMES = {"mo": "PySCF MO", "no": "NO"}
 MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen window",
               "virtmix": "virtual-mix"}

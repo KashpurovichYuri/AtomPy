@@ -5,7 +5,7 @@ store.
 A *cell* is THE unit of computation and analysis (one grid point of the
 manifest): the run, its checkpoint, its payload, and its table row are
 all addressed by one :class:`CellKey`, serialized as the cell
-*address* -- ``ti_3d4s_3-1_sa_no_free_pur_avg``. Axes resolve through
+*address* -- ``ti_3d4s_3-1_sa-casscf_no_free_pur_avg``. Axes resolve through
 their OWNING modules (:mod:`atomterm.windows`, :mod:`atomterm.core`,
 :mod:`atomterm.casscf`, :mod:`atomterm.stages`) -- cells never
 re-implement physics.
@@ -92,7 +92,7 @@ __all__ = [
     "planned",
 ]
 
-METHODS = ("casci", "casscf", "sa")
+METHODS = ("casci", "casscf", "sa-casscf")
 STARTS = ("ao", "mo", "no")       # window constructions (the span is the window)
 MASKS = ("radial", "frozen", "virtmix")   # None = free optimization
 SUBSTRATES = ("pol", "pur")
@@ -117,7 +117,7 @@ class CellKey:
         span, start = the columns defining it).
     sector : ``(na, nb)`` -- alpha/beta active electrons; fixes Ms
         and nelec together.
-    method : ``"casci"`` | ``"casscf"`` | ``"sa"``.
+    method : ``"casci"`` | ``"casscf"`` | ``"sa-casscf"``.
     start : ``"ao"`` (shell AOs) | ``"mo"`` (canonical SCF slice) |
         ``"no"`` (natural-orbital groups; the label grammar is
         ``<source>no<k>``, see :attr:`no_source`).
@@ -169,15 +169,16 @@ class CellKey:
             if self.mask not in MASKS:
                 raise ValueError(f"mask {self.mask!r} not in {MASKS} (None = free)")
             if self.method == "casci":
-                raise ValueError("a mask needs an optimizer method (casscf/sa)")
+                raise ValueError("a mask needs an optimizer method "
+                                 "(casscf/sa-casscf)")
             if self.mask == "radial" and self.start != "ao":
                 raise ValueError(
                     "the radial mask rotates member-labeled AO slots; it "
                     "needs start='ao' (MO and NO columns carry no member "
                     "labels)")
-        # (mo, pur) is valid since the window-projection builder: the
-        # canonical columns re-orthogonalized against the pur core span
-        # -- see the mo branch in run_cell.
+        # (mo, pur) is valid: the canonical columns are
+        # re-orthogonalized against the pur core span (run_cell's mo
+        # branch).
         # the pur-fold degeneracy rule: on the purified substrate the
         # core density is exactly m-scalar, so raw == avg --
         # canonicalize instead of storing two addresses for one cell;
@@ -294,8 +295,8 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
     FileNotFoundError
         No chkfile for the address (run the cell first).
     KeyError
-        The store is incomplete or predates the cell layer --
-        regenerate the cell.
+        The store is incomplete or the chkfile predates the store
+        contract -- regenerate the cell.
     """
     chk = cell_chk(key, workdir)
     if not chk.exists():
@@ -314,8 +315,8 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
     mo = lib.chkfile.load(str(chk), f"atomterm/{key.address}/mo_coeff")
     if mo is None:
         raise KeyError(
-            f"{chk} has no atomterm/{key.address}/mo_coeff (a pre-cell "
-            "chkfile); regenerate the cell")
+            f"{chk} has no atomterm/{key.address}/mo_coeff (the "
+            "chkfile predates the store contract); regenerate the cell")
     energies, ci, core_energy = store
     ncas = lib.chkfile.load(str(chk), f"atomterm/{key.address}/ncas")
     return CellData(key, np.asarray(mo), energies, ci, core_energy,
@@ -361,11 +362,16 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         ``key.fold == "frac"`` (that fold is a different reference SCF
         -- the run AND the fold use it).
     budgets : per-run knobs that are NOT cell identity:
-        ``mc_opts``/``fci_opts`` (optimizer/solver), ``sa_weights``
-        (default: uniform over the MEASURED ground block of the start
-        window -- :func:`atomterm.operators.ground_block`, the
-        SA-anchoring rule), ``verbose``, ``no_cap`` (the NO-source
-        cost stop).
+        ``mc_opts``/``fci_opts`` (optimizer/solver), ``sa_weights``,
+        ``verbose``, ``no_cap`` (the NO-source cost stop).
+        ``sa_weights`` default: uniform over the MEASURED ground block
+        of the start window (:func:`atomterm.operators.ground_block`,
+        the SA-anchoring rule). The default presupposes a DEGENERATE
+        start window -- the block measurement needs the ground term's
+        M_L set intact; on a defective window (the fact-17-class
+        split, measured ~1e-4 on Sc's projected columns) it anchors
+        ONE state: single-root SA, which collapses on TMs. Declare
+        ``sa_weights`` explicitly there.
     fresh : ignore a stored cell and re-run (a cache hit otherwise
         re-analyzes the stored run -- budgets are then ignored).
     workdir : the store root (``<workdir>/<Atom>/rungs/``).
@@ -459,8 +465,9 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                         nroots=min(9, ndet), name=key.address,
                         verbose=verbose, fci_opts=common["fci_opts"])
     else:
-        weights = budgets.get("sa_weights") if key.method == "sa" else None
-        if key.method == "sa" and weights is None:
+        weights = (budgets.get("sa_weights")
+                   if key.method == "sa-casscf" else None)
+        if key.method == "sa-casscf" and weights is None:
             from atomterm.operators import build_operators, ground_block
 
             c_act0 = mo_full[:, ncore:ncore + ncas]
@@ -473,7 +480,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                                  name=key.address, **common)
 
     _store_cell(chk, key, cas, ncas,
-                  store_name=f"{key.address}_roots" if key.method == "sa"
+                  store_name=f"{key.address}_roots"
+                            if key.method == "sa-casscf"
                   else None)
     return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_pur=c_pur)
 
@@ -568,10 +576,11 @@ def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]
         CellKey(atom, window, sec, fold="frac"),
         CellKey(atom, window, sec, method="casscf", mask="frozen",
                 substrate="pur"),
-        CellKey(atom, window, sec, method="sa", mask="frozen",
+        CellKey(atom, window, sec, method="sa-casscf", mask="frozen",
                 substrate="pur"),
         CellKey(atom, window, sec, method="casscf"),
-        CellKey(atom, window, sec, method="sa", substrate="pur"),
+        CellKey(atom, window, sec, method="sa-casscf",
+                substrate="pur"),
     ]
 
 
@@ -597,9 +606,9 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     pur fold third), then the optimizer product method x mask x
     substrate x start with the virtual-mix diagnostic after the CASSCF
     free/polarized starts, and the NO start addressing the full-span
-    group prefix (:func:`_no_label`). mo x pur IS part of the grid (the
-    projection builder); radial stays ao-only (validated at the key).
-
+    group prefix (:func:`_no_label`). mo x pur IS part of the grid
+    (the mo branch re-projects the canonical columns on the pur
+    span); radial stays ao-only (validated at the key).
     """
     from atomterm.system import sector_na_nb
 
@@ -611,7 +620,7 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
         CellKey(atom, w, sec, substrate="pur"),   # the CASCI pur fold
         CellKey(atom, w, sec, fold="frac"),
     ]
-    for m in ("casscf", "sa"):
+    for m in ("casscf", "sa-casscf"):
         for mask in (None, "radial", "frozen"):
             for sub in ("pol", "pur"):
                 starts = ("ao", "mo", "no") if mask != "radial" else ("ao",)

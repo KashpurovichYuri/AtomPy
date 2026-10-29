@@ -152,7 +152,8 @@ class StageFacts:
 
         Parameters
         ----------
-        kind : the method axis value ("casci" / "casscf" / "sa") --
+        kind : the method axis value ("casci" / "casscf" /
+        "sa-casscf") --
             recorded verbatim as ``"kind"``; ``core_anisotropy``
             appears whenever it was measured.
         """

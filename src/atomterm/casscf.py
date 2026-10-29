@@ -292,6 +292,6 @@ def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               weights=list(weights), mask=mask,
-                              name="sa_casscf", verbose=verbose)
+                              name="sa-casscf", verbose=verbose)
 
 

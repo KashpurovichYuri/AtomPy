@@ -193,7 +193,7 @@
     "comm_norm_h_lz": 0.02178182959493489,
     "comm_norm_h_l2": 1.201096868801492e-07
   },
-  "sa_casscf": {
+  "sa-casscf": {
     "energies_pyscf": [
       -37.68239129282412
     ],

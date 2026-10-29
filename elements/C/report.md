@@ -47,7 +47,7 @@ Lz eigenvalues (M_L content): [-0.998212, -0.0, 0.998212]
 ||[H, Lz]||_F  = 2.178e-02   (relative 9.850e-03)
 ||[H, L^2]||_F = 1.201e-07   (relative 5.432e-08)
 
-[sa_casscf]  total energies vs PySCF: max|dE| = 9.08e-07 Eh
+[sa-casscf]  total energies vs PySCF: max|dE| = 9.08e-07 Eh
 -----------------------------------------------------------
 sector: Ms=+2 (na=2, nb=0)   (3 determinants)
 

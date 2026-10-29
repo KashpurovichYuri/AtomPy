@@ -217,9 +217,9 @@
       ],
       "cell": "sc_3d4s_2-1_casscf_ao_frozen_pur_avg"
     },
-    "sc_3d4s_2-1_sa_ao_frozen_pur_avg": {
-      "tag": "sc_3d4s_2-1_sa_ao_frozen_pur_avg",
-      "kind": "sa",
+    "sc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg": {
+      "tag": "sc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg",
+      "kind": "sa-casscf",
       "n_det": 90,
       "diverged": false,
       "converged": true,
@@ -264,7 +264,7 @@
         "s^2.00d^1.00 (|c|=0.88); s^2.00d^1.00 (|c|=0.44)",
         "s^2.00d^1.00 (|c|=0.86); s^2.00d^1.00 (|c|=0.42)"
       ],
-      "cell": "sc_3d4s_2-1_sa_ao_frozen_pur_avg"
+      "cell": "sc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg"
     },
     "sc_3d4s_2-1_casscf_ao_-_pol_avg": {
       "tag": "sc_3d4s_2-1_casscf_ao_-_pol_avg",
@@ -304,9 +304,9 @@
       ],
       "cell": "sc_3d4s_2-1_casscf_ao_-_pol_avg"
     },
-    "sc_3d4s_2-1_sa_ao_-_pur_avg": {
-      "tag": "sc_3d4s_2-1_sa_ao_-_pur_avg",
-      "kind": "sa",
+    "sc_3d4s_2-1_sa-casscf_ao_-_pur_avg": {
+      "tag": "sc_3d4s_2-1_sa-casscf_ao_-_pur_avg",
+      "kind": "sa-casscf",
       "n_det": 90,
       "diverged": false,
       "converged": true,
@@ -351,11 +351,11 @@
         "s^2.00d^1.00 (|c|=0.86); s^2.00d^1.00 (|c|=0.41)",
         "s^2.00d^1.00 (|c|=0.64); s^2.00d^1.00 (|c|=0.48)"
       ],
-      "cell": "sc_3d4s_2-1_sa_ao_-_pur_avg"
+      "cell": "sc_3d4s_2-1_sa-casscf_ao_-_pur_avg"
     },
-    "sc_3d4s_2-1_sa_ao_-_pol_avg": {
-      "tag": "sc_3d4s_2-1_sa_ao_-_pol_avg",
-      "kind": "sa",
+    "sc_3d4s_2-1_sa-casscf_ao_-_pol_avg": {
+      "tag": "sc_3d4s_2-1_sa-casscf_ao_-_pol_avg",
+      "kind": "sa-casscf",
       "n_det": 90,
       "diverged": false,
       "converged": true,
@@ -400,11 +400,11 @@
         "p^2.00d^1.00 (|c|=0.85); p^2.00d^1.00 (|c|=0.37)",
         "p^2.00d^1.00 (|c|=0.73); p^2.00d^1.00 (|c|=0.59)"
       ],
-      "cell": "sc_3d4s_2-1_sa_ao_-_pol_avg"
+      "cell": "sc_3d4s_2-1_sa-casscf_ao_-_pol_avg"
     },
-    "sc_3d4s_2-1_sa_ao_radial_pol_avg": {
-      "tag": "sc_3d4s_2-1_sa_ao_radial_pol_avg",
-      "kind": "sa",
+    "sc_3d4s_2-1_sa-casscf_ao_radial_pol_avg": {
+      "tag": "sc_3d4s_2-1_sa-casscf_ao_radial_pol_avg",
+      "kind": "sa-casscf",
       "n_det": 90,
       "diverged": false,
       "converged": true,
@@ -449,11 +449,11 @@
         "s^2.00d^1.00 (|c|=0.93); s^2.00d^1.00 (|c|=0.33)",
         "s^2.00d^1.00 (|c|=0.98); s^2.00d^1.00 (|c|=0.17)"
       ],
-      "cell": "sc_3d4s_2-1_sa_ao_radial_pol_avg"
+      "cell": "sc_3d4s_2-1_sa-casscf_ao_radial_pol_avg"
     },
-    "sc_3d4s_2-1_sa_ao_radial_pur_avg": {
-      "tag": "sc_3d4s_2-1_sa_ao_radial_pur_avg",
-      "kind": "sa",
+    "sc_3d4s_2-1_sa-casscf_ao_radial_pur_avg": {
+      "tag": "sc_3d4s_2-1_sa-casscf_ao_radial_pur_avg",
+      "kind": "sa-casscf",
       "n_det": 90,
       "diverged": false,
       "converged": true,
@@ -498,7 +498,7 @@
         "s^2.00d^1.00 (|c|=1.00); s^1.00d^2.00 (|c|=0.04)",
         "s^2.00d^1.00 (|c|=1.00); s^1.00d^2.00 (|c|=0.04)"
       ],
-      "cell": "sc_3d4s_2-1_sa_ao_radial_pur_avg"
+      "cell": "sc_3d4s_2-1_sa-casscf_ao_radial_pur_avg"
     },
     "sc_3d4s_2-1_casscf_mo_-_pol_avg": {
       "tag": "sc_3d4s_2-1_casscf_mo_-_pol_avg",
@@ -538,9 +538,9 @@
       ],
       "cell": "sc_3d4s_2-1_casscf_mo_-_pol_avg"
     },
-    "sc_3d4s_2-1_sa_mo_-_pol_avg": {
-      "tag": "sc_3d4s_2-1_sa_mo_-_pol_avg",
-      "kind": "sa",
+    "sc_3d4s_2-1_sa-casscf_mo_-_pol_avg": {
+      "tag": "sc_3d4s_2-1_sa-casscf_mo_-_pol_avg",
+      "kind": "sa-casscf",
       "n_det": 90,
       "diverged": false,
       "converged": true,
@@ -582,7 +582,7 @@
         "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
         "s^1.00p^1.00d^1.00 (|c|=0.80); s^1.00p^1.00d^1.00 (|c|=0.45)"
       ],
-      "cell": "sc_3d4s_2-1_sa_mo_-_pol_avg"
+      "cell": "sc_3d4s_2-1_sa-casscf_mo_-_pol_avg"
     },
     "sc_3d4s_2-1_casscf_ao_radial_pol_avg": {
       "tag": "sc_3d4s_2-1_casscf_ao_radial_pol_avg",

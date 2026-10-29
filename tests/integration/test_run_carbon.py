@@ -16,7 +16,7 @@ def test_pipeline_end_to_end(tmp_path):
     results = run_carbon(cfg, workdir=str(tmp_path))
 
     # stage artifacts exist (chkfiles + reports)
-    for stage in ["rohf", "casci_ms1", "casci_ms0", "casscf", "sacasscf"]:
+    for stage in ["rohf", "casci_ms1", "casci_ms0", "casscf", "sa-casscf"]:
         assert (tmp_path / f"{cfg.label}_{stage}.chk").exists(), stage
     assert (tmp_path / f"{cfg.label}_report.md").exists()
     assert (tmp_path / f"{cfg.label}_report.json").exists()
@@ -44,4 +44,4 @@ def test_pipeline_end_to_end(tmp_path):
     # orbitals genuinely break rotational symmetry -- <L^2> < 2 and a finite
     # ||[H, Lz]|| are the interesting physical output here, not bugs)
     assert results["casscf"]["analysis"].states[0].term == "3P"
-    assert len(results["sa_casscf"]["analysis"].states) == 3
+    assert len(results["sa-casscf"]["analysis"].states) == 3

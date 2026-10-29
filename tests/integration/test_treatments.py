@@ -54,18 +54,18 @@ LADDER_ADDRESSES = {
     "casscf_virtmix": dict(method="casscf", mask="virtmix"),
     "casscf_shell":   dict(method="casscf"),                   # free, ao start
     "casscf_pyscf":   dict(method="casscf", start="mo"),
-    "sa":             dict(method="sa"),
-    "sa_radial":      dict(method="sa", mask="radial"),
-    "sa_pyscf":       dict(method="sa", start="mo"),
+    "sa":             dict(method="sa-casscf"),
+    "sa_radial":      dict(method="sa-casscf", mask="radial"),
+    "sa_pyscf":       dict(method="sa-casscf", start="mo"),
     "casci_avg_pur":     dict(method="casci", substrate="pur"),
     "casscf_relax_pur":  dict(method="casscf", mask="frozen",
                               substrate="pur"),
     "casscf_radial_pur": dict(method="casscf", mask="radial",
                               substrate="pur"),
-    "sa_relax_pur":      dict(method="sa", mask="frozen",
+    "sa_relax_pur":      dict(method="sa-casscf", mask="frozen",
                               substrate="pur"),
-    "sa_pur":            dict(method="sa", substrate="pur"),
-    "sa_radial_pur":     dict(method="sa", mask="radial",
+    "sa_pur":            dict(method="sa-casscf", substrate="pur"),
+    "sa_radial_pur":     dict(method="sa-casscf", mask="radial",
                               substrate="pur"),
 }
 
@@ -95,7 +95,7 @@ def run_ladder(cfg, patterns, nelec_act, workdir, *, sa_weights=None,
             continue
         key = CellKey(cfg.symbol, "".join(patterns), (na, nb), **axes)
         budgets = ({"sa_weights": list(sa_weights)}
-                   if axes["method"] == "sa" else None)
+                   if axes["method"] == "sa-casscf" else None)
         out[tag] = run_cell(key, mf, frac_mf=frac_mf, budgets=budgets,
                             workdir=workdir).payload(key.method)
     return out

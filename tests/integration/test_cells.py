@@ -44,20 +44,20 @@ def test_address_round_trip():
     keys = [
         CellKey("C", "2p", (1, 1)),
         CellKey("C", "2p", (1, 1), fold="raw"),
-        CellKey("c", "2p", (2, 0), method="sa", mask=None, substrate="pur"),
-        CellKey("Ti", "3d4s", (3, 1), method="sa", start="ao",
+        CellKey("c", "2p", (2, 0), method="sa-casscf", mask=None, substrate="pur"),
+        CellKey("Ti", "3d4s", (3, 1), method="sa-casscf", start="ao",
                 mask="radial", substrate="pur", fold="avg"),
         CellKey("Ti", "3d4s", (2, 2), method="casscf", start="ao",
                 mask="virtmix"),
         CellKey("Sc", "3d4s", (1, 1), method="casscf", mask="frozen",
                 fold="frac"),
-        CellKey("U", "3f2d", (4, 2), method="sa", start="ao"),
+        CellKey("U", "3f2d", (4, 2), method="sa-casscf", start="ao"),
     ]
     for k in keys:
         assert CellKey.from_address(k.address) == k
         assert k.address.count("_") == 7
     assert keys[0].address == "c_2p_1-1_casci_ao_-_pol_avg"
-    assert keys[3].address == "ti_3d4s_3-1_sa_ao_radial_pur_avg"
+    assert keys[3].address == "ti_3d4s_3-1_sa-casscf_ao_radial_pur_avg"
 
 
 @fast
@@ -125,9 +125,9 @@ def test_spine_keys_contract():
         "ti_3d4s_3-1_casci_ao_-_pol_avg",
         "ti_3d4s_3-1_casci_ao_-_pol_frac",
         "ti_3d4s_3-1_casscf_ao_frozen_pur_avg",
-        "ti_3d4s_3-1_sa_ao_frozen_pur_avg",
+        "ti_3d4s_3-1_sa-casscf_ao_frozen_pur_avg",
         "ti_3d4s_3-1_casscf_ao_-_pol_avg",
-        "ti_3d4s_3-1_sa_ao_-_pur_avg",
+        "ti_3d4s_3-1_sa-casscf_ao_-_pur_avg",
     ]
 
 
@@ -157,8 +157,8 @@ def test_window_grid_is_the_one_declaration():
     assert mopur == [                   # method-major, like every block
         "ti_3d4s_3-1_casscf_mo_-_pur_avg",
         "ti_3d4s_3-1_casscf_mo_frozen_pur_avg",
-        "ti_3d4s_3-1_sa_mo_-_pur_avg",
-        "ti_3d4s_3-1_sa_mo_frozen_pur_avg",
+        "ti_3d4s_3-1_sa-casscf_mo_-_pur_avg",
+        "ti_3d4s_3-1_sa-casscf_mo_frozen_pur_avg",
     ]
     # no radial x mo/no keys ever (void at the key)
     assert not [a for a in addrs if "_radial_" in a and "_ao_" not in a]
@@ -316,10 +316,10 @@ def test_load_cell_synthetic_roundtrip(tmp_path):
 
 
 @fast
-def test_load_cell_prefers_sa_roots_and_reports_missing(tmp_path):
+def test_load_cell_prefers_sa_casscf_roots_and_reports_missing(tmp_path):
     from pyscf import lib
 
-    key = CellKey("Xe", "5p", (1, 1), method="sa")
+    key = CellKey("Xe", "5p", (1, 1), method="sa-casscf")
     chk = cell_chk(key, tmp_path)
     chk.parent.mkdir(parents=True)
     for name in (key.address, f"{key.address}_roots"):
@@ -458,7 +458,7 @@ def test_run_cell_no_start_same_subspace(carbon, tmp_path):
 
 
 @slow
-def test_sa_run_completes_the_roots_store(carbon, tmp_path):
+def test_sa_casscf_run_completes_the_roots_store(carbon, tmp_path):
     """store_name= pins the WRITER side of the SA store (the aa21071
     bug): the SA run returns the per-ROOTS pass, and the cell-layer
     completion must land under ``<address>_roots`` -- completing
@@ -470,7 +470,7 @@ def test_sa_run_completes_the_roots_store(carbon, tmp_path):
     from atomterm.cells import run_cell
 
     _, mol, mf, _ = carbon
-    key = CellKey("C", "2p", (1, 1), method="sa")
+    key = CellKey("C", "2p", (1, 1), method="sa-casscf")
     facts = run_cell(key, mf, workdir=tmp_path)
     data = load_cell(key, tmp_path)          # prefers <address>_roots
     assert np.allclose(data.energies, facts.energies_pyscf, atol=1e-10)

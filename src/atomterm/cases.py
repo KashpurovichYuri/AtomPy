@@ -205,7 +205,7 @@ def run_atom(
     -------
     dict
         ``"rohf_energy"`` plus one payload per stage tag
-        (``casci_ms*``, ``casscf``, ``sa_casscf``), each carrying the
+        (``casci_ms*``, ``casscf``, ``sa-casscf``), each carrying the
         analysis object, the run's energies, window weights, max|dE|,
         and the particle-number sanity.
     """
@@ -297,12 +297,12 @@ def run_atom(
 
     # ---- stage 4: SA-CASSCF over the requested state weights ---------------
     if sa_weights:
-        sa_chk = str(out / f"{label}_sacasscf.chk")
+        sa_chk = str(out / f"{label}_sa-casscf.chk")
         sa = run_sa_casscf(mf, ncas, (na_p, nb_p), mo_p, list(sa_weights),
                            sa_chk, verbose=0)
         print(f"[SA-CASSCF ] roots: {np.round(sa.energies, 6)}")
         c_sa = sa.mo_coeff[:, ncore_p : ncore_p + ncas]
-        stage_analysis("sa_casscf", sa, c_sa, na_p, nb_p)
+        stage_analysis("sa-casscf", sa, c_sa, na_p, nb_p)
 
     # ---- persist -----------------------------------------------------------
     (out / f"{label}_report.md").write_text(

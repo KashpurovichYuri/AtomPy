@@ -149,9 +149,9 @@
       ],
       "cell": "si_3p_2-0_casscf_ao_frozen_pur_avg"
     },
-    "si_3p_2-0_sa_ao_frozen_pur_avg": {
-      "tag": "si_3p_2-0_sa_ao_frozen_pur_avg",
-      "kind": "sa",
+    "si_3p_2-0_sa-casscf_ao_frozen_pur_avg": {
+      "tag": "si_3p_2-0_sa-casscf_ao_frozen_pur_avg",
+      "kind": "sa-casscf",
       "n_det": 3,
       "diverged": false,
       "converged": true,
@@ -184,7 +184,7 @@
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.05)",
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.05)"
       ],
-      "cell": "si_3p_2-0_sa_ao_frozen_pur_avg"
+      "cell": "si_3p_2-0_sa-casscf_ao_frozen_pur_avg"
     },
     "si_3p_2-0_casscf_ao_-_pol_avg": {
       "tag": "si_3p_2-0_casscf_ao_-_pol_avg",
@@ -219,9 +219,9 @@
       ],
       "cell": "si_3p_2-0_casscf_ao_-_pol_avg"
     },
-    "si_3p_2-0_sa_ao_-_pur_avg": {
-      "tag": "si_3p_2-0_sa_ao_-_pur_avg",
-      "kind": "sa",
+    "si_3p_2-0_sa-casscf_ao_-_pur_avg": {
+      "tag": "si_3p_2-0_sa-casscf_ao_-_pur_avg",
+      "kind": "sa-casscf",
       "n_det": 3,
       "diverged": false,
       "converged": true,
@@ -254,11 +254,11 @@
         "p^2.00 (|c|=0.99); p^2.00 (|c|=0.10)",
         "p^2.00 (|c|=0.99); p^2.00 (|c|=0.10)"
       ],
-      "cell": "si_3p_2-0_sa_ao_-_pur_avg"
+      "cell": "si_3p_2-0_sa-casscf_ao_-_pur_avg"
     },
-    "si_3p_2-0_sa_ao_-_pol_avg": {
-      "tag": "si_3p_2-0_sa_ao_-_pol_avg",
-      "kind": "sa",
+    "si_3p_2-0_sa-casscf_ao_-_pol_avg": {
+      "tag": "si_3p_2-0_sa-casscf_ao_-_pol_avg",
+      "kind": "sa-casscf",
       "n_det": 3,
       "diverged": false,
       "converged": true,
@@ -291,11 +291,11 @@
         "p^2.00 (|c|=0.92); p^2.00 (|c|=0.39)",
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
       ],
-      "cell": "si_3p_2-0_sa_ao_-_pol_avg"
+      "cell": "si_3p_2-0_sa-casscf_ao_-_pol_avg"
     },
-    "si_3p_2-0_sa_ao_radial_pol_avg": {
-      "tag": "si_3p_2-0_sa_ao_radial_pol_avg",
-      "kind": "sa",
+    "si_3p_2-0_sa-casscf_ao_radial_pol_avg": {
+      "tag": "si_3p_2-0_sa-casscf_ao_radial_pol_avg",
+      "kind": "sa-casscf",
       "n_det": 3,
       "diverged": false,
       "converged": true,
@@ -328,11 +328,11 @@
         "p^2.00 (|c|=0.92); p^2.00 (|c|=0.40)",
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.01)"
       ],
-      "cell": "si_3p_2-0_sa_ao_radial_pol_avg"
+      "cell": "si_3p_2-0_sa-casscf_ao_radial_pol_avg"
     },
-    "si_3p_2-0_sa_ao_radial_pur_avg": {
-      "tag": "si_3p_2-0_sa_ao_radial_pur_avg",
-      "kind": "sa",
+    "si_3p_2-0_sa-casscf_ao_radial_pur_avg": {
+      "tag": "si_3p_2-0_sa-casscf_ao_radial_pur_avg",
+      "kind": "sa-casscf",
       "n_det": 3,
       "diverged": false,
       "converged": true,
@@ -365,7 +365,7 @@
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
       ],
-      "cell": "si_3p_2-0_sa_ao_radial_pur_avg"
+      "cell": "si_3p_2-0_sa-casscf_ao_radial_pur_avg"
     },
     "si_3p_2-0_casscf_mo_-_pol_avg": {
       "tag": "si_3p_2-0_casscf_mo_-_pol_avg",
@@ -400,9 +400,9 @@
       ],
       "cell": "si_3p_2-0_casscf_mo_-_pol_avg"
     },
-    "si_3p_2-0_sa_mo_-_pol_avg": {
-      "tag": "si_3p_2-0_sa_mo_-_pol_avg",
-      "kind": "sa",
+    "si_3p_2-0_sa-casscf_mo_-_pol_avg": {
+      "tag": "si_3p_2-0_sa-casscf_mo_-_pol_avg",
+      "kind": "sa-casscf",
       "n_det": 3,
       "diverged": false,
       "converged": true,
@@ -435,7 +435,7 @@
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.01)",
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
       ],
-      "cell": "si_3p_2-0_sa_mo_-_pol_avg"
+      "cell": "si_3p_2-0_sa-casscf_mo_-_pol_avg"
     },
     "si_3p_2-0_casscf_ao_radial_pol_avg": {
       "tag": "si_3p_2-0_casscf_ao_radial_pol_avg",
