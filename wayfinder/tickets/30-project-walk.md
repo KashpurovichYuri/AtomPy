@@ -135,6 +135,19 @@ declaring case anywhere (src+scripts) -- `_treatments_arm` +
 CaseSpec.study are the only cases->study bridge; decide with study's
 retire-or-keep.
 
+PHASE-5 CONSIDERATION (from the phase-4 close, user-directed):
+the campaign carries TWO run vocabularies -- the classic staged
+pipeline (cases.run_atom, stage tags like `casci_ms1`, the T1/T2 term
+tables) and the methods grid (cells, CellKey addresses, the manifest
+tables). They overlap in their CASCI stages but serve different
+deliverables; whether run_atom's stages become cells (one vocabulary)
+or stay a separate deliverable class is a phase-5/7 design question --
+raise it when the retirement trio is on the table, do not decide now.
+Extension story recorded in both module docstrings: new ATOM = a
+CAMPAIGN row (cases); new AXIS VALUE = vocabulary + one resolution
+branch through its owner (cells); new METHOD = a mask_ or a thin
+adapter over constrained_casscf (the deep-reuse paragraph above).
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE
