@@ -3,17 +3,25 @@ and the closed-shell core energy.
 
 PURPOSE
 -------
-The pur substrate: rebuild the closed core span as
-E_l ⊗ {all members of l} per angular momentum -- in block form,
-C_pur^{(l)} = E_l ⊗ 1_M, one shared radial set E_l replicated on all
-M = 2l+1 members -- the closure theorem
-(E ⊗ members is L-invariant for ANY radial subspace E; README ·
-Methods) applied to the core itself -- so that every start window's
-(1 - P_core) projection inherits EXACT closure and the fold field is
-scalar by construction. This is the fix for the fact-17 input-window
-baseline: canonical core MOs carry foreign-l tails and m-asymmetric
-same-l content, and any window orthogonalized against them inherits
-the defect.
+The pur substrate: an exactly rotation-closed replacement for the
+canonical core span. Per angular momentum l, the core block is
+rebuilt in block form as
+
+    C_pur^{(l)} = E_l ⊗ 1_M
+
+-- one shared radial set E_l (n_r columns) replicated on all M = 2l+1
+members. The closure theorem (E ⊗ members is L-invariant for ANY
+radial subspace E; README · Methods) then applies to the core itself:
+every window orthogonalized against the core -- the (1 - P_core)
+projection -- inherits EXACT closure, and the core's fold field is
+scalar by construction (its density is exactly m-symmetric).
+
+Why replace the canonical core at all: its MOs carry foreign-l tails
+and m-asymmetric same-l content, both of which break the core span's
+L-closure, and every window orthogonalized against that span inherits
+the defect (the measured input-window baseline every CASSCF start
+carries: ~1e-3 Si, ~1e-2 Sc; the mechanism:
+:func:`atomterm.windows.build_full_mo` Notes).
 """
 
 from __future__ import annotations
