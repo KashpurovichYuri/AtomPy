@@ -1,19 +1,19 @@
 """Natural-orbital mathematics: the CI 1-RDM, the NOs, occupation
-groups, and the NO window selection (ticket 22). The Window object
-and the window-kind registry (shell / primitive / scf_mo / no) live
-in atomterm.windows.
+groups, and the NO window selection. The Window object and the
+window-kind registry (shell / primitive / scf_mo / no) live in
+:mod:`atomterm.windows`.
 
-The closure theorem (fact 20) licenses ANY per-l radial subspace
-replicated over ALL members as window units. NOs are legal units
-exactly when they arrive as complete m-sets -- i.e. when the 1-RDM they
-diagonalize is m-scalar per l, which holds iff the CI roots averaged
-into it form a rotation-invariant set (a term average over the whole
-L multiplet, all in one M_S sector). A single |L, M_L> root carries an
+The closure theorem licenses ANY per-l radial subspace replicated over
+ALL members as window units. NOs are legal units exactly when they
+arrive as complete m-sets -- i.e. when the 1-RDM they diagonalize is
+m-scalar per l, which holds iff the CI roots averaged into it form a
+rotation-invariant set (a term average over the whole L multiplet,
+all in one M_S sector). A single ``|L, M_L>`` root carries an
 m-DIAGONAL but m-UNEQUAL density (p^2 3P M_L=0: occ(m=0)=2,
-occ(+-1)=0 -- pinned in tests/test_natural.py), so occupation selection
-on a single root is NOT symmetry-safe. The one-particle certificate
-(:func:`atomterm.operators.window_closure`) is the arbiter: run it on
-every NO window, never assume.
+occ(+-1)=0 -- pinned in tests/unit/test_natural.py), so occupation
+selection on a single root is NOT symmetry-safe. The one-particle
+certificate (:func:`atomterm.operators.window_closure`) is the
+arbiter: run it on every NO window, never assume.
 
 Spin-orbital conventions (repo-wide): alpha = 0..norb-1,
 beta = norb..2norb-1; determinants are sorted spin-orbital tuples.
@@ -46,8 +46,9 @@ def ci_rdm1(dets, vec, norb: int, weights=None) -> np.ndarray:
     vec = np.asarray(vec)
     if vec.ndim == 1:
         vec = vec[:, None]
-    if weights is None:
-        weights = np.eye(1, vec.shape[1])[0]
+    if weights is None:  # the first root only
+        weights = np.zeros(vec.shape[1])
+        weights[0] = 1.0
     weights = np.asarray(weights, dtype=float)
 
     def split(det):
@@ -103,7 +104,8 @@ def natural_orbitals(c_act: np.ndarray,
 
     Returns (c_no, occ): NO columns in the AO basis and occupations,
     sorted by DESCENDING occupation. c_act must be orthonormal (the
-    active space is, fact 4): the density eigenvectors ARE the NOs, no
+    active space always is -- matrix products are exact only in an
+    orthonormal basis): the density eigenvectors ARE the NOs, no
     metric dance needed inside the span.
     """
     w, v = np.linalg.eigh(gamma)
@@ -116,17 +118,17 @@ def occupation_groups(occ, deg_tol: float = 1e-7) -> list[list[int]]:
 
     For an m-scalar density each group IS an m-set (2l+1 equal
     occupations per radial); window selection must never split one
-    (the fact-19 AVAS lesson: per-member thresholds build
-    rotation-defective spans).
+    (the AVAS lesson: per-member thresholds build rotation-defective
+    spans).
 
-    The tolerance is scale-aware: ``max(deg_tol, 1e-4 * occ[0])``. The
-    source window's input defect (fact 17: core-orthogonalization
-    leakage, win certificates at 1e-3) leaks into the term-averaged
-    density as a WITHIN-m-set occupation spread (measured: Ti {3d,4p}
-    d-shell 2.7e-7 at occ 0.4) -- a fixed 1e-7 splits the set into
-    [2,3] and silently builds a rotation-defective window. Genuine
-    group gaps are orders wider (measured: 3e-4, U's tightest) than
-    the 1e-4 relative window."""
+    The tolerance is scale-aware: ``max(deg_tol, 1e-4 * occ[0])``.
+    The source window's core-orthogonalization defect (certificates
+    at 1e-3) leaks into the term-averaged density as a WITHIN-m-set
+    occupation spread (measured: Ti {3d,4p} d-shell 2.7e-7 at occ
+    0.4) -- a fixed 1e-7 splits the set into [2,3] and silently
+    builds a rotation-defective window. Genuine group gaps are orders
+    wider (measured: 3e-4, U's tightest) than the 1e-4 relative
+    window."""
     occ = np.asarray(occ)
     tol = max(deg_tol, 1e-4 * float(occ[0]))
     groups: list[list[int]] = [[0]]
@@ -159,40 +161,39 @@ def select_no_window(c_no: np.ndarray, occ, n_max: int,
     return c_no[:, cols], kept
 
 
-# -------------------------------------------------------------- registry
-# One signature per methodology: (mol, mf, ncore, **spec) -> Window.
-# Candidates are combinable with any fold / treatment (the axes product
-# ticket 20 consumes). AO-row windows carry m_complete=True by
-# construction; orbital-column windows carry their measured/declared
-# status in the flag (verify with the certificate either way).
-
+# ------------------------------------------------------------- the NO arm
 
 
 def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
                      c_core: np.ndarray = None, cap: int = 12000) -> list:
-    """@brief The NO arm: occupation-group windows from a source window's
-    term-averaged density.
+    """Occupation-group windows from a source window's term-averaged
+    density -- the NO arm.
 
-    Math: exact eigh of the source-window CASCI; the ground block (the
-    eigenspace at ev[0] with its own <L^2>) is term-AVERAGED into the
-    1-RDM gamma (a single |L,M_L> density is m-diagonal but m-unequal
-    -- never a window source); NOs = the density eigenvectors; the
-    occupation groups never split an m-set, and each group PREFIX
-    becomes a Window. By Schur, a term-averaged gamma gives l-pure
-    groups: the windows are exactly rotation-closed (the span
-    certificate verifies per cell).
+    The measurement: exact eigh of the source-window Hamiltonian; the
+    ground block (the eigenspace at ``ev[0]`` with its own ``<L^2>``)
+    is term-AVERAGED into the 1-RDM gamma -- a single ``|L, M_L>``
+    density is m-diagonal but m-unequal and is never a window source.
+    NOs are the density eigenvectors; by Schur a term-averaged gamma
+    is ``R (x) 1_{2l+1}`` per l, so the occupation groups arrive as
+    l-pure m-sets and every group PREFIX is an exactly rotation-closed
+    window (the span certificate verifies per cell).
 
-    @param mol, mf: the atom and its converged SCF.
-    @param ncore: the closed-shell count (the fold).
-    @param c_act: the SOURCE window columns (shell or primitive bands).
-    @param na, nb: the sector (skips prefixes too small to open it).
-    @param c_core: the core columns folded into the source CASCI.
-    @param cap: the exact-eigh cost stop in determinants (approved).
-    @returns: list[Window] -- the group prefixes no1..noK.
-    @note: the source eigh is the arm's cost (~ndet^2 build + eigh);
-        the returned windows are chk-free data.
-    @example: wins = no_group_windows(mol, mf, 9, c_shell, 2, 1,
-                                      c_core=c_pur)
+    Parameters
+    ----------
+    mol, mf : the atom and its converged SCF.
+    ncore : the closed-shell count (the fold).
+    c_act : the SOURCE window columns (shell or primitive bands).
+    na, nb : the sector (prefixes too small to open it are skipped --
+        the returned labels can be non-contiguous, select by label).
+    c_core : the core columns folded into the source CASCI.
+    cap : the cost stop in determinants -- the source eigh is the
+        arm's whole cost (an ``ndet x ndet`` build + solve); a prefix
+        whose sector exceeds it raises instead of hanging.
+
+    Returns
+    -------
+    list[Window] -- the usable group prefixes ``no1..noK`` (chk-free
+    data; each Window carries its own columns and m_complete=True).
     """
     from atomterm.detbasis import sector_dimension
     from atomterm.operators import build_operators, ground_block
@@ -212,7 +213,13 @@ def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
             continue          # fewer columns than electrons: no sector
         c_win, _ = select_no_window(c_no, occ, n_max)
         ndet = sector_dimension(c_win.shape[1], na, nb)
-        assert ndet <= cap, (nk, ndet)   # cost stop (approved cap)
+        if ndet > cap:
+            raise ValueError(
+                f"the no{nk} prefix opens a {ndet}-determinant sector "
+                f"(> cap={cap}): raise the cap or narrow the source")
         out.append(Window(f"no{nk}", None, c_win, True))
-    assert out, "no usable NO windows"
+    if not out:
+        raise ValueError(
+            "no usable NO windows: every group prefix is smaller than "
+            "the sector needs")
     return out

@@ -1,5 +1,4 @@
-"""Natural-orbital windows (ticket 22): the 1-RDM helper and the m-set
-claim.
+"""Natural-orbital windows: the 1-RDM helper and the m-set claim.
 
 The closure theorem licenses any radial subspace replicated over ALL
 members. These tests pin (a) the CI 1-RDM construction (projector
@@ -120,7 +119,7 @@ def test_m_scalar_density_yields_whole_m_sets():
 
 def test_defect_leakage_never_splits_an_m_set():
     """The grouping tolerance is scale-aware: the source window's
-    input defect (fact 17) leaks into the term-averaged density as a
+    input defect leaks into the term-averaged density as a
     WITHIN-m-set occupation spread (measured: Ti {3d,4p}, d-shell
     2.7e-7 at occ 0.4) -- a fixed 1e-7 split the five-member set into
     [2,3] and silently built a rotation-defective window. Genuine
@@ -139,7 +138,7 @@ def test_single_ml_root_breaks_the_m_set():
     M_L = 0 state of p^2 (not a term eigenstate; any single det makes
     the point). Its density is m-DIAGONAL but m-UNEQUAL: the top
     occupation selects ONE member -- occupation selection on a single
-    root is NOT symmetry-safe (the AVAS mistake, fact 19)."""
+    root is NOT symmetry-safe (the AVAS mistake)."""
     dets = determinant_basis(3, 1, 1)
     det = (0, 3)  # m=0 alpha, m=0 beta
     c = np.zeros(len(dets))
@@ -177,8 +176,8 @@ def test_no_window_via_registry():
 def test_certificate_on_real_ao_windows():
     """Raw 2p AOs of the bare carbon mol: complete m-set closes at
     machine precision; dropping one member is rotation-defective."""
-    from atomterm.drivers import select_valence_ao
     from atomterm.operators import window_closure
+    from atomterm.windows import select_valence_ao
 
     mol = build_mol(AtomConfig(verbose=0))
     p_rows = select_valence_ao(mol, ["2p"])
