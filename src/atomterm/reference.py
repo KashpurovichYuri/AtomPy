@@ -18,14 +18,16 @@ Conventions
 - Caching: each run is chkfile-cached and a cached chkfile is TRUSTED
   (loaded, marked converged, never re-gated) -- the unit of
   reproducibility, because from-scratch SCF is not bit-reproducible
-  (threaded BLAS draws last-digit-different MOs; fact 10). Equivalence
-  checks pin the same chkfile, never two fresh runs.
+  (threaded BLAS draws last-digit-different MOs, and orbital-optimized
+  stages amplify the draw chaotically: root splittings wobble ~1e-2 Eh
+  between identical reruns). Equivalence checks pin the same chkfile,
+  never two fresh runs.
 - The occupation hook (``get_occ``) is part of the SCF object's
   identity: attached BEFORE the cache branch, so cache hits carry it
   too.
 - Occupation metrics are S-projector weights ``c^dag P c`` (bounded by
   1 on S-orthonormal columns); the bare quadratic form is unbounded on
-  diffuse bases (fact 15c). One home:
+  diffuse bases. One home:
   :func:`atomterm.windows.span_projector`.
 """
 
@@ -42,15 +44,38 @@ __all__ = ["ReferenceSpec", "run_rohf", "run_frac_occ"]
 
 
 def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
-    """Build the character-forced ROHF ``get_occ`` hook (see :func:`run_rohf`).
+    """The character-forced ROHF occupation hook (a ``get_occ``
+    replacement built for :func:`run_rohf`).
 
-    Occupations by S-projector WEIGHT on two AO spans, never energy order
-    (the counts and spans: :func:`run_rohf`). The open block is ranked by
-    ``2 w_open + w_closed``: open-shell character carries a strict premium
-    (with whole-l spans a 1:1 sum lets closed-character leftovers tie the
-    open MOs -- measured on U, where DIIS then closed garbage), while the
-    closed term still lets early-cycle open-shell character hiding in
-    core-like MOs be found (the Sc/Ti leakage case).
+    Parameters
+    ----------
+    mol : the built Mole (its nelectron/spin fix the block sizes).
+    occ_closed, occ_open : list[str]
+        AO span patterns (the vocabulary: :class:`ReferenceSpec`).
+        Both blocks are filled by S-projector WEIGHT on those spans,
+        never by energy order.
+
+    Returns
+    -------
+    callable
+        ``occ(mo_energy, mo_coeff) -> occupations``: the ``n_closed``
+        MOs of highest closed-span weight get 2.0; then, among the
+        rest, the ``n_open`` MOs ranked by
+
+            rank = 2 w_open + w_closed
+
+        get 1.0. The premium on open-shell character is strict: with
+        whole-l spans a 1:1 sum lets closed-character leftovers TIE
+        the open MOs (measured on U: DIIS then closed s/p garbage,
+        E > +1e3), while the closed term still finds early-cycle
+        open-shell character hiding in core-like MOs (the Sc/Ti
+        leakage case).
+
+    Raises
+    ------
+    ValueError
+        If the hook is called without MO coefficients (character
+        needs them), or a pattern matches no AO labels.
     """
     s_mat = mol.intor_symmetric("int1e_ovlp")
     p_closed = span_projector(
@@ -81,10 +106,10 @@ def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
 
 @dataclass(frozen=True)
 class ReferenceSpec:
-    """How the ROHF reference is produced when plain aufbau filling
-    fails (fact 21). One object bundling character-forced occupations
-    and the basin gate, threaded through run_rohf / run_rungs /
-    run_atom.
+    """The declared recipe for an ROHF reference that plain aufbau
+    filling cannot produce: which AO spans force the occupations (by
+    character, never energy order), and which energy pins the target
+    basin. Threaded through run_rohf / run_rungs / run_atom.
 
     Attributes
     ----------
@@ -141,13 +166,13 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
         The atom (element, basis, charge, spin).
     chkfile : str
         Cache location. An existing chkfile is loaded and TRUSTED: no
-        SCF, no gate (the reproducibility unit, fact 10).
+        SCF, no gate (the reproducibility unit).
     ref : ReferenceSpec, optional
         Character-forced occupations + optional basin gate.
         Occupations are assigned each cycle by S-projector weight on
         the span patterns, never by energy order -- mandatory on
-        aufbau-runaway atoms (Ti: +123.07 mEh runaway, fact 21a). Even
-        forced, a degenerate open shell is multi-basin (Ti: +11.2 mEh
+        aufbau-runaway atoms (Ti: +123.07 mEh runaway). Even forced,
+        a degenerate open shell is multi-basin (Ti: +11.2 mEh
         metastable basin at the SAME occupations): with ``occ_e_ref``
         set, a fresh run retries over cycled init guesses (default,
         then "atom", then "huckel") until |E - occ_e_ref| <= 1e-4,
@@ -157,6 +182,13 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     -------
     (mol, mf)
         The built molecule and the converged (or cache-loaded) object.
+
+    Notes
+    -----
+    The gated Ti/cc-pVDZ reference lands E = -848.40648875 with
+    pure-3d open MOs; its good basin carries an input-window defect
+    of ~1e-8 (vs 1.6e-2 in the metastable one), which is what lets
+    the frozen-window relax rung close at 2.3e-8 there.
     """
     from atomterm.system import build_mol
 
@@ -216,7 +248,7 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
 
 
 def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
-                     open_idx: list[int] | None = None):
+                 open_idx: list[int] | None = None):
     """Average-of-configuration (fractional-occupation) HF,
     chkfile-cached.
 
@@ -225,8 +257,7 @@ def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
     which makes the converged Fock exactly spherical -- the scalar-core
     reference that density averaging reproduces, but a DIFFERENT
     physical reference from ROHF (smeared vs localized valence
-    exchange; the measured energy relation: README · Motivation, fact
-    15f).
+    exchange; the measured energy relation: README · Motivation).
 
     Parameters
     ----------
@@ -239,7 +270,7 @@ def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
         :func:`atomterm.windows.span_projector`), never energy order --
         mandatory where the valence is quasi-degenerate (on Sc the
         aufbau block runs away to {4s, 4p, ~2d}, a converged but
-        p-containing ensemble; fact 15c). ``None`` = the HOMO block by
+        p-containing ensemble). ``None`` = the HOMO block by
         energy (fine for C/Si, where both rules select the same
         orbitals).
 
@@ -255,7 +286,11 @@ def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
     -----
     Mechanism: ``get_occ`` is PySCF's per-cycle occupation hook; the
     density and Fock are built from whatever it returns, so the SCF
-    converges self-consistently in the ensemble density.
+    converges self-consistently in the ensemble density. The selection
+    is gauge-invariant WITHIN a cycle but not anchored ACROSS cycles:
+    if a future atom's near-degenerate open block oscillates between
+    cycles, the fix is MOM-anchored selection (follow the previous
+    cycle's MOs), not a tighter conv_tol.
     """
     from atomterm.system import build_mol
 

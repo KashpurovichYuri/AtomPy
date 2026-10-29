@@ -3,7 +3,7 @@ and the closed-shell core energy.
 
 PURPOSE
 -------
-The pur substrate (fact 20): rebuild the closed core span as
+The pur substrate: rebuild the closed core span as
 E_l ⊗ {all members of l} per angular momentum -- the closure theorem
 (E ⊗ members is L-invariant for ANY radial subspace E; README ·
 Methods) applied to the core itself -- so that every start window's
@@ -26,7 +26,7 @@ __all__ = ["purified_core_orbitals", "closed_shell_core_energy"]
 
 def purified_core_orbitals(mol, mf, ncore: int):
     """The canonical core MOs replaced by an exactly rotation-closed
-    core span (the pur substrate; fact 20).
+    core span (the pur substrate).
 
     The canonical core MOs of an open-shell atom carry foreign-l tails
     and m-ASYMMETRIC same-l content; both break the L-closure of the
@@ -69,7 +69,7 @@ def purified_core_orbitals(mol, mf, ncore: int):
 
     Notes
     -----
-    TRAPS (fact 20): the S-generalized eigenproblem of ``R R^T``
+    TRAPS: the S-generalized eigenproblem of ``R R^T``
     returns S^{-1}-warped radials -- the column Gram is the correct
     object; and canonical core MOs are NOT shell-confined (C 2s: 66%
     of S-weight off its shell) -- per-shell projection is wrong.

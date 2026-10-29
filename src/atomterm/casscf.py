@@ -6,8 +6,8 @@ Conventions
 -----------
 - Active space: the active orbitals sit at ``[ncore : ncore + ncas]``
   of the FULL MO matrix -- CASCI/CASSCF slice it themselves; a
-  truncated matrix fails ``nvir >= 0`` in ``check_sanity`` (fact 7).
-- mcscf objects MUTATE (fact 6): ``mc.kernel()`` canonicalizes
+  truncated matrix fails ``nvir >= 0`` in ``check_sanity``.
+- mcscf objects MUTATE: ``mc.kernel()`` canonicalizes
   ``mc.mo_coeff``, and ``get_h1eff()``/``get_h2eff()`` re-process
   whatever ``mc.mo_coeff`` currently holds -- pass ``mo`` explicitly
   and use a fresh object for integrals. This module's discipline: the
@@ -72,7 +72,7 @@ class CASResult:
     ci : list
         CI vectors per root, PySCF order -- consumers indexing them
         against detbasis-order objects must map through
-        ``cells.pyscf_ci_permutation`` (fact 24).
+        ``cells.pyscf_ci_permutation`` (the ordering bridge).
     mo_coeff : np.ndarray or None
         The converged FULL MO matrix.
     mc : object or None
@@ -96,7 +96,7 @@ def _checkpoint(chkfile: str, name: str, energies, ci) -> None:
     """Persist one run under ``atomterm/<name>/`` (energies + CI);
     ``chkfile=None`` disables. The object-array CI serialization does
     not round-trip for 2-D roots -- the loadable ``ci_stack`` form is
-    the cell layer's own (fact 24)."""
+    the cell layer's own (it does not round-trip for 2-D roots)."""
     if chkfile is None:
         return
     lib.chkfile.save(chkfile, f"atomterm/{name}/energies", np.asarray(energies))
@@ -178,7 +178,9 @@ def run_casci(mf, ncas, nelecas, mo_full, chkfile, nroots=1, verbose=0,
 def mask_frozen_window(self, nmo, ncore, ncas, frozen):
     """Allowed: ONLY inactive<->virtual rotations; every generator
     touching the active block is blocked -- the window is frozen
-    outright (the relax rung; cells axis token ``frozen``)."""
+    outright (the relax rung; cells axis token ``frozen``).
+    Signature: the ``uniq_var_indices`` hook, documented once in the
+    seam comment above."""
     mask = np.zeros((nmo, nmo), dtype=bool)
     mask[ncore + ncas :, :ncore] = True
     return mask
@@ -188,7 +190,9 @@ def mask_no_core_window_mix(self, nmo, ncore, ncas, frozen):
     """Allowed: every rotation INVOLVING a virtual (virtual<->core and
     virtual<->active); blocked: active<->inactive alone -- no orbital
     ever trades places between the core and the active window (the
-    virtmix rung; cells axis token ``virtmix``)."""
+    virtmix rung; cells axis token ``virtmix``).
+    Signature: the ``uniq_var_indices`` hook, documented once in the
+    seam comment above."""
     mask = np.zeros((nmo, nmo), dtype=bool)
     mask[ncore + ncas :, : ncore + ncas] = True
     return mask
@@ -237,6 +241,7 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
         Attributes set on the fcisolver before the kernel (see
         :func:`run_casci`).
     verbose : int
+        Verbosity passed to the mc object.
     """
     mc = mcscf.CASSCF(mf, ncas, nelecas)
     if mo_full is not None:
@@ -266,7 +271,11 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
 # call, never a new kernel path.
 
 def run_casscf(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
-    """Free CASSCF from the given start (raw-shell columns by convention)."""
+    """Free CASSCF from the given start.
+
+    Parameters: as :func:`constrained_casscf` with ``mo_full``
+    mandatory (raw-shell columns by convention), no mask.
+    """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               name="casscf", verbose=verbose)
 
@@ -275,8 +284,12 @@ def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
                   mask=None) -> CASResult:
     """SA-CASSCF over the given state weights (primary sector). PySCF's SA
     kernel returns only the ensemble energy; per-root energies come from
-    the CASCI pass in the converged window -- see :func:`constrained_casscf`
-    (``weights``)."""
+    the CASCI pass in the converged window -- see
+    :func:`constrained_casscf` (``weights``).
+
+    Parameters: as :func:`constrained_casscf` plus ``weights`` (the
+    state-average weights over the roots).
+    """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               weights=list(weights), mask=mask,
                               name="sa_casscf", verbose=verbose)
@@ -293,7 +306,10 @@ def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0,
     by construction. Peculiarity: the relaxed core is slightly
     anisotropic; the analysis fold averages it, so the rung's
     ``max|dE|`` vs PySCF measures that anisotropy -- reported, not
-    hidden. ``mc_opts``: per-run optimizer knobs (budgets).
+    hidden.
+
+    Parameters: as :func:`constrained_casscf` plus ``mc_opts``
+    (per-run optimizer budgets).
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               mask=mask_frozen_window, mc_opts=mc_opts,
@@ -309,6 +325,8 @@ def run_casscf_virtual_mix(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CA
     dynamic correlation; appears as radial correlation in the natural
     orbitals) but the state's identity cannot change. relax < virtmix <
     free CASSCF brackets the contributions (README · Motivation).
+
+    Parameters: as :func:`constrained_casscf`.
     """
     return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
                               mask=mask_no_core_window_mix,
@@ -319,7 +337,11 @@ def run_casscf_pyscf_start(mf, ncas, nelecas, chkfile, verbose=0) -> CASResult:
     """CASSCF from PySCF's own default guess (canonical ROHF MOs, active =
     the canonical window ``[ncore:ncore+ncas]``), NOT the raw shell columns.
     Isolates the start-dependence of the optimizer basin (compare with
-    :func:`run_casscf` on the same system)."""
+    :func:`run_casscf` on the same system).
+
+    Parameters: as :func:`constrained_casscf` with no ``mo_full`` --
+    PySCF's default start IS the experiment.
+    """
     return constrained_casscf(mf, ncas, nelecas, chkfile,
                               name="casscf_pyscf", verbose=verbose)
 
