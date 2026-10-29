@@ -1,6 +1,6 @@
 """Table-driven end-to-end tests of the generic pipeline (ticket 06).
 
-Each row of ``CASES`` runs one atom through :func:`atomterm.pipeline.run_atom`
+Each row of ``CASES`` runs one atom through :func:`atomterm.cases.run_atom`
 and checks the textbook term structure, the exact commutator symmetries of the
 raw-shell CASCI stages, and the particle number of the determinant space.
 Adding an atom (Si, Sc, Ti, ...) must be a pure data change: a new row here,
@@ -12,7 +12,7 @@ from collections import Counter
 import numpy as np
 import pytest
 
-from atomterm.pipeline import run_atom
+from atomterm.cases import run_atom
 from atomterm.system import AtomConfig
 from refs import TI_REF
 

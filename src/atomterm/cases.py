@@ -1,15 +1,19 @@
-"""Atom cases: the declared per-atom campaign (T1/T2 term tables and,
-optionally, the optimizer stages) and the new-atom launch entry.
+"""The declaration layer: one spec per atom case, the campaign registry,
+and the launch entry that executes a declaration.
 
 A case is DECLARED, not guessed: a :class:`CaseSpec` fixes the atom, the
-reference data, the valence window, the sectors, and which deliverables
-are wanted -- the intent manifest (ticket 20). :func:`run_case` executes
-the declaration; nothing auto-generates. ``CAMPAIGN`` is the per-atom
-registry the cell layer and the runners derive from (ticket 29 T1b).
+reference data, the valence window, the sectors, and the optional study
+arm -- the intent manifest. :func:`run_case` executes the declaration
+(the term tables are the contract, always produced; the treatments arm
+runs only when declared); nothing auto-generates. ``CAMPAIGN`` is the
+per-atom registry the cell layer and the runners derive from --
+nothing else re-declares atoms, windows, or the gated references (the
+one-declaration rule).
 """
 
 from __future__ import annotations
 
+import json
 import math
 from dataclasses import dataclass
 from pathlib import Path
@@ -53,25 +57,29 @@ def _ms_label(na: int, nb: int) -> str:
 class CaseSpec:
     """The declaration of one atom case -- what to run and what not.
 
-    symbol/basis/ecp/spin : the atom (system.AtomConfig inputs; ``basis``
-        is the AtomConfig basis -- a label like ``"ccpvdz"`` or a dict).
+    The term tables (T1/T2) are the contract: every executed case
+    produces them. The single-root and SA stages are switched by their
+    own flags; the treatments arm runs only when ``study`` is declared.
+
+    Attributes
+    ----------
+    symbol / basis / ecp / spin : the atom (:class:`~atomterm.system.AtomConfig`
+        inputs; ``basis`` is a label like ``"ccpvdz"`` or a dict).
     nelec_act / ncore : the active-electron count and the closed-shell
         count (the fold).
     shell_patterns : the valence-shell label prefixes of the standard
-        window (e.g. ["2p"]; ["3d", "4s"]).
+        window (e.g. ``["2p"]``; ``["3d", "4s"]``).
     planned_windows : further window labels of the campaign, declared
         but not yet run (Ti: the (4,10)/(4,14) partitions) -- the cell
-        grid derives their full factor grids (cells.planned).
-    ref : the ReferenceSpec (character-forced occupations + basin gate)
-        where default SCF filling fails; None lets plain aufbau run.
-        The gated references are CAMPAIGN data now (regen_cells.REFS
-        is retired).
-    sa_weights : state-average weights for the primary sector
-        (uniform over the ground term's M_L set by convention).
+        grid derives their full factor grids (:func:`atomterm.cells.planned`).
+    tag : the workdir/checkpoint label (defaults to the symbol).
+    ref : the :class:`~atomterm.reference.ReferenceSpec` (character-forced
+        occupations + basin gate) where default SCF filling fails; None
+        lets plain aufbau run.
+    sa_weights : state-average weights for the primary sector (uniform
+        over the ground term's M_L set by convention).
     run_casscf : the single-root stage (off on multi-solution atoms).
-    want : the deliverables to produce -- subset of {"terms", "casscf",
-        "sa-casscf", "treatments"}; "terms" is always produced (T1/T2
-        are the contract).
+    nroots_primary : PySCF roots for the primary CASCI.
     study : the treatments arm, held unless declared -- a dict
         {"label", "source": {"patterns": [...]} | {"bands": {l: band}},
          "windows": ["shell", "no-groups"], "no_prefixes": [2, 4],
@@ -93,7 +101,6 @@ class CaseSpec:
     sa_weights: list[float] | None = None
     run_casscf: bool = True
     nroots_primary: int = 9
-    want: frozenset = frozenset({"terms", "casscf", "sa-casscf"})
     study: dict | None = None
     planned_windows: tuple[str, ...] = ()
 
@@ -105,8 +112,8 @@ class CaseSpec:
 # The declared campaign (one spec per atom) -- THE intent manifest: the
 # cell grid (cells.window_grid/grid_keys/planned), the regen runner, and
 # the table renderers all derive from these; nothing else re-declares
-# atoms, windows, or the gated references (the one-declaration rule,
-# ticket 29 T1b). New atom = new row here.
+# atoms, windows, or the gated references (the one-declaration rule).
+# New atom = new row here.
 CAMPAIGN: dict[str, CaseSpec] = {
     "C": CaseSpec("C", "ccpvdz", nelec_act=2, ncore=2,
                   shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3),
@@ -129,34 +136,40 @@ CAMPAIGN: dict[str, CaseSpec] = {
 
 
 def run_case(spec: CaseSpec, workdir: str = "elements") -> dict:
-    """Execute a declared case. The launch entry for any atom, new or
-    old: the spec is the intent manifest, the outputs land under
-    ``workdir`` and (as generated inserts) in ``elements/<Atom>/``."""
-    assert spec.want, "an empty want is not a case"
-    assert "terms" in spec.want, (
-        "T1/T2 term tables are the contract: 'terms' is always produced")
-    res = {}
-    if "terms" in spec.want:
-        res = run_atom(
-            spec.atom_config(),
-            list(spec.shell_patterns),
-            spec.nelec_act,
-            workdir=workdir,
-            sa_weights=list(spec.sa_weights) if spec.sa_weights else None,
-            run_casscf=spec.run_casscf,
-            nroots_primary=spec.nroots_primary,
-            ref=spec.ref,
-        )
-    if "treatments" in spec.want:
-        assert spec.study is not None, \
-            "want={'treatments'} needs the spec.study declaration"
+    """Execute a declared case: the term tables always, the treatments
+    arm when declared. The launch entry for any atom, new or old.
+
+    Parameters
+    ----------
+    spec : the :class:`CaseSpec` to execute.
+    workdir : where the checkpoints and reports land (generated inserts
+        go to ``elements/<Atom>/``).
+
+    Returns
+    -------
+    The :func:`run_atom` results dict, updated by the study arm's cell
+    payloads when one is declared.
+    """
+    res = run_atom(
+        spec.atom_config(),
+        list(spec.shell_patterns),
+        spec.nelec_act,
+        workdir=workdir,
+        sa_weights=list(spec.sa_weights) if spec.sa_weights else None,
+        run_casscf=spec.run_casscf,
+        nroots_primary=spec.nroots_primary,
+        ref=spec.ref,
+    )
+    if spec.study is not None:
         res.update(_treatments_arm(spec, workdir))
     return res
 
 
-def _treatments_arm(spec: "CaseSpec", workdir: str) -> dict:
+def _treatments_arm(spec: CaseSpec, workdir: str) -> dict:
     """The declared study: windows x treatments through the study
-    runner; results injected into the element file (tickets 20/28)."""
+    runner, with the results injected into the element file's study
+    markers. Phase-5 note: currently NO campaign case declares a study
+    -- this arm is the only cases->study bridge."""
     from atomterm.core import purified_core_orbitals
     from atomterm.natural import no_group_windows
     from atomterm.study import (StudySpec, inject_markers, plan_study,
@@ -237,14 +250,23 @@ def run_atom(
 
     Every stage is checkpointed under ``workdir`` and analyzed with the exact
     L/S operator matrices; see :func:`run_carbon` for the carbon instance.
+
+    Returns
+    -------
+    dict
+        ``"rohf_energy"`` plus one payload per stage tag
+        (``casci_ms*``, ``casscf``, ``sa_casscf``), each carrying the
+        analysis object, the run's energies, window weights, max|dE|,
+        and the particle-number sanity.
     """
     out = Path(workdir)
     out.mkdir(parents=True, exist_ok=True)
     label = cfg.label
     spin = cfg.spin  # 2S (PySCF convention)
-    assert spin >= 0 and (nelec_act + spin) % 2 == 0, (
-        f"spin 2S={spin} and nelec_act={nelec_act} must have equal parity"
-    )
+    if spin < 0 or (nelec_act + spin) % 2 != 0:
+        raise ValueError(
+            f"spin 2S={spin} and nelec_act={nelec_act} must be >= 0 and "
+            "of equal parity")
 
     # ---- stage 1: ROHF (checkpointed) -------------------------------------
     rohf_chk = str(out / f"{label}_rohf.chk")
@@ -334,8 +356,6 @@ def run_atom(
         f"ROHF/cc-pVDZ energy: {mf.e_tot:.8f} Eh\n\n" + "\n\n".join(reports),
         encoding="utf-8",
     )
-    import json
-
     serial = {
         tag: {
             "energies_pyscf": payload["energies_pyscf"],

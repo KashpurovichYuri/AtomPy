@@ -1,15 +1,16 @@
-"""Cases: the declared per-atom campaign and the new-atom launch
-(CaseSpec / run_case). Integration tier: run_case executes SCF/CASCI
-stages."""
+"""Cases: the declared per-atom campaign and the launch seams
+(CaseSpec / run_case / run_atom). Unit tier: every test here raises
+before any SCF runs; the executed pipeline is pinned by
+tests/integration/test_atoms.py."""
 
 import dataclasses
 
 import pytest
 
-from atomterm.cases import CaseSpec, run_case
+from atomterm.cases import CaseSpec, run_atom
 from atomterm.system import AtomConfig
 
-pytestmark = pytest.mark.slow
+pytestmark = pytest.mark.fast
 
 
 def _spec(**kw):
@@ -25,16 +26,10 @@ def test_casespec_is_the_intent_manifest():
     names = {f.name for f in dataclasses.fields(CaseSpec)}
     assert {"symbol", "basis", "ecp", "spin", "nelec_act", "ncore",
             "shell_patterns", "ref", "sa_weights", "run_casscf",
-            "want"} <= names
+            "study", "planned_windows"} <= names
     # immutable: a declaration is not mutated by running it
     with pytest.raises(Exception):
         spec.symbol = "N"
-
-
-def test_run_case_demands_term_tables():
-    # T1/T2 are the contract; a case without them is not a case
-    with pytest.raises(AssertionError):
-        run_case(_spec(want=frozenset({"casscf", "sa-casscf"})))
 
 
 def test_casespec_atom_config_roundtrip():
@@ -42,3 +37,11 @@ def test_casespec_atom_config_roundtrip():
     cfg = spec.atom_config()
     assert isinstance(cfg, AtomConfig)
     assert cfg.spin == 0
+
+
+def test_run_atom_rejects_parity_violations(tmp_path):
+    # spin 2S and the active-electron count must share parity -- the
+    # Ms-sector construction depends on it; raises before any SCF
+    with pytest.raises(ValueError, match="parity"):
+        run_atom(AtomConfig("C", "ccpvdz", spin=1), ["2p"], 2,
+                 workdir=str(tmp_path))
