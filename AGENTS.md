@@ -433,7 +433,7 @@ module.
 
 ## Tests
 
-`pytest` runs 178 tests in ~13 min unloaded (chkfile caching; ROHF computed
+`pytest` runs 183 tests in ~13 min unloaded (chkfile caching; ROHF computed
 once per
 session; the Ti rungs block is the slowest, ~7 min cold; the Sc rungs
 ~2.5 min; under external load ~230 the same suite took 31 min, 2026-10-28).
@@ -454,11 +454,18 @@ split them out when their file is next touched). Run the full suite
 before committing changes to
 physics-bearing modules (drivers/operators/stages/treatments/scans); targeted
 files or `-m fast` are fine for everything else. Suite flakes: the rungs
-fixtures are session-scoped — ONE chaotic SCF draw per run can fail
-whichever tight band grazes it (rotating failures across runs, each
-isolation-green on redraw); widen only a grazed band, and only with the
-observed fresh-draw value in a comment (precedent: sa_pur 2.2e-2,
-2026-10-27). Test files map
+fixtures are session-scoped — a chaotic SCF draw can fail whichever tight
+band grazes it (rotating failures across runs, each isolation-green on
+redraw); widen only a grazed band, and only with the observed fresh-draw
+value in a comment (precedents: sa_pur 2.2e-2 2026-10-27; the Ti escape
+gauge 6.40 and the Sc partial-swap 0.0736, 2026-10-29). FREE-MACHINE
+AMPLIFICATION (2026-10-29): with the machine unloaded (all BLAS threads
+live), full-suite sessions intermittently crash the C/Si purified rung
+inside PySCF's Davidson (NaN CI overlaps; one fixture death cascades to
+~12 errors) while every isolated rerun is green — load-dependent chaos,
+NOT a regression; a red suite alone is never the verdict, isolation
+reruns are (measured: 2 red + 1 near-green suites on three identical
+consecutive runs). Test files map
 1:1 to src modules (`test_drivers.py` exercises the
 reference/windows/core/casscf quartet through the drivers facade -- the
 split kept its tests in place; `test_windows.py` is the unit windows

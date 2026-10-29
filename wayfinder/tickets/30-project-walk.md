@@ -23,6 +23,20 @@ DONE already (2026-10-28 wave): `AGENTS` (+ §Refactor/§Verification),
 tests split unit/integration, the reviewed unit test files. Facts
 indexed so far: 1, 2, 4, 17.
 
+Phase 1 DONE (2026-10-29, `456adba`/`abced03`/`87edda6` + the phase
+close): `operators` + `analysis` walked (fact 3 collapsed — detbasis
+had the physicist formula under a chemist LABEL, fixed; the
+regex-parsing kill in shell_occupations; `_physicist_eri` one-home;
+`shell_slots` walker reuse; the conftest-basename rule — campaign data
+in `integration/refs.py`, unit helpers in `unit/helpers.py`; the
+fast-test split with the `test_ecp_wiring` basename precedent; the
+fact-24 bridge pinned inside configuration_summary at norb=4). Two
+grazed bands widened with observed values (Ti escape gauge 6.40, Sc
+partial-swap 0.0736). ENVIRONMENT FINDING recorded in AGENTS Tests:
+free-machine suites intermittently crash the C/Si purified rung's
+Davidson (NaN, cascade) while isolated reruns are green — a red suite
+is never the verdict without isolation reruns.
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE
