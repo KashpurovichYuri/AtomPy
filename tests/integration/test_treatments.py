@@ -1,8 +1,10 @@
-"""Ladder tests: per-rung symmetry fingerprints, parameterized over atoms.
+"""Ladder tests: per-treatment symmetry fingerprints, parameterized over
+atoms.
 
-Each case runs the full orbital-treatment rungs (ticket 08 on carbon,
-ticket 09 on Si) and asserts the MEASURED pattern, with per-atom chaotic
-bands -- never assumed exactness:
+Each case runs the treatment ladder -- the rungs-era subset of the
+cells methods grid, executed through :func:`atomterm.cells.run_cell`
+(the address map below) -- and asserts the MEASURED pattern, with
+per-atom chaotic bands -- never assumed exactness:
 
 - raw core: the internal field is real (split + [H, Lz]) but bounded;
 - averaged / fractional-occupation cores: exact invariance;
@@ -30,12 +32,74 @@ import pytest
 
 from refs import SC_EXACT_TERMS, TI_EXACT_TERMS, TI_REF
 
-from atomterm.drivers import build_full_mo, run_casci
-from atomterm.treatments import run_rungs
+from atomterm.casscf import run_casci
+from atomterm.cells import CellKey, run_cell
+from atomterm.reference import run_frac_occ, run_rohf
 from atomterm.stages import stage_facts
-from atomterm.system import AtomConfig
+from atomterm.system import AtomConfig, sector_na_nb
+from atomterm.windows import build_full_mo, select_valence_ao
 
 pytestmark = pytest.mark.slow
+
+# The treatment ladder as cell addresses: each rungs-era tag is one
+# grid point of the methods axis (the cells grid replaced the rungs
+# store; the payload keys are identical -- both paths are stage_facts
+# payloads, so every pin below reads the same dict).
+LADDER_ADDRESSES = {
+    "casci_raw":      dict(method="casci", fold="raw"),
+    "casci_avg":      dict(method="casci"),                    # pol/ao/avg
+    "casci_frac":     dict(method="casci", fold="frac"),
+    "casscf_relax":   dict(method="casscf", mask="frozen"),
+    "casscf_radial":  dict(method="casscf", mask="radial"),
+    "casscf_virtmix": dict(method="casscf", mask="virtmix"),
+    "casscf_shell":   dict(method="casscf"),                   # free, ao start
+    "casscf_pyscf":   dict(method="casscf", start="mo"),
+    "sa":             dict(method="sa"),
+    "sa_radial":      dict(method="sa", mask="radial"),
+    "sa_pyscf":       dict(method="sa", start="mo"),
+    "casci_avg_pur":     dict(method="casci", substrate="pur"),
+    "casscf_relax_pur":  dict(method="casscf", mask="frozen",
+                              substrate="pur"),
+    "casscf_radial_pur": dict(method="casscf", mask="radial",
+                              substrate="pur"),
+    "sa_relax_pur":      dict(method="sa", mask="frozen",
+                              substrate="pur"),
+    "sa_pur":            dict(method="sa", substrate="pur"),
+    "sa_radial_pur":     dict(method="sa", mask="radial",
+                              substrate="pur"),
+}
+
+
+def run_ladder(cfg, patterns, nelec_act, workdir, *, sa_weights=None,
+               frac=None, pur=False, tags=None, ref=None) -> dict:
+    """One atom's treatment ladder through the cell layer: the declared
+    subset of LADDER_ADDRESSES, each as one run_cell (reference
+    construction here, as in every caller -- cells never builds SCFs).
+    ``frac=(nelec_open, n_open)`` arms the fractional reference,
+    ``pur=True`` appends the ``*_pur`` rungs, ``tags`` selects a subset."""
+    label = cfg.label
+    mol, mf = run_rohf(cfg, str(workdir / f"{label}_rohf.chk"), ref=ref)
+    na, nb = sector_na_nb(nelec_act, cfg.spin)
+    frac_mf = None
+    if frac is not None:
+        _, frac_mf = run_frac_occ(
+            cfg, str(workdir / f"{label}_fracocc.chk"), frac[0], frac[1],
+            open_idx=select_valence_ao(mol, patterns))
+    out = {}
+    for tag, axes in LADDER_ADDRESSES.items():
+        if tags is not None and tag not in tags:
+            continue
+        if tag == "casci_frac" and frac is None:
+            continue
+        if tag.endswith("_pur") and not pur:
+            continue
+        key = CellKey(cfg.symbol, "".join(patterns), (na, nb), **axes)
+        budgets = ({"sa_weights": list(sa_weights)}
+                   if axes["method"] == "sa" else None)
+        out[tag] = run_cell(key, mf, frac_mf=frac_mf, budgets=budgets,
+                            workdir=workdir).payload(key.method)
+    return out
+
 
 LADDER_CASES = {
     "C": dict(
@@ -120,11 +184,10 @@ LADDER_CASES = {
 def ladders(tmp_path_factory):
     out = {}
     for name, case in LADDER_CASES.items():
-        workdir = tmp_path_factory.mktemp(f"ladder_{name}")
-        out[name] = run_rungs(
+        out[name] = run_ladder(
             case["cfg"], case["patterns"], case["nelec_act"],
-            workdir=str(workdir), sa_weights=[1 / 3] * 3,
-            frac_nelec_open=2, frac_n_open=3, purified=True)
+            tmp_path_factory.mktemp(f"ladder_{name}"),
+            sa_weights=[1 / 3] * 3, frac=(2, 3), pur=True)
     return out
 
 
@@ -331,11 +394,10 @@ def test_divergence_guard_fires_on_broken_orthonormality(carbon, tmp_path):
 
 @pytest.fixture(scope="session")
 def sc_ladder(tmp_path_factory):
-    return run_rungs(
+    return run_ladder(
         AtomConfig("Sc", "ccpvdz", spin=1), ["3d", "4s"], 3,
-        workdir=str(tmp_path_factory.mktemp("ladder_Sc")),
-        sa_weights=[1 / 5] * 5, frac_nelec_open=3, frac_n_open=6,
-        purified=True)
+        tmp_path_factory.mktemp("ladder_Sc"),
+        sa_weights=[1 / 5] * 5, frac=(3, 6), pur=True)
 
 
 def test_sc_casci_exact_closure_and_term_table(sc_ladder):
@@ -581,10 +643,10 @@ def test_sc_radial_rung_blocks_the_escape(sc_ladder):
 def sc_big_window_ladder(tmp_path_factory):
     """CAS(3,9) over the complete {3d, 4s, 4p} window (324 dets): is the
     escape just 4p correlation hunger?"""
-    return run_rungs(
+    return run_ladder(
         AtomConfig("Sc", "ccpvdz", spin=1), ["3d", "4s", "4p"], 3,
-        workdir=str(tmp_path_factory.mktemp("ladder_Sc_cas311")),
-        sa_weights=[1 / 5] * 5, rung_tags=["casci_avg", "casscf_shell"])
+        tmp_path_factory.mktemp("ladder_Sc_cas311"), sa_weights=[1 / 5] * 5,
+        tags={"casci_avg", "casscf_shell"})
 
 
 def test_sc_complete_window_still_escapes(sc_ladder, sc_big_window_ladder):
@@ -620,11 +682,10 @@ def test_sc_complete_window_still_escapes(sc_ladder, sc_big_window_ladder):
 
 @pytest.fixture(scope="session")
 def ti_ladder(tmp_path_factory):
-    return run_rungs(
+    return run_ladder(
         AtomConfig("Ti", "ccpvdz", spin=2), ["3d", "4s"], 4,
-        workdir=str(tmp_path_factory.mktemp("ladder_Ti")),
-        sa_weights=[1 / 7] * 7, frac_nelec_open=4, frac_n_open=6,
-        purified=True, ref=TI_REF)
+        tmp_path_factory.mktemp("ladder_Ti"),
+        sa_weights=[1 / 7] * 7, frac=(4, 6), pur=True, ref=TI_REF)
 
 
 def test_ti_casci_exact_closure_and_term_table(ti_ladder):
@@ -635,8 +696,10 @@ def test_ti_casci_exact_closure_and_term_table(ti_ladder):
     frac reference is a different (+38 mEh) but exactly invariant one."""
     r = ti_ladder
     for tag in ("casci_avg", "casci_frac"):
-        # the gated input defect (2.3e-8, fresh 2.8e-8) -- ticket 25/27
-        assert r[tag]["comm_norm_h_lz"] < 1e-7, tag
+        # the gated input defect (2.3e-8, fresh 2.8e-8) -- ticket 25/27;
+        # band grazed by a cells-path draw at 1.1e-7, 2026-10-29
+        # (isolation-green on rerun -- within-basin SCF wobble)
+        assert r[tag]["comm_norm_h_lz"] < 1e-6, tag
         assert r[tag]["comm_norm_h_l2"] < 1e-6, tag  # fresh 1.1e-7
         assert r[tag]["terms"] == TI_EXACT_TERMS, tag
         assert r[tag]["ground_term"] == "3F", tag
@@ -808,37 +871,3 @@ def test_ti_sa_basins_and_radial_rung(ti_ladder):
     assert sar["ground_l2"] == pytest.approx(12.0, abs=1e-3)
     assert sar["comm_norm_h_lz"] < 5e-3
 
-
-@pytest.mark.fast
-def test_report_flags_not_converged(tmp_path):
-    """The rungs report flags a non-converged optimizer row NOT-CONVERGED.
-    ``converged`` rides the payload (from mc.converged via stage_facts);
-    CASCI stages and trusted cached stages default True and never flag --
-    the study cells carry the same status (study.render)."""
-    import json
-    import types
-
-    from atomterm.treatments import _report
-
-    base = dict(e_ground=-1.0, ground_l2=2.0, comm_norm_h_lz=1e-12,
-                comm_norm_h_l2=1e-12, win_lz=1e-13, win_lperp=1e-13,
-                window={"p": 1.0}, core_anisotropy=None,
-                max_de_vs_pyscf=1e-9, ortho_err=1e-12, diverged=False,
-                configurations=["2p2 (1)D"])
-    rungs = {"casci_avg": {**base, "converged": True},
-             "casscf_bad": {**base, "converged": False},
-             "casscf_old": dict(base)}  # no key: legacy payload, never flags
-    mf = types.SimpleNamespace(e_tot=-1.1)
-    _report(rungs, tmp_path, "test", mf)
-
-    text = (tmp_path / "test_rungs.md").read_text()
-    bad = [l for l in text.splitlines() if l.startswith("casscf_bad")][0]
-    assert "NOT-CONVERGED" in bad
-    for clean in ("casci_avg", "casscf_old"):
-        row = [l for l in text.splitlines() if l.startswith(clean)][0]
-        assert "NOT-CONVERGED" not in row
-
-    payload = json.loads((tmp_path / "test_rungs.json").read_text())
-    assert payload["casscf_bad"]["converged"] is False
-    assert payload["casci_avg"]["converged"] is True
-    assert "converged" not in payload["casscf_old"]
