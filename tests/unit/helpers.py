@@ -27,3 +27,31 @@ def random_integrals(rng, norb: int, kind: str):
     else:
         raise ValueError(f"kind must be 'complex' or 'hermitian', got {kind!r}")
     return h, g
+
+
+def uncontracted_carbon_mole(spin: int = 2):
+    """The synthetic uncontracted C basis (3 s + 2 p + 1 d primitives,
+    one AO per primitive) shared by the selection and hook pins: m
+    labels are unambiguous and whole-l spans are exact."""
+    from pyscf import gto
+
+    mol = gto.Mole()
+    mol.atom = "C 0 0 0"
+    mol.basis = gto.parse("""
+        C S
+             8.0  1.0
+        C S
+              1.0  1.0
+        C S
+              0.1  1.0
+        C P
+              2.0  1.0
+        C P
+              0.2  1.0
+        C D
+              0.5  1.0
+    """)
+    mol.spin = spin
+    mol.verbose = 0
+    mol.build()
+    return mol

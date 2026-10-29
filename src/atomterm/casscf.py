@@ -296,7 +296,7 @@ def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
 
 
 def run_casscf_core_relax(mf, ncas, nelecas, mo_full, chkfile, verbose=0,
-                          mc_opts: dict = None) -> CASResult:
+                          mc_opts: dict | None = None) -> CASResult:
     """CASSCF with the active-window span frozen ("CASCI + core relaxation").
 
     Mask :func:`mask_frozen_window`: only inactive<->virtual

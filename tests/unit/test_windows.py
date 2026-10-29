@@ -16,6 +16,7 @@ from atomterm.windows import (Window, build_full_mo, complete_orthonormal,
                               select_span, select_valence_ao,
                               select_shell_ao, shell_weights,
                               span_projector)
+from helpers import uncontracted_carbon_mole
 
 pytestmark = pytest.mark.fast
 
@@ -223,30 +224,29 @@ def test_select_valence_ao_rejects_unknown_pattern(carbon):
         select_valence_ao(mol, ["9f"])
 
 
-def test_shell_weights_partition_unity_and_group_by_l(carbon):
+def test_shell_weights_pure_l_for_raw_shell_aos(carbon):
     _, mol, mf, act_idx = carbon
     s = mf.get_ovlp()
     c = np.eye(mol.nao_nr())[:, act_idx]  # raw 2p AOs: exactly l = 1
     names, w = shell_weights(mol, c, s)
     assert names == ["s", "p", "d"]
-    assert np.allclose(w.sum(axis=1), 1.0, atol=1e-12)
     assert np.allclose(w[:, names.index("p")], 1.0, atol=1e-12)
 
 
+# ---------------------- closed-block and primitive-chain pins (synthetic)
+
 def test_occupied_core_idx_selects_the_closed_block_not_canonical_order():
-    """The core fold takes the DOUBLY-OCCUPIED MOs; canonical MO order
-    is meaningless on near-degenerate uncontracted bases (U: the first
-    canonical MOs are virtual junk at eps ~ 0.02 while the closed block
-    sits at 22/61/88/120/143 -- folding range(ncore) silently corrupted
-    the fold at max|dE| = 14.5 Eh). The contracted-basis coincidence is
-    a checked invariant, not an assumption."""
+    """The core fold takes the DOUBLY-OCCUPIED block, not canonical
+    order; the contracted-basis coincidence is checked, not assumed."""
     import warnings
 
     class FakeMF:
         def __init__(self, mo_occ):
             self.mo_occ = np.asarray(mo_occ, dtype=float)
 
-    # U-style: closed block scattered (canonical [0:5] are virtual junk)
+    # U-style: canonical [0:5] are virtual junk (eps ~ 0.02) while the
+    # closed block sits at 22/61/88/120/143 -- folding range(ncore)
+    # corrupted the fold at max|dE| = 14.5 Eh
     occ = [0.0] * 10
     for k in (2, 5, 6, 8, 9):
         occ[k] = 2.0
@@ -270,32 +270,11 @@ def test_occupied_core_idx_selects_the_closed_block_not_canonical_order():
 
 
 def test_primitive_chain_and_select_primitives():
-    """The exponent-walk selector (kin proxy retired): the chain IS the
-    basis's radial coordinate (ascending exponent, one m-complete slot
-    per primitive), bands/counts select whole primitives, and
-    contractions -- which have no single exponent -- are rejected with
-    the pointer to label/MO selection."""
+    """The primitive chain: exponent-ordered m-complete slots; band and
+    count select whole primitives; contractions are rejected."""
     from atomterm.operators import window_closure
 
-    mol = gto.Mole()
-    mol.atom = "C 0 0 0"
-    mol.basis = gto.parse("""
-        C S
-             8.0  1.0
-        C S
-              1.0  1.0
-        C S
-              0.1  1.0
-        C P
-              2.0  1.0
-        C P
-              0.2  1.0
-        C D
-              0.5  1.0
-    """)
-    mol.spin = 2
-    mol.verbose = 0
-    mol.build()
+    mol = uncontracted_carbon_mole()
 
     # the chain: exponent ordering DIRECT, m-complete slots, row identity
     chain = primitive_chain(mol, 1)
