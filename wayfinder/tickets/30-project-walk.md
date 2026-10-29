@@ -37,6 +37,16 @@ free-machine suites intermittently crash the C/Si purified rung's
 Davidson (NaN, cascade) while isolated reruns are green — a red suite
 is never the verdict without isolation reruns.
 
+DOCSTRING REMEDIATION (2026-10-29, user-directed, same day): the
+operators/analysis docstrings were re-judged against the exemplar
+passes (system/windows/secondquant/detbasis — the new R1 clause) and
+rewritten: opener + definitional-convention bullets, sections on
+every non-trivial public function, one sentence per fact, the
+Layering TOC dropped, archaeology out. Certified AST-identical
+(scripts/check_docstring_only.py — which caught one dropped function
+body before it could land; the certificate is part of the method
+now, V6).
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE

@@ -1,16 +1,15 @@
-"""Term-symbol analysis of many-electron states.
+"""Analysis: term classification of determinant-basis eigenstates.
 
-Purpose: classify the eigenstates of a determinant-basis Hamiltonian
-by their exact angular-momentum and spin content -- each state gets
-L, S and the term symbol ``^(2S+1)L`` from
+PURPOSE: given the operator matrices of
+:func:`operators.build_operators`, classify every eigenstate of H by
+its exact content -- L, S, and the term symbol ``^(2S+1)L`` from
 ``<L^2> = L(L+1)``, ``<S^2> = S(S+1)`` -- and quantify how exactly
 the CI space preserves rotational symmetry.
 
-Inputs are the full matrices of :mod:`atomterm.operators` (H, Lz,
-L^2, S^2; optionally Sz and Lz^2). The Lz eigenvalue spectrum reports
-the M_L content of the space. Exact rotational invariance means the
-Frobenius norms of the commutators [H, Lz] and [H, L^2] vanish (up
-to numerics / basis-set closure of the active space).
+Two meters: the Frobenius norms of ``[H, Lz]`` and ``[H, L^2]`` --
+exact rotational invariance means both vanish (up to numerics /
+basis-set closure of the active space). The Lz eigenvalue spectrum
+reports the M_L content of the space.
 """
 
 from __future__ import annotations
@@ -45,7 +44,14 @@ _L_LETTERS = "SPDFGHIKLMNOQRTUVWXYZ"  # J skipped, and the second P and
 
 
 def quantum_number(observed: float) -> int:
-    """Quantum number N with N(N+1) closest to ``observed`` (integer grid)."""
+    """Quantum number N with N(N+1) closest to ``observed`` (integer
+    grid).
+
+    Examples
+    --------
+    >>> quantum_number(6.0)
+    2
+    """
     n_real = (np.sqrt(1.0 + 4.0 * observed) - 1.0) / 2.0
     return int(round(n_real))
 
@@ -53,17 +59,30 @@ def quantum_number(observed: float) -> int:
 def spin_quantum_number(s2: float) -> float:
     """Spin S with S(S+1) closest to ``s2``, on the HALF-integer grid.
 
-    Orbital L is always an integer, but S of an odd-electron state is a
-    half-integer (S^2 = 0.75 -> S = 1/2 -> multiplicity 2): rounding S to
-    the integer grid silently relabels doublets/quartets as singlets/
-    triplets (first exposed by Sc, the project's first doublet).
+    Orbital L is always an integer, but S of an odd-electron state is
+    a half-integer (S^2 = 0.75 -> S = 1/2 -> multiplicity 2): rounding
+    S to the integer grid silently relabels doublets/quartets as
+    singlets/triplets (first exposed by Sc, the project's first
+    doublet).
     """
     s_real = (np.sqrt(1.0 + 4.0 * s2) - 1.0) / 2.0
     return round(2.0 * s_real) / 2.0
 
 
 def term_symbol(s2: float, l2: float) -> str:
-    """Term symbol ^(2S+1)L from expectation values of S^2 and L^2."""
+    """Term symbol ``^(2S+1)L`` from <S^2> and <L^2> expectation
+    values.
+
+    Raises
+    ------
+    ValueError
+        If L exceeds the letter table (L <= 20).
+
+    Examples
+    --------
+    >>> term_symbol(2.0, 2.0)
+    '3P'
+    """
     s = spin_quantum_number(s2)
     l = quantum_number(l2)
     if l >= len(_L_LETTERS):
@@ -77,28 +96,59 @@ def term_symbol(s2: float, l2: float) -> str:
 
 @dataclass
 class StateSummary:
+    """One eigenstate of H with its labels.
+
+    Attributes
+    ----------
+    index : position in the ascending-energy list.
+    energy : E in Eh.
+    l2 : ``<L^2>``.
+    l : the snapped L.
+    s2 : ``<S^2>``.
+    s : the snapped S -- half-integer allowed (odd-electron states).
+    term : the term symbol string.
+    lz : ``<L_z>`` of the root (the M_L label).
+    lz2 : ``<L_z^2>`` of the root: M_L^2 on broken folds, gauge on
+        isotropic ones (README, the <Lz^2> note).
+    """
+
     index: int
     energy: float
     l2: float
     l: int
     s2: float
-    s: float  # half-integer allowed (odd-electron states)
+    s: float
     term: str
-    lz: float = 0.0  # <L_z> of the root (the M_L label, per root)
-    lz2: float = 0.0  # <L_z^2> of the root (M_L^2 on broken folds; gauge
-    # on isotropic ones -- README, the <Lz^2> note)
+    lz: float = 0.0
+    lz2: float = 0.0
 
 
 @dataclass
 class AnalysisResult:
-    sector: str  # e.g. "Ms=+1 (na=2, nb=0)"
+    """The full result of one sector analysis.
+
+    Attributes
+    ----------
+    sector : the label, e.g. ``"Ms=+1 (na=2, nb=0)"``.
+    n_det : determinants in the sector.
+    states : one StateSummary per eigenstate, ascending energy.
+    lz_spectrum : sorted Lz eigenvalues (the M_L content).
+    comm_norm_h_lz, comm_norm_h_l2 : the two symmetry meters
+        (Frobenius norms of the commutators).
+    h_norm : ``||H||_F`` -- the scale the meters are read against.
+    sz_spectrum : sorted Sz eigenvalues, exactly ``M_S`` times the
+        identity -- reported for the record (H is spin-free,
+        ``[H, Sz] = 0`` identically), or None.
+    """
+
+    sector: str
     n_det: int
     states: list[StateSummary]
     lz_spectrum: list[float]
     comm_norm_h_lz: float
     comm_norm_h_l2: float
     h_norm: float
-    sz_spectrum: list[float] | None = None  # Sz = M_S*1 exactly: constant
+    sz_spectrum: list[float] | None = None
 
 
 # -------------------------------------------------------------- the analysis
@@ -112,13 +162,28 @@ def _expectation(evecs: np.ndarray, op: np.ndarray) -> np.ndarray:
 
 def analyze(h: np.ndarray, lz: np.ndarray, l2: np.ndarray, s2: np.ndarray, sector: str,
             sz: np.ndarray | None = None, lz2: np.ndarray | None = None) -> AnalysisResult:
-    """Classify the eigenstates of H and test the [H, L] commutators.
+    """Classify the eigenstates of H and measure the [H, L] meters.
 
-    ``sz`` (optional): the delivered Ŝz matrix. Its spectrum is the
-    sector's M_S, exactly -- reported for the record, certifying nothing
-    (Ĥ is spin-free, so [Ĥ, Ŝz] ≡ 0 identically).
-    ``lz2`` (optional): the delivered Lz^2 matrix; its per-root
-    expectation is recorded on every state (StateSummary.lz2).
+    Parameters
+    ----------
+    h, lz, l2, s2 : the full sector matrices from
+        ``operators.build_operators``.
+    sector : the label stored on the result.
+    sz : optional -- the delivered Sz matrix; its spectrum (exactly
+        the sector's M_S) is reported for the record, certifying
+        nothing.
+    lz2 : optional -- the delivered Lz^2 matrix; its per-root
+        expectation is recorded on every state.
+
+    Returns
+    -------
+    AnalysisResult
+
+    Raises
+    ------
+    ValueError
+        If H carries non-noise imaginary parts (a construction error
+        upstream, not physics to diagonalize).
     """
     if frobenius_norm(h.imag) > 1e-9 * max(frobenius_norm(h.real), 1.0):
         raise ValueError("Hamiltonian matrix should be real")
@@ -208,24 +273,31 @@ def save_report(res: AnalysisResult, path: str) -> None:
 
 def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
                           top: int = 2) -> list[str]:
-    """Approximate valence-configuration label of each CI root in a window.
+    """Approximate valence-configuration label of each CI root.
 
-    Method-agnostic: works for ANY window and CI vectors. Each window
-    column's l-character comes from the S-metric projection
-    (:func:`atomterm.windows.shell_weights`); a determinant's configuration
-    is the l-mass of its occupied columns; each root is labeled by its
-    ``top`` dominant determinants.
+    Works for ANY window and CI vectors. Each window column's
+    l-character comes from the S-metric projection
+    (:func:`atomterm.windows.shell_weights`); a determinant's
+    configuration is the l-mass of its occupied columns; each root is
+    labeled by its ``top`` dominant determinants.
 
-    Approximation level: exact when the window columns are raw shell AOs
-    (determinants ARE AO occupations, e.g. "p^2.00"); approximate for
-    optimized windows, whose columns are delocalized over radials/l -- the
-    label then reports the dominant character (enough to tell a 3p^2 state
-    from an escaped 3s^2 one). Returns one string per root, e.g.
-    ``"p^2.00 (|c|=0.98)"``.
+    Parameters
+    ----------
+    ci_list : CI vectors in PYSCF order -- the ordering bridge runs
+        inside (fact 24: PySCF's FCI string order differs from
+        detbasis' from ``norb >= 4``).
+    top : determinants reported per root.
 
-    ``ci_list`` entries are PySCF-order CI vectors (fact 24: the FCI
-    string order differs from detbasis' from norb >= 4 -- the ordering
-    bridge runs inside).
+    Returns
+    -------
+    list[str], one per root, e.g. ``"p^2.00 (|c|=0.98)"``.
+
+    Notes
+    -----
+    Exact for raw shell-AO windows (determinants ARE AO occupations);
+    approximate for optimized windows, whose columns are delocalized
+    over radials/l -- the label then reports the dominant character
+    (enough to tell a 3p^2 state from an escaped 3s^2 one).
     """
     from atomterm.cells import ci_in_detbasis_order  # lazy on purpose:
     # cells -> stages -> analysis is a module-level cycle
@@ -257,24 +329,30 @@ def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
 
 def shell_occupations(mol, s, c_win: np.ndarray, ci_ground, na: int,
                       nb: int) -> dict:
-    """Electron occupations per angular (l) AO subspace, ground root.
+    """Electron occupations per angular (l) AO subspace, ground root
+    -- ``{'s': .., 'p': .., ...}``.
 
-    The ELECTRON scale of the window analysis (the span counterpart is
-    :func:`~atomterm.windows.shell_weights`): ``gamma`` = the ground
+    The ELECTRON scale of the window analysis (the span counterpart
+    is :func:`~atomterm.windows.shell_weights`): gamma = the ground
     root's spin-summed 1-RDM in the window-MO basis of ``c_win``
-    (S-orthonormal columns); ``n_l = Tr[gamma . C^dag S_l C]`` with
-    ``S_l`` the l-block of the AO overlap -- the expectation of the
-    l-subspace number operator. The different-l AO blocks are exactly
-    S-orthogonal (one center), so ``sum_l S_l = S`` and the ``n_l``
-    partition the active electron count ``na + nb`` EXACTLY. (The
-    bare AO diagonal of ``C gamma C^dag`` is NOT it: same-l shells
-    are non-orthogonal -- it overshoots by the cross terms.)
+    (S-orthonormal columns); then ``n_l = Tr[gamma C^dag S_l C]``
+    with ``S_l`` the l-block of the AO overlap -- the expectation of
+    the l-subspace number operator.
+
+    Parameters
+    ----------
+    ci_ground : the ground root's CI vector in PYSCF order (the
+        ``cas.ci`` / cell-store convention); mapped through the
+        ordering bridge (fact 24).
+
+    Notes
+    -----
+    Different-l AO blocks are exactly S-orthogonal (one center), so
+    ``sum_l S_l = S`` and the ``n_l`` partition ``na + nb`` EXACTLY.
+    The bare AO diagonal of ``C gamma C^dag`` is NOT it: same-l
+    shells are non-orthogonal and overshoot by the cross terms.
     Term-stable inside a degenerate cluster (same configuration
     content).
-
-    ``ci_ground``: the ground root's CI vector in PYSCF order (the
-    ``cas.ci`` / cell-store convention) -- mapped through the ordering
-    bridge (fact 24). Returns ``{'s': .., 'p': .., ...}``.
     """
     from atomterm.natural import ci_rdm1
     from atomterm.cells import ci_in_detbasis_order  # lazy: the

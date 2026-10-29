@@ -565,6 +565,12 @@ Verification section's job):
    Defaults are contract: state what the default physically is.
    Tolerance envelopes and arrival history are comments at the point
    of use, or commit-message material.
+   The standard is concrete: measure against the exemplar passes
+   (`system.py`, `windows.py`, `secondquant.py`, `detbasis.py`) --
+   one sentence carries one fact, every fact sits in its slot,
+   formulas that carry a convention get their own line, the
+   load-bearing word is highlighted sparingly (ONE, NEVER, EXACTLY),
+   and zero `Parameters` sections in a walked file is a failed pass.
 2. **Names join their family.** Selectors take `select_*`, window
    constructors take `window_*`, pure linear algebra takes plain
    nouns. A name that misstates its function renames together with
@@ -634,7 +640,9 @@ written, and the degenerate case is the strongest anchor.
 6. **Certified, not assumed.** A behavior-preserving refactor proves
    it: bitwise A/B against pre-refactor arrays on pinned references
    (deterministic constructions only); elementwise pins for algorithm
-   restructures; the full suite before physics-bearing commits.
+   restructures; AST comparison with docstrings neutralized for
+   docstring-only passes (`scripts/check_docstring_only.py`); the
+   full suite before physics-bearing commits.
    Mathematically idempotent steps still count -- they perturb
    degenerate gauges and break bit-exactness.
 7. **Measured pins.** Bands cite the observed fresh value in a
