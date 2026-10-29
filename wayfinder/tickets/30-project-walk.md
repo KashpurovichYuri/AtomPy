@@ -206,6 +206,24 @@ rows for the four dead modules deleted, facts 9/11/12/19/20
 re-pointed (drivers->owners, treatments->the migrated pins),
 reference.py's run_rungs cite -> run_case.
 
+POST-PHASE-5 ROUND (2026-10-29, user-directed, `0909b64`): (1) the
+method axis takes the FULL name -- 'sa' -> 'sa-casscf' everywhere
+(vocabulary, addresses, payload kind, the classic stage tag, display
+maps), committed data migrated in lockstep (4 cells.json stores,
+C's report, 12 chk caches via h5py subtree copy, round-trip
+certified); identifiers keep underscores. The rename EXPOSED one
+behavioral miss (a budgets comparison still matching 'sa') -- and
+that miss found a REAL TRAP, now run_cell's contract: the
+measured-block sa_weights default presupposes a DEGENERATE start
+window; on a defective (fact-17-split) window ground_block anchors
+ONE state -> single-root SA -> the TM collapse basin (Sc measured:
+nroots=1, L2=0.047). (2) cells' comment debt brought to the
+accepted form (arrival-history clauses content-ified; the
+archaeology grep across src is clean). GRAZE LOG: the Ti escape
+comm band (test_treatments line ~817) failed in 2 of 4 full
+sessions on 2026-10-29, isolation-green 4/4, value uncaptured --
+no widening without the observed value; capture it if it recurs.
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE
