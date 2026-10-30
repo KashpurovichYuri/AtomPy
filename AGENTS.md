@@ -397,7 +397,7 @@ synthetic substrates, and the FROZEN carbon ROHF --
 the root `carbon` fixture: NO SCF runs in the unit tier and the
 downstream is bit-stable across runs, certified by double-run
 sha256; regenerate only on basis/default changes via
-`scripts/freeze_carbon_reference.py`);
+`scripts/generate_fixture_carbon.py`);
 `tests/integration/` = the campaign chemistry (TM references, CASSCF/SA,
 term tables); conftest is split the same way (shared root, campaign
 fixtures in `integration/conftest.py`). Shared DATA and helpers live in

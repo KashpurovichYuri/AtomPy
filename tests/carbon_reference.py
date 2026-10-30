@@ -3,7 +3,7 @@ one single-threaded draw): the unit tier's deterministic substrate.
 Floats are repr-round-trip exact -- loading this module reproduces the
 SCF state bitwise and NO SCF runs in the unit tier. Regenerate (only
 if the basis or defaults ever change) with
-scripts/freeze_carbon_reference.py."""
+scripts/generate_fixture_carbon.py."""
 
 import numpy as np
 

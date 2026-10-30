@@ -5,7 +5,7 @@ plain source: Python float repr round-trips exactly, so loading the
 module reproduces the SCF state bitwise. The unit tier runs NO SCF.
 
 Usage:
-    python scripts/freeze_carbon_reference.py
+    python scripts/generate_fixture_carbon.py
 """
 
 from __future__ import annotations
@@ -46,7 +46,7 @@ one single-threaded draw): the unit tier's deterministic substrate.
 Floats are repr-round-trip exact -- loading this module reproduces the
 SCF state bitwise and NO SCF runs in the unit tier. Regenerate (only
 if the basis or defaults ever change) with
-scripts/freeze_carbon_reference.py."""
+scripts/generate_fixture_carbon.py."""
 
 import numpy as np
 
