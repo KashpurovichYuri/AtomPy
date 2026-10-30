@@ -148,7 +148,9 @@ deliverable).
   separate problem, deferred.
 - /tmp/opencode pre-session artifacts: user decision pending.
 - Verdict vocabulary lives in the AUDIT dict; "MO start was not
-  closed" confirmed for the frozen-MO rows.
+  closed" confirmed for the frozen-MO rows. [The dict died with the
+  verdict column, 2026-10-30 — the vocabulary lives in README ·
+  Results' reading key.]
 
 ## Pointers
 
