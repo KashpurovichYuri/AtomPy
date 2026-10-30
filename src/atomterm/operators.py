@@ -13,7 +13,7 @@ secondquant's a+/a strings, elementwise identical behind
 ``build_operators(method=...)`` (pinned by tests).
 
 Symbols
------------
+-------
 Every operator is the pair (o, g): ``O1 = Σ_pq o_pq a+_p a_q`` and
 ``O2 = ½ Σ_pqrs g_pqrs a+_p a+_q a_s a_r`` (spin-orbitals ordered
 (alpha; beta); ``L^a = C† L^a_AO C`` -- the AO angular-momentum

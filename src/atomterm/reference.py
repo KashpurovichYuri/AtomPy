@@ -19,8 +19,8 @@ Conventions
   (loaded, marked converged, never re-gated) -- the unit of
   reproducibility, because from-scratch SCF is not bit-reproducible
   (threaded BLAS draws last-digit-different MOs, and orbital-optimized
-  stages amplify the draw chaotically: root splittings wobble at the
-  cEh scale between identical reruns). Equivalence checks pin the same chkfile,
+  stages amplify the draw chaotically: root splittings wobble between
+  identical reruns). Equivalence checks pin the same chkfile,
   never two fresh runs.
 - The occupation hook (``get_occ``) is part of the SCF object's
   identity: attached BEFORE the cache branch, so cache hits carry it

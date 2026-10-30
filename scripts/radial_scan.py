@@ -74,7 +74,8 @@ def run_one(name: str, spec) -> None:
 
     lines += ["", f"optimum: theta* = {best_th:.3f}, "
               f"dE = {(best.e_active - e_zero) * 1e6:+.1f} uEh "
-              f"(compare the free/radial CASSCF gains, AGENTS.md fact 16), "
+              f"(compare the free/radial CASSCF gains, AGENTS.md "
+              f"fact 18, the frozen-scan verdicts), "
               f"|[H,Lz]| = {best.comm_h_lz:.1e}", "",
               f"member-tilt map at theta* = {best_th:.3f} "
               f"(delta = 0.10 rad):", "",

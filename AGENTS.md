@@ -395,7 +395,7 @@ Resolved tickets are DELETED (git history is the archive); each live
 ticket is self-contained (no conversation context needed).
 
 State: the atom campaign (C, Si, Sc, Ti) and the project walk (ticket
-30) are COMPLETE. Next wave: **ECP** — ticket one declares the ECP atom
+30) are COMPLETE. Next wave: **ECP** — ticket 31 declares the ECP atom
 in `CAMPAIGN` (ECP basis + pseudopotential via `AtomConfig.ecp`; retires
 `run_u*` into the modern path AND the two stage adapters with them).
 Gated measurement batches (T2/M) run only on the user's enable. Beyond

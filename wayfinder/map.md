@@ -45,8 +45,10 @@ dies).
     analysis       analysis · stages · scans
     declaration    cases -> cells
 
-`natural` is fully pure (numpy + secondquant only — the windows→natural
-edge retired with the window-kind registry, 2026-10-30). No cycles, no
-upward edges. Division of labor over windows: declaration NAMES
-(labels), windows BUILDS (the kinds + substrate builders), cells BINDS
-(the start axis picks the builder).
+`natural`'s mathematics is pure at module level (numpy + secondquant
+only — the windows→natural edge retired with the window-kind
+registry, 2026-10-30); its one driver (`no_group_windows`) lazily
+imports the assembly layers. No cycles, no upward edges. Division of
+labor over windows: declaration NAMES (labels), windows BUILDS (the
+kinds + substrate builders), cells BINDS (the start axis picks the
+builder).
