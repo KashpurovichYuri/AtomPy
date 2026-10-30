@@ -350,7 +350,7 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
 # ------------------------------------------------------------- the execution
 
 
-def _select_no_window(wins, k: int):
+def _pick_no_window(wins, k: int):
     """The k-GROUP-PREFIX window from no_group_windows's COMPACT list.
 
     k counts occupation groups (window identity: ``3d4sno2`` = the
@@ -450,7 +450,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         c_src = mo_src[:, ncore:ncore + ncas]
         wins = no_group_windows(mol, mf, ncore, c_src, na, nb,
                                 c_core=c_pur, cap=budgets.get("no_cap", 12000))
-        win = _select_no_window(wins, key.no_source[1])
+        win = _pick_no_window(wins, key.no_source[1])
         ncas = win.c_win.shape[1]
         mo_full = win.columns(mf, ncore, c_core=c_pur)
     elif key.start == "ao":

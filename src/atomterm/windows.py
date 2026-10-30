@@ -715,7 +715,7 @@ def mask_radial_rotations(labels: list, ncore: int, ncas: int):
     the radial rotation applied IDENTICALLY to all m partners --
     independent per-member radial mixing leaves [H, Lz] nonzero at
     the member-difference level; SA over the term's M_L set is the
-    symmetry-restoring companion rung.
+    symmetry-restoring companion treatment.
     """
     lab = list(labels)
 

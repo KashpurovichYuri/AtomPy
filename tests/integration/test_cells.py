@@ -574,20 +574,20 @@ def test_run_cell_mo_start_on_pur_substrate(carbon, tmp_path):
 
 
 @fast
-def test_select_no_window_selects_by_group_number():
+def test_pick_no_window_selects_by_group_number():
     """k counts GROUPS (window identity), but no_group_windows returns
     a COMPACT list -- prefixes too small to open the sector are
     skipped, so labels can be non-contiguous. Selection is by label,
     never by index (the Ti {3d,4s}/(3,1) lattice failure class: the
     1-column s prefix skipped, no2 = the full 6-column span)."""
-    from atomterm.cells import _select_no_window
+    from atomterm.cells import _pick_no_window
     from atomterm.windows import Window
 
     wins = [Window("no2", None, np.eye(6, 6), True),
             Window("no4", None, np.eye(6, 6), True)]   # no1/no3 skipped
-    assert _select_no_window(wins, 2).label == "no2"
-    assert _select_no_window(wins, 4).c_win.shape[1] == 6
+    assert _pick_no_window(wins, 2).label == "no2"
+    assert _pick_no_window(wins, 4).c_win.shape[1] == 6
     with pytest.raises(ValueError, match="usable group prefixes"):
-        _select_no_window(wins, 1)
+        _pick_no_window(wins, 1)
     with pytest.raises(ValueError, match="no3 is not among them"):
-        _select_no_window(wins, 3)
+        _pick_no_window(wins, 3)

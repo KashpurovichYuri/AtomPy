@@ -192,7 +192,7 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     The gated Ti/cc-pVDZ reference lands E = -848.40648875 with
     pure-3d open MOs; its good basin carries an input-window defect
     of ~1e-8 (vs 1.6e-2 in the metastable one), which is what lets
-    the frozen-window relax rung close at 2.3e-8 there.
+    the frozen-window relax treatment close at 2.3e-8 there.
     """
     from atomterm.system import build_mol
 
