@@ -224,10 +224,10 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     (``c_act``), and bookkeeping -- which must be exactly 0 (the fold
     convention is machine-exact against PySCF's ``get_h1eff``, 1e-15;
     the pin lives in test_operators). The window-definition term is not small in
-    general: where the valence shell overlaps the core (Ti 4s|3s
-    overlap ~0.1), the raw-AO analysis window shifts the CI ground by
-    ~85 mEh against the run's projected columns -- on such atoms
-    max|dE| measures the window definition, not the fold.
+    general: where the valence shell overlaps the core, the raw-AO
+    analysis window shifts the CI ground substantially against the
+    run's projected columns -- on such atoms max|dE| measures the
+    window definition, not the fold (the measured Ti record: AGENTS).
 
     **Which CI labels the stage.** ``cas.ci`` drives the configuration
     labels and the shell electrons; both consumers map it through the

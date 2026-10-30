@@ -276,8 +276,8 @@ def configuration_summary(mol, s, ci_list, c_win: np.ndarray, na: int, nb: int,
     Parameters
     ----------
     ci_list : CI vectors in PYSCF order -- the ordering bridge runs
-        inside (fact 24: PySCF's FCI string order differs from
-        detbasis' from ``norb >= 4``).
+        inside (PySCF's FCI string order differs from detbasis'
+        from ``norb >= 4``).
     top : determinants reported per root.
 
     Returns
@@ -332,7 +332,7 @@ def shell_occupations(mol, s, c_win: np.ndarray, ci_ground, na: int,
     ----------
     ci_ground : the ground root's CI vector in PYSCF order (the
         ``cas.ci`` / cell-store convention); mapped through the
-        ordering bridge (fact 24).
+        ordering bridge.
 
     Notes
     -----
@@ -351,8 +351,8 @@ def shell_occupations(mol, s, c_win: np.ndarray, ci_ground, na: int,
     gamma = ci_rdm1(dets, v, norb)
     g_ao = c_win @ gamma @ c_win.conj().T          # the AO-basis 1-RDM
     ds = g_ao @ s                                   # Mulliken rows
-    # l per AO row from the shell walker -- no label parsing (fact 1:
-    # labels carry member suffixes; the walker is fused-shell-honest)
+    # l per AO row from the shell walker -- no label parsing (labels
+    # carry member suffixes; the walker is fused-shell-honest)
     ell = l_per_row(mol)
     letters = "spdfgh"
     out: dict[str, float] = {}

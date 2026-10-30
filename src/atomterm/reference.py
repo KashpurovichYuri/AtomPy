@@ -19,8 +19,8 @@ Conventions
   (loaded, marked converged, never re-gated) -- the unit of
   reproducibility, because from-scratch SCF is not bit-reproducible
   (threaded BLAS draws last-digit-different MOs, and orbital-optimized
-  stages amplify the draw chaotically: root splittings wobble ~1e-2 Eh
-  between identical reruns). Equivalence checks pin the same chkfile,
+  stages amplify the draw chaotically: root splittings wobble at the
+  cEh scale between identical reruns). Equivalence checks pin the same chkfile,
   never two fresh runs.
 - The occupation hook (``get_occ``) is part of the SCF object's
   identity: attached BEFORE the cache branch, so cache hits carry it
@@ -171,9 +171,9 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
         Character-forced occupations + optional basin gate.
         Occupations are assigned each cycle by S-projector weight on
         the span patterns, never by energy order -- mandatory on
-        aufbau-runaway atoms (Ti: +123.07 mEh runaway). Even forced,
-        a degenerate open shell is multi-basin (Ti: +11.2 mEh
-        metastable basin at the SAME occupations): with ``occ_e_ref``
+        aufbau-runaway atoms. Even forced, a degenerate open shell
+        is multi-basin (a metastable basin at the SAME occupations):
+        with ``occ_e_ref``
         set, a fresh run retries over cycled init guesses (default,
         then "atom", then "huckel") until |E - occ_e_ref| <= 1e-4,
         else RuntimeError.

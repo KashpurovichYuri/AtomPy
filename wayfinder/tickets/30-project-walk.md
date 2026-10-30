@@ -332,6 +332,54 @@ POST-PHASE-6 ROUND (2026-10-30, user-directed, bdb4b76/273ad46/
 - Sequencing confirmed: phase 7 = small close; U-declaration opens
   the ECP wave (run_u* retire then).
 
+THE GENERALIZATION WAVE (2026-10-30, user-directed, c2f7fd4/bdd970a/
+20a4400/0264796/6f71775 + round B): the user's lens -- 'repeating
+information or providing it non-generally might mean some issues' --
+executed as three PROMOTIONS + two strict docstring rounds.
+
+POLICY AMENDMENT (AGENTS R1): definitional slots carry the RULE
+stated generally -- no atom names, no measured campaign values, no
+fact/ticket tags; instances live in Examples/Notes sections; the
+measured record lives in AGENTS facts / tests (V7) / README / TABLES.
+
+A0a LATTICE PROMOTION: CaseSpec.lattice_windows + cells.lattice_keys;
+regen's --group lattice + the 'if name == Ti' attach die;
+build_lattice derives spans/sector/CAS labels (D2_SERIES deleted).
+The A/B pin CAUGHT an order delta on first try (per-span triplets vs
+the original ao/mo-then-NO blocks) -- byte-equality demanded the
+original layout; the pin is now test_cells' permanent derivation test.
+
+A0b SCAN PROMOTION: scans.ScanSpec + CaseSpec.scan; radial_scan
+becomes the thin CAMPAIGN runner (SPECS dies). Certified: C's scan.md
+BYTE-IDENTICAL from the campaign cache; Si fills a GAP (no artifact
+had ever been committed; values = the README-cited theta*=0.85,
+-126.7 mEh); the OUTPUT PATH BUG fixed en route (the old script wrote
+untracked dash-named files, never the committed element-dir artifact).
+
+A0c VERDICT ELIMINATION (supersedes ticket 29 T1b, noted there):
+build_methods' AUDIT dict deleted, the verdict column gone, the
+pending gate payload-only; the anchor line COMPUTED from the store --
+which EXPOSED A STALE LITERAL (the committed caption's eV value was
+wrong by 0.012 eV); README's 'Verdicts' paragraph became the READING
+KEY (every class + its row-level discriminator); the hand summary
+table stays as the frozen worked example.
+
+ROUND A (scripts strict): build_methods/build_lattice conventions
+bullets deleted (verified covered by README line-by-line first); the
+anecdote, arrival clauses, fact tags out; render() documented.
+AST-certified; both renderers byte-stable on Ti.
+
+ROUND B (src strict): 9 edits across analysis/core/reference/casscf/
+stages/windows -- fact tags dissolved (the phase-1 pass had missed
+analysis's three), measured values re-homed (Ti's +123/+11.2 mEh,
+U's 38 mEh and 14.5 Eh enumerations, the ~85 mEh example; kept as
+classes where the caller needs the scale), cells.py's module
+docstring sectioned (structure-only). All AST-IDENTICAL.
+
+KEPT AS RULES (declined dissolution): scans' 'exactly 0 Eh' (the
+invariant, not a measurement); scales stated as classes (cEh-scale
+wobble, m-scalar by construction).
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE

@@ -107,7 +107,7 @@ def purified_core_orbitals(mol, mf, ncore: int):
     sectors = lm_sectors(mol)
 
     # dominant l per core MO (lumped-l weights partition unity exactly;
-    # the foreign-l weight is the tiny numerical tail, fact 9)
+    # the foreign-l weight is the tiny numerical tail)
     l_names, w_l = shell_weights(mol, c_can, s)
     dom_l = [l_names[i] for i in w_l.argmax(axis=1)]
     for i, wmax in enumerate(w_l.max(axis=1)):

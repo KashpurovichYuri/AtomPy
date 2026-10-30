@@ -150,11 +150,9 @@ def run_casci(mf, ncas, nelecas, mo_full, chkfile, nroots=1, verbose=0,
         differently-folded runs never collide.
     fci_opts : dict, optional
         Attributes set on the fcisolver before the kernel (e.g.
-        ``{"pspace_size": ndet}`` forces pyscf's EXACT
-        full-diagonalization branch -- Davidson straggles inside
-        degenerate clusters: measured on U 2f2d/Ms=2, 48 roots: up to
-        38 mEh within 13-17-fold multiplets while both exact spectra
-        agree to 1e-7).
+        ``{"pspace_size": ndet}`` forces PySCF's exact
+        full-diagonalization branch -- the cure when Davidson
+        straggles inside degenerate multiplets).
     """
     mc = mcscf.CASCI(mf, ncas, nelecas)
     mc.mo_coeff = mo_full

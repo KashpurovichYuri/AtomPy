@@ -491,10 +491,10 @@ def occupied_core_idx(mf, ncore: int) -> list[int]:
     Notes
     -----
     Warns when the closed block is NOT ``range(ncore)``: canonical MO
-    ORDER is meaningless on near-degenerate uncontracted bases (U:
-    the first canonical MOs are virtual junk while the closed block
-    sits at 22/61/88/120/143; ``range(ncore)`` silently folds five
-    garbage columns, measured max|dE| = 14.5 Eh). On contracted bases
+    ORDER is meaningless on near-degenerate uncontracted bases (the
+    first canonical MOs can be virtual junk while the closed block
+    sits elsewhere; ``range(ncore)`` would silently fold garbage
+    columns). On contracted bases
     the two coincide -- this makes the coincidence a checked
     invariant instead of an assumption.
     """

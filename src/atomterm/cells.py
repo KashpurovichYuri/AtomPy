@@ -10,7 +10,9 @@ their OWNING modules (:mod:`atomterm.windows`, :mod:`atomterm.core`,
 :mod:`atomterm.casscf`, :mod:`atomterm.stages`) -- cells never
 re-implement physics.
 
-Division of labor with the declaration layer:
+Division of labor
+-----------------
+With the declaration layer:
 :mod:`atomterm.cases` declares WHAT is studied (one spec per atom --
 windows, references, sectors); this module addresses HOW each single
 calculation runs -- one frozen key per combination of the axes, the
@@ -19,7 +21,9 @@ those specs. A new axis value arrives here (vocabulary + one
 resolution branch through its owner); a new atom arrives there (one
 registry row).
 
-Axis semantics (two of them describe the CORE and are easily conflated):
+Axis semantics
+--------------
+Two axes describe the CORE and are easily conflated:
 
 * ``substrate`` -- the core SPAN (which core columns exist): ``pol`` =
   the SCF's canonical core MOs; ``pur`` = the exactly L-closed
@@ -36,8 +40,10 @@ Axis semantics (two of them describe the CORE and are easily conflated):
   ``frac`` on ``pur`` is rejected. ``substrate`` is the span, ``fold``
   is the field.
 
-Address grammar (manifest reading order: where / the physics box / the
-objective / the optimizer freedom / the core)::
+Address grammar
+---------------
+Manifest reading order: where / the physics box /
+the objective / the optimizer freedom / the core::
 
     <atom>_<window>_<na>-<nb>_<method>_<start>_<mask|->_<substrate>_<fold>
 
@@ -51,8 +57,10 @@ prefix of the source's term-averaged density -- the prefix is part of
 the window identity, so differently-sized NO cells of one source get
 different addresses.
 
-The store contract (one chkfile per cell,
-``elements/<Atom>/rungs/<address>.chk``): everything ``load_cell`` needs
+The store contract
+------------------
+One chkfile per cell,
+``elements/<Atom>/rungs/<address>.chk``; everything ``load_cell`` needs
 under ``atomterm/<address>/`` -- ``energies``, ``ci_stack`` (a plain
 ``(nroots, ndet)`` array in PYSCF FCI ordering; PySCF's object-array
 serialization does not round-trip for 2-D roots -- map through

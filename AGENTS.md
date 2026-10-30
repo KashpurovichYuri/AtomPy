@@ -532,7 +532,12 @@ Verification section's job):
    one-line brief + Parameters / Returns / Raises / Notes / Examples.
    Defaults are contract: state what the default physically is.
    Tolerance envelopes and arrival history are comments at the point
-   of use, or commit-message material.
+   of use, or commit-message material. Definitional slots (module
+   docstrings, function contracts, section comments) carry the RULE
+   stated generally — no atom names, no measured campaign values, no
+   fact/ticket tags; instances live in Examples/Notes sections, and
+   the measured record lives in AGENTS facts, tests (V7), README, or
+   TABLES (amended 2026-10-30, user-directed).
    The standard is concrete: measure against the exemplar passes
    (`system.py`, `windows.py`, `secondquant.py`, `detbasis.py`) --
    one sentence carries one fact, every fact sits in its slot,
