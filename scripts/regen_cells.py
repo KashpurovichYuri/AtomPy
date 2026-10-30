@@ -5,18 +5,36 @@ address, artifacts ``elements/<Atom>/cells.{json,md}``. Chkfiles land
 under ``elements/<Atom>/rungs/<address>.chk`` (gitignored).
 
 Usage:
-    python scripts/regen_cells.py                  # every atom, full grid
-    python scripts/regen_cells.py Ti               # one atom, full grid
-    python scripts/regen_cells.py Ti --method sa-casscf --mask radial
-    python scripts/regen_cells.py --group diagnostics
+    python scripts/regen_cells.py [atoms] [selection]
 
-``--group`` runs one named declared group (grid/spine/diagnostics/
-planned) instead of the full grid; the axis filters keep only cells
-whose CellKey field matches (key identity, never presentation), with
-``--mask -`` selecting the maskless cells and ``--sector 2-1`` the
-(na, nb) sector. A filtered run MERGES into the existing cells.json
-(untouched cells keep their stored payloads); only the unfiltered
-full run replaces the store.
+Atoms (default: every declared atom, CAMPAIGN order):
+    Ti                      only titanium
+
+Group (--group): one named declared group instead of the full grid
+    grid                    the full factor grid, every declared window
+                            (the default; Ti's d² lattice rides along)
+    spine                   the fold spine: raw/avg/frac on the primary
+                            window
+    diagnostics             the virtual-mix rows only
+    planned                 the planned windows' grids (declared,
+                            not yet run)
+
+Axis filters (AND-composed; each matches the CellKey field exactly):
+    --method casci          casci | casscf | sa-casscf
+    --window 3d4s           window label, e.g. 2p, 3d4s, 3dno1
+    --mask radial           radial | frozen | virtmix | - (maskless)
+    --start ao              ao | mo | no
+    --substrate pur         pol (canonical core) | pur (closed span)
+    --fold avg              raw | avg | frac
+    --sector 2-1            the (na, nb) active-electron sector
+
+Store semantics:
+    unfiltered run          REPLACES the store (also the pruning path)
+    filtered run            MERGES into the existing store (untouched
+                            cells keep their stored payloads; a merge
+                            never prunes, and a filtered run with no
+                            store to merge into is refused -- run
+                            unfiltered first)
 Threads: OPENBLAS_NUM_THREADS=64 OMP_NUM_THREADS=64 PYSCF_NUM_THREADS=64.
 """
 
@@ -92,26 +110,43 @@ def keep(key: CellKey, args) -> bool:
 
 
 def parse_args(argv) -> argparse.Namespace:
+    """The runner's CLI: atoms, one optional group, axis filters (every
+    help string carries its value inventory)."""
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("atoms", nargs="*",
-                   help="declared atoms to run (default: every CAMPAIGN atom)")
+                   help="declared atoms to run (default: every CAMPAIGN "
+                        "atom, CAMPAIGN order)")
     p.add_argument("--group", choices=["grid", "spine", "diagnostics",
                                        "planned"],
-                   help="run one named declared group instead of the "
-                        "full grid")
-    p.add_argument("--method", help='keep this method (casci/casscf/sa-casscf)')
-    p.add_argument("--window", help="keep this window label (e.g. 3d4s)")
-    p.add_argument("--mask", help='keep this mask (radial/frozen/virtmix; '
-                                  '"-" = the maskless cells)')
-    p.add_argument("--start", help="keep this start (ao/mo/no)")
-    p.add_argument("--substrate", help="keep this substrate (pol/pur)")
-    p.add_argument("--fold", help="keep this fold (raw/avg/frac)")
+                   help="one named declared group instead of the full "
+                        "grid: grid | spine | diagnostics | planned")
+    p.add_argument("--method",
+                   help="keep this method: casci | casscf | sa-casscf")
+    p.add_argument("--window",
+                   help="keep this window label, e.g. 2p, 3d4s, 3dno1")
+    p.add_argument("--mask",
+                   help="keep this mask: radial | frozen | virtmix | - "
+                        "(the maskless cells)")
+    p.add_argument("--start", help="keep this start: ao | mo | no")
+    p.add_argument("--substrate",
+                   help="keep this substrate: pol | pur")
+    p.add_argument("--fold", help="keep this fold: raw | avg | frac")
     p.add_argument("--sector", metavar="NA-NB",
-                   help="keep this sector, e.g. 2-1")
+                   help="keep this (na, nb) sector, e.g. 2-1")
     args = p.parse_args(argv)
     args.sector = (tuple(int(x) for x in args.sector.split("-"))
                    if args.sector else None)
     return args
+
+
+def _write_atomic(path: Path, text: str) -> None:
+    """Write through a temp file + verified move (the renderers'
+    TABLES protocol): a killed run never leaves a truncated
+    artifact."""
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    assert tmp.read_text(encoding="utf-8") == text
+    tmp.replace(path)
 
 
 def render(atom, rohf_e, cells: dict, ruler: str) -> str:
@@ -173,6 +208,22 @@ def main() -> None:
             print("  no declared cell matches the filter -- skipped",
                   flush=True)
             continue
+        cells: dict[str, dict] = {}
+        if filtered:
+            # merge mode: untouched cells keep their stored payloads.
+            # Guards BEFORE any SCF: no store to merge into (a filtered
+            # first run would create a subset-only store) and an
+            # unreadable store both refuse with the rebuild hint.
+            store = out / "cells.json"
+            if not store.exists():
+                sys.exit(f"no {store} to merge into -- a filtered first "
+                         "run would create a subset-only store; run "
+                         "unfiltered first")
+            try:
+                cells = json.loads(store.read_text())["cells"]
+            except (json.JSONDecodeError, KeyError) as e:
+                sys.exit(f"{store} is unreadable ({e!r}) -- rerun "
+                         "unfiltered to rebuild the store")
         mol, mf = run_rohf(cfg, str(out / "rungs" / "rohf.chk"),
                            ref=spec.ref)
         print(f"ROHF E = {mf.e_tot:.8f} Eh", flush=True)
@@ -182,25 +233,20 @@ def main() -> None:
                                spec.nelec_act, len(act_idx),
                                open_idx=act_idx)
 
-        cells: dict[str, dict] = {}
-        if filtered and (out / "cells.json").exists():
-            # merge mode: untouched cells keep their stored payloads
-            cells = json.loads(
-                (out / "cells.json").read_text())["cells"]
         for key in queue:
             print(f"  [cell] {key.address}", flush=True)
             facts = run_cell(key, mf, frac_mf=mf_f, workdir="elements",
                              budgets={"sa_weights": spec.sa_weights})
             cells[key.address] = cell_payload(key, facts)
 
-        (out / "cells.json").write_text(
-            json.dumps({"atom": name, "rohf_energy": float(mf.e_tot),
-                        "cells": cells}, indent=2), encoding="utf-8")
-        (out / "cells.md").write_text(
-            render(name, mf.e_tot, cells,
-                   ruler=CellKey(name, base.window, sector,
-                                 fold="avg").address),
-            encoding="utf-8")
+        _write_atomic(out / "cells.json",
+                      json.dumps({"atom": name,
+                                  "rohf_energy": float(mf.e_tot),
+                                  "cells": cells}, indent=2))
+        _write_atomic(out / "cells.md",
+                      render(name, mf.e_tot, cells,
+                             ruler=CellKey(name, base.window, sector,
+                                           fold="avg").address))
         print(f"  wrote {out}/cells.json + cells.md", flush=True)
 
     print("\ndone")

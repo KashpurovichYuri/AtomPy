@@ -516,8 +516,9 @@ python scripts/regen_cells.py --group diagnostics       # a named declared group
 ```
 
 Filtered runs **merge** into the existing `cells.json` (untouched cells
-keep their stored payloads); only the unfiltered run replaces the
-store. Anything undeclared remains explorable directly —
+keep their stored payloads; a merge never prunes, and a filtered run
+with no store to merge into is refused — run unfiltered first); only
+the unfiltered run replaces the store. Anything undeclared remains explorable directly —
 `run_atom(cfg, patterns, nelec_act, …)` for a one-off staged look,
 `run_cell(CellKey(...), mf, ...)` for a single cell: the declaration
 records what is *interesting*; it does not gate the machinery.
