@@ -19,8 +19,9 @@ scalar by construction (its density is exactly m-symmetric).
 Why replace the canonical core at all: its MOs carry foreign-l tails
 and m-asymmetric same-l content, both of which break the core span's
 L-closure, and every window orthogonalized against that span inherits
-the defect (the measured input-window baseline every CASSCF start
-carries: ~1e-3 Si, ~1e-2 Sc; the mechanism:
+the defect -- the input-window baseline every CASSCF start carries,
+growing with core-window adjacency (the measured record: AGENTS
+facts 17/20; the mechanism:
 :func:`atomterm.windows.build_full_mo` Notes).
 """
 
@@ -41,8 +42,8 @@ def purified_core_orbitals(mol, mf, ncore: int):
     The canonical core MOs of an open-shell atom carry foreign-l tails
     and m-ASYMMETRIC same-l content; both break the L-closure of the
     core SPAN, and every window orthogonalized against that span
-    inherits the defect (the fact-17 input-window baseline, ~1e-3 Si /
-    ~1e-2 Sc).
+    inherits the defect -- the input-window baseline, growing with
+    core-window adjacency (measured classes: the test pins).
 
     Notation, per angular momentum l: the shell has M = 2l+1 member
     sectors, each an identical radial chain of n_r functions with

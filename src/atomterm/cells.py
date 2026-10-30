@@ -5,10 +5,8 @@ store.
 A *cell* is THE unit of computation and analysis (one grid point of the
 manifest): the run, its checkpoint, its payload, and its table row are
 all addressed by one :class:`CellKey`, serialized as the cell
-*address* -- ``ti_3d4s_3-1_sa-casscf_no_free_pur_avg``. Axes resolve through
-their OWNING modules (:mod:`atomterm.windows`, :mod:`atomterm.core`,
-:mod:`atomterm.casscf`, :mod:`atomterm.stages`) -- cells never
-re-implement physics.
+*address* (the grammar below). Each axis resolves through its OWNING
+module -- cells never re-implements physics.
 
 Division of labor
 -----------------
@@ -56,6 +54,19 @@ sector as ``na-nb`` (fixes Ms AND nelec), and ``-`` for no mask
 prefix of the source's term-averaged density -- the prefix is part of
 the window identity, so differently-sized NO cells of one source get
 different addresses.
+
+One real address, decoded slot by slot::
+
+    ti_3d4sno2_3-1_sa-casscf_no_-_pol_avg
+    │  │        │   │         │  │ │   └ fold=avg   (the averaged core field)
+    │  │        │   │         │  │ └─── substrate=pol (the SCF core span)
+    │  │        │   │         │  └───── mask=-      (free optimization)
+    │  │        │   │         └──────── start=no    (natural-orbital columns)
+    │  │        │   └────────────────── method=sa-casscf
+    │  │        └────────────────────── sector=(3, 1) (na-nb; Ms and nelec)
+    │  └─────────────────────────────── window=3d4sno2 (the 2-group NO
+    │                                   prefix of the 3d4s source)
+    └────────────────────────────────── atom=ti
 
 The store contract
 ------------------

@@ -380,6 +380,18 @@ KEPT AS RULES (declined dissolution): scans' 'exactly 0 Eh' (the
 invariant, not a measurement); scales stated as classes (cEh-scale
 wobble, m-scalar by construction).
 
+WAVE CLOSE (2026-10-30, the user's cells-opener review): the opener's
+module enumeration was WRONG AS A MAP (stages = the analysis seam,
+not an axis owner) and its example address was INVALID --
+from_address rejects it (a plain window under start=no; 'free' is
+not a mask token, '-' is). Fixes: opener rule-only; the grammar
+section carries ONE REAL address decoded slot by slot
+(ti_3d4sno2_3-1_sa-casscf_no_-_pol_avg); the docs-example
+round-trip pin in test_cells keeps it honest forever. core's Si/Sc
+measured scales (a round-B grep gap: bare scales, no units) -> class
+statements + record pointers; a fact-17 tag dissolved with them.
+Boundary suite at the wave: 185 green. Fast tier 118.
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE

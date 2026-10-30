@@ -62,6 +62,19 @@ def test_address_round_trip():
 
 
 @fast
+def test_docstring_example_address_parses():
+    """The module docstring's decoded example is a REAL address: it
+    round-trips through ``from_address`` (the illustration it replaced
+    was invalid -- a plain window under a no start, and a 'free' mask
+    token the grammar does not define)."""
+    import atomterm.cells as cells_mod
+
+    m = re.search(r"^    (ti_\S+)$", cells_mod.__doc__, re.M)
+    assert m, "the decoded example address is missing from the docstring"
+    assert CellKey.from_address(m.group(1)).address == m.group(1)
+
+
+@fast
 def test_key_validation_and_canonicalization():
     # the pur-fold degeneracy rule: raw on pur canonicalizes to avg
     k = CellKey("C", "2p", (1, 1), substrate="pur", fold="raw")
