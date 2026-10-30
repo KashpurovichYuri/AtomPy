@@ -2,18 +2,26 @@
 groups, and the NO window selection. The :class:`Window` object the
 selection feeds lives in :mod:`atomterm.windows`.
 
-The closure theorem licenses ANY per-l radial subspace replicated over
-ALL members as window units. NOs are legal units exactly when they
-arrive as complete m-sets -- i.e. when the 1-RDM they diagonalize is
-m-scalar per l, which holds iff the CI roots averaged into it form a
-rotation-invariant set (a term average over the whole L multiplet,
-all in one M_S sector). A single ``|L, M_L>`` root carries an
-m-DIAGONAL but m-UNEQUAL density (p^2 3P M_L=0: occ(m=0)=2,
-occ(+-1)=0 -- pinned in tests/unit/test_natural.py), so occupation
-selection on a single root is NOT symmetry-safe. The one-particle
-certificate (:func:`atomterm.operators.window_closure`) is the
-arbiter: run it on every NO window, never assume.
+The m-scalar criterion
+----------------------
+The closure theorem licenses ANY per-l radial subspace replicated
+over ALL members as window units. Whether NOs ARE such units:
 
+- NOs are legal units exactly when they arrive as complete m-sets --
+  i.e. when the 1-RDM they diagonalize is m-scalar per l, which
+  holds iff the CI roots averaged into it form a rotation-invariant
+  set (a term average over the whole L multiplet, all in one M_S
+  sector).
+- A single ``|L, M_L>`` root carries an m-DIAGONAL but m-UNEQUAL
+  density (p^2 3P M_L=0: occ(m=0)=2, occ(+-1)=0 -- pinned in
+  tests/unit/test_natural.py): occupation selection on a single
+  root is NOT symmetry-safe.
+- The one-particle certificate
+  (:func:`atomterm.operators.window_closure`) is the arbiter: run it
+  on every NO window, never assume.
+
+Conventions
+-----------
 Spin-orbital conventions (repo-wide): alpha = 0..norb-1,
 beta = norb..2norb-1; determinants are sorted spin-orbital tuples.
 """

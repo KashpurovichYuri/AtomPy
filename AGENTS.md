@@ -214,6 +214,10 @@ carries a number only when the number IS the fact.
   data row, not README growth.
 - Atomic units, ℏ = 1. Spin-orbitals: alpha = `0..norb-1`, beta = `norb..2norb-1`.
 - Determinants: sorted tuples of occupied spin-orbitals.
+- The substrate signature `(mol, mf, c_act, ncore, na, nb)` — the
+  atom, its converged reference, the active columns, the core size,
+  and the sector's (n_alpha, n_beta) — recurs through the analysis
+  seam; functions document only their own knobs beyond it.
 - Every operator enters the determinant space as (one-body matrix,
   two-body integral tensor) — never creation/annihilation algebra.
   Two documented exceptions: the explicit ladder operators

@@ -9,7 +9,8 @@ basis. Because the construction is explicit, every property (closure,
 energy decomposition) is attributable to the construction, not to an
 optimizer's opinion.
 
-Two families of scans:
+The two families
+----------------
 
 - m-SYMMETRIC (one angle for all members): every such window is EXACTLY
   rotation-closed -- the members share their radial vector, which IS the

@@ -1,16 +1,23 @@
 """Windows: the active-space selection layer.
 
-PURPOSE: the window is the approximation dial of a correlated run --
-it fixes which orbitals are correlated and which are frozen into the
-core. GOAL: construct windows with a KNOWN rotational-closure
-guarantee and materialize them onto the full MO substrate, so exact
-term classification (the [H, L] certificates) is possible wherever
-the construction promises it.
+PURPOSE
+-------
+The window is the approximation dial of a correlated run -- it fixes
+which orbitals are correlated and which are frozen into the core.
+GOAL: construct windows with a KNOWN rotational-closure guarantee
+and materialize them onto the full MO substrate, so exact term
+classification (the [H, L] certificates) is possible wherever the
+construction promises it.
 
-The shared contract: a window is exactly rotation-closed iff it is
+The shared contract
+-------------------
+A window is exactly rotation-closed iff it is
 m-complete -- every (n, l) shell present with its whole 2l+1 m-set on
 one shared radial. The certificate (operators.window_closure), not
-the construction story, is the criterion. The kinds:
+the construction story, is the criterion.
+
+The kinds
+---------
 
 * AO windows -- the generic name for the two AO-row vocabularies:
   - shell: contracted valence shells; labels are true (n,l) names.
@@ -27,7 +34,9 @@ the construction story, is the criterion. The kinds:
 * custom -- any S-orthonormal columns (your MO selection, a
   hand-built window): build_full_mo takes them directly.
 
-Layering inside: `shell_slots` is the ONE shell walker (lm_sectors,
+Layering inside
+---------------
+`shell_slots` is the ONE shell walker (lm_sectors,
 primitive_chain, the l-vocabulary of select_span, and angular's
 analytic path sit on it); `lowdin` / `span_projector` /
 `s_metric_roots` / `complete_orthonormal` are the S-metric algebra;

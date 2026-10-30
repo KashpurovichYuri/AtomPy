@@ -1,6 +1,8 @@
 """Analysis: term classification of determinant-basis eigenstates.
 
-PURPOSE: given the operator matrices of
+PURPOSE
+-------
+Given the operator matrices of
 :func:`operators.build_operators`, classify every eigenstate of H by
 its exact content -- L, S, and the term symbol ``^(2S+1)L`` from
 ``<L^2> = L(L+1)``, ``<S^2> = S(S+1)`` -- and quantify how exactly

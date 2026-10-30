@@ -469,7 +469,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         # input-window defect build_full_mo's projection removes at the
         # source). Honest
         # expectation: the window's own m-delocalization survives
-        # (measured: raw-MO spans never rotation-close) -- these cells measure that, they do not fix it.
+        # (measured: raw-MO spans never rotation-close) -- these
+        # cells measure that, they do not fix it.
         if key.substrate == "pur":
             mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
                                     mf.mo_coeff[:, ncore:], c_core=c_pur)
