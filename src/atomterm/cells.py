@@ -372,7 +372,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     ----------
     key : the cell to run.
     mf : the atom's converged reference (REQUIRED -- reference
-        construction, including Ti's character-forced occupations and
+        construction, including character-forced occupations and the
         basin gate, belongs to cases/reference, not to cells). On
         ``fold="frac"`` this is REPLACED by ``frac_mf``.
     mol : the analysis mol; defaults to ``mf.mol``. Only a
@@ -388,8 +388,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         of the start window (:func:`atomterm.operators.ground_block`,
         the SA-anchoring rule). The default presupposes a DEGENERATE
         start window -- the block measurement needs the ground term's
-        M_L set intact; on a defective window (the fact-17-class
-        split, measured ~1e-4 on Sc's projected columns) it anchors
+        M_L set intact; on a defective window (the input columns'
+        core-orthogonalization split) it anchors
         ONE state: single-root SA, which collapses on TMs. Declare
         ``sa_weights`` explicitly there.
     fresh : ignore a stored cell and re-run (a cache hit otherwise

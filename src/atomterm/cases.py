@@ -4,8 +4,8 @@ and the launch entry that executes a declaration.
 A case is DECLARED, not guessed: a :class:`CaseSpec` fixes the atom, the
 reference data, the valence window, and the sectors -- the intent
 manifest. :func:`run_case` executes the declaration
-(the term tables are the contract, always produced; the treatments arm
-runs only when declared); nothing auto-generates. ``CAMPAIGN`` is the
+(the term tables are the contract, always produced); nothing
+auto-generates. ``CAMPAIGN`` is the
 per-atom registry the cell layer and the runners derive from --
 nothing else re-declares atoms, windows, or the gated references (the
 one-declaration rule).

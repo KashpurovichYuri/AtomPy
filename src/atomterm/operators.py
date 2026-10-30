@@ -265,8 +265,7 @@ def pyscf_ci_permutation(norb: int, na: int, nb: int) -> np.ndarray:
     string ADDRESSES (integer-ascending bit strings); detbasis
     enumerates lexicographic combinations. These orders differ for
     norb >= 4 once a block holds >= 2 electrons -- coinciding only in
-    trivial sectors (carbon's norb=3 window is why the difference went
-    unnoticed).
+    trivial sectors.
 
     Returns ``perm`` with ``v[perm[k]] == w_detbasis[k]``-semantics:
     the pyscf amplitude at ravelled index ``k`` belongs to determinant

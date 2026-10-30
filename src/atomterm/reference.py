@@ -36,7 +36,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
-from pyscf import lib, scf
+from pyscf import scf
 
 from atomterm.windows import select_span, span_projector
 

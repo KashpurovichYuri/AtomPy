@@ -30,6 +30,7 @@ __all__ = [
     "AnalysisResult",
     "analyze",
     "configuration_summary",
+    "shell_occupations",
     "format_report",
 ]
 
@@ -61,8 +62,7 @@ def spin_quantum_number(s2: float) -> float:
     Orbital L is always an integer, but S of an odd-electron state is
     a half-integer (S^2 = 0.75 -> S = 1/2 -> multiplicity 2): rounding
     S to the integer grid silently relabels doublets/quartets as
-    singlets/triplets (first exposed by Sc, the project's first
-    doublet).
+    singlets/triplets.
     """
     s_real = (np.sqrt(1.0 + 4.0 * s2) - 1.0) / 2.0
     return round(2.0 * s_real) / 2.0

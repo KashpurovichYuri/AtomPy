@@ -23,9 +23,8 @@ lib.num_threads(1)
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 
-from atomterm.system import AtomConfig, build_mol  # noqa: E402
+from atomterm.system import AtomConfig  # noqa: E402
 from atomterm.reference import run_rohf  # noqa: E402
-from atomterm.windows import select_shell_ao  # noqa: E402
 
 
 def block(name: str, array: np.ndarray) -> str:

@@ -29,7 +29,7 @@ Conventions
   The serialized axis tokens of the cell addresses (``frozen``,
   ``virtmix``, ``radial``) are DATA identifiers, not names -- their
   mapping to these masks is stated once at the data layer (the cells
-  docstring). The rung-purpose prose (core relaxation, virtual
+  docstring). The treatment-purpose prose (core relaxation, virtual
   mixing) belongs to docstrings and README, anchored to these names.
 """
 
@@ -175,7 +175,7 @@ def run_casci(mf, ncas, nelecas, mo_full, chkfile, nroots=1, verbose=0,
 def mask_frozen_window(self, nmo, ncore, ncas, frozen):
     """Allowed: ONLY inactive<->virtual rotations; every generator
     touching the active block is blocked -- the window is frozen
-    outright (the relax rung; cells axis token ``frozen``).
+    outright (core relaxation; cells axis token ``frozen``).
     Signature: the ``uniq_var_indices`` hook, documented once in the
     seam comment above."""
     mask = np.zeros((nmo, nmo), dtype=bool)
@@ -186,8 +186,8 @@ def mask_frozen_window(self, nmo, ncore, ncas, frozen):
 def mask_no_core_window_mix(self, nmo, ncore, ncas, frozen):
     """Allowed: every rotation INVOLVING a virtual (virtual<->core and
     virtual<->active); blocked: active<->inactive alone -- no orbital
-    ever trades places between the core and the active window (the
-    virtmix rung; cells axis token ``virtmix``).
+    ever trades places between the core and the active window (virtual
+    mixing; cells axis token ``virtmix``).
     Signature: the ``uniq_var_indices`` hook, documented once in the
     seam comment above."""
     mask = np.zeros((nmo, nmo), dtype=bool)
@@ -202,7 +202,7 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
                        mc_opts: dict | None = None,
                        fci_opts: dict | None = None) -> CASResult:
     """CASSCF with declaratively constrained orbital rotations -- the ONE
-    deep driver every orbital-optimization rung goes through.
+    deep driver every orbital-optimization treatment goes through.
 
     Parameters
     ----------
