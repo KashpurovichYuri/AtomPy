@@ -227,7 +227,7 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     general: where the valence shell overlaps the core, the raw-AO
     analysis window shifts the CI ground substantially against the
     run's projected columns -- on such atoms max|dE| measures the
-    window definition, not the fold (the measured Ti record: AGENTS).
+    window definition, not the fold.
 
     **Which CI labels the stage.** ``cas.ci`` drives the configuration
     labels and the shell electrons; both consumers map it through the

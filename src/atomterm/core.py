@@ -20,8 +20,8 @@ Why replace the canonical core at all: its MOs carry foreign-l tails
 and m-asymmetric same-l content, both of which break the core span's
 L-closure, and every window orthogonalized against that span inherits
 the defect -- the input-window baseline every CASSCF start carries,
-growing with core-window adjacency (the measured record: AGENTS
-facts 17/20; the mechanism:
+growing with core-window adjacency (the measured classes: the test
+pins; the mechanism:
 :func:`atomterm.windows.build_full_mo` Notes).
 """
 
