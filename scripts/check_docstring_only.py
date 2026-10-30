@@ -3,8 +3,7 @@
 Compares the AST of each given path between HEAD (or --rev) and the
 working tree, with every docstring node neutralized: identical dumps
 mean no executable line changed. The docstring-pass certificate of
-the module walk (AGENTS Verification rule 6); 2026-10-29: caught a
-dropped function body that eyeballing the diff missed.
+the module walk (AGENTS Verification rule 6).
 
 Usage:
     python scripts/check_docstring_only.py [--rev HEAD] path...

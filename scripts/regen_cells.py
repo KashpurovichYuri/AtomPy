@@ -129,6 +129,9 @@ def _write_atomic(path: Path, text: str) -> None:
 
 
 def render(atom, rohf_e, cells: dict, ruler: str) -> str:
+    """The cells.md report: one row per stored cell (key-addressed,
+    the ruler's ΔE within its sector only), plus per-root
+    configuration lines."""
     ref = cells.get(ruler)
     lines = [f"# Orbital-treatment cells: {atom}", "",
              f"ROHF reference energy: {rohf_e:.8f} Eh", "",

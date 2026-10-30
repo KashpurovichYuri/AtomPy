@@ -8,29 +8,16 @@ Notes
 -----
 This renderer owns the sections whose every value is a cell payload;
 log-sourced sections (Ti's 3d²4s² series, from the retired
-run_tm_lattice.py -- git history; the 0.9 mEh lattice-vs-campaign
-bookkeeping trace lives there) stay hand-curated until their own
-cells run.
+run_tm_lattice.py -- git history) stay hand-curated until their own
+cells run. The spans, sector, and CAS labels derive from the
+declaration (``CaseSpec.lattice_windows`` via ``cells.lattice_keys``);
+column conventions and the as-run reading live in README -- the one
+home. Two operational rules this file owns:
 
-Value conventions (the lattice contract):
-
-- E = ``energies_pyscf[0]`` -- the run's OWN total (as-run), directly
-  comparable with the ROHF anchor (the variational reading: the MO
-  rows sit exactly AT it; the AO rows are unbounded, their span does
-  not contain the reference determinant). One convention per family:
-  tables show as-run; the AVERAGED-fold reconstruction stays the
-  analysis ruler the meters (commutators, ⟨L²⟩) are computed on --
-  it sits ~2.8 mEh above as-run on Ti CASCI cells and would bend
-  every anchor comparison by exactly that.
-- ⟨L²⟩ 3 decimals; dets = payload ``n_det``; no ΔE column -- the
-  anchor lives in the caption.
-- constructions per row: AO (the m-complete shell span), MO (the
-  canonical slice -- m-delocalized control; non-integer ⟨L²⟩ = the
-  span does not close), custom (declared empty this wave). The NO
-  construction is NOT a column here: the full-span group prefix of
-  the same source equals the AO span by construction (fact 23) --
-  the machinery certificate, not a methodology; the compression
-  ladder from a bigger source lives in the 3d²4s² section.
+- E = ``energies_pyscf[0]`` (as-run): anchor-comparable totals -- the
+  analysis-ruler reconstruction is NOT a table value (README ·
+  Methods);
+- the custom-construction column is declared empty (no rows).
 
 TABLES edit protocol lives here (as in build_methods_tables):
 sections rebuilt from constructed blocks, structural assertions, temp

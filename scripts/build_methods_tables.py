@@ -13,35 +13,23 @@ key in README · Results (the reader classifies; the table reports).
 
 Notes
 -----
-Value conventions (the manifest contract, README · Methods):
+Column conventions and the reading key live in README (Methods and
+Results) -- the one home; this renderer formats, it does not
+re-state them. Two operational rules it does own:
 
-- E = the run's OWN total (``energies_pyscf[0]``), Eh + eV (×27.2114)
-  -- the partition-changed class never shows our reconstruction
-  (finding 2); ΔE vs the ROHF anchor (``rohf_energy``); the anchor
-  is also stated in each caption;
-- ⟨L²⟩, ⟨L̂z²⟩, the commutator norms: our analysis of the run (payload);
-- Span (Lowdin) = the converged window's S-metric shell weights
-  (fractions of the window's columns per l -- the span, not the
-  electron configuration; window identity is what the verdicts name);
-- Elec (Lowdin) = the ground root's electron count per l
-  (analysis.shell_occupations) -- partitions the active electron
-  count; blank in payloads that predate the field;
-- the fold-shift bookkeeping (|E(analysis fold) − E(as run)|) is NOT a
-  column: its reading lives in README · Methods (Partition
-  bookkeeping).
+- the anchor line in each caption is COMPUTED from the store's
+  ``rohf_energy`` (Eh + eV), never typed;
+- rows branch on key IDENTITY only (method/start/mask/substrate/
+  fold); order and grouping live once in the declaration builder
+  (cells.window_grid) -- this renderer receives ready-made key lists
+  and formats.
 
 Applicability: the Ti-style factor-grid tables (WINDOWS below; the
 window set and every cell address come from the declaration --
-``cases.CAMPAIGN`` via ``cells.grid_keys``/``cells.planned``; this file
-owns presentation only: headings, notes, value formatting). The study
-inserts are frozen history (the study module retired 2026-10-29 --
-its generated sections stay as committed data); the per-atom summary tables
-(C/Si/Sc) stay hand-curated until their manifests migrate.
-
-THE BRANCH RULE (ticket 29 T1b): rows branch on key IDENTITY only
-(method/start/mask/substrate/fold); order and grouping live once in the
-declaration builder (cells.window_grid) -- this renderer receives
-ready-made key lists and formats.
+``cases.CAMPAIGN`` via ``cells.grid_keys``/``cells.planned``; this
+file owns presentation only: headings, notes, value formatting). The
+study inserts are frozen history; the per-atom summary tables (C/Si/
+Sc) stay hand-curated until their manifests migrate.
 
 TABLES edit protocol lives here: sections are rebuilt from constructed
 blocks, structural assertions checked (each heading once, row counts,
@@ -97,9 +85,8 @@ FOLD_NAMES = {"raw": "raw", "avg": "averaged", "frac": "fractional"}
 def _cfg(w: dict) -> str:
     """The converged window's SPAN composition (S-metric Löwdin
     weights, the payload ``window``) -- fractions of the window's
-    columns per l, summing to 1 (NOT the electron configuration):
-    the span is what diagnoses window identity (the swap reads
-    s -> 0). Compact: s0 p.17 d.83 f4e-4."""
+    columns per l, summing to 1 (NOT the electron configuration).
+    Compact: s0 p.17 d.83 f4e-4."""
     out = []
     for l in ("s", "p", "d", "f"):
         v = float(w.get(l, 0.0))
