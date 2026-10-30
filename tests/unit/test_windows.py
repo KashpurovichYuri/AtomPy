@@ -48,6 +48,16 @@ def test_select_span_l_vocabulary_and_label_prefix():
         select_span(mol, "9x")
 
 
+def test_select_primitives_rejects_contracted_shells():
+    """Exponent-ranked primitive selection is undefined for
+    contracted shells (cc-pVDZ carbon p is one 3-exponent
+    contraction) -- the primitive vocabulary is for uncontracted
+    bases, where shell labels lie about n."""
+    mol = gto.M(atom="C 0 0 0", basis="ccpvdz", spin=2, verbose=0)
+    with pytest.raises(ValueError, match="contraction slot"):
+        select_primitives(mol, 1, count=1)
+
+
 def test_shell_weights_rows_sum_to_one_for_s_orthonormal_columns():
     mol = gto.M(atom="C 0 0 0", basis="ccpvdz", spin=2, verbose=0)
     s = mol.intor_symmetric("int1e_ovlp")

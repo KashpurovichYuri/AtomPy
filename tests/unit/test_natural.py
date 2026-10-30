@@ -22,13 +22,6 @@ from atomterm.natural import (
     occupation_groups,
     select_no_window,
 )
-from atomterm.windows import (
-    Window,
-    window_no,
-    window_primitive,
-    window_scf_mo,
-    window_shell,
-)
 from atomterm.secondquant import annihilate, create
 from atomterm.system import AtomConfig, build_mol
 
@@ -150,11 +143,10 @@ def test_single_ml_root_breaks_the_m_set():
     assert c_win.shape[1] == 1          # one member, not the m-set
 
 
-def test_no_window_via_registry():
-    """The uniform registry entry: toy basis, two roots averaged -- the
-    m-scalar route -- gives the whole m-set even at n_max = 1."""
+def test_no_window_term_average_gives_whole_m_set():
+    """Toy basis, two roots averaged -- the m-scalar route -- gives
+    the whole m-set even at n_max = 1."""
     dets = determinant_basis(3, 1, 1)
-    rng = np.random.default_rng(5)
     # two roots whose densities are m-scalar in a shared eigenbasis:
     # root 1 = the (m0a, m0b) determinant, root 2 = (m1a, m1b) -- the
     # average is m-scalar over {m0, m1} but not m2 (honest: the
@@ -162,13 +154,13 @@ def test_no_window_via_registry():
     vec = np.zeros((len(dets), 2))
     vec[dets.index((0, 3)), 0] = 1.0
     vec[dets.index((1, 4)), 1] = 1.0
-    w = window_no(None, None, None, c_act=np.eye(3), dets=dets,
-                  vec=vec, n_max=3, weights=[0.5, 0.5])
-    assert w.c_win.shape[1] == 3        # everything fits: all members
+    gamma = ci_rdm1(dets, vec, 3, [0.5, 0.5])
+    c_no, occ = natural_orbitals(np.eye(3), gamma)
+    c_win, _ = select_no_window(c_no, occ, 3)
+    assert c_win.shape[1] == 3        # everything fits: all members
     # the degenerate pair is never split, even when only one is asked for
-    w1 = window_no(None, None, None, c_act=np.eye(3), dets=dets,
-                   vec=vec, n_max=1, weights=[0.5, 0.5])
-    assert w1.c_win.shape[1] == 2
+    c_win1, _ = select_no_window(c_no, occ, 1)
+    assert c_win1.shape[1] == 2
 
 
 # --------------------------------------- certificate on real AO spans
@@ -186,24 +178,3 @@ def test_certificate_on_real_ao_windows():
     assert c["lz"] < 1e-12 and c["lperp"] < 1e-12
     c = window_closure(mol, eye[:, p_rows[:2]])   # m-split p window
     assert c["lz"] > 1e-2 or c["lperp"] > 1e-2
-
-
-def test_registry_ao_selectors_uniform_signature():
-    mol = build_mol(AtomConfig(verbose=0))
-    w = window_shell(mol, None, 2, patterns=["2p"])
-    assert w.m_complete and w.ao_rows is not None and w.c_win is None
-    assert len(w.ao_rows) == 3
-    # the guard: exponent-ranked primitive selection is undefined
-    # for contracted shells (ccpvdz carbon p is one 3-exponent
-    # contraction) -- the primitive selector is for uncontracted bases
-    with pytest.raises(ValueError, match="contraction slot"):
-        window_primitive(mol, None, 2, bands={1: 1})
-
-
-def test_registry_scf_mo_selector_slices_mo_columns():
-    class FakeMF:
-        mo_coeff = np.eye(6)
-    w = window_scf_mo(None, FakeMF(), 1, open_cols=[0], rank=[5, 4, 3], k=2)
-    assert not w.m_complete and w.ao_rows is None
-    assert w.c_win.shape == (6, 3)
-    assert np.allclose(w.c_win[:, 1:], np.eye(6)[:, [5, 4]])

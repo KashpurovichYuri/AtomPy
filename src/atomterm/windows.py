@@ -32,14 +32,11 @@ primitive_chain, the l-vocabulary of select_span, and angular's
 analytic path sit on it); `lowdin` / `span_projector` /
 `s_metric_roots` / `complete_orthonormal` are the S-metric algebra;
 `build_full_mo` and `radial_basis` are the two substrate
-builders (same core treatment, different window gauge); Window +
-SELECTORS are the registry on top.
-
-SELECTORS maps kind names to constructors; :class:`Window` carries
-the construction result and materializes it through
+builders (same core treatment, different window gauge); :class:`Window`
+carries a construction result and materializes it through
 :meth:`Window.columns`; the bounded-slice contract (active columns at
 ``[ncore : ncore + ncas]``) is owned here. AVAS (:func:`window_avas`)
-is the ecosystem cross-validator -- a candidate future kind.
+is the ecosystem cross-validator.
 """
 
 from __future__ import annotations
@@ -48,9 +45,6 @@ import warnings
 from typing import NamedTuple
 
 import numpy as np
-
-from atomterm.natural import (ci_rdm1, natural_orbitals,
-                              select_no_window)
 
 __all__ = [
     "Window",
@@ -72,11 +66,6 @@ __all__ = [
     "l_per_row",
     "radial_basis",
     "mask_radial_rotations",
-    "window_shell",
-    "window_primitive",
-    "window_scf_mo",
-    "window_no",
-    "SELECTORS",
     "lowdin",
 ]
 
@@ -742,7 +731,7 @@ def mask_radial_rotations(labels: list, ncore: int, ncas: int):
     return mask
 
 
-# ------------------------------------------------------------- the registry
+# ------------------------------------------------------- the Window carrier
 
 class Window(NamedTuple):
     """A candidate active space in one of two representations.
@@ -789,81 +778,10 @@ class Window(NamedTuple):
         return build_full_mo(mf, closed, act, c_core=c_core)
 
 
-def window_shell(mol, mf, ncore: int, *, patterns) -> Window:
-    """Contracted-shell window (AO rows) -- :func:`select_valence_ao`
-    wrapped as a :class:`Window`; m-complete."""
-    return Window(f"shell {patterns}", select_valence_ao(mol, patterns),
-                  None, True)
-
-
-def window_primitive(mol, mf, ncore: int, *, bands) -> Window:
-    """Primitive-band window (AO rows), ``bands = {l: count | (lo, hi)}``
-    -- :func:`select_primitives` wrapped as a :class:`Window`;
-    m-complete per primitive. Bands follow the scan protocol
-    (contiguous sets of the measured open-MO primitive weights)."""
-    rows: list[int] = []
-    for l in sorted(bands):
-        sel = bands[l]
-        if isinstance(sel, tuple):
-            rows += select_primitives(mol, l, exponent_band=sel)
-        else:
-            rows += select_primitives(mol, l, count=sel)
-    return Window(f"primitive {bands}", rows, None, True)
-
-
-def window_scf_mo(mol, mf, ncore: int, *, open_cols, rank, k: int) -> Window:
-    """Raw-SCF-MO window: the open reference MOs plus the ``k``
-    top-``rank`` virtuals.
-
-    Parameters
-    ----------
-    open_cols : MO column indices of the open reference MOs.
-    rank : the caller's virtual ordering -- the campaign metric is
-        DESCENDING valence-row S-weight (character, never energy
-        order: energy-slice picking runs away on TMs).
-    k : how many virtuals to admit.
-
-    Notes
-    -----
-    NEVER rotation-closed: the span certificate measures 7-9 at
-    every practical size (the SCF's orbitals are m-delocalized).
-    """
-    cols = list(open_cols) + list(rank[:k])
-    return Window(f"scf_mo +{k}", None, mf.mo_coeff[:, cols], False)
-
-
-def window_no(mol, mf, ncore: int, *, c_act, dets, vec, n_max: int,
-              weights=None, deg_tol: float = 1e-7) -> Window:
-    """NO window: term-average roots -> 1-RDM -> top-occupation NOs
-    (the NO mathematics lives in :mod:`atomterm.natural`).
-
-    Parameters
-    ----------
-    c_act, dets, vec : the parent CASCI's active columns,
-        determinant basis, and CI vectors.
-    n_max : how many occupation groups to keep.
-    weights : root weights for the average -- pass the whole term's
-        multiplet for an m-scalar density (a single root yields an
-        m-split window: legal but NOT rotation-closed).
-    deg_tol : occupation-grouping tolerance (scale-aware inside
-        :func:`atomterm.natural.select_no_window`).
-
-    Notes
-    -----
-    Verify every output with operators.window_closure.
-    """
-    norb = c_act.shape[1]
-    gamma = ci_rdm1(dets, vec, norb, weights)
-    c_no, occ = natural_orbitals(c_act, gamma)
-    c_win, kept = select_no_window(c_no, occ, n_max, deg_tol)
-    n_cols = sum(len(g) for g in kept)
-    return Window(f"no {n_cols} cols", None, c_win, False)
-
-
 def window_avas(mf, labels: list[str], ncore: int, threshold: float = None):
     """Window chosen by AVAS (pyscf.mcscf.avas, arXiv:1701.07862) --
     the independent ecosystem selector, used to cross-validate the
-    shell windows (a candidate future registry kind).
+    shell windows.
 
     Parameters
     ----------
@@ -893,11 +811,3 @@ def window_avas(mf, labels: list[str], ncore: int, threshold: float = None):
     ncas, nelecas, mo = avas.avas(mf, labels, ncore=ncore, **kw)
     nelecas = np.atleast_1d(np.asarray(nelecas)).ravel()
     return mo, int(ncas), nelecas
-
-
-SELECTORS = {
-    "shell": window_shell,
-    "primitive": window_primitive,
-    "scf_mo": window_scf_mo,
-    "no": window_no,
-}

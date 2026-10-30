@@ -1,7 +1,6 @@
 """Natural-orbital mathematics: the CI 1-RDM, the NOs, occupation
-groups, and the NO window selection. The Window object and the
-window-kind registry (shell / primitive / scf_mo / no) live in
-:mod:`atomterm.windows`.
+groups, and the NO window selection. The :class:`Window` object the
+selection feeds lives in :mod:`atomterm.windows`.
 
 The closure theorem licenses ANY per-l radial subspace replicated over
 ALL members as window units. NOs are legal units exactly when they
