@@ -3,9 +3,10 @@ TABLES.md from its cells.json payloads (the cell wave's render
 contract: the table and its provenance cannot diverge).
 
 This renderer owns the sections whose every value is a cell payload;
-log-sourced sections (Ti's 3d²4s² series, from run_tm_lattice.py --
-the 0.9 mEh lattice-vs-campaign bookkeeping trace lives there) stay
-hand-curated until their own cells run.
+log-sourced sections (Ti's 3d²4s² series, from the retired
+run_tm_lattice.py -- git history; the 0.9 mEh lattice-vs-campaign
+bookkeeping trace lives there) stay hand-curated until their own
+cells run.
 
 Value conventions (the lattice contract):
 

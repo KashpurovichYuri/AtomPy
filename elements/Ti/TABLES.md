@@ -28,7 +28,8 @@ CASCI, CAS(2,5), averaged
 ### One run, three fields — CAS(4,6) Ms=1 per root (the split demonstration)
 
 The same CAS(4,6) Ms=1 CI through three core fields
-(`scripts/multiplet_split.py`; the transform validated on carbon and
+(the retired `scripts/multiplet_split.py` — git history; the transform
+validated on carbon and
 titanium CAS(2,5) — ladder exact). Carbon's raw field keeps axial
 symmetry (README · Motivation); titanium's does not — stronger
 open-shell mixing. ⟨L̂z²⟩ after each energy column: it reads M_L² for

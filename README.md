@@ -15,7 +15,7 @@ ECP + cut-Dyall).
 conda activate pyscf          # PySCF 2.13 environment (any platform; in a bare
                               # shell: source <conda-root>/etc/profile.d/conda.sh first)
 pytest                        # 130 tests, ~13 min (chkfile caching); -m fast = sub-second tier
-python scripts/run_c.py       # writes elements/C/ (report.md/.json + chkfiles)
+python scripts/run.py C       # writes elements/C/ (report.md/.json + chkfiles)
 ```
 
 Run from the repo root — `pyproject.toml` preconfigures `pythonpath = src`
@@ -643,15 +643,15 @@ retired with the rungs era; committed data, not regenerable).
 New atom = new element file, not README growth; the
 regenerators write straight into these files (`scripts/regen_cells.py Ti`
 -> `elements/Ti/cells.{json,md}`; chkfiles land under `rungs/` and are
-gitignored). Regeneration: term tables — `scripts/run_c.py` and the
-per-atom `run_atom` calls (recorded in each report header); cells — the
+gitignored). Regeneration: term tables — `scripts/run.py` (the declared
+campaign; the per-atom `run_atom` calls are recorded in each report
+header); cells — the
 declared key-set of `scripts/regen_cells.py`; the methods tables —
 `scripts/build_methods_tables.py` (renders the factor grid from
 `cells.json` + the audit verdicts); the cell-sourced lattice sections —
 `scripts/build_lattice_tables.py`; scans —
-`scripts/radial_scan.py`; the
-lattices — `scripts/run_tm_lattice.py`, `run_tm_methb.py`, `run_u.py`,
-`run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
+`scripts/radial_scan.py`; the U lattices —
+`scripts/run_u.py`, `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
 suite (150 tests) — term tables, exact-class closure pins, basin
 branches.
 

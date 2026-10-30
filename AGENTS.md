@@ -18,7 +18,7 @@ cross-check twin), symmetry quantified by
 source ~/miniconda3/etc/profile.d/conda.sh && conda activate pyscf
 # or call ~/miniconda3/envs/pyscf/bin/python directly
 pytest                      # from repo root; pythonpath=src is preconfigured
-python scripts/run_c.py [workdir]
+python scripts/run.py [atoms]  # term tables per declared atom
 ```
 
 Python 3.12, PySCF 2.13, numpy 2.5, scipy 1.18 (note: `scipy.special.sph_harm`
