@@ -34,6 +34,9 @@ def stripped_dump(src: str) -> str:
 
 
 def main(argv: list[str]) -> int:
+    """Compare each path's neutralized AST between the rev (default
+    HEAD) and the working tree; exit 0 = every change is
+    docstrings/comments only."""
     rev = "HEAD"
     paths = []
     it = iter(argv)

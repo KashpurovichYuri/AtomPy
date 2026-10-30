@@ -2,6 +2,10 @@
 TABLES.md from its cells.json payloads (the cell wave's render
 contract: the table and its provenance cannot diverge).
 
+Usage: python scripts/build_lattice_tables.py Ti
+
+Notes
+-----
 This renderer owns the sections whose every value is a cell payload;
 log-sourced sections (Ti's 3d²4s² series, from the retired
 run_tm_lattice.py -- git history; the 0.9 mEh lattice-vs-campaign
@@ -31,8 +35,6 @@ Value conventions (the lattice contract):
 TABLES edit protocol lives here (as in build_methods_tables):
 sections rebuilt from constructed blocks, structural assertions, temp
 file + verified move.
-
-Usage: python scripts/build_lattice_tables.py Ti
 """
 
 import json
@@ -57,19 +59,23 @@ BOUNDARY = "## Window lattice — 3d²4s² series"
 
 
 def _e(p: dict) -> str:
+    """The as-run ground total (sign-minus normalized), or ``pending``
+    when the cell has not run."""
     if not p:
         return "pending"
-    # as-run: the run's own total (the averaged ruler would sit
-    # ~2.8 mEh above every one of these on Ti)
     return re.sub(r"(?<!e)-", "−",
                   f"{float(p['energies_pyscf'][0]):.4f}")
 
 
 def _l2(p: dict) -> str:
+    """The ground state's ⟨L²⟩ at table precision (blank when
+    pending)."""
     return f"{p['ground_l2']:.3f}" if p else ""
 
 
 def main(atom: str) -> None:
+    """Rebuild ``<atom>``'s 3d² lattice section from cells.json under
+    the TABLES edit protocol (structural assertions, verified move)."""
     src = Path(f"elements/{atom}/TABLES.md")
     data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
     cells = data["cells"]

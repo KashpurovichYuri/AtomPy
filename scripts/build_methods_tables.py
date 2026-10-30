@@ -2,11 +2,15 @@
 from its cells.json payloads -- the key-addressed provenance (the cell
 wave's render contract: the table and its source cannot diverge).
 
+Usage: python scripts/build_methods_tables.py [Ti]
+
 One table per declared window: ONE grid with an explicit method column
 (CASCI / CASSCF / SA-CASSCF), an em dash for the CASCI non-axis (the
 mask; CASCI has no optimizer), blank factor cells inheriting from the
 row above, and ``pending`` for declared-but-not-run cells.
 
+Notes
+-----
 Value conventions (the manifest contract, README · Methods):
 
 - E = the run's OWN total (``energies_pyscf[0]``), Eh + eV (×27.2114)
@@ -43,8 +47,6 @@ ready-made key lists and formats.
 TABLES edit protocol lives here: sections are rebuilt from constructed
 blocks, structural assertions checked (each heading once, row counts,
 no starred numbers), temp file + verified move.
-
-Usage: python scripts/build_methods_tables.py [Ti]
 """
 
 import json
@@ -101,7 +103,7 @@ AUDIT = {
     "ti_3d4s_3-1_sa-casscf_ao_radial_pol_avg": "floor",
     "ti_3d4s_3-1_sa-casscf_ao_radial_pur_avg": "floor",
     "ti_3d4s_3-1_sa-casscf_ao_frozen_pur_avg": "exact",
-    # ---- the grid completion (this draw) ----
+    # ---- the grid-completion cells ----
     "ti_3d4s_3-1_casscf_ao_-_pur_avg": "escape",
     "ti_3d4sno2_3-1_casscf_no_-_pol_avg": "escape (same minimum)",
     "ti_3d4sno2_3-1_casscf_no_-_pur_avg": "escape (same minimum)",
@@ -164,6 +166,9 @@ def _elec(n: dict | None) -> str:
 
 
 def _values(p: dict, anchor: float) -> list[str]:
+    """The value cells of a run cell: the as-run E in Eh/eV, ΔE vs the
+    anchor, the meters, the span and electron compositions -- sign
+    minus normalized."""
     asrun = float(p["energies_pyscf"][0])
     de_eh = asrun - anchor
     out = [f"{asrun:.4f}", f"{de_eh * 1e3:+.1f}", f"{asrun * EV:.4f}",
@@ -213,6 +218,10 @@ def render_window(keys, cells, audit, anchor) -> list[str]:
 
 
 def main(atom: str) -> None:
+    """Rebuild ``<atom>``'s factor tables from cells.json under the
+    render contract (WINDOWS cover exactly the declared windows --
+    asserted; the TABLES edit protocol's structural checks; verified
+    move)."""
     src = Path(f"elements/{atom}/TABLES.md")
     data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
     cells, audit, anchor = data["cells"], AUDIT, data["rohf_energy"]

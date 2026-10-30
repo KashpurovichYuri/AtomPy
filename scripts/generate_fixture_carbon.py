@@ -3,6 +3,9 @@
 One single-threaded draw (the cleanest, most canonical), stored as
 plain source: Python float repr round-trips exactly, so loading the
 module reproduces the SCF state bitwise. The unit tier runs NO SCF.
+Run ONLY when the basis or the SCF defaults change -- the frozen draw
+is the unit tier's determinism contract (certified by double-run
+sha256), so a casual regen silently re-baselines every unit pin.
 
 Usage:
     python scripts/generate_fixture_carbon.py
@@ -26,6 +29,8 @@ from atomterm.windows import select_shell_ao  # noqa: E402
 
 
 def block(name: str, array: np.ndarray) -> str:
+    """One numpy block as Python source (float repr -- exactly
+    round-tripping)."""
     body = np.array2string(
         np.asarray(array), separator=", ", threshold=10 ** 6,
         max_line_width=79, formatter={"float_kind": lambda x: repr(float(x))},
@@ -34,6 +39,8 @@ def block(name: str, array: np.ndarray) -> str:
 
 
 def main() -> None:
+    """One fresh single-threaded draw, written as
+    tests/carbon_reference.py and certified bitwise on the way out."""
     chk = pathlib.Path("ab.tmp_freeze.chk")
     if chk.exists():
         chk.unlink()  # always a FRESH single-threaded draw
@@ -60,9 +67,8 @@ E_TOT = {float(mf.e_tot)!r}
     chk.unlink(missing_ok=True)
 
     # certify the round trip bitwise before leaving
-    import sys
     sys.path.insert(0, "tests")
-    import carbon_reference as ref
+    import carbon_reference as ref  # noqa: E402
     assert ref.E_TOT == mf.e_tot
     assert ref.MO_COEFF.tobytes() == np.asarray(mf.mo_coeff).tobytes()
     assert ref.MO_ENERGY.tobytes() == np.asarray(mf.mo_energy).tobytes()

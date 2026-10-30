@@ -1,11 +1,11 @@
-"""Frozen radial scans for one atom (ticket 16, Phase 1): the
-m-symmetric correlation curve at exact symmetry + the member-tilt map.
+"""Frozen radial scans for one atom: the m-symmetric correlation curve
+at exact symmetry + the member-tilt map (the optimizer-free anatomy --
+every window is an explicit cos/sin construction, see atomterm.scans).
 
 Usage:
     python scripts/radial_scan.py [C|Si|Sc] [workdir]
 
-Writes elements/<label>_scan.md and prints it. No optimizer anywhere --
-every window is an explicit cos/sin construction (see atomterm.scans).
+Writes elements/<label>_scan.md and prints it. No optimizer anywhere.
 """
 
 import sys
@@ -35,6 +35,9 @@ SPECS = {
 
 
 def main():
+    """The declared atom's scan: the m-symmetric curve over the grid,
+    then the member-tilt map at its optimum; rendered to stdout and
+    elements/<label>_scan.md."""
     sym = sys.argv[1] if len(sys.argv) > 1 else "C"
     workdir = Path(sys.argv[2] if len(sys.argv) > 2 else "elements")
     workdir.mkdir(parents=True, exist_ok=True)
