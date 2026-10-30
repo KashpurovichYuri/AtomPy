@@ -67,6 +67,12 @@ to df6ec4f/dde6071).
   measurements; the renderer asserts every declared cell has one else
   renders pending. (Moving it to a data file next to cells.json is
   optional cosmetics, not structure.)
+  [SUPERSEDED 2026-10-30, user-directed: the verdict column is
+  ELIMINATED -- the renderer reads payloads only; the classes and
+  their row-level discriminators are the reading key in README ·
+  Results; the reader classifies. Kills the split source, the
+  new-atom audit cost, and the per-draw staleness liability (a regen
+  with a flipped basin would leave committed verdicts wrong).]
 - regen_cells + both renderers consume the groups; validation =
   byte-diff of the rendered tables vs. current: ONLY the four new
   pending rows may differ. AGENTS module rows updated (cells: the

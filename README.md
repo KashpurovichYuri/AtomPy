@@ -584,21 +584,29 @@ not of the solver's vector — gauge-free and fold-free. The fold-shift
 bookkeeping (|E(analysis fold) − E(as run)|) is not a table column;
 its reading: Partition bookkeeping, Methods.
 
-Verdicts (the classes of the
-failure inventory, Motivation): **exact** — commutators and span
-certificates at the 1e-13 class; **baseline** — a named non-closure
-mechanism at its signature scale (the raw fold's percent-class
-commutators at unchanged energy make it the polarized-core detector);
-**escape / swap** — the window-identity basins, compared in totals
-only; **NOT-CONVERGED** — the optimizer failed, the row waits for a
-re-run.
+Reading the manifest (the classes of the
+failure inventory, Motivation — each named by its row-level
+discriminators, never assigned by hand): **exact** — commutators and
+span certificates at the 1e-13 class; **baseline** — a named
+non-closure mechanism at its signature scale (the raw fold's
+percent-class commutators at unchanged energy make it the
+polarized-core detector); **escape** — ⟨L²⟩ ≈ 0 with the Span column
+showing massive borrowing (p-heavy on this draw); **swap** — SA rows
+whose Span reads s → 0 with p ≈ 1/6 and ‖[H,Lz]‖ at O(1): the
+window's s member exchanged for a core p; **gauge** — single-root
+radial rows, exact shell purity with basin-dependent ⟨L²⟩ and large
+commutators (the flat member direction); **construction-class** —
+mo-start rows whose span certificates never close (non-integer ⟨L²⟩;
+not an optimizer outcome); **NOT-CONVERGED** — the optimizer failed,
+the row waits for a re-run.
 
 The certified rungs sit mEh-tight around frozen CASCI (+10.5):
 orbital optimization buys ≈ nothing on the as-run window. Every other
 row of the manifest is a *classified* window-identity change — escape,
 swap, gauge — the class the fold-shift bookkeeping flags (Partition
 bookkeeping, Methods). Values, certificates: `elements/Ti/TABLES.md`;
-other atoms: their element files.
+other atoms: their element files. The summary below is the worked
+example of the reading key above (frozen, this draw):
 
 | treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | verdict |
 |---|---|---|---|---|---|---|
@@ -687,7 +695,7 @@ campaign; the per-atom `run_atom` calls are recorded in each report
 header); cells — the
 declared key-set of `scripts/regen_cells.py`; the methods tables —
 `scripts/build_methods_tables.py` (renders the factor grid from
-`cells.json` + the audit verdicts); the cell-sourced lattice sections —
+`cells.json`); the cell-sourced lattice sections —
 `scripts/build_lattice_tables.py`; scans —
 `scripts/radial_scan.py`; the U lattices —
 `scripts/run_u.py`, `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test

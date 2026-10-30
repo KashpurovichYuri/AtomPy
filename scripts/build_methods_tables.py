@@ -7,7 +7,9 @@ Usage: python scripts/build_methods_tables.py [Ti]
 One table per declared window: ONE grid with an explicit method column
 (CASCI / CASSCF / SA-CASSCF), an em dash for the CASCI non-axis (the
 mask; CASCI has no optimizer), blank factor cells inheriting from the
-row above, and ``pending`` for declared-but-not-run cells.
+row above, and ``pending`` for declared-but-not-run cells. No verdict
+column: the classes and their row-level discriminators are the reading
+key in README · Results (the reader classifies; the table reports).
 
 Notes
 -----
@@ -26,10 +28,7 @@ Value conventions (the manifest contract, README · Methods):
   count; blank in payloads that predate the field;
 - the fold-shift bookkeeping (|E(analysis fold) − E(as run)|) is NOT a
   column: its reading lives in README · Methods (Partition
-  bookkeeping);
-- verdict: the HUMAN step (AUDIT below) -- basin verdicts branch on
-  window weights (facts 15g/20), never on noise. A cell renders filled
-  only when BOTH payload and verdict exist; otherwise pending.
+  bookkeeping).
 
 Applicability: the Ti-style factor-grid tables (WINDOWS below; the
 window set and every cell address come from the declaration --
@@ -56,7 +55,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from atomterm.cases import CAMPAIGN
-from atomterm.cells import grid_keys, window_grid
+from atomterm.cells import grid_keys, planned, window_grid
 
 EV = 27.2114
 DASH = "—"
@@ -66,11 +65,11 @@ DASH = "—"
 # (primary + planned) -- asserted in main; the NO full-span prefix and
 # every cell address derive from the declaration, not from here.
 # Captions stay minimal (reading conventions live in README · Methods;
-# the anchor is the separately-specified ΔE reference).
+# the anchor line is COMPUTED from the store's rohf_energy).
 WINDOWS = [
     ("## CAS(4,6) / {3d,4s}", "3d4s", [
         "Reading — README · Methods (⟨L̂z²⟩ is a gauge diagnostic, not a"
-        " label). ROHF anchor: −848.4065 Eh (−23086.3167 eV)."]),
+        " label)."]),
     ("### CAS(4,10) / {3d,4d} — planned (constrained)", "3d4d", [
         "No 4s (constrained partition). Pending = declared, not yet run; "
         "the CASCI anchor lives in the 3d²4s² lattice above."]),
@@ -79,49 +78,11 @@ WINDOWS = [
         "the CASCI anchor lives in the 3d²4s² lattice above."]),
 ]
 
-# the audit verdicts (the human step): cell address -> verdict. Basins
-# branch on window weights: this draw's free/virtmix CASSCF escaped
-# (s 1/6, p 1/2, d 1/3, f-bearing), the free SAs swapped 4s<->3p
-# (s -> 4e-6, p -> 1/6) -- facts 15g/20/21c. "MO start was not closed" = the
-# construction's span never rotation-closes (the canonical MO slice,
-# fact 22d) -- not an optimizer outcome.
-AUDIT = {
-    "ti_3d4s_3-1_casci_ao_-_pol_raw": "baseline (detector)",
-    "ti_3d4s_3-1_casci_ao_-_pol_avg": "exact",
-    "ti_3d4s_3-1_casci_ao_-_pur_avg": "exact (pur)",
-    "ti_3d4s_3-1_casci_ao_-_pol_frac": "different functional",
-    "ti_3d4s_3-1_casscf_ao_-_pol_avg": "escape",
-    "ti_3d4s_3-1_casscf_mo_-_pol_avg": "escape (same minimum)",
-    "ti_3d4s_3-1_casscf_ao_virtmix_pol_avg": "escape (diagnostic)",
-    "ti_3d4s_3-1_casscf_ao_radial_pol_avg": "gauge",
-    "ti_3d4s_3-1_casscf_ao_radial_pur_avg": "gauge",
-    "ti_3d4s_3-1_casscf_ao_frozen_pol_avg": "baseline",
-    "ti_3d4s_3-1_casscf_ao_frozen_pur_avg": "exact (pur)",
-    "ti_3d4s_3-1_sa-casscf_ao_-_pol_avg": "swap",
-    "ti_3d4s_3-1_sa-casscf_ao_-_pur_avg": "swap (pur)",
-    "ti_3d4s_3-1_sa-casscf_mo_-_pol_avg": "escape",
-    "ti_3d4s_3-1_sa-casscf_ao_radial_pol_avg": "floor",
-    "ti_3d4s_3-1_sa-casscf_ao_radial_pur_avg": "floor",
-    "ti_3d4s_3-1_sa-casscf_ao_frozen_pur_avg": "exact",
-    # ---- the grid-completion cells ----
-    "ti_3d4s_3-1_casscf_ao_-_pur_avg": "escape",
-    "ti_3d4sno2_3-1_casscf_no_-_pol_avg": "escape (same minimum)",
-    "ti_3d4sno2_3-1_casscf_no_-_pur_avg": "escape (same minimum)",
-    "ti_3d4s_3-1_casscf_mo_frozen_pol_avg": "MO start was not closed",
-    "ti_3d4sno2_3-1_casscf_no_frozen_pol_avg": "baseline",
-    "ti_3d4sno2_3-1_casscf_no_frozen_pur_avg": "exact (pur)",
-    "ti_3d4sno2_3-1_sa-casscf_no_-_pol_avg": "swap",
-    "ti_3d4sno2_3-1_sa-casscf_no_-_pur_avg": "swap (pur)",
-    "ti_3d4s_3-1_sa-casscf_ao_frozen_pol_avg": "baseline",
-    "ti_3d4s_3-1_sa-casscf_mo_frozen_pol_avg": "MO start was not closed",
-    "ti_3d4sno2_3-1_sa-casscf_no_frozen_pol_avg": "baseline",
-    "ti_3d4sno2_3-1_sa-casscf_no_frozen_pur_avg": "exact",
-}
 
 HEAD = ("| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | "
         "E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | "
-        "Span (Lowdin) | Elec (Lowdin) | verdict |")
-SEP = "|" + "---|" * 16
+        "Span (Lowdin) | Elec (Lowdin) |")
+SEP = "|" + "---|" * 15
 
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "**CASCI**", "casscf": "**CASSCF**",
@@ -179,11 +140,11 @@ def _values(p: dict, anchor: float) -> list[str]:
     return [re.sub(r"(?<!e)-", "−", v) for v in out]   # sign minus only
 
 
-def _row(cells, audit, k, prev, anchor):
+def _row(cells, k, prev, anchor):
     """One table row from a declared key; every presentation choice
     (bold method heads, blank factor inheritance, the CASCI dash)
-    derives from the key's identity and its predecessor's."""
-    verdict = audit.get(k.address)
+    derives from the key's identity and its predecessor's. A declared
+    cell without a payload renders pending."""
     p = cells.get(k.address)
     m_new = prev is None or prev.method != k.method
     # the head-row rule: factor cells fill on AO-start rows (and every
@@ -204,16 +165,16 @@ def _row(cells, audit, k, prev, anchor):
         if k.method == "casci" or (k.start == "ao" and k.mask != "virtmix")
         else "",
     ]
-    if p is None or verdict is None:
+    if p is None:
         return "| " + " | ".join(head + ["pending"] + [""] * 9
                                  + ["pending"]) + " |"
-    return "| " + " | ".join(head + _values(p, anchor) + [verdict]) + " |"
+    return "| " + " | ".join(head + _values(p, anchor)) + " |"
 
 
-def render_window(keys, cells, audit, anchor) -> list[str]:
+def render_window(keys, cells, anchor) -> list[str]:
     """Format one window's ready-made key list (the declaration's order
     -- cells.window_grid); the renderer never constructs addresses."""
-    return [_row(cells, audit, k, prev, anchor)
+    return [_row(cells, k, prev, anchor)
             for prev, k in zip([None] + keys[:-1], keys)]
 
 
@@ -224,8 +185,12 @@ def main(atom: str) -> None:
     move)."""
     src = Path(f"elements/{atom}/TABLES.md")
     data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
-    cells, audit, anchor = data["cells"], AUDIT, data["rohf_energy"]
+    cells, anchor = data["cells"], data["rohf_energy"]
     spec = CAMPAIGN[atom]
+    # the anchor line: COMPUTED from the store (sign-minus normalized)
+    anchor_note = re.sub(r"(?<!e)-", "−",
+                         f"ROHF anchor: {anchor:.4f} Eh "
+                         f"({anchor * EV:.4f} eV).")
 
     # the declaration's per-window grids (primary + planned). Render
     # contract: this file's WINDOWS cover EXACTLY the declared windows,
@@ -239,11 +204,11 @@ def main(atom: str) -> None:
 
     sections = []
     for heading, window, notes in WINDOWS:
-        sec = [heading, ""] + notes + ["", HEAD, SEP]
-        sec += render_window(per_window[window], cells, audit, anchor)
+        sec = [heading, ""] + notes + ["", anchor_note, "", HEAD, SEP]
+        sec += render_window(per_window[window], cells, anchor)
         if heading.startswith("## "):
-            sec += ["", "Source: `cells.json` (this draw; verdicts — the "
-                    "AUDIT table of `scripts/build_methods_tables.py`)."]
+            sec += ["", "Source: `cells.json` (this draw). Reading key — "
+                    "README · Results (Methods compared)."]
         sections.append("\n".join(sec))
 
     text = src.read_text()
@@ -275,9 +240,10 @@ def main(atom: str) -> None:
     tmp.write_text(new)
     assert tmp.read_text() == new
     tmp.replace(src)
+    n = sum(1 for k in per_window[primary] + planned(spec)
+            if k.address in cells)
     print(f"{src}: methods tables rendered from cells.json "
-          f"({sum(1 for a in audit if a in cells)}/{len(audit)} "
-          "manifest cells audited)")
+          f"({n} payloads)")
 
 
 if __name__ == "__main__":
