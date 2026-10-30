@@ -12,6 +12,29 @@ the pair into the matrix -- detbasis' Slater-Condon rules or
 secondquant's a+/a strings, elementwise identical behind
 ``build_operators(method=...)`` (pinned by tests).
 
+Symbols
+-----------
+Every operator is the pair (o, g): ``O1 = Σ_pq o_pq a+_p a_q`` and
+``O2 = ½ Σ_pqrs g_pqrs a+_p a+_q a_s a_r`` (spin-orbitals ordered
+(alpha; beta); ``L^a = C† L^a_AO C`` -- the AO angular-momentum
+matrices transformed into the window)::
+
+    N   : o = 1
+    Lz  : o = L^z
+    Lz^2: o = (L^z)^2,  g = 2 (L^z)_pr (L^z)_qs
+    L^2 : o = Σ_a (L^a)^2,  g = 2 Σ_a (L^a)_pr (L^a)_qs
+    Sz  : o = diag(½·1, −½·1)
+    S^2 : o = ¾·1,  g = 2[(s_z)_pr (s_z)_qs + ½(s+)_pr (s−)_qs
+          + ½(s−)_pr (s+)_qs]
+    L±  : o = L^x ± i L^y          (orbital ladders; sector operators)
+    S±  : o = s±  (s+ = |α><β|)    (inter-sector maps: M_S → M_S ± 1)
+    H   : o = h_eff (the folded core field),  g = (pq|rs)
+
+The ladder algebra is pinned elementwise: L^2 = Lz^2 + ½(L+L− + L−L+),
+S^2 = Sz^2 + ½(S−S+ + S+S−), [Lz, L±] = ±L±. Sz certifies nothing
+(the field is spin-free: [H, Sz] ≡ 0 identically) -- it labels the
+sector; its matrix is exactly M_S·1.
+
 Conventions
 -----------
 * Spin orbitals follow detbasis: alpha ``0..norb-1``, beta
