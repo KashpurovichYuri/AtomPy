@@ -246,6 +246,67 @@ secondquant). Division of labor over windows: declaration NAMES
 BINDS (the start axis picks the builder). No cycles, no upward
 edges.
 
+Phase 6 DONE (2026-10-30, bd2dbb6/6034c08/b6bc7f2/b1ca436): the
+scripts surface + the test mass, one session (with the two review
+skills pulled in as directed -- the phase-7 review material executed
+early).
+
+SCRIPTS (the agreed classification executed):
+- run_c.py -> run.py [atoms]: the per-atom launcher over CAMPAIGN
+  (no args = every declared atom in CAMPAIGN order; fail-fast on
+  undeclared names). run_c's vestigial [workdir] arg dropped (its
+  'results' default contradicted the README contract).
+- RETIRED: run_tm_lattice / run_tm_methb / run_tm_no / multiplet_split
+  (actuality review: findings institutionalized in facts 22/23/25,
+  artifacts committed, ticket-29's gated batches run through
+  regen_cells -- none is the gated tool). Cites now read
+  'retired -- git history' (the sa_decomposition pattern).
+- run_u* untouched (the U fork = ECP wave: declare U in CAMPAIGN).
+- Live tools: the sys.path bootstrap idiom UNIFIED on run.py's robust
+  form -- radial_scan had NO bootstrap (its usage line failed); the
+  freeze script's PYTHONPATH=src note replaced by the same bootstrap.
+
+TESTS (the never-walked files, walked):
+- test_treatments: LADDER_CASES archaeology trimmed; the duplicated
+  escape-comment collapsed; the Ti sa_pyscf comment's Sc copy-paste
+  ('restored 5.99+ class' -- Ti restores 12) fixed; the divergence
+  guard MOVED to test_stages (its true home; fast tier 115 -> 116).
+- test_atoms: the stale test_pipeline cite -> test_treatments.
+- test_run_carbon: function renamed with the file (phase-5 flag
+  fully consumed); the SA-breaks comment de-lied (single-root CASSCF
+  breaks; SA RESTORES -- the C pins say so).
+- test_ecp: redundant local imports -> module-level operators.use;
+  unused build_mol dropped. conftest/ecp_wiring: import hygiene.
+- DECLINED (argued): carbon-fixture cfg removal (family symmetry with
+  sc_rohf/ti_rohf whose cfg IS consumed); test_cells fast-split (its
+  docstring states the 1:1 mixed-tier policy -- AGENTS sentence
+  rewritten accordingly, FLAGGED to the user as a working-agreement
+  change).
+
+THE BOUNDARY SUITE CAUGHT A REAL ONE: test_atoms'
+results['sa_casscf'] -- the 0909b64 rename's straggler (slow-only
+lookup, invisible to -m fast; 2 failed 182 passed, both the one
+KeyError, green in isolation after the fix). Lesson recorded in map:
+a rename round touching stage tags owes a full suite run.
+
+THE SKILLS (phase-7 material, executed early per the user):
+- code-review (fixed point 30ab209): the R6 lockstep misses fixed
+  (diag_fold/basin_map dangling cites in README + stages.py + C
+  TABLES, map item-5 supersession, README counts 130/150 -> 184);
+  the spec axis challenged the test_cells decline -- the stated
+  policy stands (module-level fast WOULD leak; module-slow +
+  function-fast double-selects into both -m tiers).
+- codebase-design over src/: save_report retired (zero consumers);
+  run_case's missing return fixed; the SELECTORS/window_* registry
+  found to be a HYPOTHETICAL SEAM (zero production consumers -- the
+  dispatch reappeared in run_cell's branches) -- decision recorded
+  (retire vs consummate) for phase 7 / the ECP wave; run_casscf and
+  stage_facts' c_ast noted borderline/deferred. map.md carries the
+  full 2026-10-30 survey section.
+
+REMAINING for phase 7: AGENTS final reduction, the SELECTORS
+decision, the recorded candidates, the closing two-axis pass.
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE
