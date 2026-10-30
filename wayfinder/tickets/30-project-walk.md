@@ -307,6 +307,31 @@ THE SKILLS (phase-7 material, executed early per the user):
 REMAINING for phase 7: AGENTS final reduction, the SELECTORS
 decision, the recorded candidates, the closing two-axis pass.
 
+POST-PHASE-6 ROUND (2026-10-30, user-directed, bdb4b76/273ad46/
+265cb27/98d4c7b -- the plan agreed in conversation):
+- freeze_carbon_reference -> generate_fixture_carbon (the doing-name;
+  cites lockstep). Lint DECLINED (the noqa comments stay as honest
+  annotations; no toolchain).
+- regen_cells GRANULARITY: key-identity filters (--method/--window/
+  --mask/--start/--substrate/--fold/--sector, '-' = maskless) +
+  --group grid|spine|diagnostics|planned; filtered runs MERGE into
+  cells.json (untouched cells keep payloads), the full run replaces;
+  empty-filter queues skip before any SCF; module-level body ->
+  main(); the dead rungs.json cleanup block deleted. Certified: the
+  selection matrix by direct call + the end-to-end C --method
+  sa-casscf run (exactly the 14 cells refreshed, 19 preserved --
+  store reverted: the refresh carries the electrons-field payload
+  evolution that belongs to a deliberate full regen, ticket 29 M).
+- README: 'The variety axes' section after the pipeline diagram (the
+  axes table, two runners/two deliverables, filter examples, merge
+  semantics, undeclared-exploration paths).
+- Scripts docstring pass to the walked-src standard (what+why ->
+  Usage -> Notes; function one-liners); AST-certified on 4 of 5
+  files, renderers byte-idempotent on Ti; the one code change:
+  generate_fixture's shadowing inner import deleted.
+- Sequencing confirmed: phase 7 = small close; U-declaration opens
+  the ECP wave (run_u* retire then).
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE
