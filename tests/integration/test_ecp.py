@@ -4,15 +4,15 @@ the gated TM references, TM free-ion tables, and the fact-20 closure
 certificate at ncore=4. All bands carry the measured fresh-draw values in
 comments."""
 
-from atomterm.casscf import run_casci
-from atomterm.core import purified_core_orbitals
-from atomterm.reference import ReferenceSpec, run_rohf
-from atomterm.windows import build_full_mo, radial_basis, select_valence_ao
 import numpy as np
 import pytest
 
 from atomterm import analysis, operators
-from atomterm.system import AtomConfig, build_mol, ncore_of, sector_na_nb
+from atomterm.casscf import run_casci
+from atomterm.core import purified_core_orbitals
+from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.system import AtomConfig, ncore_of, sector_na_nb
+from atomterm.windows import build_full_mo, radial_basis, select_valence_ao
 
 C_ECP = AtomConfig(symbol="C", basis="ccecpccpvdz", ecp="ccecp", spin=2)
 SI_ECP = AtomConfig(symbol="Si", basis="ccecpccpvdz", ecp="ccecp", spin=2)
@@ -114,8 +114,6 @@ def test_ecp_tm_references_and_basins():
     (window defect 1.4e-8). Sc: the forced basin is the reproducible one
     from EVERY guess but carries the AMPLIFIED fact-17 baseline (~1e-2:
     the explicit 3s3p core sits adjacent to the {3d,4s} window)."""
-    from atomterm.operators import window_closure
-
     for cfg, ref, nelec, e_pinned, defect_lo, defect_hi in [
         (SC_ECP, SC_REF, 3, -46.12052897, 1e-3, 1e-1),  # measured 1.38e-2
         (TI_ECP, TI_REF, 4, -57.60649802, 0.0, 1e-6),  # measured 6.9e-9
@@ -128,7 +126,7 @@ def test_ecp_tm_references_and_basins():
         # (Sc ran ncore=2, Ti ncore=3 -- silently floored, ticket 19)
         ncore = ncore_of(mol.nelectron, nelec)
         mo = build_full_mo(mf, list(range(ncore)), act)
-        cl = window_closure(mol, mo[:, ncore:ncore + len(act)])
+        cl = operators.window_closure(mol, mo[:, ncore:ncore + len(act)])
         assert defect_lo < cl["lz"] < defect_hi
 
 
@@ -171,8 +169,6 @@ def test_ecp_tm_purified_core_closes_the_input_windows():
     windows at machine precision (measured 4.9e-15 Sc / 7.2e-15 Ti vs the
     canonical-core defects 1.4e-2 / 9.5e-8); contamination at 1e-5-class
     foreign-l tails (measured 5.7e-5 / 7.0e-5)."""
-    from atomterm.operators import window_closure
-
     for cfg, ref, nelec in [(SC_ECP, SC_REF, 3), (TI_ECP, TI_REF, 4)]:
         mol, mf = run_rohf(
             cfg, f"elements/ecp/{cfg.label}/rungs/rohf.chk", ref=ref)
@@ -184,5 +180,5 @@ def test_ecp_tm_purified_core_closes_the_input_windows():
             build_full_mo(mf, list(range(ncore)), act, c_core=c_pur),
             radial_basis(mf, list(range(ncore)), act, c_core=c_pur)[0],
         ]:
-            cl = window_closure(mol, mo[:, ncore:ncore + len(act)])
+            cl = operators.window_closure(mol, mo[:, ncore:ncore + len(act)])
             assert cl["lz"] < 1e-12 and cl["lperp"] < 1e-12

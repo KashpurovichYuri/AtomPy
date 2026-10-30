@@ -1,10 +1,10 @@
 """Unit tier of the ECP mode (ticket 18): ccECP pairing and the
 valence-electron bookkeeping -- mol-only, no SCF."""
 
-from atomterm.windows import select_shell_ao
 import pytest
 
 from atomterm.system import AtomConfig, build_mol, ncore_of, sector_na_nb
+from atomterm.windows import select_shell_ao
 
 pytestmark = pytest.mark.fast
 

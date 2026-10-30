@@ -410,8 +410,9 @@ machine-light selection (the unit tier plus the frozen-reference
 integration files, e.g. test_stages); `pytest -m slow` = the
 SCF-bearing chemistry (the
 fast/slow MARKS are the machine axis, the directories the human one;
-a few fast-marked functions still live inside integration modules --
-split them out when their file is next touched). Run the full suite
+test_cells mixes tiers per function as stated policy -- 1:1 with src,
+its module docstring says so; every other file marks at module level).
+Run the full suite
 before committing changes to
 physics-bearing modules (operators/stages/cells/casscf/scans); targeted
 files or `-m fast` are fine for everything else. Suite flakes: the rungs
@@ -485,7 +486,7 @@ contamination/density-shift scales — the gate-(a)/(b) pins),
 the runaway + the hook + the basin gate's reference numbers),
 `test_radial_rung_full_gain_without_l_leakage` (fact 16a: radial == free
 gain, zero l-leakage), `test_divergence_guard_fires_on_broken_orthonormality`
-(the ticket-09 guard's negative control),
+(the ticket-09 guard's negative control; in test_stages, the fast tier),
 `test_casscf_input_window_orthogonalization_defect` (fact 17),
 `test_radial_basis_labels_and_partners` + `test_lm_sectors_partition_fused_shells`
 (the labeled substrate), `test_avas_cross_validates_the_shell_window`

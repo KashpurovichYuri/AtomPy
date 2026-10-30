@@ -3,15 +3,15 @@
 from collections import Counter
 
 import numpy as np
+import pytest
 
 from atomterm.cases import run_carbon
 from atomterm.system import AtomConfig
 
-import pytest
 pytestmark = pytest.mark.slow
 
 
-def test_pipeline_end_to_end(tmp_path):
+def test_run_carbon_end_to_end(tmp_path):
     cfg = AtomConfig(verbose=0)
     results = run_carbon(cfg, workdir=str(tmp_path))
 
@@ -40,8 +40,9 @@ def test_pipeline_end_to_end(tmp_path):
     assert terms == {"1S": 1, "1D": 5, "3P": 3}, terms
     assert {round(s.l2, 4) for s in cas0.states} == {0.0, 2.0, 6.0}
 
-    # CASSCF / SA-CASSCF stages classified (note: the SA-CASSCF optimized
-    # orbitals genuinely break rotational symmetry -- <L^2> < 2 and a finite
-    # ||[H, Lz]|| are the interesting physical output here, not bugs)
+    # CASSCF / SA-CASSCF stages classified (note: the SINGLE-ROOT CASSCF
+    # optimized orbitals genuinely break rotational symmetry -- <L^2> < 2
+    # and a finite ||[H, Lz]|| are the interesting physical output here,
+    # not bugs; the SA stage restores it -- both pinned in test_treatments)
     assert results["casscf"]["analysis"].states[0].term == "3P"
     assert len(results["sa-casscf"]["analysis"].states) == 3

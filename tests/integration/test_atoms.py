@@ -12,9 +12,10 @@ from collections import Counter
 import numpy as np
 import pytest
 
+from refs import TI_REF
+
 from atomterm.cases import run_atom
 from atomterm.system import AtomConfig
-from refs import TI_REF
 
 pytestmark = pytest.mark.slow
 
@@ -173,7 +174,7 @@ def test_atom_term_tables(name, atom_results):
         assert seen == case["ms0_order"], (name, seen)
 
     # optimized-orbital stages keep the same ground term (their residual
-    # symmetry breaking is physical output, asserted in test_pipeline)
+    # symmetry breaking is physical output, pinned in test_treatments)
     if case["run_casscf"]:
         assert results["casscf"]["analysis"].states[0].term == case["ground"][0]
     if case["sa_weights"]:

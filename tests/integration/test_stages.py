@@ -48,6 +48,23 @@ def test_stage_facts_payload_and_invariants(carbon, tmp_path):
     json.dumps(payload)
 
 
+def test_divergence_guard_fires_on_broken_orthonormality(carbon, tmp_path):
+    """Negative control for the ortho_err guard (ticket 14): a deliberately
+    non-S-orthonormal MO matrix (pre-fix-style) must be flagged DIVERGED --
+    the energies of such a rung are meaningless and the flag says so."""
+    _, mol, mf, act_idx = carbon
+    ncore = (mol.nelectron - 2) // 2
+    mo = build_full_mo(mf, list(range(ncore)), act_idx)
+    mo[:, ncore] = 1.05 * mo[:, ncore]  # break S-orthonormality (~0.1)
+    cas = run_casci(mf, 3, (2, 0), mo, str(tmp_path / "bad.chk"), nroots=3,
+                    name="bad")
+    facts = stage_facts(mol, mf, cas, mo[:, ncore:ncore + 3], ncore, 2, 0,
+                        tag="bad")
+    assert facts.ortho_err > 1e-6
+    assert facts.diverged
+    assert facts.payload("casci")["diverged"] is True
+
+
 def test_stage_facts_anisotropy_ref_roundtrip(carbon, tmp_path):
     """The anisotropy_ref knob: raw vs averaged reference cores of the SAME
     stage differ exactly by the discarded core anisotropy (the CASCI-rung

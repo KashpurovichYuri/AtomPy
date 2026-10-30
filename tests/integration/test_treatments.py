@@ -35,9 +35,8 @@ from refs import SC_EXACT_TERMS, TI_EXACT_TERMS, TI_REF
 from atomterm.casscf import run_casci
 from atomterm.cells import CellKey, run_cell
 from atomterm.reference import run_frac_occ, run_rohf
-from atomterm.stages import stage_facts
 from atomterm.system import AtomConfig, sector_na_nb
-from atomterm.windows import build_full_mo, select_valence_ao
+from atomterm.windows import select_valence_ao
 
 pytestmark = pytest.mark.slow
 
@@ -113,8 +112,7 @@ LADDER_CASES = {
             frac_dE=(1e-6, 1e-1),       # |E_frac - E_avg|, observed 6.6e-3
             corr_gain=(-0.3, -0.1),     # free CASSCF vs casci_avg: -0.251
             relax_window_offset=1e-9,   # same window definition: monotone
-            # tightened bands restored post-review (ticket 15 step 1): the
-            # ticket-10 merge had unified them to the loosest atom
+            # per-atom bands, carbon-exact (never unified to the loosest):
             exact_comm=1e-9,            # avg/frac commutators, carbon-exact
             relax_comm=1e-9,
             relax_l2_abs=1e-6,
@@ -369,23 +367,6 @@ def test_purified_rungs_exact_closure(name, ladders):
     assert 0.0 < d_e < b["pur_core_dE"], (name, d_e)
 
 
-def test_divergence_guard_fires_on_broken_orthonormality(carbon, tmp_path):
-    """Negative control for the ortho_err guard (ticket 14): a deliberately
-    non-S-orthonormal MO matrix (pre-fix-style) must be flagged DIVERGED --
-    the energies of such a rung are meaningless and the flag says so."""
-    _, mol, mf, act_idx = carbon
-    ncore = (mol.nelectron - 2) // 2
-    mo = build_full_mo(mf, list(range(ncore)), act_idx)
-    mo[:, ncore] = 1.05 * mo[:, ncore]  # break S-orthonormality (~0.1)
-    cas = run_casci(mf, 3, (2, 0), mo, str(tmp_path / "bad.chk"), nroots=3,
-                    name="bad")
-    facts = stage_facts(mol, mf, cas, mo[:, ncore:ncore + 3], ncore, 2, 0,
-                        tag="bad")
-    assert facts.ortho_err > 1e-6
-    assert facts.diverged
-    assert facts.payload("casci")["diverged"] is True
-
-
 # --------------------------------------------------------------------------
 # Sc (ticket 11): the transition-metal ladder. Same machinery, different
 # physics -- every assertion below is the measured Sc pattern across three
@@ -625,11 +606,9 @@ def test_sc_radial_rung_blocks_the_escape(sc_ladder):
         # casci_avg -- the from-scratch ROHF redraws wobble ~10 mEh);
         # the old +30..90 band mixed rulers
         assert -0.05 < rung["e_ground"] - r["casci_avg"]["e_ground"] < 0.005
-    # the escape is BELOW the radial ceiling (both minima are well-defined
-    # even though the single-root radial gauge is not; observed gap ~25 mEh,
-    # band widened for the escape energy's own wobble, fact 10)
-    # the escape is deeper than radial by ~25 mEh (draws 24-27); the
-    # band carries the draw wobble
+    # the escape is BELOW the radial ceiling: observed gap ~25 mEh
+    # (+24.4, +25.1 across cold runs), band widened for the escape
+    # energy's own draw wobble (fact 10)
     assert 0.0 < rad["e_ground"] - shell["e_ground"] < 0.08
     # imposed-symmetry SA: L restored, commutators at the 1e-3 baseline
     assert sar["ground_term"] == "2D"
@@ -852,7 +831,7 @@ def test_ti_sa_basins_and_radial_rung(ti_ladder):
 
     sa_p = r["sa_pyscf"]
     # the collapse is chaotic in depth: <L^2> fresh draw 2026-10-24 =
-    # 0.89 (was < 0.5) -- still nowhere near the restored 5.99+ class
+    # 0.89 (was < 0.5) -- still nowhere near the restored 12 class
     assert sa_p["ground_l2"] < 1.0
     assert sa_p["ortho_err"] < 1e-10
 

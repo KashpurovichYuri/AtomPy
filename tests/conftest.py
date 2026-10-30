@@ -65,8 +65,6 @@ def synthetic_p_operators():
     Condon-Shortley convention: Lz|px> = i|py>, Lz|py> = -i|px>,
     Lx|py> = i|pz>, Ly|px> = -i|pz>, etc.
     """
-    import numpy as np
-
     i = 1j
     lx = np.array([[0, 0, 0], [0, 0, -i], [0, i, 0]])
     ly = np.array([[0, 0, i], [0, 0, 0], [-i, 0, 0]])
