@@ -223,7 +223,7 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     core-field anisotropy of the fold, the window DEFINITION
     (``c_act``), and bookkeeping -- which must be exactly 0 (the fold
     convention is machine-exact against PySCF's ``get_h1eff``, 1e-15;
-    scripts/diag_fold.py). The window-definition term is not small in
+    the pin lives in test_operators). The window-definition term is not small in
     general: where the valence shell overlaps the core (Ti 4s|3s
     overlap ~0.1), the raw-AO analysis window shifts the CI ground by
     ~85 mEh against the run's projected columns -- on such atoms

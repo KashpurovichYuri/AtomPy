@@ -14,7 +14,7 @@ ECP + cut-Dyall).
 ```bash
 conda activate pyscf          # PySCF 2.13 environment (any platform; in a bare
                               # shell: source <conda-root>/etc/profile.d/conda.sh first)
-pytest                        # 130 tests, ~13 min (chkfile caching); -m fast = sub-second tier
+pytest                        # 184 tests, ~13 min (chkfile caching); -m fast = the seconds tier
 python scripts/run.py C       # writes elements/C/ (report.md/.json + chkfiles)
 ```
 
@@ -370,7 +370,7 @@ W —
 exactly (Slater–Condon: core-index integrals fold into
 h₁(ρ_C) = h + J[ρ_C] − K[ρ_C] — our fold, `build_operators`; pairs in
 C into E_core[C]; machine-exact against PySCF's own fold `get_h1eff`,
-1e-15, `scripts/diag_fold.py`). Our analysis splits
+1e-15 — the pin lives in test_operators). Our analysis splits
 `mo[:, :ncore] | mo[:, ncore:]` (`stage_facts`) — valid iff that split
 equals the run's partition. A free mask may exchange core and window
 orbitals; the kernel's final canonicalization then reorders columns by
@@ -652,7 +652,7 @@ declared key-set of `scripts/regen_cells.py`; the methods tables —
 `scripts/build_lattice_tables.py`; scans —
 `scripts/radial_scan.py`; the U lattices —
 `scripts/run_u.py`, `run_u_methb.py`, `run_u_sa.py`. Executable documentation: the test
-suite (150 tests) — term tables, exact-class closure pins, basin
+suite (184 tests) — term tables, exact-class closure pins, basin
 branches.
 
 ### Status and directions

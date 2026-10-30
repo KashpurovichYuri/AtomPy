@@ -8,15 +8,18 @@ Writes elements/<label>_scan.md and prints it. No optimizer anywhere --
 every window is an explicit cos/sin construction (see atomterm.scans).
 """
 
-from atomterm.reference import run_rohf
-from atomterm.windows import select_shell_ao
 import sys
 from pathlib import Path
 
-import numpy as np
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from atomterm.scans import member_tilt_map, radial_scan, scan_state, scan_window
-from atomterm.system import AtomConfig
+import numpy as np  # noqa: E402
+
+from atomterm.reference import run_rohf  # noqa: E402
+from atomterm.scans import (member_tilt_map, radial_scan, scan_state,  # noqa: E402
+                            scan_window)
+from atomterm.system import AtomConfig  # noqa: E402
+from atomterm.windows import select_shell_ao  # noqa: E402
 
 SPECS = {
     "C": dict(cfg=AtomConfig(), fam=("2p", "3p"), nelec=2, spin=2,

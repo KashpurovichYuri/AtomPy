@@ -12,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, "src")
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from atomterm.cases import CAMPAIGN
 from atomterm.cells import CellKey, cell_payload, grid_keys, run_cell
 from atomterm.reference import run_frac_occ, run_rohf

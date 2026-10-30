@@ -579,6 +579,13 @@ Recorded (candidates + declinations):
    multiplet_split); retire/fold the orphaned U-campaign one-offs
    (diag_s5, diag_mdecomp, run_u_* adapters) once the cell-key runner
    exists.
+   [SUPERSEDED 2026-10-30, ticket 30 phase 6: diag_fold and
+   multiplet_split RETIRED with the debug-residue + one-shot waves --
+   their findings institutionalized (facts 25/24, committed tables),
+   their cites now read 'retired -- git history'; run_u* kept pending
+   the ECP-wave U fork (declare U in CAMPAIGN). The audit's 'keep'
+   list presumed the scripts were the only anchor owners; the pins and
+   tables are.]
 6. User-authored README sentences flagged by review, deferred to the
    user's next pass: "The certified variants are similar to CASSCF
    theory." (garbled; the pur variant no longer named), the three

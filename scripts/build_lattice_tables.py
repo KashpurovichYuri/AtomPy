@@ -40,7 +40,7 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, "src")
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from atomterm.cells import CellKey
 
 SECTOR = (2, 0)          # d² Ms=1: the 4s² pair closed in the core

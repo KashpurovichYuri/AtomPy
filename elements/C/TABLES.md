@@ -48,8 +48,8 @@ answer is start-independent within a basin. The orbitals are not: each
 start draws its own flat-direction gauge (pairwise span overlaps
 0.89–0.98, ⟨L²⟩ never 2 — every endpoint is m-tilted and flagged by
 the meters). This is why the protocol certifies (SA + frozen window +
-purified core) instead of trusting convergence. Runner:
-`scripts/basin_map.py`.
+purified core) instead of trusting convergence. Runner: the retired
+`scripts/basin_map.py` (git history).
 
 ## Frozen-scan verdicts (Motivation; curves in `scan.md`)
 

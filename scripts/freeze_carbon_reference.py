@@ -5,17 +5,20 @@ plain source: Python float repr round-trips exactly, so loading the
 module reproduces the SCF state bitwise. The unit tier runs NO SCF.
 
 Usage:
-    PYTHONPATH=src python scripts/freeze_carbon_reference.py
+    python scripts/freeze_carbon_reference.py
 """
 
 from __future__ import annotations
 
 import pathlib
+import sys
 
 import numpy as np
 from pyscf import lib
 
 lib.num_threads(1)
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 
 from atomterm.system import AtomConfig, build_mol  # noqa: E402
 from atomterm.reference import run_rohf  # noqa: E402
