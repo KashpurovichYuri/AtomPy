@@ -12,12 +12,13 @@ Atoms (default: every declared atom, CAMPAIGN order):
 
 Group (--group): one named declared group instead of the full grid
     grid                    the full factor grid, every declared window
-                            (the default; Ti's d² lattice rides along)
+                            (the default; plus the declared lattice)
     spine                   the fold spine: raw/avg/frac on the primary
                             window
     diagnostics             the virtual-mix rows only
     planned                 the planned windows' grids (declared,
                             not yet run)
+    lattice                 the free-ion d2 lattice cells
 
 Axis filters (AND-composed; each matches the CellKey field exactly):
     --method casci          casci | casscf | sa-casscf
@@ -46,47 +47,24 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from atomterm.cases import CAMPAIGN  # noqa: E402
 from atomterm.cells import (CellKey, cell_payload, diagnostics, grid_keys,  # noqa: E402
-                            planned, run_cell, spine_keys)
+                            lattice_keys, planned, run_cell, spine_keys)
 from atomterm.reference import run_frac_occ, run_rohf  # noqa: E402
 from atomterm.system import sector_na_nb  # noqa: E402
 from atomterm.windows import select_valence_ao  # noqa: E402
 
 
-def lattice_keys(atom) -> list[CellKey]:
-    """The d² lattice cells (Ti): the free-ion series CAS(2,·) -- the
-    4s² pair closed in the core (ncore=10), sector (2,0) = Ms=1, over
-    the growing m-complete shell spans. Constructions per row: the raw
-    shell AOs (exactly closed), the PySCF canonical MO slice (the
-    m-delocalized control, fact 22d), and the full-span group-prefix
-    NOs of the source's own term-averaged density (fact 23: k=K spans
-    the whole source window -- NO == AOs by construction, the closure
-    certificate is the point; k=1 for {3d} doubles as the machinery
-    pin). All sectors are tiny (<= 78 dets): seconds each."""
-    sec = (2, 0)
-    keys = []
-    for w in ("3d", "3d4p", "3d4p4d"):
-        keys.append(CellKey(atom, w, sec, method="casci", fold="avg"))
-        keys.append(CellKey(atom, w, sec, method="casci", start="mo",
-                            fold="avg"))
-    for w in ("3dno1", "3d4pno2", "3d4p4dno3"):
-        keys.append(CellKey(atom, w, sec, method="casci", start="no",
-                            fold="avg"))
-    return keys
-
-
 def run_queue(name, spec, sector, group) -> list[CellKey]:
     """The run's queue: the named declared group, or the full grid
-    (plus Ti's lattice riders, which belong to no group)."""
+    plus the declared lattice."""
     if group == "spine":
         return spine_keys(name, "".join(spec.shell_patterns), sector)
     if group == "diagnostics":
         return diagnostics(spec)
     if group == "planned":
         return planned(spec)
-    queue = grid_keys(spec)
-    if name == "Ti":
-        queue += lattice_keys(name)
-    return queue
+    if group == "lattice":
+        return lattice_keys(spec)
+    return grid_keys(spec) + lattice_keys(spec)
 
 
 def keep(key: CellKey, args) -> bool:
@@ -117,9 +95,10 @@ def parse_args(argv) -> argparse.Namespace:
                    help="declared atoms to run (default: every CAMPAIGN "
                         "atom, CAMPAIGN order)")
     p.add_argument("--group", choices=["grid", "spine", "diagnostics",
-                                       "planned"],
+                                       "planned", "lattice"],
                    help="one named declared group instead of the full "
-                        "grid: grid | spine | diagnostics | planned")
+                        "grid: grid | spine | diagnostics | planned | "
+                        "lattice")
     p.add_argument("--method",
                    help="keep this method: casci | casscf | sa-casscf")
     p.add_argument("--window",

@@ -26,7 +26,7 @@ def test_casespec_is_the_intent_manifest():
     names = {f.name for f in dataclasses.fields(CaseSpec)}
     assert {"symbol", "basis", "ecp", "spin", "nelec_act", "ncore",
             "shell_patterns", "ref", "sa_weights", "run_casscf",
-            "nroots_primary", "planned_windows"} <= names
+            "nroots_primary", "planned_windows", "lattice_windows"} <= names
     # immutable: a declaration is not mutated by running it
     with pytest.raises(Exception):
         spec.symbol = "N"

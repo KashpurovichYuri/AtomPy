@@ -90,6 +90,7 @@ __all__ = [
     "grid_keys",
     "diagnostics",
     "planned",
+    "lattice_keys",
 ]
 
 METHODS = ("casci", "casscf", "sa-casscf")
@@ -655,3 +656,37 @@ def planned(spec) -> list[CellKey]:
     window (:func:`window_grid`) -- CASCI anchors first when the runs
     come, then the optimizer cells."""
     return [k for w in spec.planned_windows for k in window_grid(spec, w)]
+
+
+def lattice_keys(spec) -> list[CellKey]:
+    """The declared free-ion d2 lattice (``spec.lattice_windows``): the
+    CAS(2,·) series -- the ns2 pair closed in the core, sector (2,0) =
+    Ms=1 -- over growing m-complete shell spans.
+
+    Three constructions per span: the raw shell AOs (exactly closed),
+    the canonical MO slice (the m-delocalized control), and the
+    full-span group-prefix NOs of the source's own term-averaged
+    density (:func:`_no_label`; NO == AOs by construction -- the
+    machinery certificate, not a methodology).
+
+    Parameters
+    ----------
+    spec : the declaring :class:`~atomterm.cases.CaseSpec` (empty
+        ``lattice_windows`` -> empty list).
+
+    Examples
+    --------
+    Ti (ncore=10): 3d -> CAS(2,5), 3d4p -> CAS(2,8), 3d4p4d ->
+    CAS(2,13); the NO labels carry the group count (3d4pno2).
+    """
+    sec = (2, 0)
+    keys = []
+    for w in spec.lattice_windows:
+        keys.append(CellKey(spec.symbol, w, sec, method="casci",
+                            fold="avg"))
+        keys.append(CellKey(spec.symbol, w, sec, method="casci",
+                            start="mo", fold="avg"))
+    for w in spec.lattice_windows:
+        keys.append(CellKey(spec.symbol, _no_label(w), sec,
+                            method="casci", start="no", fold="avg"))
+    return keys

@@ -20,6 +20,7 @@ from atomterm.cells import (
     cell_chk,
     diagnostics,
     grid_keys,
+    lattice_keys,
     load_cell,
     planned,
     spine_keys,
@@ -174,6 +175,30 @@ def test_window_grid_is_the_one_declaration():
     assert {k.window for k in pl} == {
         "3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4"}
     assert all(k.address not in addrs for k in pl)   # disjoint windows
+
+
+@fast
+def test_lattice_keys_derive_from_the_declaration():
+    """The free-ion d2 lattice derives from CaseSpec.lattice_windows:
+    three constructions per span (AO / MO / the full-span group-prefix
+    NO), sector (2,0) = Ms=1, CASCI, averaged fold -- the ao/mo blocks
+    precede the NO block (the store's key order); undeclared atoms
+    derive nothing."""
+    from atomterm.cases import CAMPAIGN
+
+    assert lattice_keys(CAMPAIGN["C"]) == []
+    assert lattice_keys(CAMPAIGN["Si"]) == []
+    assert [k.address for k in lattice_keys(CAMPAIGN["Ti"])] == [
+        "ti_3d_2-0_casci_ao_-_pol_avg",
+        "ti_3d_2-0_casci_mo_-_pol_avg",
+        "ti_3d4p_2-0_casci_ao_-_pol_avg",
+        "ti_3d4p_2-0_casci_mo_-_pol_avg",
+        "ti_3d4p4d_2-0_casci_ao_-_pol_avg",
+        "ti_3d4p4d_2-0_casci_mo_-_pol_avg",
+        "ti_3dno1_2-0_casci_no_-_pol_avg",
+        "ti_3d4pno2_2-0_casci_no_-_pol_avg",
+        "ti_3d4p4dno3_2-0_casci_no_-_pol_avg",
+    ]
 
 
 # ------------------------------------------------------------- the bridge

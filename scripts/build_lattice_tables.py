@@ -43,19 +43,23 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from atomterm.cells import CellKey
+from atomterm.cases import CAMPAIGN  # noqa: E402
+from atomterm.cells import CellKey, lattice_keys  # noqa: E402
 
-SECTOR = (2, 0)          # d² Ms=1: the 4s² pair closed in the core
-D2_SERIES = [            # (window label, CAS label)
-    ("3d", "CAS(2,5)"),
-    ("3d4p", "CAS(2,8)"),
-    ("3d4p4d", "CAS(2,13)"),
-]
+SHELL_COLS = {"s": 1, "p": 3, "d": 5, "f": 7, "g": 9, "h": 11}
 HEAD = ("| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ | "
         "custom, Eh | ⟨L²⟩ |")
 SEP = "|---|---|---|---|---|---|---|---|---|"
 HEADING = "## Window lattice — 3d² series"
 BOUNDARY = "## Window lattice — 3d²4s² series"
+
+
+def cas_label(window: str) -> str:
+    """The free-ion CAS label of a shell-span window: the electron
+    count is the lattice's (2), the column count the summed m-set
+    sizes of its shells."""
+    cols = sum(SHELL_COLS[l] for l in re.findall(r"\d+([spdfgh])", window))
+    return f"CAS(2,{cols})"
 
 
 def _e(p: dict) -> str:
@@ -75,22 +79,32 @@ def _l2(p: dict) -> str:
 
 def main(atom: str) -> None:
     """Rebuild ``<atom>``'s 3d² lattice section from cells.json under
-    the TABLES edit protocol (structural assertions, verified move)."""
+    the TABLES edit protocol (structural assertions, verified move).
+    The spans and sector derive from the declaration
+    (``CaseSpec.lattice_windows`` via ``cells.lattice_keys``); this
+    file owns presentation only."""
+    spec = CAMPAIGN[atom]
+    keys = lattice_keys(spec)
+    if not keys:
+        sys.exit(f"no declared lattice for {atom} "
+                 f"(CaseSpec.lattice_windows is empty)")
+    sector = keys[0].sector
+    spans = spec.lattice_windows
     src = Path(f"elements/{atom}/TABLES.md")
     data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
     cells = data["cells"]
     anchor = data["rohf_energy"]
 
     def payload(window, start):
-        k = CellKey(atom, window, SECTOR, method="casci", start=start,
+        k = CellKey(atom, window, sector, method="casci", start=start,
                     fold="avg")
         return cells.get(k.address)
 
     rows = []
-    for w, cas in D2_SERIES:
+    for w in spans:
         ao, mo = (payload(w, s) for s in ("ao", "mo"))
         dets = f"{ao['n_det']:,}" if ao else "pending"
-        rows.append(f"| {w} | {cas} | {dets} | {_e(ao)} | {_l2(ao)} | "
+        rows.append(f"| {w} | {cas_label(w)} | {dets} | {_e(ao)} | {_l2(ao)} | "
                     f"{_e(mo)} | {_l2(mo)} | — | — |")
 
     section = [
@@ -117,8 +131,8 @@ def main(atom: str) -> None:
     assert new.count(HEADING) == 1 and new.count(BOUNDARY) == 1
     span = new[new.index(HEADING):new.index(BOUNDARY)]
     body = [r for r in span.splitlines() if r.startswith("|")]
-    assert len(body) - 2 == len(D2_SERIES), body
-    for r, (w, _) in zip(body[2:], D2_SERIES):
+    assert len(body) - 2 == len(spans), body
+    for r, w in zip(body[2:], spans):
         assert r.startswith(f"| {w} |"), r
         assert r.count("pending") <= 1, r      # a cell, never the row
 

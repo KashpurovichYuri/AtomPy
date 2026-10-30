@@ -76,6 +76,9 @@ class CaseSpec:
     planned_windows : further window labels of the campaign, declared
         but not yet run (Ti: the (4,10)/(4,14) partitions) -- the cell
         grid derives their full factor grids (:func:`atomterm.cells.planned`).
+    lattice_windows : the free-ion d2 lattice spans (empty = none) --
+        CAS(2,·) cells over growing m-complete shell spans
+        (:func:`atomterm.cells.lattice_keys`).
     tag : the workdir/checkpoint label (defaults to the symbol).
     ref : the :class:`~atomterm.reference.ReferenceSpec` (character-forced
         occupations + basin gate) where default SCF filling fails; None
@@ -99,6 +102,7 @@ class CaseSpec:
     run_casscf: bool = True
     nroots_primary: int = 9
     planned_windows: tuple[str, ...] = ()
+    lattice_windows: tuple[str, ...] = ()
 
     def atom_config(self) -> AtomConfig:
         """The spec as an :class:`AtomConfig` (``tag`` defaults to the
@@ -129,7 +133,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
                        occ_open=("3d",), occ_e_ref=-848.40648875),
-                   planned_windows=("3d4d", "3d4s4p4d")),
+                   planned_windows=("3d4d", "3d4s4p4d"),
+                   lattice_windows=("3d", "3d4p", "3d4p4d")),
 }
 
 
