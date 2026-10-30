@@ -123,6 +123,8 @@ FOLDS = ("raw", "avg", "frac")
 _WINDOW_RE = re.compile(r"[0-9][0-9a-z]*\Z")
 
 
+# the cell key -------------------------------------------------------
+
 @dataclass(frozen=True)
 class CellKey:
     """One grid point of the manifest: the unit of run, load, and report.
@@ -278,6 +280,8 @@ class CellData:
     ncas: int = 0
 
 
+# the store ----------------------------------------------------------
+
 def cell_chk(key: CellKey, workdir: str | Path = "elements") -> Path:
     """The chkfile of a cell: ``<workdir>/<Atom>/rungs/<address>.chk``."""
     return Path(workdir) / key.atom / "rungs" / f"{key.address}.chk"
@@ -343,7 +347,7 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
                     int(ncas) if ncas is not None else 0)
 
 
-# --------------------------------------------------------------- execution
+# ------------------------------------------------------------- the execution
 
 
 def _select_no_window(wins, k: int):
@@ -506,6 +510,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_pur=c_pur)
 
 
+# analysis + persistence ---------------------------------------------
+
 def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
     """Re-analyze a stored cell (load + one facts pass) -- no mol/mf-bound
     optimizer re-run, no re-solving. The two-function lean: loading is
@@ -580,6 +586,8 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
         anisotropy_ref=(mf, c_pur) if key.method == "casci" else None,
     )
 
+
+# the declared key-sets ----------------------------------------------
 
 def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]:
     """The default cell subset per atom (README · Methods, "the spine"):

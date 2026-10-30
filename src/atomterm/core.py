@@ -35,6 +35,8 @@ from atomterm.windows import (lm_sectors, lowdin, occupied_core_idx,
 __all__ = ["purified_core_orbitals", "closed_shell_core_energy"]
 
 
+# the core span ------------------------------------------------------
+
 def purified_core_orbitals(mol, mf, ncore: int):
     """The canonical core MOs replaced by an exactly rotation-closed
     core span (the pur substrate).
@@ -155,6 +157,8 @@ def purified_core_orbitals(mol, mf, ncore: int):
     # within-l mixing is span-preserving)
     return lowdin(c_pur, s), contamination
 
+
+# the core energy ----------------------------------------------------
 
 def closed_shell_core_energy(mf, c_core: np.ndarray) -> float:
     """Energy of a doubly-occupied core span in the raw mf field.

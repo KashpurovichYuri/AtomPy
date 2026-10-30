@@ -43,6 +43,8 @@ __all__ = ["StageFacts", "stage_facts"]
 ORTHO_TOL = 1e-6
 
 
+# the facts container ------------------------------------------------
+
 @dataclass
 class StageFacts:
     """Everything a finished stage reports, presentation-free.
@@ -184,6 +186,8 @@ class StageFacts:
             out["core_anisotropy"] = self.core_anisotropy
         return out
 
+
+# the one pass -------------------------------------------------------
 
 def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
                 *, tag: str, spherical_core: bool = True,

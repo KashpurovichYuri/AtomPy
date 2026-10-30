@@ -33,6 +33,8 @@ __all__ = [
 ]
 
 
+# the density --------------------------------------------------------
+
 def ci_rdm1(dets, vec, norb: int, weights=None) -> np.ndarray:
     """Spin-summed spatial 1-RDM of CI root(s), active-orbital basis.
 
@@ -105,6 +107,8 @@ def ci_rdm1(dets, vec, norb: int, weights=None) -> np.ndarray:
         gamma += w * flat.reshape(norb, norb)
     return gamma
 
+
+# the NO selection ---------------------------------------------------
 
 def natural_orbitals(c_act: np.ndarray,
                      gamma: np.ndarray) -> tuple[np.ndarray, np.ndarray]:

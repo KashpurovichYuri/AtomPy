@@ -59,6 +59,8 @@ class AtomConfig:
         return f"{self.symbol}_{self.basis}{ecp}{q}_s{self.spin}"
 
 
+# the sector geometry ------------------------------------------------
+
 def sector_na_nb(nelec_act: int, spin: int) -> tuple[int, int]:
     """(na, nb) occupations of the primary Ms sector.
 
@@ -125,6 +127,8 @@ def ncore_of(nelectron: int, nelec_act: int) -> int:
             f"core not closed: {nelectron} - {nelec_act} is odd")
     return (nelectron - nelec_act) // 2
 
+
+# the mol ------------------------------------------------------------
 
 def build_mol(cfg: AtomConfig) -> gto.Mole:
     """Build and validate a PySCF :class:`Mole` for the configured atom.

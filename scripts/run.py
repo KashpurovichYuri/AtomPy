@@ -20,7 +20,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from atomterm.cases import CAMPAIGN, run_case  # noqa: E402
 
-if __name__ == "__main__":
+
+def main():
     atoms = sys.argv[1:] or list(CAMPAIGN)
     unknown = [a for a in atoms if a not in CAMPAIGN]
     if unknown:
@@ -28,3 +29,7 @@ if __name__ == "__main__":
                  f"declared: {', '.join(CAMPAIGN)}")
     for atom in atoms:
         run_case(CAMPAIGN[atom])
+
+
+if __name__ == "__main__":
+    main()

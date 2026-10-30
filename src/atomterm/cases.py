@@ -45,6 +45,8 @@ __all__ = ["CaseSpec", "CAMPAIGN", "run_case", "run_atom", "run_carbon",
            "main"]
 
 
+# the declaration ----------------------------------------------------
+
 def _ms_label(na: int, nb: int) -> str:
     """Filename/report label of a sector's M_S = (na - nb) / 2.
 
@@ -151,6 +153,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    lattice_windows=("3d", "3d4p", "3d4p4d")),
 }
 
+
+# the executor -------------------------------------------------------
 
 def run_case(spec: CaseSpec, workdir: str = "elements") -> dict:
     """Execute a declared case: the staged pipeline's launch entry for

@@ -43,6 +43,8 @@ from atomterm.windows import select_span, span_projector
 __all__ = ["ReferenceSpec", "run_rohf", "run_frac_occ"]
 
 
+# the occupation contract --------------------------------------------
+
 def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
     """The character-forced ROHF occupation hook (a ``get_occ``
     replacement built for :func:`run_rohf`).
@@ -156,6 +158,8 @@ class ReferenceSpec:
             raise ValueError(
                 f"unknown conv_accelerator: {self.conv_accelerator!r}")
 
+
+# the runners --------------------------------------------------------
 
 def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     """ROHF for the configured atom, chkfile-cached.

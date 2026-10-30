@@ -43,6 +43,8 @@ __all__ = [
 ]
 
 
+# the elementary operators -------------------------------------------
+
 def annihilate(occ: tuple[int, ...], p: int):
     """``a_p |occ>`` -> ``(sign, occ')`` or None if p is not occupied."""
     occ = list(occ)
@@ -64,6 +66,8 @@ def create(occ: tuple[int, ...], p: int):
     occ.insert(i, p)
     return (-1 if i % 2 else 1), tuple(occ)
 
+
+# the ket applications -----------------------------------------------
 
 def apply_one_body(occ: tuple[int, ...], h: np.ndarray) -> dict[tuple, complex]:
     """``(sum_pq h[p,q] a+_p a_q) |occ>`` -> ``{occ': amplitude}``."""
@@ -121,6 +125,8 @@ def apply_two_body(
         out[o4] = out.get(o4, 0j) + amp
     return out
 
+
+# the matrices -------------------------------------------------------
 
 def one_body_matrix(
     dets: list[tuple[int, ...]], one_body: np.ndarray

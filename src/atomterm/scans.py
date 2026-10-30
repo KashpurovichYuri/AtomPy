@@ -53,6 +53,8 @@ __all__ = ["ScanPoint", "ScanSpec", "scan_window", "scan_state",
            "radial_scan", "member_tilt_map"]
 
 
+# the anatomy spec ---------------------------------------------------
+
 @dataclass
 class ScanSpec:
     """The DECLARED scan anatomy of one atom (a ``CaseSpec.scan`` value).
@@ -102,6 +104,8 @@ class ScanPoint:
         """Bookkeeping: e_active must equal e_one + e_two exactly."""
         return abs(self.e_active - (self.e_one + self.e_two))
 
+
+# the scan primitives ------------------------------------------------
 
 def scan_window(mol, mf, thetas, fam_a, fam_b) -> np.ndarray:
     """Explicit window columns ``cos(t_m) A_m + sin(t_m) B_m``.
@@ -174,6 +178,8 @@ def scan_state(mol, mf, c_act: np.ndarray, ncore: int, na: int, nb: int,
         comm_h_l2=comm_h_l2,
     )
 
+
+# the scan products --------------------------------------------------
 
 def radial_scan(mol, mf, ncore: int, na: int, nb: int, fam_a, fam_b,
                 angles) -> list[ScanPoint]:
