@@ -484,6 +484,44 @@ several starting guesses are tried, their solutions classified by
 character (the S-projector weight), and the passing basin's energy
 recorded.
 
+### The variety axes
+
+Every point of the campaign's variety is **data** — an axis value in a
+`CellKey` address, never a new script. The declaration (`CaseSpec` rows
+in `cases.CAMPAIGN`) says which slices are interesting; the runners
+execute the declared set:
+
+| Axis | Values | Declared in | Run by |
+|---|---|---|---|
+| atom × basis × ECP | any `AtomConfig` (all-electron or `ecp=`) | `CAMPAIGN` rows | both runners |
+| window | any shell set the basis carries (`3d4s`, …); `planned_windows` = declared, not yet run | `CaseSpec` | both runners |
+| sector (M_S) | `(na, nb)`, from spin + electron parity | derived from the case | `run.py` (all sectors) |
+| method | casci / casscf / sa-casscf | the grid grammar | `regen_cells.py` |
+| mask | free / frozen / radial / virtmix | the grid grammar | `regen_cells.py` |
+| start | ao / mo / no | the grid grammar | `regen_cells.py` |
+| substrate | pol (canonical core) / pur (closed span) | the grid grammar | `regen_cells.py` |
+| fold | raw / avg / frac | the grid grammar | `regen_cells.py` |
+| reference | default / fractional-occupation / character-forced gated | `CaseSpec.ref` | both runners |
+
+Two runners, two deliverables: `run.py <atoms>` runs the fixed staged
+pipeline (the term tables — the stages *are* the deliverable, no method
+filters); `regen_cells.py <atoms>` runs the methods grid and selects
+within it by key identity:
+
+```bash
+python scripts/regen_cells.py Ti                        # one atom, full grid
+python scripts/regen_cells.py Ti --method sa-casscf     # one methodology
+python scripts/regen_cells.py Ti --window 3d4s --mask radial
+python scripts/regen_cells.py --group diagnostics       # a named declared group
+```
+
+Filtered runs **merge** into the existing `cells.json` (untouched cells
+keep their stored payloads); only the unfiltered run replaces the
+store. Anything undeclared remains explorable directly —
+`run_atom(cfg, patterns, nelec_act, …)` for a one-off staged look,
+`run_cell(CellKey(...), mf, ...)` for a single cell: the declaration
+records what is *interesting*; it does not gate the machinery.
+
 ---
 
 ## Results
