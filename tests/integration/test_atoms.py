@@ -178,4 +178,4 @@ def test_atom_term_tables(name, atom_results):
     if case["run_casscf"]:
         assert results["casscf"]["analysis"].states[0].term == case["ground"][0]
     if case["sa_weights"]:
-        assert len(results["sa_casscf"]["analysis"].states) == len(case["sa_weights"])
+        assert len(results["sa-casscf"]["analysis"].states) == len(case["sa_weights"])

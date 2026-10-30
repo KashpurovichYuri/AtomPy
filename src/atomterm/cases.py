@@ -134,8 +134,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
 
 
 def run_case(spec: CaseSpec, workdir: str = "elements") -> dict:
-    """Execute a declared case: the term tables always, the treatments
-    arm when declared. The launch entry for any atom, new or old.
+    """Execute a declared case: the staged pipeline's launch entry for
+    any atom, new or old (an atom is runnable iff declared here).
 
     Parameters
     ----------
@@ -145,7 +145,8 @@ def run_case(spec: CaseSpec, workdir: str = "elements") -> dict:
 
     Returns
     -------
-    payloads when one is declared.
+    the :func:`run_atom` stage dict (``rohf_energy`` + one entry per
+    computed stage tag).
     """
     res = run_atom(
         spec.atom_config(),
@@ -157,6 +158,9 @@ def run_case(spec: CaseSpec, workdir: str = "elements") -> dict:
         nroots_primary=spec.nroots_primary,
         ref=spec.ref,
     )
+    return res
+
+
 def run_atom(
     cfg: AtomConfig,
     shell_patterns: list[str],

@@ -702,3 +702,44 @@ Design round (same date, the codebase-design vocabulary over src/):
    in-session, store round-trip). The budgets dict (five knob names)
    is the one interface leak -- documented, acceptable. stages.py is
    exemplary depth (2 public names).
+
+## Post-wave survey (2026-10-30, ticket-30 phase 6 — code-review + design survey)
+
+Review (fixed point 30ab209, the phase-6 scripts+tests commits): the
+R6 lockstep misses fixed in-commit (diag_fold/basin_map dangling
+cites, stale README counts, the map item-5 supersession, the sys.path
+bootstrap idiom unified — radial_scan had NO bootstrap: its own usage
+line failed). The suite caught a REAL straggler the fast tier cannot
+see: test_atoms' `results["sa_casscf"]` (underscore) left by the
+0909b64 sa-casscf rename — KeyError, deterministic, green again in
+isolation. LESSON: a rename round that touches stage tags owes a FULL
+suite run, not the fast tier (slow-only lookups are invisible to -m
+fast).
+
+Design survey findings (vocabulary: module/interface/depth/seam/
+adapter, the deletion test):
+
+1. **The window-kind registry is a HYPOTHETICAL SEAM** (verified):
+   `windows.SELECTORS` + `window_shell`/`window_primitive`/
+   `window_scf_mo`/`window_no` have ZERO production consumers — only
+   tests/unit/test_natural.py; production resolves windows through
+   cells.run_cell's start-axis branches and the select_* family. The
+   name->window dispatch the registry was meant to own REAPPEARED in
+   run_cell's branches instead. DECISION NEEDED (phase 7 or the ECP
+   wave): retire the constructors (tests re-home to natural's own
+   builders) or consummate (route run_cell's start axis through the
+   registry — needs substrate/pur handling inside, likely forced).
+   Candidate declined for now: recorded, not executed.
+2. `analysis.save_report` RETIRED (zero consumers, the deletion test);
+   `run_case`'s missing `return res` FIXED (declared `-> dict` lied —
+   the phase-5 study-arm deletion took the return with it but left
+   the assignment).
+3. `casscf.run_casscf` (one production caller, cases) — kept: the
+   stage-name contract; the phase-5 verdict stands (borderline,
+   revisit only if cases' stage list changes).
+4. `stage_facts`'s `c_act` parameter: every production caller passes
+   the same derived slice — deepening candidate (derive inside,
+   override for scans), medium confidence, deferred.
+5. The rest of src/ reads deep-and-right (cells.CellKey, the mask
+   seam with three live adapters, operators' twin PySCF boundaries,
+   stages' 2-name surface called exemplary by the 10-28 round).

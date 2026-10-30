@@ -14,8 +14,7 @@ reports the M_L content of the space.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
-import json
+from dataclasses import dataclass
 
 import numpy as np
 
@@ -32,7 +31,6 @@ __all__ = [
     "analyze",
     "configuration_summary",
     "format_report",
-    "save_report",
 ]
 
 _L_LETTERS = "SPDFGHIKLMNOQRTUVWXYZ"  # J skipped, and the second P and
@@ -260,13 +258,6 @@ def format_report(res: AnalysisResult, title: str) -> str:
     lines.append(f"||[H, L^2]||_F = {res.comm_norm_h_l2:.3e}   "
                  f"(relative {res.comm_norm_h_l2 / res.h_norm:.3e})")
     return "\n".join(lines)
-
-
-def save_report(res: AnalysisResult, path: str) -> None:
-    """The full AnalysisResult as JSON (asdict dump)."""
-    payload = asdict(res)
-    with open(path, "w", encoding="utf-8") as fh:
-        json.dump(payload, fh, indent=2)
 
 
 # ------------------------------------------------- the configuration readers
