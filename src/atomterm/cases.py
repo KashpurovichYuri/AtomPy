@@ -31,6 +31,7 @@ import numpy as np
 from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
 from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.scans import ScanSpec
 from atomterm.windows import build_full_mo, occupied_core_idx, select_valence_ao
 from atomterm.casscf import (
     run_casci,
@@ -79,6 +80,10 @@ class CaseSpec:
     lattice_windows : the free-ion d2 lattice spans (empty = none) --
         CAS(2,·) cells over growing m-complete shell spans
         (:func:`atomterm.cells.lattice_keys`).
+    scan : the declared frozen-scan anatomy
+        (:class:`~atomterm.scans.ScanSpec` -- family pair, angle grid,
+        fixed extras; None = no scan; the runner is
+        ``scripts/radial_scan.py``).
     tag : the workdir/checkpoint label (defaults to the symbol).
     ref : the :class:`~atomterm.reference.ReferenceSpec` (character-forced
         occupations + basin gate) where default SCF filling fails; None
@@ -103,6 +108,7 @@ class CaseSpec:
     nroots_primary: int = 9
     planned_windows: tuple[str, ...] = ()
     lattice_windows: tuple[str, ...] = ()
+    scan: ScanSpec | None = None
 
     def atom_config(self) -> AtomConfig:
         """The spec as an :class:`AtomConfig` (``tag`` defaults to the
@@ -118,12 +124,20 @@ class CaseSpec:
 # New atom = new row here.
 CAMPAIGN: dict[str, CaseSpec] = {
     "C": CaseSpec("C", "ccpvdz", nelec_act=2, ncore=2,
-                  shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3),
+                  shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3,
+                  scan=ScanSpec(fam=("2p", "3p"),
+                                grid=(0.0, 0.8, 17))),
     "Si": CaseSpec("Si", "ccpvdz", nelec_act=2, ncore=6,
-                   shell_patterns=["3p"], spin=2, sa_weights=[1 / 3] * 3),
+                   shell_patterns=["3p"], spin=2, sa_weights=[1 / 3] * 3,
+                   scan=ScanSpec(fam=("3p", "4p"),
+                                 grid=(0.0, 1.1, 23))),
     "Sc": CaseSpec("Sc", "ccpvdz", nelec_act=3, ncore=9,
                    shell_patterns=["3d", "4s"], spin=1,
                    sa_weights=[1 / 5] * 5,
+                   scan=ScanSpec(fam=("3d", "4d"), grid=(0.0, 0.4, 9),
+                                 # 4s fixed: the 4s->5s direction is
+                                 # harmful and would mask the d structure
+                                 extra_fixed="4s"),
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "2p", "3s", "3p", "4s"),
                        occ_open=("3d",), occ_e_ref=-759.73625510)),

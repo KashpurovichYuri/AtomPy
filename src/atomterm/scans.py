@@ -49,8 +49,28 @@ from atomterm.operators import (
     spin_block_two_body,
 )
 
-__all__ = ["ScanPoint", "scan_window", "scan_state", "radial_scan",
-           "member_tilt_map"]
+__all__ = ["ScanPoint", "ScanSpec", "scan_window", "scan_state",
+           "radial_scan", "member_tilt_map"]
+
+
+@dataclass
+class ScanSpec:
+    """The DECLARED scan anatomy of one atom (a ``CaseSpec.scan`` value).
+
+    Attributes
+    ----------
+    fam : the radial family pair -- the start shell and the
+        correlating shell it rotates into (e.g. ``("2p", "3p")``).
+    grid : the uniform angle grid as ``(start, stop, n_points)``
+        (radians; 0 = the unrotated window).
+    extra_fixed : a window column appended UNSCANNED and fixed -- for
+        atoms whose valence window has a member outside the scanned
+        family whose own rotation direction is not of interest.
+    """
+
+    fam: tuple[str, str]
+    grid: tuple[float, float, int]
+    extra_fixed: str | None = None
 
 
 @dataclass
