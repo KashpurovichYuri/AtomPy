@@ -9,8 +9,6 @@ dies).
 
 - [29 — gated measurement batches](tickets/29-ti-first.md): the T2 Ti
   cells + the M store migration; runs only on the user's enable.
-- [30 — the project walk](tickets/30-project-walk.md): the file-by-file
-  review — complete; phase 7 (the reduction wave) is the close.
 - [31 — the ECP wave](tickets/31-ecp-wave.md): declare the ECP atom in
   `CAMPAIGN`; opens on the user's go.
 

@@ -392,6 +392,57 @@ measured scales (a round-B grep gap: bare scales, no units) -> class
 statements + record pointers; a fact-17 tag dissolved with them.
 Boundary suite at the wave: 185 green. Fast tier 118.
 
+Phase 7 DONE (2026-10-30, the reduction wave, 4fa6407/596af98/
+08e2b5e/ca80891/66cf029 + this close). User-directed lens: 'great
+reduction, never inflate; code/tests/results depict real facts'.
+
+- 7a: SELECTORS + the four window_* constructors RETIRED (zero
+  production consumers; the dispatch lives in run_cell's start
+  branches + select_*). The windows->natural import edge died with
+  window_no. Re-homes: the m-scalar NO pin direct; the
+  contracted-shell guard to test_windows; two dead-subject tests
+  deleted (fast 118 -> 117).
+- 7b: AGENTS 653 -> 417: facts carry generic claims only (a number
+  only when the number IS the fact); layout slimmed; the per-test
+  catalog deleted (the files' own docstrings own it); R1's record
+  home amended (tests/artifacts/git); V6 gains the CASCI
+  same-process clause.
+- 7c: tickets 01-28 DELETED (git = the archive); 31-ecp-wave.md born
+  (the pre-verified design re-homed from map's survey); map.md
+  745 -> 52 (Tickets/Issues/Examples + the architecture snapshot --
+  its permanent home); README 746 -> 328 (quick-start first; IP1/IP2
+  kept as the Motivation heart; the operator symbol table ->
+  operators' docstring; column bullets; ONE 6-row excerpt; pointers
+  to elements/ for every number).
+- 7d: the closing two-axis review (fixed point 75b2db3): fixed the
+  stale fact-16 cite (radial_scan), the 'cEh' coinage (reference),
+  the 'ticket one' ambiguity (AGENTS), the natural-purity overclaim
+  (map: the no_group_windows driver lazily imports the assembly
+  layers), the Symbols underline; declined + recorded: the regen
+  docstring-vs-help inventory (the user's stated form), the
+  README/AGENTS ownership-map split (the sanctioned 265cb27 split),
+  the every-class excerpt reading (the original 8 rows never
+  instantiated gauge/construction/NOT-CONVERGED either); the 57-vs-52
+  map line-count correction recorded here. Spec axis verified by
+  counting: 185/117 truthful, both re-homes kept their assertions,
+  tickets coherent with the tree, zero scope creep.
+- G5 DISPOSITION (map Issues + the casscf layout row): run_casci
+  KEEPS (real content: the CASCI class, nroots, fci_opts);
+  run_casscf/run_sa_casscf are pass-throughs carrying the stage name
+  -- retire at the ECP wave together with run_u* (their second
+  consumer); the stage name= lives at the call site. The layering
+  story stands: frozen deliverable (stage tags) vs evolving grid (the
+  ONE driver) -- the firewall is the TAGS, not the wrappers. The SA
+  second pass: optimize the ensemble, then measure the states (the
+  readout re-diagonalizes the frozen converged window,
+  canonicalization off).
+- Boundary suite: 1F + 12E (the documented NaN-Davidson cascade
+  class) + 172 green; isolation reruns ALL GREEN (the protocol's
+  verdict). Fast 117 at every commit.
+
+RESOLVED. Deleted per the resolved-ticket rule (AGENTS Planning);
+the walk's record lives in git history and this entry's commit.
+
 ## Principal differences discovered while planning
 
 1. **Retirement inverts the fact migration**: phases 5–6 may DELETE
