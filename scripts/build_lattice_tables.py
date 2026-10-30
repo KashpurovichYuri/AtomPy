@@ -1,15 +1,14 @@
 """Render an element's CELL-SOURCED window-lattice sections of
-TABLES.md from its cells.json payloads (the cell wave's render
-contract: the table and its provenance cannot diverge).
+TABLES.md from its cells.json payloads (the render contract: the
+table and its provenance cannot diverge).
 
 Usage: python scripts/build_lattice_tables.py Ti
 
 Notes
 -----
 This renderer owns the sections whose every value is a cell payload;
-log-sourced sections (Ti's 3d²4s² series, from the retired
-run_tm_lattice.py -- git history) stay hand-curated until their own
-cells run. The spans, sector, and CAS labels derive from the
+log-sourced sections (Ti's 3d²4s² series) stay hand-curated until
+their own cells run. The spans, sector, and CAS labels derive from the
 declaration (``CaseSpec.lattice_windows`` via ``cells.lattice_keys``);
 column conventions and the as-run reading live in README -- the one
 home. Two operational rules this file owns:

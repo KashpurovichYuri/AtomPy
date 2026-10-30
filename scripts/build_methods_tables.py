@@ -1,6 +1,6 @@
 """Render the Methods-compared factor tables of an element's TABLES.md
-from its cells.json payloads -- the key-addressed provenance (the cell
-wave's render contract: the table and its source cannot diverge).
+from its cells.json payloads -- the key-addressed provenance (the
+render contract: the table and its source cannot diverge).
 
 Usage: python scripts/build_methods_tables.py [Ti]
 

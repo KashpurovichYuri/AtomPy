@@ -38,8 +38,7 @@ from atomterm.operators import build_operators, core_anisotropy, window_closure
 __all__ = ["StageFacts", "stage_facts"]
 
 # S-orthonormality tolerance of the divergence guard: above this the
-# optimizer lost the AO metric and energies stop being variational
-# (observed on Si from non-block-safe window construction, ticket 09).
+# optimizer lost the AO metric and energies stop being variational.
 ORTHO_TOL = 1e-6
 
 

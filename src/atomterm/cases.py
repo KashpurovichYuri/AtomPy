@@ -16,8 +16,10 @@ sector -> CASSCF -> SA-CASSCF, checkpointed under stage tags);
 :mod:`atomterm.cells` addresses HOW each single calculation of the
 methods grid runs -- one frozen :class:`~atomterm.cells.CellKey` per
 axis combination, its grids derived from these specs. The campaign's
-two run vocabularies (stage tags here, cell addresses there) are a
-recorded phase-5 consideration, not an accident.
+two run vocabularies (stage tags here, cell addresses there) are
+DELIBERATE: the term tables are a stable contract, the grid an
+evolving experiment -- coupling them would put the committed tables'
+reproducibility at risk.
 """
 
 from __future__ import annotations
@@ -50,7 +52,7 @@ __all__ = ["CaseSpec", "CAMPAIGN", "run_case", "run_atom", "run_carbon",
 def _ms_label(na: int, nb: int) -> str:
     """Filename/report label of a sector's M_S = (na - nb) / 2.
 
-    Whole numbers stay bare ("1", "0" -- matching the historic carbon chkfile
+    Whole numbers stay bare ("1", "0" -- matching the committed chkfile
     names); halves insert a "p" so paths stay clean ("0p5" for a doublet).
     """
     assert na >= nb, "sectors are built with na >= nb"
