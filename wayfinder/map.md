@@ -17,6 +17,17 @@ dies).
 
 ## Issues (open dispositions + watchlist)
 
+- Pinned cells' window intake (the symmetry lane's cross-route
+  question, 2026-10-31): the natural pinned-cell windows are
+  D2h-BORN sources only (raw shells, D2h-run MOs/NOs) — free-run
+  windows never cross into pinned cells; the grammar states the
+  restriction at the declaration wave.  The trap it avoids:
+  `label_orb_symm` labels m-mixed columns by dominance, so a
+  free-run window fed to a pinned solver would appear to work and
+  produce a silently wrong solve — any future intake needs an
+  explicit irrep-purity check at the seam.  The laundering routes
+  (NO-density α, radial-transplant β) stay diagnostic experiments,
+  not grammar values.
 - `run_casscf`/`run_sa_casscf` are pass-throughs carrying the stage
   name — retire at the ECP wave together with `run_u*` (their second
   consumer); the stage `name=` lives at the call site (2026-10-30).

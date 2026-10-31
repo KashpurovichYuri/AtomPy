@@ -7,9 +7,9 @@ symmetry-pinned CI (D2h `wfnsym` solvers, `state_average_mix_` over a
 term's components) evaluated and certified by our exact meters.
 Two routes, one comparison — they never merge:
 
-- route A (ours): diagonalize the symmetry-blind Ms sector, MEASURE
+- the free route (ours): diagonalize the symmetry-blind Ms sector, MEASURE
   symmetry with the exact operators, restore by SA over roots;
-- route B (theirs): CONSTRUCT symmetry by group theory — one solver
+- the pinned route (theirs): CONSTRUCT symmetry by group theory — one solver
   per D2h component, weights from the SO(3)→D2h branching.
 
 The shared surface is the existing seam: the substrate signature
@@ -72,7 +72,7 @@ the analysis meters. No new kernel path.
    ensemble energies agree, both densities pass closure certificates
    at the same floor. NEVER bit-compare orbitals across the routes
    (degenerate gauges — facts 10/15). [integration, part 2]
-7. The d-shell stress case (Sc/Ti): route B's guaranteed component
+7. The d-shell stress case (Sc/Ti): the pinned route's guaranteed component
    set vs our nroots-based SA. [integration, part 2]
 8. Campaign tables via the lane + the TABLES.md contract redesign,
    both records in hand. [gated on the user's enable]
@@ -97,14 +97,14 @@ the analysis meters. No new kernel path.
   the runner == the anchor on frozen C, and THE HEAD-TO-HEAD (C in
   the unit tier, Si in integration).
   - The head-to-head FINDING: ensembles identical (C 2e-12, Si
-    ~3e-11 over three fresh draws); route B's optimized windows
+    ~3e-11 over three fresh draws); the pinned route's optimized windows
     close orders tighter (C: lz 1e-15 vs 2.3e-6; Si: 5.1e-8 vs
     1.5e-5) — the irrep-blocked rotations cannot leak the m-set.
   - PROBED PySCF fact: state_average_ on a symmetry-adapted molecule
     forces one wfnsym per solver (its wrapper passes wfnsym through,
     and None is GUESSED to one irrep) — the symmetry-blind SA exists
-    only on C1, so the head-to-head CROSSES SUBSTRATES: route A
-    native (C1, the production driver) vs route B native (D2h twin).
+    only on C1, so the head-to-head CROSSES SUBSTRATES: the free route
+    native (C1, the production driver) vs the pinned route native (D2h twin).
     Recorded in the test's comment; the lane evaluator docstrings
     carry the never-bit-compare-orbitals rule.
 - Part 3: the evaluator lane is DONE (lean); what remains of the
@@ -117,7 +117,7 @@ the analysis meters. No new kernel path.
 
 DONE 2026-10-31 (commits faf1adb + ff62a3d, review round included).
 `tests/integration/test_symm_tm.py`, Sc + Ti parametrized, the Si
-pattern (native substrate pairs: C1 route A + a D2h-twin route B,
+pattern (native substrate pairs: C1 the free route + a D2h-twin the pinned route,
 fresh ROHFs under pytest tmp; any converged reference works -- the
 whole active set sits in the window, so the fold sees only the
 closed noble-gas core).  Windows/sectors/weights from the CAMPAIGN
@@ -125,8 +125,8 @@ rows (sector_na_nb; spec.sa_weights); the ground-term table is test
 data (the test_atoms kind of row).  The spec as written:
 
 One file `tests/integration/test_symm_tm.py` (unique basename), Sc +
-Ti sections, the Si pattern (native substrate pairs: C1 route A + a
-D2h-twin route B, fresh ROHFs under pytest tmp; the D2h constraint
+Ti sections, the Si pattern (native substrate pairs: C1 the free route + a
+D2h-twin the pinned route, fresh ROHFs under pytest tmp; the D2h constraint
 makes the degenerate-shell reference deterministic, and any converged
 reference works -- the m-scalar fold + the m-complete window absorb
 the broken sphere).  Windows/sectors derive from the CAMPAIGN rows
@@ -136,20 +136,20 @@ the broken sphere).  Windows/sectors derive from the CAMPAIGN rows
   (L=2, g) branches `{Ag: 2, B1g: 1, B2g: 1, B3g: 1}` -- the first
   per-solver `nroots=2` through the runner; Ti's ³F (L=3, g) goes
   deeper (7 components).  The anchor pin covers it via block sizes.
-- **nroots-hoped vs guaranteed components**: route A's Ti SA hopes
+- **nroots-hoped vs guaranteed components**: the free route's Ti SA hopes
   the 7 lowest (3,1)-roots are the ³F set (¹D can interleave); route
   B guarantees each.  The head-to-head is CONDITIONAL and honest:
-  measure route A's roots with our meters FIRST; assert the ensemble
+  measure the free route's roots with our meters FIRST; assert the ensemble
   identity iff the root sets coincide; a differing ensemble is
   itself the finding (document, never force).
-- **Certificates on the hostile atom**: route B's mix window at/near
-  the floor vs route A at tolerance -- the C/Si finding re-tested
+- **Certificates on the hostile atom**: the pinned route's mix window at/near
+  the floor vs the free route at tolerance -- the C/Si finding re-tested
   where member tilts break free runs (fact 18).
 - Pins per atom: runner anchor (blocks == our H, meters exact),
   component degeneracy, the conditional head-to-head, closures.
 
 Declined up front: route-B single-irrep runs (fact-18 territory
-already covered for route A by test_treatments).  Suite work, NOT
+already covered for the free route by test_treatments).  Suite work, NOT
 gated; full suite at the boundary; the two-axis review after.
 
 ## Step 7 record (what was found)
@@ -166,30 +166,59 @@ gated; full suite at the boundary; the two-axis review after.
     route-A window's certificate runs 5.2e-3 while the ensembles
     agree to 1e-8 -- the one-particle certificate sees f-direction
     drifts the energy cannot feel (hence _CERT_A = 2e-2).
-  - Ti (d²): all 7 route-A roots still READ ⟨L²⟩=12 while the free
-    optimizer had escaped the declared {3d,4s} window into the
-    recorded swap basin (the 4s column replaced by a single TORN
-    p function -- one m, a pair relocated into it: l-weights
-    p1.0 d5.0, certificates O(1), multiplet split 3.1e-3, span
-    identity vs the raw shell 1e-4, ensemble 5.2 mEh BELOW route
-    B's).  The production Ti table records the same route-A basin
-    (the swap row: comms 1.1/6.0, Elec s0 p2.0 d2.0).  Route B's
-    D2h-blocked rotations FORBID the escape (the swap is
-    cross-irrep: 4s is Ag, 3p is u): declared identity kept
-    (s1.0 d5.0), components degenerate to 3.8e-7, certificates at
-    7e-6..1e-5 -- the guaranteed component set at ~5 mEh.  The
-    symmetry-vs-variation trade, measured.
+  - Ti (d²): all 7 free-route roots still READ ⟨L²⟩=12 while the
+    free optimizer had performed a CORE<->ACTIVE SWAP (see the
+    mechanism addendum below): certificates O(1), multiplet split
+    3.1e-3, span identity vs the raw shell 1e-4, ensemble 5.2 mEh
+    BELOW the pinned route's.  The production Ti table records the
+    same free-route basin (the swap row: comms 1.1/6.0, Elec
+    s0 p2.0 d2.0).  The pinned route's D2h-blocked rotations FORBID
+    the swap (it is cross-irrep: 4s is Ag, 3p is u): declared
+    identity kept (s1.0 d5.0), components degenerate to 3.8e-7,
+    certificates at 7e-6..1e-5 -- the guaranteed component set at
+    ~5 mEh.  The symmetry-vs-variation trade, measured.
 - THE HONEST GATE is the multiplet DEGENERACY (member AND formed);
   the divergence branch asserts ens_a < ens_b -- rigorous in BOTH
   shapes (free variation in the escape; displacement-below in the
   interleave: the intruder enters below the term root it pushes
-  out) -- and never forces the finding's shape.  Route A's
+  out) -- and never forces the finding's shape.  The free route's
   certificate in the divergence branch is measured, not pinned
   (basin chaos).
 - Suite gates: TM file green on repeated draws; full suite 206/206
   GREEN (three documented rotating classes across the first three
   runs, each isolation-green).  Counts 206/132 in AGENTS; the
   seam-file exception now names the test_symm_* family.
+
+## Mechanism addendum (2026-10-31, the user's 'why Sc but not Ti')
+
+THE ESCAPE IS A CORE<->ACTIVE SEMI-CORE SWAP, measured on the
+inactive block: the Ar start reads l-content s:3 p:6; the free
+SA's converged inactive reads s:4 p:5.  The 4s pair rotated INTO
+the fold; one semi-core 3p orbital -- with its electron pair,
+0.998 pure 3p by S-metric AO content -- rotated INTO the active.
+The gain is the 3p-3d semi-core correlation (the TM M-shell
+effect); the price is a torn m-set (only one 3p m-function fits in
+ncas=6).  The Sc/Ti asymmetry is the semi-core appetite scaling
+with the open-d count (d1: the swap does not pay; d2: 5.2 mEh).
+The pin (test_symm_tm head-to-head) measures the swap detector
+and asserts the mechanism in every branch arm.
+
+Lessons from the hunt (both caught by the meters/scales):
+- The first hypothesis ('the optimizer wants the p shell; the
+  m-complete version should pay') DIED: raw {3d,4p}/{3d,3p}
+  probes came out ~300 mEh above with scrambled terms -- AND were
+  malformed (fold-9 dropped the 4s pair: 20-electron problems).
+  e_cas is fold-relative; only totals compare across folds.
+- 'A full 3p shell in' (my first record fix) was also wrong --
+  one column, not a shell; and the pair in it is the SEMI-CORE
+  pair moving in with its electrons, not the 4s pair relocating.
+- THE STEP-8 INPUT (gated): the m-complete symmetric version of
+  the swap is the semi-core window CAS(6,8) {3d,3p} with fold
+  {1s..3s,4s} on Ti (all six 3p electrons active) -- a candidate
+  planned window alongside (4,10)/(4,14).  The radial-transplant
+  (β) and NO-laundry (α) experiments stay queued; the cross-route
+  window-intake decision is recorded in map.md Issues (D2h-born
+  sources only).
 
 REMAINING for the lane: step 8 + the declaration wave (cases
 term-targets, cells axis, campaign tables via the lane, the Ti
