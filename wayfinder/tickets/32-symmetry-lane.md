@@ -168,7 +168,8 @@ gated; full suite at the boundary; the two-axis review after.
     drifts the energy cannot feel (hence _CERT_A = 2e-2).
   - Ti (d²): all 7 route-A roots still READ ⟨L²⟩=12 while the free
     optimizer had escaped the declared {3d,4s} window into the
-    recorded swap basin (4s out, a full 3p shell in: l-weights
+    recorded swap basin (the 4s column replaced by a single TORN
+    p function -- one m, a pair relocated into it: l-weights
     p1.0 d5.0, certificates O(1), multiplet split 3.1e-3, span
     identity vs the raw shell 1e-4, ensemble 5.2 mEh BELOW route
     B's).  The production Ti table records the same route-A basin

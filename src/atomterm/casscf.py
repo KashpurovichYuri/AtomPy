@@ -301,7 +301,7 @@ def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
 
 
 
-# ------------------------------------------------- the symmetry lane (route B)
+# ------------------------------------------------- the symmetry lane (pinned)
 # PySCF-native evaluators over a term's D2h component set: ONE
 # wfnsym-pinned solver per irrep of irreps.branch_d2h(L, parity), the
 # multiplicity as its root count, on the substrate signature.  They
@@ -327,7 +327,7 @@ def _irrep_solvers(mol, orbsyms, L: int, parity: str, conv_tol: float):
 
 def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
                     L: int, parity: str, conv_tol: float = 1e-12) -> dict:
-    """Route B at the CI level: one pinned block solve per component.
+    """The pinned route at the CI level: one block solve per component.
 
     Every irrep of the term's branching gets a ``wfnsym``-pinned
     solver with ``nroots`` = multiplicity, on the SAME folded h1 as
@@ -368,7 +368,7 @@ def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
 
 def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
                  L: int, parity: str, conv_tol: float = 1e-12) -> dict:
-    """Route B at the SA level: the component ensemble, optimized.
+    """The pinned route at the SA level: the component ensemble, optimized.
 
     ``mcscf.state_average_mix_`` over the pinned solvers with uniform
     component weights (the free-atom ensemble over the ``2L + 1``
@@ -391,7 +391,7 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     The optimized window stays irrep-aligned (the symmetry-adapted
     optimizer rotates only within irrep blocks), so the readout's
     block structure survives optimization.  Never bit-compare ``mo``
-    against route A -- the two optimizer paths land in different
+    against the free route -- the two optimizer paths land in different
     degenerate orbital gauges; energies and closure certificates are
     the comparison surface.
     """

@@ -1,4 +1,4 @@
-"""The route A/route B anchor: PySCF's wfnsym-pinned CI against our
+"""The free/pinned anchor: PySCF's wfnsym-pinned CI against our
 exact-matrix irrep blocks, on identical folded integrals (the frozen
 D2h carbon twin), plus the symmetry-lane runners on the same
 substrate."""
@@ -46,7 +46,7 @@ def twin(carbon_d2h):
 
 
 def _block_solver(twin, na, nb, irrep, nroots):
-    """Route B: the symmetry-pinned CI on the shared integrals."""
+    """The pinned route: symmetry-pinned CI on the shared integrals."""
     mol, _, _, h1, eri, orbsyms, _ = twin
     solver = fci.direct_spin1_symm.FCI(mol)
     solver.orbsym = orbsyms
@@ -142,35 +142,35 @@ def test_runner_matches_anchor(twin):
 
 def test_sa_head_to_head(twin, carbon, tmp_path):
     # The two SA philosophies on the same physical problem, each in
-    # its native habitat.  Route A (symmetry-blind) runs the
+    # its native habitat.  The free route (symmetry-blind) runs the
     # production driver on the C1 substrate: PySCF's SA on a
     # symmetry-adapted molecule is itself wfnsym-pinned (its wrapper
     # forces one irrep per solver), so the unpinned sector average
     # exists only on C1.  The variational problem is identical --
     # same basis, same raw-shell start window.
     mol, mf, c_act, *_ = twin
-    _, mol1, mf1, act1 = carbon
+    _, mol_c1, mf_c1, act_c1 = carbon
 
-    route_b = run_irrep_sa(mol, mf, c_act, 2, 2, 0, 1, "g")
-    assert route_b["converged"]
-    mo1 = build_full_mo(mf1, occupied_core_idx(mf1, 2),
-                        np.eye(mol1.nao_nr())[:, act1])
-    route_a = run_sa_casscf(mf1, 3, (2, 0), mo1, [1 / 3] * 3,
+    pinned_sa = run_irrep_sa(mol, mf, c_act, 2, 2, 0, 1, "g")
+    assert pinned_sa["converged"]
+    mo_start_c1 = build_full_mo(mf_c1, occupied_core_idx(mf_c1, 2),
+                        np.eye(mol_c1.nao_nr())[:, act_c1])
+    free_sa = run_sa_casscf(mf_c1, 3, (2, 0), mo_start_c1, [1 / 3] * 3,
                             str(tmp_path / "sa_a.chk"))
 
-    ens_a = float(np.mean(route_a.energies))  # uniform over the set
-    assert abs(ens_a - route_b["e_tot"]) < 1e-8  # observed 2e-12
+    ens_free = float(np.mean(free_sa.energies))  # uniform over the set
+    assert abs(ens_free - pinned_sa["e_tot"]) < 1e-8  # observed 2e-12
 
-    # the finding: route B's irrep-blocked rotations close the window
-    # to the floor; route A's free C1 optimizer closes only to its
+    # the finding: the pinned route's irrep-blocked rotations close the window
+    # to the floor; the free route's free C1 optimizer closes only to its
     # convergence tolerance (observed A: lz 2.3e-6, lperp 2.8e-6;
     # B: lz 1.0e-15, lperp 3.1e-8)
-    cert_a = window_closure(mol1, route_a.mo_coeff[:, 2:5])
-    assert cert_a["lz"] < 1e-5 and cert_a["lperp"] < 1e-5
-    cert_b = window_closure(mol1, route_b["mo"][:, 2:5])
-    assert cert_b["lz"] < 1e-10 and cert_b["lperp"] < 1e-6
+    cert_free = window_closure(mol_c1, free_sa.mo_coeff[:, 2:5])
+    assert cert_free["lz"] < 1e-5 and cert_free["lperp"] < 1e-5
+    cert_pinned = window_closure(mol_c1, pinned_sa["mo"][:, 2:5])
+    assert cert_pinned["lz"] < 1e-10 and cert_pinned["lperp"] < 1e-6
 
-    ops = build_operators(mol, mf, route_b["mo"][:, 2:5], 2, 2, 0)
-    for _, (_, ci) in route_b["roots"].items():
+    ops = build_operators(mol, mf, pinned_sa["mo"][:, 2:5], 2, 2, 0)
+    for _, (_, ci) in pinned_sa["roots"].items():
         w = ci_in_detbasis_order(ci, 3, 2, 0)
         assert abs(float(np.real(w @ ops["L2"] @ w)) - 2.0) < 1e-8
