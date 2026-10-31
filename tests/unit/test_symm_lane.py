@@ -1,0 +1,96 @@
+"""The route A/route B anchor: PySCF's wfnsym-pinned CI against our
+exact-matrix irrep blocks, on identical folded integrals (the frozen
+D2h carbon twin)."""
+
+import numpy as np
+import pytest
+from pyscf import ao2mo, fci
+from pyscf.lib.exceptions import WfnSymmetryError
+
+from atomterm.irreps import IRREP_NAMES, det_irreps, orb_irreps
+from atomterm.operators import build_operators, ci_in_detbasis_order
+
+pytestmark = pytest.mark.fast
+
+_SECTORS = ((2, 0), (1, 1))  # the triplet and the alpha-beta p^2 blocks
+
+
+@pytest.fixture(scope="module")
+def lane(carbon_d2h):
+    """The twin problem over the 2p AO shell of the frozen D2h
+    reference: our folded h1 (the m-scalar core fold), the window
+    eri in PySCF's own feed, and our determinant-basis matrices."""
+    _, mol, mf, act_idx = carbon_d2h
+    c_act = np.eye(mol.nao_nr())[:, act_idx]
+    orbsyms = orb_irreps(mol, c_act)
+    eri = ao2mo.kernel(mol, c_act)
+    mats = {}
+    h1 = None
+    for na, nb in _SECTORS:
+        parts = build_operators(mol, mf, c_act, 2, na, nb)
+        mats[(na, nb)] = {k: parts[k] for k in ("H", "L2", "S2")}
+        h1 = parts["h1"]
+    return mol, h1, eri, orbsyms, mats
+
+
+def _block_solver(lane, na, nb, irrep, nroots):
+    """Route B: the symmetry-pinned CI on the shared integrals."""
+    mol, h1, eri, orbsyms, _ = lane
+    solver = fci.direct_spin1_symm.FCI(mol)
+    solver.orbsym = orbsyms
+    solver.wfnsym = irrep
+    solver.nroots = nroots
+    solver.conv_tol = 1e-12
+    e, ci = solver.kernel(h1, eri, 3, (na, nb))
+    return np.atleast_1d(np.asarray(e, dtype=float)), np.asarray(ci)
+
+
+def test_block_energies_match_our_matrices(lane):
+    # per irrep: their pinned roots == eigenvalues of our H on the
+    # same block -- same integrals, two independent solutions
+    # (observed max |dE| 4e-16)
+    _, _, _, orbsyms, mats = lane
+    for (na, nb), m in mats.items():
+        ids = det_irreps(orbsyms, na, nb)
+        for ir in np.unique(ids):
+            sel = ids == ir
+            ours = np.linalg.eigvalsh(m["H"][np.ix_(sel, sel)])
+            theirs, _ = _block_solver(lane, na, nb, IRREP_NAMES[ir],
+                                      int(sel.sum()))
+            assert np.allclose(ours, np.sort(theirs), atol=1e-8), (na, nb, ir)
+
+
+def test_ground_states_term_pure(lane):
+    # the triplet block ground states read L=1, S=1 by OUR meters on
+    # THEIR vectors (observed deviation 2e-15)
+    _, _, _, orbsyms, mats = lane
+    m = mats[(2, 0)]
+    ids = det_irreps(orbsyms, 2, 0)
+    for ir in np.unique(ids):
+        _, ci = _block_solver(lane, 2, 0, IRREP_NAMES[ir], 1)
+        w = ci_in_detbasis_order(ci, 3, 2, 0)
+        assert abs(float(np.real(w @ m["L2"] @ w)) - 2.0) < 1e-9, ir
+        assert abs(float(np.real(w @ m["S2"] @ w)) - 2.0) < 1e-9, ir
+
+
+def test_component_degeneracy(lane):
+    # on the m-scalar fold the three L=1 components are degenerate
+    # (observed spread 0.0 -- exact to the last bit)
+    _, _, _, orbsyms, _ = lane
+    ids = det_irreps(orbsyms, 2, 0)
+    e = [_block_solver(lane, 2, 0, IRREP_NAMES[ir], 1)[0][0]
+         for ir in np.unique(ids)]
+    assert np.ptp(e) < 1e-9
+
+
+def test_reachability_contract(lane):
+    # the blocks partition the sector; irreps with no determinant
+    # raise at the solver (the parity gate)
+    _, _, _, orbsyms, mats = lane
+    for (na, nb), m in mats.items():
+        ids = det_irreps(orbsyms, na, nb)
+        sizes = {int(ir): int((ids == ir).sum()) for ir in np.unique(ids)}
+        assert sum(sizes.values()) == m["H"].shape[0]
+        for ir in set(range(8)) - set(sizes):
+            with pytest.raises(WfnSymmetryError):
+                _block_solver(lane, na, nb, IRREP_NAMES[ir], 1)

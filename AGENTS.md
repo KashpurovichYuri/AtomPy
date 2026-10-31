@@ -39,6 +39,7 @@ restrictions lift). Mechanical enforcement: the global
 |---|---|---|
 | `system.py` | `AtomConfig`, `build_mol`, `sector_na_nb`, `ncore_of` | validates: single atom, spherical basis (origin by construction); `ecp` pairs basis+pseudopotential; the sector/core helpers raise on parity violations and take `mol.nelectron` (ECP-honest — never recompute from Z) |
 | `angular.py` | `l_matrices`, `l_ladder_matrices`, `l2_matrix`, `l_matrices_analytic`, `real_to_complex` | one-electron `Lx/Ly/Lz/L²` AO matrices — TWO independent constructions certifying each other (libcint `int1e_irp` primary, exact tesseral algebra the cross-check, per-slot through `windows.shell_slots` so fused shells work); `real_to_complex` = the per-shell real→\|l,m⟩ transform |
+| `irreps.py` | `IRREP_NAMES`, `IRREP_IDS`, `branch_d2h`, `det_irreps`, `orb_irreps` | the SO(3)→D2h dictionary — which irreps a term's 2L+1 components occupy (character algebra; a multiplicity can exceed one for L≥2 and is the state-average weight / per-solver root count) and which irrep every sector determinant carries (XOR of PySCF's D2h ids over occupied orbitals — a doubly-occupied pair cancels; aligned with detbasis order); `orb_irreps` = the ONE PySCF symm boundary; D2h is the working dialect (the SO(3) CI mode is Abelianized m-sums) |
 | `detbasis.py` | `determinant_basis`, `sector_dimension`, `one_body_matrix`, `two_body_matrix`, `slater_condon_matrix`, `commutator`, `frobenius_norm` | **pure numpy, no pyscf** — Slater–Condon rules over explicit determinants; `slater_condon_matrix` = the fused one-pass production path, the name-twinned parts cross-certify with secondquant; ordering ≠ PySCF FCI strings (the bridge lives in operators; detbasis stays numpy-only) |
 | `secondquant.py` | `annihilate`, `create`, `apply_one_body`, `apply_two_body`, `one_body_matrix`, `two_body_matrix`, `secondquant_matrix` | **pure numpy, no pyscf** — the same matrices via explicit a+/a application on occupation vectors; the elementwise twin of detbasis (random non-particle-symmetric-G pins certify the string contraction terms physical integrals are blind to) |
 | `operators.py` | `build_operators`, `active_space_integrals`, `full_space_integrals`, `window_closure`, `core_anisotropy`, `ground_block`, `pyscf_ci_permutation`/`ci_in_detbasis_order` | the first-quantized assembly: H, Lz, L², S², Sz, N, the EXACT parity (exterior power), population labels; owns BOTH PySCF↔ours convention boundaries (the integral transpose + the CI-ordering bridge) and the measured-block family (closure certificate, core anisotropy, `ground_block` = the SA-anchoring/NO-averaging rule); core folded into h1 (m-scalar density; `c_core` for optimized stages); `method=` switches the evaluator |
@@ -231,8 +232,8 @@ carries a number only when the number IS the fact.
 
 ## Tests
 
-`pytest` runs 185 tests (~10 min unloaded; slower under load). The fast
-tier: `pytest -m fast` = 117 tests in seconds (machine-light selection).
+`pytest` runs 197 tests (~10 min unloaded; slower under load). The fast
+tier: `pytest -m fast` = 129 tests in seconds (machine-light selection).
 Run the full suite before committing changes to physics-bearing modules
 (`operators`/`stages`/`cells`/`casscf`/`scans`); targeted files or
 `-m fast` are fine elsewhere. A rename round touching stage tags owes a

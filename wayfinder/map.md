@@ -11,6 +11,9 @@ dies).
   cells + the M store migration; runs only on the user's enable.
 - [31 — the ECP wave](tickets/31-ecp-wave.md): declare the ECP atom in
   `CAMPAIGN`; opens on the user's go.
+- [32 — the symmetry lane](tickets/32-symmetry-lane.md): D2h-pinned CI
+  as the second route (compare, never merge) — part 1: the
+  `irreps` dictionary + the unit anchors.
 
 ## Issues (open dispositions + watchlist)
 
@@ -38,7 +41,8 @@ dies).
     pure math      system · detbasis · secondquant · natural
     substrate      windows (the hub)
     1-particle     angular (uses windows' shell_slots)
-    assembly       operators (both PySCF boundaries)
+    assembly       operators (both PySCF boundaries) · irreps (the
+                   D2h dictionary; the symm boundary)
     engines        reference · core · casscf
     analysis       analysis · stages · scans
     declaration    cases -> cells

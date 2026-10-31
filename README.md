@@ -319,6 +319,11 @@ wave). The test suite is the executable documentation.
 
 C, Si, Sc, Ti delivered end-to-end; U (ECP) complete as the frozen
 `run_u*` record, pending declaration in the campaign (the ECP wave).
+A second route to L²-symmetric states is opening: D2h-pinned CI
+(one `wfnsym` solver per term component, state averaging over the
+complete component set) — symmetry by construction rather than by
+measurement, anchored by the exact meters (block energies and term
+eigenvalues agree to machine precision on the frozen references).
 Open physics: the L = 0 reference mechanism; inner core-pair valence;
 the f³d¹/f²d² ordering inside one NO window; a NIST comparison.
 Verification program planned: toy axial-p² Λ-branching, the L̂₊ ladder

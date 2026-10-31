@@ -31,6 +31,29 @@ def carbon():
     return cfg, mol, mf, select_shell_ao(mol, "2p")
 
 
+@pytest.fixture(scope="session")
+def carbon_d2h():
+    """(cfg, mol, mf, act_idx) for the D2h twin of the frozen carbon
+    reference (``tests/carbon_reference_d2h.py``): same atom,
+    symmetry-adapted -- bit-stable across runs, NO SCF (the state
+    loads from source). The mol is built here with the one knob the
+    C1 config does not carry (symmetry)."""
+    from pyscf import gto, scf
+
+    import carbon_reference_d2h as ref
+
+    cfg = AtomConfig()
+    mol = gto.M(atom=f"{cfg.symbol} 0 0 0", basis=cfg.basis, spin=cfg.spin,
+                symmetry="D2h", verbose=0)
+    mf = scf.ROHF(mol)
+    mf.e_tot = ref.E_TOT
+    mf.mo_energy = ref.MO_ENERGY
+    mf.mo_occ = ref.MO_OCC
+    mf.mo_coeff = ref.MO_COEFF
+    mf.converged = True
+    return cfg, mol, mf, select_shell_ao(mol, "2p")
+
+
 @pytest.fixture(scope="module")
 def shell_ops(carbon):
     """Operators in the pure 2p-shell determinant spaces (Ms=1 and Ms=0)."""
