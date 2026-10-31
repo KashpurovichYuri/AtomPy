@@ -113,6 +113,36 @@ the analysis meters. No new kernel path.
   redesign), plus ladder step 7 (Sc/Ti stress) whenever the TM
   references are enabled.
 
+## Step 7 spec (the next session -- agreed 2026-10-31)
+
+One file `tests/integration/test_symm_tm.py` (unique basename), Sc +
+Ti sections, the Si pattern (native substrate pairs: C1 route A + a
+D2h-twin route B, fresh ROHFs under pytest tmp; the D2h constraint
+makes the degenerate-shell reference deterministic, and any converged
+reference works -- the m-scalar fold + the m-complete window absorb
+the broken sphere).  Windows/sectors derive from the CAMPAIGN rows
+(the one-declaration rule).  The stress content, beyond C/Si:
+
+- **The multiplicity-2 branching goes live**: Sc's ground term ²D
+  (L=2, g) branches `{Ag: 2, B1g: 1, B2g: 1, B3g: 1}` -- the first
+  per-solver `nroots=2` through the runner; Ti's ³F (L=3, g) goes
+  deeper (7 components).  The anchor pin covers it via block sizes.
+- **nroots-hoped vs guaranteed components**: route A's Ti SA hopes
+  the 7 lowest (3,1)-roots are the ³F set (¹D can interleave); route
+  B guarantees each.  The head-to-head is CONDITIONAL and honest:
+  measure route A's roots with our meters FIRST; assert the ensemble
+  identity iff the root sets coincide; a differing ensemble is
+  itself the finding (document, never force).
+- **Certificates on the hostile atom**: route B's mix window at/near
+  the floor vs route A at tolerance -- the C/Si finding re-tested
+  where member tilts break free runs (fact 18).
+- Pins per atom: runner anchor (blocks == our H, meters exact),
+  component degeneracy, the conditional head-to-head, closures.
+
+Declined up front: route-B single-irrep runs (fact-18 territory
+already covered for route A by test_treatments).  Suite work, NOT
+gated; full suite at the boundary; the two-axis review after.
+
 ## References
 
 - The live probes and the mini-anchor of 2026-10-31 (session record;
