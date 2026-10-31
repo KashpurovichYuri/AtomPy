@@ -323,9 +323,10 @@ A second route to L²-symmetric states is opening: D2h-pinned CI
 (one `wfnsym` solver per term component, state averaging over the
 complete component set) — symmetry by construction rather than by
 measurement. Head-to-head with the classic SA on the p² atoms: the
-ensembles are identical (agreement ~1e-11) and the pinned route's
-optimized windows close orders of magnitude tighter (the irrep-blocked
-rotations cannot leak the m-set).
+ensembles are identical to numerical noise, and the pinned route's
+optimized windows close orders of magnitude tighter (the
+irrep-blocked rotations cannot leak the m-set; the measured record
+lives in the tests and ticket 32).
 Open physics: the L = 0 reference mechanism; inner core-pair valence;
 the f³d¹/f²d² ordering inside one NO window; a NIST comparison.
 Verification program planned: toy axial-p² Λ-branching, the L̂₊ ladder

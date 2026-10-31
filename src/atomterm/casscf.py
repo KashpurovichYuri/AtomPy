@@ -384,8 +384,11 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     Returns
     -------
     ``{"e_tot": ensemble total, "mo": the converged FULL MO matrix,
-    "converged": bool, "roots": the run_irrep_casci readout}``.  The
-    optimized window stays irrep-aligned (the symmetry-adapted
+    "converged": bool, "roots": the run_irrep_casci readout}``.
+
+    Notes
+    -----
+    The optimized window stays irrep-aligned (the symmetry-adapted
     optimizer rotates only within irrep blocks), so the readout's
     block structure survives optimization.  Never bit-compare ``mo``
     against route A -- the two optimizer paths land in different
@@ -405,5 +408,4 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     roots = run_irrep_casci(mol, mf, mc.mo_coeff[:, active], ncore,
                             na, nb, L, parity, conv_tol)
     return {"e_tot": float(mc.e_tot), "mo": mc.mo_coeff,
-            "converged": bool(getattr(mc, "converged", False)),
-            "roots": roots}
+            "converged": bool(mc.converged), "roots": roots}

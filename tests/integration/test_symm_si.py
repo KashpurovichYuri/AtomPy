@@ -94,7 +94,7 @@ def test_si_sa_head_to_head(si_lane, tmp_path):
     # one draw grazed 5e-5, hence the headroom
     assert cert_a["lz"] < 1e-4 and cert_a["lperp"] < 1e-4
     cert_b = window_closure(mol1, route_b["mo"][:, active])
-    # observed Si: lz 5.1e-8 (C ran 1.0e-15 -- its barely-rotating SA
-    # stays at the raw-shell floor; Si's converged rotations close at
-    # the optimizer level, still far under route A)
+    # observed Si: lz and lperp both 5.1e-8 (C ran 1.0e-15 -- its
+    # barely-rotating SA stays at the raw-shell floor; Si's converged
+    # rotations close at the optimizer level, still far under route A)
     assert cert_b["lz"] < 1e-6 and cert_b["lperp"] < 1e-6

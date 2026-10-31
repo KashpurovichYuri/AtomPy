@@ -117,8 +117,10 @@ def branch_d2h(L: int, parity: str) -> dict[str, int]:
         chi(C2)      = sum_{m=-L}^{L} e^{i m pi} = (-1)^L
                        (any C2 axis; m and -m pair up)
         chi(i)       = p * (2L + 1)
-        chi(sigma)   = chi(i) * chi(C2) / (2L + 1) = p * (-1)^L
-                       (sigma = i . C2; the two commute)
+        chi(sigma)   = p * (-1)^L
+                       (in the |l m> basis i acts as the scalar p and
+                       C2 as (-1)^m, so sigma = i . C2 has eigenvalue
+                       p * (-1)^m; the trace is p * sum_m (-1)^m)
         n(Gamma)     = (1/8) * sum_ops chi(op) * chi_Gamma(op)
 
     For L=1, u the three components land one per B1u/B2u/B3u; for
