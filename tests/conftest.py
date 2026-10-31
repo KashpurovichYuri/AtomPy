@@ -10,25 +10,31 @@ import pytest
 from atomterm.system import AtomConfig, build_mol
 
 
-@pytest.fixture(scope="session")
-def carbon():
-    """(cfg, mol, mf, act_idx) for C/cc-pVDZ triplet ROHF -- the
-    FROZEN reference (``tests/carbon_reference.py``): bit-stable
-    across runs, NO SCF (the state loads from source; floats are
-    repr-round-trip exact)."""
+def _frozen_mf(mol, ref):
+    """A converged-looking ROHF carrying a frozen reference source --
+    the unit tier loads SCF states, never runs them."""
     from pyscf import scf
 
-    import carbon_reference as ref
-
-    cfg = AtomConfig()
-    mol = build_mol(cfg)
     mf = scf.ROHF(mol)
     mf.e_tot = ref.E_TOT
     mf.mo_energy = ref.MO_ENERGY
     mf.mo_occ = ref.MO_OCC
     mf.mo_coeff = ref.MO_COEFF
     mf.converged = True
-    return cfg, mol, mf, select_shell_ao(mol, "2p")
+    return mf
+
+
+@pytest.fixture(scope="session")
+def carbon():
+    """(cfg, mol, mf, act_idx) for C/cc-pVDZ triplet ROHF -- the
+    FROZEN reference (``tests/carbon_reference.py``): bit-stable
+    across runs, NO SCF (the state loads from source; floats are
+    repr-round-trip exact)."""
+    import carbon_reference as ref
+
+    cfg = AtomConfig()
+    mol = build_mol(cfg)
+    return cfg, mol, _frozen_mf(mol, ref), select_shell_ao(mol, "2p")
 
 
 @pytest.fixture(scope="session")
@@ -38,20 +44,14 @@ def carbon_d2h():
     symmetry-adapted -- bit-stable across runs, NO SCF (the state
     loads from source). The mol is built here with the one knob the
     C1 config does not carry (symmetry)."""
-    from pyscf import gto, scf
+    from pyscf import gto
 
     import carbon_reference_d2h as ref
 
     cfg = AtomConfig()
     mol = gto.M(atom=f"{cfg.symbol} 0 0 0", basis=cfg.basis, spin=cfg.spin,
                 symmetry="D2h", verbose=0)
-    mf = scf.ROHF(mol)
-    mf.e_tot = ref.E_TOT
-    mf.mo_energy = ref.MO_ENERGY
-    mf.mo_occ = ref.MO_OCC
-    mf.mo_coeff = ref.MO_COEFF
-    mf.converged = True
-    return cfg, mol, mf, select_shell_ao(mol, "2p")
+    return cfg, mol, _frozen_mf(mol, ref), select_shell_ao(mol, "2p")
 
 
 @pytest.fixture(scope="module")

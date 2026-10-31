@@ -39,6 +39,20 @@ def block(name: str, array: np.ndarray) -> str:
     return f"{name} = np.array({body}, dtype=float)"
 
 
+def _frozen_source(doc: str, mf) -> str:
+    """One frozen reference as Python source (float repr -- exactly
+    round-tripping): the given module docstring + the SCF state."""
+    return f'''"""{doc}"""
+
+import numpy as np
+
+E_TOT = {float(mf.e_tot)!r}
+{block("MO_ENERGY", mf.mo_energy)}
+{block("MO_OCC", mf.mo_occ)}
+{block("MO_COEFF", mf.mo_coeff)}
+'''
+
+
 def _certify(path: pathlib.Path, mf) -> None:
     """The fresh file must load back bitwise before we leave."""
     sys.path.insert(0, "tests")
@@ -61,20 +75,13 @@ def main() -> None:
     mol, mf = run_rohf(cfg, str(chk))
     assert mf.converged
 
-    text = f'''"""The FROZEN carbon ROHF reference (C/cc-pVDZ, spin=2,
-one single-threaded draw): the unit tier's deterministic substrate.
-Floats are repr-round-trip exact -- loading this module reproduces the
-SCF state bitwise and NO SCF runs in the unit tier. Regenerate (only
-if the basis or defaults ever change) with
-scripts/generate_fixture_carbon.py."""
-
-import numpy as np
-
-E_TOT = {float(mf.e_tot)!r}
-{block("MO_ENERGY", mf.mo_energy)}
-{block("MO_OCC", mf.mo_occ)}
-{block("MO_COEFF", mf.mo_coeff)}
-'''
+    text = _frozen_source(
+        "The FROZEN carbon ROHF reference (C/cc-pVDZ, spin=2,\n"
+        "one single-threaded draw): the unit tier's deterministic substrate.\n"
+        "Floats are repr-round-trip exact -- loading this module reproduces the\n"
+        "SCF state bitwise and NO SCF runs in the unit tier. Regenerate (only\n"
+        "if the basis or defaults ever change) with\n"
+        "scripts/generate_fixture_carbon.py.", mf)
     out = pathlib.Path("tests/carbon_reference.py")
     out.write_text(text, encoding="utf-8")
     chk.unlink(missing_ok=True)
@@ -95,20 +102,13 @@ def d2h() -> None:
     mf.kernel()
     assert mf.converged
 
-    text = f'''"""The FROZEN carbon D2h twin (C/cc-pVDZ, spin=2,
-symmetry-adapted single-threaded draw): the symmetry lane's
-deterministic substrate. Floats are repr-round-trip exact -- loading
-this module reproduces the SCF state bitwise and NO SCF runs in the
-unit tier. Regenerate (only if the basis or defaults ever change)
-with scripts/generate_fixture_carbon.py d2h."""
-
-import numpy as np
-
-E_TOT = {float(mf.e_tot)!r}
-{block("MO_ENERGY", mf.mo_energy)}
-{block("MO_OCC", mf.mo_occ)}
-{block("MO_COEFF", mf.mo_coeff)}
-'''
+    text = _frozen_source(
+        "The FROZEN carbon D2h twin (C/cc-pVDZ, spin=2,\n"
+        "symmetry-adapted single-threaded draw): the symmetry lane's\n"
+        "deterministic substrate. Floats are repr-round-trip exact -- loading\n"
+        "this module reproduces the SCF state bitwise and NO SCF runs in the\n"
+        "unit tier. Regenerate (only if the basis or defaults ever change)\n"
+        "with scripts/generate_fixture_carbon.py d2h.", mf)
     out = pathlib.Path("tests/carbon_reference_d2h.py")
     out.write_text(text, encoding="utf-8")
     _certify(out, mf)

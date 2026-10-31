@@ -16,6 +16,7 @@ from atomterm.irreps import (
     det_irreps,
     orb_irreps,
 )
+from atomterm.operators import ci_in_detbasis_order
 from atomterm.windows import shell_slots
 
 pytestmark = pytest.mark.fast
@@ -103,8 +104,11 @@ def test_det_irreps_support_equals_wfnsym_solver():
         solver.wfnsym = IRREP_NAMES[ir]
         solver.conv_tol = 1e-12
         _, ci = solver.kernel(h1, eri, 3, (2, 0))
-        theirs = set(np.flatnonzero(
-            np.abs(np.asarray(ci).ravel()) > 1e-10).tolist())
+        # through the canonical bridge: the support claim must hold in
+        # ONE ordering, independent of the sector's permutation being
+        # identity (which it happens to be here)
+        w = ci_in_detbasis_order(np.asarray(ci).ravel(), 3, 2, 0)
+        theirs = set(np.flatnonzero(np.abs(w) > 1e-10).tolist())
         ours = set(np.flatnonzero(ids == ir).tolist())
         assert theirs == ours, ir
 
@@ -116,3 +120,8 @@ def test_invalid_inputs_fail_fast():
         branch_d2h(1, "x")
     with pytest.raises(ValueError):
         det_irreps([8], 1, 0)
+    with pytest.raises(ValueError):
+        det_irreps(np.array([[5, 6]]), 1, 0)  # not 1-D
+    with pytest.raises(ValueError):
+        orb_irreps(gto.M(atom="C 0 0 0", basis="sto-3g", verbose=0),
+                   np.eye(5))  # group C1, not D2h

@@ -232,8 +232,8 @@ carries a number only when the number IS the fact.
 
 ## Tests
 
-`pytest` runs 197 tests (~10 min unloaded; slower under load). The fast
-tier: `pytest -m fast` = 129 tests in seconds (machine-light selection).
+`pytest` runs 198 tests (~10 min unloaded; slower under load). The fast
+tier: `pytest -m fast` = 130 tests in seconds (machine-light selection).
 Run the full suite before committing changes to physics-bearing modules
 (`operators`/`stages`/`cells`/`casscf`/`scans`); targeted files or
 `-m fast` are fine elsewhere. A rename round touching stage tags owes a
@@ -246,7 +246,10 @@ Layout and tiers:
   repr-round-trip-exact source, loaded by the root `carbon` fixture —
   NO SCF runs in the unit tier; downstream bit-stable, double-run
   sha256-certified; regenerate only on basis/default changes via
-  `scripts/generate_fixture_carbon.py`).
+  `scripts/generate_fixture_carbon.py`) plus its D2h twin
+  (`tests/carbon_reference_d2h.py`, the `carbon_d2h` fixture — the
+  symmetry lane's substrate; the tier also runs small
+  symmetry-pinned FCI solves, no SCF).
 - `tests/integration/` = the campaign chemistry (TM references,
   CASSCF/SA, term tables); conftest split the same way.
 - The fast/slow MARKS are the machine axis; the directories the human
@@ -257,7 +260,9 @@ Layout and tiers:
   `conftest` basename directly: pytest claims it per-directory, and
   direct imports resolve order-dependently across tiers.
 - Test files map 1:1 to src modules; tests are named for the invariant
-  they pin (one invariant per test). Each file's own docstring carries
+  they pin (one invariant per test). Cross-module SEAM files are the
+  stated exception (`test_ecp_wiring`, `test_symm_lane` — the anchor
+  spans two modules by design). Each file's own docstring carries
   its content — there is no catalog here.
 
 Suite-flake protocol (the environment findings):

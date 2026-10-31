@@ -27,6 +27,13 @@ dies).
 - Ti escape comm band (test_treatments, the sa_free band): quiet
   through recent suites; capture-not-widen stands (no observed value
   recorded).
+- The D2h twin's determinism certification is procedural (double-run
+  sha256 in the session record), encoded nowhere in-repo; a generator
+  `--verify` mode is the candidate — declined until a second regen
+  cycle (2026-10-31).
+- The D2h mol construction has two homes by design (the generator's
+  draw, the fixture's load); a shared builder would serve one consumer
+  each — revisit at a third frozen reference (2026-10-31).
 
 ## Examples (worked records in `elements/`)
 

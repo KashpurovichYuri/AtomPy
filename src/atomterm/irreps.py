@@ -154,7 +154,8 @@ def det_irreps(orbsyms, na: int, nb: int) -> np.ndarray:
 
     Raises
     ------
-    ValueError : if any id falls outside 0..7.
+    ValueError : if any id falls outside 0..7 or ``orbsyms`` is not
+        one array per spatial orbital (1-D).
 
     Examples
     --------
@@ -200,10 +201,14 @@ def orb_irreps(mol, mo_coeff) -> np.ndarray:
 
     Examples
     --------
+    The symmetry-adapted AO columns of a D2h atom, each tessereal
+    function in its own irrep:
+
+    >>> from pyscf import gto
     >>> mol = gto.M(atom="C 0 0 0", basis="sto-3g",
     ...             symmetry="D2h", verbose=0)
-    >>> orb_irreps(mol, np.eye(mol.nao_nr())).tolist()  # doctest: +SKIP
-    [0, 0, 5, 6, 7]
+    >>> orb_irreps(mol, np.eye(mol.nao_nr())).tolist()
+    [0, 0, 7, 6, 5]
     """
     if mol.groupname != "D2h":
         raise ValueError(
