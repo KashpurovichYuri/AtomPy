@@ -31,6 +31,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
+from pyscf import gto
 
 from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
@@ -128,6 +129,23 @@ class CaseSpec:
 # the table renderers all derive from these; nothing else re-declares
 # atoms, windows, or the gated references (the one-declaration rule).
 # New atom = new row here.
+
+# The ECP atom's raw specs live in data/ (raw basis/ECP text carries no
+# path-safe name -- hence the explicit tag). Its window tiers are the
+# record's exponent-band lattices expressed as their exact shell
+# subsets: this basis is its own exponent grid, so a band IS a set of
+# whole shells -- m-complete like any shell window.
+_DATA = Path(__file__).resolve().parents[2] / "data"
+_U_BASIS = gto.parse((_DATA / "u_dyall_cut_basis.txt").read_text())
+_U_ECP = (_DATA / "u_stuttgart_rlc_ecp78.txt").read_text()
+_U_TIER = {
+    "3f": ("9f", "10f", "11f", "13d"),
+    "4f": ("8f", "9f", "10f", "11f", "13d"),
+    "2f2d": ("9f", "10f", "12d", "13d"),
+    "3f2d": ("9f", "10f", "11f", "12d", "13d"),
+    "4f2d": ("8f", "9f", "10f", "11f", "12d", "13d"),
+}
+
 CAMPAIGN: dict[str, CaseSpec] = {
     "C": CaseSpec("C", "ccpvdz", nelec_act=2, ncore=2,
                   shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3,
@@ -155,6 +173,19 @@ CAMPAIGN: dict[str, CaseSpec] = {
                        occ_open=("3d",), occ_e_ref=-848.40648875),
                    planned_windows=("3d4d", "3d4s4p4d"),
                    lattice_windows=("3d", "3d4p", "3d4p4d")),
+    "U": CaseSpec("U", _U_BASIS, nelec_act=4, ncore=5,
+                  shell_patterns=list(_U_TIER["3f2d"]), spin=4,
+                  ecp=_U_ECP, tag="U_stuttgart78_dyall",
+                  sa_weights=[1 / 17] * 17,  # the ground term's M_L set
+                  run_casscf=False,          # the multi-solution class
+                  nroots_primary=48,
+                  planned_windows=tuple("".join(_U_TIER[t])
+                                        for t in ("3f", "4f", "2f2d",
+                                                  "4f2d")),
+                  ref=ReferenceSpec(
+                      occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
+                      occ_e_ref=-50.38185233,
+                      conv_accelerator="newton")),
 }
 
 
