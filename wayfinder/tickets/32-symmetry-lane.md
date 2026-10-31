@@ -79,9 +79,15 @@ the analysis meters. No new kernel path.
 
 ## Parts
 
-- Part 1 (this): the dictionary + unit pins 1–5 + the frozen D2h-C
-  fixture twin (generator gains a `--d2h` mode; the C1 fixture is
-  never touched by it).
+- Part 1 DONE (2026-10-31, commits e22260e + 16c3d4d): the `irreps`
+  dictionary (branch_d2h/det_irreps/orb_irreps, character algebra
+  anchored at PySCF's table and at real shells), the frozen D2h-C
+  twin (generator `d2h` mode, double-run sha256; the C1 fixture
+  untouched), and the unit pins 1–5 — THE ANCHOR at machine
+  precision: pinned roots == our restricted-H eigenvalues (4e-16),
+  term purity exact (2e-15), components degenerate (0.0), the
+  spectrum == the block union. Review round done (two-axis); full
+  suite 198 GREEN.
 - Part 2: the evaluator lane + pins 6–7.
 - Part 3: declaration (cases term-targets, cells axis) + part 8.
 
