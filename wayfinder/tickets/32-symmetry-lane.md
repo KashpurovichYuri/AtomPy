@@ -115,6 +115,15 @@ the analysis meters. No new kernel path.
 
 ## Step 7 spec (the next session -- agreed 2026-10-31)
 
+DONE 2026-10-31 (commits faf1adb + ff62a3d, review round included).
+`tests/integration/test_symm_tm.py`, Sc + Ti parametrized, the Si
+pattern (native substrate pairs: C1 route A + a D2h-twin route B,
+fresh ROHFs under pytest tmp; any converged reference works -- the
+whole active set sits in the window, so the fold sees only the
+closed noble-gas core).  Windows/sectors/weights from the CAMPAIGN
+rows (sector_na_nb; spec.sa_weights); the ground-term table is test
+data (the test_atoms kind of row).  The spec as written:
+
 One file `tests/integration/test_symm_tm.py` (unique basename), Sc +
 Ti sections, the Si pattern (native substrate pairs: C1 route A + a
 D2h-twin route B, fresh ROHFs under pytest tmp; the D2h constraint
@@ -142,6 +151,49 @@ the broken sphere).  Windows/sectors derive from the CAMPAIGN rows
 Declined up front: route-B single-irrep runs (fact-18 territory
 already covered for route A by test_treatments).  Suite work, NOT
 gated; full suite at the boundary; the two-axis review after.
+
+## Step 7 record (what was found)
+
+- THE ANCHOR holds at machine precision on both atoms, and the
+  multiplicity-2 branching went live: Sc's ²D Ag block hosts TWO
+  components, Ti's ³F each B_g two (per-solver nroots=2, the first
+  live exercise).  Pinned lowest-per-block roots == our restricted-H
+  eigenvalues; components degenerate to ~1e-14 on the m-scalar fold.
+- THE HEAD-TO-HEAD SPLITS BY ATOM, and the finding refines the
+  spec's gate: MEMBERSHIP ALONE IS NOT ENOUGH.
+  - Sc (d¹): the routes agree as on C/Si -- ensembles to 1.1e-8,
+    multiplet formed (ptp 3.1e-7).  Bonus reading: the symmetric
+    route-A window's certificate runs 5.2e-3 while the ensembles
+    agree to 1e-8 -- the one-particle certificate sees f-direction
+    drifts the energy cannot feel (hence _CERT_A = 2e-2).
+  - Ti (d²): all 7 route-A roots still READ ⟨L²⟩=12 while the free
+    optimizer had escaped the declared {3d,4s} window into the
+    recorded swap basin (4s out, a full 3p shell in: l-weights
+    p1.0 d5.0, certificates O(1), multiplet split 3.1e-3, span
+    identity vs the raw shell 1e-4, ensemble 5.2 mEh BELOW route
+    B's).  The production Ti table records the same route-A basin
+    (the swap row: comms 1.1/6.0, Elec s0 p2.0 d2.0).  Route B's
+    D2h-blocked rotations FORBID the escape (the swap is
+    cross-irrep: 4s is Ag, 3p is u): declared identity kept
+    (s1.0 d5.0), components degenerate to 3.8e-7, certificates at
+    7e-6..1e-5 -- the guaranteed component set at ~5 mEh.  The
+    symmetry-vs-variation trade, measured.
+- THE HONEST GATE is the multiplet DEGENERACY (member AND formed);
+  the divergence branch asserts ens_a < ens_b -- rigorous in BOTH
+  shapes (free variation in the escape; displacement-below in the
+  interleave: the intruder enters below the term root it pushes
+  out) -- and never forces the finding's shape.  Route A's
+  certificate in the divergence branch is measured, not pinned
+  (basin chaos).
+- Suite gates: TM file green on repeated draws; full suite 206/206
+  GREEN (three documented rotating classes across the first three
+  runs, each isolation-green).  Counts 206/132 in AGENTS; the
+  seam-file exception now names the test_symm_* family.
+
+REMAINING for the lane: step 8 + the declaration wave (cases
+term-targets, cells axis, campaign tables via the lane, the Ti
+TABLES compression with both records) -- GATED on the user's
+enable; the ticket-31 interleave alongside.
 
 ## References
 
