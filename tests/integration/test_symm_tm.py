@@ -66,7 +66,7 @@ _SPLIT_TOL = 1e-5
 # observed bands (fresh draws, 2026-10-31): the free/pinned
 # ensembles agree to 1.1e-8 on the symmetric draw; the pinned route
 # closes at 6.9e-6..1.4e-5
-# (both atoms); the symmetric the free route window carries an f-direction
+# (both atoms); the symmetric free-route window carries an f-direction
 # drift the energy cannot feel (Sc: certificates 5.2e-3 with
 # ensembles agreeing to 1e-8) -- hence the generous certificate band
 _ENS_BAND = 1e-6
@@ -83,8 +83,9 @@ def _root_vectors(ci):
 
 @pytest.fixture(scope="module", params=sorted(_TERMS))
 def tm_lane(request):
-    """Both substrates of one reference (C1 the free route, D2h twin route
-    B) with the window, orbsyms, and our matrices -- everything but
+    """Both substrates of one reference (C1 = the free route, D2h
+    twin = the pinned route) with the window, orbsyms, and our
+    matrices -- everything but
     the term table derived from the CAMPAIGN declaration.  Any
     converged reference of the right charge works on either side:
     the whole active set sits in the window, so the fold sees only

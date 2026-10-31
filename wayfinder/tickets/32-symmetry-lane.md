@@ -148,7 +148,7 @@ the broken sphere).  Windows/sectors derive from the CAMPAIGN rows
 - Pins per atom: runner anchor (blocks == our H, meters exact),
   component degeneracy, the conditional head-to-head, closures.
 
-Declined up front: route-B single-irrep runs (fact-18 territory
+Declined up front: pinned-route single-irrep runs (fact-18 territory
 already covered for the free route by test_treatments).  Suite work, NOT
 gated; full suite at the boundary; the two-axis review after.
 
@@ -163,7 +163,7 @@ gated; full suite at the boundary; the two-axis review after.
   spec's gate: MEMBERSHIP ALONE IS NOT ENOUGH.
   - Sc (d¹): the routes agree as on C/Si -- ensembles to 1.1e-8,
     multiplet formed (ptp 3.1e-7).  Bonus reading: the symmetric
-    route-A window's certificate runs 5.2e-3 while the ensembles
+    free-route window's certificate runs 5.2e-3 while the ensembles
     agree to 1e-8 -- the one-particle certificate sees f-direction
     drifts the energy cannot feel (hence _CERT_A = 2e-2).
   - Ti (d²): all 7 free-route roots still READ ⟨L²⟩=12 while the
