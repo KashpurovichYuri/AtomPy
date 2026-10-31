@@ -6,17 +6,19 @@ the Ag block hosts TWO components; Ti's 3F: each B_g hosts two), and
 the anchor holds at machine precision as on the p shells.
 
 The head-to-head, though, splits by atom.  On Sc (d1) the routes
-agree as on C/Si.  On Ti (d2) the free SA escapes the
-declared {3d,4s} window into the recorded swap basin (the 4s column
-replaced by a single TORN p function -- one m, a pair relocated
-into it: lower ensemble, certificates O(1), multiplet split at
-mEh) while its roots still READ as the term -- membership alone is
-not the gate, the multiplet degeneracy is.  The pinned route's D2h-blocked
-rotations forbid the escape (the swap is cross-irrep: 4s is Ag, 3p
-is u): it stays in the declared identity, components degenerate to
-4e-7, certificates at 1e-5 -- the guaranteed component set at the
-price of ~5 mEh of ensemble energy.  The symmetry-vs-variation
-trade, measured.
+agree as on C/Si.  On Ti (d2) the free SA escapes the declared
+{3d,4s} window by a CORE<->ACTIVE SWAP, measured on the inactive
+block (Ar s:3 p:6 -> s:4 p:5): the 4s pair rotates INTO the fold,
+one semi-core 3p orbital -- with its electron pair, 0.998 pure by
+AO content -- rotates INTO the active, buying the 3p-3d semi-core
+correlation at the price of a torn m-set (certificates O(1),
+multiplet split at mEh) while the roots still READ as the term --
+membership alone is not the gate, the multiplet degeneracy is.
+The pinned route's D2h-blocked rotations forbid the swap (the swap
+is cross-irrep: 4s is Ag, 3p is u): it stays in the declared
+identity, components degenerate to 4e-7, certificates at 1e-5 --
+the guaranteed component set at the price of ~5 mEh of ensemble
+energy.  The symmetry-vs-variation trade, measured.
 
 Windows, sectors, and weights derive from the CAMPAIGN declaration;
 the ground-term table (L, 2S, parity per atom) is test data, the
@@ -38,6 +40,7 @@ from atomterm.system import sector_na_nb
 from atomterm.windows import (
     build_full_mo,
     occupied_core_idx,
+    select_shell_ao,
     select_valence_ao,
     shell_weights,
 )
@@ -146,23 +149,26 @@ def test_tm_runner_anchor(tm_lane):
 
 def test_tm_sa_head_to_head(tm_lane, tmp_path):
     # THE STRESS.  The free route (C1 SA) HOPES its lowest 2L+1 roots
-    # are the term's M_L set; the pinned route GUARANTEES them.  Measured on
-    # the open d shells, the honest gate is the multiplet DEGENERACY,
+    # are the term's M_L set; the pinned route GUARANTEES them.  The
+    # honest gate on the open d shells is the multiplet DEGENERACY,
     # not membership alone: on the recorded Ti draw all 7 free-route
     # roots still read <L^2> = 12 while the free optimizer had
-    # escaped the declared window (the swap basin: 4s out, a full 3p
-    # shell in -- l-weights p1.0 d5.0, certificates O(1), multiplet
-    # split 3.1e-3; the production tables record the same basin).
-    # The pinned route's D2h-blocked rotations cannot follow: the swap is
-    # cross-irrep (4s is Ag, 3p is u) -- it stays in the declared
-    # s+d identity, degenerate and closed, ~5 mEh above.
+    # performed a CORE<->ACTIVE SWAP (measured below: the inactive
+    # block's Ar s:3 p:6 -> s:4 p:5) -- the 4s pair into the fold,
+    # one semi-core 3p orbital with its pair into the active,
+    # certificates O(1), multiplet split 3.1e-3; the production
+    # tables record the same basin.  The pinned route's
+    # D2h-blocked rotations cannot follow: the swap is cross-irrep
+    # (4s is Ag, 3p is u) -- it stays in the declared s+d identity,
+    # degenerate and closed, ~5 mEh above.
     name, spec, term, mol_c1, mf_c1, mol_d2h, mf_d2h, c_act, _, _, na, nb = tm_lane
     ncomp = 2 * term["L"] + 1
     l2 = term["L"] * (term["L"] + 1)
     ncas = c_act.shape[1]
+    s_c1 = mf_c1.get_ovlp()
 
     pinned_sa = run_irrep_sa(mol_d2h, mf_d2h, c_act, spec.ncore, na, nb,
-                           term["L"], term["parity"])
+                             term["L"], term["parity"])
     assert pinned_sa["converged"], name
     mo_start_c1 = build_full_mo(
         mf_c1, occupied_core_idx(mf_c1, spec.ncore),
@@ -174,49 +180,75 @@ def test_tm_sa_head_to_head(tm_lane, tmp_path):
     ens_free = float(np.mean(free_sa.energies))
     active = slice(spec.ncore, spec.ncore + ncas)
 
-    # the pinned route's component set and l-identity are by construction (one
-    # pinned solver per branch irrep; g-irreps only -- a p admixture
-    # is cross-irrep, unreachable); its degeneracy, certificates, and
-    # term purity are observed bands
+    # the pinned route's component set and l-identity are by
+    # construction (one pinned solver per branch irrep; g-irreps only
+    # -- a p admixture is cross-irrep, unreachable); its degeneracy,
+    # certificates, and term purity are observed bands
     e_pinned = np.concatenate([e for e, _ in pinned_sa["roots"].values()])
     assert np.ptp(e_pinned) < 1e-5, name  # observed 3.8e-7
-    labs, w = shell_weights(mol_c1, pinned_sa["mo"][:, active],
-                            mf_c1.get_ovlp())
+    labs, w = shell_weights(mol_c1, pinned_sa["mo"][:, active], s_c1)
     assert dict(zip(labs, w.sum(axis=0))).get("p", 0.0) < 1e-6, name
     cert_pinned = window_closure(mol_c1, pinned_sa["mo"][:, active])
-    assert cert_pinned["lz"] < _CERT_PINNED and cert_pinned["lperp"] < _CERT_PINNED, name
+    assert cert_pinned["lz"] < _CERT_PINNED, name
+    assert cert_pinned["lperp"] < _CERT_PINNED, name
     ops_pinned = build_operators(mol_d2h, mf_d2h, pinned_sa["mo"][:, active],
-                            spec.ncore, na, nb)
+                                 spec.ncore, na, nb)
     for irrep, (_, ci) in pinned_sa["roots"].items():
         for k, vec in enumerate(_root_vectors(ci)):
             wl = ci_in_detbasis_order(vec, ncas, na, nb)
             assert abs(float(np.real(wl @ ops_pinned["L2"] @ wl)) - l2) < 1e-6, \
                 (name, irrep, k)  # observed ~1.1e-10
 
-    # the free route's draw, measured: membership + a formed (degenerate)
-    # multiplet.  Both hold -> the routes solved the same problem and
-    # the ensembles must agree; otherwise the divergence IS the
-    # finding, documented -- never forced into one shape
+    # the free route's draw, measured: membership + a formed
+    # (degenerate) multiplet + the core<->active swap detector (the
+    # inactive block's l-content against the Ar start s:3 p:6)
     ops_free = build_operators(mol_c1, mf_c1, free_sa.mo_coeff[:, active],
-                            spec.ncore, na, nb)
+                               spec.ncore, na, nb)
     l2_free = []
     for ci in free_sa.ci:
         wl = ci_in_detbasis_order(ci, ncas, na, nb)
         l2_free.append(float(np.real(wl @ ops_free["L2"] @ wl)))
     member = sum(abs(v - l2) < _MEMBER_TOL for v in l2_free) == ncomp
     formed = np.ptp(free_sa.energies) < _SPLIT_TOL
+    labs_i, w_i = shell_weights(mol_c1, free_sa.mo_coeff[:, :spec.ncore],
+                                s_c1)
+    inact = dict(zip(labs_i, w_i.sum(axis=0)))
+    labs_a, w_a = shell_weights(mol_c1, free_sa.mo_coeff[:, active], s_c1)
+    swapped = float(w_a[:, labs_a.index("p")].sum()) > 0.5
     cert_free = window_closure(mol_c1, free_sa.mo_coeff[:, active])
+
+    def _assert_inact(s, p, tag):
+        # the swap detector: the Ar start reads s:3 p:6; the swap
+        # draws s:4 p:5 (4s in, one 3p out with its pair)
+        assert abs(inact["s"] - s) < 0.05 and abs(inact["p"] - p) < 0.05, \
+            (name, tag)
+
     if member and formed:
+        # the symmetric draw (recorded on Sc): the core untouched
+        assert not swapped, name
+        _assert_inact(3, 6, "symmetric")
         assert abs(ens_free - pinned_sa["e_tot"]) < _ENS_BAND, name
-        assert cert_free["lz"] < _CERT_FREE and cert_free["lperp"] < _CERT_FREE, name
+        assert cert_free["lz"] < _CERT_FREE, name
+        assert cert_free["lperp"] < _CERT_FREE, name
     else:
-        # whichever divergence shape the draw took -- the escape
-        # (members all present, multiplet split: the recorded Ti swap
-        # basin) or the interleave (a lower term's root displacing a
-        # component) -- the free route's ensemble sits BELOW the pinned route's: by
-        # free variation in the first shape, by displacement in the
-        # second (the intruder enters below the term root it pushes
-        # out).  The free route's certificate is measured, not pinned: the
+        # whichever divergence shape the draw took, the free route's
+        # ensemble sits BELOW the pinned route's: by free variation in
+        # the swap shape, by displacement in the interleave (the
+        # intruder enters below the term root it pushes out).  The
+        # free route's certificate is measured, not pinned: the
         # divergent window class is basin chaos, and optimizer output
         # is never pinned where chaos is the object
         assert ens_free < pinned_sa["e_tot"], name
+        if swapped:
+            # THE MECHANISM, pinned: the core<->active swap -- the
+            # 4s pair into the fold, one semi-core 3p orbital (with
+            # its pair) into the active (observed 0.998 pure 3p)
+            _assert_inact(4, 5, "swap")
+            rows_3p = select_shell_ao(mol_c1, "3p")
+            col = free_sa.mo_coeff[
+                :, spec.ncore + int(np.argmax(w_a[:, labs_a.index("p")]))]
+            scol = s_c1 @ col
+            assert float(np.dot(col[rows_3p], scol[rows_3p])) > 0.9, name
+        else:
+            # the interleave shape: the core intact
+            _assert_inact(3, 6, "interleave")
