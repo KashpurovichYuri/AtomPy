@@ -255,6 +255,54 @@ ladder (deterministic; the 17/61 mEh margins are robust), the SA
 level on the winners ((8,8) first), and the campaign-declaration
 question for the semi-core window (a new planned-window row).
 
+## The definitive ladder session (agreed 2026-10-31 -- the next unit)
+
+The user-enabled lean set: the four recorded Ti legs PLUS legs 5-7
+and the Sc pair, all under ONE uniform construction so the table is
+internally comparable (the first cut mixed mf-MO folds and raw
+columns; the definitive table recomputes every leg the same way):
+
+- EVERY leg: fold = Loewdin of the fold's raw AO shell columns;
+  actives placed through build_full_mo(mf, core_idx, act, c_core=)
+  (the seam ALREADY accepts arbitrary core columns -- no new
+  machinery); pinned CI at frozen shells; totals = component e_cas
+  mean + closed_shell_core_energy(fold) (the fold-independent
+  bookkeeping ruler).  The uniform placement matters for ANY window
+  sharing an l with its fold (4s<->3s, 3s<->4s, and even 2p<->3p
+  cross-shell overlaps) -- the raw (4,14) lesson generalized.
+
+| leg | window | CAS | fold shells | sector | branch |
+|---|---|---|---|---|---|
+| 1 | {3d,4s} | (4,6) | 1s..3p (Ar) | (3,1) | 3F |
+| 2 | {3d,4d} | (4,10) | Ar | (3,1) | 3F (as-declared reading) |
+| 3 | {3d,4s,4p,4d} | (4,14) | Ar | (3,1) | 3F |
+| 4 | {3d,3p} | (8,8) | 1s,2s,2p,3s,4s | (5,3) | 3F |
+| 5 | {3d,3p,4d} | (8,11) | 1s,2s,2p,3s,4s | (5,3) | 3F |
+| 6 | {3s,3p,3d} | (10,9) | 1s,2s,2p,4s | (6,4) | 3F |
+| 7 | {3d,3p,4s} | (10,9) | 1s,2s,2p,3s | (6,4) | 3F |
+| Sc A | {3d,4s} | (3,6) | Ar | (2,1) | 2D |
+| Sc B | {3d,3p} | (7,8) | 1s,2s,2p,3s,4s | (4,3) | 2D |
+
+Leg 6 = the full M-shell classic (3s^2 included); leg 7 = does the
+4s pair want back in-window on top of the semi-core; Sc B = the
+d-count scaling MEASURED (never presumed -- the m-complete window
+may pay at d1 even though the torn swap did not).  Declined: the
+(10,14) {3d,3p,4s,4p,4d} ceiling leg (~3M dets; adds bulk, not a
+new question) and 4f-class legs.
+
+DELIVERABLES of the session: the pins (a test_tm_cas_ladder-class
+pin: the energy ORDERING with margins + term exactness per leg via
+the meters + the Sc scaling as measured), the TABLES records
+(elements/Ti/TABLES.md gains 'the pinned CAS ladder' section beside
+the two window-lattice sections; elements/Sc/TABLES.md the scaling
+rows; provenance = the session + the certifying pins), gates (fast
+tier per commit; full suite at the boundary).  THEN the unchanged
+follow-ups: SA on the ladder winner, the campaign-declaration
+question for the semi-core window (its explicit c_core fold needs
+the declaration grammar to express non-prefix folds -- a design
+point for the declaration wave), step 8 proper, the compression
+discussion after it.
+
 REMAINING for the lane: step 8 + the declaration wave (cases
 term-targets, cells axis, campaign tables via the lane, the Ti
 TABLES compression with both records) -- GATED on the user's
