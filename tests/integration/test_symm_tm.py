@@ -33,6 +33,7 @@ from atomterm.operators import (
     ci_in_detbasis_order,
     window_closure,
 )
+from atomterm.system import sector_na_nb
 from atomterm.windows import (
     build_full_mo,
     occupied_core_idx,
@@ -42,11 +43,11 @@ from atomterm.windows import (
 
 pytestmark = pytest.mark.slow
 
-# the ground term per atom: L, 2S (the AtomConfig spin), S(S+1), and
-# the configuration parity (d^k -> g)
+# the ground term per atom: L, S(S+1), and the configuration parity
+# (d^k -> g); 2S arrives from the CAMPAIGN row's spin
 _TERMS = {
-    "Sc": dict(L=2, spin=1, s2=0.75, parity="g"),
-    "Ti": dict(L=3, spin=2, s2=2.0, parity="g"),
+    "Sc": dict(L=2, s2=0.75, parity="g"),
+    "Ti": dict(L=3, s2=2.0, parity="g"),
 }
 
 # route A root-set membership threshold: within-term mixes read
@@ -86,8 +87,7 @@ def tm_lane(request):
     name = request.param
     spec = CAMPAIGN[name]
     term = _TERMS[name]
-    na = (spec.nelec_act + term["spin"]) // 2
-    nb = (spec.nelec_act - term["spin"]) // 2
+    na, nb = sector_na_nb(spec.nelec_act, spec.spin)
     mols, mfs = [], []
     for symmetry in (None, "D2h"):
         mol = gto.M(atom=f"{spec.symbol} 0 0 0", basis=spec.basis,
@@ -129,12 +129,16 @@ def test_tm_runner_anchor(tm_lane):
         assert np.allclose(ours, np.sort(e), atol=1e-8), (name, irrep)
         for k, vec in enumerate(_root_vectors(ci)):
             w = ci_in_detbasis_order(vec, c_act.shape[1], na, nb)
+            # meters exact on their vectors (the C-anchor class: 2e-15
+            # purity at the raw window)
             assert abs(float(np.real(w @ ops["L2"] @ w)) - l2) < 1e-9, \
                 (name, irrep, k)
             assert abs(float(np.real(w @ ops["S2"] @ w)) - term["s2"]) < 1e-9, \
                 (name, irrep, k)
         e_all.append(e)
     e_all = np.concatenate(e_all)
+    # the components degenerate on the m-scalar fold (observed Sc
+    # 1.2e-14, Ti 9.8e-15)
     assert np.ptp(e_all) < 1e-9, name
 
 
@@ -162,15 +166,16 @@ def test_tm_sa_head_to_head(tm_lane, tmp_path):
         mf1, occupied_core_idx(mf1, spec.ncore),
         np.eye(mol1.nao_nr())[
             :, select_valence_ao(mol1, list(spec.shell_patterns))])
-    route_a = run_sa_casscf(mf1, ncas, (na, nb), mo1, [1 / ncomp] * ncomp,
+    route_a = run_sa_casscf(mf1, ncas, (na, nb), mo1,
+                            list(spec.sa_weights),
                             str(tmp_path / f"{name.lower()}_sa.chk"))
     ens_a = float(np.mean(route_a.energies))
     active = slice(spec.ncore, spec.ncore + ncas)
 
-    # route B's guarantees, unconditional: degenerate components, the
-    # declared l-identity (g-irreps only -- a p admixture is
-    # cross-irrep, unreachable), certificates at its floor, and the
-    # term exact on every readout root
+    # route B's component set and l-identity are by construction (one
+    # pinned solver per branch irrep; g-irreps only -- a p admixture
+    # is cross-irrep, unreachable); its degeneracy, certificates, and
+    # term purity are observed bands
     e_b = np.concatenate([e for e, _ in route_b["roots"].values()])
     assert np.ptp(e_b) < 1e-5, name  # observed 3.8e-7
     labs, w = shell_weights(mol1, route_b["mo"][:, active],
@@ -184,26 +189,32 @@ def test_tm_sa_head_to_head(tm_lane, tmp_path):
         for k, vec in enumerate(_root_vectors(ci)):
             wl = ci_in_detbasis_order(vec, ncas, na, nb)
             assert abs(float(np.real(wl @ ops_b["L2"] @ wl)) - l2) < 1e-6, \
-                (name, irrep, k)
+                (name, irrep, k)  # observed ~1.1e-10
 
     # route A's draw, measured: membership + a formed (degenerate)
     # multiplet.  Both hold -> the routes solved the same problem and
-    # the ensembles must agree; otherwise the escape IS the finding
+    # the ensembles must agree; otherwise the divergence IS the
+    # finding, documented -- never forced into one shape
     ops_a = build_operators(mol1, mf1, route_a.mo_coeff[:, active],
                             spec.ncore, na, nb)
-    l2_a = [float(np.real(ci_in_detbasis_order(ci, ncas, na, nb)
-                          @ ops_a["L2"]
-                          @ ci_in_detbasis_order(ci, ncas, na, nb)))
-            for ci in route_a.ci]
+    l2_a = []
+    for ci in route_a.ci:
+        wl = ci_in_detbasis_order(ci, ncas, na, nb)
+        l2_a.append(float(np.real(wl @ ops_a["L2"] @ wl)))
     member = sum(abs(v - l2) < _MEMBER_TOL for v in l2_a) == ncomp
     formed = np.ptp(route_a.energies) < _SPLIT_TOL
+    cert_a = window_closure(mol1, route_a.mo_coeff[:, active])
     if member and formed:
         assert abs(ens_a - route_b["e_tot"]) < _ENS_BAND, name
-        cert_a = window_closure(mol1, route_a.mo_coeff[:, active])
         assert cert_a["lz"] < _CERT_A and cert_a["lperp"] < _CERT_A, name
     else:
-        # the recorded Ti class: route A's ensemble sits BELOW route
-        # B's (the free optimizer's escape is variational), but its
-        # multiplet is split -- a lower ensemble, not a formed term
+        # whichever divergence shape the draw took -- the escape
+        # (members all present, multiplet split: the recorded Ti swap
+        # basin) or the interleave (a lower term's root displacing a
+        # component) -- route A's ensemble sits BELOW route B's: by
+        # free variation in the first shape, by displacement in the
+        # second (the intruder enters below the term root it pushes
+        # out).  Route A's certificate is measured, not pinned: the
+        # divergent window class is basin chaos, and optimizer output
+        # is never pinned where chaos is the object
         assert ens_a < route_b["e_tot"], name
-        assert np.ptp(route_a.energies) > _SPLIT_TOL, name
