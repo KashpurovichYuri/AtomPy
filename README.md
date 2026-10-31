@@ -326,7 +326,11 @@ measurement. Head-to-head with the classic SA on the p² atoms: the
 ensembles are identical to numerical noise, and the pinned route's
 optimized windows close orders of magnitude tighter (the
 irrep-blocked rotations cannot leak the m-set; the measured record
-lives in the tests and ticket 32).
+lives in the tests and ticket 32). On the open d² shell the routes
+diverge: the free SA escapes the declared window into the swap
+basin (lower ensemble, split multiplet), the pinned route stays in
+the declared window with degenerate components — symmetry kept at
+a few mEh of ensemble energy.
 Open physics: the L = 0 reference mechanism; inner core-pair valence;
 the f³d¹/f²d² ordering inside one NO window; a NIST comparison.
 Verification program planned: toy axial-p² Λ-branching, the L̂₊ ladder

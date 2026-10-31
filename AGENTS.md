@@ -232,7 +232,7 @@ carries a number only when the number IS the fact.
 
 ## Tests
 
-`pytest` runs 202 tests (~10 min unloaded; slower under load). The fast
+`pytest` runs 206 tests (~10 min unloaded; slower under load). The fast
 tier: `pytest -m fast` = 132 tests in seconds (machine-light selection).
 Run the full suite before committing changes to physics-bearing modules
 (`operators`/`stages`/`cells`/`casscf`/`scans`); targeted files or
@@ -261,9 +261,9 @@ Layout and tiers:
   direct imports resolve order-dependently across tiers.
 - Test files map 1:1 to src modules; tests are named for the invariant
   they pin (one invariant per test). Cross-module SEAM files are the
-  stated exception (`test_ecp_wiring`, `test_symm_lane` — the anchor
-  spans two modules by design). Each file's own docstring carries
-  its content — there is no catalog here.
+  stated exception (`test_ecp_wiring`, the `test_symm_*` lane files —
+  the anchor spans two modules by design). Each file's own docstring
+  carries its content — there is no catalog here.
 
 Suite-flake protocol (the environment findings):
 
