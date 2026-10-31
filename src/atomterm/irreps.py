@@ -59,7 +59,9 @@ IRREP_IDS = {name: i for i, name in enumerate(IRREP_NAMES)}
 # irrep is the sign triple (s_x, s_y, s_z) of a monomial basis function
 # (z -> B1u, yz -> B3g, xyz -> Au, ...). The character of an irrep at
 # an operation is the product of the signs of the coordinates the
-# operation flips; the operation order matches PySCF's character table.
+# operation flips -- e.g. chi_B1u(sigma_xy) = s_z = -1, because the
+# reflection flips z and z carries the sign; the operation order
+# matches PySCF's character table.
 _FLIPS = {
     "E": (), "C2x": (1, 2), "C2y": (0, 2), "C2z": (0, 1),
     "i": (0, 1, 2), "sx": (0,), "sy": (1,), "sz": (2,),
@@ -103,6 +105,25 @@ def branch_d2h(L: int, parity: str) -> dict[str, int]:
     Raises
     ------
     ValueError : if ``L`` is negative or ``parity`` is not g/u.
+
+    Notes
+    -----
+    The characters of the ``(L, parity)`` representation on the eight
+    D2h classes (``p = +1`` for g, ``-1`` for u), and the projection:
+
+    ::
+
+        chi(E)       = 2L + 1
+        chi(C2)      = sum_{m=-L}^{L} e^{i m pi} = (-1)^L
+                       (any C2 axis; m and -m pair up)
+        chi(i)       = p * (2L + 1)
+        chi(sigma)   = chi(i) * chi(C2) / (2L + 1) = p * (-1)^L
+                       (sigma = i . C2; the two commute)
+        n(Gamma)     = (1/8) * sum_ops chi(op) * chi_Gamma(op)
+
+    For L=1, u the three components land one per B1u/B2u/B3u; for
+    L=2, g the Ag block holds TWO of them (z^2 and x^2-y^2 both
+    transform as Ag).
 
     Examples
     --------
@@ -156,6 +177,18 @@ def det_irreps(orbsyms, na: int, nb: int) -> np.ndarray:
     ------
     ValueError : if any id falls outside 0..7 or ``orbsyms`` is not
         one array per spatial orbital (1-D).
+
+    Notes
+    -----
+    Why XOR: D2h is Z2^3 (every element squares to the identity), so
+    all its irreps are one-dimensional characters -- the sign triples
+    of the monomials 1, x, y, z, xy, xz, yz, xyz.  A product of
+    characters multiplies signs, and ``(-1)^a * (-1)^b = (-1)^(a^b)``:
+    PySCF's ids ARE those bits, so the irrep of a product of objects
+    is the XOR of their ids.  A determinant carries the product of its
+    occupied spatial orbitals' characters (the wedge of
+    one-dimensional irreps stays one-dimensional; antisymmetry lives
+    in the spin labels), and a doubly-occupied pair cancels.
 
     Examples
     --------

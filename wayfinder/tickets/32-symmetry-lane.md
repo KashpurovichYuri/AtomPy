@@ -88,8 +88,30 @@ the analysis meters. No new kernel path.
   term purity exact (2e-15), components degenerate (0.0), the
   spectrum == the block union. Review round done (two-axis); full
   suite 198 GREEN.
-- Part 2: the evaluator lane + pins 6–7.
-- Part 3: declaration (cases term-targets, cells axis) + part 8.
+- Part 2 DONE (2026-10-31, the lean scope): the character-algebra
+  and XOR math land in the docstrings (Notes carry the four chi
+  formulas + the projection; det_irreps Notes carry the Z2^3
+  argument); the lane evaluators in casscf — `run_irrep_casci` (one
+  pinned block solve per component, the shared folded h1) and
+  `run_irrep_sa` (state_average_mix_ + the two-pass readout); pins:
+  the runner == the anchor on frozen C, and THE HEAD-TO-HEAD (C in
+  the unit tier, Si in integration).
+  - The head-to-head FINDING: ensembles identical (C 2e-12, Si
+    ~3e-11 over three fresh draws); route B's optimized windows
+    close orders tighter (C: lz 1e-15 vs 2.3e-6; Si: 5.1e-8 vs
+    1.5e-5) — the irrep-blocked rotations cannot leak the m-set.
+  - PROBED PySCF fact: state_average_ on a symmetry-adapted molecule
+    forces one wfnsym per solver (its wrapper passes wfnsym through,
+    and None is GUESSED to one irrep) — the symmetry-blind SA exists
+    only on C1, so the head-to-head CROSSES SUBSTRATES: route A
+    native (C1, the production driver) vs route B native (D2h twin).
+    Recorded in the test's comment; the lane evaluator docstrings
+    carry the never-bit-compare-orbitals rule.
+- Part 3: the evaluator lane is DONE (lean); what remains of the
+  original part-3 scope: declaration (cases term-targets, cells
+  axis) + step 8 (gated campaign tables + the TABLES contract
+  redesign), plus ladder step 7 (Sc/Ti stress) whenever the TM
+  references are enabled.
 
 ## References
 

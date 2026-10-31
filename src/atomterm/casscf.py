@@ -39,7 +39,11 @@ import types
 from dataclasses import dataclass, field
 
 import numpy as np
-from pyscf import lib, mcscf
+from pyscf import ao2mo, fci, lib, mcscf
+
+from atomterm.irreps import branch_d2h, orb_irreps
+from atomterm.operators import active_space_integrals
+from atomterm.windows import build_full_mo, occupied_core_idx
 
 __all__ = [
     "CASResult",
@@ -49,6 +53,8 @@ __all__ = [
     "mask_no_core_window_mix",
     "run_casscf",
     "run_sa_casscf",
+    "run_irrep_casci",
+    "run_irrep_sa",
 ]
 
 
@@ -293,3 +299,111 @@ def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
                               name="sa-casscf", verbose=verbose)
 
 
+
+
+# ------------------------------------------------- the symmetry lane (route B)
+# PySCF-native evaluators over a term's D2h component set: ONE
+# wfnsym-pinned solver per irrep of irreps.branch_d2h(L, parity), the
+# multiplicity as its root count, on the substrate signature.  They
+# are evaluators, not optimizer recipes: no mask or checkpoint
+# vocabulary applies (nothing is cached; the cells axis arrives with
+# the declaration wave), and the SA form IS the two-pass pattern --
+# the ensemble mix kernel optimizes, run_irrep_casci re-solves the
+# exact roots in the frozen converged window.
+
+def _irrep_solvers(mol, orbsyms, L: int, parity: str, conv_tol: float):
+    """``[(irrep, solver, multiplicity)]`` -- one pinned solver per
+    component block of the term."""
+    solvers = []
+    for irrep, n in branch_d2h(L, parity).items():
+        s = fci.direct_spin1_symm.FCI(mol)
+        s.orbsym = np.asarray(orbsyms)
+        s.wfnsym = irrep
+        s.nroots = n
+        s.conv_tol = conv_tol
+        solvers.append((irrep, s, n))
+    return solvers
+
+
+def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
+                    L: int, parity: str, conv_tol: float = 1e-12) -> dict:
+    """Route B at the CI level: one pinned block solve per component.
+
+    Every irrep of the term's branching gets a ``wfnsym``-pinned
+    solver with ``nroots`` = multiplicity, on the SAME folded h1 as
+    our determinant-basis matrices (:func:`constrained_casscf`'s
+    convention twin) and PySCF's own window eri feed.
+
+    Parameters
+    ----------
+    mol, mf, c_act, ncore, na, nb : the substrate signature (``mol``
+        must be a D2h molecule; ``c_act`` the window columns).
+    L, parity : the target TERM -- ``parity`` is the configuration's
+        total inversion parity (p^2 -> g, s p -> u), not the shell's.
+    conv_tol : the pinned solvers' CI convergence tolerance.
+
+    Returns
+    -------
+    ``{irrep: (e_cas roots, ci vectors in PySCF order)}`` -- the
+    lowest ``multiplicity`` roots per block.  That the lowest roots
+    ARE the target term's components is an assumption the caller
+    verifies with the exact meters (analysis bridges the vectors).
+
+    Raises
+    ------
+    ValueError : via :func:`atomterm.irreps.orb_irreps`, if the
+        molecule is not D2h.
+    """
+    h1, _ = active_space_integrals(mol, mf, c_act, ncore)
+    eri = ao2mo.kernel(mol, c_act)
+    orbsyms = orb_irreps(mol, c_act)
+    out = {}
+    for irrep, solver, _ in _irrep_solvers(mol, orbsyms, L, parity,
+                                           conv_tol):
+        e, ci = solver.kernel(h1, eri, c_act.shape[1], (na, nb))
+        out[irrep] = (np.atleast_1d(np.asarray(e, dtype=float)),
+                      np.asarray(ci))
+    return out
+
+
+def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
+                 L: int, parity: str, conv_tol: float = 1e-12) -> dict:
+    """Route B at the SA level: the component ensemble, optimized.
+
+    ``mcscf.state_average_mix_`` over the pinned solvers with uniform
+    component weights (the free-atom ensemble over the ``2L + 1``
+    components), then the exact per-component roots re-solved in the
+    frozen converged window (:func:`run_irrep_casci` -- PySCF's mix
+    kernel returns the ensemble only; the two-pass pattern).
+
+    Parameters
+    ----------
+    As :func:`run_irrep_casci` (the optimizer convergence is PySCF's
+    default; the readout solvers take ``conv_tol``).
+
+    Returns
+    -------
+    ``{"e_tot": ensemble total, "mo": the converged FULL MO matrix,
+    "converged": bool, "roots": the run_irrep_casci readout}``.  The
+    optimized window stays irrep-aligned (the symmetry-adapted
+    optimizer rotates only within irrep blocks), so the readout's
+    block structure survives optimization.  Never bit-compare ``mo``
+    against route A -- the two optimizer paths land in different
+    degenerate orbital gauges; energies and closure certificates are
+    the comparison surface.
+    """
+    ncas = c_act.shape[1]
+    mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore), c_act)
+    active = slice(ncore, ncore + ncas)
+    mc = mcscf.CASSCF(mf, ncas, (na, nb))
+    mc.verbose = 0
+    solvers = _irrep_solvers(mol, orb_irreps(mol, mo_full[:, active]),
+                             L, parity, conv_tol)
+    mcscf.state_average_mix_(
+        mc, [s for _, s, _ in solvers], [1.0 / (2 * L + 1)] * (2 * L + 1))
+    mc.kernel(mo_full)
+    roots = run_irrep_casci(mol, mf, mc.mo_coeff[:, active], ncore,
+                            na, nb, L, parity, conv_tol)
+    return {"e_tot": float(mc.e_tot), "mo": mc.mo_coeff,
+            "converged": bool(getattr(mc, "converged", False)),
+            "roots": roots}
