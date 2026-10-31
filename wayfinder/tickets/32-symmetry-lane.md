@@ -220,6 +220,41 @@ Lessons from the hunt (both caught by the meters/scales):
   window-intake decision is recorded in map.md Issues (D2h-born
   sources only).
 
+## The CAS ladder (2026-10-31, the user's 'test different CAS' -- Ti, pinned, CI level, frozen shells)
+
+All totals = component e_cas mean + closed_shell_core_energy (the
+bookkeeping constant; fold-independent by construction -- fact 9's
+fixed-core-block identity -- so cross-fold comparable).  One
+substrate (the D2h ROHF), one fold rule; (4,·) windows PLACED
+through build_full_mo (raw columns carry the documented ~85 mEh
+Ti window-definition error -- the raw (4,14) run even read
+<L^2>=13.66, a non-eigenvalue: the overlapping fold breaks [H,L^2]);
+the (8,8) window is overlap-free by construction (its fold excludes
+3p).
+
+| window | E, Eh | vs declared | term |
+|---|---|---|---|
+| (4,6) {3d,4s} declared | -848.3912 | 0 | 3F exact |
+| (4,10) {3d,4d} planned | -848.2045 | +187 mEh | D/H scramble |
+| (4,14) {3d,4s,4p,4d} planned | -848.4349 | -43.7 mEh | 3F exact |
+| **(8,8) {3d,3p} semi-core** | **-848.4520** | **-60.8 mEh** | **3F exact** |
+
+THE VERDICT: the m-complete symmetric semi-core correlation (the
+CAS(8,8) {3d,3p} window, fold {1s,2s,2p,3s,4s}, sector (5,3),
+branch(3,g) -- an EXACT degenerate 3F, ptp 5e-14) is worth ~61 mEh
+-- the free SA's torn escape (5.2 mEh) was reaching for a small
+corner of a large pie, and the semi-core window beats even the
+valence (4,14) window by 17 mEh.  Readings for the planned-cells
+design: (4,10) as-declared (fold Ar(9), the 4s pair in the dead
+zone) is NOT a 3F window -- its lowest g-states scramble D and H
+components; the campaign's planned (4,10) cells have their own
+constrained semantics and should not be read against this ladder.
+
+NEXT for this thread (suite work + gated): CI-level pins of the
+ladder (deterministic; the 17/61 mEh margins are robust), the SA
+level on the winners ((8,8) first), and the campaign-declaration
+question for the semi-core window (a new planned-window row).
+
 REMAINING for the lane: step 8 + the declaration wave (cases
 term-targets, cells axis, campaign tables via the lane, the Ti
 TABLES compression with both records) -- GATED on the user's
