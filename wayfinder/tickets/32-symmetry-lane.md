@@ -303,6 +303,45 @@ the declaration grammar to express non-prefix folds -- a design
 point for the declaration wave), step 8 proper, the compression
 discussion after it.
 
+## The definitive ladder -- RESULTS (2026-10-31, the session run)
+
+Spec correction first: leg 5 is CAS(8,13), not (8,11) -- {3d,3p,4d}
+= 5+3+5 = 13 orbitals (the spec table miscounted; 368,082 dets in
+the (5,3) sector).
+
+| leg | E, Eh | vs declared |
+|---|---|---|
+| 1 {3d,4s} (4,6) declared | -848.3931 | 0 |
+| 2 {3d,4d} (4,10) planned | -848.2156 | +177.5 mEh (D/H + quintet scramble) |
+| 3 {3d,4s,4p,4d} (4,14) | -848.4374 | -44.4 |
+| 4 {3d,3p} (8,8) semi | -848.4520 | -58.9 |
+| 5 {3d,3p,4d} (8,13) | **-848.4991** | **-106.0 -- THE WINNER** |
+| 6 {3s,3p,3d} (10,9) M-shell | -848.4549 | -61.8 |
+| 7 {3d,3p,4s} (10,9) | -848.4529 | -59.8 |
+| Sc A {3d,4s} (3,6) | -759.7274 | 0 |
+| Sc B {3d,3p} (7,8) semi | -759.7871 | **-59.7** |
+
+Every m-complete window hosts its term EXACTLY (components degenerate
+to <= 3.3e-13; meters machine-exact; the direct block pattern
+anchored against our block-restricted H at 4.3e-14).  The verdicts:
+
+- THE WINNER is {3d,3p,4d}: the semi-core + the 4d pair-correlating
+  shell (the 3p^2 -> 4d^2 channel, closed while 3p sits in the fold)
+  DOUBLES the semi-core gain to -106 mEh -- at frozen shells, already
+  85 mEh below the free SA's torn escape.
+- THE D-COUNT CLAIM IS REFUTED at the window level: Sc's semi-core
+  gain (-59.7) == Ti's (-58.9).  The 3p^6 correlation is
+  d-count-INDEPENDENT; what was d2-specific was only the torn swap
+  route into a 6-orbital window (the mechanism addendum stands as
+  written -- it measured the swap, not the window).
+- THE 4s PAIR STAYS IN THE FOLD: back in-window it buys 0.9 mEh
+  (leg 7 vs leg 4) -- the escape's placement instinct confirmed, its
+  route rejected.  The 3s^2 shell adds 2.9 mEh (leg 6).
+
+Follow-up updates: the SA-level winner question is now
+{3d,3p,4d} (not {3d,3p}); the declaration question carries the same
+window with its semi fold.
+
 REMAINING for the lane: step 8 + the declaration wave (cases
 term-targets, cells axis, campaign tables via the lane, the Ti
 TABLES compression with both records) -- GATED on the user's

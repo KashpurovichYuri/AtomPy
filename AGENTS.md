@@ -232,8 +232,10 @@ carries a number only when the number IS the fact.
 
 ## Tests
 
-`pytest` runs 206 tests (~10 min unloaded; slower under load). The fast
-tier: `pytest -m fast` = 132 tests in seconds (machine-light selection).
+`pytest` runs 211 tests (~25 min unloaded; the CAS-ladder fixture in
+`test_symm_tm` dominates at ~15 min; slower under load). The fast
+tier: `pytest -m fast` = 132 tests in seconds (machine-light
+selection).
 Run the full suite before committing changes to physics-bearing modules
 (`operators`/`stages`/`cells`/`casscf`/`scans`); targeted files or
 `-m fast` are fine elsewhere. A rename round touching stage tags owes a

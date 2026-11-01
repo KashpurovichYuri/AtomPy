@@ -33,6 +33,24 @@ cross-check — fact 19.
 | 3d4s4p4d5d | (3,19) | 3,249 | −759.765 | 6.000 | — | — | — | — |
 | 3d4s4p4d4f | (3,21) | 4,410 | **−759.769** | 6.000 | — | — | — | — |
 
+## Semi-core scaling — the 3p window at d¹ (the CAS ladder's Sc pair)
+
+The ladder's Sc legs (ticket 32; the same uniform construction as the
+Ti ladder; certifying pins in `test_symm_tm.py`; fresh draw
+2026-10-31, deterministic):
+
+| window | CAS | fold | dets | E, Eh | vs 3d4s | term |
+|---|---|---|---|---|---|---|
+| 3d4s | (3,6) | Ar | 90 | −759.7274 | 0 | ²D exact |
+| 3d3p | (7,8) | semi | 3,920 | −759.7871 | −59.7 mEh | ²D exact |
+
+fold: Ar = {1s..3p}; semi = {1s,2s,2p,3s,4s}.  The d-count scaling,
+measured: the m-complete 3p semi-core window pays the SAME ~60 mEh at
+d¹ (−59.7) as at d² (Ti, −58.9) — the semi-core correlation is
+d-count-independent.  What was d²-specific was only the free SA's torn
+swap route into a 6-orbital window (the mechanism in the Ti tables);
+at the window level there is no d-count effect to find.
+
 ## Methods compared at 3d4s (cross-check = the averaging effect
 (1.3 mEh; ticket 25) — the old ~90 mEh window-definition offset was an
 artifact of the retired raw-AO-span analysis convention; 0 on the pur
@@ -61,8 +79,9 @@ Ticket-24 amendment: the +25 mEh radial ceiling is a window statement
 
 ## Open questions
 
-Semicore (3p; deprioritized); spin–orbit of ²D; the frac-occ septet
-ordering is SCF-chaos-dependent — never pin.
+Semicore measured (−59.7 mEh, the ladder pair; d-count-independent);
+spin–orbit of ²D; the frac-occ septet ordering is
+SCF-chaos-dependent — never pin.
 
 ## Studies (generated between the markers; ticket 28)
 

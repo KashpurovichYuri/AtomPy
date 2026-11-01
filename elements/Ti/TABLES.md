@@ -73,6 +73,46 @@ Reading — README · Results (window lattice). Source: `cells.json` (`*_2-0_*`)
 | 3d4d | (4,10) constrained | 1,200 | −848.2320 | 6.000 | — | — | — | — | — | — |
 | 3d4s4d | (4,11) constrained | 1,815 | −848.4090 | 12.000 | −848.4140 | 0.010 | — | — | — | — |
 
+## The pinned CAS ladder — term energies across the window families
+
+The symmetry lane's definitive window survey (ticket 32): the ³F TERM
+energy per window — pinned route, CI level at frozen shells, one
+uniform construction (Loewdin raw-AO-shell folds; windows placed
+against them through `build_full_mo(c_core=)`; totals via the
+fold-independent bookkeeping ruler, so cross-fold legs compare).
+Term energies, not sector grounds: each window's 2L+1 branch
+components are solved and averaged.  Certifying pins:
+`test_symm_tm.py::test_cas_ladder_*`; fresh draw 2026-10-31
+(deterministic — raw AO spans on both sides of the fold).
+
+| window | CAS | fold | dets | E, Eh | vs 3d4s | term |
+|---|---|---|---|---|---|---|
+| 3d4s | (4,6) | Ar | 120 | −848.3931 | 0 | ³F exact |
+| 3d4d | (4,10) | Ar | 1,200 | −848.2156 | +177.5 mEh | D/H scramble — not a ³F window |
+| 3d4s4p4d | (4,14) | Ar | 5,096 | −848.4374 | −44.4 | ³F exact |
+| 3d3p | (8,8) | semi | 3,136 | −848.4520 | −58.9 | ³F exact |
+| **3d3p4d** | **(8,13)** | semi | 368,082 | **−848.4991** | **−106.0** | ³F exact |
+| 3s3p3d | (10,9) | M3 | 10,584 | −848.4549 | −61.8 | ³F exact |
+| 3d3p4s | (10,9) | S3 | 10,584 | −848.4529 | −59.8 | ³F exact |
+
+folds: Ar = {1s,2s,2p,3s,3p}; semi = {1s,2s,2p,3s,4s}; M3 =
+{1s,2s,2p,4s}; S3 = {1s,2s,2p,3s}.
+
+Readings:
+- the semi-core 3p⁶ correlation (−58.9 mEh) outweighs the whole
+  valence 4p4d set (−44.4); with the 4d pair-correlating shell added
+  (the 3p²→4d² channel) it doubles to −106.0 — the free SA's torn
+  escape (−5.2 mEh) was a small corner of this;
+- the 4s pair stays in the fold: back in-window it buys 0.9 mEh
+  (3d3p4s vs 3d3p);
+- the 3s² shell adds 2.9 mEh (3s3p3d vs 3d3p);
+- every m-complete window hosts the term exactly — components
+  degenerate to ≤3.3e-13 Eh;
+- the planned 3d4d window as declared (fold Ar, the 4s pair in the
+  dead zone) hosts D and H components with quintet admixture at
+  +177.5 mEh — the campaign's constrained (4,10) cells carry their
+  own semantics and are not read against this ladder.
+
 ## CAS(4,6) / {3d,4s}
 
 Reading — README · Methods (⟨L̂z²⟩ is a gauge diagnostic, not a label).
@@ -206,7 +246,8 @@ ROHF anchor: −848.4065 Eh (−23086.3283 eV).
 ## Open questions
 
 ⟨L²⟩ = 0 MO-window phenomenon (the U ⁵S° class; mechanism open);
-semicore (deprioritized); spin–orbit.
+semicore measured (the pinned CAS ladder; SA on {3d,3p,4d} open);
+spin–orbit.
 
 ## Others (generated between the markers; ticket 28)
 
