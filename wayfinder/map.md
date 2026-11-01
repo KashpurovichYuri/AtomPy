@@ -5,7 +5,12 @@ live. History is git's job — resolved tickets are deleted, survey dumps
 are not kept (open findings move to Issues below before their section
 dies).
 
-## Tickets (live)
+## Tickets
+
+Queue decision (2026-11-01, user): ticket 31 (U) runs AFTER the
+ticket-32 close -- the C/Si/Sc/Ti tables land in their redesigned
+contract first, and U inherits the settled table grammar and
+declaration path as a fresh wave. (live)
 
 - [29 — gated measurement batches](tickets/29-ti-first.md): the T2 Ti
   cells + the M store migration; runs only on the user's enable.
