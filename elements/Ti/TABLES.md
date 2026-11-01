@@ -92,11 +92,8 @@ components are solved and averaged.  Certifying pins:
 | 3d4s4p4d | (4,14) | Ar | 5,096 | −848.4374 | −44.4 | ³F exact |
 | 3d3p | (8,8) | semi | 3,136 | −848.4520 | −58.9 | ³F exact |
 | **3d3p4d** | **(8,13)** | semi | 368,082 | **−848.4991** | **−106.0** | ³F exact |
-| 3s3p3d | (10,9) | M3 | 10,584 | −848.4549 | −61.8 | ³F exact |
-| 3d3p4s | (10,9) | S3 | 10,584 | −848.4529 | −59.8 | ³F exact |
-
-folds: Ar = {1s,2s,2p,3s,3p}; semi = {1s,2s,2p,3s,4s}; M3 =
-{1s,2s,2p,4s}; S3 = {1s,2s,2p,3s}.
+| 3s3p3d | (10,9) | {1s,2s,2p,4s} | 10,584 | −848.4549 | −61.8 | ³F exact |
+| 3d3p4s | (10,9) | {1s,2s,2p,3s} | 10,584 | −848.4529 | −59.8 | ³F exact |
 
 Readings:
 - the semi-core 3p⁶ correlation (−58.9 mEh) outweighs the whole

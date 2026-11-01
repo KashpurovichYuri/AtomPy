@@ -44,7 +44,7 @@ Ti ladder; certifying pins in `test_symm_tm.py`; fresh draw
 | 3d4s | (3,6) | Ar | 90 | −759.7274 | 0 | ²D exact |
 | 3d3p | (7,8) | semi | 3,920 | −759.7871 | −59.7 mEh | ²D exact |
 
-fold: Ar = {1s..3p}; semi = {1s,2s,2p,3s,4s}.  The d-count scaling,
+The d-count scaling,
 measured: the m-complete 3p semi-core window pays the SAME ~60 mEh at
 d¹ (−59.7) as at d² (Ti, −58.9) — the semi-core correlation is
 d-count-independent.  What was d²-specific was only the free SA's torn
