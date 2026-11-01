@@ -22,6 +22,17 @@ declaration path as a fresh wave. (live)
 
 ## Issues (open dispositions + watchlist)
 
+- The ladder-wave review round (2026-11-01, `701b31c..c02d0c6`, both
+  axes): applied — the module-docstring lockstep, the shared
+  `_substrate` builder, the V1 test split, the `_FOLD_*` renames, the
+  `LadderLeg` NamedTuple.  Declined: splitting the ladder sessions
+  out of ticket 32 (the ticket IS the provenance mechanism, per the
+  Conventions); the map queue-decision placement nit (live prose
+  until the wave closes).  Recorded partials (spec axis): the ladder
+  TABLES omit a sector column (implicit in dets — add when the
+  emitter generates the tables); the ours-vs-solver anchor runs on
+  one leg per construction, not per leg (the uniform-construction
+  argument — revisit if a leg's meters ever disagree).
 - Pinned cells' window intake (the symmetry lane's cross-route
   question, 2026-10-31): the natural pinned-cell windows are
   D2h-BORN sources only (raw shells, D2h-run MOs/NOs) — free-run

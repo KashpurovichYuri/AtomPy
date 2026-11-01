@@ -342,6 +342,81 @@ Follow-up updates: the SA-level winner question is now
 {3d,3p,4d} (not {3d,3p}); the declaration question carries the same
 window with its semi fold.
 
+## The step-8 workset spec (2026-11-01 — the declaration wave's design)
+
+GOAL: the campaign tables (all four atoms) rendered from declared
+cells through ONE grammar — windows carry their folds, scenarios
+gate computation and demonstration, the lane tables generate like
+the production tables — so TABLES.md carries the classified record
+and nothing hand-copied can drift.
+
+Three modules, each with its seam and its deletion test:
+
+1. THE FOLD RESOLVER (windows.py, beside the selectors).  Interface:
+   a fold spec string -> the explicit shell tuple; ``Ar``/``Ne``/
+   ``He``... resolve through the noble-gas prefix table (universal),
+   ``semi`` through the atom-class rule (open-(n)d: prefix minus
+   (n-1)p plus ns), and a bracketed/leading ``1s,2s,...`` list is
+   itself.  Unknown name -> ValueError (the seam owns the invariant;
+   README "Fold notation" is the user-facing statement of the SAME
+   rule).  Deletion test: without it, every fold consumer re-parses
+   strings — it earns its keep at the second consumer (cases
+   validation + cells construction).
+
+2. THE SCENARIO LAYER (cases.py, ONE declaration).  A scenario is
+   DECLARED DATA on the campaign with per-atom override (dict merge):
+   ``{name: dict(cells=..., instead_of=..., reason="...<dated>",
+   render="collapse", eps=1e-4, enabled=True)}``.  Two consumers
+   interpret the generic vocabulary, nothing else: the RUN GATE
+   (cells: a scenario'd cell is VOID-WITH-REASON at the key — still
+   addressable, ``--full`` materializes) and the RENDER POLICY (the
+   emitter: rows agreeing with their ``instead_of`` head within eps
+   collapse into a generated note).  Unknown scenario kind -> the
+   declaration is refused (fail at the seam that owns the grammar).
+   A skip reason is a dated physics claim; ``--full`` re-tests it.
+
+3. THE LANE EMITTER (scripts/, the build_*_tables family's third
+   member; the TABLES edit protocol verbatim — structural asserts,
+   the .md.tmp move).  The CI-level ladder legs become DECLARED
+   planned cells: window strings gain ``@fold`` ("3d3p4d@semi"), the
+   cells axis enumerates them like any planned cell (chk + payload
+   per key; the fold is part of the address grammar), and the
+   emitter renders the lane section between markers.  The existing
+   test_cas_ladder_* pins REMAIN the certification; the emitter
+   reports, the tests certify.  SA-level cells wait for the cost
+   probe (368k dets x iterations) — not declared until priced.
+
+THE TABLES SECTION GRAMMAR (per atom, four section types):
+contract (combinatorial, hand, route-independent) / production (the
+declared cells, as-run: the treatment-grid spine + generated
+markers; the multiplet/excitation tables live here) / lane (the
+generated ladder + the HAND head-to-head section with the mechanism
+record) / readings (scan verdicts, open questions).  Every energy
+row states partition (fold notation) + route (free/pinned) +
+provenance (cells.json | pin | session).
+
+THE TI COMPRESSION under the render policy: keep the certified
+rungs, the basin-different rows, the detector pairs (~10 rows);
+start-triplets that agree collapse to head + generated note; ALL
+pending rows leave the committed table (the full grid stays one
+regen away; a pointer line says so).
+
+ROLLOUT: Sc first (smallest), one review pass, then Ti (the
+compression), then C/Si.  The stale ``<!-- study:begin -->`` blocks
+(the generator is retired) get a one-line frozen-history label in
+the same pass.
+
+PINS the workset owes: the resolver (each rule class + the explicit
+list + the unknown-name refusal); the scenario evaluator (on/off,
+the campaign-atom merge, VOID-at-key, the eps-collapse, the
+unknown-kind refusal — pure data, unit-tier); the emitter's
+determinism (same payloads + policy -> byte-identical section); the
+``@fold`` cells (a declared semi-core cell's payload == the
+corresponding ladder pin's numbers).
+
+SKILLS: the design survey (codebase-design vocabulary) shapes the
+seams as implemented; the two-axis review at the wave close.
+
 REMAINING for the lane: step 8 + the declaration wave (cases
 term-targets, cells axis, campaign tables via the lane, the Ti
 TABLES compression with both records) -- GATED on the user's
