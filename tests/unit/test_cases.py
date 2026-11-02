@@ -58,32 +58,24 @@ def test_run_atom_rejects_parity_violations(tmp_path):
 
 
 def test_scenario_grammar_refusals():
-    # the declaration's own grammar: unknown render kinds, collapse
-    # without a comparison head, non-positive eps, and empty
-    # name/cells/reason all refuse at construction
+    # the declaration's own grammar: empty name/cells/reason all
+    # refuse at construction
     ok = dict(name="s", cells=("ti_3d4d_",), reason="dated claim")
     Scenario(**ok)
-    for kw in (dict(render="suppress"), dict(render="collapse"),
-               dict(eps=0.0), dict(name=""), dict(cells=()),
-               dict(reason="")):
+    for kw in (dict(name=""), dict(cells=()), dict(reason="")):
         with pytest.raises(ValueError):
             Scenario(**{**ok, **kw})
 
 
-def test_scenario_gates_and_collapses():
-    # the two consumers' vocabulary: prefix gating (enabled = the
-    # whole scenario's gate) and the eps-collapse decision
+def test_scenario_gates():
+    # the run gate's vocabulary: prefix gating, enabled = the whole
+    # scenario's gate
     on = Scenario(name="s", cells=("ti_3d4d_",), reason="r")
     off = Scenario(name="s", cells=("ti_3d4d_",), reason="r",
                    enabled=False)
     assert on.gates("ti_3d4d_3-1_casscf_ao_-_pol_avg")
     assert not on.gates("ti_3d4s_3-1_casscf_ao_-_pol_avg")
     assert not off.gates("ti_3d4d_3-1_casscf_ao_-_pol_avg")
-    c = Scenario(name="c", cells=("ti_3d4d_",), reason="r",
-                 instead_of="ti_3d4d_3-1_casci_ao_-_pol_avg",
-                 render="collapse", eps=1e-4)
-    assert c.collapses(1.0, 1.0 + 5e-5)
-    assert not c.collapses(1.0, 1.0 + 5e-3)
 
 
 def test_scenarios_for_merges_by_name(monkeypatch):

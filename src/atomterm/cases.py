@@ -57,16 +57,15 @@ __all__ = ["CaseSpec", "Scenario", "CAMPAIGN", "scenarios_for",
 @dataclass(frozen=True)
 class Scenario:
     """One declared scenario: a named, dated physics claim that a set
-    of cells need not run (and how their rows render).
+    of cells need not run.
 
-    A scenario is DECLARED DATA, interpreted by exactly two consumers
+    A scenario is DECLARED DATA, interpreted by exactly one consumer
     -- the run gate (:func:`atomterm.cells.void_reason`: a scenario'd
     cell is void-with-reason at its key, still addressable; a full
-    regen materializes it) and the render policy (the emitter: with
-    ``render="collapse"``, a materialized row agreeing with its
-    ``instead_of`` head within ``eps`` collapses into a generated
-    note).  The vocabulary is generic on purpose: what a scenario
-    MEANS physically lives in its ``reason``.
+    regen materializes it).  The vocabulary is generic on purpose:
+    what a scenario MEANS physically lives in its ``reason``.  (The
+    render half the original spec declared never came -- presentation
+    lives with the emitters.)
 
     Attributes
     ----------
@@ -76,23 +75,12 @@ class Scenario:
         -- a cell is scenario'd iff its address starts with one.
     reason : the dated physics claim the gate carries ("... (2026-11-02)");
         ``--full`` re-tests it.
-    instead_of : the comparison head's address (required by
-        ``render="collapse"``; the eps band is measured on stored
-        payloads).
-    render : the row policy -- ``"keep"`` (render the row, void or
-        materialized, as itself) | ``"collapse"`` (agreeing rows
-        collapse into one note).  The unknown-kind refusal happens
-        here.
-    eps : the collapse band.
-    enabled : the whole scenario's gate (both consumers).
+    enabled : the whole scenario's gate.
     """
 
     name: str
     cells: tuple[str, ...]
     reason: str
-    instead_of: str | None = None
-    render: str = "keep"
-    eps: float = 1e-4
     enabled: bool = True
 
     def __post_init__(self):
@@ -102,25 +90,10 @@ class Scenario:
             raise ValueError(f"scenario {self.name!r} names no cells")
         if not self.reason:
             raise ValueError(f"scenario {self.name!r} carries no reason")
-        if self.render not in ("keep", "collapse"):
-            raise ValueError(
-                f"scenario {self.name!r}: unknown render kind {self.render!r}"
-                " (kept kinds: 'keep' | 'collapse')")
-        if self.render == "collapse" and not self.instead_of:
-            raise ValueError(
-                f"scenario {self.name!r}: render='collapse' needs the "
-                "comparison head (instead_of=<address>)")
-        if not self.eps > 0:
-            raise ValueError(f"scenario {self.name!r}: eps must be positive")
 
     def gates(self, address: str) -> bool:
         """Whether ``address`` is this scenario's cell (prefix match)."""
         return self.enabled and address.startswith(self.cells)
-
-    def collapses(self, value: float, head_value: float) -> bool:
-        """The render decision for a materialized row: agreement with
-        the head within ``eps``."""
-        return abs(value - head_value) <= self.eps
 
 
 # campaign-level scenarios applied to EVERY atom unless its row
@@ -354,9 +327,9 @@ CAMPAIGN: dict[str, CaseSpec] = {
 def scenarios_for(spec: CaseSpec) -> tuple[Scenario, ...]:
     """The spec's effective scenarios: the campaign defaults
     (:data:`DEFAULT_SCENARIOS`) merged with the row's own -- the row
-    wins by name.  The ONE evaluated policy object the gate consumers
-    read (run gate + render policy); disabled scenarios stay in the
-    tuple (their ``enabled`` flag is the consumer's check).
+    wins by name.  The ONE evaluated policy object the run gate
+    reads; disabled scenarios stay in the tuple (their ``enabled``
+    flag is the consumer's check).
     """
     merged = {**DEFAULT_SCENARIOS, **{s.name: s for s in spec.scenarios}}
     return tuple(merged.values())
