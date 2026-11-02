@@ -56,7 +56,7 @@ one NO window; NIST; 3rd-d point.
 
 <!-- study:begin --> (frozen history: the generator (atomterm.study) is retired, commit ad28d3a -- the block stays as the committed record; the lane/lattice/methods blocks are the living generated tables)
 
-| cell | status | E, Eh | <L2> | |[P,Lz]| | |[P,Lp]| |
+| cell | status | E, Eh | ⟨L²⟩ | ‖[P,Lz]‖ | ‖[P,Lp]‖ |
 |---|---|---|---|---|---|
 | study_u_no_no2_relax | ok | -49.899728 | 30.7639 | 2.1e-13 | 4.3e-13 |
 | study_u_no_no4_relax | ok | -49.918895 | 26.4817 | 5.7e-13 | 1.2e-12 |

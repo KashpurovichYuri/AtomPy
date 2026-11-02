@@ -20,20 +20,20 @@ Route free · partition averaged fold · source `report.md` (`scripts/run.py Sc`
 
 ## Production — window lattice
 
-Route free · partition averaged fold · source the lattice logs (session).
+Route free · partition averaged fold · sector (2, 1) · source `cells.json` (as-run).
 
-| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ | NO, Eh | ⟨L²⟩ |
-|---|---|---|---|---|---|---|---|---|
-| 3d | (3,5) | 50 | −759.436 | 12.000 | — | — | — | — |
-| 3d4s | (3,6) | 90 | −759.729 | 6.000 | −759.736 | 0.000 | −759.731 | 6.000 |
-| 3d4d | (3,10) | 450 | −759.555 | 12.000 | — | — | — | — |
-| 3d4s4p | (3,9) | 324 | −759.760 | 6.000 | — | — | −759.762 | 6.000 |
-| 3d4s4d | (3,11) | 605 | −759.739 | 6.000 | −759.745 | 0.008 | — | — |
-| 3d4s4p4d | (3,14) | 1,274 | **−759.765** | 6.000 | −759.745 | 0.143 | **−759.765** | 6.000 |
-| 3d4s4p4d5d | (3,19) | 3,249 | −759.765 | 6.000 | — | — | — | — |
-| 3d4s4p4d4f | (3,21) | 4,410 | **−759.769** | 6.000 | — | — | — | — |
+| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ |
+|---|---|---|---|---|---|---|
+| 3d | CAS(3,5) | 50 | −759.4359 | 12.000 | −759.7467 | 0.006 |
+| 3d4s | CAS(3,6) | 90 | −759.7296 | 6.000 | −759.7470 | 0.006 |
+| 3d4d | CAS(3,10) | 450 | −759.5553 | 12.000 | −759.7482 | 1.578 |
+| 3d4s4p | CAS(3,9) | 324 | −759.7611 | 6.000 | −759.7481 | 0.627 |
+| 3d4s4d | CAS(3,11) | 605 | −759.7402 | 6.000 | −759.7484 | 1.603 |
+| 3d4s4p4d | CAS(3,14) | 1,274 | −759.7658 | 6.000 | −759.7510 | 2.868 |
+| 3d4s4p4d5d | CAS(3,19) | 3,249 | −759.7660 | 6.000 | −759.7696 | 5.590 |
+| 3d4s4p4d4f | CAS(3,21) | 4,410 | −759.7697 | 6.000 | −759.7720 | 5.635 |
 
-## Production — methods compared (3d4s)
+## Production — the method ladder, CAS(3,6)/{3d,4s}
 
 Route free · partition the treatment column · source `cells.json` (the committed draw).
 
@@ -58,25 +58,15 @@ Route pinned · partition the fold column · source `cells.json` (as-run) · pin
 |---|---|---|---|---|---|---|
 | 3d4s | (3,6) | Ar | 90 | −759.7274 | 0 | ²D exact |
 | 3d3p | (7,8) | semi | 3,920 | −759.7871 | −59.7 mEh | ²D exact |
+| 3d3p4d | (7,13) | semi | 204,490 | −759.8409 | −113.4 mEh | ²D exact |
+| 3d3p4s | (9,9) | {1s,2s,2p,3s} | 15,876 | −759.7899 | −62.4 mEh | ²D exact |
+| 3s3p3d | (9,9) | {1s,2s,2p,4s} | 15,876 | −759.7900 | −62.5 mEh | ²D exact |
 <!-- lane:end -->
 
-The d-count scaling,
-measured: the m-complete 3p semi-core window pays the SAME ~60 mEh at
-d¹ (−59.7) as at d² (Ti, −58.9) — the semi-core correlation is
-d-count-independent.  What was d²-specific was only the free SA's torn
-swap route into a 6-orbital window (the mechanism in the Ti tables);
-at the window level there is no d-count effect to find.
-
-## Readings — frozen-scan verdicts
-
-Curves: `scan.md`.
-
-| radial rotation (m-symmetric) | single-member tilt |
-|---|---|
-| rises everywhere | descends (−0.3 mEh @ δ = 0.1; −0.9 with four members) — JT-like |
-
-The +25 mEh radial ceiling is a window statement (the lattice crosses
-below the escape via 4f, −3.06 mEh).
+The semi-core window pays −59.7 mEh over the declared window at
+frozen shells — the 3p⁶ correlation — with ²D hosted exactly
+(components degenerate, every meter exact).  The extension legs place
+the pair-correlating 4d shell and the 4s/3s pairs against it.
 
 ## Readings — open questions
 
@@ -88,7 +78,7 @@ SCF-chaos-dependent — never pin.
 
 <!-- study:begin --> (frozen history: the generator (atomterm.study) is retired, commit ad28d3a -- the block stays as the committed record; the lane/lattice/methods blocks are the living generated tables)
 
-| cell | status | E, Eh | <L2> | |[P,Lz]| | |[P,Lp]| |
+| cell | status | E, Eh | ⟨L²⟩ | ‖[P,Lz]‖ | ‖[P,Lp]‖ |
 |---|---|---|---|---|---|
 | study_sc_no_no2_casci | ok | -759.730616 | 6.0615 | 1.9e-14 | 3.0e-14 |
 | study_sc_no_no2_relax | ok | -759.731210 | 6.0602 | 1.9e-14 | 3.0e-14 |

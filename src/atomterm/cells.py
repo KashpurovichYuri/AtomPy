@@ -950,15 +950,21 @@ def planned(spec) -> list[CellKey]:
 
 
 def lattice_keys(spec) -> list[CellKey]:
-    """The declared free-ion d2 lattice (``spec.lattice_windows``): the
-    CAS(2,·) series -- the ns2 pair closed in the core, sector (2,0) =
-    Ms=1 -- over growing m-complete shell spans.
+    """The declared lattice (``spec.lattice_windows`` at
+    ``spec.lattice_sector``): CASCI over growing m-complete shell
+    spans -- WHAT the series studies is the declared sector (the
+    free-ion series with the ns2 pair folded into the core, or the
+    full valence).
 
-    Three constructions per span: the raw shell AOs (exactly closed),
-    the canonical MO slice (the m-delocalized control), and the
-    full-span group-prefix NOs of the source's own term-averaged
-    density (:func:`_no_label`; NO == AOs by construction -- the
-    machinery certificate, not a methodology).
+    Two constructions per span: the raw shell AOs (exactly closed)
+    and the canonical MO slice (the m-delocalized control).  NO
+    variants are NOT a lattice arm: the own-span group-prefix label
+    presupposes a term-averaged source density, which is a
+    free-ion-series property (the ground block is the whole multiplet)
+    -- on the valence series the ground block is a split +-pair whose
+    m-unequal density groups by noise (measured, 2026-11-02); the NO
+    window variant lives in the methods grid, where its donor is
+    declared per key.
 
     Parameters
     ----------
@@ -967,19 +973,17 @@ def lattice_keys(spec) -> list[CellKey]:
 
     Examples
     --------
-    Ti (ncore=10): 3d -> CAS(2,5), 3d4p -> CAS(2,8), 3d4p4d ->
-    CAS(2,13); the NO labels carry the group count (3d4pno2).
+    Ti (free-ion series, sector (2,0)): 3d -> CAS(2,5), 3d4p ->
+    CAS(2,8), 3d4p4d -> CAS(2,13).  Sc (valence series, sector
+    (2,1)): 3d4s -> CAS(3,6).
     """
-    sec = (2, 0)
+    sec = spec.lattice_sector
     keys = []
     for w in spec.lattice_windows:
         keys.append(CellKey(spec.symbol, w, sec, method="casci",
                             fold="avg"))
         keys.append(CellKey(spec.symbol, w, sec, method="casci",
                             start="mo", fold="avg"))
-    for w in spec.lattice_windows:
-        keys.append(CellKey(spec.symbol, _no_label(w), sec,
-                            method="casci", start="no", fold="avg"))
     return keys
 
 

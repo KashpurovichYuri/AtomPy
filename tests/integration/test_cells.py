@@ -158,7 +158,8 @@ def test_lane_keys_derive_from_the_declaration():
     """The lane legs and their SECTORS derive from the declaration:
     activating a shell moves its electrons into the window, so the
     sector follows the fold (Ti semi grows (3,1) -> (5,3), the
-    M-shell folds to (6,4); the Ar legs keep the case sector)."""
+    M-shell folds to (6,4); the Ar legs keep the case sector); Sc's
+    five-leg family (d1: one electron fewer per M-shell leg)."""
     ti = {k.window: k.sector for k in lane_keys(CAMPAIGN["Ti"])}
     assert ti["3d4s@ar"] == (3, 1)
     assert ti["3d4d@ar"] == (3, 1)
@@ -167,7 +168,9 @@ def test_lane_keys_derive_from_the_declaration():
     assert ti["3s3p3d@1s2s2p4s"] == (6, 4)
     assert ti["3d3p4s@1s2s2p3s"] == (6, 4)
     assert [(k.window, k.sector) for k in lane_keys(CAMPAIGN["Sc"])] == [
-        ("3d4s@ar", (2, 1)), ("3d3p@semi", (4, 3))]
+        ("3d4s@ar", (2, 1)), ("3d3p@semi", (4, 3)),
+        ("3d3p4d@semi", (4, 3)), ("3d3p4s@1s2s2p3s", (5, 4)),
+        ("3s3p3d@1s2s2p4s", (5, 4))]
     assert lane_keys(CAMPAIGN["U"]) == []
 
 
@@ -251,11 +254,11 @@ def test_window_grid_is_the_one_declaration():
 
 @fast
 def test_lattice_keys_derive_from_the_declaration():
-    """The free-ion d2 lattice derives from CaseSpec.lattice_windows:
-    three constructions per span (AO / MO / the full-span group-prefix
-    NO), sector (2,0) = Ms=1, CASCI, averaged fold -- the ao/mo blocks
-    precede the NO block (the store's key order); undeclared atoms
-    derive nothing."""
+    """The lattice derives from CaseSpec.lattice_windows at the
+    declared lattice_sector: two constructions per span (AO -- exactly
+    closed; MO -- the m-delocalized control); undeclared atoms derive
+    nothing; the sector is a declaration, not a constant (Sc's valence
+    series differs from Ti's free-ion series)."""
     from atomterm.cases import CAMPAIGN
 
     assert lattice_keys(CAMPAIGN["C"]) == []
@@ -267,10 +270,11 @@ def test_lattice_keys_derive_from_the_declaration():
         "ti_3d4p_2-0_casci_mo_-_pol_avg",
         "ti_3d4p4d_2-0_casci_ao_-_pol_avg",
         "ti_3d4p4d_2-0_casci_mo_-_pol_avg",
-        "ti_3dno1_2-0_casci_no_-_pol_avg",
-        "ti_3d4pno2_2-0_casci_no_-_pol_avg",
-        "ti_3d4p4dno3_2-0_casci_no_-_pol_avg",
     ]
+    # the valence series at its own sector: CAS(3,·), Ms = 1/2
+    first = lattice_keys(CAMPAIGN["Sc"])[0]
+    assert first.address == "sc_3d_2-1_casci_ao_-_pol_avg"
+    assert [k.sector for k in lattice_keys(CAMPAIGN["Sc"])] == [(2, 1)] * 16
 
 
 # ------------------------------------------------------------- the bridge
@@ -711,10 +715,13 @@ def test_lane_emitter_deterministic():
     block = mod.section(cs, payloads)
     assert block == mod.section(cs, payloads)
     lines = [l for l in block.splitlines() if l.startswith("|")]
-    assert len(lines) == 4, lines                     # head + sep + 2 legs
+    assert len(lines) == 2 + len(keys), lines   # head + sep + the legs
     assert lines[2].startswith("| 3d4s | (3,6) | Ar |")
     assert "²D exact" in lines[2] and "| 0 |" in lines[2]
     assert lines[3].startswith("| 3d3p | (7,8) | semi |")
+    # the extension legs render in declaration order after the pair
+    assert [l.split("|")[1].strip() for l in lines[3:]] == [
+        "3d3p", "3d3p4d", "3d3p4s", "3s3p3d"]
 
     no_payload = dict(payloads)
     del no_payload[keys[1].address]
@@ -729,3 +736,45 @@ def test_lane_emitter_deterministic():
     scramble[keys[1].address] = {**payloads[keys[1].address],
                                  "l2": [6.0, 12.0, 6.0, 6.0, 30.0]}
     assert "not a ²D window" in mod.section(cs, scramble)
+
+
+@fast
+def test_lattice_emitter_deterministic():
+    """The lattice emitter's generated section: byte-identical across
+    calls from the same payloads, the CAS label carries the DECLARED
+    sector (the valence series reads CAS(3,·), not the free-ion
+    CAS(2,·)), an unrun cell renders pending in its own column, and
+    the row set equals the declared spans in declaration order."""
+    import importlib.util
+    from pathlib import Path as _Path
+
+    loader = importlib.util.spec_from_file_location(
+        "build_lattice_tables",
+        _Path(__file__).resolve().parents[2] / "scripts"
+        / "build_lattice_tables.py")
+    mod = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(mod)
+
+    cs = CAMPAIGN["Sc"]
+    keys = lattice_keys(cs)
+    payloads = {k.address: {"n_det": 90,
+                            "energies_pyscf": [-759.7296],
+                            "ground_l2": 6.0} for k in keys}
+    sec = mod.section(cs, payloads)
+    assert sec == mod.section(cs, payloads)
+    lines = [l for l in sec.splitlines() if l.startswith("|")]
+    assert lines[0] == mod.HEAD and lines[1] == mod.SEP   # well-formed
+    assert lines[1].count("|---") == 7 and "||" not in lines[1]
+    assert len(lines) == 2 + len(cs.lattice_windows)
+    assert lines[2].startswith("| 3d | CAS(3,5) | 90 |")
+    assert lines[3].startswith("| 3d4s | CAS(3,6) | 90 |")
+    assert "sector (2, 1)" in sec
+
+    # an unrun cell is pending IN ITS COLUMN (the row survives)
+    partial = dict(payloads)
+    del partial[keys[1].address]          # 3d's MO cell
+    row = [l for l in mod.section(cs, partial).splitlines()
+           if l.startswith("| 3d |")][0]
+    cells_ = row.split("|")
+    assert cells_[6].strip() == "pending" and cells_[7].strip() == ""
+    assert cells_[4].strip() == "−759.7296"

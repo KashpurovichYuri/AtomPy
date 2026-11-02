@@ -161,9 +161,13 @@ class CaseSpec:
     planned_windows : further window labels of the campaign, declared
         but not yet run (Ti: the (4,10)/(4,14) partitions) -- the cell
         grid derives their full factor grids (:func:`atomterm.cells.planned`).
-    lattice_windows : the free-ion d2 lattice spans (empty = none) --
-        CAS(2,·) cells over growing m-complete shell spans
+    lattice_windows : the lattice spans (empty = none) -- CASCI cells
+        over growing m-complete shell spans at ``lattice_sector``
         (:func:`atomterm.cells.lattice_keys`).
+    lattice_sector : the lattice series' sector ``(na, nb)`` -- WHAT
+        the lattice studies: the free-ion series (the ns2 pair folded
+        into the core) or the full valence.  Required when
+        ``lattice_windows`` is non-empty.
     scan : the declared frozen-scan anatomy
         (:class:`~atomterm.scans.ScanSpec` -- family pair, angle grid,
         fixed extras; None = no scan; the runner is
@@ -202,6 +206,7 @@ class CaseSpec:
     nroots_primary: int = 9
     planned_windows: tuple[str, ...] = ()
     lattice_windows: tuple[str, ...] = ()
+    lattice_sector: tuple[int, int] | None = None
     scan: ScanSpec | None = None
     term: tuple[int, str] | None = None
     lane_windows: tuple[str, ...] = ()
@@ -214,6 +219,15 @@ class CaseSpec:
         if self.lane_windows and self.term is None:
             raise ValueError(
                 "lane windows need the term target (term=(L, 'g' | 'u'))")
+        if self.lattice_windows and self.lattice_sector is None:
+            raise ValueError(
+                "lattice windows need the lattice sector "
+                "(lattice_sector=(na, nb) -- the series' own Ms)")
+        na, nb = self.lattice_sector or (1, 0)
+        if not (na >= nb >= 0 and na + nb > 0):
+            raise ValueError(
+                f"lattice_sector {self.lattice_sector!r} must be "
+                "(na >= nb >= 0, n > 0)")
         if self.term is not None:
             L, parity = self.term
             if not (isinstance(L, int) and L >= 0) or parity not in ("g", "u"):
@@ -292,7 +306,13 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    shell_patterns=["3d", "4s"], spin=1,
                    sa_weights=[1 / 5] * 5,
                    term=(2, "g"),
-                   lane_windows=("3d4s@ar", "3d3p@semi"),
+                   lane_windows=("3d4s@ar", "3d3p@semi", "3d3p4d@semi",
+                                 "3d3p4s@1s2s2p3s",
+                                 "3s3p3d@1s2s2p4s"),
+                   lattice_windows=("3d", "3d4s", "3d4d", "3d4s4p",
+                                    "3d4s4d", "3d4s4p4d",
+                                    "3d4s4p4d5d", "3d4s4p4d4f"),
+                   lattice_sector=(2, 1),
                    scan=ScanSpec(fam=("3d", "4d"), grid=(0.0, 0.4, 9),
                                  # 4s fixed: the 4s->5s direction is
                                  # harmful and would mask the d structure
@@ -313,7 +333,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                        occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
                        occ_open=("3d",), occ_e_ref=-848.40648875),
                    planned_windows=("3d4d", "3d4s4p4d"),
-                   lattice_windows=("3d", "3d4p", "3d4p4d")),
+                   lattice_windows=("3d", "3d4p", "3d4p4d"),
+                   lattice_sector=(2, 0)),
     "U": CaseSpec("U", _U_BASIS, nelec_act=4, ncore=5,
                   shell_patterns=list(_U_TIER["3f2d"]), spin=4,
                   ecp=_U_ECP, tag="U_stuttgart78_dyall",

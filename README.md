@@ -235,7 +235,7 @@ regenerable). This section is the reading key and one excerpt.
 | Type | Carries | Source of truth |
 |---|---|---|
 | **Contract** | the combinatorial term census per CAS/window — no energies, route-independent | hand, checked against the solver |
-| **Production** | the declared campaign as run: multiplet energies, window lattices, the methods grid | `report.md` / `cells.json` — regenerated, never hand-copied |
+| **Production** | the declared campaign as run: the method ladder per CAS window, window lattices, multiplet energies | `report.md` / `cells.json` — regenerated, never hand-copied |
 | **Lane** | the pinned route's CAS ladder + its readings | `cells.json` between markers; the ladder pins certify |
 | **Readings** | scan verdicts, basin maps, open questions | session, cited |
 

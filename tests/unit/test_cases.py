@@ -27,7 +27,8 @@ def test_casespec_is_the_intent_manifest():
     assert {"symbol", "basis", "ecp", "spin", "nelec_act", "ncore",
             "shell_patterns", "ref", "sa_weights", "run_casscf",
             "nroots_primary", "planned_windows", "lattice_windows",
-            "scan", "term", "lane_windows", "scenarios"} <= names
+            "lattice_sector", "scan", "term", "lane_windows",
+            "scenarios"} <= names
     # immutable: a declaration is not mutated by running it
     with pytest.raises(Exception):
         spec.symbol = "N"
@@ -38,6 +39,14 @@ def test_casespec_atom_config_roundtrip():
     cfg = spec.atom_config()
     assert isinstance(cfg, AtomConfig)
     assert cfg.spin == 0
+
+
+def test_lattice_declaration_needs_its_sector():
+    # the lattice sector says WHAT the series studies (free-ion vs
+    # valence); windows without it refuse at the declaration
+    with pytest.raises(ValueError, match="lattice sector"):
+        _spec(lattice_windows=("2p",))
+    _spec(lattice_windows=("2p",), lattice_sector=(2, 0))
 
 
 def test_run_atom_rejects_parity_violations(tmp_path):

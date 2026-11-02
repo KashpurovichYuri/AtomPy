@@ -479,19 +479,70 @@ the emitter's row policy — not a physics declaration; the spec's
 "render policy" wording read as data was over-literal).  SA-level
 lane cells wait for the cost probe, undeclared.
 
-REMAINING for step 8: the TABLES section-grammar redesign across all
-four atoms (the four section types -- contract/production/lane/
-readings -- and the partition+route+provenance row contract on every
-energy row; the lane sections already follow it, the methods/
-multiplet/lattice/term sections get the classification pass; the Ti
-CAS(4,6) grid compression is the Ti instance under the render
-policy).  PROSE MINIMAL (user, 2026-11-02): the reading conventions
-live ONCE in README (Results gains the lane-column keys + the Tables
-grammar paragraph); TABLES sections carry tables + one-line pointers,
-no per-section legends.  Then the SA cost probe on {3d,3p,4d} (gated
--- SA cells undeclared until priced), the wave-close two-axis review
-+ design survey + the refactoring round (user-strengthened), then
-ticket 31 (U).
+## Step 8, second execution round (2026-11-02 — the grammar amendments + the Sc lattice/lane runs)
+
+User review of the Sc shape (2026-11-02) settled: prose minimal with
+README the one home (DONE round 1); atom files carry ATOM-SPECIFIC
+output only (no cross-atom tables in element files — the d-count
+verdict moves to this record); scan sections leave the TABLES (the
+anatomy delivery is rethought in ticket 33); the method-ladder naming
+adopts the CAS abbreviation; sa_decomposition.md retires and scan.md
+deletes at the C/Si pass.
+
+1. THE LATTICE BECOMES DECLARED CELLS: `CaseSpec.lattice_sector`
+   (validated; the series' own Ms — WHAT it studies is a declaration,
+   not the hardcoded free-ion (2,0)).  Sc's valence series CAS(3,·) at
+   (2,1): 8 spans x (AO, MO), 16 cells run, the table GENERATED from
+   cells.json (the old session-frozen hand table dies; the MO column
+   now full-rank — the ⟨L²⟩ control readings complete: 0.006 at {3d}
+   through 5.6 at the top).  The lattice emitter generalized (per-atom
+   sector + grammar heading/tag) and pinned (determinism, pending
+   cells, declared-sector CAS labels, well-formed separators).
+
+2. THE OWN-SPAN NO ARM RETIRED from the lattice (measured): its label
+   (k = shell count) presupposes a TERM-AVERAGED source density.  The
+   free-ion d² source delivers one (the ground block IS the whole
+   7-root ³F multiplet: occupations 0.4 x5, ONE group).  The valence
+   d³ source does NOT: its ground block is a SPLIT 2-ROOT ±PAIR
+   (occupations [.5,.5,1,.5,.5] — a |M_L|±pair average, m-unequal at
+   the fold-anisotropy scale) and the occupation groups split by noise
+   ([1,1,2,1]) — the certificate was series-specific, never
+   universal.  The NO window variant lives where its donor is
+   declared per key (the methods grid).  Ti's three stored ti_*no*
+   cells stay (never pruned); the arm's keys leave lattice_keys and
+   its pin.
+
+3. THE Sc LANE EXTENDED to the five-leg d¹ family (user-enabled; all
+   legs ²D exact, components degenerate <=1.2e-13):
+
+   | leg | E, Eh | vs declared |
+   |---|---|---|
+   | 3d4s@ar anchor | −759.7274 | 0 |
+   | 3d3p@semi | −759.7871 | −59.7 mEh |
+   | 3d3p4d@semi | **−759.8409** | **−113.4 mEh** |
+   | 3d3p4s@{1s,2s,2p,3s} | −759.7899 | −62.4 mEh |
+   | 3s3p3d@{1s,2s,2p,4s} | −759.7900 | −62.5 mEh |
+
+   READINGS (atom-specific): the pair-correlating 4d shell DOUBLES
+   the semi-core gain at d¹ (−113.4) — the 3p²→4d² channel; the 4s
+   pair back in-window costs +2.8 mEh against the semi fold (it wants
+   to stay folded); the 3s² shell adds nothing beyond the 4s
+   placement (+2.9 over the anchor leg alone).  The cross-atom
+   statement (the d-count independence of the 3p⁶ correlation and the
+   pair-channel doubling at both d¹ and d²) lives HERE, in the record
+   — not in the element tables.
+
+4. Grammar amendments landed: 'the method ladder, CAS(3,6)/{3d,4s}'
+   naming; the frozen-scan sections out; the studies blocks' broken
+   ASCII-pipe headers repaired (‖…‖ — they never rendered as tables);
+   the lane reading atom-specific.
+
+REMAINING: the Ti pass (the methods compression + the renderer row
+policy, headings lockstep with the emitters) and the C/Si pass (+ the
+sa_decomposition.md retirement and the scan.md deletion), then the SA
+cost probe on {3d,3p,4d} (gated — SA cells undeclared until priced),
+the wave-close two-axis review + design survey + the refactoring
+round (user-strengthened), then ticket 31 (U).
 
 ## References
 
