@@ -758,6 +758,68 @@ def test_lane_emitter_deterministic():
 
 
 @fast
+def test_survey_emitter_deterministic():
+    """The CI-survey emitter's generated block: byte-identical across
+    calls, every declared CI cell one row (lattice starts + the fold
+    variants + the pinned legs, deduped -- the primary window's avg
+    cell IS its lattice AO row), the fold column's vocabulary (prefix
+    name, ·raw/·frac/·pur, the legs' own tags), ΔE anchored on the
+    pinned primary row, pending cells, and the anchor refusal."""
+    import importlib.util
+    from pathlib import Path as _Path
+
+    loader = importlib.util.spec_from_file_location(
+        "build_survey_tables",
+        _Path(__file__).resolve().parents[2] / "scripts"
+        / "build_survey_tables.py")
+    mod = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(mod)
+
+    cs = CAMPAIGN["Sc"]
+    keys = mod.survey_keys(cs)
+    # every address distinct; the lattice AO cell of the primary
+    # window absorbed the grid's avg cell (dedup)
+    assert len({k.address for k in keys}) == len(keys)
+    assert "sc_3d4s_2-1_casci_ao_-_pol_avg" in {k.address for k in keys}
+    assert len([k for k in keys if k.span_label == "3d4s"]) == 6
+
+    def free(e):
+        return {"energies_pyscf": [e], "ground_l2": 6.0, "n_det": 90,
+                "comm_norm_h_lz": 1e-9, "comm_norm_h_l2": 1e-8}
+
+    payloads = {}
+    for k in keys:
+        payloads[k.address] = (
+            {"total": -759.7274, "l2": [6.0] * 5, "s2": [0.75] * 5,
+             "n_det": 90, "comm_norm_h_lz": 1e-14,
+             "comm_norm_h_l2": 1e-13}
+            if k.fold_tag is not None else free(-759.7296))
+    block = mod.section(cs, payloads)
+    assert block == mod.section(cs, payloads)
+    lines = [l for l in block.splitlines() if l.startswith("|")]
+    assert len(lines) == 2 + len(keys)
+    anchor = [l for l in lines if " pinned | 90 | " in l
+              and l.startswith("| 3d4s | (3,6) | Ar |")][0]
+    assert "| 0 |" in anchor                       # the ΔE anchor row
+    raw = [l for l in lines if "·raw" in l][0]
+    assert raw.startswith("| 3d4s | (3,6) | Ar·raw | AO | free |")
+    assert "| semi | AO | pinned |" in [
+        l.split("| dets")[0] + "" for l in lines] or any(
+        "| semi | AO | pinned |" in l for l in lines)
+
+    # pending cells keep their row; a missing anchor refuses
+    no_payload = dict(payloads)
+    del no_payload[keys[0].address]
+    assert "pending" in mod.section(cs, no_payload)
+    no_anchor = dict(payloads)
+    for k in keys:
+        if k.fold_tag is not None and k.span_label == "3d4s":
+            del no_anchor[k.address]
+    with pytest.raises(SystemExit, match="anchor"):
+        mod.section(cs, no_anchor)
+
+
+@fast
 def test_lattice_emitter_deterministic():
     """The lattice emitter's generated section: byte-identical across
     calls from the same payloads, the CAS label carries the DECLARED

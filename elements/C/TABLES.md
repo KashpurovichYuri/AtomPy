@@ -36,7 +36,7 @@ Routes in rows · partition fold column · source `cells.json` (as-run) · pins 
 Route free · partition treatment column · source `cells.json` (the committed draw).
 
 | treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | note |
-|---|---|---|---|---|---|---|
+|---|---|---|---|---|---|
 | ROHF (anchor) | −37.682418 | 0 | — | — | |
 | CASCI, averaged | −37.431611 | +250.8 | 2.0000 | 1.3e-15 | the confinement cost |
 | CASCI, raw | −37.431611 | +250.8 | 2.0000 | 9.8e-06 | polarized-core detector |

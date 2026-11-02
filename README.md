@@ -251,6 +251,23 @@ component), its **partition** (the fold — Fold notation; a column
 when it varies, stated once when uniform), and its **source**, as a
 one-line tag under the heading. Per-section legends live nowhere.
 
+Columns of the CI window survey (one row per declared CI cell):
+
+- **window / CAS / dets** — the span and its active size; **fold** —
+  the partition: the pinned legs' own tags (`semi`, explicit lists),
+  the prefix name for free rows, `·raw`/`·frac`/`·pur` marking the
+  free variants' deviation; **start** — the construction (AO shell
+  span / canonical MO slice); **route** — free (the native driver) or
+  pinned (D2h construction).
+- **E** — the free rows' own total; the pinned rows' TERM energy (the
+  branch components averaged + the fold-independent bookkeeping
+  constant — legs compare across folds). **ΔE** — anchored on the
+  primary window's pinned AO row (the tag names it).
+- **⟨L²⟩** — the free rows' ground root; the pinned rows' components
+  (one value when they agree, a range when they scramble). The
+  commutator columns are the assembled meters, em-dash past the
+  dense-meter cap.
+
 Columns of a methods table:
 
 - **E** — the run's variational total (Eh; eV in parentheses).

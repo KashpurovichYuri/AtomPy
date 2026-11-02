@@ -18,7 +18,7 @@ Route free · partition averaged fold · source `report.md` (`scripts/run.py Si`
 |---|---|---|---|---|
 | ³P | 3 | −0.667376 | — | −1…1 |
 | ¹D | 5 | −0.607963 | +0.0594 | −2…2 |
-| ¹S | 1 | −0.518843 | +0.1485
+| ¹S | 1 | −0.518843 | +0.1485 | 0 |
 
 ## CAS ladder
 
@@ -35,15 +35,15 @@ Routes in rows · partition fold column · source `cells.json` (as-run) · pins 
 Route free · partition treatment column · source `cells.json` (the committed draw).
 
 | treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ |
-|---|---|---|---|---|---|
-| ROHF (anchor) | −288.846437 | 0 | — | —
-| CASCI, averaged | −288.624937 | +221.5 | 2.0000 | 2.5e-15
-| CASCI, raw | −288.624937 | +221.5 | 2.0000 | 5.6e-04
-| CASCI, fractional | −288.628625 | +217.8 | 2.0000 | 1.3e-15
-| CASSCF, free | −288.846437 | +0.0 | 1.5782 | 1.1e-01
-| CASSCF, frozen window | −288.628912 | +217.5 | 2.0000 | 6.1e-05
-| SA-CASSCF, free | −288.846398 | +0.0 | 2.0000 | 7.4e-10
-| SA-CASSCF, frozen, pur | −288.628792 | +217.6 | 2.0000 | 0.0
+|---|---|---|---|---|
+| ROHF (anchor) | −288.846437 | 0 | — | — |
+| CASCI, averaged | −288.624937 | +221.5 | 2.0000 | 2.5e-15 |
+| CASCI, raw | −288.624937 | +221.5 | 2.0000 | 5.6e-04 |
+| CASCI, fractional | −288.628625 | +217.8 | 2.0000 | 1.3e-15 |
+| CASSCF, free | −288.846437 | +0.0 | 1.5782 | 1.1e-01 |
+| CASSCF, frozen window | −288.628912 | +217.5 | 2.0000 | 6.1e-05 |
+| SA-CASSCF, free | −288.846398 | +0.0 | 2.0000 | 7.4e-10 |
+| SA-CASSCF, frozen, pur | −288.628792 | +217.6 | 2.0000 | 0.0 |
 
 ## Studies (frozen history; ticket 28)
 
