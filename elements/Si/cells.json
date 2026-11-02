@@ -632,6 +632,8 @@
       ],
       "n_det": 3,
       "anchor_dev": 0.0,
+      "comm_norm_h_lz": 0.0,
+      "comm_norm_h_l2": 0.0,
       "fold": [
         "1s",
         "2s",

@@ -230,14 +230,19 @@ machinery.
 All tables live in `elements/<Atom>/TABLES.md` (committed,
 regenerable). This section is the reading key and one excerpt.
 
-**Tables grammar** — every element file, four section types:
+**Tables grammar** — every element file, same section families in
+the same order (headings carry no type labels; the family is the
+content):
 
-| Type | Carries | Source of truth |
-|---|---|---|
-| **Contract** | the combinatorial term census per CAS/window — no energies, route-independent | hand, checked against the solver |
-| **Production** | the declared campaign as run: the method ladder per CAS window, window lattices, multiplet energies | `report.md` / `cells.json` — regenerated, never hand-copied |
-| **Lane** | the pinned route's CAS ladder + its readings | `cells.json` between markers; the ladder pins certify |
-| **Readings** | scan verdicts, basin maps, open questions | session, cited |
+- **Term table** — the combinatorial term census per CAS/window: no
+  energies, route-independent (hand, checked against the solver).
+- **Multiplet energies, window lattices, method ladders** — the
+  declared campaign as run: `report.md` / `cells.json` — regenerated,
+  never hand-copied.
+- **CAS ladder** — window families × routes; generated between
+  markers, the ladder pins certify.
+- **Basin map and studies** — readings and frozen history,
+  session-sourced, cited.
 
 Every energy table states its **route** (free — our symmetry-blind
 native driver, symmetry measured and restored by averaging; pinned —
@@ -262,22 +267,34 @@ Columns of a methods table:
 - **Terms** — from ⟨L̂²⟩/⟨S²⟩; the M_L-resolved reading (L̂z
   diagonalized inside the ground eigenspace) is the multiplet
   demonstration.
-- **cross-check** (the summary tables) — max|dE| of the analysis
-  ruler against the run's own totals: ~0 by construction; an mEh-class
-  residue is core-field anisotropy + window definition; the swap
-  row's ~800 mEh is the partition-bookkeeping shift (Methods).
+- **cross-check** — not a table column: the store's
+  `max_de_vs_pyscf`, the analysis-ruler agreement with the run's own
+  totals. ~0 by construction; an mEh-class residue is core-field
+  anisotropy + window definition; a huge value (the swap row's ~800
+  mEh) is the partition-bookkeeping shift (Methods) — compare kernel
+  totals there, never the analysis split. Values live in
+  `cells.json/md`.
 
-Columns of a lane table (the pinned CAS ladder):
+Columns of a ladder table (window families × routes):
 
+- **route / method** — the treatment identity: pinned (D2h
+  construction, one `wfnsym` solver per term component) or free (the
+  symmetry-blind native driver); CI today, CASSCF/SA with the route
+  axis.
 - **CAS / dets** — the leg's active size and sector determinant
   count; **fold** — the leg's partition (the column that varies).
-- **E** — the TERM energy: the mean over the 2L+1 branch components,
-  each solved in its D2h block, plus the fold-independent bookkeeping
-  constant — legs compare across folds (not sector grounds).
-- **vs declared** — gap to the leg spanning the case's primary window.
-- **term** — generated from the meters: `exact` when every component
-  reads L(L+1) and S(S+1) and the components sit degenerate; else
-  `not a … window` (the scramble's nuance stays in the readings).
+- **E** — the TERM energy: the mean over the 2L+1 branch components
+  plus the fold-independent bookkeeping constant — legs compare
+  across folds (not sector grounds).
+- **ΔE** — gap to the leg spanning the case's primary window (the
+  tag line's anchor), in mEh and eV.
+- **⟨L²⟩** — across the branch components: one value when they agree
+  (the term reading), a min–max range when they do not (the scramble;
+  **ptp** carries its energy side — the component spread, the
+  degeneracy certificate).
+- **‖[H,Lz]‖, ‖[H,L²]‖** — the assembled-treatment meters, exact up
+  to the dense-meter cap (~6k dets); beyond it they read an em-dash —
+  structural zeros for the certified fold class.
 
 The meters, and what each is blind to (ε = ‖ρ_c − ρ̄_c‖/‖ρ̄_c‖, the
 core anisotropy — `core_anisotropy()`, no CI involved):

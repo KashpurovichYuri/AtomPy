@@ -408,6 +408,10 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
 
 # ------------------------------------------------------------- the execution
 
+# the dense-meter budget: sectors past this determinant count skip the
+# exact [H, L] commutators (O(ndet^2) memory) -- the ladder's em-dash
+_COMM_CAP = 6000
+
 
 def _pick_no_window(wins, k: int):
     """The k-GROUP-PREFIX window from no_group_windows's COMPACT list.
@@ -693,7 +697,11 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     through :func:`load_lane_cell`): per-component ``energies`` /
     ``l2`` / ``s2`` in branch order, the TERM ``total`` (component
     mean + the closed-shell core energy), the component spread
-    ``ptp``, the sector size ``n_det``, and ``anchor_dev``.
+    ``ptp``, the sector size ``n_det``, ``anchor_dev``, and the dense
+    assembled-treatment commutators ``comm_norm_h_lz`` /
+    ``comm_norm_h_l2`` (NaN above :data:`_COMM_CAP` -- sectors past
+    the dense-meter budget; the certified fold class makes them
+    structural there).
 
     Raises
     ------
@@ -793,6 +801,23 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
             del mb
 
     es = np.asarray(es)
+    # the assembled-treatment meters: exact dense commutators where
+    # the sector fits memory; above the cap the certified fold class
+    # makes [H, L] ~ 0 structural (the component spread ptp is the
+    # energy-space certificate) and the columns read em-dash
+    comm_lz = comm_l2 = float("nan")
+    if len(dets) <= _COMM_CAP:
+        from atomterm.detbasis import commutator, frobenius_norm
+
+        h_m = slater_condon_matrix(dets, one_body=parts["H"][0],
+                                   two_body=parts["H"][1])
+        lz_m = slater_condon_matrix(dets, one_body=parts["Lz"][0],
+                                    two_body=parts["Lz"][1])
+        l2_m = slater_condon_matrix(dets, one_body=parts["L2"][0],
+                                    two_body=parts["L2"][1])
+        comm_lz = float(frobenius_norm(commutator(h_m, lz_m)))
+        comm_l2 = float(frobenius_norm(commutator(h_m, l2_m)))
+        del h_m, lz_m, l2_m
     payload = {
         "cell": key.address,
         "term": [int(L), str(parity)],
@@ -803,6 +828,8 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         "s2": s2s,
         "n_det": int(sector_dimension(ncas, na, nb)),
         "anchor_dev": float(anchor_dev),
+        "comm_norm_h_lz": comm_lz,
+        "comm_norm_h_l2": comm_l2,
         "fold": list(fold),
     }
     for field_name, value in payload.items():

@@ -544,6 +544,88 @@ cost probe on {3d,3p,4d} (gated — SA cells undeclared until priced),
 the wave-close two-axis review + design survey + the refactoring
 round (user-strengthened), then ticket 31 (U).
 
+## Step 8, third round (2026-11-02 — the Ti pass: compression + grammar)
+
+[Record repair 2026-11-02: this and the fourth round's ticket edits
+silently no-opped at their commits (an unstated-em-dash mismatch in a
+script replace; the commit messages carried the content until now).]
+
+The methods renderer's ROW POLICY (the compression, renderer-local --
+declined as scenario data in round 1): run cells only (pending and
+void cells leave the table); within a (method, mask, substrate, fold)
+group the AO head absorbs MO/NO runs agreeing within 1e-4 Eh -- named
+in its start cell, "(+mo,no)"; disagreement keeps its own row (the
+basin and construction classes stay visible); a window with no run
+cells renders the POINTER line (declared, gated -- the anchor-first
+scenario named; one regen away).  The policy lives in ONE home
+(_groups/_collapsed, shared by rendering and the structural asserts);
+window_section extracted for pinnability.  THE PIN:
+test_method_ladder_row_policy (byte-determinism, full collapse,
+disagreement, pending/void drop, pointer branch).
+
+Ti TABLES re-sectioned to the grammar; all three emitters re-rendered
+(method ladder 29 run cells -> 20 rows + 2 pointer lines; lattice
+6/6; lane 7 legs byte-stable); net -91 lines.  THE STORE FACT the
+compression exposed: the (4,10)/(4,14) planned windows have ZERO run
+cells (the 8 'anchors' never ran); both windows render pointers.
+
+## Step 8, fourth round (2026-11-02 — the C/Si pass + retirement)
+
+C and Si re-sectioned into the grammar (the cross-check legends die --
+README carries the key once; the basin map labeled a READING with its
+session source).  Si's multiplet table carried a DEAD POINTER (values
+in results/*_report.md -- the dir does not exist; the values were
+nowhere in the tree): the staged pipeline ran for Si on the cached
+reference and the Production table carries the real values (3P
+-0.667376 / 1D -0.607963 / 1S -0.518843; report.md+json committed).
+The scan sections are gone from every atom; RETIRED the artifacts:
+scan.md x3 and sa_decomposition.md x3 deleted (regenerable by
+scripts/radial_scan.py where ticket 33 needs them; sa_decomposition's
+undelivered content -- the per-rung attribution column, the
+tilt-follow curves -- is ticket 33's requirements list).  The lane
+emitters re-rendered byte-stable on both rewritten files.
+
+## Step 8, fifth round (2026-11-02 — the user's table review: A-prime)
+
+The review's directives, executed: the OPEN-QUESTIONS sections leave
+the atom files (their content is cross-atom/general -- new tables
+deliver readings when their time comes); the cross-check COLUMN
+leaves the method ladders (README keeps the what-it-is/how-to-deal
+note; values live in the store); article-free headings everywhere;
+the LANE vocabulary renamed LADDER (the section carries window
+families x routes -- a route-named type would lie once the free rows
+arrive).
+
+THE LADDER TABLE redesigned (the meters speak, no verdict column):
+
+| route | method | window | CAS | fold | dets | E, Eh | ΔE, mEh |
+  | E, eV | ΔE, eV | ⟨L²⟩ | ptp (Eh) | ‖[H,Lz]‖ | ‖[H,L²]‖ |
+
+- ΔE (was "vs declared") anchors on the primary leg; eV twins as in
+  the method ladder;
+- route/method columns carry the treatment identity (pinned/CI today;
+  the free-route rows arrive with the route axis -- the user's "all
+  we run with pinned we can run with free");
+- ⟨L²⟩ renders ONE value when the branch components agree and the
+  min-max RANGE when they scramble (Ti 3d4d reads 6.0-30.0 -- the
+  scramble in meters, the verdict word retired);
+- ptp = the component spread, the always-available degeneracy
+  certificate;
+- ‖[H,Lz]‖/‖[H,L²]‖: EXACT dense commutators, computed by
+  run_lane_cell under a 6k-determinant memory cap (_COMM_CAP); past
+  it they read em-dash (structural zeros for the certified fold
+  class -- the note lives in README's ladder key).  All legs re-run
+  fresh with the new payload fields; every total bit-stable vs the
+  certified record.
+
+REMAINING: the SA cost probe on {3d,3p,4d} (user-enabled in
+principle -- the priced statement first), then the route axis (the
+free-route rows: CI / CASSCF / SA-CASSCF per leg -- the user's
+"all we run with pinned we can run with free"; machinery = the
+fold-tag resolution in the free driver + the c_core passthrough for
+pinned SA), the wave-close two-axis review + design survey + the
+refactoring round (user-strengthened), then ticket 31 (U).
+
 ## References
 
 

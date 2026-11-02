@@ -58,8 +58,8 @@ one NO window; NIST; 3rd-d point.
 
 | cell | status | E, Eh | ⟨L²⟩ | ‖[P,Lz]‖ | ‖[P,Lp]‖ |
 |---|---|---|---|---|---|
-| study_u_no_no2_relax | ok | -49.899728 | 30.7639 | 2.1e-13 | 4.3e-13 |
-| study_u_no_no4_relax | ok | -49.918895 | 26.4817 | 5.7e-13 | 1.2e-12 |
+| study_u_no_no2_relax | ok | -49.8997 | 30.7639 | 2.1e-13 | 4.3e-13 |
+| study_u_no_no4_relax | ok | -49.9189 | 26.4817 | 5.7e-13 | 1.2e-12 |
 
 <!-- study:end -->
 

@@ -247,7 +247,7 @@ configurations per root (top-2 determinants):
   sc_3d4s4p4d4f_2-1_casci_mo_-_pol_avg         root 8: s^1.00p^1.00d^1.00 (|c|=0.72); s^1.00p^1.00d^1.00 (|c|=0.43)
 
 lane cells (pinned-route term energies) and void cells (scenario-gated):
-  sc_3d4s@ar_2-1_casci_ao_-_pur_avg            E_term    -759.72743563  ptp 7.5e-15  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']
+  sc_3d4s@ar_2-1_casci_ao_-_pur_avg            E_term    -759.72743563  ptp 7.3e-15  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']
   sc_3d3p@semi_4-3_casci_ao_-_pur_avg          E_term    -759.78711958  ptp 1.1e-14  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']
   sc_3d3p4d@semi_4-3_casci_ao_-_pur_avg        E_term    -759.84086955  ptp 2.5e-14  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']
   sc_3d3p4s@1s2s2p3s_5-4_casci_ao_-_pur_avg    E_term    -759.78987426  ptp 1.1e-13  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']

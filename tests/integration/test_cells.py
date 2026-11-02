@@ -692,11 +692,13 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
 
 @fast
 def test_lane_emitter_deterministic():
-    """The lane emitter's generated block: byte-identical across calls
-    from the same payloads (the emitter REPORTS, the ladder pins
-    certify), the verdict column reads the meters (exact vs not-a-term
-    window), a leg without a payload renders pending, and a missing
-    anchor leg refuses."""
+    """The ladder emitter's generated block: byte-identical across
+    calls from the same payloads (the emitter REPORTS, the ladder pins
+    certify), the treatment columns carry the route/method identity,
+    ΔE anchors on the primary leg with eV twins, a scrambling leg
+    reads the ⟨L²⟩ RANGE (no verdict column), a NaN commutator
+    (past the dense-meter cap) reads an em-dash, a leg without a
+    payload renders pending, and a missing anchor leg refuses."""
     import importlib.util
     from pathlib import Path as _Path
 
@@ -711,16 +713,22 @@ def test_lane_emitter_deterministic():
     keys = lane_keys(cs)
     payloads = {k.address: {"total": -759.7274, "n_det": 90,
                             "l2": [6.0] * 5, "s2": [0.75] * 5,
-                            "ptp": 1e-13} for k in keys}
+                            "ptp": 1e-13,
+                            "comm_norm_h_lz": 1e-14,
+                            "comm_norm_h_l2": 1e-13} for k in keys}
     block = mod.section(cs, payloads)
     assert block == mod.section(cs, payloads)
     lines = [l for l in block.splitlines() if l.startswith("|")]
     assert len(lines) == 2 + len(keys), lines   # head + sep + the legs
-    assert lines[2].startswith("| 3d4s | (3,6) | Ar |")
-    assert "²D exact" in lines[2] and "| 0 |" in lines[2]
-    assert lines[3].startswith("| 3d3p | (7,8) | semi |")
+    assert lines[0].startswith("| route | method | window | CAS | fold"
+                               " | dets | E, Eh | ΔE, mEh | E, eV |"
+                               " ΔE, eV |")
+    assert lines[2].startswith("| pinned | CI | 3d4s | (3,6) | Ar |")
+    assert "| 0 |" in lines[2]                  # the anchor's ΔE
+    assert f"| −{759.7274 * 27.2114:.4f} |" in lines[2]   # the eV twin
+    assert lines[3].startswith("| pinned | CI | 3d3p | (7,8) | semi |")
     # the extension legs render in declaration order after the pair
-    assert [l.split("|")[1].strip() for l in lines[3:]] == [
+    assert [l.split("|")[3].strip() for l in lines[3:]] == [
         "3d3p", "3d3p4d", "3d3p4s", "3s3p3d"]
 
     no_payload = dict(payloads)
@@ -731,11 +739,22 @@ def test_lane_emitter_deterministic():
     with pytest.raises(SystemExit, match="anchor"):
         mod.section(cs, no_anchor)
 
-    # a scrambling leg (the planned-window class) reads NOT-a-term
+    # a scrambling leg (the planned-window class): the meters speak --
+    # the ⟨L²⟩ RANGE carries the scramble, no verdict column exists
     scramble = dict(payloads)
     scramble[keys[1].address] = {**payloads[keys[1].address],
                                  "l2": [6.0, 12.0, 6.0, 6.0, 30.0]}
-    assert "not a ²D window" in mod.section(cs, scramble)
+    sec = mod.section(cs, scramble)
+    assert "6.0–30.0" in sec and "not a" not in sec
+
+    # past the dense-meter cap: the commutators read em-dash
+    cap = dict(payloads)
+    cap[keys[1].address] = {**payloads[keys[1].address],
+                            "comm_norm_h_lz": float("nan"),
+                            "comm_norm_h_l2": float("nan")}
+    row = [l for l in mod.section(cs, cap).splitlines()
+           if l.startswith("| pinned | CI | 3d3p ")][0]
+    assert row.endswith("| — | — |")
 
 
 @fast
@@ -812,10 +831,9 @@ def test_method_ladder_row_policy():
     sec = mod.window_section("H", "3d4s", keys, agree, -848.4065)
     assert sec == mod.window_section("H", "3d4s", keys, agree, -848.4065)
     rows = [r for r in sec.splitlines() if r.startswith("|")]
-    ao = [r for r in rows if "free" in r and "polarized" in r
-          and "**CASSCF**" in r][0]
+    ao = [r for r in rows if r.startswith("| CASSCF, free (")][0]
     assert "(+mo,no)" in ao
-    assert not any("PySCF MO" in r for r in rows)   # all collapsed
+    assert not any(", MO" in r or ", NO" in r for r in rows)  # collapsed
 
     # a DISAGREEING mo run keeps its own row (the basin class)
     basin = dict(agree)
@@ -825,7 +843,7 @@ def test_method_ladder_row_policy():
     rows = [r for r in mod.window_section(
         "H", "3d4s", keys, basin, -848.4065).splitlines()
         if r.startswith("|")]
-    assert sum("PySCF MO" in r for r in rows) == 1
+    assert sum(", MO" in r for r in rows) == 1
 
     # pending cells leave the table; a void cell is not a run either
     sparse = {k.address: payload(-848.4) for k in keys

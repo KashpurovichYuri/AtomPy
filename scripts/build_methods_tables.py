@@ -4,16 +4,17 @@ contract: the table and its source cannot diverge).
 
 Usage: python scripts/build_methods_tables.py [Ti]
 
-One table per RUN declared window under the ROW POLICY (the
-compression): a cell without a stored payload (pending, or void under
-a scenario) leaves the table -- a window with no run cells renders a
-pointer line instead of a pending grid (the full grid is one regen
-away); within a (method, mask, substrate, fold) group the AO row is
-the head and MO/NO runs agreeing with it within EPS collapse into its
-start cell -- disagreement stays as its own row (the basin and
-construction classes live there).  No verdict column: the classes and
-their row-level discriminators are the reading key in README --
-the one home.
+One table per RUN declared window, the SUMMARY SHAPE (one treatment
+column composes the identity -- the C/Si/Sc convention), under the ROW
+POLICY (the compression): a cell without a stored payload (pending,
+or void under a scenario) leaves the table -- a window with no run
+cells renders a pointer line instead of a pending grid (the full grid
+is one regen away); within a (method, mask, substrate, fold) group
+the AO row is the head and MO/NO runs agreeing with it within EPS
+collapse into its treatment name -- disagreement stays as its own row
+(the basin and construction classes live there).  No verdict column:
+the classes and their row-level discriminators are the reading key in
+README -- the one home.
 
 Notes
 -----
@@ -50,7 +51,6 @@ from atomterm.cases import CAMPAIGN
 from atomterm.cells import grid_keys, window_grid
 
 EV = 27.2114
-DASH = "—"
 EPS = 1e-4          # Eh -- agreeing starts collapse into the AO head
 
 # the declared windows this file renders, with their presentation
@@ -60,29 +60,49 @@ EPS = 1e-4          # Eh -- agreeing starts collapse into the AO head
 # conventions live in README; the anchor line is COMPUTED from the
 # store's rohf_energy).
 WINDOWS = [
-    ("## Production — the method ladder, CAS(4,6)/{3d,4s}", "3d4s"),
+    ("## Method ladder, CAS(4,6)/{3d,4s}", "3d4s"),
     ("### CAS(4,10)/{3d,4d} — declared, gated", "3d4d"),
     ("### CAS(4,14)/{3d,4s,4p,4d} — declared, gated", "3d4s4p4d"),
 ]
-BOUNDARY = "## Readings — open questions"
+BOUNDARY = "## Studies (frozen history; ticket 28)"
 POINTER = ("Declared, not yet run -- the optimizer cells are void "
            "until their CASCI anchors are read (the anchor-first "
            "scenario). One regen away: `regen_cells.py Ti --window "
            "{window}`.")
 
-HEAD = ("| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | "
-        "E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | "
-        "Span (Lowdin) | Elec (Lowdin) |")
-SEP = "|" + "---|" * 15
+# the summary shape (the C/Si/Sc convention): ONE treatment column
+# composes the identity (method, mask, substrate, fold, starts); the
+# meters and the span composition carry the reading
+HEAD = ("| treatment | E, Eh | ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | "
+        "‖[H,Lz]‖ | ‖[H,L²]‖ | Span (Lowdin) |")
+SEP = "|" + "---|" * 9
 
 # identity -> display (the ONLY branching the renderer does)
-METHOD_NAMES = {"casci": "**CASCI**", "casscf": "**CASSCF**",
-                "sa-casscf": "**SA-CASSCF**"}
-START_NAMES = {"mo": "PySCF MO", "no": "NO"}
-MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen window",
+METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
+                "sa-casscf": "SA-CASSCF"}
+START_NAMES = {"ao": "", "mo": ", MO", "no": ", NO"}
+MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
               "virtmix": "virtual-mix"}
-SUBSTRATE_NAMES = {"pol": "polarized", "pur": "purified"}
 FOLD_NAMES = {"raw": "raw", "avg": "averaged", "frac": "fractional"}
+
+
+def _treatment(k, collapsed=()) -> str:
+    """The treatment column: the cell's identity composed into one
+    name -- CASCI names its fold (pur implies averaged, the canonical
+    pur-fold rule); an optimizer names mask and the pur substrate
+    (pol implied); a non-AO start names itself; a collapsed head
+    names the starts it absorbed."""
+    name = METHOD_NAMES[k.method]
+    if k.method == "casci":
+        return (f"{name}, pur" if k.substrate == "pur"
+                else f"{name}, {FOLD_NAMES[k.fold]}")
+    name += f", {MASK_NAMES[k.mask]}"
+    if k.substrate == "pur":
+        name += ", pur"
+    name += START_NAMES[k.start]
+    if collapsed:
+        name += f" (+{','.join(collapsed)})"
+    return name
 
 
 def _cfg(w: dict) -> str:
@@ -102,31 +122,16 @@ def _cfg(w: dict) -> str:
     return " ".join(out)
 
 
-def _elec(n: dict | None) -> str:
-    """The ground root's electron count per l (payload ``electrons``,
-    analysis.shell_occupations) -- partitions the active electron
-    count. Blank when the payload predates the field. Compact:
-    s1.2 p0 d2.8 f0."""
-    if n is None:
-        return ""
-    out = []
-    for l in ("s", "p", "d", "f"):
-        v = float(n.get(l, 0.0))
-        out.append(f"{l}{v:.1f}" if v >= 5e-3 else f"{l}0")
-    return " ".join(out)
-
-
 def _values(p: dict, anchor: float) -> list[str]:
     """The value cells of a run cell: the as-run E in Eh/eV, ΔE vs the
-    anchor, the meters, the span and electron compositions -- sign
-    minus normalized."""
+    anchor, the meters, the span composition -- sign minus
+    normalized."""
     asrun = float(p["energies_pyscf"][0])
     de_eh = asrun - anchor
     out = [f"{asrun:.4f}", f"{de_eh * 1e3:+.1f}", f"{asrun * EV:.4f}",
            f"{de_eh * EV:+.4f}", f"{p['ground_l2']:.4f}",
-           f"{p['ground_lz2']:.4f}", f"{p['comm_norm_h_lz']:.1e}",
-           f"{p['comm_norm_h_l2']:.1e}", _cfg(p["window"]),
-           _elec(p.get("electrons"))]
+           f"{p['comm_norm_h_lz']:.1e}", f"{p['comm_norm_h_l2']:.1e}",
+           _cfg(p["window"])]
     return [re.sub(r"(?<!e)-", "−", v) for v in out]   # sign minus only
 
 
@@ -137,35 +142,13 @@ def _run(p: dict | None) -> dict | None:
     return p
 
 
-def _row(cells, k, prev, anchor, collapsed=()):
-    """One table row from a run cell; every presentation choice (bold
-    method heads, blank factor inheritance, the CASCI dash, the
-    collapsed-starts note) derives from the key's identity and its
-    predecessor's."""
+def _row(cells, k, anchor, collapsed=()):
+    """One table row from a run cell: the composed treatment name and
+    the value cells."""
     p = _run(cells.get(k.address))
-    m_new = prev is None or prev.method != k.method
-    # the head-row rule: factor cells fill on AO-start rows (and every
-    # CASCI row names its substrate/fold -- blank inheritance would
-    # misread row 2 as raw); the virtual-mix diagnostic names only its
-    # mask; CASCI repeats the mask dash (no optimizer)
-    start = (f"AO {{{''.join(k.shell_patterns)}}}" if k.start == "ao"
-             else START_NAMES[k.start])
-    if collapsed:
-        start += f" (+{','.join(collapsed)})"
-    head = [
-        METHOD_NAMES[k.method] if m_new else "",
-        "" if (k.method == "casci" and not m_new) else start,
-        DASH if k.method == "casci" else
-        (MASK_NAMES[k.mask] if k.start == "ao" else ""),
-        SUBSTRATE_NAMES[k.substrate]
-        if k.method == "casci" or (k.start == "ao" and k.mask != "virtmix")
-        else "",
-        FOLD_NAMES[k.fold]
-        if k.method == "casci" or (k.start == "ao" and k.mask != "virtmix")
-        else "",
-    ]
     assert p is not None, "the policy renders run cells only"
-    return "| " + " | ".join(head + _values(p, anchor)) + " |"
+    vals = _values(p, anchor)
+    return f"| {_treatment(k, collapsed)} | " + " | ".join(vals) + " |"
 
 
 def _groups(keys, cells) -> dict[tuple, dict[str, tuple]]:
@@ -207,7 +190,7 @@ def render_window(keys, cells, anchor) -> list[str]:
     groups = _groups(keys, cells)
     collapsed = _collapsed(groups)
 
-    rows, prev = [], None
+    rows = []
     for k in keys:
         p = _run(cells.get(k.address))
         if p is None:
@@ -215,9 +198,8 @@ def render_window(keys, cells, anchor) -> list[str]:
         g = (k.method, k.mask, k.substrate, k.fold)
         if k.start != "ao" and k.start in collapsed.get(g, ()):
             continue
-        rows.append(_row(cells, k, prev, anchor,
+        rows.append(_row(cells, k, anchor,
                          collapsed.get(g, ()) if k.start == "ao" else ()))
-        prev = k
     return rows
 
 

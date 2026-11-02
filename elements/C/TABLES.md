@@ -4,14 +4,14 @@ cc-pVDZ. Reference **ROHF −37.682418 Eh** (raw core = averaged fold).
 Sectors Ms = 1 and Ms = 0. Section grammar and column keys —
 README · Results.
 
-## Contract — term table
+## Term table
 
 | CAS / window | Sector | Dets | Term → states |
 |---|---|---|---|
 | CAS(2,3) / {2p} | Ms=1 | 3 | ³P: 3 |
 | CAS(2,3) / {2p} | Ms=0 | 9 | ³P: 3, ¹D: 5, ¹S: 1 |
 
-## Production — multiplet energies
+## Multiplet energies
 
 Route free · partition averaged fold · source `report.md` (`scripts/run.py C`).
 
@@ -21,32 +21,32 @@ Route free · partition averaged fold · source `report.md` (`scripts/run.py C`)
 | ¹D | 5 | −1.012515 | +0.0881 | −2…2 |
 | ¹S | 1 | −0.880374 | +0.2202 | 0 |
 
-## Lane — the pinned lane
+## CAS ladder
 
-Route pinned · partition the fold column · source `cells.json` (as-run) · pins `test_symm_lane.py`.
+Routes in rows · partition fold column · source `cells.json` (as-run) · pins `test_symm_lane.py`.
 
 <!-- lane:begin -->
-| window | CAS | fold | dets | E, Eh | vs declared | term |
-|---|---|---|---|---|---|---|
-| 2p | (2,3) | {1s,2s} | 3 | −37.0678 | 0 | ³P exact |
+| route | method | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | ptp (Eh) | ‖[H,Lz]‖ | ‖[H,L²]‖ |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| pinned | CI | 2p | (2,3) | {1s,2s} | 3 | −37.0678 | 0 | −1008.6665 | +0.0000 | 2.0000 | 0e+00 | 0.0e+00 | 0.0e+00 |
 <!-- lane:end -->
 
-## Production — the method ladder, CAS(2,3)/{2p}
+## Method ladder, CAS(2,3)/{2p}
 
-Route free · partition the treatment column · source `cells.json` (the committed draw).
+Route free · partition treatment column · source `cells.json` (the committed draw).
 
-| treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | cross-check (mEh) | note |
+| treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | note |
 |---|---|---|---|---|---|---|
-| ROHF (anchor) | −37.682418 | 0 | — | — | 0 | |
-| CASCI, averaged | −37.431611 | +250.8 | 2.0000 | 1.3e-15 | ~0 | the confinement cost |
-| CASCI, raw | −37.431611 | +250.8 | 2.0000 | 9.8e-06 | ~0 | polarized-core detector |
-| CASCI, fractional | −37.440244 | +242.2 | 2.0000 | 0.0 | ~0 | a different functional |
-| CASSCF, free | −37.682418 | +0.0 | 1.6864 | 2.3e-02 | ~0 | member-tilted gauge |
-| CASSCF, frozen window | −37.440394 | +242.0 | 2.0000 | 7.6e-17 | ~0 | |
-| SA-CASSCF, free | −37.682391 | +0.0 | 2.0000 | 1.0e-10 | ~0 | lands symmetric |
-| SA-CASSCF, frozen, pur | −37.440382 | +242.0 | 2.0000 | 0.0 | 0.0 | the certified rung |
+| ROHF (anchor) | −37.682418 | 0 | — | — | |
+| CASCI, averaged | −37.431611 | +250.8 | 2.0000 | 1.3e-15 | the confinement cost |
+| CASCI, raw | −37.431611 | +250.8 | 2.0000 | 9.8e-06 | polarized-core detector |
+| CASCI, fractional | −37.440244 | +242.2 | 2.0000 | 0.0 | a different functional |
+| CASSCF, free | −37.682418 | +0.0 | 1.6864 | 2.3e-02 | member-tilted gauge |
+| CASSCF, frozen window | −37.440394 | +242.0 | 2.0000 | 7.6e-17 | |
+| SA-CASSCF, free | −37.682391 | +0.0 | 2.0000 | 1.0e-10 | lands symmetric |
+| SA-CASSCF, frozen, pur | −37.440382 | +242.0 | 2.0000 | 0.0 | the certified rung |
 
-## Readings — the basin map
+## Basin map
 
 Free CASSCF start dependence (CAS(2,3)/{2p}, Ms=1) · source the session record (the retired `scripts/basin_map.py`).
 

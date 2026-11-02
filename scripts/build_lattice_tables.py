@@ -30,7 +30,7 @@ from atomterm.cells import lattice_keys  # noqa: E402
 SHELL_COLS = {"s": 1, "p": 3, "d": 5, "f": 7, "g": 9, "h": 11}
 HEAD = "| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ |"
 SEP = "|" + "---|" * 7
-HEADING = "## Production — window lattice"
+HEADING = "## Window lattice"
 # first pass: accept any legacy lattice heading (the pre-grammar spellings)
 _LEGACY = re.compile(r"^## (?:Production — )?[Ww]indow lattice.*$", re.M)
 
