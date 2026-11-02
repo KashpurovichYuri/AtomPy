@@ -349,8 +349,8 @@ meaningful NO source is the term-averaged CI density.
 
 Everything human-readable lives in `elements/<Atom>/`: `TABLES.md`,
 `report.md/json` (term tables), `cells.json/md` (the treatment grid),
-`scan.md`, plus frozen one-shot artifacts. New atom = new element
-file, not README growth. Regeneration: term tables — `scripts/run.py`
+plus frozen one-shot artifacts. New atom = new element file, not
+README growth. Regeneration: term tables — `scripts/run.py`
 (the per-atom calls recorded in each report header); cells —
 `scripts/regen_cells.py` (chkfiles land under `rungs/`, gitignored);
 methods tables — `scripts/build_methods_tables.py`; lattice sections —
