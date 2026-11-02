@@ -230,6 +230,22 @@ machinery.
 All tables live in `elements/<Atom>/TABLES.md` (committed,
 regenerable). This section is the reading key and one excerpt.
 
+**Tables grammar** — every element file, four section types:
+
+| Type | Carries | Source of truth |
+|---|---|---|
+| **Contract** | the combinatorial term census per CAS/window — no energies, route-independent | hand, checked against the solver |
+| **Production** | the declared campaign as run: multiplet energies, window lattices, the methods grid | `report.md` / `cells.json` — regenerated, never hand-copied |
+| **Lane** | the pinned route's CAS ladder + its readings | `cells.json` between markers; the ladder pins certify |
+| **Readings** | scan verdicts, basin maps, open questions | session, cited |
+
+Every energy table states its **route** (free — our symmetry-blind
+native driver, symmetry measured and restored by averaging; pinned —
+symmetry by D2h construction, one `wfnsym` solver per term
+component), its **partition** (the fold — Fold notation; a column
+when it varies, stated once when uniform), and its **source**, as a
+one-line tag under the heading. Per-section legends live nowhere.
+
 Columns of a methods table:
 
 - **E** — the run's variational total (Eh; eV in parentheses).
@@ -246,6 +262,22 @@ Columns of a methods table:
 - **Terms** — from ⟨L̂²⟩/⟨S²⟩; the M_L-resolved reading (L̂z
   diagonalized inside the ground eigenspace) is the multiplet
   demonstration.
+- **cross-check** (the summary tables) — max|dE| of the analysis
+  ruler against the run's own totals: ~0 by construction; an mEh-class
+  residue is core-field anisotropy + window definition; the swap
+  row's ~800 mEh is the partition-bookkeeping shift (Methods).
+
+Columns of a lane table (the pinned CAS ladder):
+
+- **CAS / dets** — the leg's active size and sector determinant
+  count; **fold** — the leg's partition (the column that varies).
+- **E** — the TERM energy: the mean over the 2L+1 branch components,
+  each solved in its D2h block, plus the fold-independent bookkeeping
+  constant — legs compare across folds (not sector grounds).
+- **vs declared** — gap to the leg spanning the case's primary window.
+- **term** — generated from the meters: `exact` when every component
+  reads L(L+1) and S(S+1) and the components sit degenerate; else
+  `not a … window` (the scramble's nuance stays in the readings).
 
 The meters, and what each is blind to (ε = ‖ρ_c − ρ̄_c‖/‖ρ̄_c‖, the
 core anisotropy — `core_anisotropy()`, no CI involved):

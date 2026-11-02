@@ -1,26 +1,26 @@
 # Sc — scandium (d¹)
 
 cc-pVDZ. Reference **ROHF −759.736255 Eh** (3d¹4s²; M_S = ½; S
-half-integer). Provenance: `cells.json` (Methods compared; key-addressed),
-the lattice logs (window lattice), `scan.md`, `sa_decomposition.md`. Records: escape/swap
-basins, bimodal SA — AGENTS facts 15/20; frac septet — fact 21d; AVAS
-cross-check — fact 19.
+half-integer). Section grammar and column keys — README · Results.
 
-## Term table — the combinatorial contract
+## Contract — term table
 
 | CAS / window | Sector | Dets | Term → states |
 |---|---|---|---|
 | CAS(1,5) / {3d} | Ms=½ | 5 | ²D: 5 |
 | CAS(3,6) / {3d,4s} | Ms=½ | 90 | ²D: 20, ⁴F: 14, ²F: 14, ²G: 18, ⁴P: 6, ²P: 6, ²S: 1, ²H: 11 |
 
-## Multiplet energies (CAS(1,5), averaged fold)
+## Production — multiplet energies
+
+Route free · partition averaged fold · source `report.md` (`scripts/run.py Sc`).
 
 | Term | States | Energy (Eh) | Gap to ground | M_L set |
 |---|---|---|---|---|
 | ²D | 5 | −0.342549 | — | −2…2 |
 
-## Window lattice — direct CASCI at matched cost (frozen CASCI; ROHF reference
-−759.736 Eh; the d-atom window already correlates)
+## Production — window lattice
+
+Route free · partition averaged fold · source the lattice logs (session).
 
 | window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ | NO, Eh | ⟨L²⟩ |
 |---|---|---|---|---|---|---|---|---|
@@ -33,11 +33,25 @@ cross-check — fact 19.
 | 3d4s4p4d5d | (3,19) | 3,249 | −759.765 | 6.000 | — | — | — | — |
 | 3d4s4p4d4f | (3,21) | 4,410 | **−759.769** | 6.000 | — | — | — | — |
 
-## Semi-core scaling — the 3p window at d¹ (the CAS ladder's Sc pair)
+## Production — methods compared (3d4s)
 
-The ladder's Sc legs (ticket 32; the same uniform construction as the
-Ti ladder; certifying pins in `test_symm_tm.py`; the block between the
-markers is generated from `cells.json` — as-run):
+Route free · partition the treatment column · source `cells.json` (the committed draw).
+
+| treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | cross-check (mEh) | note |
+|---|---|---|---|---|---|---|
+| ROHF (anchor) | −759.736255 | 0 | — | — | 0 | forced filling |
+| CASCI, averaged | −759.729565 | +6.7 | 5.9998 | 8.9e-04 | 1.3 | reference fold |
+| CASCI, raw | −759.729565 | +6.7 | 6.0003 | 2.8e-02 | ~0 | polarized-core detector |
+| CASCI, fractional | −759.699492 | +36.8 | 6.0000 | 3.3e-14 | ~0 | different functional |
+| CASSCF, free | −759.767951 | −31.7 | 0.0469 | 5.7e-01 | 1.9 | escape — no term |
+| CASSCF, frozen window | −759.729655 | +6.6 | 5.9998 | 8.9e-04 | 1.3 | |
+| SA-CASSCF, free | −759.749511 | −13.3 | 6.0020 | 7.9e-01 | 798.6 | swap basin — totals only |
+| CASCI, pur | −759.728891 | +7.4 | 6.0000 | 3.4e-14 | 0.0 | pur substrate |
+| SA-CASSCF, frozen, pur | −759.728978 | +7.3 | 6.0000 | 6.5e-14 | 0.0 | the certified rung |
+
+## Lane — the pinned ladder (semi-core scaling)
+
+Route pinned · partition the fold column · source `cells.json` (as-run) · pins `test_symm_tm.py::test_cas_ladder_*`.
 
 <!-- lane:begin -->
 | window | CAS | fold | dets | E, Eh | vs declared | term |
@@ -53,39 +67,24 @@ d-count-independent.  What was d²-specific was only the free SA's torn
 swap route into a 6-orbital window (the mechanism in the Ti tables);
 at the window level there is no d-count effect to find.
 
-## Methods compared at 3d4s (cross-check = the averaging effect
-(1.3 mEh; ticket 25) — the old ~90 mEh window-definition offset was an
-artifact of the retired raw-AO-span analysis convention; 0 on the pur
-rows)
+## Readings — frozen-scan verdicts
 
-| treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | cross-check (mEh) | note |
-|---|---|---|---|---|---|---|
-| ROHF (anchor) | −759.736255 | 0 | — | — | 0 | forced filling |
-| CASCI, averaged | −759.729685 | +6.7 | 6.0000 | 5.6e-15 | 1.8 | reference fold |
-| CASCI, raw | −759.729565 | +6.7 | 6.0004 | 2.8e-02 | ~0 | polarized-core detector |
-| CASCI, fractional | −759.699492 | +36.8 | 6.0000 | 3.4e-14 | ~0 | different functional |
-| CASSCF, free | −759.767769 | −31.5 | 0.0526 | 3.2e-01 | 1.9 | escape — no term |
-| CASSCF, frozen window | −759.729655 | +6.6 | 5.9998 | 2.8e-03 | 1.3 | |
-| SA-CASSCF, free | −759.749511 | −13.3 | 6.0020 | 8.3e-01 | 798.6 | swap basin — totals only |
-| CASCI, pur | −759.728891 | +7.4 | 6.0000 | 6.6e-15 | 0.0 | pur substrate |
-| SA-CASSCF, frozen, pur | −759.728978 | +7.3 | 6.0000 | 3.5e-14 | 0.0 | the certified rung |
-
-## Frozen-scan verdicts (Motivation; curves in `scan.md`)
+Curves: `scan.md`.
 
 | radial rotation (m-symmetric) | single-member tilt |
 |---|---|
 | rises everywhere | descends (−0.3 mEh @ δ = 0.1; −0.9 with four members) — JT-like |
 
-Ticket-24 amendment: the +25 mEh radial ceiling is a window statement
-(the lattice crosses below the escape via 4f, −3.06 mEh).
+The +25 mEh radial ceiling is a window statement (the lattice crosses
+below the escape via 4f, −3.06 mEh).
 
-## Open questions
+## Readings — open questions
 
 Semicore measured (−59.7 mEh, the ladder pair; d-count-independent);
 spin–orbit of ²D; the frac-occ septet ordering is
 SCF-chaos-dependent — never pin.
 
-## Studies (generated between the markers; ticket 28)
+## Studies (frozen history; ticket 28)
 
 <!-- study:begin --> (frozen history: the generator (atomterm.study) is retired, commit ad28d3a -- the block stays as the committed record; the lane/lattice/methods blocks are the living generated tables)
 
