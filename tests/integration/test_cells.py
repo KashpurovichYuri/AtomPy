@@ -778,3 +778,70 @@ def test_lattice_emitter_deterministic():
     cells_ = row.split("|")
     assert cells_[6].strip() == "pending" and cells_[7].strip() == ""
     assert cells_[4].strip() == "−759.7296"
+
+
+@fast
+def test_method_ladder_row_policy():
+    """The methods renderer's ROW POLICY (the compression): run cells
+    only -- pending and void cells leave the table; within a group the
+    AO head absorbs MO/NO runs agreeing within EPS (named in its start
+    cell), disagreement keeps its own row; a window with no run cells
+    renders the POINTER line, not a pending grid; byte-deterministic."""
+    import importlib.util
+    from pathlib import Path as _Path
+
+    loader = importlib.util.spec_from_file_location(
+        "build_methods_tables",
+        _Path(__file__).resolve().parents[2] / "scripts"
+        / "build_methods_tables.py")
+    mod = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(mod)
+
+    cs = CAMPAIGN["Ti"]
+    keys = grid_keys(cs)          # the primary window's factor grid
+
+    def payload(e):
+        return {"energies_pyscf": [e], "ground_l2": 12.0,
+                "ground_lz2": 4.0, "comm_norm_h_lz": 1e-9,
+                "comm_norm_h_l2": 1e-8, "window": {"d": 1.0},
+                "electrons": {"d": 2.0}}
+
+    # every cell ran and the optimizer start-triplets agree: full
+    # collapse (every group renders one AO row naming +mo,no)
+    agree = {k.address: payload(-848.4) for k in keys}
+    sec = mod.window_section("H", "3d4s", keys, agree, -848.4065)
+    assert sec == mod.window_section("H", "3d4s", keys, agree, -848.4065)
+    rows = [r for r in sec.splitlines() if r.startswith("|")]
+    ao = [r for r in rows if "free" in r and "polarized" in r
+          and "**CASSCF**" in r][0]
+    assert "(+mo,no)" in ao
+    assert not any("PySCF MO" in r for r in rows)   # all collapsed
+
+    # a DISAGREEING mo run keeps its own row (the basin class)
+    basin = dict(agree)
+    mo = next(k for k in keys if k.method == "casscf" and k.mask is None
+              and k.substrate == "pol" and k.start == "mo")
+    basin[mo.address] = payload(-848.35)
+    rows = [r for r in mod.window_section(
+        "H", "3d4s", keys, basin, -848.4065).splitlines()
+        if r.startswith("|")]
+    assert sum("PySCF MO" in r for r in rows) == 1
+
+    # pending cells leave the table; a void cell is not a run either
+    sparse = {k.address: payload(-848.4) for k in keys
+              if k.start == "ao"}
+    sec = mod.window_section("H", "3d4s", keys, sparse, -848.4065)
+    rows = [r for r in sec.splitlines() if r.startswith("|")]
+    assert all("(+" not in r for r in rows)      # nothing to collapse
+    void = dict(agree)
+    void[keys[0].address] = {"void_reason": "scenario"}
+    rows = [r for r in mod.window_section(
+        "H", "3d4s", keys, void, -848.4065).splitlines()
+        if r.startswith("|")]
+    assert not any("raw" in r for r in rows)     # the void CASCI row is gone
+
+    # no run cells at all: the POINTER line, no table
+    sec = mod.window_section("H", "3d4d", window_grid(cs, "3d4d"),
+                             {}, -848.4065)
+    assert "regen_cells.py Ti --window 3d4d" in sec
+    assert not [r for r in sec.splitlines() if r.startswith("|")]

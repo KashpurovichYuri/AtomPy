@@ -1,13 +1,10 @@
-# Ti — titanium
+# Ti — titanium (3d²4s²)
 
-cc-pVDZ. Reference **ROHF −848.406489 Eh** (3d²4s², gated good-basin).
-M_S = 1. Ground term ³F. Provenance: `cells.json` (Methods compared — key-addressed, regenerated in-place),
-the lattice logs (window lattice), `report.md/json`, `scan.md`. Records: the gated reference —
-AGENTS fact 21a; escape/swap/JT — the classes and their discriminators:
-README ·
-Motivation; ⟨L²⟩ = 0 MO windows — open, elements/U/.
+cc-pVDZ. Reference **ROHF −848.406489 Eh** (gated good-basin).
+M_S = 1. Ground term ³F. Section grammar and column keys —
+README · Results.
 
-## Term table — the combinatorial contract
+## Contract — term table
 
 | CAS / window | Sector | Dets | Term → states |
 |---|---|---|---|
@@ -15,8 +12,11 @@ Motivation; ⟨L²⟩ = 0 MO windows — open, elements/U/.
 | CAS(2,5) / {3d} | Ms=0 | 25 | ³F: 7, ¹D: 5, ³P: 3, ¹G: 9, ¹S: 1 |
 | CAS(4,6) / {3d,4s} | Ms=1 | 120 | ³D: 15, ³F: 35, ³G: 18, ³H: 22, ³P: 15, ⁵D: 5, ⁵F: 7, ⁵P: 3 |
 
-## Multiplet energies
-CASCI, CAS(2,5), averaged
+## Production — multiplet energies
+
+Route free · partition averaged fold · source `report.md` (`scripts/run.py Ti`).
+
+CASCI, CAS(2,5).
 
 | Term | States | Energy (Eh) | Gap to ground | M_L set |
 |---|---|---|---|---|
@@ -27,6 +27,8 @@ CASCI, CAS(2,5), averaged
 | ¹S | 1 | −1.2951 | +0.1736 | 0 |
 
 ### One run, three fields — CAS(4,6) Ms=1 per root (the split demonstration)
+
+Partition: one column per fold · source the session record (the retired `scripts/multiplet_split.py`; validated on C and Ti CAS(2,5) — ladder exact).
 
 The same CAS(4,6) Ms=1 CI through three core fields
 (the retired `scripts/multiplet_split.py` — git history; the transform
@@ -50,18 +52,20 @@ M_L is not conserved there).
 | ⁵F −3 | −3.296365 | 9 | −3.457635 | 9 | −3.297772 | 5.9023 |
 | ⁵F −2 | −3.296365 | 4 | −3.457635 | 4 | −3.297772 | 0.1927 |
 
-## Window lattice — 3d² series
+## Production — window lattice
 
-CASCI; E = the run's own total (as-run). ROHF reference −848.4065 Eh.
-Reading — README · Results (window lattice). Source: `cells.json` (`*_2-0_*`).
+Route free · partition averaged fold · sector (2, 0) · source `cells.json` (as-run).
 
-| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ | custom, Eh | ⟨L²⟩ |
-|---|---|---|---|---|---|---|---|---|
-| 3d | CAS(2,5) | 10 | −848.4001 | 12.000 | −848.4065 | 0.000 | — | — |
-| 3d4p | CAS(2,8) | 28 | −848.4001 | 12.000 | −848.4065 | 3.426 | — | — |
-| 3d4p4d | CAS(2,13) | 78 | −848.4096 | 12.000 | −848.4065 | 5.150 | — | — |
+| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ |
+|---|---|---|---|---|---|---|
+| 3d | CAS(2,5) | 10 | −848.4001 | 12.000 | −848.4065 | 0.000 |
+| 3d4p | CAS(2,8) | 28 | −848.4001 | 12.000 | −848.4065 | 3.426 |
+| 3d4p4d | CAS(2,13) | 78 | −848.4096 | 12.000 | −848.4065 | 5.150 |
 
-## Window lattice — 3d²4s² series
+## Production — the CAS(4,·) valence lattice
+
+Route free · partition averaged fold · source the lattice logs (session).
+
 
 | window | CAS | dets | AOs, Eh | ⟨L²⟩ | PySCF MO, Eh | ⟨L²⟩ | NO, Eh | ⟨L²⟩ | custom, Eh | ⟨L²⟩ |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -73,17 +77,9 @@ Reading — README · Results (window lattice). Source: `cells.json` (`*_2-0_*`)
 | 3d4d | (4,10) constrained | 1,200 | −848.2320 | 6.000 | — | — | — | — | — | — |
 | 3d4s4d | (4,11) constrained | 1,815 | −848.4090 | 12.000 | −848.4140 | 0.010 | — | — | — | — |
 
-## The pinned CAS ladder — term energies across the window families
+## Lane — the pinned CAS ladder
 
-The symmetry lane's definitive window survey (ticket 32): the ³F TERM
-energy per window — pinned route, CI level at frozen shells, one
-uniform construction (Loewdin raw-AO-shell folds; windows placed
-against them through `build_full_mo(c_core=)`; totals via the
-fold-independent bookkeeping ruler, so cross-fold legs compare).
-Term energies, not sector grounds: each window's 2L+1 branch
-components are solved and averaged.  Certifying pins:
-`test_symm_tm.py::test_cas_ladder_*`; the block between the markers is
-generated from `cells.json` — as-run.
+Route pinned · partition the fold column · source `cells.json` (as-run) · pins `test_symm_tm.py::test_cas_ladder_*`. TERM energies (the 2L+1 branch components averaged through the fold-independent bookkeeping ruler — legs compare across folds; not sector grounds).
 
 <!-- lane:begin -->
 | window | CAS | fold | dets | E, Eh | vs declared | term |
@@ -112,9 +108,9 @@ Readings:
   +177.5 mEh — the campaign's constrained (4,10) cells carry their
   own semantics and are not read against this ladder.
 
-## CAS(4,6) / {3d,4s}
+## Production — the method ladder, CAS(4,6)/{3d,4s}
 
-Reading — README · Methods (⟨L̂z²⟩ is a gauge diagnostic, not a label).
+Route free · partition the fold column · source `cells.json` (the committed draw).
 
 ROHF anchor: −848.4065 Eh (−23086.3283 eV).
 
@@ -124,131 +120,44 @@ ROHF anchor: −848.4065 Eh (−23086.3283 eV).
 |  |  | — | polarized | averaged | −848.3959 | +10.5 | −23086.0413 | +0.2871 | 12.0000 | 4.8832 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
 |  |  | — | purified | averaged | −848.3946 | +11.9 | −23086.0044 | +0.3239 | 12.0000 | 4.0214 | 3.4e-14 | 4.6e-13 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
 |  |  | — | polarized | fractional | −848.3585 | +48.0 | −23085.0230 | +1.3053 | 12.0000 | 5.5419 | 1.0e-09 | 7.6e-09 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
-| **CASSCF** | AO {3d4s} | free | polarized | averaged | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | s1.8 p0.2 d2.0 f0 |
-|  | PySCF MO |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | s1.8 p0.2 d2.0 f0 |
-|  | NO |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | s1.8 p0.2 d2.0 f0 |
+| **CASSCF** | AO {3d4s} (+mo,no) | free | polarized | averaged | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | s1.8 p0.2 d2.0 f0 |
 |  | AO {3d4s} | virtual-mix |  |  | −848.4377 | −31.2 | −23087.1779 | −0.8496 | 0.0496 | 0.0165 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | s1.8 p0.2 d2.0 f0 |
-|  | AO {3d4s} | free | purified | averaged | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | s1.8 p0.2 d2.0 f0 |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | s1.8 p0.2 d2.0 f0 |
+|  | AO {3d4s} (+no) | free | purified | averaged | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 0.0503 | 0.0168 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 | s1.8 p0.2 d2.0 f0 |
 |  | AO {3d4s} | radial | polarized | averaged | −848.4112 | −4.7 | −23086.4576 | −0.1292 | 6.9323 | 2.3102 | 3.2e+00 | 1.3e+01 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
 |  | AO {3d4s} | radial | purified | averaged | −848.4100 | −3.5 | −23086.4234 | −0.0951 | 6.9638 | 2.3214 | 3.2e+00 | 1.2e+01 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
-|  | AO {3d4s} | frozen window | polarized | averaged | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 4.8846 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
+|  | AO {3d4s} (+no) | frozen window | polarized | averaged | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 4.8846 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
 |  | PySCF MO |  |  |  | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 | s1.9 p0.1 d2.0 f0 |
-|  | NO |  |  |  | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 4.8865 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
-|  | AO {3d4s} | frozen window | purified | averaged | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 7.0253 | 3.4e-14 | 3.4e-13 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 3.8854 | 5.9e-14 | 1.0e-12 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
-| **SA-CASSCF** | AO {3d4s} | free | polarized | averaged | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 1.8438 | 1.1e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 | s0 p2.0 d2.0 f0 |
+|  | AO {3d4s} (+no) | frozen window | purified | averaged | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 12.0000 | 7.0253 | 3.4e-14 | 3.4e-13 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
+| **SA-CASSCF** | AO {3d4s} (+no) | free | polarized | averaged | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 1.8438 | 1.1e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 | s0 p2.0 d2.0 f0 |
 |  | PySCF MO |  |  |  | −848.4316 | −25.1 | −23087.0118 | −0.6835 | 0.0255 | 0.0085 | 3.0e-01 | 7.4e-01 | s0.17 p0.50 d0.33 f0 | s1.8 p0.2 d2.0 f0 |
-|  | NO |  |  |  | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 1.5114 | 1.2e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 | s0 p2.0 d2.0 f0 |
-|  | AO {3d4s} | free | purified | averaged | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 3.1567 | 1.0e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 | s0 p2.0 d2.0 f0 |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | −848.4165 | −10.0 | −23086.6002 | −0.2719 | 12.0034 | 4.5601 | 9.1e-01 | 6.1e+00 | s4e-04 p0.17 d0.83 f0 | s0.0 p2.0 d2.0 f0 |
+|  | AO {3d4s} (+no) | free | purified | averaged | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 12.0029 | 3.1567 | 1.0e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 | s0 p2.0 d2.0 f0 |
 |  | AO {3d4s} | radial | polarized | averaged | −848.4069 | −0.4 | −23086.3399 | −0.0115 | 12.0000 | 4.0000 | 1.3e-03 | 6.9e-03 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
 |  | AO {3d4s} | radial | purified | averaged | −848.4055 | +1.0 | −23086.3017 | +0.0266 | 12.0000 | 6.0951 | 1.1e-04 | 5.5e-04 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
-|  | AO {3d4s} | frozen window | polarized | averaged | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 4.8835 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
+|  | AO {3d4s} (+no) | frozen window | polarized | averaged | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 4.8835 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
 |  | PySCF MO |  |  |  | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 0.0051 | 0.0017 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 | s1.9 p0.1 d2.0 f0 |
-|  | NO |  |  |  | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 4.8998 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
-|  | AO {3d4s} | frozen window | purified | averaged | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 0.9855 | 3.4e-14 | 6.1e-13 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 2.3486 | 4.3e-14 | 4.4e-13 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
-
-Source: `cells.json` (this draw). Reading key — README · Results (Methods compared).
+|  | AO {3d4s} (+no) | frozen window | purified | averaged | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 12.0000 | 0.9855 | 3.4e-14 | 6.1e-13 | s0.17 p0 d0.83 f0 | s2.0 p0 d2.0 f0 |
 
 
-### CAS(4,10) / {3d,4d} — planned (constrained)
-
-No 4s (constrained partition). Pending = declared, not yet run; the CASCI anchor lives in the 3d²4s² lattice above.
+### CAS(4,10)/{3d,4d} — declared, gated
 
 ROHF anchor: −848.4065 Eh (−23086.3283 eV).
 
-| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | Span (Lowdin) | Elec (Lowdin) |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **CASCI** | AO {3d4d} | — | polarized | raw | pending |  |  |  |  |  |  |  |  |  | pending |
-|  |  | — | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  |  | — | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  |  | — | polarized | fractional | pending |  |  |  |  |  |  |  |  |  | pending |
-| **CASSCF** | AO {3d4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | virtual-mix |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-| **SA-CASSCF** | AO {3d4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+Declared, not yet run -- the optimizer cells are void until their CASCI anchors are read (the anchor-first scenario). One regen away: `regen_cells.py Ti --window 3d4d`.
 
 
-### CAS(4,14) / {3d,4s,4p,4d} — planned
-
-The complete valence window. Pending = declared, not yet run; the CASCI anchor lives in the 3d²4s² lattice above.
+### CAS(4,14)/{3d,4s,4p,4d} — declared, gated
 
 ROHF anchor: −848.4065 Eh (−23086.3283 eV).
 
-| method | start | mask | substrate | fold | E, Eh | ΔE (mEh) | E, eV | ΔE (eV) | ⟨L²⟩ | ⟨L̂z²⟩ | ‖[Ĥ,L̂z]‖ | ‖[Ĥ,L²]‖ | Span (Lowdin) | Elec (Lowdin) |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **CASCI** | AO {3d4s4p4d} | — | polarized | raw | pending |  |  |  |  |  |  |  |  |  | pending |
-|  |  | — | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  |  | — | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  |  | — | polarized | fractional | pending |  |  |  |  |  |  |  |  |  | pending |
-| **CASSCF** | AO {3d4s4p4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | virtual-mix |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-| **SA-CASSCF** | AO {3d4s4p4d} | free | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | free | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | radial | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | radial | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | frozen window | polarized | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | AO {3d4s4p4d} | frozen window | purified | averaged | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | PySCF MO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
-|  | NO |  |  |  | pending |  |  |  |  |  |  |  |  |  | pending |
+Declared, not yet run -- the optimizer cells are void until their CASCI anchors are read (the anchor-first scenario). One regen away: `regen_cells.py Ti --window 3d4s4p4d`.
 
-## Open questions
+## Readings — open questions
 
 ⟨L²⟩ = 0 MO-window phenomenon (the U ⁵S° class; mechanism open);
 semicore measured (the pinned CAS ladder; SA on {3d,3p,4d} open);
 spin–orbit.
 
-## Others (generated between the markers; ticket 28)
+## Studies (frozen history; ticket 28)
 
 <!-- study:begin --> (frozen history: the generator (atomterm.study) is retired, commit ad28d3a -- the block stays as the committed record; the lane/lattice/methods blocks are the living generated tables)
 
