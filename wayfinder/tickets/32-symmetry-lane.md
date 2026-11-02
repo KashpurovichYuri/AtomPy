@@ -485,9 +485,13 @@ readings -- and the partition+route+provenance row contract on every
 energy row; the lane sections already follow it, the methods/
 multiplet/lattice/term sections get the classification pass; the Ti
 CAS(4,6) grid compression is the Ti instance under the render
-policy), the SA cost probe on {3d,3p,4d} (gated -- SA cells
-undeclared until priced), the wave-close two-axis review + design
-survey + the refactoring round, then ticket 31 (U).
+policy).  PROSE MINIMAL (user, 2026-11-02): the reading conventions
+live ONCE in README (Results gains the lane-column keys + the Tables
+grammar paragraph); TABLES sections carry tables + one-line pointers,
+no per-section legends.  Then the SA cost probe on {3d,3p,4d} (gated
+-- SA cells undeclared until priced), the wave-close two-axis review
++ design survey + the refactoring round (user-strengthened), then
+ticket 31 (U).
 
 ## References
 
