@@ -26,6 +26,7 @@ from atomterm.cells import (
     load_lane_cell,
     planned,
     run_lane_cell,
+    route_keys,
     spine_keys,
     void_reason,
     window_grid,
@@ -690,6 +691,61 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
                       mol, mf, (1, "g"), workdir=tmp_path)
 
 
+@slow
+def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
+    """The route axis: route_keys spawns every leg's four twins (the
+    substrate axis naming the route); the SPAN-IDENTITY certificate --
+    the free CI twin (run_cell, the C1 driver) reproduces the pinned
+    leg's ground component to solver tolerance (same window, same
+    fold, different construction); run_cell's fold branch refuses the
+    pur class (run_lane_cell's), raw/frac, non-ao starts, and wrong
+    sectors; the pinned SA runner delivers the two-pass payload with
+    its term exact."""
+    from dataclasses import replace
+
+    from atomterm.cells import cell_payload, run_cell
+    _, mol_c1, mf_c1, _ = carbon
+    _, mol_d2h, mf_d2h, _ = carbon_d2h
+    cs = CAMPAIGN["C"]
+    leg = lane_keys(cs)[0]
+
+    # the derivation: 1 pinned CI + 4 twins per leg, routes by substrate
+    rk = route_keys(cs)
+    assert len(rk) == 5 and rk[0].address == leg.address
+    tails = sorted(k.address[len(leg.address) - len("casci_ao_-_pur_avg"):]
+                   for k in rk[1:])
+    assert tails == ["casci_ao_-_pol_avg", "casscf_ao_-_pol_avg",
+                     "sa-casscf_ao_-_pol_avg", "sa-casscf_ao_-_pur_avg"]
+
+    # the span-identity certificate at CI level: the free driver's
+    # ground TOTAL equals the pinned leg's TERM total (the components
+    # are degenerate -- same span, same fold, different construction)
+    pinned = run_lane_cell(leg, mol_d2h, mf_d2h, cs.term, workdir=tmp_path)
+    free = cell_payload(
+        replace(leg, substrate="pol"),
+        run_cell(replace(leg, substrate="pol"), mf_c1, mol_c1,
+                 workdir=str(tmp_path)))
+    assert abs(free["energies_pyscf"][0] - pinned["total"]) < 1e-8
+
+    # the fold branch's refusals
+    for kw, msg in (
+            (dict(substrate="pur"), "run_lane_cell"),
+            (dict(substrate="pol", fold="raw"), "raw/frac"),
+            (dict(substrate="pol", start="mo"), "ao/pol/avg"),
+            (dict(substrate="pol"), "active electrons")):
+        k = (replace(leg, window="2p@1s2s", sector=(3, 1), **kw)
+             if msg == "active electrons" else replace(leg, **kw))
+        with pytest.raises(ValueError, match=msg):
+            run_cell(k, mf_c1, mol_c1, workdir=str(tmp_path))
+
+    # the pinned SA runner: the two-pass payload, term exact
+    sa = run_lane_cell(replace(leg, method="sa-casscf"), mol_d2h, mf_d2h,
+                       cs.term, workdir=tmp_path)
+    assert "ensemble" in sa and sa["ptp"] < 1e-8
+    assert all(abs(v - 2.0) < 1e-7 for v in sa["l2"])   # 3P exact
+    assert sa["total"] < min(pinned["energies"]) + 1.0  # relaxation helps
+
+
 @fast
 def test_lane_emitter_deterministic():
     """The ladder emitter's generated block: byte-identical across
@@ -781,7 +837,7 @@ def test_survey_emitter_deterministic():
     # window absorbed the grid's avg cell (dedup)
     assert len({k.address for k in keys}) == len(keys)
     assert "sc_3d4s_2-1_casci_ao_-_pol_avg" in {k.address for k in keys}
-    assert len([k for k in keys if k.span_label == "3d4s"]) == 6
+    assert len([k for k in keys if k.span_label == "3d4s"]) == 7
 
     def free(e):
         return {"energies_pyscf": [e], "ground_l2": 6.0, "n_det": 90,
@@ -789,11 +845,12 @@ def test_survey_emitter_deterministic():
 
     payloads = {}
     for k in keys:
+        pinned = k.fold_tag is not None and k.substrate == "pur"
         payloads[k.address] = (
             {"total": -759.7274, "l2": [6.0] * 5, "s2": [0.75] * 5,
              "n_det": 90, "comm_norm_h_lz": 1e-14,
              "comm_norm_h_l2": 1e-13}
-            if k.fold_tag is not None else free(-759.7296))
+            if pinned else free(-759.7296))
     block = mod.section(cs, payloads)
     assert block == mod.section(cs, payloads)
     lines = [l for l in block.splitlines() if l.startswith("|")]

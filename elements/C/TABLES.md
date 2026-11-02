@@ -1,6 +1,6 @@
 # C — carbon (p²)
 
-cc-pVDZ. Reference **ROHF −37.682418 Eh** (raw core = averaged fold).
+cc-pVDZ. Reference **ROHF −37.6824 Eh** (raw core = averaged fold).
 Sectors Ms = 1 and Ms = 0. Section grammar and column keys —
 README · Results.
 
@@ -19,7 +19,7 @@ Route free · partition averaged fold · source `report.md` (`scripts/run.py C`)
 |---|---|---|---|---|
 | ³P | 3 | −1.100609 | — | −1…1 |
 | ¹D | 5 | −1.012515 | +0.0881 | −2…2 |
-| ¹S | 1 | −0.880374 | +0.2202 | 0 |
+| ¹S | 1 | −0.8803 | +0.2202 | 0 |
 
 ## CAS ladder
 
@@ -37,7 +37,7 @@ Route free · partition treatment column · source `cells.json` (the committed d
 
 | treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | note |
 |---|---|---|---|---|---|
-| ROHF (anchor) | −37.682418 | 0 | — | — | |
+| ROHF (anchor) | −37.6824 | 0 | — | — | |
 | CASCI, averaged | −37.431611 | +250.8 | 2.0000 | 1.3e-15 | the confinement cost |
 | CASCI, raw | −37.431611 | +250.8 | 2.0000 | 9.8e-06 | polarized-core detector |
 | CASCI, fractional | −37.440244 | +242.2 | 2.0000 | 0.0 | a different functional |

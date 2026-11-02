@@ -57,7 +57,8 @@ from pyscf import gto, scf  # noqa: E402
 from atomterm.cases import CAMPAIGN, scenarios_for  # noqa: E402
 from atomterm.cells import (CellKey, cell_payload, diagnostics,  # noqa: E402
                             grid_keys, lane_keys, lattice_keys, planned,
-                            run_cell, run_lane_cell, spine_keys,
+                            kernel_cell_payload, route_keys, run_cell,
+                           run_lane_cell, spine_keys,
                             void_reason)
 from atomterm.reference import run_frac_occ, run_rohf  # noqa: E402
 from atomterm.system import sector_na_nb  # noqa: E402
@@ -94,6 +95,8 @@ def run_queue(name, spec, sector, group) -> list[CellKey]:
         return lattice_keys(spec)
     if group == "lane":
         return lane_keys(spec)
+    if group == "route":
+        return route_keys(spec)
     return grid_keys(spec) + lattice_keys(spec)
 
 
@@ -125,10 +128,11 @@ def parse_args(argv) -> argparse.Namespace:
                    help="declared atoms to run (default: every CAMPAIGN "
                         "atom, CAMPAIGN order)")
     p.add_argument("--group", choices=["grid", "spine", "diagnostics",
-                                       "planned", "lattice", "lane"],
+                                       "planned", "lattice", "lane",
+                                       "route"],
                    help="one named declared group instead of the full "
                         "grid: grid | spine | diagnostics | planned | "
-                        "lattice | lane")
+                        "lattice | lane | route")
     p.add_argument("--full", action="store_true",
                    help="materialize scenario-voided cells (re-testing "
                         "their dated claims)")
@@ -202,16 +206,20 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
         for i, cfg_str in enumerate(r["configurations"][:9]):
             lines.append(f"  {addr:<44} root {i}: {cfg_str}")
     if other:
-        lines += ["", "lane cells (pinned-route term energies) and "
-                      "void cells (scenario-gated):"]
+        lines += ["", "lane cells (tagged windows; the pinned rows "
+                      "carry term energies) and void cells "
+                      "(scenario-gated):"]
         for addr, r in other:
             if "void_reason" in r:
                 lines.append(f"  {addr:<44} VOID -- {r['void_reason']}")
-            else:
+            elif "total" in r:
                 lines.append(
                     f"  {addr:<44} E_term {r['total']:>16.8f}"
                     f"  ptp {r['ptp']:.1e}"
                     f"  L2 {['%.3f' % v for v in r['l2']]}")
+            else:                      # a free-route twin (cell payload)
+                e = r["energies_pyscf"][0]
+                lines.append(f"  {addr:<44} E      {e:>16.8f}")
     return "\n".join(lines) + "\n"
 
 
@@ -273,7 +281,7 @@ def main() -> None:
                                       "void_reason": reason}
                 continue
             print(f"  [cell] {key.address}", flush=True)
-            if key.fold_tag is not None:
+            if key.fold_tag is not None and key.substrate == "pur":
                 if lane_sub is None:
                     lane_sub = lane_substrate(spec)
                 cells[key.address] = run_lane_cell(
@@ -282,7 +290,9 @@ def main() -> None:
             else:
                 facts = run_cell(key, mf, frac_mf=mf_f, workdir="elements",
                                  budgets={"sa_weights": spec.sa_weights})
-                cells[key.address] = cell_payload(key, facts)
+                cells[key.address] = (
+                    cell_payload(key, facts) if facts is not None
+                    else kernel_cell_payload(key))
 
         _write_atomic(out / "cells.json",
                       json.dumps({"atom": name,

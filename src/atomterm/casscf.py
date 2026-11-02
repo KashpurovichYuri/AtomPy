@@ -417,6 +417,6 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
         mc, [s for _, s, _ in solvers], [1.0 / (2 * L + 1)] * (2 * L + 1))
     mc.kernel(mo_full)
     roots = run_irrep_casci(mol, mf, mc.mo_coeff[:, active], ncore,
-                            na, nb, L, parity, conv_tol)
+                            na, nb, L, parity, conv_tol, c_core=c_core)
     return {"e_tot": float(mc.e_tot), "mo": mc.mo_coeff,
             "converged": bool(mc.converged), "roots": roots}

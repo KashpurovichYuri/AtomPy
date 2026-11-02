@@ -642,11 +642,63 @@ the route axis is affordable -- declare it (free twins: CI / CASSCF /
 SA through the free driver with the fold-tag resolution; pinned SA
 rows through the lane runner's method axis).
 
-REMAINING: the route axis (the machinery: run_cell's fold-tag
-resolution for the free twins + the lane runner's method axis for
-pinned SA; then the runs, the emitter's route rows, the pins), the
-wave-close two-axis review + design survey + the refactoring round
-(user-strengthened), then ticket 31 (U).
+## The route axis, EXECUTED on Sc (2026-11-02 — the twins run)
+
+The user's directives: run the free variants ("all we run with
+pinned we can run with free"), plan the full variant set in the method
+ladder, ROHF at 4 digits.  Machinery: run_cell's FOLD BRANCH (the
+tag names the partition; the fold's raw-shell Loewdin span is the
+substrate; the SUBSTRATE axis names the route -- pol = free driver,
+pur = the pinned lane class; validated BEFORE the store cache);
+run_lane_cell's PINNED-SA branch (run_irrep_sa with the c_core
+passthrough; meters on the two-pass readout roots); route_keys (four
+twins per leg); regen --group route.
+
+THE DENSE-BUDGET WALL, hit and fixed twice: the free twins on the
+204k-det window entered run_cell's stage analysis (dense sector
+matrices, O(ndet^2) -- 1 TB resident class).  Fixes: (1) run_cell
+skips _facts past _COMM_CAP and the caller stores KERNEL-ONLY
+payloads (the run's own energies; every dense meter NaN -- the
+em-dash class); (2) analyze_cell (the CACHE path) got the same guard
+plus fold-aware core sizing -- the first guard missed it and the
+cached chk re-entered the dense analysis.
+
+TWO CONVENTION BUGS the runs exposed: (1) run_irrep_sa's two-pass
+READOUT folded the prefix (c_core not passed through to its internal
+run_irrep_casci) -- the pinned-SA totals were ~4 Eh wrong; the
+ENSEMBLES were always right (PySCF's own bookkeeping).  (2) The SA
+total is the KERNEL ENSEMBLE, not readout+bookkeeping: the optimizer
+rotates same-irrep core/window columns (4s is Ag; the semi windows
+host Ag members) -- the readout's absolute energies are of the run's
+OWN partition (the partition-bookkeeping rule); its component spread
+and meters are the diagnostics.  Also load_lane_cell's fixed field
+list predated the commutator fields (cache-hits silently dropped
+them).
+
+RESULTS (Sc, all 25 tagged cells run):
+- SPAN IDENTITY at CI: every free twin == its pinned leg to 4
+  decimals, INDEPENDENT meters agreeing (7.1e-13 vs 7.6e-13).
+- ROUTE AGREEMENT at SA: pinned == free on four of five windows
+  (-759.8523/-.8523 on the winner (7,13); -.8218; -.8266 x2).  The
+  ONE divergence is 3d4s@ar (pinned -.7397, free -.7495): the
+  escape-class window, the free SA finding a lower basin -- the
+  multi-solution class measured ON the lane.
+- The winner's ladder: CI -.8409 -> SA -.8523 on BOTH routes (the SA
+  relaxation +11.4 mEh); single-root CASSCF reaches -.8668
+  (kernel-only at 204k; its (7,8) twin prices the class: L2=5.07,
+  commutators O(1) -- the JT-tilted root, no term).
+- TABLES: the survey renders 29 rows (twins interleaved); the method
+  ladder 20 rows with the full route plan; ROHF literals 4 digits
+  everywhere (the first pass's regex missed 6-decimal literals --
+  redone directly and verified).
+
+The pinned-SA payload: total = the kernel ensemble; ensemble,
+per-component readout energies, ptp, meters stored.  The route pin
+(test_route_axis_twins): the span-identity certificate, the twin
+derivation, every refusal class, the pinned-SA shape.
+
+REMAINING: Ti's pass (the survey merge + the method-ladder renderer
+v2 + the route cells), C/Si's pass, then the wave close as planned.
 
 ## References
 

@@ -1,6 +1,6 @@
 # Si — silicon (p²)
 
-cc-pVDZ. Reference **ROHF −288.846437 Eh**. Sectors Ms = 1 / Ms = 0.
+cc-pVDZ. Reference **ROHF −288.8464 Eh**. Sectors Ms = 1 / Ms = 0.
 Section grammar and column keys — README · Results.
 
 ## Term table
@@ -18,7 +18,7 @@ Route free · partition averaged fold · source `report.md` (`scripts/run.py Si`
 |---|---|---|---|---|
 | ³P | 3 | −0.667376 | — | −1…1 |
 | ¹D | 5 | −0.607963 | +0.0594 | −2…2 |
-| ¹S | 1 | −0.518843 | +0.1485 | 0 |
+| ¹S | 1 | −0.5188 | +0.1485 | 0 |
 
 ## CAS ladder
 
@@ -36,7 +36,7 @@ Route free · partition treatment column · source `cells.json` (the committed d
 
 | treatment | E (as run), Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ |
 |---|---|---|---|---|
-| ROHF (anchor) | −288.846437 | 0 | — | — |
+| ROHF (anchor) | −288.8464 | 0 | — | — |
 | CASCI, averaged | −288.624937 | +221.5 | 2.0000 | 2.5e-15 |
 | CASCI, raw | −288.624937 | +221.5 | 2.0000 | 5.6e-04 |
 | CASCI, fractional | −288.628625 | +217.8 | 2.0000 | 1.3e-15 |

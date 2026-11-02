@@ -72,11 +72,17 @@ def survey_keys(spec) -> list[CellKey]:
                 and (k.fold in ("raw", "frac") or k.substrate == "pur")
                 and k.address not in seen]
     legs = [k for k in lane_keys(spec) if k.address not in seen]
+    from dataclasses import replace
+
+    twins = [replace(k, substrate="pol", method="casci")
+             for k in lane_keys(spec)]
+    legs += [k for k in twins if k.address not in seen
+             and k.address not in {x.address for x in legs}]
     by_span: dict[str, list[CellKey]] = {}
     for k in lat + variants + legs:
         by_span.setdefault(k.span_label, []).append(k)
     order = list(spec.lattice_windows) + [
-        s for s in (k.span_label for k in legs)
+        s for s in dict.fromkeys(k.span_label for k in legs)
         if s not in spec.lattice_windows]
     return [k for s in order for k in by_span.get(s, [])]
 
@@ -92,13 +98,15 @@ def _payload(cells: dict, k: CellKey) -> dict | None:
 def _l2_text(p: dict) -> str:
     """⟨L²⟩: the free cells' ground root; the pinned legs' components
     -- one value when they agree, the min–max range when they
-    scramble."""
+    scramble; the em-dash when the sector sat past the dense-meter
+    budget (kernel-only payload)."""
     if "l2" in p:
         l2 = p["l2"]
         if max(l2) - min(l2) < 1e-6:
             return f"{sum(l2) / len(l2):.4f}"
         return f"{min(l2):.1f}–{max(l2):.1f}"
-    return f"{p['ground_l2']:.4f}"
+    g = p["ground_l2"]
+    return f"{g:.4f}" if g == g else DASH        # NaN check
 
 
 def _comm(v) -> str:
@@ -138,6 +146,7 @@ def section(spec, cells: dict) -> str:
     keys = survey_keys(spec)
     primary = "".join(spec.shell_patterns)
     anchor = next((k for k in keys if k.fold_tag is not None
+                   and k.substrate == "pur"
                    and k.span_label == primary), None)
     if anchor is None:
         sys.exit(f"{spec.symbol}: no pinned leg spans the primary window "
@@ -152,7 +161,8 @@ def section(spec, cells: dict) -> str:
     rows = []
     for k in keys:
         p = _payload(cells, k)
-        route = "pinned" if k.fold_tag is not None else "free"
+        route = ("pinned" if k.substrate == "pur" and k.fold_tag
+                 is not None else "free")
         head = [k.span_label, _cas(k), _fold_col(k, spec),
                 k.start.upper(), route]
         if p is None:

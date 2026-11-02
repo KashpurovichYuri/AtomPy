@@ -1,6 +1,6 @@
 # Sc — scandium (d¹)
 
-cc-pVDZ. Reference **ROHF −759.736255 Eh** (3d¹4s²; M_S = ½; S
+cc-pVDZ. Reference **ROHF −759.7362 Eh** (3d¹4s²; M_S = ½; S
 half-integer). Section grammar and column keys — README · Results.
 
 ## Term table
@@ -33,6 +33,7 @@ CI level · ΔE anchored on 3d4s pinned AO (the certified leg) · source `cells.
 | 3d4s | (3,6) | Ar·pur | AO | free | 90 | −759.7289 | −1.5 | −20673.2867 | −0.0396 | 6.0000 | 3.4e-14 | 1.7e-13 |
 | 3d4s | (3,6) | Ar·frac | AO | free | 90 | −759.6995 | +27.9 | −20672.4868 | +0.7604 | 6.0000 | 3.3e-14 | 3.1e-13 |
 | 3d4s | (3,6) | Ar | AO | pinned | 90 | −759.7274 | 0 | −20673.2471 | +0.0000 | 6.0000 | 3.4e-14 | 3.7e-13 |
+| 3d4s | (3,6) | Ar | AO | free | 90 | −759.7274 | +0.0 | −20673.2471 | +0.0000 | 6.0000 | 6.5e-14 | 2.4e-13 |
 | 3d4d | (3,10) | Ar | AO | free | 450 | −759.5553 | +172.1 | −20668.5639 | +4.6833 | 11.9999 | 2.2e-03 | 1.2e-01 |
 | 3d4d | (3,10) | Ar | MO | free | 450 | −759.7482 | −20.8 | −20673.8133 | −0.5662 | 1.5780 | 4.7e+00 | 1.3e+01 |
 | 3d4s4p | (3,9) | Ar | AO | free | 324 | −759.7611 | −33.7 | −20674.1629 | −0.9157 | 5.9998 | 1.4e-03 | 5.8e-02 |
@@ -46,9 +47,13 @@ CI level · ΔE anchored on 3d4s pinned AO (the certified leg) · source `cells.
 | 3d4s4p4d4f | (3,21) | Ar | AO | free | 4,410 | −759.7697 | −42.3 | −20674.3985 | −1.1513 | 5.9998 | 1.4e-01 | 8.0e-01 |
 | 3d4s4p4d4f | (3,21) | Ar | MO | free | 4,410 | −759.7720 | −44.6 | −20674.4604 | −1.2133 | 5.6353 | 1.2e+01 | 7.2e+01 |
 | 3d3p | (7,8) | semi | AO | pinned | 3,920 | −759.7871 | −59.7 | −20674.8712 | −1.6241 | 6.0000 | 7.1e-13 | 4.9e-12 |
+| 3d3p | (7,8) | semi | AO | free | 3,920 | −759.7871 | −59.7 | −20674.8712 | −1.6241 | 6.0000 | 7.6e-13 | 5.0e-12 |
 | 3d3p4d | (7,13) | semi | AO | pinned | 204,490 | −759.8409 | −113.4 | −20676.3338 | −3.0867 | 6.0000 | — | — |
+| 3d3p4d | (7,13) | semi | AO | free | 204,490 | −759.8409 | −113.4 | −20676.3338 | −3.0867 | — | — | — |
 | 3d3p4s | (9,9) | {1s,2s,2p,3s} | AO | pinned | 15,876 | −759.7899 | −62.4 | −20674.9462 | −1.6990 | 6.0000 | — | — |
+| 3d3p4s | (9,9) | {1s,2s,2p,3s} | AO | free | 15,876 | −759.7899 | −62.4 | −20674.9462 | −1.6990 | — | — | — |
 | 3s3p3d | (9,9) | {1s,2s,2p,4s} | AO | pinned | 15,876 | −759.7900 | −62.5 | −20674.9492 | −1.7021 | 6.0000 | — | — |
+| 3s3p3d | (9,9) | {1s,2s,2p,4s} | AO | free | 15,876 | −759.7900 | −62.5 | −20674.9492 | −1.7021 | — | — | — |
 <!-- survey:end -->
 
 The semi-core window pays −59.7 mEh over the declared window at
@@ -58,17 +63,40 @@ the pair-correlating 4d shell and the 4s/3s pairs against it.
 
 ## Method ladder
 
-ΔE vs ROHF anchor (−759.736255 Eh) · source `cells.json` (the committed draw).
+ΔE vs ROHF anchor (−759.7363 Eh) · source `cells.json` (as-run).
 
 | method | CAS | fold | route | E, Eh | ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| ROHF (anchor) | — | — | — | −759.736255 | 0 | −20673.4871 | +0.0000 | — | — | — | forced filling |
-| CASCI, averaged | (3,6) | Ar | free | −759.7296 | +6.7 | −20673.3051 | +0.1820 | 5.9998 | 8.9e-04 | 4.0e-02 | reference rung |
-| CASSCF, free | (3,6) | Ar | free | −759.7680 | −31.7 | −20674.3496 | −0.8625 | 0.0469 | 5.7e-01 | 1.2e+00 | escape — no term |
-| CASSCF, frozen | (3,6) | Ar | free | −759.7297 | +6.6 | −20673.3075 | +0.1796 | 5.9998 | 8.9e-04 | 4.0e-02 |  |
-| SA-CASSCF, free | (3,6) | Ar | free | −759.7495 | −13.3 | −20673.8478 | −0.3607 | 6.0020 | 7.9e-01 | 3.8e+00 | swap basin — totals only |
-| SA-CASSCF, frozen, pur | (3,6) | Ar | free | −759.7290 | +7.3 | −20673.2891 | +0.1980 | 6.0000 | 6.5e-14 | 2.1e-13 | certified rung |
-| SA-CASSCF | (7,13) | semi | pinned | pending | | | | | | | the route axis, declared |
+| ROHF (anchor) | — | — | — | −759.7363 | 0 | −20673.4871 | +0.0000 | — | — | — | forced filling |
+| CASCI, averaged | (3,6) | Ar | free | −759.7296 | +6.7 | −20673.3051 | +0.1833 | 5.9998 | 8.9e-04 | 4.0e-02 | reference rung |
+| CASSCF, free | (3,6) | Ar | free | −759.7680 | −31.7 | −20674.3496 | −0.8613 | 0.0469 | 5.7e-01 | 1.2e+00 | escape — no term |
+| SA-CASSCF | (3,6) | Ar | free | −759.7495 | −13.2 | −20673.8478 | −0.3595 | 6.0020 | 7.9e-01 | 3.8e+00 | swap basin — totals only |
+| SA-CASSCF, frozen, pur | (3,6) | Ar | free | −759.7290 | +7.3 | −20673.2891 | +0.1992 | 6.0000 | 6.5e-14 | 2.1e-13 | certified rung |
+| CASSCF | (3,6) | Ar·lane | free | −759.7436 | −7.3 | −20673.6877 | −0.1993 | 3.5457 | 1.5e+00 | 3.7e+00 |  |
+| SA-CASSCF | (3,6) | Ar·lane | free | −759.7495 | −13.2 | −20673.8479 | −0.3595 | 6.0020 | 2.3e-01 | 3.8e+00 |  |
+| SA-CASSCF | (3,6) | Ar·lane | pinned | −759.7397 | −3.4 | −20673.5819 | −0.0936 | 6.0000 | 3.4e-14 | 3.7e-13 | basin split vs free |
+| CASSCF | (7,8) | semi | free | −759.8454 | −109.1 | −20676.4572 | −2.9689 | 5.0700 | 6.2e+00 | 6.0e+01 |  |
+| SA-CASSCF | (7,8) | semi | free | −759.8218 | −85.5 | −20675.8147 | −2.3264 | 6.0000 | 5.5e-05 | 1.7e-03 |  |
+| SA-CASSCF | (7,8) | semi | pinned | −759.8218 | −85.5 | −20675.8147 | −2.3264 | 6.0000 | 7.1e-13 | 4.9e-12 |  |
+| CASSCF | (7,13) | semi | free | −759.8668 | −130.5 | −20677.0398 | −3.5515 | — | — | — |  |
+| SA-CASSCF | (7,13) | semi | free | −759.8523 | −116.0 | −20676.6438 | −3.1555 | — | — | — |  |
+| SA-CASSCF | (7,13) | semi | pinned | −759.8523 | −116.0 | −20676.6438 | −3.1555 | 6.0000 | — | — | the winner |
+| CASSCF | (9,9) | {1s,2s,2p,3s} | free | −759.8511 | −114.8 | −20676.6116 | −3.1232 | — | — | — |  |
+| SA-CASSCF | (9,9) | {1s,2s,2p,3s} | free | −759.8266 | −90.3 | −20675.9462 | −2.4579 | — | — | — |  |
+| SA-CASSCF | (9,9) | {1s,2s,2p,3s} | pinned | −759.8266 | −90.3 | −20675.9462 | −2.4579 | 6.0000 | — | — |  |
+| CASSCF | (9,9) | {1s,2s,2p,4s} | free | −759.8509 | −114.6 | −20676.6077 | −3.1194 | — | — | — |  |
+| SA-CASSCF | (9,9) | {1s,2s,2p,4s} | free | −759.8266 | −90.3 | −20675.9462 | −2.4579 | — | — | — |  |
+| SA-CASSCF | (9,9) | {1s,2s,2p,4s} | pinned | −759.8266 | −90.3 | −20675.9462 | −2.4579 | 6.0000 | — | — |  |
+
+Readings: the ROUTES AGREE at the SA level — pinned and free land on
+one energy on every window except 3d4s (the escape-class window: the
+free SA finds a basin 9.8 mEh below the pinned one — the multi-
+solution class, measured on the lane).  On the winner {3d,3p,4d} both
+routes pay the same SA relaxation, +11.4 mEh over the frozen-shell CI
+(−759.8523); the single-root CASSCF reaches −759.8668 — kernel-only
+at 204k dets (meters past the dense budget; the (7,8) twin prices the
+class: −759.8454 with ⟨L²⟩ = 5.07, commutators O(1) — the JT-tilted
+single root, no term).
 
 ## Studies (frozen history; ticket 28)
 
