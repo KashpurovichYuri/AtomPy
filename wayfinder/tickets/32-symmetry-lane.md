@@ -479,10 +479,15 @@ the emitter's row policy — not a physics declaration; the spec's
 "render policy" wording read as data was over-literal).  SA-level
 lane cells wait for the cost probe, undeclared.
 
-REMAINING for step 8: the Ti CAS(4,6) grid compression under the
-render policy, the SA cost probe on {3d,3p,4d} (gated — SA cells
+REMAINING for step 8: the TABLES section-grammar redesign across all
+four atoms (the four section types -- contract/production/lane/
+readings -- and the partition+route+provenance row contract on every
+energy row; the lane sections already follow it, the methods/
+multiplet/lattice/term sections get the classification pass; the Ti
+CAS(4,6) grid compression is the Ti instance under the render
+policy), the SA cost probe on {3d,3p,4d} (gated -- SA cells
 undeclared until priced), the wave-close two-axis review + design
-survey, then ticket 31 (U).
+survey + the refactoring round, then ticket 31 (U).
 
 ## References
 
