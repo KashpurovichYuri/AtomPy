@@ -106,6 +106,7 @@ __all__ = [
     "CellData",
     "cell_chk",
     "cell_payload",
+    "kernel_cell_payload",
     "load_cell",
     "run_cell",
     "analyze_cell",
@@ -116,6 +117,7 @@ __all__ = [
     "planned",
     "lattice_keys",
     "lane_keys",
+    "route_keys",
     "run_lane_cell",
     "load_lane_cell",
     "void_reason",
@@ -432,9 +434,47 @@ def _pick_no_window(wins, k: int):
         "open the sector)")
 
 
+def _fold_span(key: CellKey, mol, mf) -> tuple[tuple[str, ...], np.ndarray]:
+    """One home for the fold construction shared by the free fold
+    branch (:func:`run_cell`), the cache path (:func:`analyze_cell`),
+    and the pinned lane (:func:`run_lane_cell`): resolve the tag's
+    shells, refuse the malformed keys, and return the fold's shell
+    tuple with its Loewdin-orthonormalized raw-AO span (the fold's
+    column count is the core size).
+
+    Raises
+    ------
+    ValueError
+        a shell sits in both the window and its fold; the sector
+        disagrees with the fold-derived electron count; the basis
+        lacks one of the fold's shells.
+    """
+    from atomterm.windows import closed_electrons, lowdin, select_shell_ao
+
+    fold = key.fold_shells()
+    overlap = sorted(set(key.shell_patterns) & set(fold))
+    if overlap:
+        raise ValueError(
+            f"{key.address}: {overlap} sit in both the window and its fold")
+    na, nb = key.sector
+    nelec = mol.nelectron - closed_electrons(fold)
+    if na + nb != nelec:
+        raise ValueError(
+            f"{key.address}: the sector holds {na + nb} active electrons; "
+            f"the fold {list(fold)} leaves {nelec}")
+    fold_rows: list[int] = []
+    for sh in fold:
+        rows = select_shell_ao(mol, sh)
+        if not rows:
+            raise ValueError(
+                f"{key.address}: the basis has no {sh} shell to fold")
+        fold_rows.extend(rows)
+    return fold, lowdin(np.eye(mol.nao_nr())[:, fold_rows], mf.get_ovlp())
+
+
 def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
              fresh: bool = False, verbose: int = 0,
-             workdir: str | Path = "elements") -> "StageFacts":
+             workdir: str | Path = "elements") -> "StageFacts | None":
     """Execute one cell: resolve every axis through its OWNER, run,
     store, analyze. The unit of the run queue.
 
@@ -469,8 +509,12 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     Returns
     -------
     The stage's :class:`~atomterm.stages.StageFacts`; persist with
-    :func:`cell_payload` (which embeds the address).
+    :func:`cell_payload` (which embeds the address).  ``None`` past
+    the dense-meter budget (:data:`_COMM_CAP` dets): the cell stores
+    kernel-only -- :func:`kernel_cell_payload` is the caller's
+    continuation.
     """
+
     budgets = dict(budgets or {})
     if key.fold == "frac":
         if frac_mf is None:
@@ -511,33 +555,19 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
 
     # a fold-tagged window: the tag names the core partition (the
     # route-class grammar validated above); the fold's raw-shell
-    # Loewdin span IS the substrate.  The construction validations
-    # mirror the pinned lane's.
+    # Loewdin span IS the substrate (:func:`_fold_span` owns the
+    # construction and its refusals)
     c_run = None
     if key.fold_tag is not None:
-        from atomterm.windows import (closed_electrons, lowdin,
-                                      select_shell_ao)
-        fold = key.fold_shells()
-        overlap = sorted(set(key.shell_patterns) & set(fold))
-        if overlap:
-            raise ValueError(
-                f"{key.address}: {overlap} sit in both the window and "
-                "its fold")
-        nelec = mol.nelectron - closed_electrons(fold)
-        if na + nb != nelec:
-            raise ValueError(
-                f"{key.address}: the sector holds {na + nb} active "
-                f"electrons; the fold {list(fold)} leaves {nelec}")
-        fold_rows = [r for sh in fold for r in select_shell_ao(mol, sh)]
-        if not fold_rows:
-            raise ValueError(
-                f"{key.address}: the basis lacks a fold shell")
-        c_run = lowdin(np.eye(mol.nao_nr())[:, fold_rows], mf.get_ovlp())
+        _, c_run = _fold_span(key, mol, mf)
         ncore = c_run.shape[1]
 
     c_pur = (None if c_run is not None
              else purified_core_orbitals(mol, mf, ncore)[0]
              if key.substrate == "pur" else None)
+    # the core span every fold in this run uses (the tagged substrate
+    # above, else the pur class's; None folds the occupied prefix)
+    c_core = c_run if c_run is not None else c_pur
 
     # start x mask -> the substrate MO matrix + the optimizer mask.
     # frozen/virtmix are START-INDEPENDENT (they pin the window columns
@@ -564,13 +594,10 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                     else occupied_core_idx(mf, ncore))
         if key.mask == "radial":
             mo_full, labels = radial_basis(
-                mf, core_idx, act_idx, c_core=c_run if c_run is not None
-                else c_pur)
+                mf, core_idx, act_idx, c_core=c_core)
             mask = mask_radial_rotations(labels, ncore, ncas)
         else:
-            mo_full = build_full_mo(mf, core_idx, act_idx,
-                                    c_core=c_run if c_run is not None
-                                    else c_pur)
+            mo_full = build_full_mo(mf, core_idx, act_idx, c_core=c_core)
     else:  # start == "mo": PySCF's default start (canonical MOs,
         # canonical window). On pol the canonical MO matrix IS the
         # substrate; on pur the canonical columns are re-orthogonalized
@@ -607,8 +634,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
 
             c_act0 = mo_full[:, ncore:ncore + ncas]
             ops0 = build_operators(mol, mf, c_act0, ncore, na, nb,
-                                   c_core=c_run if c_run is not None
-                                   else c_pur)
+                                   c_core=c_core)
             _, _, weights, _ = ground_block(ops0)  # the SA-anchoring rule
             weights = list(weights)
         cas = constrained_casscf(mf, ncas, (na, nb), str(chk),
@@ -625,8 +651,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     # None is the caller's signal (:func:`kernel_cell_payload`)
     if sector_dimension(ncas, na, nb) > _COMM_CAP:
         return None
-    return _facts(key, mol, mf, cas, ncore, ncas, na, nb,
-                  c_pur=c_run if c_run is not None else c_pur)
+    return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_pur=c_core)
 
 
 # analysis + persistence ---------------------------------------------
@@ -645,8 +670,7 @@ def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
     from atomterm.casscf import CASResult
     from atomterm.core import purified_core_orbitals
     from atomterm.system import ncore_of
-    from atomterm.windows import (closed_electrons, lowdin,
-                                  select_shell_ao, select_valence_ao)
+    from atomterm.windows import select_valence_ao
 
     data = load_cell(key, workdir)
     cas = CASResult(data.energies, data.ci, data.mo_coeff,
@@ -656,9 +680,7 @@ def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
     ncas = data.ncas or len(select_valence_ao(mol, key.shell_patterns))
     c_run = None
     if key.fold_tag is not None:
-        fold = key.fold_shells()
-        fold_rows = [r for sh in fold for r in select_shell_ao(mol, sh)]
-        c_run = lowdin(np.eye(mol.nao_nr())[:, fold_rows], mf.get_ovlp())
+        _, c_run = _fold_span(key, mol, mf)
         ncore = c_run.shape[1]
     if sector_dimension(ncas, na, nb) > _COMM_CAP:
         return None
@@ -744,6 +766,16 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
 # the pinned lane ------------------------------------------------------
 
 
+# the payload's required fields, in store order -- the ONE field list
+# shared by the writer (:func:`run_lane_cell`) and the reader
+# (:func:`load_lane_cell`); method-dependent extras are optional
+_LANE_FIELDS = ("term", "energies", "total", "ptp", "l2", "s2",
+                "n_det", "anchor_dev", "comm_norm_h_lz",
+                "comm_norm_h_l2", "fold")
+# optional fields, loaded when present: the SA ensemble
+_LANE_FIELDS_OPT = ("ensemble",)
+
+
 def _root_vectors(ci):
     """A solver's return as a list of root vectors (nroots = 1 returns
     a bare array, nroots > 1 a stacked one)."""
@@ -796,21 +828,20 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     Raises
     ------
     ValueError
-        the key is not a lane cell; the window and its fold overlap;
-        the sector disagrees with the fold-derived electron count; the
-        basis lacks a fold shell.
+        the key is not a lane cell; the fold construction refuses the
+        key (:func:`_fold_span`: window/fold overlap, a sector
+        disagreeing with the fold-derived electron count, an absent
+        fold shell).
     """
-    from pyscf import ao2mo, fci, lib
+    from pyscf import lib
 
     from atomterm.core import closed_shell_core_energy
     from atomterm.irreps import (IRREP_IDS, branch_d2h, det_irreps,
                                  orb_irreps)
-    from atomterm.operators import (active_space_integrals,
-                                    build_operator_parts,
+    from atomterm.operators import (build_operator_parts,
                                     ci_in_detbasis_order)
     from atomterm.detbasis import sector_dimension, slater_condon_matrix
-    from atomterm.windows import (build_full_mo, closed_electrons, lowdin,
-                                  select_shell_ao, select_valence_ao)
+    from atomterm.windows import build_full_mo, select_valence_ao
 
     if (key.method, key.start, key.mask, key.substrate,
             key.fold) not in (("casci", "ao", None, "pur", "avg"),
@@ -824,103 +855,77 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     chk.parent.mkdir(parents=True, exist_ok=True)
 
     L, parity = term
-    fold = key.fold_shells()
-    span = key.shell_patterns
-    overlap = sorted(set(span) & set(fold))
-    if overlap:
-        raise ValueError(
-            f"{key.address}: {overlap} sit in both the window and its fold")
     na, nb = key.sector
-    nelec = mol.nelectron - closed_electrons(fold)
-    if na + nb != nelec:
-        raise ValueError(
-            f"{key.address}: the sector holds {na + nb} active electrons; "
-            f"the fold {list(fold)} leaves {nelec}")
-    fold_rows: list[int] = []
-    for sh in fold:
-        rows = select_shell_ao(mol, sh)
-        if not rows:
-            raise ValueError(
-                f"{key.address}: the basis has no {sh} shell to fold")
-        fold_rows.extend(rows)
-    s = mf.get_ovlp()
-    n = mol.nao_nr()
-    c_fold = lowdin(np.eye(n)[:, fold_rows], s)
+    fold, c_fold = _fold_span(key, mol, mf)
     nf = c_fold.shape[1]
-    rows = select_valence_ao(mol, span)
+    rows = select_valence_ao(mol, key.shell_patterns)
     mo = build_full_mo(mf, list(range(nf)), rows, c_core=c_fold)
     c = mo[:, nf:nf + len(rows)]
     ncas = c.shape[1]
-    h1, _ = active_space_integrals(mol, mf, c, nf, c_core=c_fold)
-    eri = ao2mo.kernel(mol, c)
     orbsyms = orb_irreps(mol, c)
     parts = build_operator_parts(mol, mf, c, nf, na, nb, c_core=c_fold)
     dets = parts["dets"]
     ids = det_irreps(orbsyms, na, nb)
 
+    # the kernel half: the pinned solvers live in the evaluator (one
+    # per branch component, multiplicity as nroots) -- SA returns the
+    # ensemble plus the exact roots re-solved in the frozen converged
+    # window (the two-pass pattern); CI solves the start window
     es, l2s, s2s = [], [], []
     anchor_dev = 0.0
     ensemble = None
     if key.method == "sa-casscf":
-        # the pinned SA: the component ensemble optimized
-        # (state_average_mix_ over the pinned solvers), then the exact
-        # per-component roots re-solved in the frozen converged window
-        # -- the two-pass pattern; the meters read the READOUT roots
         from atomterm.casscf import run_irrep_sa
 
         out = run_irrep_sa(mol, mf, c, nf, na, nb, L, parity,
                            conv_tol=conv_tol, c_core=c_fold)
         ensemble = float(out["e_tot"])
-        # the term TOTAL is the kernel ensemble (the optimizer may
-        # rotate same-irrep core/window columns -- the readout's
-        # absolute energies are of the run's own partition; its
-        # COMPONENT SPREAD and meters are the diagnostics)
-        for irrep, mult in branch_d2h(L, parity).items():
-            e_arr, ci = out["roots"][irrep]
-            e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
-            es.extend(float(x) for x in e_arr[:mult])
-            sel = ids == IRREP_IDS[irrep]
-            block = [d for d, m in zip(dets, sel) if m]
-            for meters, op in ((l2s, "L2"), (s2s, "S2")):
-                mb = slater_condon_matrix(block, one_body=parts[op][0],
-                                          two_body=parts[op][1])
-                for vec in _root_vectors(ci):
-                    w = ci_in_detbasis_order(vec, ncas, na, nb)[sel]
-                    meters.append(float(np.real(w @ mb @ w)))
-                del mb
+        roots = out["roots"]
     else:
-        for irrep, mult in branch_d2h(L, parity).items():
-            sol = fci.direct_spin1_symm.FCI(mol)
-            sol.orbsym, sol.wfnsym = orbsyms, IRREP_IDS[irrep]
-            sol.nroots, sol.conv_tol = mult, conv_tol
-            if verbose:
-                print(f"  lane {key.address} block {irrep} nroots={mult}")
-            e, ci = sol.kernel(h1, eri, ncas, (na, nb))
-            e = np.atleast_1d(e)[:mult]
-            es.extend(float(x) for x in e)
-            sel = ids == IRREP_IDS[irrep]
-            block = [d for d, m in zip(dets, sel) if m]
-            w_blk = []
-            for vec in _root_vectors(ci):
-                w = ci_in_detbasis_order(vec, ncas, na, nb)[sel]
-                # the pinned vector lives entirely in its block
-                assert abs(np.linalg.norm(w) - 1.0) < 1e-8, irrep
-                w_blk.append(w)
-            if anchor:
-                hb = slater_condon_matrix(block,
-                                          one_body=parts["H"][0],
-                                          two_body=parts["H"][1])
-                ours = np.linalg.eigvalsh(hb)[:mult]
-                anchor_dev = max(anchor_dev,
-                                 float(np.max(np.abs(np.sort(e) - ours))))
-                del hb
-            for meters, op in ((l2s, "L2"), (s2s, "S2")):
-                mb = slater_condon_matrix(block,
-                                          one_body=parts[op][0],
-                                          two_body=parts[op][1])
-                for w in w_blk:
-                    meters.append(float(np.real(w @ mb @ w)))
-                del mb
+        from atomterm.casscf import run_irrep_casci
+
+        if verbose:
+            print(f"  lane {key.address} pinned blocks "
+                  f"{list(branch_d2h(L, parity))}")
+        roots = run_irrep_casci(mol, mf, c, nf, na, nb, L, parity,
+                                conv_tol=conv_tol, c_core=c_fold)
+
+    # the readout half (shared): per component block, the pinned roots
+    # bridge into detbasis order, live entirely in their block (the
+    # support assert), and the meters read them restricted to the
+    # block -- L2/S2/H are totally symmetric, so the restriction is
+    # exact.  The SA TOTAL is the kernel ensemble (the optimizer may
+    # rotate same-irrep core/window columns -- the readout's absolute
+    # energies are of the run's own partition; its COMPONENT SPREAD
+    # and meters are the diagnostics).
+    for irrep, mult in branch_d2h(L, parity).items():
+        e_arr, ci = roots[irrep]
+        e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
+        es.extend(float(x) for x in e_arr[:mult])
+        sel = ids == IRREP_IDS[irrep]
+        block = [d for d, m in zip(dets, sel) if m]
+        w_blk = []
+        for vec in _root_vectors(ci):
+            w = ci_in_detbasis_order(vec, ncas, na, nb)[sel]
+            # the pinned vector lives entirely in its block
+            assert abs(np.linalg.norm(w) - 1.0) < 1e-8, irrep
+            w_blk.append(w)
+        if anchor and key.method == "casci":
+            # our own H restricted to the block must reproduce the
+            # pinned solver's roots (the conventions certificate)
+            hb = slater_condon_matrix(block,
+                                      one_body=parts["H"][0],
+                                      two_body=parts["H"][1])
+            ours = np.linalg.eigvalsh(hb)[:mult]
+            anchor_dev = max(anchor_dev,
+                             float(np.max(np.abs(np.sort(e_arr) - ours))))
+            del hb
+        for meters, op in ((l2s, "L2"), (s2s, "S2")):
+            mb = slater_condon_matrix(block, one_body=parts[op][0],
+                                      two_body=parts[op][1])
+            for w in w_blk:
+                meters.append(float(np.real(w @ mb @ w)))
+            del mb
 
     es = np.asarray(es)
     # the assembled-treatment meters: exact dense commutators where
@@ -997,9 +1002,7 @@ def load_lane_cell(key: CellKey, workdir: str | Path = "elements") -> dict:
             f"no stored lane cell {key.address} at {chk}; run it first "
             "(atomterm.cells.run_lane_cell)")
     out = {"cell": key.address}
-    for field_name in ("term", "energies", "total", "ptp", "l2", "s2",
-                       "n_det", "anchor_dev", "comm_norm_h_lz",
-                       "comm_norm_h_l2", "fold"):
+    for field_name in _LANE_FIELDS:
         value = lib.chkfile.load(str(chk),
                                  f"atomterm/{key.address}/{field_name}")
         if value is None:
@@ -1008,10 +1011,11 @@ def load_lane_cell(key: CellKey, workdir: str | Path = "elements") -> dict:
                 "regenerate the cell")
         out[field_name] = _stored(value)
     # optional fields (method-dependent): the SA ensembles
-    value = lib.chkfile.load(str(chk),
-                             f"atomterm/{key.address}/ensemble")
-    if value is not None:
-        out["ensemble"] = _stored(value)
+    for field_name in _LANE_FIELDS_OPT:
+        value = lib.chkfile.load(str(chk),
+                                 f"atomterm/{key.address}/{field_name}")
+        if value is not None:
+            out[field_name] = _stored(value)
     return out
 
 
@@ -1125,10 +1129,9 @@ def lattice_keys(spec) -> list[CellKey]:
     variants are NOT a lattice arm: the own-span group-prefix label
     presupposes a term-averaged source density, which is a
     free-ion-series property (the ground block is the whole multiplet)
-    -- on the valence series the ground block is a split +-pair whose
-    m-unequal density groups by noise (measured, 2026-11-02); the NO
-    window variant lives in the methods grid, where its donor is
-    declared per key.
+    -- a split ground block groups by noise and the label misstates
+    the window; the NO window variant lives in the methods grid,
+    where its donor is declared per key.
 
     Parameters
     ----------
@@ -1198,8 +1201,9 @@ def route_keys(spec) -> list[CellKey]:
     """
     from dataclasses import replace
 
-    out = list(lane_keys(spec))
-    for leg in lane_keys(spec):
+    legs = lane_keys(spec)
+    out = list(legs)
+    for leg in legs:
         for method in ("casci", "casscf", "sa-casscf"):
             out.append(replace(leg, method=method, substrate="pol"))
         out.append(replace(leg, method="sa-casscf"))
