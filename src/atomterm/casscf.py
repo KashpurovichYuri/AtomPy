@@ -326,7 +326,8 @@ def _irrep_solvers(mol, orbsyms, L: int, parity: str, conv_tol: float):
 
 
 def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
-                    L: int, parity: str, conv_tol: float = 1e-12) -> dict:
+                    L: int, parity: str, conv_tol: float = 1e-12,
+                    c_core=None) -> dict:
     """The pinned route at the CI level: one block solve per component.
 
     Every irrep of the term's branching gets a ``wfnsym``-pinned
@@ -341,6 +342,9 @@ def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
     L, parity : the target TERM -- ``parity`` is the configuration's
         total inversion parity (p^2 -> g, s p -> u), not the shell's.
     conv_tol : the pinned solvers' CI convergence tolerance.
+    c_core : explicit fold columns (the ladder's non-prefix folds --
+        ``ncore`` is then the fold's column count; the default None
+        folds the ncore prefix).
 
     Returns
     -------
@@ -354,7 +358,7 @@ def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
     ValueError : via :func:`atomterm.irreps.orb_irreps`, if the
         molecule is not D2h.
     """
-    h1, _ = active_space_integrals(mol, mf, c_act, ncore)
+    h1, _ = active_space_integrals(mol, mf, c_act, ncore, c_core=c_core)
     eri = ao2mo.kernel(mol, c_act)
     orbsyms = orb_irreps(mol, c_act)
     out = {}
@@ -367,7 +371,8 @@ def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
 
 
 def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
-                 L: int, parity: str, conv_tol: float = 1e-12) -> dict:
+                 L: int, parity: str, conv_tol: float = 1e-12,
+                 c_core=None) -> dict:
     """The pinned route at the SA level: the component ensemble, optimized.
 
     ``mcscf.state_average_mix_`` over the pinned solvers with uniform
@@ -379,7 +384,8 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     Parameters
     ----------
     As :func:`run_irrep_casci` (the optimizer convergence is PySCF's
-    default; the readout solvers take ``conv_tol``).
+    default; the readout solvers take ``conv_tol``), including the
+    ``c_core`` fold passthrough.
 
     Returns
     -------
@@ -396,7 +402,12 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     the comparison surface.
     """
     ncas = c_act.shape[1]
-    mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore), c_act)
+    if c_core is None:
+        mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore), c_act)
+    else:
+        nf = c_core.shape[1]
+        mo_full = build_full_mo(mf, list(range(nf)), c_act, c_core=c_core)
+        ncore = nf
     active = slice(ncore, ncore + ncas)
     mc = mcscf.CASSCF(mf, ncas, (na, nb))
     mc.verbose = 0

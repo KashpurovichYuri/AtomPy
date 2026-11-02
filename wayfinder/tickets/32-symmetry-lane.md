@@ -618,13 +618,35 @@ THE LADDER TABLE redesigned (the meters speak, no verdict column):
   fresh with the new payload fields; every total bit-stable vs the
   certified record.
 
-REMAINING: the SA cost probe on {3d,3p,4d} (user-enabled in
-principle -- the priced statement first), then the route axis (the
-free-route rows: CI / CASSCF / SA-CASSCF per leg -- the user's
-"all we run with pinned we can run with free"; machinery = the
-fold-tag resolution in the free driver + the c_core passthrough for
-pinned SA), the wave-close two-axis review + design survey + the
-refactoring round (user-strengthened), then ticket 31 (U).
+## The SA cost probe -- PRICED (2026-11-02, unit B)
+
+One timed pinned-SA solve on the ladder winner {3d,3p,4d}@semi
+(368,082 dets, sector (5,3), branch(3,g) = 7 components,
+state_average_mix_ + the two-pass readout), through the c_core fold
+passthrough added to run_irrep_casci/run_irrep_sa for exactly this
+(the non-prefix semi fold; default None keeps the prefix contract):
+
+- WALL TIME: 6 min 52 s end-to-end (D2h ROHF ~1 min + construction +
+  the SA solve) -- the solve itself ~6 min on the biggest leg;
+- RESULT: ensemble -848.510765 Eh, converged -- 11.7 mEh below the
+  CI-level term total (-848.4991): the orbital relaxation the frozen
+  shells could not take, at exact component structure (irrep-blocked
+  rotations).
+
+THE PRICED STATEMENT: the SA level is MINUTES-CLASS everywhere in the
+declared ladder families -- the 368k leg ~6 min, Sc's 204k leg a few
+minutes, every other leg seconds-to-a-minute; a full route-axis batch
+(pinned SA + free SA over all legs of all four atoms) is well under
+an hour of compute per regen.  No hours-class cell exists.  DECISION:
+the route axis is affordable -- declare it (free twins: CI / CASSCF /
+SA through the free driver with the fold-tag resolution; pinned SA
+rows through the lane runner's method axis).
+
+REMAINING: the route axis (the machinery: run_cell's fold-tag
+resolution for the free twins + the lane runner's method axis for
+pinned SA; then the runs, the emitter's route rows, the pins), the
+wave-close two-axis review + design survey + the refactoring round
+(user-strengthened), then ticket 31 (U).
 
 ## References
 
