@@ -697,8 +697,56 @@ per-component readout energies, ptp, meters stored.  The route pin
 (test_route_axis_twins): the span-identity certificate, the twin
 derivation, every refusal class, the pinned-SA shape.
 
-REMAINING: Ti's pass (the survey merge + the method-ladder renderer
-v2 + the route cells), C/Si's pass, then the wave close as planned.
+REMAINING (the next wave, agreed 2026-11-02 -- design settled in
+conversation, see also the handoff):
+
+- UNIT P (persistence, small): the Sc method-ladder Readings paragraph
+  OUT (the table speaks; row-level notes stay); lane payloads gain
+  mo_coeff (the pinned route's converged orbitals -- currently LOST:
+  restart + orbital-level route comparisons) and cycles (CASResult
+  gains the optimizer macro-cycles); store round-trip pins.
+- UNIT S (sparse meters -- the dense wall dies): the matrix-free
+  apply IS our _build with the N^2 container deleted -- same pair
+  classification (occupation table + prefix counts), same
+  Slater-Condon values, same signs; the scatter writes into the
+  output VECTOR.  The zeros were never evaluated (the builder already
+  skips >=3-excitation pairs by Pauli-vanishing + orthogonality) --
+  their cost was storage (333 GB at (7,13)) and dense algebra
+  (matvec N^2, eigvalsh N^3).  FOUR verification legs: apply ==
+  _build matvec; == _slater_condon_slow (the elementwise direct
+  reference, already pinned); == secondquant's explicit a/a-dagger
+  application (the algebraic-direct); PySCF contract_1e/contract_2e
+  the C leg.  Meters beyond the cap: L2/S2 per root + the STATE
+  residual ||[H,Lz]psi|| (replaces the operator Frobenius norm at
+  size; exact zero <==> symmetry eigenstate); dense stays below the
+  cap, cross-certified.  README · Methods gains the matrix-free note
+  + the excitation-class table.  Then re-run the big Sc cells: every
+  em-dash fills.  nnz grows LINEARLY in N (dense quadratic): (7,13)
+  3e8 couplings/apply sub-second; (7,20) 240 TB dense DEAD,
+  apply seconds; (7,27) a minute.
+- UNIT L (saturation -- the user's open question, NOT stateable from
+  current data: at (7,13) CASSCF is still 14.5 mEh below SA): test
+  whether a complete-enough window kills the tilt (single-root lands
+  ON the term; SA == CASSCF; CI gain/shell -> 0).  Legs: S1
+  {3d,3p,4d,4f}@semi (7,20) ~5.5M dets; S2 {3d,3p,4d,5d}@semi (7,20);
+  CI first (minutes-tens), then ONE optimizer pair on the
+  still-gaining leg (hours-class); S3 the union (7,27) ~51M only if
+  needed.  AFTER Unit S (the meters are the point).
+- UNIT T (Ti): the survey merge (emitter on Ti: lattice + 7 legs +
+  variants + twins ~30 rows); the method-ladder RENDERER v2 (Ti is
+  generated): method|CAS|fold|route columns, pending rows for
+  declared cells; the Ti route batch (28 cells; the (8,13) SA pair
+  ~6 min each); planned windows keep pointer lines (pending rows if
+  the user prefers).
+- C/Si passes, then the WAVE CLOSE (Unit C: two-axis review over the
+  unreviewed span, design survey, the DEDICATED refactoring round,
+  map dispositions, ticket 32 resolved; ticket 33 next).
+
+Settled in conversation (the standing answers): the SA route
+agreement is genuine (1e-9..2e-7 at solver tolerance on m-complete
+windows; 9.77 mEh basin split on the escape-class 3d4s window);
+iterations were not stored; restart = converged-state chks (PySCF
+per-cycle dumps exist via mc.chkfile); lane mo_coeff was a gap.
 
 ## References
 

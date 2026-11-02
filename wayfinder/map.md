@@ -17,9 +17,11 @@ declaration path as a fresh wave. (live)
 - [31 — the ECP wave](tickets/31-ecp-wave.md): declare the ECP atom in
   `CAMPAIGN`; opens on the user's go.
 - [32 — the symmetry lane](tickets/32-symmetry-lane.md): D2h-pinned CI
-  as the second route (compare, never merge) — step 8 in flight: the
-  tables grammar landed (Sc re-sectioned + the lattice/lane as
-  declared cells); the Ti compression + the C/Si pass remain.
+  as the second route (compare, never merge) — step 8 deep in flight:
+  the tables grammar + the CI window survey landed, the ROUTE AXIS
+  executed on Sc (the twins run; the routes agree at SA on m-complete
+  windows); next: sparse meters, saturation legs, the Ti/C/Si passes,
+  then the wave close.
 - [33 — the symmetry-breaking anatomy deliverable](tickets/33-symmetry-anatomy.md):
   design-first — the frozen-landscape tables that replace the retired
   scan pointers.
