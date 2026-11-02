@@ -50,6 +50,7 @@ is the ecosystem cross-validator.
 
 from __future__ import annotations
 
+import re
 import warnings
 from typing import NamedTuple
 
@@ -63,6 +64,9 @@ __all__ = [
     "select_span",
     "primitive_chain",
     "select_primitives",
+    "fold_shells",
+    "closed_electrons",
+    "NOBLE_CORES",
     "shell_weights",
     "window_avas",
     "span_overlap",
@@ -452,6 +456,104 @@ def select_primitives(mol, l: int, count: int | None = None,
                 f"{len(chain)}")
         picked = [rows for _, rows in chain[:count]]
     return sorted(r for rows in picked for r in rows)
+
+
+# ------------------------------------------------------- the fold vocabulary
+
+# the noble-gas closed-core prefixes, in fill order up to and including
+# each noble gas's outermost np (universal -- Z-independent)
+NOBLE_CORES = {
+    "he": ("1s",),
+    "ne": ("1s", "2s", "2p"),
+    "ar": ("1s", "2s", "2p", "3s", "3p"),
+    "kr": ("1s", "2s", "2p", "3s", "3p", "4s", "3d", "4p"),
+    "xe": ("1s", "2s", "2p", "3s", "3p", "4s", "3d", "4p",
+           "5s", "4d", "5p"),
+    "rn": ("1s", "2s", "2p", "3s", "3p", "4s", "3d", "4p",
+           "5s", "4d", "5p", "6s", "4f", "5d", "6p"),
+}
+
+_SHELL_M = {"s": 1, "p": 3, "d": 5, "f": 7, "g": 9, "h": 11}
+
+# which noble core ends at n p -- the semi rule's starting prefix per
+# open-d period (3d -> ar, 4d -> kr, ...)
+_NOBLE_AT_NP = {n: name for n, name in ((3, "ar"), (4, "kr"),
+                                         (5, "xe"), (6, "rn"))}
+
+
+def closed_electrons(shells: tuple[str, ...]) -> int:
+    """Electron count of a closed shell set: two per m-slot
+    (``2(2l+1)`` per shell).  The count a closed fold removes from the
+    atom's active problem.
+
+    Examples
+    --------
+    >>> closed_electrons(("1s", "2s", "2p"))
+    10
+    """
+    return sum(2 * _SHELL_M[sh[-1]] for sh in shells)
+
+
+def fold_shells(name: str, open_d: str | None = None) -> tuple[str, ...]:
+    """The shells of a named fold -- the closed-core partition an atom
+    is split by (the window is what remains).
+
+    Three rule classes (README · Fold notation is the user-facing
+    statement of the SAME rule):
+
+    * a noble-gas name (``"ar"``): that noble gas's closed-shell
+      prefix (:data:`NOBLE_CORES`, universal);
+    * ``"semi"``: the open-(n)d semi-core -- the noble core ending at
+      np, minus np, plus (n+1)s.  The 3d metals: Ar - 3p + 4s =
+      ``("1s", "2s", "2p", "3s", "4s")``.  Needs ``open_d`` (the
+      atom's open d shell, e.g. ``"3d"``);
+    * anything else: an EXPLICIT list, concatenated (``"1s2s2p4s"``)
+      or comma-separated (``"1s,2s,2p,4s"``) -- it must consume
+      entirely.
+
+    Parameters
+    ----------
+    name : the fold spec (case-insensitive).
+    open_d : the atom's open d shell (``"3d"``); only ``"semi"``
+      reads it.
+
+    Returns
+    -------
+    the fold's shells, in fill order.
+
+    Raises
+    ------
+    ValueError
+        unknown name; ``"semi"`` without ``open_d`` or on a non-d
+        shell; a list that does not consume entirely.  Whether the
+        shells EXIST in a given basis is the consumer's check (a
+        missing shell selects no columns).
+
+    Examples
+    --------
+    >>> fold_shells("ar")
+    ('1s', '2s', '2p', '3s', '3p')
+    >>> fold_shells("semi", open_d="3d")
+    ('1s', '2s', '2p', '3s', '4s')
+    """
+    key = name.strip().lower()
+    if key in NOBLE_CORES:
+        return NOBLE_CORES[key]
+    if key == "semi":
+        if open_d is None or not re.fullmatch(r"[3-6]d", open_d or ""):
+            raise ValueError(
+                f"fold 'semi' needs the atom's open d shell ('3d'..'6d'), "
+                f"got open_d={open_d!r}")
+        core = NOBLE_CORES[_NOBLE_AT_NP[int(open_d[0])]]
+        n = int(open_d[0])
+        return tuple(s for s in core if s != f"{n}p") + (f"{n + 1}s",)
+    stripped = key.replace(",", "").replace(" ", "")
+    shells = tuple(re.findall(r"\d+[spdfgh]", stripped))
+    if not shells or "".join(shells) != stripped:
+        raise ValueError(
+            f"fold {name!r} is neither a noble-gas name {sorted(NOBLE_CORES)}"
+            f" nor an explicit shell list like '1s2s2p4s'")
+    return shells
 
 
 # ------------------------------------------------------------- the meters

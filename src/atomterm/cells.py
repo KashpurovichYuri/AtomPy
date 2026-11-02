@@ -53,7 +53,12 @@ sector as ``na-nb`` (fixes Ms AND nelec), and ``-`` for no mask
 ``<source>no<k>`` (e.g. ``3d4sno2``) = the k-th occupation-group
 prefix of the source's term-averaged density -- the prefix is part of
 the window identity, so differently-sized NO cells of one source get
-different addresses.
+different addresses.  A LANE window carries its own fold as a tag on
+the label (``3d3p@semi``, ``3s3p3d@1s2s2p4s`` --
+:func:`atomterm.windows.fold_shells` the tag grammar): the tag
+declares the cell's core partition AND marks the pinned-lane cell
+(:func:`lane_keys`, :func:`run_lane_cell`) -- a tagged window never
+collides with a free-route label.
 
 One real address, decoded slot by slot::
 
@@ -110,6 +115,10 @@ __all__ = [
     "diagnostics",
     "planned",
     "lattice_keys",
+    "lane_keys",
+    "run_lane_cell",
+    "load_lane_cell",
+    "void_reason",
 ]
 
 METHODS = ("casci", "casscf", "sa-casscf")
@@ -119,8 +128,9 @@ SUBSTRATES = ("pol", "pur")
 FOLDS = ("raw", "avg", "frac")
 
 # the nominal window label: shell tokens like "2p", "3d4s" -- lowercase
-# alphanumerics, no separators (the address splits on "_")
-_WINDOW_RE = re.compile(r"[0-9][0-9a-z]*\Z")
+# alphanumerics, no separators (the address splits on "_"); a lane
+# window appends its fold tag: "3d3p@semi", "3s3p3d@1s2s2p4s"
+_WINDOW_RE = re.compile(r"[0-9][0-9a-z]*(?:@[0-9a-z]+)?\Z")
 
 
 # the cell key -------------------------------------------------------
@@ -136,7 +146,11 @@ class CellKey:
     atom : element label, e.g. ``"Ti"`` (the ``elements/<Atom>/`` dir).
     window : NOMINAL span label, e.g. ``"3d4s"`` -- names the table
         row; the construction is the ``start`` axis (window = the
-        span, start = the columns defining it).
+        span, start = the columns defining it).  A LANE window
+        carries its own fold as a tag (``"3d3p@semi"`` --
+        :meth:`fold_shells` resolves it): the tag declares the cell's
+        core partition AND marks the lane (a tagged window never
+        collides with a free-route label; NO windows take none).
     sector : ``(na, nb)`` -- alpha/beta active electrons; fixes Ms
         and nelec together.
     method : ``"casci"`` | ``"casscf"`` | ``"sa-casscf"``.
@@ -147,6 +161,9 @@ class CellKey:
         ``"frozen"`` | ``"virtmix"``; only meaningful for optimizer
         methods (rejected for ``casci``).
     substrate / fold : the core axes -- see the module docstring.
+        Lane cells carry ``(pur, avg)`` -- the certified-fold class:
+        an exactly-closed shell-span fold whose field is exactly
+        m-scalar (the uniform construction of :func:`run_lane_cell`).
     """
 
     atom: str
@@ -168,7 +185,8 @@ class CellKey:
         if not (isinstance(self.window, str) and _WINDOW_RE.match(self.window)):
             raise ValueError(
                 f"window {self.window!r} must be a nominal shell label "
-                "(lowercase alphanumerics, e.g. '3d4s'; no separators)")
+                "(lowercase alphanumerics, e.g. '3d4s', optionally with "
+                "a fold tag '3d3p@semi'; no separators)")
         na, nb = self.sector
         if not (isinstance(na, int) and isinstance(nb, int)
                 and na >= nb >= 0 and na + nb > 0):
@@ -187,6 +205,10 @@ class CellKey:
                 f"start='no' and the window label must agree: NO windows "
                 "are '<source>no<k>' (e.g. '3d4sno2'), other starts take "
                 "a plain shell label")
+        if self.no_source is not None and self.fold_tag is not None:
+            raise ValueError(
+                f"window {self.window!r}: NO windows carry no fold tag "
+                "(their fold is the source window's own)")
         if self.mask is not None:
             if self.mask not in MASKS:
                 raise ValueError(f"mask {self.mask!r} not in {MASKS} (None = free)")
@@ -235,8 +257,45 @@ class CellKey:
 
     @property
     def shell_patterns(self) -> list[str]:
-        """The window label as shell selectors: ``"3d4s"`` -> ``["3d", "4s"]``."""
-        return re.findall(r"\d+[spdfgh]", self.window)
+        """The window's span as shell selectors: ``"3d4s"`` ->
+        ``["3d", "4s"]``; a lane window's fold tag is not part of the
+        span."""
+        return re.findall(r"\d+[spdfgh]", self.span_label)
+
+    @property
+    def span_label(self) -> str:
+        """The window label without its fold tag (the bare span)."""
+        return self.window.partition("@")[0]
+
+    @property
+    def fold_tag(self) -> str | None:
+        """The window's ``@fold`` tag (None = the case's core prefix;
+        :meth:`fold_shells` resolves a tag to shells)."""
+        span, sep, tag = self.window.partition("@")
+        return tag if sep else None
+
+    def fold_shells(self) -> tuple[str, ...]:
+        """The key's fold tag resolved to shells
+        (:func:`atomterm.windows.fold_shells`; the class rule's open d
+        = the LOWEST-n d shell of the window span -- every lane window
+        contains the valence d).
+
+        Raises
+        ------
+        ValueError
+            the window carries no tag (its fold is the case's prefix,
+            not the key's to resolve), or the tag is not a fold name.
+        """
+        from atomterm.windows import fold_shells
+
+        tag = self.fold_tag
+        if tag is None:
+            raise ValueError(
+                f"window {self.window!r} carries no fold tag; its fold "
+                "is the case's core prefix")
+        ds = [p for p in self.shell_patterns if p.endswith("d")]
+        open_d = min(ds, key=lambda p: int(p[:-1])) if ds else None
+        return fold_shells(tag, open_d=open_d)
 
     @property
     def no_source(self) -> tuple[str, int] | None:
@@ -247,7 +306,7 @@ class CellKey:
         unambiguous. The prefix IS part of the window identity: two NO
         cells of one source differ in k and get different addresses.
         """
-        m = re.fullmatch(r"(.+?)no([1-9]\d*)", self.window)
+        m = re.fullmatch(r"(.+?)no([1-9]\d*)", self.span_label)
         return (m.group(1), int(m.group(2))) if m else None
 
 
@@ -588,6 +647,210 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
     )
 
 
+# the pinned lane ------------------------------------------------------
+
+
+def _root_vectors(ci):
+    """A solver's return as a list of root vectors (nroots = 1 returns
+    a bare array, nroots > 1 a stacked one)."""
+    ci = np.asarray(ci)
+    return [ci] if ci.ndim == 2 else list(ci)
+
+
+def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
+                  anchor: bool = False, fresh: bool = False, verbose: int = 0,
+                  workdir: str | Path = "elements") -> dict:
+    """Run one pinned-lane cell: the CAS ladder's UNIFORM construction.
+    The fold's raw AO-shell span, Löwdin-orthonormalized; the window
+    placed by :func:`atomterm.windows.build_full_mo` against it; one
+    ``wfnsym``-pinned solver per branch component
+    (:func:`atomterm.irreps.branch_d2h`); meters per irrep block
+    (L2/S2/H are totally symmetric, so the block restriction is
+    exact); the fold-independent bookkeeping ruler
+    (:func:`atomterm.core.closed_shell_core_energy`).  Deterministic:
+    raw AO spans, draw-free on both sides of the fold.
+
+    Parameters
+    ----------
+    key : the lane cell (a :func:`lane_keys` key: ``casci/ao/-/pur/avg``
+        with a tagged window).  Its sector must hold exactly the
+        electrons its fold leaves active.
+    mol, mf : the PINNED substrate -- ``mol`` a converged-reference
+        D2h molecule, ``mf`` its ROHF.
+    term : the target ``(L, parity)`` (:attr:`~atomterm.cases.CaseSpec.term`);
+        parity is the configuration's total inversion parity.
+    conv_tol : the pinned solvers' CI tolerance.
+    anchor : also eigen-solve each block with OUR H and record the
+        max deviation from the pinned solver (the conventions
+        certificate; O(block^3) -- keep off large blocks).
+    fresh : ignore a stored payload and re-run.
+    verbose : print each block as it solves.
+    workdir : the store root.
+
+    Returns
+    -------
+    the payload dict (also stored under the key's address, reloadable
+    through :func:`load_lane_cell`): per-component ``energies`` /
+    ``l2`` / ``s2`` in branch order, the TERM ``total`` (component
+    mean + the closed-shell core energy), the component spread
+    ``ptp``, the sector size ``n_det``, and ``anchor_dev``.
+
+    Raises
+    ------
+    ValueError
+        the key is not a lane cell; the window and its fold overlap;
+        the sector disagrees with the fold-derived electron count; the
+        basis lacks a fold shell.
+    """
+    from pyscf import ao2mo, fci, lib
+
+    from atomterm.core import closed_shell_core_energy
+    from atomterm.irreps import (IRREP_IDS, branch_d2h, det_irreps,
+                                 orb_irreps)
+    from atomterm.operators import (active_space_integrals,
+                                    build_operator_parts,
+                                    ci_in_detbasis_order)
+    from atomterm.detbasis import sector_dimension, slater_condon_matrix
+    from atomterm.windows import (build_full_mo, closed_electrons, lowdin,
+                                  select_shell_ao, select_valence_ao)
+
+    if (key.method, key.start, key.mask, key.substrate,
+            key.fold) != ("casci", "ao", None, "pur", "avg"):
+        raise ValueError(
+            f"a lane cell is casci/ao/-/pur/avg (the certified fold "
+            f"class); {key.address} is not one")
+    chk = cell_chk(key, workdir)
+    if chk.exists() and not fresh:
+        return load_lane_cell(key, workdir)
+    chk.parent.mkdir(parents=True, exist_ok=True)
+
+    L, parity = term
+    fold = key.fold_shells()
+    span = key.shell_patterns
+    overlap = sorted(set(span) & set(fold))
+    if overlap:
+        raise ValueError(
+            f"{key.address}: {overlap} sit in both the window and its fold")
+    na, nb = key.sector
+    nelec = mol.nelectron - closed_electrons(fold)
+    if na + nb != nelec:
+        raise ValueError(
+            f"{key.address}: the sector holds {na + nb} active electrons; "
+            f"the fold {list(fold)} leaves {nelec}")
+    fold_rows: list[int] = []
+    for sh in fold:
+        rows = select_shell_ao(mol, sh)
+        if not rows:
+            raise ValueError(
+                f"{key.address}: the basis has no {sh} shell to fold")
+        fold_rows.extend(rows)
+    s = mf.get_ovlp()
+    n = mol.nao_nr()
+    c_fold = lowdin(np.eye(n)[:, fold_rows], s)
+    nf = c_fold.shape[1]
+    rows = select_valence_ao(mol, span)
+    mo = build_full_mo(mf, list(range(nf)), rows, c_core=c_fold)
+    c = mo[:, nf:nf + len(rows)]
+    ncas = c.shape[1]
+    h1, _ = active_space_integrals(mol, mf, c, nf, c_core=c_fold)
+    eri = ao2mo.kernel(mol, c)
+    orbsyms = orb_irreps(mol, c)
+    parts = build_operator_parts(mol, mf, c, nf, na, nb, c_core=c_fold)
+    dets = parts["dets"]
+    ids = det_irreps(orbsyms, na, nb)
+
+    es, l2s, s2s = [], [], []
+    anchor_dev = 0.0
+    for irrep, mult in branch_d2h(L, parity).items():
+        sol = fci.direct_spin1_symm.FCI(mol)
+        sol.orbsym, sol.wfnsym = orbsyms, IRREP_IDS[irrep]
+        sol.nroots, sol.conv_tol = mult, conv_tol
+        if verbose:
+            print(f"  lane {key.address} block {irrep} nroots={mult}")
+        e, ci = sol.kernel(h1, eri, ncas, (na, nb))
+        e = np.atleast_1d(e)[:mult]
+        es.extend(float(x) for x in e)
+        sel = ids == IRREP_IDS[irrep]
+        block = [d for d, m in zip(dets, sel) if m]
+        w_blk = []
+        for vec in _root_vectors(ci):
+            w = ci_in_detbasis_order(vec, ncas, na, nb)[sel]
+            # the pinned vector lives entirely in its block
+            assert abs(np.linalg.norm(w) - 1.0) < 1e-8, irrep
+            w_blk.append(w)
+        if anchor:
+            hb = slater_condon_matrix(block, one_body=parts["H"][0],
+                                      two_body=parts["H"][1])
+            ours = np.linalg.eigvalsh(hb)[:mult]
+            anchor_dev = max(anchor_dev,
+                             float(np.max(np.abs(np.sort(e) - ours))))
+            del hb
+        for meters, op in ((l2s, "L2"), (s2s, "S2")):
+            mb = slater_condon_matrix(block, one_body=parts[op][0],
+                                      two_body=parts[op][1])
+            for w in w_blk:
+                meters.append(float(np.real(w @ mb @ w)))
+            del mb
+
+    es = np.asarray(es)
+    payload = {
+        "cell": key.address,
+        "term": [int(L), str(parity)],
+        "energies": [float(x) for x in es],
+        "total": float(es.mean() + closed_shell_core_energy(mf, c_fold)),
+        "ptp": float(np.ptp(es)),
+        "l2": l2s,
+        "s2": s2s,
+        "n_det": int(sector_dimension(ncas, na, nb)),
+        "anchor_dev": float(anchor_dev),
+        "fold": list(fold),
+    }
+    for field_name, value in payload.items():
+        lib.chkfile.save(str(chk), f"atomterm/{key.address}/{field_name}",
+                         value)
+    return payload
+
+
+def load_lane_cell(key: CellKey, workdir: str | Path = "elements") -> dict:
+    """Load a stored lane cell's payload (:func:`run_lane_cell`'s
+    reader half) -- pure data, no mol/mf needed, normalized to the
+    stored types (HDF5 hands strings back as bytes).
+
+    Raises
+    ------
+    FileNotFoundError / KeyError
+        no chkfile for the address / an incomplete store (regenerate
+        the cell).
+    """
+    from pyscf import lib
+
+    def _stored(v):
+        if isinstance(v, bytes):
+            return v.decode()
+        if isinstance(v, np.generic):
+            return v.item()
+        if isinstance(v, (list, tuple, np.ndarray)):
+            return [_stored(x) for x in v]
+        return v
+
+    chk = cell_chk(key, workdir)
+    if not chk.exists():
+        raise FileNotFoundError(
+            f"no stored lane cell {key.address} at {chk}; run it first "
+            "(atomterm.cells.run_lane_cell)")
+    out = {"cell": key.address}
+    for field_name in ("term", "energies", "total", "ptp", "l2", "s2",
+                       "n_det", "anchor_dev", "fold"):
+        value = lib.chkfile.load(str(chk),
+                                 f"atomterm/{key.address}/{field_name}")
+        if value is None:
+            raise KeyError(
+                f"lane store {chk} is incomplete (no {field_name}); "
+                "regenerate the cell")
+        out[field_name] = _stored(value)
+    return out
+
+
 # the declared key-sets ----------------------------------------------
 
 def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]:
@@ -718,3 +981,49 @@ def lattice_keys(spec) -> list[CellKey]:
         keys.append(CellKey(spec.symbol, _no_label(w), sec,
                             method="casci", start="no", fold="avg"))
     return keys
+
+
+def lane_keys(spec) -> list[CellKey]:
+    """The declared pinned-lane legs (``spec.lane_windows``): one
+    CI-level lane cell per leg, run by :func:`run_lane_cell` (the legs
+    need ``spec.term`` declared -- validated at the CaseSpec).
+
+    The SECTOR derives from the leg's own fold: activating a shell
+    moves its electrons into the window (the 3d-metal semi fold leaves
+    ``nelec_act + 4`` active), so a lane key never reuses the case's
+    default sector blindly.
+
+    Examples
+    --------
+    Ti (nelec_act=4, Ar prefix): ``3d4s@ar`` keeps sector (3, 1);
+    ``3d3p@semi`` grows to (5, 3); the M-shell folds to (6, 4).
+    """
+    from dataclasses import replace
+
+    from atomterm.system import sector_na_nb
+    from atomterm.windows import closed_electrons
+
+    base = sector_na_nb(spec.nelec_act, spec.spin)
+    keys = []
+    for label in spec.lane_windows:
+        k = CellKey(spec.symbol, label, base, method="casci",
+                    substrate="pur", fold="avg")
+        nelec = (spec.nelec_act + 2 * spec.ncore
+                 - closed_electrons(k.fold_shells()))
+        keys.append(replace(k, sector=sector_na_nb(nelec, spec.spin)))
+    return keys
+
+
+def void_reason(address, scenarios) -> str | None:
+    """The RUN GATE: why the cell at ``address`` (a
+    :class:`CellKey` or its address string) is void under the declared
+    scenarios, or None if it runs.  A void cell stays addressable -- a
+    full regen materializes it, which re-tests the scenario's dated
+    claim.  First enabled match wins (scenario order: campaign
+    defaults, then the row's).
+    """
+    a = address.address if isinstance(address, CellKey) else address
+    for s in scenarios:
+        if s.enabled and s.gates(a):
+            return f"{s.name}: {s.reason}"
+    return None

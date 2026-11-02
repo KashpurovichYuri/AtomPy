@@ -19,6 +19,13 @@ Group (--group): one named declared group instead of the full grid
     planned                 the planned windows' grids (declared,
                             not yet run)
     lattice                 the free-ion d2 lattice cells
+    lane                    the pinned-lane legs (CI-level term
+                            energies, run_lane_cell on a D2h substrate)
+
+Run gate (--full materializes): cells voided by a declared scenario
+    (cases.Scenario -- e.g. the anchor-first protocol on planned
+    windows' optimizer cells) are recorded as void-with-reason and
+    skipped; --full runs them, re-testing the scenario's dated claim.
 
 Axis filters (AND-composed; each matches the CellKey field exactly):
     --method casci          casci | casscf | sa-casscf
@@ -45,12 +52,33 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from atomterm.cases import CAMPAIGN  # noqa: E402
-from atomterm.cells import (CellKey, cell_payload, diagnostics, grid_keys,  # noqa: E402
-                            lattice_keys, planned, run_cell, spine_keys)
+from pyscf import gto, scf  # noqa: E402
+
+from atomterm.cases import CAMPAIGN, scenarios_for  # noqa: E402
+from atomterm.cells import (CellKey, cell_payload, diagnostics,  # noqa: E402
+                            grid_keys, lane_keys, lattice_keys, planned,
+                            run_cell, run_lane_cell, spine_keys,
+                            void_reason)
 from atomterm.reference import run_frac_occ, run_rohf  # noqa: E402
 from atomterm.system import sector_na_nb  # noqa: E402
 from atomterm.windows import select_valence_ao  # noqa: E402
+
+
+def lane_substrate(spec):
+    """The pinned lane's D2h substrate: plain ROHF at tight tolerance
+    (the certified lane construction's substrate; the reference
+    spec's occupation forcing is deliberately NOT applied -- the lane
+    record was measured on the plain substrate)."""
+    mol = gto.M(atom=f"{spec.symbol} 0 0 0", basis=spec.basis,
+                spin=spec.spin, ecp=spec.ecp, symmetry="D2h", verbose=0)
+    mf = scf.ROHF(mol)
+    mf.conv_tol = 1e-12
+    mf.kernel()
+    if not mf.converged:
+        sys.exit(f"the lane substrate SCF did not converge "
+                 f"({spec.symbol}, D2h)")
+    print(f"lane substrate D2h ROHF E = {mf.e_tot:.8f} Eh", flush=True)
+    return mol, mf
 
 
 def run_queue(name, spec, sector, group) -> list[CellKey]:
@@ -64,6 +92,8 @@ def run_queue(name, spec, sector, group) -> list[CellKey]:
         return planned(spec)
     if group == "lattice":
         return lattice_keys(spec)
+    if group == "lane":
+        return lane_keys(spec)
     return grid_keys(spec) + lattice_keys(spec)
 
 
@@ -95,10 +125,13 @@ def parse_args(argv) -> argparse.Namespace:
                    help="declared atoms to run (default: every CAMPAIGN "
                         "atom, CAMPAIGN order)")
     p.add_argument("--group", choices=["grid", "spine", "diagnostics",
-                                       "planned", "lattice"],
+                                       "planned", "lattice", "lane"],
                    help="one named declared group instead of the full "
                         "grid: grid | spine | diagnostics | planned | "
-                        "lattice")
+                        "lattice | lane")
+    p.add_argument("--full", action="store_true",
+                   help="materialize scenario-voided cells (re-testing "
+                        "their dated claims)")
     p.add_argument("--method",
                    help="keep this method: casci | casscf | sa-casscf")
     p.add_argument("--window",
@@ -129,17 +162,21 @@ def _write_atomic(path: Path, text: str) -> None:
 
 
 def render(atom, rohf_e, cells: dict, ruler: str) -> str:
-    """The cells.md report: one row per stored cell (key-addressed,
-    the ruler's ΔE within its sector only), plus per-root
-    configuration lines."""
-    ref = cells.get(ruler)
+    """The cells.md report: one row per stored FACTS cell
+    (key-addressed, the ruler's ΔE within its sector only), plus
+    per-root configuration lines; the other payload shapes render in
+    their own sections (lane cells: term energies; void cells: their
+    scenario's reason)."""
+    facts_cells = {a: r for a, r in cells.items() if "e_ground" in r}
+    other = [(a, r) for a, r in cells.items() if "e_ground" not in r]
+    ref = facts_cells.get(ruler)
     lines = [f"# Orbital-treatment cells: {atom}", "",
              f"ROHF reference energy: {rohf_e:.8f} Eh", "",
              f"{'cell':<44} {'E_ground':>16} {'dE_vs_avg':>10} {'<L^2>':>9} "
              f"{'|[H,Lz]|':>10} {'|[H,L2]|':>10} {'|[P,Lz]|':>9} {'|[P,Lp]|':>9} "
              f"{'win_l':>6} {'aniso':>9} {'max|dE|':>9} {'ortho':>9}  conv"]
     ruler_sec = CellKey.from_address(ruler).sector
-    for addr, r in cells.items():
+    for addr, r in facts_cells.items():
         # ΔE vs the ruler only within its sector -- cross-sector rows
         # (the d² lattice vs the 3d²4s² spine) have no common zero
         d_e = (r["e_ground"] - ref["e_ground"]
@@ -161,9 +198,20 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
             f"{r['max_de_vs_pyscf']:>9.1e} {r['ortho_err']:>9.1e}"
             f"{flag}")
     lines += ["", "configurations per root (top-2 determinants):"]
-    for addr, r in cells.items():
+    for addr, r in facts_cells.items():
         for i, cfg_str in enumerate(r["configurations"][:9]):
             lines.append(f"  {addr:<44} root {i}: {cfg_str}")
+    if other:
+        lines += ["", "lane cells (pinned-route term energies) and "
+                      "void cells (scenario-gated):"]
+        for addr, r in other:
+            if "void_reason" in r:
+                lines.append(f"  {addr:<44} VOID -- {r['void_reason']}")
+            else:
+                lines.append(
+                    f"  {addr:<44} E_term {r['total']:>16.8f}"
+                    f"  ptp {r['ptp']:.1e}"
+                    f"  L2 {['%.3f' % v for v in r['l2']]}")
     return "\n".join(lines) + "\n"
 
 
@@ -215,11 +263,26 @@ def main() -> None:
                                spec.nelec_act, len(act_idx),
                                open_idx=act_idx)
 
+        scens = scenarios_for(spec)
+        lane_sub = None
         for key in queue:
+            reason = void_reason(key, scens)
+            if reason and not args.full:
+                print(f"  [void] {key.address} -- {reason}", flush=True)
+                cells[key.address] = {"cell": key.address,
+                                      "void_reason": reason}
+                continue
             print(f"  [cell] {key.address}", flush=True)
-            facts = run_cell(key, mf, frac_mf=mf_f, workdir="elements",
-                             budgets={"sa_weights": spec.sa_weights})
-            cells[key.address] = cell_payload(key, facts)
+            if key.fold_tag is not None:
+                if lane_sub is None:
+                    lane_sub = lane_substrate(spec)
+                cells[key.address] = run_lane_cell(
+                    key, lane_sub[0], lane_sub[1], spec.term,
+                    workdir="elements")
+            else:
+                facts = run_cell(key, mf, frac_mf=mf_f, workdir="elements",
+                                 budgets={"sa_weights": spec.sa_weights})
+                cells[key.address] = cell_payload(key, facts)
 
         _write_atomic(out / "cells.json",
                       json.dumps({"atom": name,

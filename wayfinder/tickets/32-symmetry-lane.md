@@ -422,7 +422,70 @@ term-targets, cells axis, campaign tables via the lane, the Ti
 TABLES compression with both records) -- GATED on the user's
 enable; the ticket-31 interleave alongside.
 
+## Step 8, first execution round (2026-11-02 — the grammar + the runner + the Sc rollout)
+
+The workset spec's three modules LANDED, with its pins:
+
+1. THE FOLD RESOLVER (windows): `fold_shells(name, open_d=)` — the
+   noble-gas table (`NOBLE_CORES`, universal), the `semi` class rule
+   (the noble core ending at np, minus np, plus (n+1)s; open_d the
+   atom's open d shell), explicit lists (concatenated or
+   comma-separated, must consume entirely); unknown names refuse.
+   `closed_electrons(shells)` = 2 per m-slot (the lane sector
+   derivation: nelec = nelec_act + 2·ncore − closed(fold); verified
+   against the ladder's CAS(8,·)/(10,·) legs exactly).  Pins: 3 unit.
+2. THE SCENARIO LAYER (cases): `Scenario` (name/cells/instead_of/
+   reason/render/eps/enabled; render kinds 'keep'|'collapse', unknown
+   kinds refuse at construction) + `scenarios_for` (campaign defaults
+   ⊕ the row by name — DEFAULT_SCENARIOS empty today, the merge is the
+   tested seam).  FIRST REAL USE: Ti's `anchor-first` scenario — the
+   planned windows' optimizer cells (both label forms, plain + NO)
+   are void-with-reason until their CASCI anchors are read; the gate
+   is exact (58/66 planned cells void, the 8 anchors + the primary
+   grid run).  Pins: 4 unit.
+3. THE LANE (cells): the `@fold` window grammar (the tag is part of
+   the address — a tagged window NEVER collides with a free-route
+   label; NO windows take none), `lane_keys` (the sector derives from
+   the leg's fold), `run_lane_cell`/`load_lane_cell` (the ladder's
+   uniform construction productized — the certified fixture now RUNS
+   the production path; its `_ladder_leg` deleted), `void_reason`
+   (the run gate; `--full` materializes).  `CaseSpec.term` (L, parity)
+   declared for C/Si/Sc/Ti; `lane_windows` for all four (C/Si join
+   the lane with their default folds as explicit lists).  Pins: 3
+   fast + the carbon lane run (term exact, store round-trip, cache
+   hit, three refusals) + the emitter determinism.
+4. THE EMITTER (scripts/build_lane_tables.py, the family's third
+   member): the `<!-- lane:begin/end -->` block generated from
+   cells.json under the TABLES edit protocol; the prose around the
+   markers stays hand (the readings, the mechanism record).  regen
+   gained `--group lane` + the void gate + `--full`; render() carries
+   the lane/void payload shapes in their own sections.
+5. THE ROLLOUTS (the first production lane runs, all four atoms):
+   Sc −759.727436 / −759.787120; C −37.067793; Si −288.485053; Ti
+   all seven legs — every total matches the certified record to its
+   4-decimal precision.  THE DRAW-FREE PROOF, stronger in production
+   than in the fixture: the Ti run's D2h substrate SCF landed in a
+   DIFFERENT ROHF basin (−848.2834 vs the fixture's −848.4065, ~0.12
+   Eh apart — the multi-basin class) and the ladder totals are
+   IDENTICAL anyway: only mf.h_core enters the construction, and it
+   is draw-independent.  All four TABLES lane blocks are now
+   GENERATED (as-run provenance; the markers bound the generated
+   block, the prose stays hand).  The stale study blocks in all five
+   element files carry the frozen-history label (the generator is
+   retired).
+
+Declined: the Ti compression as a scenario (it is presentation —
+the emitter's row policy — not a physics declaration; the spec's
+"render policy" wording read as data was over-literal).  SA-level
+lane cells wait for the cost probe, undeclared.
+
+REMAINING for step 8: the Ti CAS(4,6) grid compression under the
+render policy, the SA cost probe on {3d,3p,4d} (gated — SA cells
+undeclared until priced), the wave-close two-axis review + design
+survey, then ticket 31 (U).
+
 ## References
+
 
 - The live probes and the mini-anchor of 2026-10-31 (session record;
   the demo script is the anchor test's skeleton).

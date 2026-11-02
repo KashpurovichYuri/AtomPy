@@ -27,6 +27,7 @@ reproducibility at risk.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -37,7 +38,8 @@ from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
 from atomterm.reference import ReferenceSpec, run_rohf
 from atomterm.scans import ScanSpec
-from atomterm.windows import build_full_mo, occupied_core_idx, select_valence_ao
+from atomterm.windows import (build_full_mo, closed_electrons, fold_shells,
+                              occupied_core_idx, select_valence_ao)
 from atomterm.casscf import (
     run_casci,
     run_casscf as casscf_stage,
@@ -46,11 +48,86 @@ from atomterm.casscf import (
 from atomterm.stages import stage_facts
 from atomterm.analysis import format_report
 
-__all__ = ["CaseSpec", "CAMPAIGN", "run_case", "run_atom", "run_carbon",
-           "main"]
+__all__ = ["CaseSpec", "Scenario", "CAMPAIGN", "scenarios_for",
+           "run_case", "run_atom", "run_carbon", "main"]
 
 
 # the declaration ----------------------------------------------------
+
+@dataclass(frozen=True)
+class Scenario:
+    """One declared scenario: a named, dated physics claim that a set
+    of cells need not run (and how their rows render).
+
+    A scenario is DECLARED DATA, interpreted by exactly two consumers
+    -- the run gate (:func:`atomterm.cells.void_reason`: a scenario'd
+    cell is void-with-reason at its key, still addressable; a full
+    regen materializes it) and the render policy (the emitter: with
+    ``render="collapse"``, a materialized row agreeing with its
+    ``instead_of`` head within ``eps`` collapses into a generated
+    note).  The vocabulary is generic on purpose: what a scenario
+    MEANS physically lives in its ``reason``.
+
+    Attributes
+    ----------
+    name : the scenario's provenance key (campaign defaults and
+        per-atom declarations merge on it).
+    cells : cell ADDRESS PREFIXES (:attr:`atomterm.cells.CellKey.address`)
+        -- a cell is scenario'd iff its address starts with one.
+    reason : the dated physics claim the gate carries ("... (2026-11-02)");
+        ``--full`` re-tests it.
+    instead_of : the comparison head's address (required by
+        ``render="collapse"``; the eps band is measured on stored
+        payloads).
+    render : the row policy -- ``"keep"`` (render the row, void or
+        materialized, as itself) | ``"collapse"`` (agreeing rows
+        collapse into one note).  The unknown-kind refusal happens
+        here.
+    eps : the collapse band.
+    enabled : the whole scenario's gate (both consumers).
+    """
+
+    name: str
+    cells: tuple[str, ...]
+    reason: str
+    instead_of: str | None = None
+    render: str = "keep"
+    eps: float = 1e-4
+    enabled: bool = True
+
+    def __post_init__(self):
+        if not self.name:
+            raise ValueError("a scenario needs a name")
+        if not self.cells:
+            raise ValueError(f"scenario {self.name!r} names no cells")
+        if not self.reason:
+            raise ValueError(f"scenario {self.name!r} carries no reason")
+        if self.render not in ("keep", "collapse"):
+            raise ValueError(
+                f"scenario {self.name!r}: unknown render kind {self.render!r}"
+                " (kept kinds: 'keep' | 'collapse')")
+        if self.render == "collapse" and not self.instead_of:
+            raise ValueError(
+                f"scenario {self.name!r}: render='collapse' needs the "
+                "comparison head (instead_of=<address>)")
+        if not self.eps > 0:
+            raise ValueError(f"scenario {self.name!r}: eps must be positive")
+
+    def gates(self, address: str) -> bool:
+        """Whether ``address`` is this scenario's cell (prefix match)."""
+        return self.enabled and address.startswith(self.cells)
+
+    def collapses(self, value: float, head_value: float) -> bool:
+        """The render decision for a materialized row: agreement with
+        the head within ``eps``."""
+        return abs(value - head_value) <= self.eps
+
+
+# campaign-level scenarios applied to EVERY atom unless its row
+# overrides them by name (none today -- the merge is the tested seam;
+# a campaign-wide scenario arrives with its first campaign-wide claim)
+DEFAULT_SCENARIOS: dict[str, Scenario] = {}
+
 
 def _ms_label(na: int, nb: int) -> str:
     """Filename/report label of a sector's M_S = (na - nb) / 2.
@@ -99,6 +176,16 @@ class CaseSpec:
         over the ground term's M_L set by convention).
     run_casscf : the single-root stage (off on multi-solution atoms).
     nroots_primary : PySCF roots for the primary CASCI.
+    term : the certified ground term ``(L, parity)`` the pinned lane
+        targets (parity = the configuration's total inversion parity);
+        None = not certified for lane cells.
+    lane_windows : the pinned-lane legs -- window labels carrying
+        their own fold (``"3d3p4d@semi"``, :func:`atomterm.windows.fold_shells`
+        the tag grammar); each becomes one CI-level lane cell
+        (:func:`atomterm.cells.lane_keys`).  The tag marks the lane
+        cell: a tagged window NEVER collides with a free-route label.
+    scenarios : this atom's :class:`Scenario` declarations (merged
+        over :data:`DEFAULT_SCENARIOS` by :func:`scenarios_for`).
     """
 
     symbol: str
@@ -116,6 +203,37 @@ class CaseSpec:
     planned_windows: tuple[str, ...] = ()
     lattice_windows: tuple[str, ...] = ()
     scan: ScanSpec | None = None
+    term: tuple[int, str] | None = None
+    lane_windows: tuple[str, ...] = ()
+    scenarios: tuple[Scenario, ...] = ()
+
+    def __post_init__(self):
+        """Validate the declaration's own grammar: the term target and
+        every lane window (its tag resolves, its fold stays out of its
+        window).  Fail here, at the seam that owns the grammar."""
+        if self.lane_windows and self.term is None:
+            raise ValueError(
+                "lane windows need the term target (term=(L, 'g' | 'u'))")
+        if self.term is not None:
+            L, parity = self.term
+            if not (isinstance(L, int) and L >= 0) or parity not in ("g", "u"):
+                raise ValueError(
+                    f"term {self.term!r} must be (L >= 0, 'g' | 'u')")
+        open_d = next((p for p in self.shell_patterns
+                       if p.endswith("d")), None)
+        for label in self.lane_windows:
+            span, sep, tag = label.partition("@")
+            shells = re.findall(r"\d+[spdfgh]", span)
+            if not sep or not tag or "".join(shells) != span:
+                raise ValueError(
+                    f"lane window {label!r} must be <shells>@<fold> "
+                    "(e.g. '3d3p@semi')")
+            fold = fold_shells(tag, open_d=open_d)
+            overlap = sorted(set(shells) & set(fold))
+            if overlap:
+                raise ValueError(
+                    f"lane window {label!r}: {overlap} sit in both the "
+                    "window and its fold")
 
     def atom_config(self) -> AtomConfig:
         """The spec as an :class:`AtomConfig` (``tag`` defaults to the
@@ -146,18 +264,35 @@ _U_TIER = {
     "4f2d": ("8f", "9f", "10f", "11f", "12d", "13d"),
 }
 
+# the standing protocol for planned windows, enforced: their OPTIMIZER
+# cells stay void until their CASCI anchors have been read (a full
+# regen materializes on demand).  The prefixes name every label form
+# the grid gives the windows (plain and NO-prefix).
+_ANCHOR_FIRST = Scenario(
+    name="anchor-first",
+    cells=("ti_3d4d_3-1_casscf_", "ti_3d4dno2_3-1_casscf_",
+           "ti_3d4d_3-1_sa-casscf_", "ti_3d4dno2_3-1_sa-casscf_",
+           "ti_3d4s4p4d_3-1_casscf_", "ti_3d4s4p4dno4_3-1_casscf_",
+           "ti_3d4s4p4d_3-1_sa-casscf_", "ti_3d4s4p4dno4_3-1_sa-casscf_"),
+    reason="planned windows anchor first: no optimizer cell of a window "
+           "whose CASCI anchors are unread (2026-11-02)")
+
 CAMPAIGN: dict[str, CaseSpec] = {
     "C": CaseSpec("C", "ccpvdz", nelec_act=2, ncore=2,
                   shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3,
+                  term=(1, "g"), lane_windows=("2p@1s2s",),
                   scan=ScanSpec(fam=("2p", "3p"),
                                 grid=(0.0, 0.8, 17))),
     "Si": CaseSpec("Si", "ccpvdz", nelec_act=2, ncore=6,
                    shell_patterns=["3p"], spin=2, sa_weights=[1 / 3] * 3,
+                   term=(1, "g"), lane_windows=("3p@1s2s2p3s",),
                    scan=ScanSpec(fam=("3p", "4p"),
                                  grid=(0.0, 1.1, 23))),
     "Sc": CaseSpec("Sc", "ccpvdz", nelec_act=3, ncore=9,
                    shell_patterns=["3d", "4s"], spin=1,
                    sa_weights=[1 / 5] * 5,
+                   term=(2, "g"),
+                   lane_windows=("3d4s@ar", "3d3p@semi"),
                    scan=ScanSpec(fam=("3d", "4d"), grid=(0.0, 0.4, 9),
                                  # 4s fixed: the 4s->5s direction is
                                  # harmful and would mask the d structure
@@ -168,6 +303,12 @@ CAMPAIGN: dict[str, CaseSpec] = {
     "Ti": CaseSpec("Ti", "ccpvdz", nelec_act=4, ncore=9,
                    shell_patterns=["3d", "4s"], spin=2,
                    sa_weights=[1 / 7] * 7,
+                   term=(3, "g"),
+                   lane_windows=("3d4s@ar", "3d4d@ar", "3d4s4p4d@ar",
+                                 "3d3p@semi", "3d3p4d@semi",
+                                 "3s3p3d@1s2s2p4s",
+                                 "3d3p4s@1s2s2p3s"),
+                   scenarios=(_ANCHOR_FIRST,),
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
                        occ_open=("3d",), occ_e_ref=-848.40648875),
@@ -187,6 +328,17 @@ CAMPAIGN: dict[str, CaseSpec] = {
                       occ_e_ref=-50.38185233,
                       conv_accelerator="newton")),
 }
+
+
+def scenarios_for(spec: CaseSpec) -> tuple[Scenario, ...]:
+    """The spec's effective scenarios: the campaign defaults
+    (:data:`DEFAULT_SCENARIOS`) merged with the row's own -- the row
+    wins by name.  The ONE evaluated policy object the gate consumers
+    read (run gate + render policy); disabled scenarios stay in the
+    tuple (their ``enabled`` flag is the consumer's check).
+    """
+    merged = {**DEFAULT_SCENARIOS, **{s.name: s for s in spec.scenarios}}
+    return tuple(merged.values())
 
 
 # the executor -------------------------------------------------------

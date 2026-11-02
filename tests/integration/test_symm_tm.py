@@ -20,34 +20,31 @@ identity, components degenerate to 4e-7, certificates at 1e-5 --
 the guaranteed component set at the price of ~5 mEh of ensemble
 energy.  The symmetry-vs-variation trade, measured.
 
-Windows, sectors, and weights derive from the CAMPAIGN declaration;
-the ground-term table (L, 2S, parity per atom) is test data, the
-same kind of row test_atoms carries.
+Windows, sectors, weights, and the term target (L, parity) derive
+from the CAMPAIGN declaration; the ground terms' 2S(2S+1) is test
+data, the same kind of row test_atoms carries.
 
 The CAS ladder extends the survey across the WINDOW FAMILIES
 (declared / valence / semi-core / the M shell): the TERM energy per
-window at frozen shells under one uniform construction (Loewdin
-raw-AO-shell folds, ``build_full_mo`` placement, the fold-independent
-bookkeeping ruler) -- deterministic, draw-free on both sides of the
-fold.  Every m-complete window hosts its term exactly; the ordering,
-margins, and the cross-atom scaling are the recorded verdicts
-(elements/Ti,Sc TABLES).  The planned {3d,4d} leg is read as declared
-(a dead-zone window) and pinned as NOT hosting the term.
+window at frozen shells under one uniform construction -- the
+PRODUCTION lane runner (cells.run_lane_cell; the legs and their
+folds are declared data), certified here: every m-complete window
+hosts its term exactly; the ordering, margins, and the cross-atom
+scaling are the recorded verdicts (elements/Ti,Sc TABLES).  The
+planned {3d,4d} leg is read as declared (a dead-zone window) and
+pinned as NOT hosting the term.
 """
 
 import numpy as np
 import pytest
-from pyscf import ao2mo, fci, gto, scf
+from pyscf import gto, scf
 from typing import NamedTuple
 
 from atomterm.casscf import run_irrep_casci, run_irrep_sa, run_sa_casscf
 from atomterm.cases import CAMPAIGN
-from atomterm.core import closed_shell_core_energy
-from atomterm.detbasis import slater_condon_matrix
+from atomterm.cells import lane_keys, run_lane_cell
 from atomterm.irreps import IRREP_IDS, branch_d2h, det_irreps, orb_irreps
 from atomterm.operators import (
-    active_space_integrals,
-    build_operator_parts,
     build_operators,
     ci_in_detbasis_order,
     window_closure,
@@ -55,7 +52,6 @@ from atomterm.operators import (
 from atomterm.system import sector_na_nb
 from atomterm.windows import (
     build_full_mo,
-    lowdin,
     occupied_core_idx,
     select_shell_ao,
     select_valence_ao,
@@ -66,9 +62,11 @@ pytestmark = pytest.mark.slow
 
 # the ground term per atom: L, S(S+1), and the configuration parity
 # (d^k -> g); 2S arrives from the CAMPAIGN row's spin
+# the ground-term 2S(2S+1) per atom -- the one piece the declaration
+# does not carry (L, parity live in CAMPAIGN.<atom>.term)
 _TERMS = {
-    "Sc": dict(L=2, s2=0.75, parity="g"),
-    "Ti": dict(L=3, s2=2.0, parity="g"),
+    "Sc": dict(s2=0.75),
+    "Ti": dict(s2=2.0),
 }
 
 # the free route root-set membership threshold: within-term mixes read
@@ -123,7 +121,8 @@ def tm_lane(request):
     the closed noble-gas core."""
     name = request.param
     spec = CAMPAIGN[name]
-    term = _TERMS[name]
+    L, parity = spec.term
+    term = dict(L=L, parity=parity, s2=_TERMS[name]["s2"])
     na, nb = sector_na_nb(spec.nelec_act, spec.spin)
     (mol_c1, mf_c1), (mol_d2h, mf_d2h) = (
         _substrate(spec, symmetry) for symmetry in (None, "D2h"))
@@ -278,42 +277,21 @@ def test_tm_sa_head_to_head(tm_lane, tmp_path):
 # ---------------------------------------------------------------------------
 # The CAS ladder: the pinned route's TERM-energy survey across the
 # window families (declared / valence / semi-core / the M shell), CI
-# level at frozen shells, ONE uniform construction: fold = Loewdin of
-# the fold's raw AO shell columns, window placed against it through
-# build_full_mo(c_core=) (raw columns carry the documented ~85 mEh
-# window-definition error on core-overlapping windows), pinned solver
-# per branch component, totals = component e_cas mean +
-# closed_shell_core_energy(fold) -- the fold-independent bookkeeping
-# ruler (fact 9's fixed-core-block identity), so CROSS-FOLD legs
-# compare.  The energies are TERM energies, not sector grounds: each
-# window's 2L+1 branch components are solved and averaged.  Everything
-# is draw-free (raw AO spans on both sides of the fold), so the legs
-# are deterministic.
+# level at frozen shells, ONE uniform construction -- the PRODUCTION
+# lane runner (cells.run_lane_cell over cells.lane_keys; the legs and
+# folds are declared data: CAMPAIGN.lane_windows + .term).  The
+# energies are TERM energies, not sector grounds: each window's 2L+1
+# branch components are solved and averaged, the total = component
+# mean + the fold-independent bookkeeping ruler, so CROSS-FOLD legs
+# compare.  Everything is draw-free (raw AO spans on both sides of the
+# fold), so the legs are deterministic.
 
-# the fold spans: the noble-gas prefix, the semi-core fold (3p ACTIVE,
-# 4s folded), and the two M-shell-family folds (README · Fold notation)
-_FOLD_AR = ("1s", "2s", "2p", "3s", "3p")
-_FOLD_SEMI = ("1s", "2s", "2p", "3s", "4s")
-_FOLD_MSHELL = ("1s", "2s", "2p", "4s")
-_FOLD_3S = ("1s", "2s", "2p", "3s")
-
-# (window shells, fold shells, active electrons, tag) per atom; the
-# Ti {3d,4d} leg is read AS DECLARED by the campaign (fold Ar, the 4s
-# pair in the dead zone) -- it is not expected to host the term
-_LADDER = {
-    "Ti": [
-        (("3d", "4s"), _FOLD_AR, 4, "declared"),
-        (("3d", "4d"), _FOLD_AR, 4, "planned"),
-        (("3d", "4s", "4p", "4d"), _FOLD_AR, 4, "valence"),
-        (("3d", "3p"), _FOLD_SEMI, 8, "semicore"),
-        (("3d", "3p", "4d"), _FOLD_SEMI, 8, "semicore_d"),
-        (("3s", "3p", "3d"), _FOLD_MSHELL, 10, "mshell"),
-        (("3d", "3p", "4s"), _FOLD_3S, 10, "semicore_4s"),
-    ],
-    "Sc": [
-        (("3d", "4s"), _FOLD_AR, 3, "declared"),
-        (("3d", "3p"), _FOLD_SEMI, 7, "semicore"),
-    ],
+# lane-window label -> leg tag (the reading key of the pins below)
+_LEG_TAGS = {
+    "3d4s@ar": "declared", "3d4d@ar": "planned",
+    "3d4s4p4d@ar": "valence", "3d3p@semi": "semicore",
+    "3d3p4d@semi": "semicore_d", "3s3p3d@1s2s2p4s": "mshell",
+    "3d3p4s@1s2s2p3s": "semicore_4s",
 }
 
 
@@ -329,82 +307,25 @@ class LadderLeg(NamedTuple):
     anchor: float
 
 
-def _ladder_leg(mol, mf, spin, win, fold_shells, nelec, L, parity,
-                anchor=False):
-    """One ladder leg under the uniform construction (see the section
-    comment); meters are built per IREP BLOCK -- L2/S2/H are totally
-    symmetric, so they never connect determinant irreps and the block
-    restriction is exact.  With ``anchor``, the block H is
-    eigen-solved and compared against the pinned solver (the direct
-    block pattern's convention certificate)."""
-    s = mf.get_ovlp()
-    n = mol.nao_nr()
-    fold_rows = np.concatenate(
-        [select_shell_ao(mol, sh) for sh in fold_shells])
-    c_fold = lowdin(np.eye(n)[:, fold_rows], s)
-    nf = c_fold.shape[1]
-    rows = select_valence_ao(mol, list(win))
-    mo = build_full_mo(mf, list(range(nf)), rows, c_core=c_fold)
-    c = mo[:, nf:nf + len(rows)]
-    ncas = c.shape[1]
-    na, nb = sector_na_nb(nelec, spin)
-    h1, _ = active_space_integrals(mol, mf, c, nf, c_core=c_fold)
-    eri = ao2mo.kernel(mol, c)
-    orbsyms = orb_irreps(mol, c)
-    parts = build_operator_parts(mol, mf, c, nf, na, nb, c_core=c_fold)
-    dets = parts["dets"]
-    ids = det_irreps(orbsyms, na, nb)
-    es, l2s, s2s = [], [], []
-    anchor_dev = 0.0
-    for irrep, mult in branch_d2h(L, parity).items():
-        sol = fci.direct_spin1_symm.FCI(mol)
-        sol.orbsym, sol.wfnsym = orbsyms, IRREP_IDS[irrep]
-        sol.nroots, sol.conv_tol = mult, 1e-12
-        e, ci = sol.kernel(h1, eri, ncas, (na, nb))
-        e = np.atleast_1d(e)[:mult]
-        es.extend(float(x) for x in e)
-        sel = ids == IRREP_IDS[irrep]
-        block = [d for d, m in zip(dets, sel) if m]
-        w_blk = []
-        for vec in _root_vectors(ci):
-            w = ci_in_detbasis_order(vec, ncas, na, nb)[sel]
-            # the pinned vector lives entirely in its block
-            assert abs(np.linalg.norm(w) - 1.0) < 1e-8, irrep
-            w_blk.append(w)
-        if anchor:
-            hb = slater_condon_matrix(block, one_body=parts["H"][0],
-                                      two_body=parts["H"][1])
-            ours = np.linalg.eigvalsh(hb)[:mult]
-            anchor_dev = max(anchor_dev,
-                             float(np.max(np.abs(np.sort(e) - ours))))
-            del hb
-        for meters, op in ((l2s, "L2"), (s2s, "S2")):
-            mb = slater_condon_matrix(block, one_body=parts[op][0],
-                                      two_body=parts[op][1])
-            for w in w_blk:
-                meters.append(float(np.real(w @ mb @ w)))
-            del mb
-    es = np.array(es)
-    return LadderLeg(
-        total=float(es.mean() + closed_shell_core_energy(mf, c_fold)),
-        ptp=float(np.ptp(es)), l2=l2s, s2=s2s, anchor=anchor_dev)
-
-
 @pytest.fixture(scope="module")
-def cas_ladder():
-    """Every ladder leg on one D2h substrate per atom (the head-to-head
-    fixture's D2h twin, through the shared builder).  ~15 min: the
-    semicore_d leg solves 368k determinants."""
+def cas_ladder(tmp_path_factory):
+    """Every declared lane leg through the PRODUCTION runner, on one
+    D2h substrate per atom (the head-to-head fixture's D2h twin, via
+    the shared builder); payloads land in a throwaway store.  ~15 min:
+    the semicore_d leg solves 368k determinants."""
     out = {}
-    for name in sorted(_LADDER):
+    for name in ("Sc", "Ti"):
         spec = CAMPAIGN[name]
-        term = _TERMS[name]
         mol, mf = _substrate(spec, "D2h")
-        for win, fold, nelec, tag in _LADDER[name]:
-            out[(name, tag)] = _ladder_leg(
-                mol, mf, spec.spin, win, fold, nelec,
-                term["L"], term["parity"],
-                anchor=(name == "Ti" and tag == "semicore"))
+        workdir = tmp_path_factory.mktemp(f"lane_{name}")
+        for key in lane_keys(spec):
+            p = run_lane_cell(
+                key, mol, mf, spec.term,
+                anchor=(name == "Ti" and key.window == "3d3p@semi"),
+                workdir=workdir)
+            out[(name, _LEG_TAGS[key.window])] = LadderLeg(
+                total=p["total"], ptp=p["ptp"], l2=p["l2"], s2=p["s2"],
+                anchor=p["anchor_dev"])
     return out
 
 
@@ -417,12 +338,13 @@ def test_cas_ladder_terms(cas_ladder):
     for (name, tag), leg in cas_ladder.items():
         if tag == "planned":
             continue
-        term = _TERMS[name]
-        assert len(leg.l2) == 2 * term["L"] + 1, (name, tag)
+        L = CAMPAIGN[name].term[0]
+        s2 = _TERMS[name]["s2"]
+        assert len(leg.l2) == 2 * L + 1, (name, tag)
         for v in leg.l2:
-            assert abs(v - term["L"] * (term["L"] + 1)) < 1e-8, (name, tag)
+            assert abs(v - L * (L + 1)) < 1e-8, (name, tag)
         for v in leg.s2:
-            assert abs(v - term["s2"]) < 1e-8, (name, tag)
+            assert abs(v - s2) < 1e-8, (name, tag)
         assert leg.ptp < 1e-9, (name, tag)
 
 
@@ -430,7 +352,7 @@ def test_cas_ladder_ordering(cas_ladder):
     # the Ti ordering, margins observed (fresh 2026-10-31):
     # semicore_d -106.0 < mshell -61.8 < semicore_4s -59.8 <
     # semicore -58.9 < valence -44.4 < declared 0 < planned +177.5 mEh
-    e = {tag: cas_ladder[("Ti", tag)].total for _, _, _, tag in _LADDER["Ti"]}
+    e = {tag: cas_ladder[("Ti", tag)].total for tag in _LEG_TAGS.values()}
     order = ["semicore_d", "mshell", "semicore_4s", "semicore",
              "valence", "declared", "planned"]
     for lo, hi in zip(order, order[1:]):

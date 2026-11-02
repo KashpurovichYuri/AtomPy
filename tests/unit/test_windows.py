@@ -10,12 +10,13 @@ import pytest
 
 from pyscf import gto
 
-from atomterm.windows import (Window, build_full_mo, complete_orthonormal,
-                              lm_sectors, lowdin, occupied_core_idx,
-                              primitive_chain, select_primitives,
-                              select_span, select_valence_ao,
-                              select_shell_ao, shell_weights,
-                              span_projector)
+from atomterm.windows import (NOBLE_CORES, Window, build_full_mo,
+                              closed_electrons, complete_orthonormal,
+                              fold_shells, lm_sectors, lowdin,
+                              occupied_core_idx, primitive_chain,
+                              select_primitives, select_span,
+                              select_valence_ao, select_shell_ao,
+                              shell_weights, span_projector)
 from helpers import uncontracted_carbon_mole
 
 pytestmark = pytest.mark.fast
@@ -323,3 +324,46 @@ def test_primitive_chain_and_select_primitives():
     ccd.build()
     with pytest.raises(ValueError, match="contractions"):
         primitive_chain(ccd, 1)
+
+
+# -------------------------------------------------------- the fold vocabulary
+
+
+def test_fold_shells_rules():
+    """The three rule classes resolve: the universal noble-gas table,
+    the semi class rule (the noble core ending at np, minus np, plus
+    (n+1)s -- the open-d period's), and the explicit list (concatenated
+    or comma-separated -- it must consume entirely)."""
+    assert fold_shells("he") == ("1s",)
+    assert fold_shells("AR") == NOBLE_CORES["ar"]
+    assert fold_shells("kr") == ("1s", "2s", "2p", "3s", "3p",
+                                 "4s", "3d", "4p")
+    assert fold_shells("semi", open_d="3d") == ("1s", "2s", "2p", "3s", "4s")
+    assert fold_shells("semi", open_d="4d") == ("1s", "2s", "2p", "3s",
+                                                "3p", "4s", "3d", "5s")
+    assert fold_shells("1s2s2p4s") == ("1s", "2s", "2p", "4s")
+    assert fold_shells("1s, 2s") == ("1s", "2s")
+
+
+def test_fold_shells_refusals():
+    """Unknown names, junk lists, and semi without a usable open-d
+    shell all refuse at the resolver (the seam that owns the
+    vocabulary)."""
+    for name, open_d in (("xe2", None), ("np", None), ("1s2q", None),
+                         ("s", None), ("", None),
+                         ("semi", None), ("semi", "3p"), ("semi", "7d")):
+        with pytest.raises(ValueError):
+            fold_shells(name, open_d=open_d)
+
+
+def test_closed_electrons():
+    """Two electrons per m-slot: the noble cores' shell closures and
+    the ladder's Ti folds (semi leaves 8 of 22 active; the M-shell
+    folds leave 10)."""
+    assert closed_electrons(NOBLE_CORES["he"]) == 2
+    assert closed_electrons(NOBLE_CORES["ne"]) == 10
+    assert closed_electrons(NOBLE_CORES["ar"]) == 18
+    assert closed_electrons(NOBLE_CORES["rn"]) == 86
+    assert closed_electrons(fold_shells("semi", open_d="3d")) == 14
+    assert 22 - closed_electrons(("1s", "2s", "2p", "4s")) == 10
+    assert 22 - closed_electrons(("1s", "2s", "2p", "3s")) == 10

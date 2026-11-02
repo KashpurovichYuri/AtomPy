@@ -147,7 +147,10 @@ is exactly that element's closed-shell prefix — He {1s}, Ne
 open-(n)d atom, the noble-gas prefix with the (n−1)p shell promoted to
 the active window and the valence ns pair folded in — on the 3d
 metals, Ar − 3p + 4s = {1s,2s,2p,3s,4s}. Every other fold is written
-as an explicit shell list, e.g. {1s,2s,2p,4s}.
+as an explicit shell list, e.g. {1s,2s,2p,4s}. The machine form
+(addresses, declarations) is the concatenated list — `1s2s2p4s` —
+resolved by `windows.fold_shells`; a lane window carries its fold as
+a tag on the label (`3d3p@semi`).
 
 **The treatment grid.** One declared grid, priced and classified at
 fixed window: fold (raw/avg/frac) × start (AO/MO/NO) × mask

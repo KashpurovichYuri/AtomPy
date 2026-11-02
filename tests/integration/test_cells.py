@@ -20,12 +20,17 @@ from atomterm.cells import (
     cell_chk,
     diagnostics,
     grid_keys,
+    lane_keys,
     lattice_keys,
     load_cell,
+    load_lane_cell,
     planned,
+    run_lane_cell,
     spine_keys,
+    void_reason,
     window_grid,
 )
+from atomterm.cases import CAMPAIGN, scenarios_for
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
 from atomterm.operators import ci_in_detbasis_order, pyscf_ci_permutation
 from atomterm.windows import span_overlap
@@ -126,6 +131,60 @@ def test_no_window_grammar():
         CellKey("Ti", "3d4s", (3, 1), start="no")
     with pytest.raises(ValueError, match="agree"):
         CellKey("Ti", "3d4sno2", (3, 1))        # ao start, no-tail label
+
+
+@fast
+def test_lane_window_grammar():
+    """A lane window carries its fold as a tag: the tag is part of the
+    address (never collides with a free-route label), stays out of the
+    span selectors, and resolves through the fold vocabulary; NO
+    windows take no tag (their fold is the source's)."""
+    k = CellKey("ti", "3d3p4d@semi", (5, 3), substrate="pur")
+    assert CellKey.from_address(k.address) == k
+    assert k.address == "ti_3d3p4d@semi_5-3_casci_ao_-_pur_avg"
+    assert k.shell_patterns == ["3d", "3p", "4d"]
+    assert k.fold_tag == "semi"
+    assert k.fold_shells() == ("1s", "2s", "2p", "3s", "4s")
+    with pytest.raises(ValueError, match="fold tag"):
+        CellKey("Ti", "3d4sno2@semi", (3, 1), start="no")
+    with pytest.raises(ValueError, match="fold tag"):
+        CellKey("Ti", "3d4s", (3, 1)).fold_shells()
+    with pytest.raises(ValueError, match="neither"):
+        CellKey("Ti", "3d3p@nope", (5, 3)).fold_shells()
+
+
+@fast
+def test_lane_keys_derive_from_the_declaration():
+    """The lane legs and their SECTORS derive from the declaration:
+    activating a shell moves its electrons into the window, so the
+    sector follows the fold (Ti semi grows (3,1) -> (5,3), the
+    M-shell folds to (6,4); the Ar legs keep the case sector)."""
+    ti = {k.window: k.sector for k in lane_keys(CAMPAIGN["Ti"])}
+    assert ti["3d4s@ar"] == (3, 1)
+    assert ti["3d4d@ar"] == (3, 1)
+    assert ti["3d3p@semi"] == (5, 3)
+    assert ti["3d3p4d@semi"] == (5, 3)
+    assert ti["3s3p3d@1s2s2p4s"] == (6, 4)
+    assert ti["3d3p4s@1s2s2p3s"] == (6, 4)
+    assert [(k.window, k.sector) for k in lane_keys(CAMPAIGN["Sc"])] == [
+        ("3d4s@ar", (2, 1)), ("3d3p@semi", (4, 3))]
+    assert lane_keys(CAMPAIGN["U"]) == []
+
+
+@fast
+def test_void_reason_gates_scenariod_cells():
+    """The run gate: the anchor-first scenario voids EXACTLY the
+    planned windows' optimizer cells (both label forms); the CASCI
+    anchors and the primary grid run.  A void cell stays addressable
+    (the key constructs; only the run is gated)."""
+    spec = CAMPAIGN["Ti"]
+    sc = scenarios_for(spec)
+    for k in planned(spec):
+        assert (void_reason(k, sc) is not None) == (k.method != "casci"), \
+            k.address
+    assert all(void_reason(k, sc) is None for k in grid_keys(spec))
+    reason = void_reason("ti_3d4d_3-1_casscf_ao_-_pol_avg", sc)
+    assert reason.startswith("anchor-first") and "2026-11-02" in reason
 
 
 @fast
@@ -591,3 +650,82 @@ def test_pick_no_window_selects_by_group_number():
         _pick_no_window(wins, 1)
     with pytest.raises(ValueError, match="no3 is not among them"):
         _pick_no_window(wins, 3)
+
+
+@slow
+def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
+    """The lane runner on the frozen D2h carbon twin: the declared leg
+    hosts its term exactly (all 2L+1 components read L(L+1), S(S+1),
+    degenerate), the payload round-trips the store, and the runner
+    refuses non-lane keys, wrong sectors, and absent fold shells."""
+    cfg, mol, mf, _ = carbon_d2h
+    key = lane_keys(CAMPAIGN["C"])[0]
+    assert (key.window, key.sector) == ("2p@1s2s", (2, 0))
+    p = run_lane_cell(key, mol, mf, CAMPAIGN["C"].term, workdir=tmp_path)
+    assert p["cell"] == key.address and p["term"] == [1, "g"]
+    assert len(p["energies"]) == 3 and p["ptp"] < 1e-9
+    for v in p["l2"]:
+        assert abs(v - 2.0) < 1e-8          # 3P: L(L+1) = 2
+    for v in p["s2"]:
+        assert abs(v - 2.0) < 1e-8          # S(S+1) = 2
+    # the store round-trips (and a fresh run is a cache hit)
+    q = load_lane_cell(key, workdir=tmp_path)
+    assert q["total"] == p["total"] and q["energies"] == p["energies"]
+    assert run_lane_cell(key, mol, mf, CAMPAIGN["C"].term,
+                         workdir=tmp_path) == p
+    # refusals: a free-route key, a sector disagreeing with the fold,
+    # a fold shell the basis lacks
+    with pytest.raises(ValueError, match="lane cell"):
+        run_lane_cell(CellKey("C", "2p", (2, 0)), mol, mf, (1, "g"),
+                      workdir=tmp_path)
+    with pytest.raises(ValueError, match="active electrons"):
+        run_lane_cell(CellKey("C", "2p@1s2s", (3, 1), substrate="pur"),
+                      mol, mf, (1, "g"), workdir=tmp_path)
+    with pytest.raises(ValueError, match="no 5s shell"):
+        run_lane_cell(CellKey("C", "2p@1s5s", (2, 0), substrate="pur"),
+                      mol, mf, (1, "g"), workdir=tmp_path)
+
+
+@fast
+def test_lane_emitter_deterministic():
+    """The lane emitter's generated block: byte-identical across calls
+    from the same payloads (the emitter REPORTS, the ladder pins
+    certify), the verdict column reads the meters (exact vs not-a-term
+    window), a leg without a payload renders pending, and a missing
+    anchor leg refuses."""
+    import importlib.util
+    from pathlib import Path as _Path
+
+    loader = importlib.util.spec_from_file_location(
+        "build_lane_tables",
+        _Path(__file__).resolve().parents[2] / "scripts"
+        / "build_lane_tables.py")
+    mod = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(mod)
+
+    cs = CAMPAIGN["Sc"]
+    keys = lane_keys(cs)
+    payloads = {k.address: {"total": -759.7274, "n_det": 90,
+                            "l2": [6.0] * 5, "s2": [0.75] * 5,
+                            "ptp": 1e-13} for k in keys}
+    block = mod.section(cs, payloads)
+    assert block == mod.section(cs, payloads)
+    lines = [l for l in block.splitlines() if l.startswith("|")]
+    assert len(lines) == 4, lines                     # head + sep + 2 legs
+    assert lines[2].startswith("| 3d4s | (3,6) | Ar |")
+    assert "²D exact" in lines[2] and "| 0 |" in lines[2]
+    assert lines[3].startswith("| 3d3p | (7,8) | semi |")
+
+    no_payload = dict(payloads)
+    del no_payload[keys[1].address]
+    assert "pending" in mod.section(cs, no_payload)
+    no_anchor = dict(payloads)
+    del no_anchor[keys[0].address]
+    with pytest.raises(SystemExit, match="anchor"):
+        mod.section(cs, no_anchor)
+
+    # a scrambling leg (the planned-window class) reads NOT-a-term
+    scramble = dict(payloads)
+    scramble[keys[1].address] = {**payloads[keys[1].address],
+                                 "l2": [6.0, 12.0, 6.0, 6.0, 30.0]}
+    assert "not a ²D window" in mod.section(cs, scramble)
