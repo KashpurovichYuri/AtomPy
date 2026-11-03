@@ -40,6 +40,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 from pyscf import ao2mo, fci, lib, mcscf
+from pyscf.mcscf import mc1step
 
 from atomterm.irreps import branch_d2h, orb_irreps
 from atomterm.operators import active_space_integrals
@@ -81,11 +82,14 @@ class CASResult:
     mo_coeff : np.ndarray or None
         The converged FULL MO matrix.
     mc : object or None
-        The live pyscf object. Read ``converged`` from it, nothing
-        else -- the mutation rule above.
+        The live pyscf object. Read ``converged`` and the optimizer's
+        ``cycles`` from it, nothing else -- the mutation rule above.
     core_energy : float
         ``e_tot`` minus the (weight-averaged for SA) active energy:
         the constant every per-root total shares.
+    cycles : int or None
+        The optimizer's macro-cycle count (cost pricing + restart
+        audits); ``None`` for runs without an optimizer (CASCI).
     """
 
     energies: np.ndarray  # total energies of the roots
@@ -93,6 +97,7 @@ class CASResult:
     mo_coeff: np.ndarray | None = None
     mc: object | None = None  # live pyscf object
     core_energy: float = 0.0  # total minus active-space energy
+    cycles: int | None = None  # optimizer macro-cycles (CI: None)
 
 
 # ------------------------------------------------- checkpointing + the kernel
@@ -120,6 +125,24 @@ def _core_energy(mc) -> float:
     return e_tot - avg_active
 
 
+def _count_cycles(mc) -> list[int]:
+    """Install the macro-cycle counter on an optimizer and return its
+    mutable cell -- PySCF never stores the count (the loop counter is
+    kernel-local); the per-cycle ``callback`` IS the instrument,
+    chained onto any user callback.  Read the cell after ``kernel()``.
+    """
+    count = [0]
+    prev = getattr(mc, "callback", None)
+
+    def _tick(env):
+        count[0] += 1
+        if callable(prev):
+            prev(env)
+
+    mc.callback = _tick
+    return count
+
+
 def _root_energies(mc) -> np.ndarray:
     """Total energies of all roots (active-space e_cas + common core part)."""
     e_cas = np.atleast_1d(np.asarray(mc.e_cas)).ravel().astype(float)
@@ -133,11 +156,16 @@ def _run(mc, nroots: int, chkfile: str, name: str, verbose: int) -> CASResult:
     mc.fcisolver.nroots = nroots
     mc.verbose = verbose
     mc.chkfile = chkfile
+    # the optimizer class only (mcscf.CASSCF is the factory;
+    # mc1step.CASSCF the class; CASCI is not its subclass)
+    count = (_count_cycles(mc)
+             if isinstance(mc, mc1step.CASSCF) else None)
     mc.kernel()
     energies = _root_energies(mc)  # nroots=1 reproduces float(mc.e_tot)
     ci = [mc.ci] if nroots == 1 else list(mc.ci)
     _checkpoint(chkfile, name, energies, ci)
-    return CASResult(energies, ci, mc.mo_coeff, mc, _core_energy(mc))
+    return CASResult(energies, ci, mc.mo_coeff, mc, _core_energy(mc),
+                     cycles=count[0] if count is not None else None)
 
 
 # --------------------------------------------------------------------- CASCI
@@ -390,7 +418,8 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     Returns
     -------
     ``{"e_tot": ensemble total, "mo": the converged FULL MO matrix,
-    "converged": bool, "roots": the run_irrep_casci readout}``.
+    "converged": bool, "cycles": the optimizer's macro-cycle count,
+    "roots": the run_irrep_casci readout}``.
 
     Notes
     -----
@@ -415,8 +444,10 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
                              L, parity, conv_tol)
     mcscf.state_average_mix_(
         mc, [s for _, s, _ in solvers], [1.0 / (2 * L + 1)] * (2 * L + 1))
+    count = _count_cycles(mc)
     mc.kernel(mo_full)
     roots = run_irrep_casci(mol, mf, mc.mo_coeff[:, active], ncore,
                             na, nb, L, parity, conv_tol, c_core=c_core)
     return {"e_tot": float(mc.e_tot), "mo": mc.mo_coeff,
-            "converged": bool(mc.converged), "roots": roots}
+            "converged": bool(mc.converged), "cycles": count[0],
+            "roots": roots}

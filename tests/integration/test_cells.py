@@ -579,6 +579,12 @@ def test_sa_casscf_run_completes_the_roots_store(carbon, tmp_path):
     chk = cell_chk(key, tmp_path)
     ci = lib.chkfile.load(str(chk), f"atomterm/{key.address}_roots/ci_stack")
     assert ci is not None and len(ci) == len(facts.energies_pyscf)
+    # the optimizer's macro-cycle count persists (the callback is the
+    # instrument -- PySCF stores no count); CI runs read 0
+    assert data.cycles > 0
+    ci_key = CellKey("C", "2p", (1, 1), method="casci")
+    run_cell(ci_key, mf, workdir=tmp_path)
+    assert load_cell(ci_key, tmp_path).cycles == 0
 
 
 @slow
@@ -676,6 +682,7 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
     # the store round-trips (and a fresh run is a cache hit)
     q = load_lane_cell(key, workdir=tmp_path)
     assert q["total"] == p["total"] and q["energies"] == p["energies"]
+    assert "mo_coeff" not in q and "cycles" not in q  # CI: no optimizer
     assert run_lane_cell(key, mol, mf, CAMPAIGN["C"].term,
                          workdir=tmp_path) == p
     # refusals: a free-route key, a sector disagreeing with the fold,
@@ -748,6 +755,14 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
     assert sa["total"] == sa["ensemble"]
     assert all(abs(v - 2.0) < 1e-7 for v in sa["l2"])   # 3P exact
     assert sa["total"] < min(pinned["energies"]) + 1.0  # relaxation helps
+    # the converged window PERSISTS: the stored payload round-trips
+    # the full MO matrix (restart + orbital-level route comparisons)
+    # and the optimizer's cycle count
+    sa_q = load_lane_cell(replace(leg, method="sa-casscf"),
+                          workdir=tmp_path)
+    assert sa_q["mo_coeff"].shape == (mol_d2h.nao_nr(),) * 2
+    assert np.array_equal(sa_q["mo_coeff"], sa["mo_coeff"])
+    assert sa_q["cycles"] == sa["cycles"] > 0
 
 
 @fast

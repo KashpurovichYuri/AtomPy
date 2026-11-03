@@ -334,6 +334,9 @@ class CellData:
     core_energy : ``E_tot`` minus the active part (the fold constant).
     ncas : window width -- needed exactly when it is not derivable
         from the label (NO windows); 0 = derive from the shell label.
+    cycles : the optimizer's macro-cycle count (cost pricing +
+        restart audits); 0 for runs without an optimizer and for
+        stores predating the field.
     """
 
     key: CellKey
@@ -342,6 +345,7 @@ class CellData:
     ci: list
     core_energy: float
     ncas: int = 0
+    cycles: int = 0
 
 
 # the store ----------------------------------------------------------
@@ -407,8 +411,10 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
             "chkfile predates the store contract); regenerate the cell")
     energies, ci, core_energy = store
     ncas = lib.chkfile.load(str(chk), f"atomterm/{key.address}/ncas")
+    cycles = lib.chkfile.load(str(chk), f"atomterm/{key.address}/cycles")
     return CellData(key, np.asarray(mo), energies, ci, core_energy,
-                    int(ncas) if ncas is not None else 0)
+                    int(ncas) if ncas is not None else 0,
+                    int(cycles) if cycles is not None else 0)
 
 
 # ------------------------------------------------------------- the execution
@@ -674,7 +680,8 @@ def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
 
     data = load_cell(key, workdir)
     cas = CASResult(data.energies, data.ci, data.mo_coeff,
-                    None, data.core_energy)
+                    None, data.core_energy,
+                    cycles=data.cycles or None)
     na, nb = key.sector
     ncore = ncore_of(mol.nelectron, na + nb)
     ncas = data.ncas or len(select_valence_ao(mol, key.shell_patterns))
@@ -743,6 +750,10 @@ def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
     lib.chkfile.save(str(chk), f"atomterm/{key.address}/mo_coeff",
                      np.asarray(cas.mo_coeff))
     lib.chkfile.save(str(chk), f"atomterm/{key.address}/ncas", int(ncas))
+    cycles = getattr(cas, "cycles", None)
+    if cycles is not None:
+        lib.chkfile.save(str(chk), f"atomterm/{key.address}/cycles",
+                         int(cycles))
 
 
 def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
@@ -772,8 +783,10 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
 _LANE_FIELDS = ("term", "energies", "total", "ptp", "l2", "s2",
                 "n_det", "anchor_dev", "comm_norm_h_lz",
                 "comm_norm_h_l2", "fold")
-# optional fields, loaded when present: the SA ensemble
-_LANE_FIELDS_OPT = ("ensemble",)
+# optional fields, loaded when present: the SA ensemble and, on
+# optimizer cells, the converged FULL MO matrix (restart +
+# orbital-level route comparisons) with the optimizer's cycle count
+_LANE_FIELDS_OPT = ("ensemble", "mo_coeff", "cycles")
 
 
 def _root_vectors(ci):
@@ -823,7 +836,8 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     assembled-treatment commutators ``comm_norm_h_lz`` /
     ``comm_norm_h_l2`` (NaN above :data:`_COMM_CAP` -- sectors past
     the dense-meter budget; the certified fold class makes them
-    structural there).
+    structural there).  SA cells add the ``ensemble``, the converged
+    FULL MO matrix ``mo_coeff``, and the optimizer's ``cycles``.
 
     Raises
     ------
@@ -874,6 +888,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     es, l2s, s2s = [], [], []
     anchor_dev = 0.0
     ensemble = None
+    extra: dict = {}
     if key.method == "sa-casscf":
         from atomterm.casscf import run_irrep_sa
 
@@ -881,6 +896,11 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
                            conv_tol=conv_tol, c_core=c_fold)
         ensemble = float(out["e_tot"])
         roots = out["roots"]
+        # the converged window PERSISTS (restart + orbital-level route
+        # comparisons) -- the run's own partition moves under
+        # same-irrep rotations, the span certificate survives
+        extra = {"mo_coeff": np.asarray(out["mo"], dtype=float),
+                 "cycles": int(out["cycles"])}
     else:
         from atomterm.casscf import run_irrep_casci
 
@@ -968,6 +988,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     }
     if ensemble is not None:
         payload["ensemble"] = ensemble
+    payload.update(extra)
     for field_name, value in payload.items():
         lib.chkfile.save(str(chk), f"atomterm/{key.address}/{field_name}",
                          value)
@@ -1010,12 +1031,16 @@ def load_lane_cell(key: CellKey, workdir: str | Path = "elements") -> dict:
                 f"lane store {chk} is incomplete (no {field_name}); "
                 "regenerate the cell")
         out[field_name] = _stored(value)
-    # optional fields (method-dependent): the SA ensembles
+    # optional fields (method-dependent): the SA ensemble, the
+    # converged MO matrix, the optimizer's cycles -- mo_coeff loads as
+    # the array it was stored as (consumers do linear algebra)
     for field_name in _LANE_FIELDS_OPT:
         value = lib.chkfile.load(str(chk),
                                  f"atomterm/{key.address}/{field_name}")
         if value is not None:
-            out[field_name] = _stored(value)
+            out[field_name] = (np.asarray(value, dtype=float)
+                               if field_name == "mo_coeff"
+                               else _stored(value))
     return out
 
 

@@ -88,16 +88,6 @@ the pair-correlating 4d shell and the 4s/3s pairs against it.
 | SA-CASSCF | (9,9) | {1s,2s,2p,4s} | free | −759.8266 | −90.3 | −20675.9462 | −2.4579 | — | — | — |  |
 | SA-CASSCF | (9,9) | {1s,2s,2p,4s} | pinned | −759.8266 | −90.3 | −20675.9462 | −2.4579 | 6.0000 | — | — |  |
 
-Readings: the ROUTES AGREE at the SA level — pinned and free land on
-one energy on every window except 3d4s (the escape-class window: the
-free SA finds a basin 9.8 mEh below the pinned one — the multi-
-solution class, measured on the lane).  On the winner {3d,3p,4d} both
-routes pay the same SA relaxation, +11.4 mEh over the frozen-shell CI
-(−759.8523); the single-root CASSCF reaches −759.8668 — kernel-only
-at 204k dets (meters past the dense budget; the (7,8) twin prices the
-class: −759.8454 with ⟨L²⟩ = 5.07, commutators O(1) — the JT-tilted
-single root, no term).
-
 ## Studies (frozen history; ticket 28)
 
 <!-- study:begin --> (frozen history: the generator (atomterm.study) is retired, commit ad28d3a -- the block stays as the committed record; the lane/lattice/methods blocks are the living generated tables)
