@@ -47,10 +47,10 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN
 from atomterm.cells import grid_keys, window_grid
-
-EV = 27.2114
+from _tables_common import DASH, EV, comm_text, minus
 EPS = 1e-4          # Eh -- agreeing starts collapse into the AO head
 
 # the declared windows this file renders, with their presentation
@@ -125,14 +125,19 @@ def _cfg(w: dict) -> str:
 def _values(p: dict, anchor: float) -> list[str]:
     """The value cells of a run cell: the as-run E in Eh/eV, ΔE vs the
     anchor, the meters, the span composition -- sign minus
-    normalized."""
+    normalized.  Kernel-only payloads (the dense-meter budget class)
+    carry NaN meters -- they render the em-dash; the window
+    composition falls back to empty (the payload records no span)."""
     asrun = float(p["energies_pyscf"][0])
     de_eh = asrun - anchor
+    g = float(p.get("ground_l2", float("nan")))
     out = [f"{asrun:.4f}", f"{de_eh * 1e3:+.1f}", f"{asrun * EV:.4f}",
-           f"{de_eh * EV:+.4f}", f"{p['ground_l2']:.4f}",
-           f"{p['comm_norm_h_lz']:.1e}", f"{p['comm_norm_h_l2']:.1e}",
-           _cfg(p["window"])]
-    return [re.sub(r"(?<!e)-", "−", v) for v in out]   # sign minus only
+           f"{de_eh * EV:+.4f}",
+           f"{g:.4f}" if g == g else DASH,          # NaN check
+           comm_text(p.get("comm_norm_h_lz", float("nan"))),
+           comm_text(p.get("comm_norm_h_l2", float("nan"))),
+           _cfg(p.get("window", {}))]
+    return [minus(v) for v in out]   # sign minus only
 
 
 def _run(p: dict | None) -> dict | None:
@@ -205,8 +210,7 @@ def render_window(keys, cells, anchor) -> list[str]:
 
 def _anchor_note(anchor: float) -> str:
     """The computed anchor line (sign-minus normalized)."""
-    return re.sub(r"(?<!e)-", "−",
-                  f"ROHF anchor: {anchor:.4f} Eh ({anchor * EV:.4f} eV).")
+    return minus(f"ROHF anchor: {anchor:.4f} Eh ({anchor * EV:.4f} eV).")
 
 
 def window_section(heading, window, keys, cells, anchor) -> str:

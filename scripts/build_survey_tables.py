@@ -17,27 +17,22 @@ Atoms (default: every declared atom with survey rows, CAMPAIGN order).
 
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN  # noqa: E402
 from atomterm.cells import CellKey, grid_keys, lane_keys, lattice_keys  # noqa: E402
-from atomterm.windows import NOBLE_CORES, fold_shells  # noqa: E402
+from _tables_common import (EV, SHELL_COLS, cas_label, comm_text,  # noqa: E402
+                            fold_label, l2_text, minus, payload_of,
+                            replace_block)
+from atomterm.windows import NOBLE_CORES  # noqa: E402
 
-SHELL_COLS = {"s": 1, "p": 3, "d": 5, "f": 7, "g": 9, "h": 11}
-EV = 27.2114
-DASH = "—"
 HEAD = ("| window | CAS | fold | start | route | dets | E, Eh | "
         "ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ |")
 SEP = "|" + "---|" * 13
 BEGIN, END = "<!-- survey:begin -->", "<!-- survey:end -->"
-
-
-def minus(text: str) -> str:
-    """Sign-minus normalization (the tables' typographic convention)."""
-    return re.sub(r"(?<!e)-", "−", text)
 
 
 def _noble(ncore: int) -> str:
@@ -47,16 +42,6 @@ def _noble(ncore: int) -> str:
         if sum(SHELL_COLS[s[-1]] for s in shells) == ncore:
             return name.capitalize()
     return f"n={ncore}"
-
-
-def fold_label(tag: str) -> str:
-    """The fold column's README notation: noble names capitalized,
-    ``semi`` as itself, explicit lists braced."""
-    if tag in NOBLE_CORES:
-        return tag.capitalize()
-    if tag == "semi":
-        return tag
-    return "{" + ",".join(fold_shells(tag)) + "}"
 
 
 def survey_keys(spec) -> list[CellKey]:
@@ -87,34 +72,6 @@ def survey_keys(spec) -> list[CellKey]:
     return [k for s in order for k in by_span.get(s, [])]
 
 
-def _payload(cells: dict, k: CellKey) -> dict | None:
-    """The run payload (None for pending and void cells)."""
-    p = cells.get(k.address)
-    if p is None or "void_reason" in p:
-        return None
-    return p
-
-
-def _l2_text(p: dict) -> str:
-    """⟨L²⟩: the free cells' ground root; the pinned legs' components
-    -- one value when they agree, the min–max range when they
-    scramble; the em-dash when the sector sat past the dense-meter
-    budget (kernel-only payload)."""
-    if "l2" in p:
-        l2 = p["l2"]
-        if max(l2) - min(l2) < 1e-6:
-            return f"{sum(l2) / len(l2):.4f}"
-        return f"{min(l2):.1f}–{max(l2):.1f}"
-    g = p["ground_l2"]
-    return f"{g:.4f}" if g == g else DASH        # NaN check
-
-
-def _comm(v) -> str:
-    """One commutator norm, or the em-dash when the sector sat above
-    the dense-meter cap."""
-    return f"{v:.1e}" if v == v else DASH          # NaN check: v != v
-
-
 def _fold_col(k: CellKey, spec) -> str:
     """The fold column: the pinned legs' own tag; the free cells'
     prefix (the variants name their deviation)."""
@@ -130,14 +87,6 @@ def _fold_col(k: CellKey, spec) -> str:
     return base
 
 
-def _cas(k: CellKey) -> str:
-    """The CAS(nelec, ncas) label: electrons from the key's sector,
-    columns from the window span's summed m-set sizes."""
-    cols = sum(SHELL_COLS[l] for l in
-               re.findall(r"\d+([spdfgh])", k.span_label))
-    return f"({sum(k.sector)},{cols})"
-
-
 def section(spec, cells: dict) -> str:
     """The generated block between the markers: one row per declared
     CI cell, as-run, in window-family order.  ``ΔE`` anchors on the
@@ -151,7 +100,7 @@ def section(spec, cells: dict) -> str:
     if anchor is None:
         sys.exit(f"{spec.symbol}: no pinned leg spans the primary window "
                  f"{primary!r} -- the ΔE column needs it")
-    a0 = _payload(cells, anchor)
+    a0 = payload_of(cells, anchor)
     if a0 is None:
         sys.exit(f"{spec.symbol}: the anchor leg {anchor.address} has no "
                  "stored payload -- run the lane first "
@@ -160,10 +109,10 @@ def section(spec, cells: dict) -> str:
 
     rows = []
     for k in keys:
-        p = _payload(cells, k)
+        p = payload_of(cells, k)
         route = ("pinned" if k.substrate == "pur" and k.fold_tag
                  is not None else "free")
-        head = [k.span_label, _cas(k), _fold_col(k, spec),
+        head = [k.span_label, cas_label(k), _fold_col(k, spec),
                 k.start.upper(), route]
         if p is None:
             rows.append("| " + " | ".join(head + ["pending", "", "", "",
@@ -174,8 +123,9 @@ def section(spec, cells: dict) -> str:
         de = (e - e0) * 1e3
         vals = [f"{p['n_det']:,}", f"{e:.4f}",
                 "0" if k is anchor else f"{de:+.1f}",
-                f"{e * EV:.4f}", f"{(e - e0) * EV:+.4f}", _l2_text(p),
-                _comm(p["comm_norm_h_lz"]), _comm(p["comm_norm_h_l2"])]
+                f"{e * EV:.4f}", f"{(e - e0) * EV:+.4f}", l2_text(p),
+                comm_text(p["comm_norm_h_lz"]),
+                comm_text(p["comm_norm_h_l2"])]
         rows.append("| " + " | ".join(
             head + [minus(v) for v in vals]) + " |")
     return "\n".join([BEGIN, HEAD, SEP, *rows, END])
@@ -192,28 +142,14 @@ def run(atom: str) -> None:
     cells = json.loads(
         Path(f"elements/{atom}/cells.json").read_text())["cells"]
     new_block = section(spec, cells)
-
-    text = src.read_text()
-    if text.count(BEGIN) != 1 or text.count(END) != 1:
-        sys.exit(f"{src}: expected exactly one {BEGIN}/{END} marker pair"
-                 " (place them around the survey table on the first pass)")
-    head, rest = text.split(BEGIN)
-    _, tail = rest.split(END)
-    new = head + new_block + tail
+    replace_block(src, BEGIN, END, new_block)
 
     # structural assertions (the TABLES protocol)
-    assert new.count(BEGIN) == 1 and new.count(END) == 1
-    body = [r for r in new[new.index(BEGIN):new.index(END)].splitlines()
-            if r.startswith("|")]
+    body = [r for r in new_block.splitlines() if r.startswith("|")]
     assert len(body) - 2 == len(keys), body
     for r, k in zip(body[2:], keys):
         assert r.startswith(f"| {k.span_label} |"), r
-
-    tmp = src.with_suffix(".md.tmp")
-    tmp.write_text(new)
-    assert tmp.read_text() == new
-    tmp.replace(src)
-    n = sum(1 for k in keys if _payload(cells, k))
+    n = sum(1 for k in keys if payload_of(cells, k))
     print(f"{src}: CI survey rendered from cells.json "
           f"({len(keys)} rows, {n} run)")
 

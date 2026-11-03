@@ -24,20 +24,16 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN  # noqa: E402
 from atomterm.cells import lattice_keys  # noqa: E402
+from _tables_common import SHELL_COLS, minus  # noqa: E402
 
-SHELL_COLS = {"s": 1, "p": 3, "d": 5, "f": 7, "g": 9, "h": 11}
 HEAD = "| window | CAS | dets | AO, Eh | ⟨L²⟩ | MO, Eh | ⟨L²⟩ |"
 SEP = "|" + "---|" * 7
 HEADING = "## Window lattice"
 # first pass: accept any legacy lattice heading (the pre-grammar spellings)
 _LEGACY = re.compile(r"^## (?:Production — )?[Ww]indow lattice.*$", re.M)
-
-
-def _minus(text: str) -> str:
-    """Sign-minus normalization (the tables' typographic convention)."""
-    return re.sub(r"(?<!e)-", "−", text)
 
 
 def _cas(cols: int, sector: tuple[int, int]) -> str:
@@ -55,7 +51,7 @@ def _cell(cells: dict, key) -> dict | None:
 
 def _e(p: dict | None) -> str:
     """The as-run ground total, or ``pending``."""
-    return _minus(f"{float(p['energies_pyscf'][0]):.4f}") if p else "pending"
+    return minus(f"{float(p['energies_pyscf'][0]):.4f}") if p else "pending"
 
 
 def _l2(p: dict | None) -> str:
@@ -110,9 +106,14 @@ def run(atom: str) -> None:
     src = Path(f"elements/{atom}/TABLES.md")
     cells = json.loads(
         Path(f"elements/{atom}/cells.json").read_text())["cells"]
+    text = src.read_text()
+    if HEADING not in text and "<!-- survey:begin -->" in text:
+        # the survey supersedes this section (the lattice spans are
+        # its first window family)
+        print(f"{src}: the lattice rows render in the CI survey -- skipped")
+        return
     new_section = section(spec, cells)
 
-    text = src.read_text()
     if HEADING in text:
         start = text.index(HEADING)
     else:
