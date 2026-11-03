@@ -41,6 +41,7 @@ __all__ = [
     "one_body_matrix",
     "two_body_matrix",
     "slater_condon_matrix",
+    "operator_apply",
     "commutator",
     "frobenius_norm",
 ]
@@ -179,21 +180,24 @@ def _pair_chunks(occ: np.ndarray, cum: np.ndarray, nelec: int):
 
 # ------------------------------------------------------- the two rule sets
 
-def _scatter_one_body(mat: np.ndarray, pairs: _Pairs, h: np.ndarray) -> None:
-    """The one-body off-diagonal rule: on k=1 pairs,
-    ``<I| h[a, i] a+_a a_i |J>`` -- scattered into ``mat`` in place."""
+def _one_body_pairs(pairs: _Pairs, h: np.ndarray):
+    """The SIGNED one-body couplings of a pair chunk as
+    ``(rows, cols, values)`` -- ``<I| h[a, i] a+_a a_i |J>`` on the
+    k=1 pairs.  The one home for the rule: the matrix builder and the
+    matrix-free application consume the same triples."""
     if not pairs.m1.any():
-        return
+        z = np.zeros(0, dtype=int)
+        return z, z, np.zeros(0)
     val = h[pairs.cre[pairs.m1, 0], pairs.ann[pairs.m1, 0]]
     nz = val != 0
-    mat[pairs.ii[pairs.m1][nz], pairs.jj[pairs.m1][nz]] += (
-        pairs.sign[pairs.m1][nz] * val[nz])
+    return (pairs.ii[pairs.m1][nz], pairs.jj[pairs.m1][nz],
+            pairs.sign[pairs.m1][nz] * val[nz])
 
 
-def _scatter_two_body(mat: np.ndarray, pairs: _Pairs,
-                      g: np.ndarray) -> None:
-    """The two-body off-diagonal rules, scattered into ``mat`` in
-    place (chemists' ``G`` throughout):
+def _two_body_pairs(pairs: _Pairs, g: np.ndarray):
+    """The SIGNED two-body couplings of a pair chunk as
+    ``(rows, cols, values)``, both off-diagonal rules (chemists' ``G``
+    throughout) -- the one home for the rules:
 
     * k=1: the contraction over the orbitals common to I and J (the
       four-term antisymmetrized gather);
@@ -201,6 +205,7 @@ def _scatter_two_body(mat: np.ndarray, pairs: _Pairs,
     """
     n2 = pairs.occ_i.shape[1]
     orb = np.arange(n2)
+    iis, jjs, vals = [], [], []
     if pairs.m1.any():
         i1, a1 = pairs.ann[pairs.m1, 0], pairs.cre[pairs.m1, 0]
         common = pairs.occ_j[pairs.m1] & pairs.occ_i[pairs.m1]
@@ -212,8 +217,9 @@ def _scatter_two_body(mat: np.ndarray, pairs: _Pairs,
         )
         val = (tb * common).sum(axis=1)
         nz = val != 0
-        mat[pairs.ii[pairs.m1][nz], pairs.jj[pairs.m1][nz]] += (
-            pairs.sign[pairs.m1][nz] * val[nz])
+        iis.append(pairs.ii[pairs.m1][nz])
+        jjs.append(pairs.jj[pairs.m1][nz])
+        vals.append(pairs.sign[pairs.m1][nz] * val[nz])
     m2 = ~pairs.m1
     if m2.any():
         i2, j2 = pairs.ann[m2, 0], pairs.ann[m2, 1]
@@ -223,7 +229,13 @@ def _scatter_two_body(mat: np.ndarray, pairs: _Pairs,
             - g[b2, a2, i2, j2] - g[a2, b2, j2, i2]
         )
         nz = val != 0
-        mat[pairs.ii[m2][nz], pairs.jj[m2][nz]] += pairs.sign[m2][nz] * val[nz]
+        iis.append(pairs.ii[m2][nz])
+        jjs.append(pairs.jj[m2][nz])
+        vals.append(pairs.sign[m2][nz] * val[nz])
+    if not iis:
+        z = np.zeros(0, dtype=int)
+        return z, z, np.zeros(0)
+    return np.concatenate(iis), np.concatenate(jjs), np.concatenate(vals)
 
 
 def _diag_one_body(dets, occ, h, dtype) -> np.ndarray:
@@ -324,6 +336,102 @@ def slater_condon_matrix(
     return _build(dets, one_body, two_body)
 
 
+def operator_apply(
+    dets: list[tuple[int, ...]],
+    one_body: np.ndarray | None = None,
+    two_body: np.ndarray | None = None,
+):
+    """The MATRIX-FREE application of a (one-body, two-body) operator
+    pair: returns ``apply(v) -> O @ v`` -- the operator exists only
+    through its action, the ``len(dets)^2`` container never forms.
+
+    The nonzero pattern is exact, not heuristic: an operator of this
+    form connects determinants differing by at most two spin-orbitals
+    (beyond that the strings vanish by Pauli, or the result is
+    orthogonal to the bra) -- :func:`_pair_chunks` enumerates exactly
+    those pairs, and the SAME signed couplings
+    (:func:`_one_body_pairs` / :func:`_two_body_pairs`) that build the
+    matrix (:func:`slater_condon_matrix`) accumulate the output
+    vector here, so ``apply(v) == slater_condon_matrix(...) @ v`` is
+    an identity, certifiable elementwise.
+
+    Cost: the FIRST application pays the pair classification once and
+    caches the signed couplings (~16 bytes per nonzero -- budget the
+    sector); every application after is O(#nonzeros), no quadratic
+    work and no dense operator in memory.  For sectors whose cached
+    couplings would not fit, the PySCF contraction boundary
+    (:func:`atomterm.operators.pyscf_apply`) applies the same operator
+    pair at C speed with no caching.
+
+    Parameters
+    ----------
+    dets, one_body, two_body
+        As :func:`slater_condon_matrix` (at least one part required).
+
+    Returns
+    -------
+    ``apply`` -- a closure mapping a sector vector (real or complex)
+    to ``O @ v``.
+
+    Examples
+    --------
+    >>> dets = determinant_basis(3, 2, 1)
+    >>> h = np.eye(6)
+    >>> f = operator_apply(dets, one_body=h)
+    >>> v = np.zeros(len(dets)); v[0] = 1.0
+    >>> np.allclose(f(v), slater_condon_matrix(dets, one_body=h) @ v)
+    True
+    """
+    if one_body is None and two_body is None:
+        raise ValueError("at least one of one_body / two_body is required")
+    n = len(dets)
+    n2 = (one_body if one_body is not None else two_body).shape[0]
+    occ = np.zeros((n, n2), dtype=bool)
+    for i, d in enumerate(dets):
+        occ[i, list(d)] = True
+    # prefix counts: cum[j, t] = # occupied spin-orbitals < t in det j
+    cum = np.zeros((n, n2), dtype=np.int64)
+    np.cumsum(occ[:, :-1], axis=1, out=cum[:, 1:])
+    dtype = complex if (np.iscomplexobj(one_body if one_body is not None
+                                        else two_body)) else float
+    diag = np.zeros(n, dtype=dtype)
+    if one_body is not None:
+        diag += _diag_one_body(dets, occ, one_body, dtype)
+    if two_body is not None:
+        diag += _diag_two_body(dets, two_body, dtype)
+
+    couplings = None  # the signed (rows, cols, values) chunks, built once
+
+    def apply(v):
+        nonlocal couplings
+        v = np.asarray(v)
+        out_dtype = np.result_type(v.dtype, dtype)
+        if couplings is None:
+            couplings = []
+            for pairs in _pair_chunks(occ, cum, len(dets[0])):
+                rows_i, cols_i, vals_i = [], [], []
+                if one_body is not None:
+                    ii, jj, val = _one_body_pairs(pairs, one_body)
+                    rows_i.append(ii); cols_i.append(jj); vals_i.append(val)
+                if two_body is not None:
+                    ii, jj, val = _two_body_pairs(pairs, two_body)
+                    rows_i.append(ii); cols_i.append(jj); vals_i.append(val)
+                couplings.append((np.concatenate(rows_i),
+                                  np.concatenate(cols_i),
+                                  np.concatenate(vals_i)))
+        out = diag * v.astype(out_dtype)
+        for ii, jj, val in couplings:
+            prod = val * v[jj]
+            if np.iscomplexobj(prod):
+                out += np.bincount(ii, weights=prod.real, minlength=n)
+                out += 1j * np.bincount(ii, weights=prod.imag, minlength=n)
+            else:
+                out += np.bincount(ii, weights=prod, minlength=n)
+        return out
+
+    return apply
+
+
 def _build(
     dets: list[tuple[int, ...]],
     one_body: np.ndarray | None,
@@ -355,9 +463,11 @@ def _build(
 
     for pairs in _pair_chunks(occ, cum, len(dets[0])):
         if one_body is not None:
-            _scatter_one_body(mat, pairs, one_body)
+            ii, jj, val = _one_body_pairs(pairs, one_body)
+            mat[ii, jj] += val
         if two_body is not None:
-            _scatter_two_body(mat, pairs, two_body)
+            ii, jj, val = _two_body_pairs(pairs, two_body)
+            mat[ii, jj] += val
     return mat
 
 

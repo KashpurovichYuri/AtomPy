@@ -90,6 +90,7 @@ __all__ = [
     "ground_block",
     "pyscf_ci_permutation",
     "ci_in_detbasis_order",
+    "pyscf_apply",
     "s2_operator_parts",
     "spin_ladders",
     "spin_ladder_matrix",
@@ -303,6 +304,71 @@ def ci_in_detbasis_order(v: np.ndarray, norb: int, na: int,
     w = np.empty_like(v)
     w[pyscf_ci_permutation(norb, na, nb)] = v
     return w
+
+
+def pyscf_apply(h1e: np.ndarray, eri: np.ndarray, norb: int, na: int,
+                nb: int):
+    """The C-contraction boundary: the Hamiltonian applied through
+    PySCF's own kernels at ANY sector size -- no dense operator, no
+    cached couplings, the permutation owned here.
+
+    Parameters
+    ----------
+    h1e, eri
+        The KERNEL FEED's convention (what the lane evaluators pass
+        the solvers): ``h1e`` from :func:`active_space_integrals`
+        (the folded active one-body), ``eri`` from
+        ``ao2mo.kernel(mol, c)`` (PySCF-native chemist).  Real
+        tensors -- PySCF's contraction kernels refuse complex input.
+    norb, na, nb
+        The window width and the sector.
+
+    Returns
+    -------
+    ``apply`` -- a closure mapping a sector vector in detbasis order
+    (real or complex) to ``H @ v`` (same order; a complex vector
+    contracts through its real and imaginary halves).  ``h1e`` is
+    absorbed into the contracted tensor at the kernel's own ``0.5``
+    factor (:func:`pyscf.fci.direct_spin1.absorb_h1e`) -- the exact
+    pairing whose roots the lane anchor certifies against our
+    Slater-Condon Hamiltonian; the apply pin certifies the
+    vector-level action.
+
+    Notes
+    -----
+    The one-body counterpart does NOT exist here on purpose: the C
+    kernel packs the lower triangle, so ``contract_1e`` silently
+    symmetrizes -- it serves symmetric matrices only, and the
+    angular-momentum operators (antisymmetric-imaginary in a real
+    basis) would be corrupted.  Apply those through
+    :func:`atomterm.detbasis.operator_apply`, with ``Lz`` rotated to
+    its real form ``M = -i Lz`` (norms unchanged) when a real
+    intermediate is wanted.
+    """
+    from pyscf.fci import direct_spin1
+
+    perm = pyscf_ci_permutation(norb, na, nb)
+    h2e = direct_spin1.absorb_h1e(
+        np.ascontiguousarray(np.real(h1e), dtype=float),
+        np.ascontiguousarray(np.real(eri), dtype=float),
+        norb, (na, nb), .5)
+
+    def _real(x):
+        out = direct_spin1.contract_2e(
+            h2e, np.ascontiguousarray(np.real(x)[perm]),
+            norb, (na, nb)).reshape(-1)
+        back = np.empty(out.size, dtype=out.dtype)
+        back[perm] = out
+        return back
+
+    def apply(v):
+        v = np.asarray(v)
+        out = _real(v)
+        if np.iscomplexobj(v):
+            out = out + 1j * _real(v.imag)
+        return out
+
+    return apply
 
 
 # --------------------------------------------------------- one-body symbols

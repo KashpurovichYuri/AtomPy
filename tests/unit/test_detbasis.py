@@ -134,6 +134,101 @@ def test_vectorized_matches_slow_loop_multichunk(monkeypatch):
     assert np.allclose(a, b, atol=1e-13)
 
 
+# ------------------------------------------- the matrix-free application
+
+def test_operator_apply_equals_matrix():
+    # THE TWIN: apply(v) == slater_condon_matrix(...) @ v elementwise,
+    # on complex vectors and random NON-particle-symmetric integrals
+    # (the class where contraction-order bugs live)
+    from atomterm.detbasis import operator_apply
+
+    rng = np.random.default_rng(41)
+    norb = 5
+    h, g = random_integrals(rng, norb, "complex")
+    for na, nb in [(2, 1), (2, 2), (3, 1)]:
+        dets = determinant_basis(norb, na, nb)
+        for one, two in [(h, g), (h, None), (None, g)]:
+            mat = slater_condon_matrix(dets, one_body=one, two_body=two)
+            f = operator_apply(dets, one_body=one, two_body=two)
+            for _ in range(2):
+                v = rng.standard_normal(len(dets)) \
+                    + 1j * rng.standard_normal(len(dets))
+                assert np.allclose(f(v), mat @ v, atol=1e-11), (na, nb)
+
+
+def test_operator_apply_equals_slow_reference():
+    # the DIRECT per-pair construction: the apply's output equals the
+    # elementwise reference's action (_slater_condon_slow, the O(n^2)
+    # loop the vectorized builder replaced)
+    from atomterm.detbasis import operator_apply
+
+    rng = np.random.default_rng(43)
+    h, g = random_integrals(rng, 4, "complex")
+    dets = determinant_basis(4, 2, 1)
+    mat = _slater_condon_slow(dets, one_body=h, two_body=g)
+    v = rng.standard_normal(len(dets))
+    f = operator_apply(dets, one_body=h, two_body=g)
+    assert np.allclose(f(v), mat @ v, atol=1e-12)
+
+
+def test_operator_apply_equals_explicit_ladder_application():
+    # the ALGEBRAIC-DIRECT construction: applying the a+/a strings to
+    # each determinant (secondquant.apply_one_body/apply_two_body)
+    # and summing weighted by v reproduces the apply -- the same
+    # elementwise agreement the dense twins pin, at the vector level
+    from atomterm.detbasis import operator_apply
+    from atomterm.secondquant import apply_one_body, apply_two_body
+
+    rng = np.random.default_rng(47)
+    h, g = random_integrals(rng, 4, "complex")
+    for na, nb in [(2, 1), (2, 0)]:
+        dets = determinant_basis(4, na, nb)
+        index = {d: i for i, d in enumerate(dets)}
+        v = rng.standard_normal(len(dets))
+        direct = np.zeros(len(dets), complex)
+        for j, d in enumerate(dets):
+            # the random integrals mix spin blocks, so the a+/a
+            # application reaches out-of-sector occupations; the
+            # sector-restricted operator is the projection P O P --
+            # those components drop (the in-sector matrix never sees
+            # them either)
+            for o2, a in apply_one_body(d, h).items():
+                if o2 in index:
+                    direct[index[o2]] += v[j] * a
+            for o2, a in apply_two_body(d, g).items():
+                if o2 in index:
+                    direct[index[o2]] += v[j] * a
+        f = operator_apply(dets, one_body=h, two_body=g)
+        assert np.allclose(f(v), direct, atol=1e-12), (na, nb)
+
+
+def test_operator_apply_caches_its_couplings():
+    # the closure's contract: the FIRST application builds and caches
+    # the signed couplings, every later application is O(#nonzeros)
+    # and bitwise-stable; dtype follows the tensors (real stays real)
+    from atomterm.detbasis import operator_apply
+
+    rng = np.random.default_rng(53)
+    h, g = random_integrals(rng, 4, "complex")
+    hr = np.real(h)
+    dets = determinant_basis(4, 2, 1)
+    v = rng.standard_normal(len(dets))
+    f = operator_apply(dets, one_body=hr)
+    first = f(v)
+    assert first.dtype == float and np.array_equal(f(v), first)
+    fc = operator_apply(dets, one_body=h, two_body=g)
+    assert fc(v).dtype == complex
+    assert fc(first.astype(complex)).dtype == complex
+    # a structurally zero operator is the zero application (the empty
+    # coupling chunks stay empty)
+    fz = operator_apply(dets, one_body=np.zeros_like(h),
+                        two_body=np.zeros_like(g))
+    assert np.allclose(fz(v), 0.0)
+    # both parts None refuses
+    with pytest.raises(ValueError):
+        operator_apply(dets)
+
+
 # ------------------------------------------------------- the sign algebra
 
 def test_elementary_sign_rules():

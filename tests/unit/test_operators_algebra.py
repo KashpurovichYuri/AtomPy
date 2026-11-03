@@ -307,3 +307,60 @@ def test_spin_ladders_twin_construct_s2_across_sectors():
     assert np.allclose(s2_up, twin_up)
     twin_dn = sz_dn @ sz_dn + 0.5 * (sm_0d @ sm_0d.conj().T)
     assert np.allclose(s2_dn, twin_dn)
+
+
+def test_pyscf_apply_is_the_slater_condon_action(carbon):
+    """The C-contraction boundary: pyscf_apply over the kernel feed's
+    own (h1e, eri) reproduces our Slater-Condon Hamiltonian's action
+    on random vectors (the vector-level twin of the lane's root
+    anchor), real and complex; a kernel root is an eigenvector of
+    ours; the state residual [H, -i Lz] applied through the boundary
+    + the numpy apply vanishes on the term root."""
+    from pyscf import ao2mo
+    from pyscf.fci import direct_spin1
+
+    from atomterm.detbasis import operator_apply
+    from atomterm.operators import (active_space_integrals,
+                                    build_operator_parts,
+                                    ci_in_detbasis_order, pyscf_apply)
+    from atomterm.windows import build_full_mo, occupied_core_idx
+
+    _, mol, mf, _ = carbon
+    ncore = 2
+    mo = build_full_mo(mf, occupied_core_idx(mf, ncore),
+                       mf.mo_coeff[:, ncore:])
+    c = mo[:, ncore:]
+    na, nb = 2, 1
+    norb = c.shape[1]
+    h1e, _ = active_space_integrals(mol, mf, c, ncore)
+    eri = ao2mo.kernel(mol, c)
+    parts = build_operator_parts(mol, mf, c, ncore, na, nb)
+    dets = parts["dets"]
+    ours = operator_apply(dets, one_body=parts["H"][0],
+                          two_body=parts["H"][1])
+
+    f = pyscf_apply(h1e, eri, norb, na, nb)
+    rng = np.random.default_rng(19)
+    for _ in range(2):
+        v = rng.standard_normal(len(dets)) + 1j * rng.standard_normal(len(dets))
+        assert np.allclose(f(v), ours(v), atol=1e-10)
+
+    # the anchor's vector form: a kernel root is an eigenvector of ours
+    e, ci = direct_spin1.kernel(np.real(h1e).astype(float),
+                                np.real(eri).astype(float), norb,
+                                (na, nb), nroots=1)
+    w = ci_in_detbasis_order(np.asarray(ci).ravel(), norb, na, nb)
+    assert abs(w @ ours(w) - float(np.atleast_1d(e)[0])) < 1e-10
+
+    # the state residual through the pair of applies: M = -i Lz real,
+    # [H, Lz] = i[H, M] -- the norm is M's; on the closed 2p window
+    # the root is an Lz eigenstate-ish (the term's |M_L| member) so
+    # the residual is small but nonzero at the window level -- the
+    # INVARIANT is agreement with the dense commutator's action
+    m_apply = operator_apply(dets, one_body=-1j * parts["Lz"][0])
+    lz_m = slater_condon_matrix(dets, one_body=-1j * parts["Lz"][0])
+    h_m = slater_condon_matrix(dets, one_body=parts["H"][0],
+                               two_body=parts["H"][1])
+    r_apply = f(m_apply(w)) - m_apply(f(w))
+    r_dense = h_m @ (lz_m @ w) - lz_m @ (h_m @ w)
+    assert np.allclose(r_apply, r_dense, atol=1e-9)
