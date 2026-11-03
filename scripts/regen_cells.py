@@ -43,6 +43,8 @@ Store semantics:
                             never prunes, and a filtered run with no
                             store to merge into is refused -- run
                             unfiltered first)
+    the store writes PER-CELL -- a kill mid-group keeps every
+    finished cell; cells.md (the render) refreshes at group end.
 Threads: OPENBLAS_NUM_THREADS=64 OMP_NUM_THREADS=64 PYSCF_NUM_THREADS=64.
 """
 
@@ -297,11 +299,12 @@ def main() -> None:
                 cells[key.address] = (
                     cell_payload(key, facts) if facts is not None
                     else kernel_cell_payload(key, mol, mf))
-
-        _write_atomic(out / "cells.json",
-                      json.dumps({"atom": name,
-                                  "rohf_energy": float(mf.e_tot),
-                                  "cells": cells}, indent=2))
+            # the store writes PER-CELL: a kill mid-group (the shell
+            # host caps background jobs) keeps every finished cell
+            _write_atomic(out / "cells.json",
+                          json.dumps({"atom": name,
+                                      "rohf_energy": float(mf.e_tot),
+                                      "cells": cells}, indent=2))
         _write_atomic(out / "cells.md",
                       render(name, mf.e_tot, cells,
                              ruler=CellKey(name, base.window, sector,

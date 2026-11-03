@@ -883,7 +883,9 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     ``comm_norm_h_l2`` (NaN above :data:`_COMM_CAP` -- sectors past
     the dense-meter budget; the certified fold class makes them
     structural there).  SA cells add the ``ensemble``, the converged
-    FULL MO matrix ``mo_coeff``, and the optimizer's ``cycles``.
+    FULL MO ``mo_coeff`` (nested lists in the payload -- the
+    JSON-store contract; :func:`load_lane_cell` returns the matrix),
+    and the optimizer's ``cycles``.
 
     Raises
     ------
@@ -940,8 +942,11 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         roots = out["roots"]
         # the converged window PERSISTS (restart + orbital-level route
         # comparisons) -- the run's own partition moves under
-        # same-irrep rotations, the span certificate survives
-        extra = {"mo_coeff": np.asarray(out["mo"], dtype=float),
+        # same-irrep rotations, the span certificate survives.  The
+        # payload dict is the JSON-store contract (regen dumps it
+        # verbatim): mo_coeff travels as nested lists, and
+        # load_lane_cell hands the matrix back.
+        extra = {"mo_coeff": np.asarray(out["mo"], dtype=float).tolist(),
                  "cycles": int(out["cycles"])}
         c_read = out["mo"][:, nf:nf + ncas]
     else:
