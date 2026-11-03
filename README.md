@@ -273,6 +273,9 @@ Columns of a methods table:
 
 - **E** — the run's variational total (Eh; eV in parentheses).
 - **ΔE** — gap to the ROHF anchor (the anchor: the caption).
+- **conv** — the optimizer rows' convergence: the final macro-cycle
+  |ΔE| (its order of magnitude) per cycle count, `1e-9/7`; CI rows
+  carry no optimizer — the em-dash.
 - **Span (Lowdin)** — the converged window's composition per l
   (S-metric fractions of the window's columns — the span, not the
   occupation: the swap reads s → 0).
@@ -301,6 +304,9 @@ Columns of a ladder table (window families × routes):
   axis.
 - **CAS / dets** — the row's active size and sector determinant
   count; **fold** — the row's partition (the column that varies).
+- **conv** — the optimizer rows' convergence: the final macro-cycle
+  |ΔE| (its order of magnitude) per cycle count, `1e-9/7`; CI rows
+  carry no optimizer — the em-dash.
 - **E** — **rows compare across folds, never sector grounds.** The
   TERM energy: the mean over the 2L+1 branch components at CI, the
   uniform-weight ensemble at SA (its exact degenerate limit — the

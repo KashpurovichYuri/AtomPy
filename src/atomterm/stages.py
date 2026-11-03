@@ -92,6 +92,13 @@ class StageFacts:
     converged : bool
         The optimizer's own kernel report; CASCI stages and trusted
         cached stages default True and never flag.
+    cycles : int or None
+        The optimizer's macro-cycle count (``CASResult.cycles``);
+        ``None`` for CASCI stages and cache hits.
+    conv_dE : float or None
+        The final macro-cycle |delta e_tot| (``CASResult.conv_dE``)
+        -- the convergence precision beside the count; ``None``
+        where ``cycles`` is.
     """
 
     tag: str
@@ -109,6 +116,8 @@ class StageFacts:
     shell_electrons: dict
     core_anisotropy: float | None = None
     converged: bool = True
+    cycles: int | None = None  # optimizer macro-cycles (CI/cache: None)
+    conv_dE: float | None = None  # final |delta e_tot| (beside cycles)
 
     # --- shared readouts (thin pass-throughs: renderers never reach
     # --- into the analysis object)
@@ -164,6 +173,8 @@ class StageFacts:
             "n_det": self.analysis.n_det,
             "diverged": self.diverged,
             "converged": self.converged,
+            "cycles": self.cycles,
+            "conv_dE": self.conv_dE,
             "ortho_err": self.ortho_err,
             "e_ground": self.e_ground,
             "energies_pyscf": np.asarray(self.energies_pyscf).tolist(),
@@ -287,4 +298,6 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         # the optimizer's own report, read off the live mc object (the
         # mutation discipline); CASCI stages and cache hits carry no mc
         converged=bool(getattr(getattr(cas, "mc", None), "converged", True)),
+        cycles=getattr(cas, "cycles", None),
+        conv_dE=getattr(cas, "conv_dE", None),
     )

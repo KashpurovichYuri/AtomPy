@@ -795,6 +795,9 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
     assert sa_q["mo_coeff"].shape == (mol_d2h.nao_nr(),) * 2
     assert np.array_equal(sa_q["mo_coeff"], sa["mo_coeff"])
     assert sa_q["cycles"] == sa["cycles"] > 0
+    # the convergence precision persists beside the count (the conv
+    # column's data; 0.0 is the legitimately dead-still final cycle)
+    assert sa_q["conv_dE"] == sa["conv_dE"] >= 0.0
 
 
 @fast
@@ -829,7 +832,7 @@ def test_lane_emitter_deterministic():
     assert len(lines) == 2 + len(keys), lines   # head + sep + the legs
     assert lines[0].startswith("| route | method | window | CAS | fold"
                                " | dets | E, Eh | ΔE, mEh | E, eV |"
-                               " ΔE, eV |")
+                               " ΔE, eV | conv |")
     assert lines[2].startswith("| pinned | CI | 3d4s | (3,6) | Ar |")
     assert "| 0 |" in lines[2]                  # the anchor's ΔE
     assert f"| −{759.7274 * 27.2114:.4f} |" in lines[2]   # the eV twin
@@ -862,6 +865,18 @@ def test_lane_emitter_deterministic():
     row = [l for l in mod.section(cs, cap).splitlines()
            if l.startswith("| pinned | CI | 3d3p ")][0]
     assert row.endswith("| — | — |")
+
+    # the conv column: the optimizer trace renders precision per cycle
+    # count; a payload without one (CI legs) reads the em-dash
+    cv = dict(payloads)
+    cv[keys[1].address] = {**payloads[keys[1].address],
+                           "conv_dE": 3.1e-10, "cycles": 7}
+    row = [l for l in mod.section(cs, cv).splitlines()
+           if l.startswith("| pinned | CI | 3d3p ")][0]
+    assert "| 1e-10/7 |" in row
+    row = [l for l in mod.section(cs, payloads).splitlines()
+           if l.startswith("| pinned | CI | 3d3p ")][0]
+    assert row.split("|")[11].strip() == "—"   # the conv cell: no optimizer
 
 
 @fast
@@ -1004,6 +1019,20 @@ def test_method_ladder_row_policy():
     ao = [r for r in rows if r.startswith("| CASSCF, free (")][0]
     assert "(+mo,no)" in ao
     assert not any(", MO" in r or ", NO" in r for r in rows)  # collapsed
+
+    # the conv column: optimizer cells render the trace (precision per
+    # cycle count); without one (CI cells, old stores) the em-dash
+    traced = dict(agree)
+    for k in keys:
+        if k.method != "casci":
+            traced[k.address] = {**traced[k.address],
+                                 "conv_dE": 2.3e-9, "cycles": 5}
+    traced_rows = [r for r in mod.window_section(
+        "H", "3d4s", keys, traced, -848.4065).splitlines()
+        if r.startswith("|")]
+    assert any("| 1e-9/5 |" in r for r in traced_rows)
+    agree_rows = [r for r in sec.splitlines() if r.startswith("|")]
+    assert not any("1e-" in r for r in agree_rows)   # no trace, no value
 
     # a DISAGREEING mo run keeps its own row (the basin class)
     basin = dict(agree)

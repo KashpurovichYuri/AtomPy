@@ -50,7 +50,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN
 from atomterm.cells import grid_keys, window_grid
-from _tables_common import DASH, EV, comm_cell, minus
+from _tables_common import DASH, EV, comm_cell, conv_cell, minus
 EPS = 1e-4          # Eh -- agreeing starts collapse into the AO head
 
 # the declared windows this file renders, with their presentation
@@ -73,9 +73,9 @@ POINTER = ("Declared, not yet run -- the optimizer cells are void "
 # the summary shape (the C/Si/Sc convention): ONE treatment column
 # composes the identity (method, mask, substrate, fold, starts); the
 # meters and the span composition carry the reading
-HEAD = ("| treatment | E, Eh | ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | "
+HEAD = ("| treatment | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | "
         "‖[H,Lz]‖ | ‖[H,L²]‖ | Span (Lowdin) |")
-SEP = "|" + "---|" * 9
+SEP = "|" + "---|" * 10
 
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
@@ -124,7 +124,8 @@ def _cfg(w: dict) -> str:
 
 def _values(p: dict, anchor: float) -> list[str]:
     """The value cells of a run cell: the as-run E in Eh/eV, ΔE vs the
-    anchor, the meters, the span composition -- sign minus
+    anchor, the convergence (final |Δe_tot| per macro-cycle count),
+    the meters, the span composition -- sign minus
     normalized.  Kernel-only payloads (the dense-meter budget class)
     carry NaN meters -- they render the em-dash; the window
     composition falls back to empty (the payload records no span)."""
@@ -132,7 +133,7 @@ def _values(p: dict, anchor: float) -> list[str]:
     de_eh = asrun - anchor
     g = float(p.get("ground_l2", float("nan")))
     out = [f"{asrun:.4f}", f"{de_eh * 1e3:+.1f}", f"{asrun * EV:.4f}",
-           f"{de_eh * EV:+.4f}",
+           f"{de_eh * EV:+.4f}", conv_cell(p),
            f"{g:.4f}" if g == g else DASH,          # NaN check
            comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
            comm_cell(p, "comm_norm_h_l2", "res_h_l2"),

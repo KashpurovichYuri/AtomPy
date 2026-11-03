@@ -7,6 +7,7 @@ column sets, row grouping -- lives with each emitter.  Presentation
 only: nothing here touches physics or the store.
 """
 
+import math
 import re
 import sys
 from pathlib import Path
@@ -72,6 +73,17 @@ def comm_cell(payload: dict, field: str, res_field: str) -> str:
         return f"{v:.1e}"
     r = payload.get(res_field)
     return f"{r:.1e}" if r is not None else DASH
+
+
+def conv_cell(payload: dict) -> str:
+    """The optimizer rows' convergence column: the final macro-cycle
+    |delta e_tot| and the cycle count (``1e-9/7`` -- precision per
+    cycle count).  Rows without an optimizer (CI) and stores
+    predating the field render the em-dash."""
+    de, n = payload.get("conv_dE"), payload.get("cycles")
+    if de is None or not n:
+        return DASH
+    return f"1e{math.floor(math.log10(de))}/{n}" if de > 0 else f"0/{n}"
 
 
 def payload_of(cells: dict, key) -> dict | None:

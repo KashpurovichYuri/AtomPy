@@ -35,12 +35,12 @@ sc_3d4s4p4d5d_2-1_casci_ao_-_pol_avg            -759.76460545 -3.637e-02   5.999
 sc_3d4s4p4d5d_2-1_casci_mo_-_pol_avg            -759.76807973 -3.984e-02   5.59050   1.06e+01   4.88e+01   2.8e+00   2.0e+00  0.579   1.3e-02   1.7e-03   1.4e-12
 sc_3d4s4p4d4f_2-1_casci_ao_-_pol_avg            -759.76839021 -4.015e-02   5.99976   1.35e-01   7.99e-01   5.7e-02   4.3e-02  0.476   1.3e-02   1.4e-03   3.6e-12
 sc_3d4s4p4d4f_2-1_casci_mo_-_pol_avg            -759.77058815 -4.235e-02   5.63529   1.16e+01   7.21e+01   2.8e+00   4.0e+00  0.571   1.3e-02   2.6e-03   1.4e-12
-sc_3d4s@ar_2-1_casci_ao_-_pol_avg               -759.72743563  8.038e-04   6.00000   6.54e-14   2.38e-13   6.6e-15   8.7e-15  0.833   0.0e+00   1.1e-13   4.3e-12
-sc_3d4s@ar_2-1_casscf_ao_-_pol_avg              -759.74209351 -1.385e-02   3.54569   1.55e+00   3.75e+00   2.7e+00   2.1e+00  0.810       nan   1.5e-03   3.9e-12
-sc_3d4s@ar_2-1_sa-casscf_ao_-_pol_avg           -760.54808065 -8.198e-01   6.00198   2.26e-01   3.81e+00   3.8e-01   2.0e+00  0.833       nan   8.0e-01   4.5e-12
-sc_3d3p@semi_4-3_casci_ao_-_pol_avg             -759.78711958        nan   6.00000   7.62e-13   5.01e-12   4.7e-14   6.2e-14  0.625   0.0e+00   1.2e-08   4.3e-12
+sc_3d4s@ar_2-1_casci_ao_-_pol_avg               -759.72743563  8.038e-04   6.00000   6.54e-14   2.41e-13   6.6e-15   8.7e-15  0.833   0.0e+00   0.0e+00   4.0e-12
+sc_3d4s@ar_2-1_casscf_ao_-_pol_avg              -759.74209351 -1.385e-02   3.54569   1.55e+00   3.75e+00   2.7e+00   2.1e+00  0.810       nan   1.5e-03   4.0e-12
+sc_3d4s@ar_2-1_sa-casscf_ao_-_pol_avg           -760.54808065 -8.198e-01   6.00198   2.26e-01   3.81e+00   3.8e-01   2.0e+00  0.833       nan   8.0e-01   4.2e-12
+sc_3d3p@semi_4-3_casci_ao_-_pol_avg             -759.78711958        nan   6.00000   5.24e-13   4.80e-12   4.7e-14   6.2e-14  0.625   0.0e+00   4.9e-02   4.0e-12
 sc_3d3p@semi_4-3_casscf_ao_-_pol_avg            -759.84421990        nan   5.07002   6.21e+00   5.96e+01   7.9e-01   1.8e+00  0.625       nan   1.2e-03   3.8e-12
-sc_3d3p@semi_4-3_sa-casscf_ao_-_pol_avg         -759.82179225        nan   6.00000   5.50e-05   1.68e-03   1.7e-05   4.7e-05  0.625       nan   2.7e-09   2.8e-12
+sc_3d3p@semi_4-3_sa-casscf_ao_-_pol_avg         -759.82179225        nan   6.00000   5.50e-05   1.68e-03   1.7e-05   4.7e-05  0.625       nan   2.7e-09   2.7e-12
 
 configurations per root (top-2 determinants):
   sc_3d4s_2-1_casci_ao_-_pol_raw               root 0: s^2.00d^1.00 (|c|=0.97); s^2.00d^1.00 (|c|=0.16)
@@ -252,29 +252,29 @@ configurations per root (top-2 determinants):
   sc_3d4s4p4d4f_2-1_casci_mo_-_pol_avg         root 7: s^1.00p^1.00d^1.00 (|c|=0.38); s^1.00p^1.00d^1.00 (|c|=0.38)
   sc_3d4s4p4d4f_2-1_casci_mo_-_pol_avg         root 8: s^1.00p^1.00d^1.00 (|c|=0.72); s^1.00p^1.00d^1.00 (|c|=0.43)
   sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 0: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.07)
-  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 1: s^2.00d^1.00 (|c|=0.81); s^2.00d^1.00 (|c|=0.55)
-  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 2: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.06)
-  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 3: s^2.00d^1.00 (|c|=0.82); s^2.00d^1.00 (|c|=0.53)
-  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 4: s^2.00d^1.00 (|c|=0.97); s^2.00d^1.00 (|c|=0.21)
-  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 5: s^1.00d^2.00 (|c|=0.57); s^1.00d^2.00 (|c|=0.57)
-  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 6: s^1.00d^2.00 (|c|=0.51); s^1.00d^2.00 (|c|=0.51)
-  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 7: s^1.00d^2.00 (|c|=0.51); s^1.00d^2.00 (|c|=0.51)
-  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 8: s^1.00d^2.00 (|c|=0.47); s^1.00d^2.00 (|c|=0.47)
+  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 1: s^2.00d^1.00 (|c|=0.87); s^2.00d^1.00 (|c|=0.41)
+  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 2: s^2.00d^1.00 (|c|=0.96); s^2.00d^1.00 (|c|=0.19)
+  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 3: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.06)
+  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 4: s^2.00d^1.00 (|c|=0.88); s^2.00d^1.00 (|c|=0.44)
+  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 5: s^1.00d^2.00 (|c|=0.41); s^1.00d^2.00 (|c|=0.41)
+  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 6: s^1.00d^2.00 (|c|=0.33); s^1.00d^2.00 (|c|=0.33)
+  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 7: s^1.00d^2.00 (|c|=0.47); s^1.00d^2.00 (|c|=0.47)
+  sc_3d4s@ar_2-1_casci_ao_-_pol_avg            root 8: s^1.00d^2.00 (|c|=0.44); s^1.00d^2.00 (|c|=0.44)
   sc_3d4s@ar_2-1_casscf_ao_-_pol_avg           root 0: s^2.00d^1.00 (|c|=0.99); s^1.14d^1.86 (|c|=0.07)
   sc_3d4s@ar_2-1_sa-casscf_ao_-_pol_avg        root 0: p^2.00d^1.00 (|c|=0.96); p^2.00d^1.00 (|c|=0.21)
   sc_3d4s@ar_2-1_sa-casscf_ao_-_pol_avg        root 1: p^2.00d^1.00 (|c|=0.96); p^2.00d^1.00 (|c|=0.21)
   sc_3d4s@ar_2-1_sa-casscf_ao_-_pol_avg        root 2: p^2.00d^1.00 (|c|=0.92); p^2.00d^1.00 (|c|=0.24)
   sc_3d4s@ar_2-1_sa-casscf_ao_-_pol_avg        root 3: p^2.00d^1.00 (|c|=0.86); p^2.00d^1.00 (|c|=0.42)
   sc_3d4s@ar_2-1_sa-casscf_ao_-_pol_avg        root 4: p^2.00d^1.00 (|c|=0.89); p^2.00d^1.00 (|c|=0.37)
-  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 0: p^6.00d^1.00 (|c|=0.99); p^4.00d^3.00 (|c|=0.04)
-  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 1: p^6.00d^1.00 (|c|=0.95); p^6.00d^1.00 (|c|=0.27)
-  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 2: p^6.00d^1.00 (|c|=0.95); p^6.00d^1.00 (|c|=0.27)
-  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 3: p^6.00d^1.00 (|c|=0.90); p^6.00d^1.00 (|c|=0.41)
-  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 4: p^6.00d^1.00 (|c|=0.90); p^6.00d^1.00 (|c|=0.41)
-  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 5: p^5.00d^2.00 (|c|=0.36); p^5.00d^2.00 (|c|=0.36)
-  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 6: p^5.00d^2.00 (|c|=0.35); p^5.00d^2.00 (|c|=0.35)
-  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 7: p^5.00d^2.00 (|c|=0.32); p^5.00d^2.00 (|c|=0.32)
-  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 8: p^5.00d^2.00 (|c|=0.39); p^5.00d^2.00 (|c|=0.39)
+  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 0: p^6.00d^1.00 (|c|=0.98); p^6.00d^1.00 (|c|=0.11)
+  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 1: p^6.00d^1.00 (|c|=0.99); p^6.00d^1.00 (|c|=0.04)
+  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 2: p^6.00d^1.00 (|c|=0.84); p^6.00d^1.00 (|c|=0.40)
+  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 3: p^6.00d^1.00 (|c|=0.92); p^6.00d^1.00 (|c|=0.25)
+  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 4: p^6.00d^1.00 (|c|=0.87); p^6.00d^1.00 (|c|=0.46)
+  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 5: p^5.00d^2.00 (|c|=0.40); p^5.00d^2.00 (|c|=0.40)
+  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 6: p^5.00d^2.00 (|c|=0.34); p^5.00d^2.00 (|c|=0.34)
+  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 7: p^5.00d^2.00 (|c|=0.34); p^5.00d^2.00 (|c|=0.34)
+  sc_3d3p@semi_4-3_casci_ao_-_pol_avg          root 8: p^5.00d^2.00 (|c|=0.32); p^5.00d^2.00 (|c|=0.32)
   sc_3d3p@semi_4-3_casscf_ao_-_pol_avg         root 0: p^6.00d^1.00 (|c|=0.98); p^4.00d^3.00 (|c|=0.05)
   sc_3d3p@semi_4-3_sa-casscf_ao_-_pol_avg      root 0: p^6.00d^1.00 (|c|=0.92); p^6.00d^1.00 (|c|=0.31)
   sc_3d3p@semi_4-3_sa-casscf_ao_-_pol_avg      root 1: p^6.00d^1.00 (|c|=0.86); p^6.00d^1.00 (|c|=0.40)

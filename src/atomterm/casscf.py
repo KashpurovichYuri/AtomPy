@@ -90,6 +90,10 @@ class CASResult:
     cycles : int or None
         The optimizer's macro-cycle count (cost pricing + restart
         audits); ``None`` for runs without an optimizer (CASCI).
+    conv_dE : float or None
+        The final macro-cycle |delta e_tot| -- the convergence
+        precision; ``None`` without an optimizer or before the second
+        cycle.
     """
 
     energies: np.ndarray  # total energies of the roots
@@ -98,6 +102,7 @@ class CASResult:
     mc: object | None = None  # live pyscf object
     core_energy: float = 0.0  # total minus active-space energy
     cycles: int | None = None  # optimizer macro-cycles (CI: None)
+    conv_dE: float | None = None  # final |delta e_tot| (CI: None)
 
 
 # ------------------------------------------------- checkpointing + the kernel
@@ -125,22 +130,29 @@ def _core_energy(mc) -> float:
     return e_tot - avg_active
 
 
-def _count_cycles(mc) -> list[int]:
-    """Install the macro-cycle counter on an optimizer and return its
-    mutable cell -- PySCF never stores the count (the loop counter is
-    kernel-local); the per-cycle ``callback`` IS the instrument,
-    chained onto any user callback.  Read the cell after ``kernel()``.
+def _cycle_trace(mc) -> list:
+    """Install the macro-cycle instrument on an optimizer and return
+    its mutable cell -- PySCF never stores the count (the loop counter
+    is kernel-local); the per-cycle ``callback`` IS the instrument,
+    chained onto any user callback.  The cell reads ``[count, dE,
+    e_prev]`` after ``kernel()``: the macro-cycle count, the final
+    |delta e_tot| (the convergence precision; NaN before the second
+    cycle), and the previous cycle's energy.
     """
-    count = [0]
+    out = [0, float("nan"), None]
     prev = getattr(mc, "callback", None)
 
     def _tick(env):
-        count[0] += 1
+        e = float(env.get("e_tot", float("nan")))
+        if out[2] is not None:
+            out[1] = abs(e - out[2])
+        out[2] = e
+        out[0] += 1
         if callable(prev):
             prev(env)
 
     mc.callback = _tick
-    return count
+    return out
 
 
 def _root_energies(mc) -> np.ndarray:
@@ -158,14 +170,16 @@ def _run(mc, nroots: int, chkfile: str, name: str, verbose: int) -> CASResult:
     mc.chkfile = chkfile
     # the optimizer class only (mcscf.CASSCF is the factory;
     # mc1step.CASSCF the class; CASCI is not its subclass)
-    count = (_count_cycles(mc)
-             if isinstance(mc, mc1step.CASSCF) else None)
+    trace = _cycle_trace(mc) if isinstance(mc, mc1step.CASSCF) else None
     mc.kernel()
     energies = _root_energies(mc)  # nroots=1 reproduces float(mc.e_tot)
     ci = [mc.ci] if nroots == 1 else list(mc.ci)
     _checkpoint(chkfile, name, energies, ci)
-    return CASResult(energies, ci, mc.mo_coeff, mc, _core_energy(mc),
-                     cycles=count[0] if count is not None else None)
+    return CASResult(
+        energies, ci, mc.mo_coeff, mc, _core_energy(mc),
+        cycles=trace[0] if trace is not None else None,
+        conv_dE=(float(trace[1]) if trace is not None
+                 and np.isfinite(trace[1]) else None))
 
 
 # --------------------------------------------------------------------- CASCI
@@ -419,6 +433,7 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     -------
     ``{"e_tot": ensemble total, "mo": the converged FULL MO matrix,
     "converged": bool, "cycles": the optimizer's macro-cycle count,
+    "conv_dE": the final macro-cycle |delta e_tot|,
     "roots": the run_irrep_casci readout}``.
 
     Notes
@@ -444,10 +459,12 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
                              L, parity, conv_tol)
     mcscf.state_average_mix_(
         mc, [s for _, s, _ in solvers], [1.0 / (2 * L + 1)] * (2 * L + 1))
-    count = _count_cycles(mc)
+    trace = _cycle_trace(mc)
     mc.kernel(mo_full)
     roots = run_irrep_casci(mol, mf, mc.mo_coeff[:, active], ncore,
                             na, nb, L, parity, conv_tol, c_core=c_core)
     return {"e_tot": float(mc.e_tot), "mo": mc.mo_coeff,
-            "converged": bool(mc.converged), "cycles": count[0],
+            "converged": bool(mc.converged), "cycles": trace[0],
+            "conv_dE": (float(trace[1]) if np.isfinite(trace[1])
+                        else None),
             "roots": roots}

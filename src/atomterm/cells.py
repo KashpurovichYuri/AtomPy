@@ -337,6 +337,8 @@ class CellData:
     cycles : the optimizer's macro-cycle count (cost pricing +
         restart audits); 0 for runs without an optimizer and for
         stores predating the field.
+    conv_dE : the final macro-cycle |delta e_tot| (``None`` where
+        ``cycles`` is 0).
     """
 
     key: CellKey
@@ -346,6 +348,7 @@ class CellData:
     core_energy: float
     ncas: int = 0
     cycles: int = 0
+    conv_dE: float | None = None
 
 
 # the store ----------------------------------------------------------
@@ -412,9 +415,11 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
     energies, ci, core_energy = store
     ncas = lib.chkfile.load(str(chk), f"atomterm/{key.address}/ncas")
     cycles = lib.chkfile.load(str(chk), f"atomterm/{key.address}/cycles")
+    conv_dE = lib.chkfile.load(str(chk), f"atomterm/{key.address}/conv_dE")
     return CellData(key, np.asarray(mo), energies, ci, core_energy,
                     int(ncas) if ncas is not None else 0,
-                    int(cycles) if cycles is not None else 0)
+                    int(cycles) if cycles is not None else 0,
+                    float(conv_dE) if conv_dE is not None else None)
 
 
 # ------------------------------------------------------------- the execution
@@ -681,7 +686,8 @@ def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
     data = load_cell(key, workdir)
     cas = CASResult(data.energies, data.ci, data.mo_coeff,
                     None, data.core_energy,
-                    cycles=data.cycles or None)
+                    cycles=data.cycles or None,
+                    conv_dE=data.conv_dE)
     na, nb = key.sector
     ncore = ncore_of(mol.nelectron, na + nb)
     ncas = data.ncas or len(select_valence_ao(mol, key.shell_patterns))
@@ -727,6 +733,8 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
         "comm_norm_h_lz": float("nan"),
         "comm_norm_h_l2": float("nan"),
         "converged": True,
+        "cycles": data.cycles or None,
+        "conv_dE": data.conv_dE,
     }
     if mol is None or mf is None or key.fold == "frac":
         # frac cells ran under the fractional reference (not this mf);
@@ -800,6 +808,10 @@ def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
     if cycles is not None:
         lib.chkfile.save(str(chk), f"atomterm/{key.address}/cycles",
                          int(cycles))
+    conv_dE = getattr(cas, "conv_dE", None)
+    if conv_dE is not None:
+        lib.chkfile.save(str(chk), f"atomterm/{key.address}/conv_dE",
+                         float(conv_dE))
 
 
 def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
@@ -832,7 +844,7 @@ _LANE_FIELDS = ("term", "energies", "total", "ptp", "l2", "s2",
 # optional fields, loaded when present: the SA ensemble and, on
 # optimizer cells, the converged FULL MO matrix (restart +
 # orbital-level route comparisons) with the optimizer's cycle count
-_LANE_FIELDS_OPT = ("ensemble", "mo_coeff", "cycles")
+_LANE_FIELDS_OPT = ("ensemble", "mo_coeff", "cycles", "conv_dE")
 
 
 def _root_vectors(ci):
@@ -947,7 +959,8 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         # verbatim): mo_coeff travels as nested lists, and
         # load_lane_cell hands the matrix back.
         extra = {"mo_coeff": np.asarray(out["mo"], dtype=float).tolist(),
-                 "cycles": int(out["cycles"])}
+                 "cycles": int(out["cycles"]),
+                 "conv_dE": out["conv_dE"]}
         c_read = out["mo"][:, nf:nf + ncas]
     else:
         from atomterm.casscf import run_irrep_casci
@@ -1119,8 +1132,9 @@ def load_lane_cell(key: CellKey, workdir: str | Path = "elements") -> dict:
                 "regenerate the cell")
         out[field_name] = _stored(value)
     # optional fields (method-dependent): the SA ensemble, the
-    # converged MO matrix, the optimizer's cycles -- mo_coeff loads as
-    # the array it was stored as (consumers do linear algebra)
+    # converged MO matrix, the optimizer's cycles and conv_dE --
+    # mo_coeff loads as the array it was stored as (consumers do
+    # linear algebra)
     for field_name in _LANE_FIELDS_OPT:
         value = lib.chkfile.load(str(chk),
                                  f"atomterm/{key.address}/{field_name}")

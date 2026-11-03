@@ -29,13 +29,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN  # noqa: E402
 from atomterm.cells import lane_keys  # noqa: E402
 from _tables_common import (EV, cas_label, comm_cell,  # noqa: E402
-                            fold_label, l2_text, minus, payload_of,
-                            replace_block)
+                            conv_cell, fold_label, l2_text, minus,
+                            payload_of, replace_block)
 
 HEAD = ("| route | method | window | CAS | fold | dets | E, Eh | "
-        "ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | ptp (Eh) | ‖[H,Lz]‖ | "
+        "ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[H,Lz]‖ | "
         "‖[H,L²]‖ |")
-SEP = "|" + "---|" * 14
+SEP = "|" + "---|" * 15
 BEGIN, END = "<!-- lane:begin -->", "<!-- lane:end -->"
 SURVEY_BEGIN = "<!-- survey:begin -->"
 
@@ -64,13 +64,13 @@ def section(spec, payloads: dict) -> str:
         if p is None:
             rows.append(f"| pinned | CI | {k.span_label} | {cas_label(k)} "
                         f"| {fold_label(k.fold_tag)} | pending | | | | "
-                        f"| | | | |")
+                        f"| | | | | |")
             continue
         e = float(p["total"])
         de = (e - e0) * 1e3
         de_txt = "0" if k is anchor else f"{de:+.1f}"
         row = [f"{e:.4f}", de_txt, f"{e * EV:.4f}",
-               f"{(e - e0) * EV:+.4f}", l2_text(p),
+               f"{(e - e0) * EV:+.4f}", conv_cell(p), l2_text(p),
                f"{p['ptp']:.0e}",
                comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
                comm_cell(p, "comm_norm_h_l2", "res_h_l2")]
