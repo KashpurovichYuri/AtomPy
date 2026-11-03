@@ -24,9 +24,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN  # noqa: E402
 from atomterm.cells import CellKey, grid_keys, lane_keys, lattice_keys  # noqa: E402
-from _tables_common import (EV, SHELL_COLS, cas_label, comm_text,  # noqa: E402
-                            fold_label, l2_text, minus, payload_of,
-                            replace_block)
+from _tables_common import (EV, SHELL_COLS, cas_label,  # noqa: E402
+                            comm_cell, fold_label, l2_text, minus,
+                            payload_of, replace_block)
 from atomterm.windows import NOBLE_CORES  # noqa: E402
 
 HEAD = ("| window | CAS | fold | start | route | dets | E, Eh | "
@@ -124,8 +124,8 @@ def section(spec, cells: dict) -> str:
         vals = [f"{p['n_det']:,}", f"{e:.4f}",
                 "0" if k is anchor else f"{de:+.1f}",
                 f"{e * EV:.4f}", f"{(e - e0) * EV:+.4f}", l2_text(p),
-                comm_text(p["comm_norm_h_lz"]),
-                comm_text(p["comm_norm_h_l2"])]
+                comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
+                comm_cell(p, "comm_norm_h_l2", "res_h_lz")]
         rows.append("| " + " | ".join(
             head + [minus(v) for v in vals]) + " |")
     return "\n".join([BEGIN, HEAD, SEP, *rows, END])

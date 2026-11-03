@@ -705,15 +705,20 @@ def cell_payload(key: CellKey, facts) -> dict:
     return out
 
 
-def kernel_cell_payload(key: CellKey,
+def kernel_cell_payload(key: CellKey, mol=None, mf=None,
                         workdir: str | Path = "elements") -> dict:
     """The kernel-only payload of a big-sector cell (run_cell returns
     None past the dense-meter budget): the run's own energies from the
-    store, every dense-meter field NaN -- the tables' em-dash class.
-    The kernel totals are the values that compare; the meters are
-    structural zeros for the certified folds."""
+    store.  With the substrate given (``mol``/``mf``), the payload
+    ALSO carries the apply-based meters -- the ground root's
+    ``ground_l2`` and the state residual ``res_h_lz``,
+    :func:`run_lane_cell`'s size-independent certificates -- filling
+    the columns the dense budget leaves NaN (the tables' em-dash
+    class).  The meters read the STORED window (the run's own
+    converged MO) through the same fold resolution :func:`run_cell`
+    uses; the kernel totals are the values that compare."""
     data = load_cell(key, workdir)
-    return {
+    out = {
         "cell": key.address,
         "kind": key.method,
         "n_det": int(sector_dimension(data.ncas, *key.sector)),
@@ -723,6 +728,45 @@ def kernel_cell_payload(key: CellKey,
         "comm_norm_h_l2": float("nan"),
         "converged": True,
     }
+    if mol is None or mf is None or key.fold == "frac":
+        # frac cells ran under the fractional reference (not this mf);
+        # their meters belong to the dense path
+        return out
+    from pyscf import ao2mo
+
+    from atomterm.core import purified_core_orbitals
+    from atomterm.detbasis import operator_apply
+    from atomterm.operators import (active_space_integrals,
+                                    build_operator_parts,
+                                    ci_in_detbasis_order, pyscf_apply)
+    from atomterm.system import ncore_of
+    from atomterm.windows import select_valence_ao
+
+    na, nb = key.sector
+    ncore = ncore_of(mol.nelectron, na + nb)
+    c_run = None
+    if key.fold_tag is not None:
+        _, c_run = _fold_span(key, mol, mf)
+        ncore = c_run.shape[1]
+    c_core = (c_run if c_run is not None
+              else purified_core_orbitals(mol, mf, ncore)[0]
+              if key.substrate == "pur" else None)
+    ncas = data.ncas or len(select_valence_ao(mol, key.shell_patterns))
+    c_act = np.asarray(data.mo_coeff)[:, ncore:ncore + ncas]
+    parts = build_operator_parts(mol, mf, c_act, ncore, na, nb,
+                                 c_core=c_core)
+    dets = parts["dets"]
+    k = int(np.argmin(np.atleast_1d(data.energies)))
+    w = ci_in_detbasis_order(np.asarray(data.ci)[k], ncas, na, nb)
+    apply_l2 = operator_apply(dets, one_body=parts["L2"][0],
+                              two_body=parts["L2"][1])
+    out["ground_l2"] = float(np.real(w @ apply_l2(w)))
+    h1, _ = active_space_integrals(mol, mf, c_act, ncore, c_core=c_core)
+    apply_h = pyscf_apply(h1, ao2mo.kernel(mol, c_act), ncas, na, nb)
+    apply_m = operator_apply(dets, one_body=(-1j * parts["Lz"][0]).real)
+    out["res_h_lz"] = float(np.linalg.norm(
+        apply_h(apply_m(w)) - apply_m(apply_h(w))))
+    return out
 
 
 def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
@@ -782,7 +826,7 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
 # (:func:`load_lane_cell`); method-dependent extras are optional
 _LANE_FIELDS = ("term", "energies", "total", "ptp", "l2", "s2",
                 "n_det", "anchor_dev", "comm_norm_h_lz",
-                "comm_norm_h_l2", "fold")
+                "comm_norm_h_l2", "res_h_lz", "fold")
 # optional fields, loaded when present: the SA ensemble and, on
 # optimizer cells, the converged FULL MO matrix (restart +
 # orbital-level route comparisons) with the optimizer's cycle count
@@ -876,10 +920,6 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     mo = build_full_mo(mf, list(range(nf)), rows, c_core=c_fold)
     c = mo[:, nf:nf + len(rows)]
     ncas = c.shape[1]
-    orbsyms = orb_irreps(mol, c)
-    parts = build_operator_parts(mol, mf, c, nf, na, nb, c_core=c_fold)
-    dets = parts["dets"]
-    ids = det_irreps(orbsyms, na, nb)
 
     # the kernel half: the pinned solvers live in the evaluator (one
     # per branch component, multiplicity as nroots) -- SA returns the
@@ -901,6 +941,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         # same-irrep rotations, the span certificate survives
         extra = {"mo_coeff": np.asarray(out["mo"], dtype=float),
                  "cycles": int(out["cycles"])}
+        c_read = out["mo"][:, nf:nf + ncas]
     else:
         from atomterm.casscf import run_irrep_casci
 
@@ -909,15 +950,23 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
                   f"{list(branch_d2h(L, parity))}")
         roots = run_irrep_casci(mol, mf, c, nf, na, nb, L, parity,
                                 conv_tol=conv_tol, c_core=c_fold)
+        c_read = c
 
-    # the readout half (shared): per component block, the pinned roots
-    # bridge into detbasis order, live entirely in their block (the
-    # support assert), and the meters read them restricted to the
-    # block -- L2/S2/H are totally symmetric, so the restriction is
-    # exact.  The SA TOTAL is the kernel ensemble (the optimizer may
-    # rotate same-irrep core/window columns -- the readout's absolute
-    # energies are of the run's own partition; its COMPONENT SPREAD
-    # and meters are the diagnostics).
+    # the readout half (shared), on the READOUT window (CI: the start
+    # window; SA: the converged one): per component block, the pinned
+    # roots bridge into detbasis order and live entirely in their
+    # block (the support assert); the meters read them restricted to
+    # the block -- L2/S2/H are totally symmetric, so the restriction
+    # is exact.  The SA TOTAL is the kernel ensemble (the optimizer
+    # may rotate same-irrep core/window columns -- the readout's
+    # absolute energies are of the run's own partition; its COMPONENT
+    # SPREAD and meters are the diagnostics).
+    orbsyms = orb_irreps(mol, c_read)
+    parts = build_operator_parts(mol, mf, c_read, nf, na, nb,
+                                 c_core=c_fold)
+    dets = parts["dets"]
+    ids = det_irreps(orbsyms, na, nb)
+    w_all: list[np.ndarray] = []
     for irrep, mult in branch_d2h(L, parity).items():
         e_arr, ci = roots[irrep]
         e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
@@ -926,10 +975,11 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         block = [d for d, m in zip(dets, sel) if m]
         w_blk = []
         for vec in _root_vectors(ci):
-            w = ci_in_detbasis_order(vec, ncas, na, nb)[sel]
+            w = ci_in_detbasis_order(vec, ncas, na, nb)
             # the pinned vector lives entirely in its block
-            assert abs(np.linalg.norm(w) - 1.0) < 1e-8, irrep
+            assert abs(np.linalg.norm(w[sel]) - 1.0) < 1e-8, irrep
             w_blk.append(w)
+        w_all.extend(w_blk)
         if anchor and key.method == "casci":
             # our own H restricted to the block must reproduce the
             # pinned solver's roots (the conventions certificate)
@@ -944,8 +994,27 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
             mb = slater_condon_matrix(block, one_body=parts[op][0],
                                       two_body=parts[op][1])
             for w in w_blk:
-                meters.append(float(np.real(w @ mb @ w)))
+                meters.append(float(np.real(w[sel] @ mb @ w[sel])))
             del mb
+
+    # the state residual ||[H, Lz]psi|| over the component roots -- the
+    # SIZE-INDEPENDENT symmetry certificate (exact 0 iff a symmetry
+    # eigenstate; the operator Frobenius norm it backs up past the
+    # dense budget needs every matrix element).  Lz enters as its real
+    # form M = -i Lz (norms unchanged -- the one-body apply's singles
+    # enumeration keeps this cheap at any sector we run); H through
+    # the C contraction boundary on the readout window's own feed.
+    from atomterm.detbasis import operator_apply
+    from atomterm.operators import active_space_integrals, pyscf_apply
+    from pyscf import ao2mo
+
+    h1r, _ = active_space_integrals(mol, mf, c_read, nf, c_core=c_fold)
+    apply_h = pyscf_apply(h1r, ao2mo.kernel(mol, c_read), ncas, na, nb)
+    apply_m = operator_apply(dets, one_body=(-1j * parts["Lz"][0]).real)
+    res_lz = 0.0
+    for w in w_all:
+        r = apply_h(apply_m(w)) - apply_m(apply_h(w))
+        res_lz = max(res_lz, float(np.linalg.norm(r)))
 
     es = np.asarray(es)
     # the assembled-treatment meters: exact dense commutators where
@@ -984,6 +1053,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         "anchor_dev": float(anchor_dev),
         "comm_norm_h_lz": comm_lz,
         "comm_norm_h_l2": comm_l2,
+        "res_h_lz": float(res_lz),
         "fold": list(fold),
     }
     if ensemble is not None:

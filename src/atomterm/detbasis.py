@@ -336,6 +336,37 @@ def slater_condon_matrix(
     return _build(dets, one_body, two_body)
 
 
+def _singles_couplings(dets, occ: np.ndarray, cum: np.ndarray):
+    """All SINGLE-excitation couplings as ``(rows, cols, ann, cre)`` --
+    the one-body operator's entire nonzero pattern, enumerated by
+    index arithmetic (bitmask searchsorted) instead of the pairwise
+    classification: O(n * nelec * nvirt), no n^2 work.  The one-body
+    closure at big sectors rides this; the pair classifier serves the
+    two-body class.
+    """
+    n, n2 = occ.shape
+    nelec = len(dets[0])
+    nvirt = n2 - nelec
+    if nelec == 0 or nvirt == 0:
+        z = np.zeros(0, dtype=np.int64)
+        return z, z, z, z
+    masks = (occ * (np.int64(1) << np.arange(n2))).sum(axis=1)
+    order = np.argsort(masks)
+    sorted_masks = masks[order]
+    occ_of = np.nonzero(occ)[1].reshape(n, nelec)
+    virt_of = np.nonzero(~occ)[1].reshape(n, nvirt)
+    ii = np.repeat(np.arange(n, dtype=np.int64), nelec * nvirt)
+    ann = np.repeat(occ_of, nvirt, axis=1).ravel()
+    cre = np.tile(virt_of, (1, nelec)).ravel()
+    j_mask = masks[ii] ^ (np.int64(1) << ann) ^ (np.int64(1) << cre)
+    pos = np.searchsorted(sorted_masks, j_mask)
+    np.clip(pos, 0, n - 1, out=pos)
+    valid = sorted_masks[pos] == j_mask
+    ii, ann, cre = ii[valid], ann[valid], cre[valid]
+    jj = order[pos[valid]]
+    return ii, jj, ann, cre
+
+
 def operator_apply(
     dets: list[tuple[int, ...]],
     one_body: np.ndarray | None = None,
@@ -402,23 +433,41 @@ def operator_apply(
 
     couplings = None  # the signed (rows, cols, values) chunks, built once
 
+    def _build_couplings():
+        # one-body-only operators ride the singles enumeration (no
+        # pairwise classification -- the big-sector one-body path);
+        # anything with a two-body part uses the chunked classifier
+        out = []
+        if two_body is None:
+            ii, jj, ann, cre = _singles_couplings(dets, occ, cum)
+            # ii enumerates the SOURCE determinants (the kets the
+            # operator acts on), jj their single-excitation partners;
+            # the sign is the source's transition sign, and the
+            # scatter accumulates into the PARTNER rows
+            sign = (_sign_single(cum[ii], ann, cre)
+                    if ii.size else np.zeros(0))
+            val = sign * one_body[cre, ann]
+            nz = val != 0
+            out.append((jj[nz], ii[nz], val[nz]))
+            return out
+        for pairs in _pair_chunks(occ, cum, len(dets[0])):
+            rows_i, cols_i, vals_i = [], [], []
+            if one_body is not None:
+                ii, jj, val = _one_body_pairs(pairs, one_body)
+                rows_i.append(ii); cols_i.append(jj); vals_i.append(val)
+            ii, jj, val = _two_body_pairs(pairs, two_body)
+            rows_i.append(ii); cols_i.append(jj); vals_i.append(val)
+            out.append((np.concatenate(rows_i),
+                        np.concatenate(cols_i),
+                        np.concatenate(vals_i)))
+        return out
+
     def apply(v):
         nonlocal couplings
         v = np.asarray(v)
         out_dtype = np.result_type(v.dtype, dtype)
         if couplings is None:
-            couplings = []
-            for pairs in _pair_chunks(occ, cum, len(dets[0])):
-                rows_i, cols_i, vals_i = [], [], []
-                if one_body is not None:
-                    ii, jj, val = _one_body_pairs(pairs, one_body)
-                    rows_i.append(ii); cols_i.append(jj); vals_i.append(val)
-                if two_body is not None:
-                    ii, jj, val = _two_body_pairs(pairs, two_body)
-                    rows_i.append(ii); cols_i.append(jj); vals_i.append(val)
-                couplings.append((np.concatenate(rows_i),
-                                  np.concatenate(cols_i),
-                                  np.concatenate(vals_i)))
+            couplings = _build_couplings()
         out = diag * v.astype(out_dtype)
         for ii, jj, val in couplings:
             prod = val * v[jj]

@@ -62,6 +62,18 @@ def comm_text(v) -> str:
     return f"{v:.1e}" if v == v else DASH          # NaN check: v != v
 
 
+def comm_cell(payload: dict, field: str, res_field: str) -> str:
+    """One symmetry column of a generated table: the dense operator
+    norm where the dense budget allowed it; past the budget the stored
+    STATE RESIDUAL (the size-independent certificate, when the payload
+    carries one); neither -- the em-dash."""
+    v = payload.get(field, float("nan"))
+    if v == v:
+        return f"{v:.1e}"
+    r = payload.get(res_field)
+    return f"{r:.1e}" if r is not None else DASH
+
+
 def payload_of(cells: dict, key) -> dict | None:
     """The key's RUN payload (None for pending and void cells)."""
     p = cells.get(key.address)

@@ -28,8 +28,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN  # noqa: E402
 from atomterm.cells import lane_keys  # noqa: E402
-from _tables_common import (EV, cas_label, comm_text, fold_label,  # noqa: E402
-                            l2_text, minus, payload_of, replace_block)
+from _tables_common import (EV, cas_label, comm_cell,  # noqa: E402
+                            fold_label, l2_text, minus, payload_of,
+                            replace_block)
 
 HEAD = ("| route | method | window | CAS | fold | dets | E, Eh | "
         "ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | ptp (Eh) | ‖[H,Lz]‖ | "
@@ -70,8 +71,9 @@ def section(spec, payloads: dict) -> str:
         de_txt = "0" if k is anchor else f"{de:+.1f}"
         row = [f"{e:.4f}", de_txt, f"{e * EV:.4f}",
                f"{(e - e0) * EV:+.4f}", l2_text(p),
-               f"{p['ptp']:.0e}", comm_text(p["comm_norm_h_lz"]),
-               comm_text(p["comm_norm_h_l2"])]
+               f"{p['ptp']:.0e}",
+               comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
+               comm_cell(p, "comm_norm_h_l2", "res_h_lz")]
         rows.append("| pinned | CI | "
                     + " | ".join([k.span_label, cas_label(k),
                                   fold_label(k.fold_tag),

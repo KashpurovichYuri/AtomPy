@@ -588,6 +588,34 @@ def test_sa_casscf_run_completes_the_roots_store(carbon, tmp_path):
 
 
 @slow
+def test_kernel_cell_payload_meters_match_the_dense_path(carbon, tmp_path):
+    """The apply-based meters of a kernel-only payload read the STORED
+    window through the run's own fold resolution: the ground ⟨L²⟩
+    agrees with the dense analysis payload's, and the state residual
+    is present at the certificate floor (the free route's big-cell
+    columns; here pinned at a small cell where both paths live)."""
+    from atomterm.casscf import run_casci
+    from atomterm.cells import (cell_payload, kernel_cell_payload,
+                                run_cell)
+    from atomterm.windows import select_valence_ao
+
+    _, mol, mf, _ = carbon
+    key = CellKey("C", "2p", (1, 1), method="casci",
+                  substrate="pur", fold="avg")
+    facts = run_cell(key, mf, workdir=tmp_path)
+    dense = cell_payload(key, facts)
+    kern = kernel_cell_payload(key, mol, mf, workdir=tmp_path)
+    assert kern["energies_pyscf"] == dense["energies_pyscf"]
+    assert abs(kern["ground_l2"] - dense["ground_l2"]) < 1e-9
+    assert 0.0 <= kern["res_h_lz"] < 1e-8
+    # no substrate given: the kernel-only shape (NaN meters, no
+    # residual) -- the free-standing energies class
+    bare = kernel_cell_payload(key, workdir=tmp_path)
+    assert "res_h_lz" not in bare
+    assert bare["ground_l2"] != bare["ground_l2"]   # NaN: no meters
+
+
+@slow
 def test_frozen_mask_applies_to_the_mo_start(carbon, tmp_path):
     """Masks are START-INDEPENDENT: a frozen-window
     MO-start cell must converge WITH its start columns -- if the mask
@@ -678,7 +706,10 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
     for v in p["l2"]:
         assert abs(v - 2.0) < 1e-8          # 3P: L(L+1) = 2
     for v in p["s2"]:
-        assert abs(v - 2.0) < 1e-8          # S(S+1) = 2
+        assert abs(v - 2.0) < 1e-8
+    # the state residual: the closed window's term components are
+    # symmetry eigenstates -- the residual sits at the apply floor
+    assert 0.0 <= p["res_h_lz"] < 1e-8          # S(S+1) = 2
     # the store round-trips (and a fresh run is a cache hit)
     q = load_lane_cell(key, workdir=tmp_path)
     assert q["total"] == p["total"] and q["energies"] == p["energies"]

@@ -310,8 +310,28 @@ Columns of a ladder table (window families × routes):
   **ptp** carries its energy side — the component spread, the
   degeneracy certificate).
 - **‖[H,Lz]‖, ‖[H,L²]‖** — the assembled-treatment meters, exact up
-  to the dense-meter cap (~6k dets); beyond it they read an em-dash —
-  structural zeros for the certified fold class.
+  to the dense-meter cap (~6k dets); beyond it the columns carry the
+  stored STATE RESIDUAL ‖[H,Lz]ψ‖ (the per-root certificate — exact
+  zero iff the state is a symmetry eigenstate) where a payload has
+  one, else the em-dash — structural zeros for the certified fold
+  class.
+
+**Matrix-free meters.** Meters evaluate through *application*, not
+matrices: ⟨ψ|Ô|ψ⟩ and ‖[Ĥ,L̂z]ψ‖ need only Ôψ. The algebra fixes the
+nonzero pattern — a (one-, two-body) operator connects determinants
+differing by at most two spin-orbitals; beyond that the element is
+exactly zero (Pauli vanishing, then orthogonality), never computed:
+
+| ⟨D_i|Ô|D_j⟩ | same det | 1 excitation | 2 excitations | ≥ 3 |
+|---|---|---|---|---|
+| | diagonal rules | single rules | double rules | **0** |
+
+`detbasis.operator_apply` accumulates the same signed couplings the
+matrix builder scatters, straight into the output vector (the N²
+container never forms; one-body operators ride a singles-only
+enumeration); `operators.pyscf_apply` is the same Hamiltonian through
+PySCF's own C contractions at any sector size. Below the cap the
+matrix forms remain as the cross-certified twins.
 
 The meters, and what each is blind to (ε = ‖ρ_c − ρ̄_c‖/‖ρ̄_c‖, the
 core anisotropy — `core_anisotropy()`, no CI involved):

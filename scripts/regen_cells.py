@@ -292,7 +292,7 @@ def main() -> None:
                                  budgets={"sa_weights": spec.sa_weights})
                 cells[key.address] = (
                     cell_payload(key, facts) if facts is not None
-                    else kernel_cell_payload(key))
+                    else kernel_cell_payload(key, mol, mf))
 
         _write_atomic(out / "cells.json",
                       json.dumps({"atom": name,

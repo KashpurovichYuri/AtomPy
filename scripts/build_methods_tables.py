@@ -50,7 +50,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN
 from atomterm.cells import grid_keys, window_grid
-from _tables_common import DASH, EV, comm_text, minus
+from _tables_common import DASH, EV, comm_cell, minus
 EPS = 1e-4          # Eh -- agreeing starts collapse into the AO head
 
 # the declared windows this file renders, with their presentation
@@ -134,8 +134,8 @@ def _values(p: dict, anchor: float) -> list[str]:
     out = [f"{asrun:.4f}", f"{de_eh * 1e3:+.1f}", f"{asrun * EV:.4f}",
            f"{de_eh * EV:+.4f}",
            f"{g:.4f}" if g == g else DASH,          # NaN check
-           comm_text(p.get("comm_norm_h_lz", float("nan"))),
-           comm_text(p.get("comm_norm_h_l2", float("nan"))),
+           comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
+           comm_cell(p, "comm_norm_h_l2", "res_h_lz"),
            _cfg(p.get("window", {}))]
     return [minus(v) for v in out]   # sign minus only
 
