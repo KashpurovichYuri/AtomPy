@@ -136,6 +136,9 @@ def parse_args(argv) -> argparse.Namespace:
     p.add_argument("--full", action="store_true",
                    help="materialize scenario-voided cells (re-testing "
                         "their dated claims)")
+    p.add_argument("--fresh", action="store_true",
+                   help="re-run stored cells (ignore the store cache -- "
+                        "payload migrations and re-measures)")
     p.add_argument("--method",
                    help="keep this method: casci | casscf | sa-casscf")
     p.add_argument("--window",
@@ -286,9 +289,10 @@ def main() -> None:
                     lane_sub = lane_substrate(spec)
                 cells[key.address] = run_lane_cell(
                     key, lane_sub[0], lane_sub[1], spec.term,
-                    workdir="elements")
+                    fresh=args.fresh, workdir="elements")
             else:
-                facts = run_cell(key, mf, frac_mf=mf_f, workdir="elements",
+                facts = run_cell(key, mf, frac_mf=mf_f, fresh=args.fresh,
+                                 workdir="elements",
                                  budgets={"sa_weights": spec.sa_weights})
                 cells[key.address] = (
                     cell_payload(key, facts) if facts is not None
