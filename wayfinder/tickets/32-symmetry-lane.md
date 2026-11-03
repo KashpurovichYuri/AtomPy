@@ -742,6 +742,46 @@ conversation, see also the handoff):
   unreviewed span, design survey, the DEDICATED refactoring round,
   map dispositions, ticket 32 resolved; ticket 33 next).
 
+## The review wave, applied early (2026-11-03 -- the skills run at the plan door)
+
+The user directed the two-axis review + design survey BEFORE the next
+units (plan-accurately).  Fixed point 75d3a93..HEAD.  Three commits:
+
+- 0f457c1 (cells): _fold_span ONE home (was written three times --
+  run_cell, analyze_cell without the refusals, run_lane_cell);
+  run_lane_cell's CI branch calls run_irrep_casci (the inline loop
+  was verbatim _irrep_solvers) and SA/CI share ONE readout/meter
+  loop (the block-support assert now covers both; anchor stays
+  CI-only -- the SA parts are the start window's); _LANE_FIELDS one
+  field list (writer+reader); __all__ lockstep (kernel_cell_payload,
+  route_keys); run_cell's Returns states the None-past-_COMM_CAP
+  contract; route_keys calls lane_keys once.  Certified: the
+  lane/route pins green (span identity 1e-8).
+- 5604460 (cases): Scenario leans to its one consumer -- the render
+  vocabulary (instead_of/render/eps/collapses) had ZERO consumers
+  (the render-policy consumer was declined at round 3; the dead
+  vocabulary died).
+- ca98fc8 (emitters): scripts/_tables_common.py (constants + label
+  helpers + the marker-form edit protocol; the run-payload predicate
+  joins its family as payload_of); the lane and lattice emitters
+  SKIP survey-carrying atoms (Sc was a hard sys.exit -- a declared
+  emitter broken against a declared atom); methods._values guards
+  the kernel-only payload class.  Byte-identical output certified
+  against the committed TABLES (the pre-refactor reference).
+
+DECLINED/DEFERRED with reasons: the lane:->ladder: marker rename
+(moot -- the sections die at the C/Si migration); cells.json NaN
+literals (Python-tolerated; writer and reader are both ours); a
+cells.py split into lanes.py (hypothetical seam -- one consumer);
+stage-adapter retirement (live consumers; correctly scheduled with
+run_u*/ECP); moving the eps-collapse row policy into scenarios
+(presentation lives with the emitter -- the earlier decline
+re-affirmed by the deletion direction); exposing the apply's
+excitation indices (per Refactor 4 the closure IS the product; a
+public pair-handle widens detbasis for one consumer).
+
+The SA-total==ensemble rule gained its pin (test_route_axis_twins).
+
 Settled in conversation (the standing answers): the SA route
 agreement is genuine (1e-9..2e-7 at solver tolerance on m-complete
 windows; 9.77 mEh basin split on the escape-class 3d4s window);

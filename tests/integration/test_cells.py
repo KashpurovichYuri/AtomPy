@@ -742,6 +742,10 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
     sa = run_lane_cell(replace(leg, method="sa-casscf"), mol_d2h, mf_d2h,
                        cs.term, workdir=tmp_path)
     assert "ensemble" in sa and sa["ptp"] < 1e-8
+    # the SA TOTAL is the kernel ensemble (the optimizer rotates
+    # same-irrep core/window columns -- the readout's absolutes are of
+    # the run's own partition; only the kernel bookkeeping compares)
+    assert sa["total"] == sa["ensemble"]
     assert all(abs(v - 2.0) < 1e-7 for v in sa["l2"])   # 3P exact
     assert sa["total"] < min(pinned["energies"]) + 1.0  # relaxation helps
 
