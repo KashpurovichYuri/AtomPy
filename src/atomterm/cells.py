@@ -766,6 +766,8 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
     apply_m = operator_apply(dets, one_body=(-1j * parts["Lz"][0]).real)
     out["res_h_lz"] = float(np.linalg.norm(
         apply_h(apply_m(w)) - apply_m(apply_h(w))))
+    out["res_h_l2"] = float(np.linalg.norm(
+        apply_h(apply_l2(w)) - apply_l2(apply_h(w))))
     return out
 
 
@@ -826,7 +828,7 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
 # (:func:`load_lane_cell`); method-dependent extras are optional
 _LANE_FIELDS = ("term", "energies", "total", "ptp", "l2", "s2",
                 "n_det", "anchor_dev", "comm_norm_h_lz",
-                "comm_norm_h_l2", "res_h_lz", "fold")
+                "comm_norm_h_l2", "res_h_lz", "res_h_l2", "fold")
 # optional fields, loaded when present: the SA ensemble and, on
 # optimizer cells, the converged FULL MO matrix (restart +
 # orbital-level route comparisons) with the optimizer's cycle count
@@ -1015,6 +1017,15 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     for w in w_all:
         r = apply_h(apply_m(w)) - apply_m(apply_h(w))
         res_lz = max(res_lz, float(np.linalg.norm(r)))
+    # the L2 residual: L2 carries a two-body part, so its closure pays
+    # the pair classification once (minutes-class at the 2e5-det
+    # sector, cached after) -- priced by measurement, not declined
+    apply_l2r = operator_apply(dets, one_body=parts["L2"][0],
+                               two_body=parts["L2"][1])
+    res_l2 = 0.0
+    for w in w_all:
+        r = apply_h(apply_l2r(w)) - apply_l2r(apply_h(w))
+        res_l2 = max(res_l2, float(np.linalg.norm(r)))
 
     es = np.asarray(es)
     # the assembled-treatment meters: exact dense commutators where
@@ -1054,6 +1065,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         "comm_norm_h_lz": comm_lz,
         "comm_norm_h_l2": comm_l2,
         "res_h_lz": float(res_lz),
+        "res_h_l2": float(res_l2),
         "fold": list(fold),
     }
     if ensemble is not None:

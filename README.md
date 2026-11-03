@@ -254,15 +254,16 @@ one-line tag under the heading. Per-section legends live nowhere.
 Columns of the CI window survey (one row per declared CI cell):
 
 - **window / CAS / dets** — the span and its active size; **fold** —
-  the partition: the pinned legs' own tags (`semi`, explicit lists),
-  the prefix name for free rows, `·raw`/`·frac`/`·pur` marking the
-  free variants' deviation; **start** — the construction (AO shell
-  span / canonical MO slice); **route** — free (the native driver) or
-  pinned (D2h construction).
-- **E** — the free rows' own total; the pinned rows' TERM energy (the
-  branch components averaged + the fold-independent bookkeeping
-  constant — legs compare across folds). **ΔE** — anchored on the
-  primary window's pinned AO row (the tag names it).
+  the partition: the pinned rows carry their own tags (`semi`,
+  explicit lists), free rows the prefix name, with `·raw`/`·frac`/
+  `·pur` marking the free variants' deviation; **start** — the
+  construction (AO shell span / canonical MO slice); **route** — free
+  (the native driver) or pinned (D2h construction).
+- **E** — **rows compare across folds only.** Free rows: the run's
+  own total. Pinned rows: the TERM energy — the branch components'
+  mean at CI plus the fold-independent bookkeeping constant.
+- **ΔE** — zero at the primary window's pinned AO row (the anchor
+  every ΔE is taken against).
 - **⟨L²⟩** — the free rows' ground root; the pinned rows' components
   (one value when they agree, a range when they scramble). The
   commutator columns are the assembled meters, em-dash past the
@@ -298,23 +299,26 @@ Columns of a ladder table (window families × routes):
   construction, one `wfnsym` solver per term component) or free (the
   symmetry-blind native driver); CI today, CASSCF/SA with the route
   axis.
-- **CAS / dets** — the leg's active size and sector determinant
-  count; **fold** — the leg's partition (the column that varies).
-- **E** — the TERM energy: the mean over the 2L+1 branch components
-  plus the fold-independent bookkeeping constant — legs compare
-  across folds (not sector grounds).
-- **ΔE** — gap to the leg spanning the case's primary window (the
-  tag line's anchor), in mEh and eV.
+- **CAS / dets** — the row's active size and sector determinant
+  count; **fold** — the row's partition (the column that varies).
+- **E** — **rows compare across folds, never sector grounds.** The
+  TERM energy: the mean over the 2L+1 branch components at CI, the
+  uniform-weight ensemble at SA (its exact degenerate limit — the
+  readout absolutes move under same-irrep partition rotations), plus
+  the fold-independent bookkeeping constant.
+- **ΔE** — gap to the row spanning the case's primary window (the
+  anchor; zero there), in mEh and eV.
 - **⟨L²⟩** — across the branch components: one value when they agree
   (the term reading), a min–max range when they do not (the scramble;
   **ptp** carries its energy side — the component spread, the
   degeneracy certificate).
-- **‖[H,Lz]‖, ‖[H,L²]‖** — the assembled-treatment meters, exact up
-  to the dense-meter cap (~6k dets); beyond it the columns carry the
-  stored STATE RESIDUAL ‖[H,Lz]ψ‖ (the per-root certificate — exact
-  zero iff the state is a symmetry eigenstate) where a payload has
-  one, else the em-dash — structural zeros for the certified fold
-  class.
+- **‖[H,Lz]‖, ‖[H,L²]‖** — **zero certifies symmetry; the value
+  localizes the breaking.** Exact operator norms up to the
+  dense-meter cap (~6k dets); beyond it the columns carry the stored
+  STATE RESIDUAL ‖[H,Lz]ψ‖ / ‖[H,L²]ψ‖ (the same commutator applied
+  to the converged state — exact zero iff the state is a symmetry
+  eigenstate) where a payload has one, else the em-dash (structural
+  zeros for the certified fold class).
 
 **Matrix-free meters.** Meters evaluate through *application*, not
 matrices: ⟨ψ|Ô|ψ⟩ and ‖[Ĥ,L̂z]ψ‖ need only Ôψ. The algebra fixes the

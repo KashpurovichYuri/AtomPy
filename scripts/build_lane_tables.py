@@ -73,7 +73,7 @@ def section(spec, payloads: dict) -> str:
                f"{(e - e0) * EV:+.4f}", l2_text(p),
                f"{p['ptp']:.0e}",
                comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
-               comm_cell(p, "comm_norm_h_l2", "res_h_lz")]
+               comm_cell(p, "comm_norm_h_l2", "res_h_l2")]
         rows.append("| pinned | CI | "
                     + " | ".join([k.span_label, cas_label(k),
                                   fold_label(k.fold_tag),

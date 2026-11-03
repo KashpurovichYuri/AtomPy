@@ -135,7 +135,7 @@ def _values(p: dict, anchor: float) -> list[str]:
            f"{de_eh * EV:+.4f}",
            f"{g:.4f}" if g == g else DASH,          # NaN check
            comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
-           comm_cell(p, "comm_norm_h_l2", "res_h_lz"),
+           comm_cell(p, "comm_norm_h_l2", "res_h_l2"),
            _cfg(p.get("window", {}))]
     return [minus(v) for v in out]   # sign minus only
 

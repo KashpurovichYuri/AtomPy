@@ -608,11 +608,11 @@ def test_kernel_cell_payload_meters_match_the_dense_path(carbon, tmp_path):
     assert kern["energies_pyscf"] == dense["energies_pyscf"]
     assert abs(kern["ground_l2"] - dense["ground_l2"]) < 1e-9
     assert 0.0 <= kern["res_h_lz"] < 1e-8
+    assert 0.0 <= kern["res_h_l2"] < 1e-8
     # no substrate given: the kernel-only shape (NaN meters, no
     # residual) -- the free-standing energies class
     bare = kernel_cell_payload(key, workdir=tmp_path)
-    assert "res_h_lz" not in bare
-    assert bare["ground_l2"] != bare["ground_l2"]   # NaN: no meters
+    assert "res_h_lz" not in bare and "res_h_l2" not in bare
 
 
 @slow
@@ -709,7 +709,8 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
         assert abs(v - 2.0) < 1e-8
     # the state residual: the closed window's term components are
     # symmetry eigenstates -- the residual sits at the apply floor
-    assert 0.0 <= p["res_h_lz"] < 1e-8          # S(S+1) = 2
+    assert 0.0 <= p["res_h_lz"] < 1e-8
+    assert 0.0 <= p["res_h_l2"] < 1e-8          # S(S+1) = 2
     # the store round-trips (and a fresh run is a cache hit)
     q = load_lane_cell(key, workdir=tmp_path)
     assert q["total"] == p["total"] and q["energies"] == p["energies"]

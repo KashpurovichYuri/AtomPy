@@ -125,7 +125,7 @@ def section(spec, cells: dict) -> str:
                 "0" if k is anchor else f"{de:+.1f}",
                 f"{e * EV:.4f}", f"{(e - e0) * EV:+.4f}", l2_text(p),
                 comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
-                comm_cell(p, "comm_norm_h_l2", "res_h_lz")]
+                comm_cell(p, "comm_norm_h_l2", "res_h_l2")]
         rows.append("| " + " | ".join(
             head + [minus(v) for v in vals]) + " |")
     return "\n".join([BEGIN, HEAD, SEP, *rows, END])

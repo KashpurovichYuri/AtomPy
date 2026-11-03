@@ -20,7 +20,7 @@ Route free · partition averaged fold · source `report.md` (`scripts/run.py Sc`
 
 ## CASCI — window survey
 
-CI level · ΔE anchored on 3d4s pinned AO (the certified leg) · source `cells.json` (as-run) · pins `test_symm_tm.py::test_cas_ladder_*`.
+CI level · ΔE anchored on 3d4s pinned AO (the certified row) · source `cells.json` (as-run) · pins `test_symm_tm.py::test_cas_ladder_*`.
 
 <!-- survey:begin -->
 | window | CAS | fold | start | route | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ |
@@ -58,7 +58,7 @@ CI level · ΔE anchored on 3d4s pinned AO (the certified leg) · source `cells.
 
 The semi-core window pays −59.7 mEh over the declared window at
 frozen shells — the 3p⁶ correlation — with ²D hosted exactly
-(components degenerate, every meter exact).  The extension legs place
+(components degenerate, every meter exact).  The extension windows place
 the pair-correlating 4d shell and the 4s/3s pairs against it.
 
 ## Method ladder
