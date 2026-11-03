@@ -782,6 +782,66 @@ public pair-handle widens detbasis for one consumer).
 
 The SA-total==ensemble rule gained its pin (test_route_axis_twins).
 
+## Units P + S EXECUTED (2026-11-03 -- persistence + the sparse meters)
+
+UNIT P (84a1afb): CASResult.cycles (the per-cycle callback IS the
+instrument -- PySCF 2.13 stores no count; mcscf.CASSCF is a factory,
+mc1step.CASSCF the class, CASCI not its subclass); the lane SA
+payload persists mo_coeff (the converged FULL MO -- was LOST) +
+cycles; the free-route chk stores cycles; Sc's Readings paragraph
+deleted (tables speak).
+
+UNIT S (e9cdd8f, f580b65, fbb541b): the dense wall dies.
+- detbasis.operator_apply: the SAME signed couplings the matrix
+  builder scatters, accumulated into the output vector (bincount) --
+  bitwise-certified refactor (_one_body_pairs/_two_body_pairs = the
+  one home for the rule sets; _build rewired, old vs new module
+  bitwise-equal on matched inputs).  One-body-only closures ride a
+  SINGLES-ONLY enumeration (bitmask searchsorted, O(n*nelec*nvirt)):
+  1.9s build + 0.09s/apply at 204k.  The bra/ket sides: the SOURCE
+  determinant supplies the sign; the scatter lands in the partner
+  rows.
+- operators.pyscf_apply: H through PySCF's C kernels at any size
+  (absorb_h1e at the kernel's OWN .5 factor + contract_2e; the
+  permutation owned inside; complex vectors via re/im halves).
+  Conventions MACHINE-CERTIFIED, recorded: contract_1e packs the
+  lower triangle (silently symmetrizes -- Lz would be corrupted; the
+  one-body C leg does not exist); contract_2e alone is NOT our
+  two-body (the E-product carries a one-body delta); the C kernel
+  serves only the Coulomb-symmetric class (L2's composite two-body
+  cannot ride it -- ao2mo.restore assumes the 8-fold symmetries).
+- Meters past the cap: lane payloads + kernel_cell_payload(key, mol,
+  mf) carry res_h_lz AND res_h_l2 (max over component roots of
+  ||[H,O]psi||, O applied through operator_apply -- Lz as its real
+  form M = -i Lz; H through pyscf_apply).  The lane meters moved to
+  the READOUT window (SA: the converged one).  Emitters' symmetry
+  columns: dense norm below the cap, the stored residual past it,
+  em-dash if neither.  PRICED: the two-body closure build at the
+  204,490-det sector = 1208s once per cell (4.3s/cached apply) --
+  executable at 2e5; at 5.5e6 the n^2 scaling is dead (days) --
+  Unit L's L2 meters need either a smarter doubles enumeration or
+  the one-particle closure certificate there.
+- regen --fresh (the store-migration flag).  README: the
+  matrix-free note + the excitation-class table; the de-slang round
+  (leg/arm out of the one-home; the E key states comparability
+  first; the meters key leads with what zero certifies).
+
+REVIEW WAVE applied early at the user's direction (0f457c1, 5604460,
+ca98fc8, f41bb51): _fold_span one-home; the run_irrep_casci adapter
++ ONE unified readout loop; Scenario lean; _tables_common.py; the
+Sc lane/lattice emitter exit FIXED (the survey skip); methods NaN
+guard; __all__ lockstep; the SA-total==ensemble pin.
+
+USER DIRECTIVES (this conversation, standing): tables carry NO
+slang; E's comparability rule first; SA totals are the uniform-weight
+ensemble (the degenerate limit of the mean -- the readout absolutes
+move under same-irrep partition rotations); the residual meters test
+THE STATE (apply on the solution); Ti gets EXACTLY Sc's policy (no
+atom-specific cases; renderer v2 declaration-driven, any atom --
+windows are per-atom DATA, rows not code; planned windows keep
+pointer lines, never pending rows); execute and price, don't
+pre-decline.
+
 Settled in conversation (the standing answers): the SA route
 agreement is genuine (1e-9..2e-7 at solver tolerance on m-complete
 windows; 9.77 mEh basin split on the escape-class 3d4s window);
