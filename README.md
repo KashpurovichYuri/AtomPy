@@ -269,23 +269,22 @@ Columns of the CI window survey (one row per declared CI cell):
   commutator columns are the assembled meters, em-dash past the
   dense-meter cap.
 
-Columns of a methods table (the ladder grammar; one section per CAS
-window family — the primary window's factor grid under the row
-policy, the planned windows, every lane window whose route twins
-ran):
+Columns of a methods table (ONE big ladder per atom — the primary
+window's optimizer grid leads, then every lane window whose route
+twins ran, families separated by a rule row):
 
-- **route / method** — as the CAS ladder; the method column composes
-  the treatment identity (mask, substrate, absorbed starts) — the
-  ROHF anchor row leads the primary section, ΔE's zero.
-- **window / CAS / fold / dets / E / ΔE / eV / conv / ⟨L²⟩ / ptp /
-  the meter columns** — as the CAS ladder's key (the ΔE anchor is
-  the caption's computed ROHF energy here).
-- **The row policy** (the compression): within a treatment group the
-  AO row is the head and MO/NO runs agreeing with it within 1e-4 Eh
-  collapse into its start cell — disagreement keeps its own row (the
-  basin and construction classes live there); pending and void cells
-  leave the table, and a window with no run cells renders the
-  pointer line.
+- **method | route | window | CAS | fold | dets | E | ΔE | eV | conv
+  | ⟨L²⟩ | ptp | meters | note** — the CAS ladder's grammar; the
+  method column composes the FULL treatment name (method, mask,
+  start) — every run cell a row, nothing collapsed or hidden; the
+  substrate is the fold column's (`Ar` the canonical core, `Ar·pur`
+  the purified span, `·lane` the raw-shell Löwdin fold); the ROHF
+  anchor row leads, ΔE's zero (the caption's computed value).
+- **ptp** — intrinsic where a component/root set exists (the pinned
+  rows store it; the free SA rows' root spread computes at render);
+  the dash means "no set" (single-root CASSCF).
+- **note** — terse, data-derived flags only (`cycle cap` at the
+  optimizer's 200-cycle limit); never verdicts.
 
 Columns of a ladder table (window families × routes):
 
