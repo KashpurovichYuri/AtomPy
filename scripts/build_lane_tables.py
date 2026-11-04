@@ -91,8 +91,8 @@ def run(atom: str) -> None:
     if not keys:
         sys.exit(f"no declared ladder legs for {atom}")
     src = Path(f"elements/{atom}/TABLES.md")
-    if "<!-- ladder:begin -->" in src.read_text():
-        print(f"{src}: the one ladder table carries the rows -- skipped")
+    if Path(f"elements/{atom}/TABLE.md").exists():
+        print(f"{src}: the one-table atom (TABLE.md) -- skipped")
         return
     payloads = json.loads(
         Path(f"elements/{atom}/cells.json").read_text())["cells"]

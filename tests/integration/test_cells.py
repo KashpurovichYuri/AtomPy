@@ -1127,7 +1127,7 @@ def test_method_ladder_lane_families():
     text = "\n".join(mod.ladder_section(cs, cells, -759.7363))
     lines = text.splitlines()
     assert sum(l.startswith("| method |") for l in lines) == 1
-    assert lines[7].startswith("| ROHF (anchor) |")
+    assert lines[3].startswith("| ROHF (anchor) |")
     rules = [l for l in lines
              if set(l.replace("|", "").replace(" ", "")) == {"-"}]
     assert len(rules) == 1    # the SEP only: the lone family leads

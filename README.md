@@ -38,7 +38,7 @@ Lz eigenvalues (M_L content): [-3.0 … 3.0]
 The textbook d² multiplet comes out exactly (Hund: ³F ground) with
 commutators at round-off — the {3d} window is exactly rotation-closed.
 Every atom delivers this per sector; any atom's tables:
-`elements/<Atom>/TABLES.md`.
+`elements/<Atom>/TABLE.md`.
 
 **The methods grid** — every orbital treatment priced against the
 atom's ROHF anchor and classified by its diagnostics (Results).
@@ -237,22 +237,16 @@ machinery.
 
 ## Results
 
-All tables live in `elements/<Atom>/TABLES.md` (committed,
-regenerable). This section is the reading key and one excerpt.
+All tables live in `elements/<Atom>/TABLE.md` (committed,
+regenerable; `TABLES.md` on atoms not yet migrated). This section is
+the reading key and one excerpt.
 
-**Tables grammar** — every element file, same section families in
-the same order (headings carry no type labels; the family is the
-content):
-
-- **Term table** — the combinatorial term census per CAS/window: no
-  energies, route-independent (hand, checked against the solver).
-- **Multiplet energies, window lattices, method ladders** — the
-  declared campaign as run: `report.md` / `cells.json` — regenerated,
-  never hand-copied.
-- **CAS ladder** — window families × routes; generated between
-  markers, the ladder pins certify.
-- **Basin map and studies** — readings and frozen history,
-  session-sourced, cited.
+**Tables grammar** — the element file is `TABLE.md`: the ONE ladder
+table (below), generated between `ladder` markers, its CSV mirror
+`TABLE.csv` beside it (same rows, ASCII headers). Atoms not yet
+migrated keep `TABLES.md` and its section families (term table,
+multiplet energies, lattices, ladders, studies) until their pass.
+The ladder pins certify what the tables report.
 
 Every energy table states its **route** (free — our symmetry-blind
 native driver, symmetry measured and restored by averaging; pinned —
@@ -439,8 +433,10 @@ meaningful NO source is the term-averaged CI density.
 | `analysis` | term labels, configuration summaries, report rendering |
 | `cases` / `cells` | the declaration (`CaseSpec` → `run_case`); the cell addressing layer |
 
-Everything human-readable lives in `elements/<Atom>/`: `TABLES.md`,
-`report.md/json` (term tables), `cells.json/md` (the treatment grid),
+Everything human-readable lives in `elements/<Atom>/`: `TABLE.md` +
+`TABLE.csv` (the one ladder table and its mirror; `TABLES.md` on
+atoms not yet migrated), `report.md/json` (term tables),
+`cells.json/md` (the treatment grid),
 plus frozen one-shot artifacts. New atom = new element file, not
 README growth. Regeneration: term tables — `scripts/run.py`
 (the per-atom calls recorded in each report header); cells —

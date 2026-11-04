@@ -83,6 +83,32 @@ MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
               "virtmix": "virtual-mix"}
 
 
+CSV_HEADER = ["method", "route", "window", "CAS", "fold", "dets", "E_Eh",
+              "dE_mEh", "E_eV", "dE_eV", "conv", "L2", "ptp_Eh", "PLz",
+              "PLperp", "HLz", "HL2", "note"]
+
+
+def csv_of(body: str) -> str:
+    """The CSV mirror of the ladder table: the same data rows (the
+    rule rows and the markdown furniture dropped), ASCII header
+    names, csv-quoted (the braced folds carry commas)."""
+    import csv
+    import io
+    out = io.StringIO()
+    w = csv.writer(out, lineterminator="\n")
+    w.writerow(CSV_HEADER)
+    for line in body.splitlines():
+        if not line.startswith("|"):
+            continue
+        if set(line.replace("|", "").replace(" ", "")) == {"-"}:
+            continue                      # the SEP and RULE rows
+        cells = [c.strip() for c in line.split("|")[1:-1]]
+        if cells[0] == "method":
+            continue                      # the markdown header row
+        w.writerow(cells)
+    return out.getvalue()
+
+
 def _method(k) -> str:
     """The method column: the objective + its restriction only (the
     start rides in the window cell, the substrate in the fold
@@ -208,10 +234,7 @@ def ladder_section(spec, cells, anchor) -> list[str]:
                and _run(cells.get(k.address)) for k in twins):
             _fam([k for k in twins if k.start != "no"])
 
-    out = [BEGIN, "## Method ladder", "",
-           "Every run cell, ROHF anchor to the pinned twins · ΔE vs "
-           f"the ROHF anchor ({anchor:.4f} Eh) · source `cells.json` "
-           "(as-run).", "", HEAD, SEP, _anchor_row(anchor), *body, END]
+    out = [BEGIN, HEAD, SEP, _anchor_row(anchor), *body, END]
 
     for w in spec.planned_windows:
         keys = window_grid(spec, w)
@@ -224,8 +247,11 @@ def ladder_section(spec, cells, anchor) -> list[str]:
 def main(atom: str) -> None:
     """Rebuild ``<atom>``'s ladder block (the one table) from
     cells.json under the TABLES edit protocol (the marker pair;
-    structural checks; verified move)."""
-    src = Path(f"elements/{atom}/TABLES.md")
+    structural checks; verified move) and write the CSV mirror."""
+    src = Path(f"elements/{atom}/TABLE.md")
+    if not src.exists():
+        sys.exit(f"{src}: not a one-table atom (no TABLE.md) -- the "
+                 "atom's pass migrates it")
     data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
     cells, anchor = data["cells"], data["rohf_energy"]
     spec = CAMPAIGN[atom]
@@ -241,10 +267,10 @@ def main(atom: str) -> None:
             assert line.count("|") == HEAD.count("|"), line
 
     replace_block(src, BEGIN, END, body)
+    src.with_suffix(".csv").write_text(csv_of(body))
     n = sum(1 for line in body.splitlines()
             if line.startswith(("| CASCI", "| CASSCF", "| SA-CASSCF")))
-    print(f"{src}: ladder rendered from cells.json "
-          f"({n} run rows, one table)")
+    print(f"{src}: ladder rendered ({n} run rows) + TABLE.csv mirror")
 
 
 if __name__ == "__main__":

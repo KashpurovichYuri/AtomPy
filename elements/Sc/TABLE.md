@@ -1,30 +1,6 @@
-# Sc — scandium (d¹)
-
-cc-pVDZ. Reference **ROHF −759.7362 Eh** (3d¹4s²; M_S = ½; S
-half-integer). Section grammar and column keys — README · Results.
-
-## Term table
-
-| CAS / window | Sector | Dets | Term → states |
-|---|---|---|---|
-| CAS(1,5) / {3d} | Ms=½ | 5 | ²D: 5 |
-| CAS(3,6) / {3d,4s} | Ms=½ | 90 | ²D: 20, ⁴F: 14, ²F: 14, ²G: 18, ⁴P: 6, ²P: 6, ²S: 1, ²H: 11 |
-
-## Multiplet energies
-
-Route free · partition averaged fold · source `report.md` (`scripts/run.py Sc`).
-
-| Term | States | Energy (Eh) | Gap to ground | M_L set |
-|---|---|---|---|---|
-| ²D | 5 | −0.342549 | — | −2…2 |
-
-## Method ladder
+# Sc (4s^2 3d^1)
 
 <!-- ladder:begin -->
-## Method ladder
-
-Every run cell, ROHF anchor to the pinned twins · ΔE vs the ROHF anchor (-759.7363 Eh) · source `cells.json` (as-run).
-
 | method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −759.7363 | 0 | −20673.4871 | +0.0000 | — | — | — | — | — | — | — | forced filling |
@@ -110,21 +86,3 @@ Every run cell, ROHF anchor to the pinned twins · ΔE vs the ROHF anchor (-759.
 | SA-CASSCF | free | 3s3p3d / AO | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.8266 | −90.4 | −20675.9462 | −2.4591 | 1e-8/18 | 6.0000 | 2e-07 | — | — | 4.9e-07ψ | 2.8e-06ψ |  |
 | SA-CASSCF | pinned | 3s3p3d / AO | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.8266 | −90.4 | −20675.9462 | −2.4591 | 1e-13/21 | 6.0000 | 1e-06 | 3e-05 | 5e-05 | 1.4e-06ψ | 1.1e-05ψ |  |
 <!-- ladder:end -->
-
-## Studies (frozen history; ticket 28)
-
-<!-- study:begin --> (frozen history: the generator (atomterm.study) is retired, commit ad28d3a -- the block stays as the committed record; the lane/lattice/methods blocks are the living generated tables)
-
-| cell | status | E, Eh | ⟨L²⟩ | ‖[P,Lz]‖ | ‖[P,Lp]‖ |
-|---|---|---|---|---|---|
-| study_sc_no_no2_casci | ok | -759.7306 | 6.0615 | 1.9e-14 | 3.0e-14 |
-| study_sc_no_no2_relax | ok | -759.7312 | 6.0602 | 1.9e-14 | 3.0e-14 |
-| study_sc_no_no2_sa-casscf | ok | -759.7495 | 8.9253 | 1.9e-14 | 3.0e-14 |
-| study_sc_no_no3_casci | ok | -759.7622 | 6.5059 | 2.2e-13 | 3.5e-13 |
-| study_sc_no_no3_relax | ok | -759.7627 | 6.5047 | 2.2e-13 | 3.5e-13 |
-| study_sc_no_no3_sa-casscf | ok | -759.7657 | 6.3497 | 2.2e-13 | 3.5e-13 |
-| study_sc_no_no4_casci | ok | -759.7651 | 6.6032 | 2.2e-13 | 3.5e-13 |
-| study_sc_no_no4_relax | ok | -759.7655 | 6.6014 | 2.2e-13 | 3.5e-13 |
-| study_sc_no_no4_sa-casscf | ok | -759.7710 | 6.4999 | 2.2e-13 | 3.5e-13 |
-
-<!-- study:end -->
