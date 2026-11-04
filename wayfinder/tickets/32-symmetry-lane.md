@@ -848,6 +848,44 @@ windows; 9.77 mEh basin split on the escape-class 3d4s window);
 iterations were not stored; restart = converged-state chks (PySCF
 per-cycle dumps exist via mc.chkfile); lane mo_coeff was a gap.
 
+## The store migration EXECUTED (2026-11-04 -- residuals + conv everywhere)
+
+The batch ran chunked after TWO operational bugs (both fixed in
+d380aa7/36be795): (1) the shell host kills background commands at
+exactly 2h wall -- batches run in <=90-min chunks since, with a
+user-directed WATCHDOG CYCLE (sleep+check: process alive, log
+advancing, store fresh; kills cost only the in-flight cell now);
+(2) regen wrote cells.json at group end -- any death lost the whole
+invocation (twice).  The store now writes PER-CELL.
+
+RESULTS (all committed, 238de78):
+- Every certified total reproduces: 7 Ti legs + both Sc routes
+  (route gap -0.00 mEh at the (7,13) SA winner) + C/Si bit-match.
+- The em-dashes fill: state residuals at the apply floor on every
+  pinned leg (1e-15..4e-13) and independently on the free twins;
+  free <L^2> columns filled (6.0000 at the m-complete windows).
+- THE JT READING: the (7,13) free CASSCF root -- res_h_lz 0.25,
+  res_h_l2 1.31, <L^2> 4.86, conv 1.1e-06/200 (cap hit).  Ti's
+  scramble window (3d4d@ar) carries ITS verdict in ptp 5e-02 with
+  floor residuals -- eigenstate-ness (residuals) and term identity
+  (ptp) are separate certificates and the tables now show both.
+- THE CONV COLUMN (user directive '1e-x/77'): _cycle_trace captures
+  the final |dE| beside the count; CASResult/StageFacts/chk/kernel
+  and lane payloads persist it; conv_cell renders it (methods +
+  ladder tables; README keys).  First texture: the escape-class
+  free SA 1e-9/75 vs pinned 1e-13/32; the JT root cap-hits at 200.
+- Pricing measured: the 204,490-det two-body closure 23 min in-cell
+  (368k ~66 min) -- the lane SA legs carry it; fine at this scale.
+
+REMAINING (unchanged): Unit L (saturation legs; CI legs priced then
+ASK before the hours-class optimizer pair; L2 meters dead at 5.5M by
+the n^2 measurement -- one-particle certificate or smarter
+enumeration); Unit T (declaration-driven renderer v2 -- the methods
+WINDOWS assert is the live boundary; survey merge; Ti route batch --
+the anchors it needs are NOW RUN (33 cells)); C/Si; the wave close
+(the full suite STILL OWED at the boundary -- physics-bearing
+modules changed this wave).
+
 ## References
 
 
