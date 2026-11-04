@@ -886,6 +886,54 @@ the anchors it needs are NOW RUN (33 cells)); C/Si; the wave close
 (the full suite STILL OWED at the boundary -- physics-bearing
 modules changed this wave).
 
+## The ONE-TABLE grammar round (2026-11-04 -- the user's design review, Sc settled)
+
+User-directed, landed (46c8229, 056e718, cc1b5f7): the element file
+BECOMES the one table.  elements/<Atom>/TABLE.md = the atom heading
++ the ladder between ladder:begin/end markers; TABLE.csv the mirror
+(same rows, ASCII headers, csv-quoted).  The user's directives, in
+order: ONE big table (the per-CAS sections died); method first,
+route second; the method column bare + restriction only (CASSCF,
+radial); the START rides the window cell ('3d4s / AO', slash); NO
+starts are not ladder rows (cells stay runnable, out of the render);
+CASCI BESIDE its optimizer variants per fold group (CI interleaved,
+the survey/lane sections die with the atom's migration); ptp
+INTRINSIC (stored pinned, computed at render on free SA root sets;
+dash = no set); the NOTE column (terse data-derived: 'cycle cap' at
+cycles=200); THE CLOSURE COLUMNS ||[P,Lz]||, ||[P,L]||
+(window_closure on the readout window -- run_lane_cell +
+kernel_cell_payload carry them; the MO-slice rows read 3e+00, the
+certificate working; 10 pre-field free-twin payloads dash until
+their next re-run); the fold markers -raw/-frac/-pur/-lane defined
+at Fold notation (the one home); the FURTHER-VARIANTS bullet list
+(the diagnostic levers, e.g. on bad convergence); eV twins KEPT (the
+user's call); the collapse row policy DELETED (it hid conv/meters).
+Sc: 66 rows (29 CI + 16 CASSCF + 20 SA + anchor), 17 family rules
+(8 lattice spans + 4 fold groups + 5 lane families), deduped by
+address.  The generators skip one-table atoms by file; the ladder
+builder refuses atoms without TABLE.md.  The splice eats everything
+ladder-heading-to-boundary (historical forms cannot survive).
+Bonus reading: the pinned (9,9) SA's converged span is NOT perfectly
+m-closed (PLz 3e-05) -- irrep-blocked rotations keep the state
+symmetric while the span drifts; exactly what the new columns read.
+
+NEXT (user-ordered): UNIT U (UHF as a reference class) BEFORE the
+Ti/C/Si migration -- run_uhf (character-forced alpha/beta
+occupations, the basin gate -- the worse multi-basin class --,
+guards, chk trust), spin-paired cores first cut (broken-core fold
+generalization a separate declared step), the <S^2> contamination
+meter on the reference itself (the exact S2), the conv trace; open
+seam question FIRST: how runs declare the UHF reference (a
+frac-class fold variant vs its own substrate class).  THEN: Ti's
+route batch + the TABLE.md migrations (Ti, C, Si), the survey/lane/
+lattice emitters dying per atom, the boundary suite at the close.
+
+OPERATIONAL (this session's lessons): the shell host kills
+background commands at exactly 2h -- chunks <=90 min, per-cell
+store writes, the user-directed watchdog cycle (sleep+check on the
+IN-REPO log); pkill -f self-matches its wrapper (use [b]racket
+patterns); detached suites via setsid survive the cap.
+
 ## References
 
 
