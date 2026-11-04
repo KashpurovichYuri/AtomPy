@@ -512,7 +512,10 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         M_L set intact; on a defective window (the input columns'
         core-orthogonalization split) it anchors
         ONE state: single-root SA, which collapses on TMs. Declare
-        ``sa_weights`` explicitly there.
+        ``sa_weights`` explicitly there.  A declared block LONGER
+        than the sector (the occupation-group windows: a CAS(3,2)
+        sector cannot host a term's 2L+1) falls back to the measured
+        rule -- window-local by construction.
     fresh : ignore a stored cell and re-run (a cache hit otherwise
         re-analyzes the stored run -- budgets are then ignored).
     workdir : the store root (``<workdir>/<Atom>/rungs/``).
@@ -640,6 +643,13 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     else:
         weights = (budgets.get("sa_weights")
                    if key.method == "sa-casscf" else None)
+        if key.method == "sa-casscf" and weights is not None \
+                and len(weights) > sector_dimension(ncas, na, nb):
+            # the declared case block cannot fit this window (the
+            # occupation-group class: a CAS(3,2) sector hosts 2
+            # roots, not a term's 2L+1) -- the MEASURED block anchors
+            # instead (the default rule, window-local by construction)
+            weights = None
         if key.method == "sa-casscf" and weights is None:
             from atomterm.operators import build_operators, ground_block
 

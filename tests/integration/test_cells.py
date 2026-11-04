@@ -559,6 +559,22 @@ def test_run_cell_no_start_same_subspace(carbon, tmp_path):
     assert no.win_lperp == pytest.approx(0.0, abs=1e-12)
 
 
+@fast
+def test_sa_budget_longer_than_sector_falls_back(carbon, tmp_path):
+    """A declared sa_weights block LONGER than the sector cannot host
+    its roots (the occupation-group windows: CAS(3,2) cannot host a
+    term's 2L+1) -- the run falls back to the MEASURED ground block
+    (the default rule, window-local) instead of crashing the solver."""
+    from atomterm.cells import run_cell
+
+    _, mol, mf, _ = carbon
+    key = CellKey("C", "2p", (1, 1), method="sa-casscf")
+    facts = run_cell(key, mf, workdir=tmp_path,
+                     budgets={"sa_weights": [1 / 11] * 11})
+    n = len(facts.energies_pyscf)
+    assert 1 < n < 11        # the measured block anchors, not the declared
+
+
 @slow
 def test_sa_casscf_run_completes_the_roots_store(carbon, tmp_path):
     """store_name= pins the WRITER side of the SA store (the aa21071
