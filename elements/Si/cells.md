@@ -60,5 +60,5 @@ configurations per root (top-2 determinants):
   si_3p_2-0_casci_ao_-_pur_avg                 root 2: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
   si_3p_2-0_casscf_ao_radial_pur_avg           root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
 
-lane cells (pinned-route term energies) and void cells (scenario-gated):
+lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
   si_3p@1s2s2p3s_2-0_casci_ao_-_pur_avg        E_term    -288.48505323  ptp 0.0e+00  L2 ['2.000', '2.000', '2.000']

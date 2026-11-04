@@ -25,9 +25,9 @@ Route free · partition averaged fold · source `report.md` (`scripts/run.py Si`
 Routes in rows · partition fold column · source `cells.json` (as-run) · pins `test_symm_lane.py`.
 
 <!-- lane:begin -->
-| route | method | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | ptp (Eh) | ‖[H,Lz]‖ | ‖[H,L²]‖ |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| pinned | CI | 3p | (2,3) | {1s,2s,2p,3s} | 3 | −288.4851 | 0 | −7850.0822 | +0.0000 | 2.0000 | 0e+00 | 0.0e+00 | 0.0e+00 |
+| route | method | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[H,Lz]‖ | ‖[H,L²]‖ |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| pinned | CI | 3p | (2,3) | {1s,2s,2p,3s} | 3 | −288.4851 | 0 | −7850.0822 | +0.0000 | — | 2.0000 | 0e+00 | 0.0e+00 | 0.0e+00 |
 <!-- lane:end -->
 
 ## Method ladder, CAS(2,3)/{3p}

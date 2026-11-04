@@ -634,6 +634,8 @@
       "anchor_dev": 0.0,
       "comm_norm_h_lz": 0.0,
       "comm_norm_h_l2": 0.0,
+      "res_h_lz": 1.1102230246251565e-16,
+      "res_h_l2": 2.220446049250313e-16,
       "fold": [
         "1s",
         "2s",
