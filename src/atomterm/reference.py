@@ -1,5 +1,6 @@
 """The SCF reference engine: ROHF with character-forced occupations and
-the reference-basin gate, plus the fractional-occupation ensemble.
+the reference-basin gate, its spin-broken UHF sibling, plus the
+fractional-occupation ensemble.
 
 PURPOSE
 -------
@@ -12,6 +13,17 @@ fixed occupations. The toolbox, escalating: character-forced filling
 basin gate (cycled guesses against a reference energy --
 :class:`ReferenceSpec`), and the fractional-occupation ensemble (the
 spherical reference with smeared valence -- :func:`run_frac_occ`).
+
+The UHF class (:func:`run_uhf`) runs the same discipline per spin:
+at the campaign's maximal-Ms sectors the forced occupations have the
+same per-spin counts as ROHF, so any breaking lives in the orbital
+shapes -- closed pairs polarizing around the open shell -- and
+:func:`uhf_contamination` measures it. The UHF object is a
+REFERENCE-CLASS product here, deliberately not a cells-layer axis:
+every fold path consumes one closed-shell core density (``2 C C^dag``)
+and one MO set, so consuming a UHF reference downstream is the
+declared broken-core fold step (the ``frac`` precedent does not
+carry: the fractional mf is RHF-shaped and drops in unchanged).
 
 Conventions
 -----------
@@ -40,7 +52,8 @@ from pyscf import scf
 
 from atomterm.windows import select_span, span_projector
 
-__all__ = ["ReferenceSpec", "run_rohf", "run_frac_occ"]
+__all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "run_frac_occ",
+           "uhf_contamination"]
 
 
 # the occupation contract --------------------------------------------
@@ -106,6 +119,69 @@ def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
     return _occ
 
 
+def _forced_uhf_occ(mol, occ_closed: list[str], occ_open: list[str]):
+    """The character-forced UHF occupation hook (the per-spin twin of
+    :func:`_forced_rohf_occ`, built for :func:`run_uhf`).
+
+    Parameters
+    ----------
+    mol : the built Mole (its nelectron/spin fix the per-spin block
+        sizes).
+    occ_closed, occ_open : list[str]
+        AO span patterns -- the shared :class:`ReferenceSpec`
+        vocabulary, interpreted per spin.
+
+    Returns
+    -------
+    callable
+        ``occ(mo_energy, mo_coeff) -> (occ_alpha, occ_beta)``: per
+        spin, the ``n_pair`` MOs of highest closed-span weight get
+        1.0; alpha additionally takes the ``mol.spin`` unpaired
+        electrons on the same ``2 w_open + w_closed`` premium as
+        :func:`_forced_rohf_occ`. The beta open block is empty at the
+        maximal-Ms sectors (``n_pair`` pairs + ``mol.spin`` alpha
+        singles exhaust the electrons) -- a beta-open UHF reference
+        would need the premium generalized, not this hook.
+
+    Raises
+    ------
+    ValueError
+        If the hook is called without MO coefficients (character
+        needs them), or a pattern matches no AO labels.
+    """
+    s_mat = mol.intor_symmetric("int1e_ovlp")
+    p_closed = span_projector(
+        s_mat, sum((select_span(mol, p) for p in occ_closed), []))
+    p_open = span_projector(
+        s_mat, sum((select_span(mol, p) for p in occ_open), []))
+    n_pair = (mol.nelectron - mol.spin) // 2
+    n_open_a = mol.spin
+
+    def _occ(mo_energy, mo_coeff=None):
+        if mo_coeff is None:
+            raise ValueError("character-forced occupations need the MOs")
+        occ = np.zeros((2, mo_coeff[0].shape[1]))
+        w_closed_a = None
+        for s in (0, 1):
+            c = mo_coeff[s]
+            w_closed = np.einsum("ai,ab,bi->i", c.conj(), p_closed,
+                                 c).real
+            closed = np.argsort(w_closed)[::-1][:n_pair]
+            occ[s, closed] = 1.0
+            if s == 0:
+                w_closed_a = w_closed
+        c = mo_coeff[0]
+        w_open = np.einsum("ai,ab,bi->i", c.conj(), p_open, c).real
+        rest = np.flatnonzero(occ[0] == 0.0)
+        open_mos = sorted(
+            rest, key=lambda i: -(2 * w_open[i] + w_closed_a[i])
+        )[:n_open_a]
+        occ[0, open_mos] = 1.0
+        return occ
+
+    return _occ
+
+
 @dataclass(frozen=True)
 class ReferenceSpec:
     """The declared recipe for an ROHF reference that plain aufbau
@@ -161,6 +237,54 @@ class ReferenceSpec:
 
 # the runners --------------------------------------------------------
 
+def _accelerated(m, ref):
+    """Run one SCF under the declared acceleration policy -- the ONE
+    dispatch, shared by :func:`run_rohf` / :func:`run_uhf`:
+    "diis" plain, "newton" second-order from the start,
+    "diis+newton" DIIS linearly first, then the Newton switch."""
+    acc = ref.conv_accelerator if ref is not None else "diis"
+    if acc == "newton":
+        m = m.newton()
+    elif acc == "diis+newton":
+        m.run()
+        m = m.newton()
+    m.run()
+    return m
+
+
+def _converged_cached(mol, fresh_mf, chkfile, ref, cfg):
+    """The cache-then-gate skeleton shared by the SCF runners: an
+    existing chkfile is loaded and TRUSTED (marked converged, never
+    re-gated -- the reproducibility unit); a fresh run solves under
+    ``ref``'s acceleration and, with ``occ_e_ref`` set, retries over
+    cycled guesses (default, then "atom", then "huckel") until
+    ``|E - occ_e_ref| <= 1e-4``, else RuntimeError. Returns
+    ``(mol, mf)``."""
+    try:
+        _, rec = scf.chkfile.load_scf(chkfile)
+        mf = fresh_mf(None)
+        mf.__dict__.update(rec)
+        mf.converged = True
+        mf.verbose = cfg.verbose
+        return mol, mf
+    except (OSError, KeyError, ValueError):
+        pass
+    mf = _accelerated(fresh_mf(None), ref)
+    if ref is not None and ref.occ_e_ref is not None:
+        for guess in ("atom", "huckel"):
+            if mf.converged and abs(mf.e_tot - ref.occ_e_ref) <= 1e-4:
+                break
+            mf = _accelerated(fresh_mf(guess), ref)
+        else:
+            if not (mf.converged and abs(mf.e_tot - ref.occ_e_ref) <= 1e-4):
+                raise RuntimeError(
+                    f"character-forced SCF did not reach the reference "
+                    f"basin E = {ref.occ_e_ref:.8f} (got {mf.e_tot:.8f}, "
+                    f"converged={mf.converged}); the basin census or the "
+                    f"guess list needs revisiting")
+    return mol, mf
+
+
 def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     """ROHF for the configured atom, chkfile-cached.
 
@@ -212,43 +336,105 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
             m.init_guess = guess
         return m
 
-    def solve(m):
-        """Run one SCF under the declared acceleration policy -- the
-        ONE dispatch: "diis" plain, "newton" second-order from the
-        start, "diis+newton" DIIS linearly first, then the Newton
-        switch."""
-        acc = ref.conv_accelerator if ref is not None else "diis"
-        if acc == "newton":
-            m = m.newton()
-        elif acc == "diis+newton":
-            m.run()
-            m = m.newton()
-        m.run()
+    return _converged_cached(mol, fresh_mf, chkfile, ref, cfg)
+
+
+def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
+    """UHF for the configured atom, chkfile-cached -- the spin-broken
+    sibling of :func:`run_rohf`, same discipline (the per-spin
+    character-forced hook, the basin gate, the accelerator, the
+    trusted cache). Read the spin breaking with
+    :func:`uhf_contamination`.
+
+    Parameters
+    ----------
+    cfg, chkfile, ref : as :func:`run_rohf` (the same
+        :class:`ReferenceSpec`; the occupation patterns apply per
+        spin).
+
+    Returns
+    -------
+    (mol, mf)
+        The built molecule and the converged (or cache-loaded) UHF
+        object (``mo_coeff`` is ``(2, nao, nao)``, ``mo_occ`` is
+        ``(2, nao)``).
+
+    Notes
+    -----
+    - At the campaign's maximal-Ms sectors the forced occupations
+      have the same per-spin counts as ROHF (the open shell entirely
+      alpha): any breaking is in the orbital SHAPES -- closed pairs
+      polarizing around the open shell -- not a different
+      configuration. The energy can then sit BELOW the ROHF basin;
+      an ``occ_e_ref`` taken from an ROHF census gates the UNBROKEN
+      basin only, and a broken solution trips it BY DESIGN (anchor
+      the gate on a UHF census, or leave it unset while census-ing).
+    - The returned object is a REFERENCE-CLASS product, not a cells
+      axis: downstream folds consume one closed-shell core density
+      and one MO set (the module docstring's declined-seam note).
+    """
+    from atomterm.system import build_mol
+
+    mol = build_mol(cfg)
+
+    def fresh_mf(guess: str | None = None):
+        """One unconverged UHF object: the per-spin occupation hook
+        attached, chkfile/verbosity set, optional starting guess."""
+        m = scf.UHF(mol)
+        if ref is not None and ref.occ_closed is not None:
+            m.get_occ = _forced_uhf_occ(mol, list(ref.occ_closed),
+                                        list(ref.occ_open))
+        m.chkfile = chkfile
+        m.conv_tol = 1e-12
+        m.verbose = cfg.verbose
+        if guess is not None:
+            m.init_guess = guess
         return m
 
-    try:
-        _, rec = scf.chkfile.load_scf(chkfile)
-        mf = fresh_mf()
-        mf.__dict__.update(rec)
-        mf.converged = True
-        mf.verbose = cfg.verbose
-        return mol, mf
-    except (OSError, KeyError, ValueError):
-        pass
-    mf = solve(fresh_mf())
-    if ref is not None and ref.occ_e_ref is not None:
-        for guess in ("atom", "huckel"):
-            if mf.converged and abs(mf.e_tot - ref.occ_e_ref) <= 1e-4:
-                break
-            mf = solve(fresh_mf(guess))
-        else:
-            if not (mf.converged and abs(mf.e_tot - ref.occ_e_ref) <= 1e-4):
-                raise RuntimeError(
-                    f"character-forced ROHF did not reach the reference "
-                    f"basin E = {ref.occ_e_ref:.8f} (got {mf.e_tot:.8f}, "
-                    f"converged={mf.converged}); the basin census or the "
-                    f"guess list needs revisiting")
-    return mol, mf
+    return _converged_cached(mol, fresh_mf, chkfile, ref, cfg)
+
+
+def uhf_contamination(mf) -> tuple[float, np.ndarray]:
+    """``<S^2>`` of a UHF determinant and its pairing spectrum -- the
+    reference's own spin-honesty meter.
+
+    The overlap formula: ``<S^2> = Sz (Sz + 1) + N_beta -
+    sum_ij |<phi_a_i | phi_b_j>|^2`` over the occupied blocks (the
+    AO-metric overlap). A spin-paired determinant (the ROHF pattern:
+    the beta occupied span inside alpha's) makes the sum ``N_beta``
+    and ``<S^2> = S (S+1)`` exactly -- the formula's fixed point;
+    any excess is spin contamination.
+
+    Parameters
+    ----------
+    mf : a UHF object (``mo_coeff`` ``(2, nao, nao)``, ``mo_occ``
+        ``(2, nao)``, ``get_ovlp``) -- converged or not.
+
+    Returns
+    -------
+    (s2, sigma)
+        ``s2`` the expectation value; ``sigma`` the singular values
+        of the occupied overlap matrix (the corresponding-orbital
+        pairs), descending: 1 = a paired couple, 0 = fully broken.
+        The core pairs sitting at 1 is the spin-paired-core
+        certificate any future UHF fold admits on.
+
+    Notes
+    -----
+    Certified against the exact determinant-space S^2 (the unit-tier
+    pins): the formula is a diagonal matrix element of
+    :func:`atomterm.operators.s2_operator_parts` on the UHF
+    determinant.
+    """
+    ca, cb = mf.mo_coeff
+    occ = np.asarray(mf.mo_occ)
+    a_idx = np.flatnonzero(occ[0] > 0)
+    b_idx = np.flatnonzero(occ[1] > 0)
+    na, nb = len(a_idx), len(b_idx)
+    x = ca[:, a_idx].conj().T @ mf.get_ovlp() @ cb[:, b_idx]
+    sz = (na - nb) / 2.0
+    s2 = sz * (sz + 1.0) + nb - float(np.sum(np.abs(x) ** 2))
+    return s2, np.linalg.svd(x, compute_uv=False)
 
 
 def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,

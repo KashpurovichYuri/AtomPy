@@ -934,6 +934,67 @@ store writes, the user-directed watchdog cycle (sleep+check on the
 IN-REPO log); pkill -f self-matches its wrapper (use [b]racket
 patterns); detached suites via setsid survive the cap.
 
+## Unit U EXECUTED (2026-11-04 -- UHF as a reference class, user-ordered before the migration)
+
+THE SEAM DECISION (settled first, as planned): UHF is a
+REFERENCE-LAYER class, NOT a cells axis.  Both candidate axes die on
+shape: every fold path consumes ONE closed-shell core density
+(active_space_integrals: d = 2 C C^dag) and one MO set
+(occupied_core_idx/build_full_mo/constrained_casscf all index
+mf.mo_coeff[:, ...]); the frac precedent does not carry (the frac mf
+is RHF-shaped and drops in unchanged, the UHF mf is (2, nao, nao)).
+Consuming a UHF reference downstream = the declared BROKEN-CORE FOLD
+step (the alpha/beta c_core generalization).  Recorded in the
+module docstring + run_uhf Notes + AGENTS row.
+
+WHAT LANDED (src/atomterm/reference.py):
+- _forced_uhf_occ: the per-spin character-forced hook (the same
+  ReferenceSpec vocabulary; at maximal-Ms sectors the beta open
+  block is empty -- n_pair pairs + mol.spin alpha singles exhaust
+  the electrons; the 2:1 premium unchanged);
+- _accelerated + _converged_cached: the cache/gate skeleton
+  EXTRACTED from run_rohf (the deletion test: ~25 lines x2; the
+  SCF call sequence identical -- behavior-preserving);
+- run_uhf: the UHF runner on the shared skeleton; the gate note:
+  an occ_e_ref from an ROHF census gates the UNBROKEN basin only --
+  a broken UHF sits BELOW it and trips BY DESIGN (anchor on a UHF
+  census or leave unset while census-ing);
+- uhf_contamination(mf) -> (s2, sigma): the overlap formula
+  <S^2> = Sz(Sz+1) + N_beta - sum|<phia_i|phib_j>|^2 + the
+  corresponding-orbital pairing spectrum (singular values of the
+  occupied overlap; 1 = paired, 0 = broken).
+
+CERTIFICATION (Verification rule 4, the three-layer chain):
+- (a)+(c) unit pins, no SCF: the formula == the DIAGONAL element of
+  the exact determinant-space S2 (s2_operator_parts through
+  secondquant_matrix) on 0/1-overlap patterns AND the continuous
+  broken pair (angle theta; the exact side = the one-body-rotated
+  paired determinant, expm; sigma reads cos(theta); analytically
+  1.75 - cos^2(theta) at the (3,2) norb=4 case);
+- the paired fixed point: exactly S(S+1), sigma == 1;
+- (b) integration (tests/integration/test_reference_uhf.py): C
+  converges with the per-spin forcing, E <= E_ROHF + 1e-9 (UHF
+  contains ROHF), s2 >= the pure-triplet floor, sigma in (0, 1].
+
+MEASURED (the demo runs, in-repo temp chks, removed after):
+  C  <S^2> = 2.006315 (pure 2); sigma = [1, 0.9968] (the 2s pair
+     polarizes, 1s exact); dE = -4.127 mEh below ROHF.
+  Sc <S^2> = 0.753166 (pure 0.75); sigma = [1x5 (the [Ar] core,
+     EXACTLY paired), 0.999988/974/975 (3p), 0.999572 (3s),
+     0.998908 (4s -- the MOST broken)]; dE = -1.498 mEh.
+The pairing spectrum reads the spin-polarization profile SHELL BY
+SHELL -- the [Ar] core intact, the valence s pair polarizing around
+the 3d1 hole (the classic exchange polarization); both campaign
+atoms break at the maximal-Ms forced occupations.
+
+COUNTS: 245 tests (160 fast) -- the AGENTS 229/146 were STALE (the
+one-table round added pins without the count update; 237/154 at
+HEAD before Unit U).
+
+REMAINING for U (the consumption wave, user-gated): the UHF anchor
+rows in the tables (the census + gate numbers per atom), the
+broken-core fold design (alpha/beta c_core), Ti/Si readings.
+
 ## References
 
 

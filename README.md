@@ -114,7 +114,16 @@ energy-ordered filling fails (runaway configurations; metastable
 polarized basins) it is kept honest by character-forced occupations
 (orbital type measured by S-projector weight, never energy order), an
 energy gate over cycled starting guesses, and cached trusted
-references.
+references. **UHF** is the spin-broken sibling of the same discipline
+(`run_uhf`: the occupations forced per spin, at the maximal-M_S
+sectors the same counts as ROHF — any breaking is closed pairs
+polarizing around the open shell); `uhf_contamination` reads the
+reference's own spin honesty: ⟨S²⟩ by the overlap formula plus the
+corresponding-orbital pairing spectrum (1 = paired; measured: the
+[Ar] core stays paired while the valence s pair polarizes most). The
+UHF object is a reference-class product — the methods grid does not
+run on it (the folds assume one closed-shell core density; the
+broken-core fold is the declared next step).
 
 **CASCI — at fixed core and window.** Exact diagonalization of one
 sector; the window is a stated start's span; closure is a property of
@@ -213,7 +222,7 @@ slices are interesting; the runners execute the declared set:
 | start | ao / mo / no | `regen_cells.py` |
 | substrate | pol (canonical core) / pur (closed span) | `regen_cells.py` |
 | fold | raw / avg / frac | `regen_cells.py` |
-| reference | default / fractional-occupation / gated | both runners |
+| reference | default / gated / UHF / fractional-occupation | both runners |
 
 Two runners, two deliverables — `run.py <atoms>` runs the fixed staged
 pipeline (the term tables); `regen_cells.py <atoms>` runs the methods
