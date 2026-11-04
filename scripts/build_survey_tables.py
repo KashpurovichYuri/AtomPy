@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN  # noqa: E402
 from atomterm.cells import CellKey, grid_keys, lane_keys, lattice_keys  # noqa: E402
 from _tables_common import (EV, SHELL_COLS, cas_label,  # noqa: E402
-                            comm_cell, fold_label, l2_text, minus,
+                            comm_cell, fold_col, fold_label, l2_text, minus,
                             payload_of, replace_block)
 from atomterm.windows import NOBLE_CORES  # noqa: E402
 
@@ -33,15 +33,6 @@ HEAD = ("| window | CAS | fold | start | route | dets | E, Eh | "
         "ΔE, mEh | E, eV | ΔE, eV | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ |")
 SEP = "|" + "---|" * 13
 BEGIN, END = "<!-- survey:begin -->", "<!-- survey:end -->"
-
-
-def _noble(ncore: int) -> str:
-    """The case prefix's noble name (the fold of every untagged cell):
-    the noble whose closed electron count fills ``ncore`` orbitals."""
-    for name, shells in NOBLE_CORES.items():
-        if sum(SHELL_COLS[s[-1]] for s in shells) == ncore:
-            return name.capitalize()
-    return f"n={ncore}"
 
 
 def survey_keys(spec) -> list[CellKey]:
@@ -72,21 +63,6 @@ def survey_keys(spec) -> list[CellKey]:
     return [k for s in order for k in by_span.get(s, [])]
 
 
-def _fold_col(k: CellKey, spec) -> str:
-    """The fold column: the pinned legs' own tag; the free cells'
-    prefix (the variants name their deviation)."""
-    if k.fold_tag is not None:
-        return fold_label(k.fold_tag)
-    base = _noble(spec.ncore)
-    if k.fold == "raw":
-        return f"{base}·raw"
-    if k.fold == "frac":
-        return f"{base}·frac"
-    if k.substrate == "pur":
-        return f"{base}·pur"
-    return base
-
-
 def section(spec, cells: dict) -> str:
     """The generated block between the markers: one row per declared
     CI cell, as-run, in window-family order.  ``ΔE`` anchors on the
@@ -112,7 +88,7 @@ def section(spec, cells: dict) -> str:
         p = payload_of(cells, k)
         route = ("pinned" if k.substrate == "pur" and k.fold_tag
                  is not None else "free")
-        head = [k.span_label, cas_label(k), _fold_col(k, spec),
+        head = [k.span_label, cas_label(k), fold_col(k, spec),
                 k.start.upper(), route]
         if p is None:
             rows.append("| " + " | ".join(head + ["pending", "", "", "",

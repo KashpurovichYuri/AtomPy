@@ -2,19 +2,26 @@
 cells.json payloads -- the key-addressed provenance (the render
 contract: the table and its source cannot diverge).
 
-Usage: python scripts/build_methods_tables.py [Ti]
+Usage: python scripts/build_methods_tables.py [atom]
 
-One table per RUN declared window, the SUMMARY SHAPE (one treatment
-column composes the identity -- the C/Si/Sc convention), under the ROW
-POLICY (the compression): a cell without a stored payload (pending,
-or void under a scenario) leaves the table -- a window with no run
-cells renders a pointer line instead of a pending grid (the full grid
-is one regen away); within a (method, mask, substrate, fold) group
-the AO row is the head and MO/NO runs agreeing with it within EPS
-collapse into its treatment name -- disagreement stays as its own row
-(the basin and construction classes live there).  No verdict column:
-the classes and their row-level discriminators are the reading key in
-README -- the one home.
+THE LADDER SHAPE (one grammar with the CAS ladder): route | method |
+window | CAS | fold | dets | E | ΔE | eV | conv | ⟨L²⟩ | ptp |
+comms -- one section per CAS window family, every OPTIMIZER run cell
+a row (the CI story lives in the survey / the CAS ladder):
+
+- the PRIMARY window: its factor grid's optimizer cells under the ROW
+  POLICY (the compression) -- within a (method, mask, substrate,
+  fold) group the AO row is the head and MO/NO runs agreeing with it
+  within EPS collapse into its treatment name -- disagreement stays
+  as its own row (the basin and construction classes live there),
+  and the ROHF anchor row leads (ΔE's zero);
+- the PLANNED windows: their optimizer cells when they ran, else the
+  pointer line (declared, gated -- one regen away);
+- every LANE window whose route twins ran: the free CASSCF/SA and
+  the pinned SA beside it (the methods axis across CAS sizes).
+
+No verdict column: the classes and their row-level discriminators
+are the reading key in README -- the one home.
 
 Notes
 -----
@@ -26,15 +33,12 @@ re-state them. Two operational rules it does own:
   ``rohf_energy`` (Eh + eV), never typed;
 - rows branch on key IDENTITY only (method/start/mask/substrate/
   fold) and on the ROW POLICY; order and grouping live once in the
-  declaration builder (cells.window_grid) -- this renderer receives
-  ready-made key lists and formats.
+  declaration builder (cells.window_grid / cells.route_keys) -- this
+  renderer receives ready-made key lists and formats.
 
-Applicability: the Ti-style factor-grid tables (WINDOWS below; the
-window set and every cell address come from the declaration --
-``cases.CAMPAIGN`` via ``cells.grid_keys``/``cells.planned``; this
-file owns presentation only: headings, notes, value formatting). The
-study inserts are frozen history; the per-atom summary tables (C/Si/
-Sc) stay hand-curated until their manifests migrate.
+Applicability: any declared atom (``cases.CAMPAIGN``; windows and
+cell addresses derive from the declaration -- this file owns
+presentation only: headings, notes, value formatting).
 
 TABLES edit protocol lives here: sections are rebuilt from constructed
 blocks, structural assertions checked (each heading once, row counts,
@@ -48,34 +52,25 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from atomterm.cases import CAMPAIGN
-from atomterm.cells import grid_keys, window_grid
-from _tables_common import DASH, EV, comm_cell, conv_cell, minus
+from atomterm.cases import CAMPAIGN  # noqa: E402
+from atomterm.cells import (grid_keys, lane_keys, route_keys,  # noqa: E402
+                            window_grid)
+from _tables_common import (DASH, EV, SHELL_COLS, cas_label,  # noqa: E402
+                            comm_cell, conv_cell, fold_col, fold_label,
+                            l2_text, minus)
 EPS = 1e-4          # Eh -- agreeing starts collapse into the AO head
 
-# the declared windows this file renders, with their presentation
-# (headings). The window list MUST equal the declaration's (primary +
-# planned) -- asserted in main; every cell address derives from the
-# declaration, not from here. Captions stay minimal (reading
-# conventions live in README; the anchor line is COMPUTED from the
-# store's rohf_energy).
-WINDOWS = [
-    ("## Method ladder, CAS(4,6)/{3d,4s}", "3d4s"),
-    ("### CAS(4,10)/{3d,4d} — declared, gated", "3d4d"),
-    ("### CAS(4,14)/{3d,4s,4p,4d} — declared, gated", "3d4s4p4d"),
-]
 BOUNDARY = "## Studies (frozen history; ticket 28)"
 POINTER = ("Declared, not yet run -- the optimizer cells are void "
            "until their CASCI anchors are read (the anchor-first "
-           "scenario). One regen away: `regen_cells.py Ti --window "
-           "{window}`.")
+           "scenario). One regen away: `regen_cells.py {atom} "
+           "--window {window}`.")
 
-# the summary shape (the C/Si/Sc convention): ONE treatment column
-# composes the identity (method, mask, substrate, fold, starts); the
-# meters and the span composition carry the reading
-HEAD = ("| treatment | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | "
-        "‖[H,Lz]‖ | ‖[H,L²]‖ | Span (Lowdin) |")
-SEP = "|" + "---|" * 10
+# the ladder grammar (one shape with the CAS ladder table)
+HEAD = ("| route | method | window | CAS | fold | dets | E, Eh | "
+        "ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | "
+        "‖[H,Lz]‖ | ‖[H,L²]‖ |")
+SEP = "|" + "---|" * 15
 
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
@@ -83,19 +78,16 @@ METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
 START_NAMES = {"ao": "", "mo": ", MO", "no": ", NO"}
 MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
               "virtmix": "virtual-mix"}
-FOLD_NAMES = {"raw": "raw", "avg": "averaged", "frac": "fractional"}
 
 
 def _treatment(k, collapsed=()) -> str:
-    """The treatment column: the cell's identity composed into one
-    name -- CASCI names its fold (pur implies averaged, the canonical
-    pur-fold rule); an optimizer names mask and the pur substrate
-    (pol implied); a non-AO start names itself; a collapsed head
-    names the starts it absorbed."""
+    """The method column: the cell's composed treatment identity
+    (mask, substrate, starts) -- the ladder's window/CAS/fold/route
+    columns carry the rest; a collapsed head names the starts it
+    absorbed."""
     name = METHOD_NAMES[k.method]
-    if k.method == "casci":
-        return (f"{name}, pur" if k.substrate == "pur"
-                else f"{name}, {FOLD_NAMES[k.fold]}")
+    if k.fold_tag is not None:
+        return name        # tagged cells: the route column carries it
     name += f", {MASK_NAMES[k.mask]}"
     if k.substrate == "pur":
         name += ", pur"
@@ -105,42 +97,6 @@ def _treatment(k, collapsed=()) -> str:
     return name
 
 
-def _cfg(w: dict) -> str:
-    """The converged window's SPAN composition (S-metric Löwdin
-    weights, the payload ``window``) -- fractions of the window's
-    columns per l, summing to 1 (NOT the electron configuration).
-    Compact: s0 p.17 d.83 f4e-4."""
-    out = []
-    for l in ("s", "p", "d", "f"):
-        v = float(w.get(l, 0.0))
-        if v < 5e-5:
-            out.append(f"{l}0")
-        elif v < 0.001:
-            out.append(f"{l}{v:.0e}")
-        else:
-            out.append(f"{l}{v:.2f}")
-    return " ".join(out)
-
-
-def _values(p: dict, anchor: float) -> list[str]:
-    """The value cells of a run cell: the as-run E in Eh/eV, ΔE vs the
-    anchor, the convergence (final |Δe_tot| per macro-cycle count),
-    the meters, the span composition -- sign minus
-    normalized.  Kernel-only payloads (the dense-meter budget class)
-    carry NaN meters -- they render the em-dash; the window
-    composition falls back to empty (the payload records no span)."""
-    asrun = float(p["energies_pyscf"][0])
-    de_eh = asrun - anchor
-    g = float(p.get("ground_l2", float("nan")))
-    out = [f"{asrun:.4f}", f"{de_eh * 1e3:+.1f}", f"{asrun * EV:.4f}",
-           f"{de_eh * EV:+.4f}", conv_cell(p),
-           f"{g:.4f}" if g == g else DASH,          # NaN check
-           comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
-           comm_cell(p, "comm_norm_h_l2", "res_h_l2"),
-           _cfg(p.get("window", {}))]
-    return [minus(v) for v in out]   # sign minus only
-
-
 def _run(p: dict | None) -> dict | None:
     """The payload of a RUN cell (None for pending and void cells)."""
     if p is None or "void_reason" in p:
@@ -148,19 +104,10 @@ def _run(p: dict | None) -> dict | None:
     return p
 
 
-def _row(cells, k, anchor, collapsed=()):
-    """One table row from a run cell: the composed treatment name and
-    the value cells."""
-    p = _run(cells.get(k.address))
-    assert p is not None, "the policy renders run cells only"
-    vals = _values(p, anchor)
-    return f"| {_treatment(k, collapsed)} | " + " | ".join(vals) + " |"
-
-
 def _groups(keys, cells) -> dict[tuple, dict[str, tuple]]:
-    """The window's RUN cells grouped by identity (method, mask,
-    substrate, fold) -> {start: (key, payload)} -- the policy's one
-    home (rendering and the structural assertions share it)."""
+    """The RUN cells grouped by identity (method, mask, substrate,
+    fold) -> {start: (key, payload)} -- the policy's one home
+    (rendering and the structural assertions share it)."""
     groups: dict[tuple, dict[str, tuple]] = {}
     for k in keys:
         p = _run(cells.get(k.address))
@@ -169,6 +116,13 @@ def _groups(keys, cells) -> dict[tuple, dict[str, tuple]]:
         groups.setdefault(
             (k.method, k.mask, k.substrate, k.fold), {})[k.start] = (k, p)
     return groups
+
+
+def _e0(p: dict) -> float:
+    """A payload's as-run comparison energy (the collapse ruler):
+    the lane payloads' TERM total or the free cells' run total."""
+    return float(p["total"]) if "total" in p \
+        else float(p["energies_pyscf"][0])
 
 
 def _collapsed(groups) -> dict[tuple, tuple[str, ...]]:
@@ -180,112 +134,179 @@ def _collapsed(groups) -> dict[tuple, tuple[str, ...]]:
         head = members.get("ao")
         if head is None:
             continue
-        e0 = float(head[1]["energies_pyscf"][0])
+        e0 = _e0(head[1])
         out[g] = tuple(
             st for st in ("mo", "no") if st in members
-            and abs(float(members[st][1]["energies_pyscf"][0]) - e0)
-            <= EPS)
+            and abs(_e0(members[st][1]) - e0) <= EPS)
     return out
 
 
-def render_window(keys, cells, anchor) -> list[str]:
-    """Format one window's ready-made key list under the ROW POLICY:
-    run cells only; within a (method, mask, substrate, fold) group the
-    AO head absorbs MO/NO runs agreeing within EPS (named in its start
-    cell); disagreeing runs stay. Declaration order preserved."""
+def _row(k, p, anchor, spec, collapsed=()) -> str:
+    """One optimizer run cell in the ladder columns."""
+    route = ("pinned" if k.fold_tag is not None and k.substrate == "pur"
+             else "free")
+    e = _e0(p)
+    de = e - anchor
+    ptp = p.get("ptp")
+    cells = [
+        route, _treatment(k, collapsed), k.span_label, cas_label(k),
+        fold_col(k, spec), f"{p['n_det']:,}",
+        f"{e:.4f}", f"{de * 1e3:+.1f}", f"{e * EV:.4f}",
+        f"{de * EV:+.4f}", conv_cell(p), l2_text(p),
+        f"{ptp:.0e}" if ptp is not None else DASH,
+        comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
+        comm_cell(p, "comm_norm_h_l2", "res_h_l2"),
+    ]
+    # sign minus on the ENERGY cells only (method names keep their
+    # ASCII hyphens)
+    for i in (6, 7, 8, 9):
+        cells[i] = minus(cells[i])
+    return "| " + " | ".join(cells) + " |"
+
+
+def _grid_rows(keys, cells, anchor, spec) -> list[str]:
+    """The primary window's optimizer cells under the row policy, in
+    declaration order: the AO head per group (naming absorbed
+    starts), disagreeing starts as their own rows."""
     groups = _groups(keys, cells)
     collapsed = _collapsed(groups)
-
     rows = []
     for k in keys:
+        if k.method == "casci":
+            continue
         p = _run(cells.get(k.address))
         if p is None:
             continue
         g = (k.method, k.mask, k.substrate, k.fold)
+        members = groups[g]
         if k.start != "ao" and k.start in collapsed.get(g, ()):
-            continue
-        rows.append(_row(cells, k, anchor,
-                         collapsed.get(g, ()) if k.start == "ao" else ()))
+            continue                    # absorbed into the AO head
+        coll = collapsed.get(g, ()) if k.start == "ao" else ()
+        rows.append(_row(k, p, anchor, spec, coll))
     return rows
 
 
-def _anchor_note(anchor: float) -> str:
-    """The computed anchor line (sign-minus normalized)."""
-    return minus(f"ROHF anchor: {anchor:.4f} Eh ({anchor * EV:.4f} eV).")
+def _anchor_row(anchor: float) -> str:
+    """The ROHF anchor row: ΔE's zero (the caption states it)."""
+    cells = ["—", "ROHF (anchor)", "—", "—", "—", "—",
+             f"{anchor:.4f}", "0", f"{anchor * EV:.4f}", "+0.0000",
+             DASH, DASH, DASH, DASH, DASH]
+    return "| " + " | ".join(minus(v) for v in cells) + " |"
 
 
-def window_section(heading, window, keys, cells, anchor) -> str:
-    """One window's generated block: the compressed table when any
-    cell has run, else the pointer line (declared, gated/pending --
-    no pending grid in the committed table)."""
-    if not any(k for k in keys if _run(cells.get(k.address))):
-        return "\n".join([heading, "", _anchor_note(anchor), "",
-                          POINTER.format(window=window)])
-    rows = render_window(keys, cells, anchor)
-    return "\n".join([
-        heading, "",
-        "Route free · partition the fold column · source "
-        "`cells.json` (the committed draw).",
-        "", _anchor_note(anchor), "", HEAD, SEP, *rows])
+def _caption(anchor: float) -> list[str]:
+    return ["Optimizer rows across CAS windows · ΔE vs the ROHF "
+            f"anchor ({anchor:.4f} Eh) · routes in rows · source "
+            "`cells.json` (as-run)."]
+
+
+def _table(keys, cells, anchor, spec, lead_anchor: bool) -> list[str]:
+    rows = ([_anchor_row(anchor)] if lead_anchor else []) \
+        + _grid_rows(keys, cells, anchor, spec)
+    return ["", HEAD, SEP, *rows] if rows else []
+
+
+def _section(heading, keys, cells, anchor, spec,
+             lead_anchor=False) -> list[str]:
+    """One window family's block: the ladder table when an optimizer
+    cell ran (a grid section may lead with the ROHF anchor row);
+    pending/void grids render the pointer line -- no pending rows in
+    the committed table."""
+    has_run = any(k.method != "casci" and _run(cells.get(k.address))
+                  for k in keys)
+    if not has_run:
+        return [heading, "", *_caption(anchor), "",
+                POINTER.format(atom=keys[0].atom, window=keys[0].window)]
+    return [heading, "", *_caption(anchor), *_table(keys, cells, anchor,
+                                                    spec, lead_anchor)]
+
+
+def _heading(prefix: str, k) -> str:
+    """The section heading of a window family from any of its keys
+    (the fold names the lane families' partition)."""
+    shells = re.findall(r"\d+[spdfgh]", k.span_label)
+    display = "{" + ",".join(shells) + "}"
+    cas = f"({sum(k.sector)},{sum(SHELL_COLS[s[-1]] for s in shells)})"
+    if k.fold_tag is not None:
+        return f"{prefix} CAS{cas}/{display} · {fold_label(k.fold_tag)}"
+    return f"{prefix} CAS{cas}/{display}"
+
+
+def sections_of(spec, cells, anchor) -> list[list[str]]:
+    """The method ladder's sections, in declaration order: the
+    primary window's optimizer grid (leading the ROHF anchor row),
+    the planned windows (their grids or the pointer), then every
+    lane window whose route twins ran (the methods axis across CAS
+    sizes).  Windows with no optimizer run cells render nothing --
+    they are not this table's story yet."""
+    from atomterm.cases import scenarios_for
+    from atomterm.cells import void_reason
+
+    primary = grid_keys(spec)
+    heading = _heading("## Method ladder,", primary[0])
+    out = [_section(heading, primary, cells, anchor, spec,
+                    lead_anchor=True)]
+
+    scens = scenarios_for(spec)
+    for w in spec.planned_windows:
+        keys = window_grid(spec, w)
+        gated = any(void_reason(k.address, scens) for k in keys)
+        mark = " — declared, gated" if gated else ""
+        out.append(_section(_heading("###", keys[0]) + mark,
+                            keys, cells, anchor, spec))
+    routes = route_keys(spec)
+    for leg in [k for k in routes
+                if k.substrate == "pur" and k.method == "sa-casscf"]:
+        twins = [k for k in routes
+                 if k.window == leg.window and k.method != "casci"]
+        ran = any(k.method != "casci" and _run(cells.get(k.address))
+                  for k in twins)
+        if ran:        # un-run lane windows are not this table's story
+            out.append(_section(_heading("###", leg),
+                                twins, cells, anchor, spec))
+    return out
 
 
 def main(atom: str) -> None:
     """Rebuild ``<atom>``'s method-ladder section from cells.json under
-    the render contract (WINDOWS cover exactly the declared windows --
-    asserted; the TABLES edit protocol's structural checks; verified
+    the render contract (the declared windows derive from the
+    CaseSpec; the TABLES edit protocol's structural checks; verified
     move)."""
     src = Path(f"elements/{atom}/TABLES.md")
     data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
     cells, anchor = data["cells"], data["rohf_energy"]
     spec = CAMPAIGN[atom]
 
-    # the declaration's per-window grids (primary + planned). Render
-    # contract: this file's WINDOWS cover EXACTLY the declared windows,
-    # primary first -- presentation here, content from the declaration.
-    primary = "".join(spec.shell_patterns)
-    per_window = {primary: grid_keys(spec)}
-    per_window.update({w: window_grid(spec, w)
-                       for w in spec.planned_windows})
-    assert [w for _, w in WINDOWS] == [primary, *spec.planned_windows], \
-        "the renderer's WINDOWS and cases.CAMPAIGN diverged"
-
-    sections = [window_section(heading, window, per_window[window],
-                               cells, anchor)
-                for heading, window in WINDOWS]
-
     text = src.read_text()
-    b0 = WINDOWS[0][0]
-    assert text.count(b0) == 1 and text.count(BOUNDARY) == 1
-    new = text[:text.index(b0)] + "\n\n\n".join(sections) + "\n\n" \
-        + text[text.index(BOUNDARY):]
+    if text.count(BOUNDARY) != 1:
+        sys.exit(f"{src}: no {BOUNDARY!r} boundary -- place the "
+                 "section family first (the atom's pass)")
+    old = re.search(r"^## Method ladder.*?(?=^## )", text, re.M | re.S)
+    if old is None:
+        sys.exit(f"{src}: no '## Method ladder' section to replace")
 
-    # structural assertions (the TABLES protocol): one heading each,
-    # the declared windows covered, and NO pending rows anywhere
-    for heading, window in WINDOWS:
-        assert new.count(heading) == 1, heading
-    span = new[new.index(b0):new.index(BOUNDARY)]
-    assert "pending" not in span
-    assert not re.search(r"\d\*", span)          # no starred gauge numbers
-    for heading, window in WINDOWS:
-        h = new.index(heading)
-        e = (new.index("\n### ", h) + 1 if "\n### " in new[h:]
-             else new.index(BOUNDARY))
-        rows = [r for r in new[h:e].splitlines() if r.startswith("|")]
-        groups = _groups(per_window[window], cells)
-        expect = len(render_window(per_window[window], cells, anchor))
-        if expect:
-            assert len(rows) - 2 == expect, (heading, len(rows), expect)
-        else:
-            assert not rows, heading        # the pointer line, no table
+    sections = sections_of(spec, cells, anchor)
+    body = "\n\n\n".join("\n".join(s) for s in sections)
+    new = text[:old.start()] + body + "\n\n" + text[old.end():]
+
+    # structural assertions (the TABLES protocol): no pending rows,
+    # no starred gauge numbers, every table row well-formed
+    assert "pending" not in body
+    assert not re.search(r"\d\*", body)      # no starred gauge numbers
+    for line in body.splitlines():
+        if line.startswith("|"):
+            assert line.count("|") == HEAD.count("|"), line
 
     tmp = src.with_suffix(".md.tmp")
     tmp.write_text(new)
     assert tmp.read_text() == new
     tmp.replace(src)
-    n = sum(1 for _, w in WINDOWS for k in per_window[w]
-            if _run(cells.get(k.address)))
+    n = sum(1 for sec in sections for line in sec
+            if line.startswith(("| free | CASSCF", "| free | SA-CASSCF",
+                                "| pinned | CASSCF",
+                                "| pinned | SA-CASSCF")))
     print(f"{src}: method ladder rendered from cells.json "
-          f"({n} run cells, compressed)")
+          f"({n} optimizer rows, ladder shape)")
 
 
 if __name__ == "__main__":

@@ -857,12 +857,21 @@ def test_lane_emitter_deterministic():
     sec = mod.section(cs, scramble)
     assert "6.0–30.0" in sec and "not a" not in sec
 
-    # past the dense-meter cap: the commutators read em-dash
+    # past the dense-meter cap: the commutators read the state
+    # residual, marked psi; without a stored residual, the em-dash
     cap = dict(payloads)
     cap[keys[1].address] = {**payloads[keys[1].address],
                             "comm_norm_h_lz": float("nan"),
-                            "comm_norm_h_l2": float("nan")}
+                            "comm_norm_h_l2": float("nan"),
+                            "res_h_lz": 1.2e-14, "res_h_l2": 3.4e-14}
     row = [l for l in mod.section(cs, cap).splitlines()
+           if l.startswith("| pinned | CI | 3d3p ")][0]
+    assert row.endswith("| 1.2e-14ψ | 3.4e-14ψ |")
+    bare = dict(payloads)
+    bare[keys[1].address] = {**payloads[keys[1].address],
+                             "comm_norm_h_lz": float("nan"),
+                             "comm_norm_h_l2": float("nan")}
+    row = [l for l in mod.section(cs, bare).splitlines()
            if l.startswith("| pinned | CI | 3d3p ")][0]
     assert row.endswith("| — | — |")
 
@@ -986,12 +995,16 @@ def test_lattice_emitter_deterministic():
 
 @fast
 def test_method_ladder_row_policy():
-    """The methods renderer's ROW POLICY (the compression): run cells
-    only -- pending and void cells leave the table; within a group the
-    AO head absorbs MO/NO runs agreeing within EPS (named in its start
-    cell), disagreement keeps its own row; a window with no run cells
-    renders the POINTER line, not a pending grid; byte-deterministic."""
+    """The method ladder (LADDER SHAPE, one grammar with the CAS
+    ladder): byte-deterministic; the ROHF anchor row leads the
+    primary; within a group the AO head absorbs MO/NO runs agreeing
+    within EPS (named in its start cell), disagreement keeps its own
+    row; CASCI cells are never rows; a window with no optimizer run
+    cells renders the POINTER line; every lane window whose twins ran
+    gets its own CAS section (methods across CAS sizes); the conv
+    column carries the trace."""
     import importlib.util
+    from itertools import chain
     from pathlib import Path as _Path
 
     loader = importlib.util.spec_from_file_location(
@@ -1005,60 +1018,100 @@ def test_method_ladder_row_policy():
     keys = grid_keys(cs)          # the primary window's factor grid
 
     def payload(e):
-        return {"energies_pyscf": [e], "ground_l2": 12.0,
-                "ground_lz2": 4.0, "comm_norm_h_lz": 1e-9,
-                "comm_norm_h_l2": 1e-8, "window": {"d": 1.0},
-                "electrons": {"d": 2.0}}
+        return {"energies_pyscf": [e], "n_det": 90, "ground_l2": 12.0,
+                "comm_norm_h_lz": 1e-9, "comm_norm_h_l2": 1e-8}
+
+    def body(cells):
+        return "\n".join(chain(*mod.sections_of(cs, cells, -848.4065)))
 
     # every cell ran and the optimizer start-triplets agree: full
     # collapse (every group renders one AO row naming +mo,no)
     agree = {k.address: payload(-848.4) for k in keys}
-    sec = mod.window_section("H", "3d4s", keys, agree, -848.4065)
-    assert sec == mod.window_section("H", "3d4s", keys, agree, -848.4065)
-    rows = [r for r in sec.splitlines() if r.startswith("|")]
-    ao = [r for r in rows if r.startswith("| CASSCF, free (")][0]
+    assert body(agree) == body(agree)
+    rows = [r for r in body(agree).splitlines() if r.startswith("|")]
+    assert rows[2].startswith("| — | ROHF (anchor) |")   # ΔE's zero
+    ao = [r for r in rows if r.startswith("| free | CASSCF, free (")][0]
     assert "(+mo,no)" in ao
     assert not any(", MO" in r or ", NO" in r for r in rows)  # collapsed
-
-    # the conv column: optimizer cells render the trace (precision per
-    # cycle count); without one (CI cells, old stores) the em-dash
-    traced = dict(agree)
-    for k in keys:
-        if k.method != "casci":
-            traced[k.address] = {**traced[k.address],
-                                 "conv_dE": 2.3e-9, "cycles": 5}
-    traced_rows = [r for r in mod.window_section(
-        "H", "3d4s", keys, traced, -848.4065).splitlines()
-        if r.startswith("|")]
-    assert any("| 1e-9/5 |" in r for r in traced_rows)
-    agree_rows = [r for r in sec.splitlines() if r.startswith("|")]
-    assert not any("1e-" in r for r in agree_rows)   # no trace, no value
+    assert not any(r.startswith("| free | CASCI")
+                   or r.startswith("| pinned | CASCI") for r in rows)
 
     # a DISAGREEING mo run keeps its own row (the basin class)
     basin = dict(agree)
     mo = next(k for k in keys if k.method == "casscf" and k.mask is None
               and k.substrate == "pol" and k.start == "mo")
     basin[mo.address] = payload(-848.35)
-    rows = [r for r in mod.window_section(
-        "H", "3d4s", keys, basin, -848.4065).splitlines()
-        if r.startswith("|")]
+    rows = [r for r in body(basin).splitlines() if r.startswith("|")]
     assert sum(", MO" in r for r in rows) == 1
 
-    # pending cells leave the table; a void cell is not a run either
-    sparse = {k.address: payload(-848.4) for k in keys
-              if k.start == "ao"}
-    sec = mod.window_section("H", "3d4s", keys, sparse, -848.4065)
-    rows = [r for r in sec.splitlines() if r.startswith("|")]
-    assert all("(+" not in r for r in rows)      # nothing to collapse
+    # a void cell is not a run either
     void = dict(agree)
     void[keys[0].address] = {"void_reason": "scenario"}
-    rows = [r for r in mod.window_section(
-        "H", "3d4s", keys, void, -848.4065).splitlines()
-        if r.startswith("|")]
-    assert not any("raw" in r for r in rows)     # the void CASCI row is gone
+    rows = [r for r in body(void).splitlines() if r.startswith("|")]
+    assert rows[2].startswith("| — | ROHF (anchor) |")  # CI row gone
 
-    # no run cells at all: the POINTER line, no table
-    sec = mod.window_section("H", "3d4d", window_grid(cs, "3d4d"),
-                             {}, -848.4065)
-    assert "regen_cells.py Ti --window 3d4d" in sec
-    assert not [r for r in sec.splitlines() if r.startswith("|")]
+    # no optimizer run cells anywhere: the POINTER lines, no tables
+    only_ci = {k.address: payload(-848.4) for k in keys
+               if k.method == "casci"}
+    text = body(only_ci)
+    assert "regen_cells.py Ti --window 3d4s" in text
+    assert "| free | CASSCF" not in text
+
+    # the conv column: optimizer cells render the trace
+    traced = dict(agree)
+    for k in keys:
+        if k.method != "casci":
+            traced[k.address] = {**traced[k.address],
+                                 "conv_dE": 2.3e-9, "cycles": 5}
+    assert any("| 1e-9/5 |" in r
+               for r in body(traced).splitlines())
+
+
+@fast
+def test_method_ladder_cas_sections():
+    """The methods ladder carries the CAS WINDOWS axis: every lane
+    window whose route twins ran gets its own section (the free
+    CASSCF/SA and the pinned SA rows beside it), un-run lane windows
+    render nothing."""
+    import importlib.util
+    from itertools import chain
+    from pathlib import Path as _Path
+
+    loader = importlib.util.spec_from_file_location(
+        "build_methods_tables",
+        _Path(__file__).resolve().parents[2] / "scripts"
+        / "build_methods_tables.py")
+    mod = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(mod)
+
+    cs = CAMPAIGN["Sc"]
+
+    def twin_payload(e, pinned=False):
+        p = {"n_det": 204490, "comm_norm_h_lz": float("nan"),
+             "comm_norm_h_l2": float("nan"), "res_h_lz": 1e-14,
+             "res_h_l2": 2e-14, "conv_dE": 1e-9, "cycles": 16,
+             "ground_l2": 6.0}
+        if pinned:
+            p.update({"total": e, "l2": [6.0] * 5, "ptp": 5e-8,
+                      "energies": [e] * 5})
+        else:
+            p["energies_pyscf"] = [e]
+        return p
+
+    routes = route_keys(cs)
+    twins = [k for k in routes if k.window == "3d3p4d@semi"
+             and k.method != "casci"]
+    assert len(twins) == 3                     # CASSCF/SA free + SA pinned
+    cells = {k.address: twin_payload(-759.85, pinned=(k.substrate == "pur"))
+             for k in twins}
+    # the primary grid un-run: its pointer renders; the lane section
+    # renders its three rows under its own CAS heading
+    text = "\n".join(chain(*mod.sections_of(cs, cells, -759.7363)))
+    assert "CAS(7,13)/{3d,3p,4d} · semi" in text
+    rows = [r for r in text.splitlines() if r.startswith("|")]
+    assert sum(r.startswith("| free | CASSCF |") for r in rows) == 1
+    assert sum(r.startswith("| free | SA-CASSCF |") for r in rows) == 1
+    assert sum(r.startswith("| pinned | SA-CASSCF |") for r in rows) == 1
+    # the un-run lane windows render nothing
+    assert "CAS(7,8)" not in text and "CAS(9,9)" not in text
+

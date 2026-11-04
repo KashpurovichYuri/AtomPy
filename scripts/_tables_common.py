@@ -25,6 +25,25 @@ def minus(text: str) -> str:
     return re.sub(r"(?<!e)-", "−", text)
 
 
+def fold_col(k, spec) -> str:
+    """The fold column (every table's one grammar): a tagged window's
+    own fold; an untagged cell's prefix -- the noble whose closed
+    count fills ``spec.ncore`` orbitals, the variants naming their
+    deviation."""
+    if k.fold_tag is not None:
+        return fold_label(k.fold_tag)
+    base = next((n.capitalize() for n, sh in NOBLE_CORES.items()
+                 if sum(SHELL_COLS[s[-1]] for s in sh) == spec.ncore),
+                f"n={spec.ncore}")
+    if k.fold == "raw":
+        return f"{base}·raw"
+    if k.fold == "frac":
+        return f"{base}·frac"
+    if k.substrate == "pur":
+        return f"{base}·pur"
+    return base
+
+
 def fold_label(tag: str) -> str:
     """The fold column's README notation: noble names capitalized,
     ``semi`` as itself, explicit lists braced."""
@@ -37,9 +56,13 @@ def fold_label(tag: str) -> str:
 
 def cas_label(key) -> str:
     """The CAS(nelec, ncas) label: electrons from the key's sector,
-    columns from the window span's summed m-set sizes."""
-    cols = sum(SHELL_COLS[l] for l in
-               re.findall(r"\d+([spdfgh])", key.span_label))
+    columns from the window span's summed m-set sizes (an occupation-
+    GROUP window names its group count -- ``3d4sno2`` is 2 groups)."""
+    if m := re.search(r"no(\d+)$", key.span_label):
+        cols = int(m.group(1))
+    else:
+        cols = sum(SHELL_COLS[l] for l in
+                   re.findall(r"\d+([spdfgh])", key.span_label))
     return f"({sum(key.sector)},{cols})"
 
 
@@ -65,14 +88,16 @@ def comm_text(v) -> str:
 
 def comm_cell(payload: dict, field: str, res_field: str) -> str:
     """One symmetry column of a generated table: the dense operator
-    norm where the dense budget allowed it; past the budget the stored
-    STATE RESIDUAL (the size-independent certificate, when the payload
-    carries one); neither -- the em-dash."""
+    norm (whole matrices, plain) where the dense budget allowed it;
+    past the budget the stored STATE RESIDUAL (the size-independent
+    certificate, when the payload carries one) -- marked ``psi``: the
+    commutator applied to that row's converged solution, exact zero
+    iff it is a symmetry eigenstate; neither -- the em-dash."""
     v = payload.get(field, float("nan"))
     if v == v:
         return f"{v:.1e}"
     r = payload.get(res_field)
-    return f"{r:.1e}" if r is not None else DASH
+    return f"{r:.1e}ψ" if r is not None else DASH
 
 
 def conv_cell(payload: dict) -> str:

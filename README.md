@@ -269,32 +269,23 @@ Columns of the CI window survey (one row per declared CI cell):
   commutator columns are the assembled meters, em-dash past the
   dense-meter cap.
 
-Columns of a methods table:
+Columns of a methods table (the ladder grammar; one section per CAS
+window family — the primary window's factor grid under the row
+policy, the planned windows, every lane window whose route twins
+ran):
 
-- **E** — the run's variational total (Eh; eV in parentheses).
-- **ΔE** — gap to the ROHF anchor (the anchor: the caption).
-- **conv** — the optimizer rows' convergence: the final macro-cycle
-  |ΔE| (its order of magnitude) per cycle count, `1e-9/7`; CI rows
-  carry no optimizer — the em-dash.
-- **Span (Lowdin)** — the converged window's composition per l
-  (S-metric fractions of the window's columns — the span, not the
-  occupation: the swap reads s → 0).
-- **Elec (Lowdin)** — the ground root's electron count per l: what
-  the electrons *do* inside the span.
-- **⟨L̂z²⟩** — gauge diagnostic, not an observable: an exactly closed
-  fold gives a degenerate M_L ground and the solver returns an
-  arbitrary member mix; it quantizes to M² only when something lifts
-  the degeneracy.
-- **Terms** — from ⟨L̂²⟩/⟨S²⟩; the M_L-resolved reading (L̂z
-  diagonalized inside the ground eigenspace) is the multiplet
-  demonstration.
-- **cross-check** — not a table column: the store's
-  `max_de_vs_pyscf`, the analysis-ruler agreement with the run's own
-  totals. ~0 by construction; an mEh-class residue is core-field
-  anisotropy + window definition; a huge value (the swap row's ~800
-  mEh) is the partition-bookkeeping shift (Methods) — compare kernel
-  totals there, never the analysis split. Values live in
-  `cells.json/md`.
+- **route / method** — as the CAS ladder; the method column composes
+  the treatment identity (mask, substrate, absorbed starts) — the
+  ROHF anchor row leads the primary section, ΔE's zero.
+- **window / CAS / fold / dets / E / ΔE / eV / conv / ⟨L²⟩ / ptp /
+  the meter columns** — as the CAS ladder's key (the ΔE anchor is
+  the caption's computed ROHF energy here).
+- **The row policy** (the compression): within a treatment group the
+  AO row is the head and MO/NO runs agreeing with it within 1e-4 Eh
+  collapse into its start cell — disagreement keeps its own row (the
+  basin and construction classes live there); pending and void cells
+  leave the table, and a window with no run cells renders the
+  pointer line.
 
 Columns of a ladder table (window families × routes):
 
@@ -319,12 +310,13 @@ Columns of a ladder table (window families × routes):
   **ptp** carries its energy side — the component spread, the
   degeneracy certificate).
 - **‖[H,Lz]‖, ‖[H,L²]‖** — **zero certifies symmetry; the value
-  localizes the breaking.** Exact operator norms up to the
-  dense-meter cap (~6k dets); beyond it the columns carry the stored
-  STATE RESIDUAL ‖[H,Lz]ψ‖ / ‖[H,L²]ψ‖ (the same commutator applied
-  to the converged state — exact zero iff the state is a symmetry
-  eigenstate) where a payload has one, else the em-dash (structural
-  zeros for the certified fold class).
+  localizes the breaking.** Plain values are the exact operator norms
+  (whole matrices — sectors under the dense-meter cap, ~6k dets);
+  values marked **ψ** are the STATE RESIDUAL ‖[H,Lz]ψ‖ / ‖[H,L²]ψ‖ —
+  the same commutator applied to that row's converged solution
+  (exact zero iff the state is a symmetry eigenstate) — the only form
+  past the cap, where a payload carries one; the em-dash where
+  neither exists (structural zeros for the certified fold class).
 
 **Matrix-free meters.** Meters evaluate through *application*, not
 matrices: ⟨ψ|Ô|ψ⟩ and ‖[Ĥ,L̂z]ψ‖ need only Ôψ. The algebra fixes the

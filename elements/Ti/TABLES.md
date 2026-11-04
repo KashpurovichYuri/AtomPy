@@ -110,47 +110,83 @@ Readings:
 
 ## Method ladder, CAS(4,6)/{3d,4s}
 
-Route free · partition the fold column · source `cells.json` (the committed draw).
+Optimizer rows across CAS windows · ΔE vs the ROHF anchor (-848.4065 Eh) · routes in rows · source `cells.json` (as-run).
 
-ROHF anchor: −848.4065 Eh (−23086.3283 eV).
-
-| treatment | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | Span (Lowdin) |
-|---|---|---|---|---|---|---|---|---|---|
-| CASCI, raw | −848.3959 | +10.5 | −23086.0413 | +0.2871 | — | 12.0000 | 4.9e-02 | 2.6e-01 | s0.17 p0 d0.83 f0 |
-| CASCI, averaged | −848.3959 | +10.5 | −23086.0413 | +0.2871 | — | 12.0000 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 |
-| CASCI, pur | −848.3946 | +11.9 | −23086.0044 | +0.3239 | — | 12.0000 | 8.7e-14 | 6.9e-13 | s0.17 p0 d0.83 f0 |
-| CASCI, fractional | −848.3585 | +48.0 | −23085.0230 | +1.3053 | — | 12.0000 | 1.0e-09 | 7.6e-09 | s0.17 p0 d0.83 f0 |
-| CASSCF, free (+mo,no) | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 1e-8/38 | 0.0503 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 |
-| CASSCF, virtual-mix | −848.4377 | −31.2 | −23087.1779 | −0.8496 | 1e-9/42 | 0.0496 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 |
-| CASSCF, free, pur (+mo,no) | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 1e-11/41 | 0.0503 | 4.3e-01 | 1.1e+00 | s0.17 p0.50 d0.33 f4e-04 |
-| CASSCF, radial | −848.4112 | −4.7 | −23086.4576 | −0.1292 | 1e-11/17 | 6.9323 | 3.2e+00 | 1.3e+01 | s0.17 p0 d0.83 f0 |
-| CASSCF, radial, pur | −848.4100 | −3.5 | −23086.4234 | −0.0951 | 0/12 | 6.9638 | 3.2e+00 | 1.2e+01 | s0.17 p0 d0.83 f0 |
-| CASSCF, frozen (+no) | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 1e-11/5 | 12.0000 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 |
-| CASSCF, frozen, MO | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0/4 | 0.0051 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 |
-| CASSCF, frozen, pur (+no) | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 1e-12/6 | 12.0000 | 8.9e-14 | 4.7e-13 | s0.17 p0 d0.83 f0 |
-| CASSCF, frozen, pur, MO | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0/5 | 0.0051 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 |
-| SA-CASSCF, free (+no) | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 1e-9/33 | 12.0029 | 1.1e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 |
-| SA-CASSCF, free, MO | −848.4316 | −25.1 | −23087.0118 | −0.6835 | 1e-11/9 | 0.0255 | 3.0e-01 | 7.4e-01 | s0.17 p0.50 d0.33 f0 |
-| SA-CASSCF, free, pur (+no) | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 1e-8/94 | 12.0029 | 1.0e+00 | 6.0e+00 | s0 p0.17 d0.83 f0 |
-| SA-CASSCF, free, pur, MO | −848.4316 | −25.1 | −23087.0119 | −0.6835 | 1e-11/10 | 0.0255 | 3.0e-01 | 7.4e-01 | s0.17 p0.50 d0.33 f0 |
-| SA-CASSCF, radial | −848.4069 | −0.4 | −23086.3399 | −0.0115 | 1e-10/8 | 12.0000 | 1.3e-03 | 6.9e-03 | s0.17 p0 d0.83 f0 |
-| SA-CASSCF, radial, pur | −848.4055 | +1.0 | −23086.3017 | +0.0266 | 1e-10/8 | 12.0000 | 1.4e-04 | 5.7e-04 | s0.17 p0 d0.83 f0 |
-| SA-CASSCF, frozen (+no) | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 1e-10/6 | 12.0000 | 4.2e-09 | 2.3e-08 | s0.17 p0 d0.83 f0 |
-| SA-CASSCF, frozen, MO | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 1e-10/4 | 0.0051 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 |
-| SA-CASSCF, frozen, pur (+no) | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 1e-11/6 | 12.0000 | 4.8e-14 | 4.0e-13 | s0.17 p0 d0.83 f0 |
-| SA-CASSCF, frozen, pur, MO | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 1e-13/6 | 0.0051 | 1.6e-01 | 3.9e-01 | s0.17 p0.50 d0.33 f0 |
+| route | method | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[H,Lz]‖ | ‖[H,L²]‖ |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| — | ROHF (anchor) | — | — | — | — | −848.4065 | 0 | −23086.3283 | +0.0000 | — | — | — | — | — |
+| free | CASSCF, free (+mo,no) | 3d4s | (4,6) | Ar | 120 | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 1e-8/38 | 0.0503 | — | 4.3e-01 | 1.1e+00 |
+| free | CASSCF, virtual-mix | 3d4s | (4,6) | Ar | 120 | −848.4377 | −31.2 | −23087.1779 | −0.8496 | 1e-9/42 | 0.0496 | — | 4.3e-01 | 1.1e+00 |
+| free | CASSCF, free, pur (+mo,no) | 3d4s | (4,6) | Ar·pur | 120 | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 1e-11/41 | 0.0503 | — | 4.3e-01 | 1.1e+00 |
+| free | CASSCF, radial | 3d4s | (4,6) | Ar | 120 | −848.4112 | −4.7 | −23086.4576 | −0.1292 | 1e-11/17 | 6.9323 | — | 3.2e+00 | 1.3e+01 |
+| free | CASSCF, radial, pur | 3d4s | (4,6) | Ar·pur | 120 | −848.4100 | −3.5 | −23086.4234 | −0.0951 | 0/12 | 6.9638 | — | 3.2e+00 | 1.2e+01 |
+| free | CASSCF, frozen (+no) | 3d4s | (4,6) | Ar | 120 | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 1e-11/5 | 12.0000 | — | 4.2e-09 | 2.3e-08 |
+| free | CASSCF, frozen, MO | 3d4s | (4,6) | Ar | 120 | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0/4 | 0.0051 | — | 1.6e-01 | 3.9e-01 |
+| free | CASSCF, frozen, pur (+no) | 3d4s | (4,6) | Ar·pur | 120 | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 1e-12/6 | 12.0000 | — | 8.9e-14 | 4.7e-13 |
+| free | CASSCF, frozen, pur, MO | 3d4s | (4,6) | Ar·pur | 120 | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0/5 | 0.0051 | — | 1.6e-01 | 3.9e-01 |
+| free | SA-CASSCF, free (+no) | 3d4s | (4,6) | Ar | 120 | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 1e-9/33 | 12.0029 | — | 1.1e+00 | 6.0e+00 |
+| free | SA-CASSCF, free, MO | 3d4s | (4,6) | Ar | 120 | −848.4316 | −25.1 | −23087.0118 | −0.6835 | 1e-11/9 | 0.0255 | — | 3.0e-01 | 7.4e-01 |
+| free | SA-CASSCF, free, pur (+no) | 3d4s | (4,6) | Ar·pur | 120 | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 1e-8/94 | 12.0029 | — | 1.0e+00 | 6.0e+00 |
+| free | SA-CASSCF, free, pur, MO | 3d4s | (4,6) | Ar·pur | 120 | −848.4316 | −25.1 | −23087.0119 | −0.6835 | 1e-11/10 | 0.0255 | — | 3.0e-01 | 7.4e-01 |
+| free | SA-CASSCF, radial | 3d4s | (4,6) | Ar | 120 | −848.4069 | −0.4 | −23086.3399 | −0.0115 | 1e-10/8 | 12.0000 | — | 1.3e-03 | 6.9e-03 |
+| free | SA-CASSCF, radial, pur | 3d4s | (4,6) | Ar·pur | 120 | −848.4055 | +1.0 | −23086.3017 | +0.0266 | 1e-10/8 | 12.0000 | — | 1.4e-04 | 5.7e-04 |
+| free | SA-CASSCF, frozen (+no) | 3d4s | (4,6) | Ar | 120 | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 1e-10/6 | 12.0000 | — | 4.2e-09 | 2.3e-08 |
+| free | SA-CASSCF, frozen, MO | 3d4s | (4,6) | Ar | 120 | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 1e-10/4 | 0.0051 | — | 1.6e-01 | 3.9e-01 |
+| free | SA-CASSCF, frozen, pur (+no) | 3d4s | (4,6) | Ar·pur | 120 | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 1e-11/6 | 12.0000 | — | 4.8e-14 | 4.0e-13 |
+| free | SA-CASSCF, frozen, pur, MO | 3d4s | (4,6) | Ar·pur | 120 | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 1e-13/6 | 0.0051 | — | 1.6e-01 | 3.9e-01 |
 
 
 ### CAS(4,10)/{3d,4d} — declared, gated
 
-ROHF anchor: −848.4065 Eh (−23086.3283 eV).
+Optimizer rows across CAS windows · ΔE vs the ROHF anchor (-848.4065 Eh) · routes in rows · source `cells.json` (as-run).
 
 Declared, not yet run -- the optimizer cells are void until their CASCI anchors are read (the anchor-first scenario). One regen away: `regen_cells.py Ti --window 3d4d`.
 
 
 ### CAS(4,14)/{3d,4s,4p,4d} — declared, gated
 
-ROHF anchor: −848.4065 Eh (−23086.3283 eV).
+Optimizer rows across CAS windows · ΔE vs the ROHF anchor (-848.4065 Eh) · routes in rows · source `cells.json` (as-run).
+
+Declared, not yet run -- the optimizer cells are void until their CASCI anchors are read (the anchor-first scenario). One regen away: `regen_cells.py Ti --window 3d4s4p4d`.
+
+## Method ladder, CAS(4,6)/{3d,4s}
+
+Optimizer rows across CAS windows · ΔE vs the ROHF anchor (-848.4065 Eh) · routes in rows · source `cells.json` (as-run).
+
+| route | method | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[H,Lz]‖ | ‖[H,L²]‖ |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| — | ROHF (anchor) | — | — | — | — | −848.4065 | 0 | −23086.3283 | +0.0000 | — | — | — | — | — |
+| free | CASSCF, free (+mo,no) | 3d4s | (4,6) | averaged | 120 | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 1e-8/38 | 0.0503 | — | 4.3e-01 | 1.1e+00 |
+| free | CASSCF, virtual−mix | 3d4s | (4,6) | averaged | 120 | −848.4377 | −31.2 | −23087.1779 | −0.8496 | 1e-9/42 | 0.0496 | — | 4.3e-01 | 1.1e+00 |
+| free | CASSCF, free, pur (+mo,no) | 3d4s | (4,6) | averaged | 120 | −848.4377 | −31.3 | −23087.1787 | −0.8504 | 1e-11/41 | 0.0503 | — | 4.3e-01 | 1.1e+00 |
+| free | CASSCF, radial | 3d4s | (4,6) | averaged | 120 | −848.4112 | −4.7 | −23086.4576 | −0.1292 | 1e-11/17 | 6.9323 | — | 3.2e+00 | 1.3e+01 |
+| free | CASSCF, radial, pur | 3d4s | (4,6) | averaged | 120 | −848.4100 | −3.5 | −23086.4234 | −0.0951 | 0/12 | 6.9638 | — | 3.2e+00 | 1.2e+01 |
+| free | CASSCF, frozen (+no) | 3d4s | (4,6) | averaged | 120 | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 1e-11/5 | 12.0000 | — | 4.2e-09 | 2.3e-08 |
+| free | CASSCF, frozen, MO | 3d4s | (4,6) | averaged | 120 | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0/4 | 0.0051 | — | 1.6e-01 | 3.9e-01 |
+| free | CASSCF, frozen, pur (+no) | 3d4s | (4,6) | averaged | 120 | −848.3961 | +10.4 | −23086.0459 | +0.2825 | 1e-12/6 | 12.0000 | — | 8.9e-14 | 4.7e-13 |
+| free | CASSCF, frozen, pur, MO | 3d4s | (4,6) | averaged | 120 | −848.4171 | −10.6 | −23086.6177 | −0.2893 | 0/5 | 0.0051 | — | 1.6e-01 | 3.9e-01 |
+| free | SA−CASSCF, free (+no) | 3d4s | (4,6) | averaged | 120 | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 1e-9/33 | 12.0029 | — | 1.1e+00 | 6.0e+00 |
+| free | SA−CASSCF, free, MO | 3d4s | (4,6) | averaged | 120 | −848.4316 | −25.1 | −23087.0118 | −0.6835 | 1e-11/9 | 0.0255 | — | 3.0e-01 | 7.4e-01 |
+| free | SA−CASSCF, free, pur (+no) | 3d4s | (4,6) | averaged | 120 | −848.4166 | −10.1 | −23086.6025 | −0.2741 | 1e-8/94 | 12.0029 | — | 1.0e+00 | 6.0e+00 |
+| free | SA−CASSCF, free, pur, MO | 3d4s | (4,6) | averaged | 120 | −848.4316 | −25.1 | −23087.0119 | −0.6835 | 1e-11/10 | 0.0255 | — | 3.0e-01 | 7.4e-01 |
+| free | SA−CASSCF, radial | 3d4s | (4,6) | averaged | 120 | −848.4069 | −0.4 | −23086.3399 | −0.0115 | 1e-10/8 | 12.0000 | — | 1.3e-03 | 6.9e-03 |
+| free | SA−CASSCF, radial, pur | 3d4s | (4,6) | averaged | 120 | −848.4055 | +1.0 | −23086.3017 | +0.0266 | 1e-10/8 | 12.0000 | — | 1.4e-04 | 5.7e-04 |
+| free | SA−CASSCF, frozen (+no) | 3d4s | (4,6) | averaged | 120 | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 1e-10/6 | 12.0000 | — | 4.2e-09 | 2.3e-08 |
+| free | SA−CASSCF, frozen, MO | 3d4s | (4,6) | averaged | 120 | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 1e-10/4 | 0.0051 | — | 1.6e-01 | 3.9e-01 |
+| free | SA−CASSCF, frozen, pur (+no) | 3d4s | (4,6) | averaged | 120 | −848.3948 | +11.7 | −23086.0090 | +0.3194 | 1e-11/6 | 12.0000 | — | 4.8e-14 | 4.0e-13 |
+| free | SA−CASSCF, frozen, pur, MO | 3d4s | (4,6) | averaged | 120 | −848.4170 | −10.5 | −23086.6151 | −0.2868 | 1e-13/6 | 0.0051 | — | 1.6e-01 | 3.9e-01 |
+
+
+### CAS(4,10)/{3d,4d} — declared, gated
+
+Optimizer rows across CAS windows · ΔE vs the ROHF anchor (-848.4065 Eh) · routes in rows · source `cells.json` (as-run).
+
+Declared, not yet run -- the optimizer cells are void until their CASCI anchors are read (the anchor-first scenario). One regen away: `regen_cells.py Ti --window 3d4d`.
+
+
+### CAS(4,14)/{3d,4s,4p,4d} — declared, gated
+
+Optimizer rows across CAS windows · ΔE vs the ROHF anchor (-848.4065 Eh) · routes in rows · source `cells.json` (as-run).
 
 Declared, not yet run -- the optimizer cells are void until their CASCI anchors are read (the anchor-first scenario). One regen away: `regen_cells.py Ti --window 3d4s4p4d`.
 
