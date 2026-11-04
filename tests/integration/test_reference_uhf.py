@@ -7,7 +7,7 @@ import pytest
 
 from atomterm.cases import CAMPAIGN
 from atomterm.reference import ReferenceSpec, run_rohf, run_uhf, \
-    uhf_contamination
+    uhf_basin_census, uhf_contamination
 
 
 @pytest.fixture(scope="module")
@@ -30,6 +30,21 @@ def test_uhf_reference_converges_at_or_below_rohf(carbon_references):
     mf_r, mf_u = carbon_references
     assert mf_u.converged
     assert mf_u.e_tot <= mf_r.e_tot + 1e-9
+
+
+def test_uhf_basin_census_single_basin(tmp_path_factory):
+    """The census on C (the gate's measurement): every arm converges,
+    one basin -- identical energies across the guess sweep, the
+    record carrying the meter per arm."""
+    cfg = CAMPAIGN["C"].atom_config()
+    ref = ReferenceSpec(occ_closed=("1s", "2s"), occ_open=("2p",))
+    rows = uhf_basin_census(cfg, ref=ref)
+    assert [r["label"] for r in rows] == \
+        ["default", "minao", "atom", "huckel", "broken"]
+    assert all(r["converged"] for r in rows)
+    assert len({round(r["e_tot"], 9) for r in rows}) == 1
+    assert all(r["s2"] >= 2.0 - 1e-9 for r in rows)
+    assert all(0.0 < r["sigma_min"] <= 1.0 for r in rows)
 
 
 def test_uhf_reference_meter_reads(carbon_references):

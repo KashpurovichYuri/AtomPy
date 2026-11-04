@@ -13468,5 +13468,11 @@
       ],
       "cell": "sc_3d4sno2_2-1_sa-casscf_no_frozen_pur_avg"
     }
+  },
+  "uhf": {
+    "e_tot": -759.7378912284389,
+    "s2": 0.7619902904184386,
+    "sigma_min": 0.994546380150559,
+    "converged": true
   }
 }

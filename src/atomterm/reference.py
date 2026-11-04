@@ -52,8 +52,8 @@ from pyscf import scf
 
 from atomterm.windows import select_span, span_projector
 
-__all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "run_frac_occ",
-           "uhf_contamination"]
+__all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "uhf_basin_census",
+           "run_frac_occ", "uhf_contamination"]
 
 
 # the occupation contract --------------------------------------------
@@ -203,6 +203,12 @@ class ReferenceSpec:
     occ_e_ref : float | None
         Reference energy (Eh) of the target SCF basin; gates the
         multi-basin chaos by guess cycling (see :func:`run_rohf`).
+    occ_e_ref_uhf : float | None
+        The UHF gate anchor: the census energy of the intended UHF
+        basin (:func:`uhf_basin_census` measures it;
+        :func:`run_uhf` gates on it). NOT the ROHF ``occ_e_ref`` --
+        a spin-broken solution sits below it and would trip that
+        gate by design.
     conv_accelerator : str
         "diis" (default; the plain SCF), "newton" (second-order SOSCF
         from the start), or "diis+newton" (DIIS linearly first, then
@@ -222,6 +228,7 @@ class ReferenceSpec:
     occ_closed: tuple[str, ...] | None = None
     occ_open: tuple[str, ...] | None = None
     occ_e_ref: float | None = None
+    occ_e_ref_uhf: float | None = None
     conv_accelerator: str = "diis"
 
     def __post_init__(self):
@@ -230,6 +237,9 @@ class ReferenceSpec:
         if self.occ_e_ref is not None and self.occ_closed is None:
             raise ValueError(
                 "occ_e_ref needs the occ_closed/occ_open patterns")
+        if self.occ_e_ref_uhf is not None and self.occ_closed is None:
+            raise ValueError(
+                "occ_e_ref_uhf needs the occ_closed/occ_open patterns")
         if self.conv_accelerator not in ("diis", "newton", "diis+newton"):
             raise ValueError(
                 f"unknown conv_accelerator: {self.conv_accelerator!r}")
@@ -252,14 +262,14 @@ def _accelerated(m, ref):
     return m
 
 
-def _converged_cached(mol, fresh_mf, chkfile, ref, cfg):
+def _converged_cached(mol, fresh_mf, chkfile, ref, e_gate, cfg):
     """The cache-then-gate skeleton shared by the SCF runners: an
     existing chkfile is loaded and TRUSTED (marked converged, never
     re-gated -- the reproducibility unit); a fresh run solves under
-    ``ref``'s acceleration and, with ``occ_e_ref`` set, retries over
-    cycled guesses (default, then "atom", then "huckel") until
-    ``|E - occ_e_ref| <= 1e-4``, else RuntimeError. Returns
-    ``(mol, mf)``."""
+    ``ref``'s acceleration and, with a gate energy ``e_gate`` given,
+    retries over cycled guesses (default, then "atom", then
+    "huckel") until ``|E - e_gate| <= 1e-4``, else RuntimeError.
+    Returns ``(mol, mf)``."""
     try:
         _, rec = scf.chkfile.load_scf(chkfile)
         mf = fresh_mf(None)
@@ -270,16 +280,16 @@ def _converged_cached(mol, fresh_mf, chkfile, ref, cfg):
     except (OSError, KeyError, ValueError):
         pass
     mf = _accelerated(fresh_mf(None), ref)
-    if ref is not None and ref.occ_e_ref is not None:
+    if e_gate is not None:
         for guess in ("atom", "huckel"):
-            if mf.converged and abs(mf.e_tot - ref.occ_e_ref) <= 1e-4:
+            if mf.converged and abs(mf.e_tot - e_gate) <= 1e-4:
                 break
             mf = _accelerated(fresh_mf(guess), ref)
         else:
-            if not (mf.converged and abs(mf.e_tot - ref.occ_e_ref) <= 1e-4):
+            if not (mf.converged and abs(mf.e_tot - e_gate) <= 1e-4):
                 raise RuntimeError(
                     f"character-forced SCF did not reach the reference "
-                    f"basin E = {ref.occ_e_ref:.8f} (got {mf.e_tot:.8f}, "
+                    f"basin E = {e_gate:.8f} (got {mf.e_tot:.8f}, "
                     f"converged={mf.converged}); the basin census or the "
                     f"guess list needs revisiting")
     return mol, mf
@@ -336,7 +346,8 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
             m.init_guess = guess
         return m
 
-    return _converged_cached(mol, fresh_mf, chkfile, ref, cfg)
+    gate = ref.occ_e_ref if ref is not None else None
+    return _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg)
 
 
 def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
@@ -366,9 +377,11 @@ def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
       alpha): any breaking is in the orbital SHAPES -- closed pairs
       polarizing around the open shell -- not a different
       configuration. The energy can then sit BELOW the ROHF basin;
-      an ``occ_e_ref`` taken from an ROHF census gates the UNBROKEN
-      basin only, and a broken solution trips it BY DESIGN (anchor
-      the gate on a UHF census, or leave it unset while census-ing).
+      the gate anchors on :attr:`ReferenceSpec.occ_e_ref_uhf`, the
+      census energy of the intended UHF basin
+      (:func:`uhf_basin_census` measures it) -- the ROHF
+      ``occ_e_ref`` would gate the UNBROKEN basin only and a broken
+      solution trips it BY DESIGN.
     - The returned object is a REFERENCE-CLASS product, not a cells
       axis: downstream folds consume one closed-shell core density
       and one MO set (the module docstring's declined-seam note).
@@ -380,18 +393,89 @@ def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     def fresh_mf(guess: str | None = None):
         """One unconverged UHF object: the per-spin occupation hook
         attached, chkfile/verbosity set, optional starting guess."""
-        m = scf.UHF(mol)
-        if ref is not None and ref.occ_closed is not None:
-            m.get_occ = _forced_uhf_occ(mol, list(ref.occ_closed),
-                                        list(ref.occ_open))
-        m.chkfile = chkfile
-        m.conv_tol = 1e-12
-        m.verbose = cfg.verbose
-        if guess is not None:
-            m.init_guess = guess
-        return m
+        return _uhf_object(mol, chkfile, ref, guess, verbose=cfg.verbose)
 
-    return _converged_cached(mol, fresh_mf, chkfile, ref, cfg)
+    gate = ref.occ_e_ref_uhf if ref is not None else None
+    return _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg)
+
+
+def _uhf_object(mol, chkfile, ref, guess=None, break_=None,
+                verbose: int = 0):
+    """One unconverged UHF object -- the ONE construction, shared by
+    :func:`run_uhf` (the production path) and
+    :func:`uhf_basin_census` (the measurement arms): the per-spin
+    occupation hook attached, chkfile/verbosity set, optional
+    starting guess and spin-break amplitude (PySCF's
+    ``init_guess_break`` -- the deliberate symmetry breaking of the
+    start). ``chkfile=None`` disables the checkpoint (the census
+    writes nothing)."""
+    m = scf.UHF(mol)
+    if ref is not None and ref.occ_closed is not None:
+        m.get_occ = _forced_uhf_occ(mol, list(ref.occ_closed),
+                                    list(ref.occ_open))
+    m.chkfile = chkfile
+    m.conv_tol = 1e-12  # tight core density: keeps symmetry clean
+    m.verbose = verbose
+    if guess is not None:
+        m.init_guess = guess
+    if break_ is not None:
+        m.init_guess_break = break_
+    return m
+
+
+# the census default arms: the production start, the named PySCF
+# starts, and one deliberately strong spin break
+UHF_CENSUS_GUESSES = (("default", None, None),
+                      ("minao", "minao", None),
+                      ("atom", "atom", None),
+                      ("huckel", "huckel", None),
+                      ("broken", None, 2.0))
+
+
+def uhf_basin_census(cfg, ref: ReferenceSpec | None = None,
+                     guesses: tuple = UHF_CENSUS_GUESSES) -> list[dict]:
+    """The UHF basin census: one converged SCF per starting guess,
+    the basin table side by side (energy, spin honesty, breaking).
+
+    The measurement behind the gate: UHF's multi-basin class is the
+    widest of the reference formalisms (every closed pair is a
+    breaking site), so the intended basin is DECLARED by anchoring
+    :attr:`ReferenceSpec.occ_e_ref_uhf` on one census row -- the
+    census measures, the declaration picks. The occupations stay
+    character-forced throughout (``ref``): the basins differ in
+    orbital SHAPE at fixed occupations, which is exactly what the
+    ``sigma`` spectrum reads. No checkpoint is written.
+
+    Parameters
+    ----------
+    cfg : AtomConfig
+        The atom.
+    ref : ReferenceSpec, optional
+        The occupation forcing, as :func:`run_uhf`.
+    guesses : (label, init_guess, init_guess_break) triples
+        The arms; the default sweeps the production start, the named
+        PySCF starts, and one strong spin break.
+
+    Returns
+    -------
+    list[dict]
+        Per arm: ``label``, ``e_tot``, ``converged``, ``s2``,
+        ``sigma_min`` (the weakest corresponding-orbital pair),
+        ``sigma`` (the full pairing spectrum).
+    """
+    from atomterm.system import build_mol
+
+    mol = build_mol(cfg)
+    out = []
+    for label, guess, break_ in guesses:
+        mf = _uhf_object(mol, None, ref, guess, break_)
+        mf.run()
+        s2, sigma = uhf_contamination(mf)
+        out.append({"label": label, "e_tot": float(mf.e_tot),
+                    "converged": bool(mf.converged), "s2": float(s2),
+                    "sigma_min": float(sigma.min()) if sigma.size else 1.0,
+                    "sigma": sigma.tolist()})
+    return out
 
 
 def uhf_contamination(mf) -> tuple[float, np.ndarray]:

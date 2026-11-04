@@ -1037,8 +1037,8 @@ def test_method_ladder_one_table():
                 "comm_norm_h_l2": 1e-8, "win_lz": 1e-15,
                 "win_lperp": 2e-15}
 
-    def body(cells):
-        return "\n".join(mod.ladder_section(cs, cells, -848.4065))
+    def body(cells, uhf=None):
+        return "\n".join(mod.ladder_section(cs, cells, -848.4065, uhf=uhf))
 
     # every cell ran: CI rows render beside the optimizers, NO never
     agree = {k.address: payload(-848.4) for k in keys}
@@ -1047,6 +1047,23 @@ def test_method_ladder_one_table():
     assert text.count(mod.BEGIN) == 1 and text.count(mod.END) == 1
     rows = [r for r in text.splitlines() if r.startswith("|")]
     assert rows[2].startswith("| ROHF (anchor) |")
+    # the UHF anchor row follows when the store carries the record:
+    # DeltaE against the same zero, the meter in the note
+    uhf_row = mod._uhf_anchor_row(-848.4065,
+                                  {"e_tot": -848.41, "s2": 4.02,
+                                   "sigma_min": 0.98})
+    cells_uhf = [c.strip() for c in uhf_row.split("|")[1:-1]]
+    assert cells_uhf[0] == "UHF (anchor)"
+    assert cells_uhf[7] == "−3.5"
+    assert "⟨S²⟩=4.0200" in cells_uhf[17]
+    with_uhf = "\n".join(mod.ladder_section(cs, agree, -848.4065,
+                                            uhf={"e_tot": -848.41,
+                                                 "s2": 4.02,
+                                                 "sigma_min": 0.98}))
+    rows_uhf = [r for r in with_uhf.splitlines() if r.startswith("|")]
+    assert rows_uhf[2].startswith("| ROHF (anchor) |")
+    assert rows_uhf[3].startswith("| UHF (anchor) |")
+    assert rows_uhf[4].startswith("| CASCI |")  # the first family follows
     ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / AO |")]
     assert len(ci) == 4            # the four fold variants' CI rows
     assert not any("/ NO |" in r for r in rows)   # NO starts excluded

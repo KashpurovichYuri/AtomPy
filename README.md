@@ -120,10 +120,17 @@ sectors the same counts as ROHF — any breaking is closed pairs
 polarizing around the open shell); `uhf_contamination` reads the
 reference's own spin honesty: ⟨S²⟩ by the overlap formula plus the
 corresponding-orbital pairing spectrum (1 = paired; measured: the
-[Ar] core stays paired while the valence s pair polarizes most). The
-UHF object is a reference-class product — the methods grid does not
-run on it (the folds assume one closed-shell core density; the
-broken-core fold is the declared next step).
+[Ar] core stays paired while the valence s pair polarizes most).
+⟨Sz⟩ is exact by construction (each spin block conserves its
+electron count) — the meter is ⟨S²⟩+σ, never Sz. The basin gate
+anchors on `occ_e_ref_uhf`, measured once per atom by the guess
+census (`uhf_basin_census`: the production start, the named PySCF
+starts, one strong spin break — one call, any atom; the census
+measures, the declaration picks). The UHF object is a
+reference-class product — the methods grid does not run on it (the
+folds assume one closed-shell core density; the broken-core fold is
+the declared next step); the anchor row renders from the store's
+`uhf` record beside the ROHF anchor.
 
 **CASCI — at fixed core and window.** Exact diagonalization of one
 sector; the window is a stated start's span; closure is a property of

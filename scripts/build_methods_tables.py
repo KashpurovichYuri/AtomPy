@@ -191,15 +191,33 @@ def _anchor_row(anchor: float) -> str:
     return "| " + " | ".join(cells) + " |"
 
 
-def ladder_section(spec, cells, anchor) -> list[str]:
+def _uhf_anchor_row(anchor: float, uhf: dict) -> str:
+    """The UHF anchor row: the spin-broken reference beside the ROHF
+    one -- ΔE against the same zero, the meter reading (⟨S²⟩, the
+    weakest corresponding-orbital pair) in the note."""
+    e = uhf["e_tot"]
+    de = (e - anchor) * 1000.0
+    cells = ["UHF (anchor)", "—", "—", "—", "—", "—",
+             f"{e:.4f}", f"{de:+.1f}", f"{e * EV:.4f}",
+             f"{de * EV / 1000.0:+.4f}",
+             DASH, DASH, DASH, DASH, DASH, DASH, DASH,
+             f"⟨S²⟩={uhf['s2']:.4f}, σ_min={uhf['sigma_min']:.4f}"]
+    # sign minus on the ENERGY cells only (names keep their hyphens)
+    for i in (6, 7, 8, 9):
+        cells[i] = minus(cells[i])
+    return "| " + " | ".join(cells) + " |"
+
+
+def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     """THE LADDER: one table for the whole atom.  Families in
     declaration order, separated by the rule row -- the lattice
     spans (CI only), the primary window (each fold group's CASCI
     BESIDE its optimizer variants), then every lane window whose
     route twins ran (the pinned and free CI, the free CASSCF/SA, the
-    pinned SA).  The ROHF anchor row leads; NO-start cells are not
-    ladder rows; a lane family without run optimizer twins is not
-    this table's story yet."""
+    pinned SA).  The ROHF anchor row leads, the UHF anchor row
+    follows when the store carries the record; NO-start cells are
+    not ladder rows; a lane family without run optimizer twins is
+    not this table's story yet."""
     from atomterm.cells import lattice_keys
 
     body: list[str] = []
@@ -234,7 +252,10 @@ def ladder_section(spec, cells, anchor) -> list[str]:
                and _run(cells.get(k.address)) for k in twins):
             _fam([k for k in twins if k.start != "no"])
 
-    out = [BEGIN, HEAD, SEP, _anchor_row(anchor), *body, END]
+    out = [BEGIN, HEAD, SEP, _anchor_row(anchor)]
+    if uhf is not None:
+        out.append(_uhf_anchor_row(anchor, uhf))
+    out.extend([*body, END])
 
     for w in spec.planned_windows:
         keys = window_grid(spec, w)
@@ -256,7 +277,8 @@ def main(atom: str) -> None:
     cells, anchor = data["cells"], data["rohf_energy"]
     spec = CAMPAIGN[atom]
 
-    body = "\n".join(ladder_section(spec, cells, anchor))
+    body = "\n".join(ladder_section(spec, cells, anchor,
+                                    uhf=data.get("uhf")))
 
     # structural assertions (the TABLES protocol): no pending rows,
     # no starred gauge numbers, every table row well-formed

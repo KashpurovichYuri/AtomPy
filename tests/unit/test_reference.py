@@ -22,10 +22,14 @@ def test_reference_spec_validation():
     and the basin gate needs them."""
     ReferenceSpec()  # plain reference: all-None is the default run
     ReferenceSpec(occ_closed=("4s",), occ_open=("3d",))
+    ReferenceSpec(occ_closed=("4s",), occ_open=("3d",),
+                  occ_e_ref_uhf=-759.73789123)
     with pytest.raises(ValueError, match="together"):
         ReferenceSpec(occ_closed=("4s",))
     with pytest.raises(ValueError, match="needs the"):
         ReferenceSpec(occ_e_ref=-848.40648875)
+    with pytest.raises(ValueError, match="needs the"):
+        ReferenceSpec(occ_e_ref_uhf=-759.73789123)
 
 
 def test_forced_occ_l_specifiers_select_whole_subspaces():

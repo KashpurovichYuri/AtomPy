@@ -292,7 +292,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  extra_fixed="4s"),
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "2p", "3s", "3p", "4s"),
-                       occ_open=("3d",), occ_e_ref=-759.73625510)),
+                       occ_open=("3d",), occ_e_ref=-759.73625510,
+                       occ_e_ref_uhf=-759.73789123)),
     "Ti": CaseSpec("Ti", "ccpvdz", nelec_act=4, ncore=9,
                    shell_patterns=["3d", "4s"], spin=2,
                    sa_weights=[1 / 7] * 7,
