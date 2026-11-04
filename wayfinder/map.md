@@ -28,6 +28,32 @@ declaration path as a fresh wave. (live)
 
 ## Issues (open dispositions + watchlist)
 
+- The f41bb51..HEAD review (2026-11-04, both axes; fixes in the
+  round's commit, ticket 32's closing entry is the record).
+  DESIGN SURVEY (the delta seams; the full src/ survey stays at the
+  wave close): reference.py got DEEPER (one cache/gate skeleton +
+  one acceleration dispatch behind three runners; the object
+  construction `_uhf_object` is now a REAL seam -- two adapters:
+  the production runner and the census arms; the declined cells-axis
+  seam is documented at the module contract, where a seam refusal
+  belongs); the UHF gate's declaration rides the row's
+  ReferenceSpec (the declaration-owns-intent rule held).  The one
+  real shallowness finding is item (1) below.  The scripts'
+  vocabulary module tightened (comm_text deleted).
+  RECORDED, not fixed: (1) the kernel/lane residual block is written
+  twice (`kernel_cell_payload` vs `run_lane_cell` -- the apply/residual
+  loop and its imports) -- the one-home candidate for the wave-close
+  refactoring round; (2) multi-invariant pins (`test_pyscf_apply_is_
+  the_slater_condon_action` x3, `test_method_ladder_one_table`) --
+  V1 splits at the wave close, the pins are load-bearing; (3) the new
+  residual bands (`< 1e-8`) carry no observed fresh-value comment
+  (V7) -- capture at the next natural fixture run; (4) the "cycle
+  cap" note keys on the DECLARED 200 while the payload carries only
+  the count -- the proper fix stores max_cycle in the payload (a
+  schema bump; rides the next store migration); (5) `cas_label`'s
+  NO branch is a hypothetical seam (NO starts never reach labels) --
+  delete at the wave close unless a consumer appears.
+
 - The ladder-wave review round (2026-11-01, `701b31c..c02d0c6`, both
   axes): applied — the module-docstring lockstep, the shared
   `_substrate` builder, the V1 test split, the `_FOLD_*` renames, the

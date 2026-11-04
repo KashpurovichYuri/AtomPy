@@ -350,6 +350,11 @@ def _singles_couplings(dets, occ: np.ndarray, cum: np.ndarray):
     if nelec == 0 or nvirt == 0:
         z = np.zeros(0, dtype=np.int64)
         return z, z, z, z
+    if n2 > 63:
+        raise ValueError(
+            f"the bitmask enumeration addresses {n2} spin-orbitals in "
+            "int64 -- the safe limit is 63; wider sectors need the "
+            "pair classifier's path, not a wider mask")
     masks = (occ * (np.int64(1) << np.arange(n2))).sum(axis=1)
     order = np.argsort(masks)
     sorted_masks = masks[order]
@@ -375,6 +380,10 @@ def operator_apply(
     """The MATRIX-FREE application of a (one-body, two-body) operator
     pair: returns ``apply(v) -> O @ v`` -- the operator exists only
     through its action, the ``len(dets)^2`` container never forms.
+
+    The one-body class rides the bitmask enumeration, which addresses
+    at most 63 spin-orbitals in int64 (wider sectors are refused,
+    never silently truncated).
 
     The nonzero pattern is exact, not heuristic: an operator of this
     form connects determinants differing by at most two spin-orbitals

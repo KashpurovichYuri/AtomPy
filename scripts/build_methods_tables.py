@@ -1,24 +1,19 @@
-"""Render the method-ladder section of an element's TABLES.md from its
+"""Render the method-ladder section of an element's TABLE.md from its
 cells.json payloads -- the key-addressed provenance (the render
 contract: the table and its source cannot diverge).
 
 Usage: python scripts/build_methods_tables.py [atom]
 
-THE LADDER SHAPE (one grammar with the CAS ladder): route | method |
-window | CAS | fold | dets | E | ΔE | eV | conv | ⟨L²⟩ | ptp |
-comms -- one section per CAS window family, every OPTIMIZER run cell
-a row (the CI story lives in the survey / the CAS ladder):
-
-- the PRIMARY window: its factor grid's optimizer cells under the ROW
-  POLICY (the compression) -- within a (method, mask, substrate,
-  fold) group the AO row is the head and MO/NO runs agreeing with it
-  within EPS collapse into its treatment name -- disagreement stays
-  as its own row (the basin and construction classes live there),
-  and the ROHF anchor row leads (ΔE's zero);
-- the PLANNED windows: their optimizer cells when they ran, else the
-  pointer line (declared, gated -- one regen away);
-- every LANE window whose route twins ran: the free CASSCF/SA and
-  the pinned SA beside it (the methods axis across CAS sizes).
+THE ONE LADDER TABLE (the element file IS the table): every run cell
+of the atom a row, ROHF anchor first, the UHF anchor beside it when
+the store carries the record; families in declaration order,
+separated by the rule row -- the lattice spans (CI only), the
+primary window (each fold group's CASCI BESIDE its optimizer
+variants -- CI interleaved, the row-collapse policy is DELETED),
+then every lane window whose route twins ran (the pinned and free
+CI, the free CASSCF/SA, the pinned SA).  NO-start cells are not
+ladder rows.  The PLANNED windows follow as pointers when gated
+(declared, not yet run -- one regen away).
 
 No verdict column: the classes and their row-level discriminators
 are the reading key in README -- the one home.
@@ -153,6 +148,9 @@ def _row(k, p, anchor, spec) -> str:
     if ptp is None and len(p.get("energies_pyscf", [])) > 1:
         ptp = float(np.ptp(p["energies_pyscf"]))   # the SA root set
     note = "cycle cap" if p.get("cycles") == 200 else ""
+    # ^ 200 = the cycle cap a measurement run DECLARES in its
+    # mc_opts (production runs on PySCF's 50 default); the payload
+    # carries only the count, so the note keys on the declared cap.
     cells = [
         _method(k), route, f"{k.span_label} / {START_NAMES[k.start]}",
         cas_label(k), fold, f"{p['n_det']:,}",
@@ -218,8 +216,6 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     follows when the store carries the record; NO-start cells are
     not ladder rows; a lane family without run optimizer twins is
     not this table's story yet."""
-    from atomterm.cells import lattice_keys
-
     body: list[str] = []
     seen: set[str] = set()
 

@@ -80,12 +80,6 @@ def l2_text(payload: dict) -> str:
     return f"{g:.4f}" if g == g else DASH        # NaN check
 
 
-def comm_text(v) -> str:
-    """One commutator norm, or the em-dash when the sector sat above
-    the dense-meter cap (structural for the certified fold class)."""
-    return f"{v:.1e}" if v == v else DASH          # NaN check: v != v
-
-
 def comm_cell(payload: dict, field: str, res_field: str) -> str:
     """One symmetry column of a generated table: the dense operator
     norm (whole matrices, plain) where the dense budget allowed it;

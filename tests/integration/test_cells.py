@@ -726,7 +726,7 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
     # the state residual: the closed window's term components are
     # symmetry eigenstates -- the residual sits at the apply floor
     assert 0.0 <= p["res_h_lz"] < 1e-8
-    assert 0.0 <= p["res_h_l2"] < 1e-8          # S(S+1) = 2
+    assert 0.0 <= p["res_h_l2"] < 1e-8
     # the store round-trips (and a fresh run is a cache hit)
     q = load_lane_cell(key, workdir=tmp_path)
     assert q["total"] == p["total"] and q["energies"] == p["energies"]
@@ -1048,22 +1048,18 @@ def test_method_ladder_one_table():
     rows = [r for r in text.splitlines() if r.startswith("|")]
     assert rows[2].startswith("| ROHF (anchor) |")
     # the UHF anchor row follows when the store carries the record:
-    # DeltaE against the same zero, the meter in the note
-    uhf_row = mod._uhf_anchor_row(-848.4065,
-                                  {"e_tot": -848.41, "s2": 4.02,
-                                   "sigma_min": 0.98})
-    cells_uhf = [c.strip() for c in uhf_row.split("|")[1:-1]]
+    # DeltaE against the same zero (Unicode minus), the meter in the
+    # note; the first family follows it directly
+    with_uhf = body(agree, uhf={"e_tot": -848.41, "s2": 4.02,
+                                "sigma_min": 0.98})
+    rows_uhf = [r for r in with_uhf.splitlines() if r.startswith("|")]
+    assert rows_uhf[2].startswith("| ROHF (anchor) |")
+    cells_uhf = [c.strip() for c in rows_uhf[3].split("|")[1:-1]]
     assert cells_uhf[0] == "UHF (anchor)"
     assert cells_uhf[7] == "−3.5"
     assert "⟨S²⟩=4.0200" in cells_uhf[17]
-    with_uhf = "\n".join(mod.ladder_section(cs, agree, -848.4065,
-                                            uhf={"e_tot": -848.41,
-                                                 "s2": 4.02,
-                                                 "sigma_min": 0.98}))
-    rows_uhf = [r for r in with_uhf.splitlines() if r.startswith("|")]
-    assert rows_uhf[2].startswith("| ROHF (anchor) |")
-    assert rows_uhf[3].startswith("| UHF (anchor) |")
     assert rows_uhf[4].startswith("| CASCI |")  # the first family follows
+    rows = rows_uhf
     ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / AO |")]
     assert len(ci) == 4            # the four fold variants' CI rows
     assert not any("/ NO |" in r for r in rows)   # NO starts excluded
@@ -1123,10 +1119,7 @@ def test_method_ladder_lane_families():
         d = {"n_det": 204490, "comm_norm_h_lz": float("nan"),
              "comm_norm_h_l2": float("nan"), "res_h_lz": 1e-14,
              "res_h_l2": 2e-14, "win_lz": 1e-15, "win_lperp": 1e-15}
-        if pinned:
-            d.update({"total": e, "l2": [6.0] * 5, "ptp": 5e-8,
-                      "energies": [e] * 5})
-        elif ci:
+        if pinned or ci:
             d.update({"total": e, "l2": [6.0] * 5, "ptp": 5e-8,
                       "energies": [e] * 5})
         else:

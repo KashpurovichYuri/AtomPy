@@ -995,6 +995,55 @@ REMAINING for U (the consumption wave, user-gated): the UHF anchor
 rows in the tables (the census + gate numbers per atom), the
 broken-core fold design (alpha/beta c_core), Ti/Si readings.
 
+## The two-axis review + the consumption round (2026-11-04 -- the skills over f41bb51..HEAD)
+
+The user-directed consumption round LANDED (6197f68): the census
+(uhf_basin_census -- five arms, any atom one call, no chkfile),
+occ_e_ref_uhf (the UHF gate anchor; the skeleton's gate energy
+parameterized; _uhf_object the ONE construction), scripts/
+uhf_anchor.py (the gated run + the store's uhf record), the builder
+renders UHF (anchor) beside ROHF (DeltaE against the same zero,
+<S^2>/sigma_min in the note).  Sc DECLARED: occ_e_ref_uhf =
+-759.73789123 -- the census reads a SINGLE basin (all five arms
+identical to 9 decimals, 13 s), <S^2> = 0.7620, sigma_min = 0.9945.
+The per-commit TEST GATE re-settled (user): fast tier + targeted
+files, 5-10 min MAX; the heavy fixtures once at the wave close,
+detached, OMP_NUM_THREADS capped (the uncapped 255-thread run hit
+an hour; the in-flight suite was killed under the new policy).
+
+REVIEW FINDINGS APPLIED (this commit): comm_text deleted (consumer-
+less); the redundant lattice_keys local import dropped; the builder
+module docstring rewritten (it still documented the DELETED
+row-collapse policy -- R6); the 63-bit mask limit GUARDED in
+detbasis._singles_couplings (int64 shifts silently truncate past 63
+spin-orbitals -- exactly operator_apply's advertised regime; the
+limit is in operator_apply's contract); the displaced S(S+1) test
+comment fixed; the lane_families helper's identical pinned/ci
+branches merged; the anchor-row pin asserts the RENDERED row (V2);
+the cycle-cap comment names the contract (200 = a DECLARED cap;
+production runs PySCF's 50 default -- the payload carries only the
+count, the cap-in-payload proper fix recorded in map.md); the
+anchor-row energy formatting... SHARED via the minus loop (the
+_quad extraction declined: two call sites, the deletion test says
+pass-through).
+
+DISPOSITIONS RECORDED (spec axis):
+- Unit U's "the conv trace" clause: the CAS optimizer's _cycle_trace
+  instrument does not apply to an SCF (no macro-cycle trace); the
+  UHF record carries converged + conv_tol=1e-12; the anchor row's
+  conv column dashes.  The clause is DISPOSED, not missing.
+- kernel_cell_payload's residuals are GROUND-ROOT only (the ticket's
+  recorded "max over component roots" is the lane's behavior); the
+  max is a x nroots cost on the big sectors -- disposition at the
+  wave close (narrow the wording or pay the cost).
+- The SA budget guard (3adfe51) was never ticket-recorded -- THIS
+  entry is its record (a declared block longer than the sector
+  anchors on the measured one; PySCF crashes the never-run class
+  otherwise).
+- The ticket's "[P,L^2]" closure-column wording: the settled
+  vocabulary is [P,L_perp] (fact 19) -- the ticket line is amended
+  here, not in place (history stays).
+
 ## References
 
 
