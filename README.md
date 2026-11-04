@@ -152,6 +152,16 @@ as an explicit shell list, e.g. {1s,2s,2p,4s}. The machine form
 resolved by `windows.fold_shells`; a lane window carries its fold as
 a tag on the label (`3d3p@semi`).
 
+The fold column's **variant markers**: `·raw` — the raw AO shell
+columns as the fold span (no SCF averaging; the anisotropy control);
+`·frac` — the fractional-occupation reference (a *different*
+reference SCF, not the ε→0 limit of averaging); `·pur` — the
+**purified** core substrate (the rotation-closed span of `core.py`:
+raw ROHF cores never rotation-close, the purified span does, at
+machine precision); `·lane` — the ladder's uniform construction (the
+fold's raw-shell Löwdin span, the window placed through
+`build_full_mo`) — the label under which the pinned route runs.
+
 **The treatment grid.** One declared grid, priced and classified at
 fixed window: fold (raw/avg/frac) × start (AO/MO/NO) × mask
 (free/radial/frozen) × objective (single root / M_L average) ×
@@ -269,22 +279,49 @@ Columns of the CI window survey (one row per declared CI cell):
   commutator columns are the assembled meters, em-dash past the
   dense-meter cap.
 
-Columns of a methods table (ONE big ladder per atom — the primary
-window's optimizer grid leads, then every lane window whose route
-twins ran, families separated by a rule row):
+Columns of a methods table (ONE ladder per atom between the
+`ladder` markers — every run cell a row: the lattice spans (CI), the
+primary window's fold groups (each CASCI beside its optimizer
+variants), the lane families (pinned and free CI, the free and
+pinned optimizers); families separated by a rule row; the tables
+render what ran):
 
 - **method | route | window | CAS | fold | dets | E | ΔE | eV | conv
-  | ⟨L²⟩ | ptp | meters | note** — the CAS ladder's grammar; the
-  method column composes the FULL treatment name (method, mask,
-  start) — every run cell a row, nothing collapsed or hidden; the
-  substrate is the fold column's (`Ar` the canonical core, `Ar·pur`
-  the purified span, `·lane` the raw-shell Löwdin fold); the ROHF
-  anchor row leads, ΔE's zero (the caption's computed value).
+  | ⟨L²⟩ | ptp | the closure and meter columns | note** — the
+  window cell carries the start (`3d4s / AO`); the method names the
+  objective and its restriction only (`CASSCF, radial`); the
+  substrate is the fold column's (Fold notation's markers); the ROHF
+  anchor row leads, ΔE's zero.
 - **ptp** — intrinsic where a component/root set exists (the pinned
   rows store it; the free SA rows' root spread computes at render);
-  the dash means "no set" (single-root CASSCF).
+  the dash means "no set" (single-root runs).
+- **‖[P,Lz]‖, ‖[P,L⊥]‖** — the one-particle closure certificate of
+  the window span (gauge-invariant: rotations within the span cannot
+  move it) — zero certifies the span itself is m-closed; cheap at any
+  size.
 - **note** — terse, data-derived flags only (`cycle cap` at the
   optimizer's 200-cycle limit); never verdicts.
+
+**Further variants** — the tables render what ran; other combinations
+of the treatment axes are possible, one regen away, and are the
+first levers when a run misbehaves (bad convergence, a suspected
+basin escape):
+
+- **start — MO / NO**: a different initial window gauge (canonical
+  MO slice; the density-picked occupation groups) when the AO start
+  stalls or lands in a wrong basin;
+- **mask — radial / frozen**: same-(l,member)-only rotations / a
+  frozen window — to separate correlation hunger from window-identity
+  drift when free optimization escapes;
+- **fold — raw / frac**: core-field controls (raw shell columns; the
+  fractional-occupation reference);
+- **substrate — pur**: the purified rotation-closed core, when the
+  canonical core's anisotropy contaminates;
+- **route — pinned**: the guaranteed D2h component set, to check a
+  free route's averaging (the term identification always comes from
+  the symmetric run);
+- **window / CAS**: the planned windows and the lattice spans —
+  completeness and saturation questions.
 
 Columns of a ladder table (window families × routes):
 

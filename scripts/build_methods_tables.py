@@ -55,11 +55,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import CAMPAIGN  # noqa: E402
-from atomterm.cells import (grid_keys, lane_keys, route_keys,  # noqa: E402
-                            window_grid)
+from atomterm.cells import (grid_keys, lattice_keys,  # noqa: E402
+                            route_keys, window_grid)
 from _tables_common import (DASH, EV, cas_label,  # noqa: E402
                             comm_cell, conv_cell, fold_col,
-                            l2_text, minus)
+                            l2_text, minus, replace_block)
 BOUNDARY = "## Studies (frozen history; ticket 28)"
 POINTER = ("Declared, not yet run -- the optimizer cells are void "
            "until their CASCI anchors are read (the anchor-first "
@@ -70,9 +70,10 @@ POINTER = ("Declared, not yet run -- the optimizer cells are void "
 # family separator row renders as a horizontal rule mid-table
 HEAD = ("| method | route | window | CAS | fold | dets | E, Eh | "
         "ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | "
-        "‖[H,Lz]‖ | ‖[H,L²]‖ | note |")
-SEP = "|" + "---|" * 16
-RULE = "|" + " --- |" * 16
+        "‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |")
+SEP = "|" + "---|" * 18
+RULE = "|" + " --- |" * 18
+BEGIN, END = "<!-- ladder:begin -->", "<!-- ladder:end -->"
 
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
@@ -83,12 +84,14 @@ MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
 
 
 def _method(k) -> str:
-    """The method column: the full treatment name (method, mask,
-    start) -- every axis of the run's identity is on the row: route,
-    window, CAS and fold are columns; the substrate IS the fold
-    (Ar = the canonical core, Ar*pur the purified span)."""
-    return (f"{METHOD_NAMES[k.method]}, {MASK_NAMES[k.mask]}, "
-            f"{START_NAMES[k.start]}")
+    """The method column: the objective + its restriction only (the
+    start rides in the window cell, the substrate in the fold
+    column; an unrestricted optimizer names nothing beyond its
+    method)."""
+    name = METHOD_NAMES[k.method]
+    if k.method != "casci" and k.mask is not None:
+        name += f", {MASK_NAMES[k.mask]}"
+    return name
 
 
 def _run(p: dict | None) -> dict | None:
@@ -105,10 +108,14 @@ def _e0(p: dict) -> float:
         else float(p["energies_pyscf"][0])
 
 
+def _num(v, fmt) -> str:
+    """A numeric cell, or the em-dash when absent/NaN."""
+    return format(v, fmt) if isinstance(v, float) and v == v else DASH
+
+
 def _row(k, p, anchor, spec) -> str:
-    """One optimizer run cell in the ladder columns -- every run cell
-    a row, fully named (no collapse: the absorbed rows' conv and
-    meters were being hidden)."""
+    """One run cell in the ladder columns -- every run cell a row,
+    fully identified (method, route, window/start, CAS, fold)."""
     route = ("pinned" if k.fold_tag is not None and k.substrate == "pur"
              else "free")
     fold = fold_col(k, spec)
@@ -121,11 +128,13 @@ def _row(k, p, anchor, spec) -> str:
         ptp = float(np.ptp(p["energies_pyscf"]))   # the SA root set
     note = "cycle cap" if p.get("cycles") == 200 else ""
     cells = [
-        _method(k), route, k.span_label, cas_label(k), fold,
-        f"{p['n_det']:,}",
+        _method(k), route, f"{k.span_label} / {START_NAMES[k.start]}",
+        cas_label(k), fold, f"{p['n_det']:,}",
         f"{e:.4f}", f"{de * 1e3:+.1f}", f"{e * EV:.4f}",
         f"{de * EV:+.4f}", conv_cell(p), l2_text(p),
-        f"{ptp:.0e}" if ptp is not None else DASH,
+        _num(ptp, ".0e"),
+        _num(p.get("win_lz"), ".0e"),
+        _num(p.get("win_lperp"), ".0e"),
         comm_cell(p, "comm_norm_h_lz", "res_h_lz"),
         comm_cell(p, "comm_norm_h_l2", "res_h_l2"),
         note,
@@ -137,11 +146,12 @@ def _row(k, p, anchor, spec) -> str:
 
 
 def _rows(keys, cells, anchor, spec) -> list[str]:
-    """Every OPTIMIZER run cell of the key set, in declaration order
-    (CASCI cells are the survey's and the CAS ladder's story)."""
+    """Every RUN cell of the key set except NO starts (the
+    occupation-group windows -- diagnostics, not ladder rows), in
+    the given order."""
     return [_row(k, p, anchor, spec)
             for k in keys
-            if k.method != "casci"
+            if k.start != "no"
             and (p := _run(cells.get(k.address))) is not None]
 
 
@@ -149,76 +159,78 @@ def _anchor_row(anchor: float) -> str:
     """The ROHF anchor row: ΔE's zero (the caption states it)."""
     cells = ["ROHF (anchor)", "—", "—", "—", "—", "—",
              f"{anchor:.4f}", "0", f"{anchor * EV:.4f}", "+0.0000",
-             DASH, DASH, DASH, DASH, DASH, "forced filling"]
+             DASH, DASH, DASH, DASH, DASH, DASH, DASH, "forced filling"]
     for i in (6, 8):
         cells[i] = minus(cells[i])
     return "| " + " | ".join(cells) + " |"
 
 
-def _caption(anchor: float) -> list[str]:
-    return ["Optimizer rows, every CAS window · ΔE vs the ROHF "
-            f"anchor ({anchor:.4f} Eh) · source `cells.json` "
-            "(as-run)."]
-
-
 def ladder_section(spec, cells, anchor) -> list[str]:
-    """THE METHOD LADDER: one table for the whole atom -- the primary
-    window's optimizer grid (the ROHF anchor row leading), then every
-    lane window whose route twins ran, window families separated by
-    the rule row.  Gated planned windows follow as pointer lines; a
-    window with no optimizer run cells is not this table's story."""
-    from atomterm.cases import scenarios_for
-    from atomterm.cells import void_reason
+    """THE LADDER: one table for the whole atom.  Families in
+    declaration order, separated by the rule row -- the lattice
+    spans (CI only), the primary window (each fold group's CASCI
+    BESIDE its optimizer variants), then every lane window whose
+    route twins ran (the pinned and free CI, the free CASSCF/SA, the
+    pinned SA).  The ROHF anchor row leads; NO-start cells are not
+    ladder rows; a lane family without run optimizer twins is not
+    this table's story yet."""
+    from atomterm.cells import lattice_keys
 
-    body = [_anchor_row(anchor), *_rows(grid_keys(spec), cells,
-                                        anchor, spec)]
+    body: list[str] = []
+    seen: set[str] = set()
+
+    def _fam(keys) -> None:
+        rows = _rows([k for k in keys
+                      if k.address not in seen and k.start != "no"],
+                     cells, anchor, spec)
+        seen.update(k.address for k in keys)
+        if rows:
+            body.extend([RULE] if body else [])
+            body.extend(rows)
+
+    for span in dict.fromkeys(k.window for k in lattice_keys(spec)):
+        _fam([k for k in lattice_keys(spec) if k.window == span])
+
+    # the primary family: fold groups in declaration order, each
+    # group's CASCI beside its optimizer variants
+    grid = [k for k in grid_keys(spec) if k.start != "no"]
+    groups: dict[str, list] = {}
+    for k in grid:
+        groups.setdefault(fold_col(k, spec), []).append(k)
+    for keys in groups.values():
+        _fam(keys)
+
     routes = route_keys(spec)
-    families = []
     for leg in [k for k in routes
                 if k.substrate == "pur" and k.method == "sa-casscf"]:
-        twins = [k for k in routes
-                 if k.window == leg.window and k.method != "casci"]
-        if any(_run(cells.get(k.address)) for k in twins):
-            families.append(_rows(twins, cells, anchor, spec))
-    for fam in families:
-        body += [RULE, *fam]
+        twins = [k for k in routes if k.window == leg.window]
+        if any(k.method != "casci" and k.start != "no"
+               and _run(cells.get(k.address)) for k in twins):
+            _fam([k for k in twins if k.start != "no"])
 
-    out = ["## Method ladder", "", *_caption(anchor), "",
-           HEAD, SEP, *body]
+    out = [BEGIN, "## Method ladder", "",
+           "Every run cell, ROHF anchor to the pinned twins · ΔE vs "
+           f"the ROHF anchor ({anchor:.4f} Eh) · source `cells.json` "
+           "(as-run).", "", HEAD, SEP, _anchor_row(anchor), *body, END]
 
-    scens = scenarios_for(spec)
     for w in spec.planned_windows:
         keys = window_grid(spec, w)
-        if not any(k.method != "casci" and _run(cells.get(k.address))
-                   for k in keys):
-            out += ["", POINTER.format(atom=spec.symbol, window=w)]
+        if not any(k.method != "casci" and k.start != "no"
+                   and _run(cells.get(k.address)) for k in keys):
+            out[-1:-1] = ["", POINTER.format(atom=spec.symbol, window=w)]
     return out
 
 
 def main(atom: str) -> None:
-    """Rebuild ``<atom>``'s method-ladder section from cells.json under
-    the render contract (the declared windows derive from the
-    CaseSpec; the TABLES edit protocol's structural checks; verified
-    move)."""
+    """Rebuild ``<atom>``'s ladder block (the one table) from
+    cells.json under the TABLES edit protocol (the marker pair;
+    structural checks; verified move)."""
     src = Path(f"elements/{atom}/TABLES.md")
     data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
     cells, anchor = data["cells"], data["rohf_energy"]
     spec = CAMPAIGN[atom]
 
-    text = src.read_text()
-    if text.count(BOUNDARY) != 1:
-        sys.exit(f"{src}: no {BOUNDARY!r} boundary -- place the "
-                 "section family first (the atom's pass)")
-    first = re.search(r"^## Method ladder", text, re.M)
-    if first is None:
-        sys.exit(f"{src}: no '## Method ladder' section to replace")
-
     body = "\n".join(ladder_section(spec, cells, anchor))
-    # the splice eats EVERYTHING from the first ladder heading to the
-    # boundary -- historical section forms cannot survive a render
-    new = text[:first.start()] + body + "\n\n" \
-        + text[text.index(BOUNDARY):]
-    assert new.count("\n## Method ladder\n") == 1
 
     # structural assertions (the TABLES protocol): no pending rows,
     # no starred gauge numbers, every table row well-formed
@@ -228,14 +240,11 @@ def main(atom: str) -> None:
         if line.startswith("|"):
             assert line.count("|") == HEAD.count("|"), line
 
-    tmp = src.with_suffix(".md.tmp")
-    tmp.write_text(new)
-    assert tmp.read_text() == new
-    tmp.replace(src)
+    replace_block(src, BEGIN, END, body)
     n = sum(1 for line in body.splitlines()
-            if line.startswith(("| CASSCF", "| SA-CASSCF")))
-    print(f"{src}: method ladder rendered from cells.json "
-          f"({n} optimizer rows, ladder shape)")
+            if line.startswith(("| CASCI", "| CASSCF", "| SA-CASSCF")))
+    print(f"{src}: ladder rendered from cells.json "
+          f"({n} run rows, one table)")
 
 
 if __name__ == "__main__":

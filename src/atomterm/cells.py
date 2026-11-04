@@ -745,6 +745,8 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
         "converged": True,
         "cycles": data.cycles or None,
         "conv_dE": data.conv_dE,
+        "win_lz": float("nan"),
+        "win_lperp": float("nan"),
     }
     if mol is None or mf is None or key.fold == "frac":
         # frac cells ran under the fractional reference (not this mf);
@@ -774,6 +776,12 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
     parts = build_operator_parts(mol, mf, c_act, ncore, na, nb,
                                  c_core=c_core)
     dets = parts["dets"]
+    # the one-particle closure certificate of the stored window (the
+    # span projector's commutators -- cheap at any sector size)
+    from atomterm.operators import window_closure
+    closure = window_closure(mol, c_act)
+    out["win_lz"] = float(closure["lz"])
+    out["win_lperp"] = float(closure["lperp"])
     k = int(np.argmin(np.atleast_1d(data.energies)))
     w = ci_in_detbasis_order(np.asarray(data.ci)[k], ncas, na, nb)
     apply_l2 = operator_apply(dets, one_body=parts["L2"][0],
@@ -849,8 +857,9 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
 # shared by the writer (:func:`run_lane_cell`) and the reader
 # (:func:`load_lane_cell`); method-dependent extras are optional
 _LANE_FIELDS = ("term", "energies", "total", "ptp", "l2", "s2",
-                "n_det", "anchor_dev", "comm_norm_h_lz",
-                "comm_norm_h_l2", "res_h_lz", "res_h_l2", "fold")
+                "n_det", "anchor_dev", "win_lz", "win_lperp",
+                "comm_norm_h_lz", "comm_norm_h_l2", "res_h_lz",
+                "res_h_l2", "fold")
 # optional fields, loaded when present: the SA ensemble and, on
 # optimizer cells, the converged FULL MO matrix (restart +
 # orbital-level route comparisons) with the optimizer's cycle count
@@ -923,7 +932,8 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     from atomterm.irreps import (IRREP_IDS, branch_d2h, det_irreps,
                                  orb_irreps)
     from atomterm.operators import (build_operator_parts,
-                                    ci_in_detbasis_order)
+                                    ci_in_detbasis_order,
+                                    window_closure)
     from atomterm.detbasis import sector_dimension, slater_condon_matrix
     from atomterm.windows import build_full_mo, select_valence_ao
 
@@ -1080,6 +1090,9 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         total = ensemble
     else:
         total = float(es.mean() + closed_shell_core_energy(mf, c_fold))
+    # the one-particle closure certificate of the READOUT window (the
+    # span projector's commutators -- gauge-invariant, any size)
+    closure = window_closure(mol, c_read)
     payload = {
         "cell": key.address,
         "term": [int(L), str(parity)],
@@ -1090,6 +1103,8 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         "s2": s2s,
         "n_det": int(sector_dimension(ncas, na, nb)),
         "anchor_dev": float(anchor_dev),
+        "win_lz": float(closure["lz"]),
+        "win_lperp": float(closure["lperp"]),
         "comm_norm_h_lz": comm_lz,
         "comm_norm_h_l2": comm_l2,
         "res_h_lz": float(res_lz),

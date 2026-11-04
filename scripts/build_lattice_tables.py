@@ -104,6 +104,9 @@ def run(atom: str) -> None:
         sys.exit(f"no declared lattice for {atom} "
                  "(CaseSpec.lattice_windows is empty)")
     src = Path(f"elements/{atom}/TABLES.md")
+    if "<!-- ladder:begin -->" in src.read_text():
+        print(f"{src}: the one ladder table carries the rows -- skipped")
+        return
     cells = json.loads(
         Path(f"elements/{atom}/cells.json").read_text())["cells"]
     text = src.read_text()

@@ -355,8 +355,8 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
   sc_3d3p4s@1s2s2p3s_5-4_casci_ao_-_pol_avg    E         -759.78987426
   sc_3d3p4s@1s2s2p3s_5-4_casscf_ao_-_pol_avg   E         -759.85107663
   sc_3d3p4s@1s2s2p3s_5-4_sa-casscf_ao_-_pol_avg E         -759.82662465
-  sc_3d3p4s@1s2s2p3s_5-4_sa-casscf_ao_-_pur_avg E_term    -759.82662459  ptp 7.5e-07  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']
+  sc_3d3p4s@1s2s2p3s_5-4_sa-casscf_ao_-_pur_avg E_term    -759.82662458  ptp 3.4e-06  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']
   sc_3s3p3d@1s2s2p4s_5-4_casci_ao_-_pol_avg    E         -759.78998491
   sc_3s3p3d@1s2s2p4s_5-4_casscf_ao_-_pol_avg   E         -759.85093550
   sc_3s3p3d@1s2s2p4s_5-4_sa-casscf_ao_-_pol_avg E         -759.82662470
-  sc_3s3p3d@1s2s2p4s_5-4_sa-casscf_ao_-_pur_avg E_term    -759.82662459  ptp 1.7e-07  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']
+  sc_3s3p3d@1s2s2p4s_5-4_sa-casscf_ao_-_pur_avg E_term    -759.82662459  ptp 1.0e-06  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']

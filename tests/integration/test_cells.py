@@ -1010,14 +1010,14 @@ def test_lattice_emitter_deterministic():
 
 
 @fast
-def test_method_ladder_row_policy():
-    """The method ladder (ONE big table, the ladder grammar): byte-
-    deterministic; EVERY optimizer run cell a row, fully named
-    (method, mask, start -- the collapse died with the conv/meters it
-    hid); CASCI cells are never rows; the ROHF anchor leads; ptp is
-    computed where the payload carries a root set; the note column
-    carries the cycle cap; gated planned windows follow as pointer
-    lines."""
+def test_method_ladder_one_table():
+    """THE LADDER (one table per atom, between the markers): byte-
+    deterministic; EVERY run cell a row -- CASCI beside its optimizer
+    variants, the method bare + restriction only; the window cell
+    carries the start (slash form); NO starts are not ladder rows;
+    the ROHF anchor leads; ptp computes where a root set exists; the
+    closure columns carry the span certificate; the note column
+    carries the cycle cap; gated planned windows follow as pointers."""
     import importlib.util
     from pathlib import Path as _Path
 
@@ -1034,30 +1034,31 @@ def test_method_ladder_row_policy():
     def payload(e, roots=1):
         return {"energies_pyscf": [e] * roots, "n_det": 90,
                 "ground_l2": 12.0, "comm_norm_h_lz": 1e-9,
-                "comm_norm_h_l2": 1e-8}
+                "comm_norm_h_l2": 1e-8, "win_lz": 1e-15,
+                "win_lperp": 2e-15}
 
     def body(cells):
         return "\n".join(mod.ladder_section(cs, cells, -848.4065))
 
+    # every cell ran: CI rows render beside the optimizers, NO never
     agree = {k.address: payload(-848.4) for k in keys}
     assert body(agree) == body(agree)
-    rows = [r for r in body(agree).splitlines() if r.startswith("|")]
-    assert rows[2].startswith("| ROHF (anchor) |")     # ΔE's zero
-    # every optimizer cell its OWN row -- AO and MO both render even
-    # when they agree (the collapse is dead)
-    n_opt = len([k for k in keys
-                 if k.method != "casci"
-                 and k.start in ("ao", "mo")
-                 and "no" not in k.window])
-    assert sum(r.startswith("| CASSCF, free, AO |") for r in rows) >= 1
-    assert sum(r.startswith("| CASSCF, free, MO |") for r in rows) >= 1
-    assert not any(r.startswith("| CASCI") for r in rows)
+    text = body(agree)
+    assert text.count(mod.BEGIN) == 1 and text.count(mod.END) == 1
+    rows = [r for r in text.splitlines() if r.startswith("|")]
+    assert rows[2].startswith("| ROHF (anchor) |")
+    ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / AO |")]
+    assert len(ci) == 4            # the four fold variants' CI rows
+    assert not any("/ NO |" in r for r in rows)   # NO starts excluded
+    opt = [r for r in rows
+           if r.startswith("| CASSCF | free | 3d4s / AO |")]
+    assert len(opt) == 2 and not any("·lane" in r for r in opt)  # Ar + Ar·pur substrates
+    # the closure columns render (values here)
+    assert opt[0].split("|")[14].strip() == "1e-15"
+    assert opt[0].split("|")[15].strip() == "2e-15"
 
-    # a void cell is not a run either
-    void = dict(agree)
-    void[keys[0].address] = {"void_reason": "scenario"}
-
-    # ptp computed where a root set exists; single roots stay dash
+    # ptp computed where a root set exists; single roots stay dash;
+    # the cap notes the row
     sa = next(k for k in keys if k.method == "sa-casscf"
               and k.mask is None and k.start == "ao"
               and k.substrate == "pol")
@@ -1065,36 +1066,30 @@ def test_method_ladder_row_policy():
     traced[sa.address] = {**payload(-848.4, roots=5), "conv_dE": 2.3e-9,
                           "cycles": 5}
     row = [r for r in body(traced).splitlines()
-           if r.startswith("| SA-CASSCF, free, AO | free | 3d4s |")
-           and "·lane" not in r][0]
-    assert "| 1e-9/5 |" in row and "| 0e+00 |" in row  # conv + ptp(=0)
-    # the cycle cap notes the row
+           if r.startswith("| SA-CASSCF | free | 3d4s / AO |")][0]
+    assert "| 1e-9/5 |" in row and "| 0e+00 |" in row
+    assert opt[0].split("|")[13].strip() == "—"  # the single root: no set
     capped = dict(traced)
     capped[sa.address] = {**capped[sa.address], "cycles": 200}
     assert "cycle cap" in [r for r in body(capped).splitlines()
-                           if r.startswith("| SA-CASSCF, free, AO | free "
-                                           "| 3d4s |") and "·lane" not in r
-                           ][0]
-    single = [r for r in body(agree).splitlines()
-              if r.startswith("| CASSCF, free, AO | free | 3d4s |")
-              and "·lane" not in r][0]
-    assert single.split("|")[13].strip() == "—"     # one root: no set
+                           if r.startswith("| SA-CASSCF | free "
+                                           "| 3d4s / AO |")][0]
 
-    # no optimizer run cells anywhere: the table is the anchor alone,
-    # the planned pointers follow
-    only_ci = {k.address: payload(-848.4) for k in keys
-               if k.method == "casci"}
-    text = body(only_ci)
-    assert "regen_cells.py Ti --window 3d4s" in text
+    # no optimizer run cells anywhere: CI rows still render, the
+    # planned pointers follow the table
+    text = body({k.address: payload(-848.4) for k in keys
+                 if k.method == "casci"})
+    assert "| CASCI | free | 3d4s / AO |" in text
+    assert "regen_cells.py Ti --window 3d4d" in text
     assert "| CASSCF" not in text and "| SA-CASSCF" not in text
 
 
 @fast
 def test_method_ladder_lane_families():
-    """The big table carries the CAS WINDOWS axis: every lane window
-    whose route twins ran renders its free/pinned rows in the ONE
-    table, families separated by the rule row; un-run lane windows
-    are absent."""
+    """The one table carries the lane families: pinned CI, free CI,
+    the free CASSCF/SA, and the pinned SA in one family block; the
+    tagged folds carry the lane marker; un-run lane families are
+    absent; families are separated by the rule row."""
     import importlib.util
     from pathlib import Path as _Path
 
@@ -1107,40 +1102,45 @@ def test_method_ladder_lane_families():
 
     cs = CAMPAIGN["Sc"]
 
-    def twin_payload(e, pinned=False):
-        p = {"n_det": 204490, "comm_norm_h_lz": float("nan"),
+    def p(e, pinned=False, ci=False):
+        d = {"n_det": 204490, "comm_norm_h_lz": float("nan"),
              "comm_norm_h_l2": float("nan"), "res_h_lz": 1e-14,
-             "res_h_l2": 2e-14, "conv_dE": 1e-9, "cycles": 16,
-             "ground_l2": 6.0}
+             "res_h_l2": 2e-14, "win_lz": 1e-15, "win_lperp": 1e-15}
         if pinned:
-            p.update({"total": e, "l2": [6.0] * 5, "ptp": 5e-8,
+            d.update({"total": e, "l2": [6.0] * 5, "ptp": 5e-8,
+                      "energies": [e] * 5})
+        elif ci:
+            d.update({"total": e, "l2": [6.0] * 5, "ptp": 5e-8,
                       "energies": [e] * 5})
         else:
-            p["energies_pyscf"] = [e]
-        return p
+            d["energies_pyscf"] = [e]
+            d["ground_l2"] = 6.0
+        return d
 
     routes = route_keys(cs)
-    twins = [k for k in routes if k.window == "3d3p4d@semi"
-             and k.method != "casci"]
-    assert len(twins) == 3                     # CASSCF/SA free + SA pinned
-    cells = {k.address: twin_payload(-759.85, pinned=(k.substrate == "pur"))
-             for k in twins}
+    fam = [k for k in routes if k.window == "3d3p4d@semi"]
+    cells = {k.address: p(-759.85,
+                          pinned=(k.substrate == "pur"
+                                  and k.method == "sa-casscf"),
+                          ci=(k.method == "casci"))
+             for k in fam}
     text = "\n".join(mod.ladder_section(cs, cells, -759.7363))
     lines = text.splitlines()
-    # one table, the anchor leads, the lane rows follow the rule
     assert sum(l.startswith("| method |") for l in lines) == 1
-    assert lines[6].startswith("| ROHF (anchor) |")
+    assert lines[7].startswith("| ROHF (anchor) |")
     rules = [l for l in lines
              if set(l.replace("|", "").replace(" ", "")) == {"-"}]
-    assert len(rules) == 2    # the header SEP + one family rule
-    assert sum(l.startswith("| CASSCF, free, AO | free | 3d3p4d |")
+    assert len(rules) == 1    # the SEP only: the lone family leads
+    assert sum(l.startswith("| CASCI | pinned | 3d3p4d / AO |")
                for l in lines) == 1
-    assert sum(l.startswith("| SA-CASSCF, free, AO | pinned |")
+    assert sum(l.startswith("| CASCI | free | 3d3p4d / AO |")
                for l in lines) == 1
-    assert "| Ar·lane |" not in text           # un-run families absent
-    # the tagged folds carry the lane marker; the pinned row keeps
-    # its stored ptp
-    row = [l for l in lines if l.startswith(
-        "| SA-CASSCF, free, AO | pinned |")][0]
-    assert "semi·lane" in row and "| 5e-08 |" in row
+    assert sum(l.startswith("| CASSCF | free | 3d3p4d / AO |")
+               for l in lines) == 1
+    assert sum(l.startswith("| SA-CASSCF | pinned | 3d3p4d")
+               for l in lines) == 1
+    assert "·lane" in [l for l in lines
+                       if l.startswith("| SA-CASSCF | pinned | 3d3p4d")
+                       ][0]
+    assert "3d3p / AO" not in text       # un-run families absent
 
