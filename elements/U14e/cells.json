@@ -1007,5 +1007,11 @@
       "cell": "u14e_8f9f10f11f12d13dno6_4-0_sa-casscf_no_frozen_pur_avg",
       "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
     }
+  },
+  "uhf": {
+    "e_tot": -50.38881342598943,
+    "s2": 6.228941144786871,
+    "sigma_min": 0.8834991118737197,
+    "converged": true
   }
 }

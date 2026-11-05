@@ -206,12 +206,16 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     """THE LADDER: one table for the whole atom.  Families in
     declaration order, separated by the rule row -- the lattice
     spans (CI only), the primary window (each fold group's CASCI
-    BESIDE its optimizer variants), then every lane window whose
-    route twins ran (the pinned and free CI, the free CASSCF/SA, the
-    pinned SA).  The ROHF anchor row leads, the UHF anchor row
-    follows when the store carries the record; NO-start cells are
-    not ladder rows; a lane family without run optimizer twins is
-    not this table's story yet."""
+    BESIDE its optimizer variants), the planned windows whose CASCI
+    anchors are read (the anchor-first protocol's readable half: the
+    tier families render their anchor rows while the optimizer cells
+    stay void at the key, ``--full`` materializing them into the same
+    families), then every lane window whose route twins ran (the
+    pinned and free CI, the free CASSCF/SA, the pinned SA).  The ROHF
+    anchor row leads, the UHF anchor row follows when the store
+    carries the record; NO-start cells are not ladder rows; a lane
+    family without run optimizer twins is not this table's story
+    yet."""
     body: list[str] = []
     seen: set[str] = set()
 
@@ -244,15 +248,20 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
                and payload_of(cells, k) for k in twins):
             _fam([k for k in twins if k.start != "no"])
 
+    # the planned windows whose CASCI anchors are read: the tier
+    # families (the whole window's non-NO cells at once -- the optimizer
+    # cells are void at the key under the anchor-first gate and join
+    # the family when --full materializes them)
+    for w in spec.planned_windows:
+        _fam([k for k in window_grid(spec, w) if k.start != "no"])
+
     out = [BEGIN, HEAD, SEP, _anchor_row(anchor)]
     if uhf is not None:
         out.append(_uhf_anchor_row(anchor, uhf))
     out.extend([*body, END])
 
     for w in spec.planned_windows:
-        keys = window_grid(spec, w)
-        if not any(k.method != "casci" and k.start != "no"
-                   and payload_of(cells, k) for k in keys):
+        if not any(payload_of(cells, k) for k in window_grid(spec, w)):
             out[-1:-1] = ["", POINTER.format(atom=spec.key, window=w)]
     return out
 
