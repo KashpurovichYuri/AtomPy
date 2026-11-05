@@ -235,18 +235,30 @@ carries a number only when the number IS the fact.
 
 ## Tests
 
-`pytest` runs 253 tests (~25 min unloaded; the CAS-ladder fixture in
-`test_symm_tm` dominates at ~15 min; slower under load). The fast
-tier: `pytest -m fast` = 164 tests in seconds (machine-light
-selection).
+`pytest` runs 253 tests. The fast tier: `pytest -m fast` = 164
+tests in seconds (machine-light selection). The heavy tail is
+HOURS-class now (the `test_symm_tm` fixture carries the (8,13)
+SA-leg optimizer pairs, 1–2 h each — the old "~15 min" record
+predated their admission and was never re-priced; caught 2026-11-05).
 **The per-commit gate** (user-directed 2026-11-04): the fast tier
 plus the diff's targeted files, together 5–10 minutes MAXIMUM — the
-suite's purpose is correctness confidence, not endurance. The heavy
-fixtures run ONCE at the wave close, detached (`setsid`), with
-`OMP_NUM_THREADS` capped (8): uncapped, 255 BLAS threads thrash the
-box and turn 25 minutes into an hour. Targeted files or `-m fast`
-are fine elsewhere. A rename round touching stage tags owes a
-FULL suite run — slow-only lookups are invisible to `-m fast`.
+suite's purpose is correctness confidence, not endurance.
+**The full-suite run is RETIRED** (user-directed 2026-11-05): no
+wave-close full run — the gates close a wave. A heavy pin runs
+ISOLATION, on evidence (a targeted red, a touched file, an open
+physics question), detached (`setsid`) with `OMP_NUM_THREADS`
+capped (8): uncapped, 255 BLAS threads thrash the box. A rename
+round touching stage tags owes the slow-tier FILES carrying the
+renamed lookups — targeted, not the whole suite. A red alone is
+never the verdict — isolation reruns are.
+**The boundary the suite guards** (user-directed 2026-11-05):
+tests verify CONSTRUCTIONS at pinned small sizes — seconds to
+minutes; heavy compute belongs to the ATOMIC CALCULATIONS (the
+campaign runs — the project's goal), priced per batch and gated at
+doors. A test that needs hours is a run in a test costume: the one
+known offender (the `test_symm_tm` SA legs) re-scopes to
+store-anchored verification — fresh CI legs stay, the SA verdicts
+load the committed route-batch stores and re-verify their meters.
 
 Layout and tiers:
 

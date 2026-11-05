@@ -7,24 +7,20 @@ dies).
 
 ## Tickets
 
-Queue decision (2026-11-01, user): ticket 31 (U) runs AFTER the
-ticket-32 close -- the C/Si/Sc/Ti tables land in their redesigned
-contract first, and U inherits the settled table grammar and
-declaration path as a fresh wave. (live)
-
 - [29 — gated measurement batches](tickets/29-ti-first.md): the T2 Ti
   cells + the M store migration; runs only on the user's enable.
-- [31 — the ECP wave](tickets/31-ecp-wave.md): declare the ECP atom in
-  `CAMPAIGN`; opens on the user's go.
-- [32 — the symmetry lane](tickets/32-symmetry-lane.md): D2h-pinned CI
-  as the second route (compare, never merge) — step 8 deep in flight:
-  the tables grammar + the CI window survey landed, the ROUTE AXIS
-  executed on Sc (the twins run; the routes agree at SA on m-complete
-  windows); next: sparse meters, saturation legs, the Ti/C/Si passes,
-  then the wave close.
+- [31 — the ECP wave / U14e](tickets/31-ecp-wave.md): the door plan
+  SETTLED (2026-11-05, in the ticket) — opens NOW: ticket 32 closed
+  2026-11-05 (git history is the archive; the closing record lives
+  in the deleted ticket's last commit and map.md's resolved entries).
 - [33 — the symmetry-breaking anatomy deliverable](tickets/33-symmetry-anatomy.md):
   design-first — the frozen-landscape tables that replace the retired
   scan pointers.
+
+Resolved: ticket 32 (the symmetry lane) — the campaign complete
+(C/Si/Sc/Ti on the one table, the route axis, the UHF anchors), the
+wave closed 2026-11-05 on the gates (the full-suite run retired by
+user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
@@ -68,6 +64,14 @@ declaration path as a fresh wave. (live)
   docstrings carry the physics, not the residual class the item
   targeted; the unknown-atom CLI guard dedup -- four lines, two
   CLIs, a dedup that adds an import for a TODO's worth of code.
+- The `test_symm_tm` SA legs mispriced as tests (2026-11-05): the
+  fixture's SA-level pins re-run campaign-scale optimizer pairs
+  (1-2 h class) fresh every invocation -- a run in a test costume.
+  RE-SCOPE (the AGENTS Tests boundary, user-directed 2026-11-05):
+  fresh CI legs stay; the SA verdicts become STORE-ANCHORED (load
+  the committed route-batch stores, re-verify the meters -- no
+  optimizer reruns).  Lands at the file's next touch (the U14e wave
+  needs no bump from it; the verdicts already live in the stores).
 
 - The ladder-wave review round (2026-11-01, `701b31c..c02d0c6`, both
   axes): applied — the module-docstring lockstep, the shared
