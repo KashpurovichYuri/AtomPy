@@ -263,31 +263,37 @@ def main() -> None:
             except (json.JSONDecodeError, KeyError) as e:
                 sys.exit(f"{store} is unreadable ({e!r}) -- rerun "
                          "unfiltered to rebuild the store")
+        scens = scenarios_for(spec)
         mol, mf = run_rohf(cfg, str(out / "rungs" / "rohf.chk"),
                            ref=spec.ref)
         if not mf.converged:
+            Path(out / "rungs" / "rohf.chk").unlink(missing_ok=True)
             sys.exit(f"{name}: the reference ROHF did not converge "
                      f"(E = {mf.e_tot:.8f}) -- the SCF class or the "
                      "basin gate needs revisiting before any cell runs")
         print(f"ROHF E = {mf.e_tot:.8f} Eh", flush=True)
         base = CellKey(name, "".join(spec.shell_patterns), sector)
         act_idx = select_valence_ao(mol, base.shell_patterns)
-        # the fractional-occupation reference is built only when a frac
-        # fold runs (a voided frac class -- e.g. the ECP atom's
-        # unconverged basin -- skips the head; --full materializing a
-        # frac cell brings the head back, guard included)
+        # the fractional-occupation reference is built only when a
+        # NON-VOID frac fold runs (a voided frac class -- e.g. the ECP
+        # atom's unconverged basin -- skips the head; --full
+        # materializing a frac cell brings the head back, guard
+        # included)
         mf_f = None
-        if any(k.fold == "frac" for k in queue):
+        if any(k.fold == "frac" and not void_reason(k, scens)
+               for k in queue):
             _, mf_f = run_frac_occ(cfg, str(out / "rungs" / "fracocc.chk"),
                                    spec.nelec_act, len(act_idx),
                                    open_idx=act_idx, ref=spec.ref)
             if not mf_f.converged:
+                # a diverged SCF must not leave a chk the trusted cache
+                # would load on the next run
+                Path(out / "rungs" / "fracocc.chk").unlink(missing_ok=True)
                 sys.exit(f"{name}: the fractional-occupation reference "
                          f"did not converge (E = {mf_f.e_tot:.8f}) -- "
                          "the frac folds would be poisoned; fix the SCF "
                          "class first")
 
-        scens = scenarios_for(spec)
         lane_sub = None
         for key in queue:
             reason = void_reason(key, scens)

@@ -72,6 +72,17 @@ user decision; the partial verdict 91/91-isolation-green).
   the committed route-batch stores, re-verify the meters -- no
   optimizer reruns).  Lands at the file's next touch (the U14e wave
   needs no bump from it; the verdicts already live in the stores).
+- The U14e frac reference's MOM-anchored fix (2026-11-05, evidence in
+  ticket 31): the fractional block's cycle-to-cycle gauge is
+  unanchored on the ECP atom (DIIS diverges; Newton collapses to
+  -12.74 vs the aufbau RHF -49.04; Newton-from-ROHF does not leave
+  the seed) -- the runner docstring's prescribed remedy is MOM-style
+  anchoring of the character-selected block.  Until then the
+  `frac-reference-unconverged` scenario holds the frac folds void.
+  RIDES THE SAME VISIT: the diverged-reference poison-chk hazard
+  (a non-converged SCF leaves a chk the trusted cache would load;
+  the regen head's guards unlink at refusal -- the deeper fix is
+  writers persisting only converged chks).
 
 - The ladder-wave review round (2026-11-01, `701b31c..c02d0c6`, both
   axes): applied — the module-docstring lockstep, the shared

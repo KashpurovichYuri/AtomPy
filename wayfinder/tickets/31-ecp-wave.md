@@ -99,11 +99,41 @@ campaign's output; `run_u*` stays the frozen record until then).
   end (mol builds ECP-honest: nelectron 14, ncore 5; the sector and
   the label<->patterns round trip; the primary grid = 33 cells, the
   planned tiers = 132). NO SCF anywhere.
-- Part 2 (next): THE DOOR PLAN ABOVE (cache-warm -> census ->
-  anchor-first regen -> the retirement); the term tables and the
-  landscape survey stay gated on the user's enable.
-- run_u* + the two stage adapters retire TOGETHER when the tables
-  regenerate through the modern path (their second consumer's death).
+- Part 2 EXECUTING (2026-11-05, the door plan; commits 408387b,
+  bca1057):
+  1. THE KEY RENAME: `CAMPAIGN['U14e']` (symbol stays `U`; tag stays
+     `U_stuttgart78_dyall`); `elements/U14e/` born, `elements/U/`
+     frozen. CaseSpec gained `key` (the element-dir contract, one
+     lookup: `campaign_spec`); CellKey admits campaign keys.
+  2. CACHE-WARM: the record's chk copied to
+     `elements/U14e/rungs/rohf.chk`; the trusted load reads
+     E = -50.38185233 (the record's value).
+  3. THE CENSUS (five arms, Newton class — the door plan's flag
+     SPENT on evidence: all five plain-DIIS arms diverge,
+     E ~ +2.4e3..+3.0e3, so the census learned
+     `ref.conv_accelerator`): FOUR arms identical to 1e-6 —
+     E = -50.38881343, conv, <S^2> = 6.2289 (exact quartet 6;
+     mildly broken), sigma_min = 0.8835; huckel non-converged (not a
+     second basin). SINGLE BASIN, and 6.96 mEh BELOW the ROHF — the
+     open physics question ANSWERED for the UHF class: the
+     mean-field minimum is the mildly-broken determinant, not the
+     ⁵S° eigenstate-determinant. `occ_e_ref_uhf = -50.38881343`
+     declared. (The ROHF-class broken-landscape legs stay gated.)
+  4. THE FRAC REFERENCE HAS NO CONVERGED BASIN on the ECP atom
+     (measured): DIIS diverges (+137); Newton collapses (-12.74 vs
+     the aufbau RHF -49.04); Newton-from-ROHF does not leave the
+     seed. The `frac-reference-unconverged` scenario voids the five
+     frac-fold cells; MOM-anchored selection is the recorded fix
+     (map Issues). The regen head builds the frac reference only
+     when a non-void frac fold runs; both head guards now unlink a
+     diverged reference's chk (the trusted-cache poison class).
+  5. THE ANCHOR-FIRST REGEN: the gate voids the whole optimizer
+     class (145 cells, all windows incl. the NO forms) + the frac
+     class → 15 CASCI anchors run. IN FLIGHT (detached; priced on
+     the real primary cell: 272 s, kernel-only payload class).
+- Part 3 (next): uhf_anchor.py U14e → build_methods_tables.py U14e
+  (the first modern U14e TABLE.md) → THE RETIREMENT (G5): `run_u*` +
+  `run_casscf`/`run_sa_casscf` die, `stage_facts`' `c_act` absorbs.
 
 ## References
 
