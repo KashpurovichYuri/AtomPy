@@ -267,8 +267,11 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
         or build one per window from AO labels); ``None`` = free
         optimization.
     weights : sequence of float, optional
-        State-average over these weights. PySCF's SA kernel returns
-        only the ENSEMBLE energy, so per-root energies come from a
+        State-average over these weights. A ONE-root list IS the
+        single root (the plain kernel -- PySCF's SA wrapper cannot
+        einsum the scalar base return); longer lists run the SA
+        kernel, which returns only the ENSEMBLE energy, so per-root
+        energies come from a
         CASCI pass in the SA-converged window
         (``canonicalization = False``: the window reported EXACTLY as
         converged). The returned container pairs those exact per-root
@@ -297,7 +300,10 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
         setattr(mc.fcisolver, k, v)
     if mask is not None:
         mc.uniq_var_indices = types.MethodType(mask, mc)
-    if weights is None:
+    if weights is None or len(weights) == 1:
+        # a one-root SA IS the single root (PySCF's SA wrapper einsums
+        # the energies -- with nroots=1 the base kernel returns a
+        # scalar and the wrapper's 'i' subscript has no axis to walk)
         return _run(mc, 1, chkfile, name, verbose)
     mc.state_average_(list(weights))
     res = _run(mc, len(weights), chkfile, name, verbose)

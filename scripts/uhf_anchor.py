@@ -1,8 +1,9 @@
-"""Warm the UHF anchor record into an atom's cells.json: the gated
-run_uhf (:attr:`ReferenceSpec.occ_e_ref_uhf` -- the census measured
-it, :func:`atomterm.reference.uhf_basin_census`) plus the
-contamination reading.  The ladder builder renders the ``UHF
-(anchor)`` row from this record; re-running is idempotent (the
+"""Warm the UHF anchor record into an atom's cells.json: run_uhf
+(:attr:`ReferenceSpec.occ_e_ref_uhf` gates it where the census shows
+multiple basins -- the census measures, the declaration picks; a
+single-basin atom runs ungated, the census verdict being its guard)
+plus the contamination reading.  The ladder builder renders the
+``UHF (anchor)`` row from this record; re-running is idempotent (the
 cached chk is trusted, the record is overwritten with the same
 numbers).
 
@@ -22,10 +23,6 @@ from atomterm.reference import run_uhf, uhf_contamination  # noqa: E402
 
 def main(atom: str) -> None:
     spec = CAMPAIGN[atom]
-    if spec.ref is None or spec.ref.occ_e_ref_uhf is None:
-        sys.exit(f"{atom}: no UHF gate declared "
-                 "(ReferenceSpec.occ_e_ref_uhf) -- the census runs "
-                 "first, the declaration picks the basin")
     store = Path("elements") / atom / "cells.json"
     data = json.loads(store.read_text())
     chk = str(Path("elements") / atom / "rungs" / "uhf.chk")

@@ -8,6 +8,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 1.4710557360335494e-15,
       "e_ground": -37.431610677487726,
       "energies_pyscf": [
@@ -31,6 +33,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 5.986823152213762e-34,
+        "p": 2.0,
+        "d": 3.854403610054943e-39
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)",
@@ -46,6 +53,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 8.881784197001252e-16,
       "e_ground": -37.43158152516689,
       "energies_pyscf": [
@@ -69,6 +78,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 5.986823152213762e-34,
+        "p": 2.0,
+        "d": 3.854403610054943e-39
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)",
@@ -84,6 +98,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 1.4432899320127035e-15,
       "e_ground": -37.44024429434056,
       "energies_pyscf": [
@@ -107,6 +123,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 3.5844736273381097e-32,
+        "p": 2.000000000000001,
+        "d": 1.6276645713411362e-64
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
@@ -122,6 +143,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 4.584440735784841e-16,
       "e_ground": -37.440370062780886,
       "energies_pyscf": [
@@ -143,6 +166,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000004,
+        "d": 0.0
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
@@ -155,12 +183,14 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 6.661338147750939e-16,
-      "e_ground": -37.44038205289859,
+      "e_ground": -37.4403820528986,
       "energies_pyscf": [
-        -37.4403820528986,
-        -37.4403820528986,
-        -37.4403820528986
+        -37.440382052898606,
+        -37.440382052898606,
+        -37.440382052898606
       ],
       "max_de_vs_pyscf": 7.105427357601002e-15,
       "ground_term": "3P",
@@ -178,6 +208,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000004,
+        "d": 0.0
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
@@ -192,6 +227,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 1.3322676295501878e-15,
       "e_ground": -37.68236461240056,
       "energies_pyscf": [
@@ -213,6 +250,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 2.6015283442441744e-12,
+        "p": 1.999999999996148,
+        "d": 1.2499456242875994e-12
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)"
@@ -225,27 +267,34 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
-      "ortho_err": 6.661338147750939e-16,
-      "e_ground": -37.682391292825066,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 8.881784197001252e-16,
+      "e_ground": -37.68239129282384,
       "energies_pyscf": [
-        -37.682391292825066,
-        -37.682391292825066,
-        -37.682391292825066
+        -37.682391292823844,
+        -37.68239129282384,
+        -37.68239129282384
       ],
-      "max_de_vs_pyscf": 0.0,
+      "max_de_vs_pyscf": 7.105427357601002e-15,
       "ground_term": "3P",
-      "ground_l2": 2.000000000000002,
-      "ground_lz2": 0.0,
+      "ground_l2": 2.0000000000000036,
+      "ground_lz2": 1.0000000000000013,
       "terms": {
         "3P": 3
       },
-      "comm_norm_h_lz": 0.0,
+      "comm_norm_h_lz": 3.1401849173675503e-16,
       "comm_norm_h_l2": 0.0,
-      "win_lz": 3.583802674971042e-15,
-      "win_lperp": 3.469335927874738e-15,
+      "win_lz": 2.493597492070897e-13,
+      "win_lperp": 3.279687229247121e-13,
       "window": {
         "s": 0.0,
         "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.000000000000001,
         "d": 0.0
       },
       "n_dev": 0.0,
@@ -262,28 +311,35 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
-      "ortho_err": 1.1102230246251565e-15,
-      "e_ground": -37.68239129244671,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 1.820906235288325e-15,
+      "e_ground": -37.68239129244672,
       "energies_pyscf": [
-        -37.68239129691323,
-        -37.682391292715344,
-        -37.6823912875072
+        -37.68239129691324,
+        -37.68239129271535,
+        -37.68239128750721
       ],
-      "max_de_vs_pyscf": 4.837708900140569e-09,
+      "max_de_vs_pyscf": 4.837716005567927e-09,
       "ground_term": "3P",
-      "ground_l2": 1.9999999981687537,
-      "ground_lz2": 0.9274198427454978,
+      "ground_l2": 1.9999999981687528,
+      "ground_lz2": 0.9274204505671269,
       "terms": {
         "3P": 3
       },
-      "comm_norm_h_lz": 1.0010481390946678e-10,
-      "comm_norm_h_l2": 4.606077771784352e-20,
-      "win_lz": 7.735907475826574e-05,
-      "win_lperp": 6.845201054422814e-05,
+      "comm_norm_h_lz": 1.0010482053954494e-10,
+      "comm_norm_h_l2": 4.606081465239406e-20,
+      "win_lz": 7.73590747584417e-05,
+      "win_lperp": 6.845201054447347e-05,
       "window": {
         "s": 0.0,
         "p": 1.0,
         "d": 0.0
+      },
+      "electrons": {
+        "s": 1.5211194094992645e-11,
+        "p": 1.999999999895871,
+        "d": 8.891824294620217e-11
       },
       "n_dev": 0.0,
       "configurations": [
@@ -299,7 +355,9 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
-      "ortho_err": 2.160319478873853e-15,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 1.1139446574311075e-14,
       "e_ground": -37.68236462063004,
       "energies_pyscf": [
         -37.6824178814322,
@@ -308,19 +366,24 @@
       ],
       "max_de_vs_pyscf": 5.326080216150331e-05,
       "ground_term": "3P",
-      "ground_l2": 1.999999997726802,
+      "ground_l2": 1.9999999977268024,
       "ground_lz2": 0.0,
       "terms": {
         "3P": 3
       },
-      "comm_norm_h_lz": 8.26999099837918e-12,
-      "comm_norm_h_l2": 2.6334712906294094e-43,
-      "win_lz": 1.227898045640037e-06,
-      "win_lperp": 9.53561629979889e-05,
+      "comm_norm_h_lz": 8.270305016870917e-12,
+      "comm_norm_h_l2": 2.633468285153841e-43,
+      "win_lz": 1.2278980444203054e-06,
+      "win_lperp": 9.53561629976578e-05,
       "window": {
         "s": 0.0,
         "p": 1.0,
         "d": 0.0
+      },
+      "electrons": {
+        "s": 1.5705916056590723e-33,
+        "p": 2.0000000000000004,
+        "d": 1.0172844051428541e-38
       },
       "n_dev": 0.0,
       "configurations": [
@@ -336,6 +399,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 1.2212453270876722e-15,
       "e_ground": -37.68239129273895,
       "energies_pyscf": [
@@ -359,6 +424,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 0.0,
+        "p": 1.9999999999999987,
+        "d": 0.0
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
@@ -373,6 +443,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 1.6653345369377348e-15,
       "e_ground": -37.6823646207117,
       "energies_pyscf": [
@@ -394,6 +466,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 2.0065653785219997e-33,
+        "p": 1.9999999999999993,
+        "d": 1.0565319926186187e-31
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
@@ -406,33 +483,40 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
-      "ortho_err": 1.4432899320127035e-15,
-      "e_ground": -37.682391292817954,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 2.55351295663786e-15,
+      "e_ground": -37.68239129281796,
       "energies_pyscf": [
-        -37.682391294772366,
-        -37.682391294772366,
-        -37.6823912889061
+        -37.68239129477237,
+        -37.68239129477237,
+        -37.68239128890611
       ],
       "max_de_vs_pyscf": 3.90881638168139e-09,
       "ground_term": "3P",
-      "ground_l2": 1.9999999999960287,
-      "ground_lz2": 0.9821139711357841,
+      "ground_l2": 1.9999999999960274,
+      "ground_lz2": 0.9765002723815667,
       "terms": {
         "3P": 3
       },
-      "comm_norm_h_lz": 6.805582010017768e-13,
-      "comm_norm_h_l2": 1.6517187074576717e-28,
-      "win_lz": 6.325927326971085e-07,
-      "win_lperp": 5.600200241281404e-06,
+      "comm_norm_h_lz": 6.805722643371245e-13,
+      "comm_norm_h_l2": 5.3744949975029e-28,
+      "win_lz": 6.325927327169183e-07,
+      "win_lperp": 5.600200241460183e-06,
       "window": {
         "s": 0.0,
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 4.0300764313976885e-32,
+        "p": 1.9999999999999993,
+        "d": 3.663192737618357e-32
+      },
       "n_dev": 0.0,
       "configurations": [
-        "p^2.00 (|c|=0.92); p^2.00 (|c|=0.39)",
-        "p^2.00 (|c|=0.92); p^2.00 (|c|=0.39)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.01)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.01)",
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
       ],
       "cell": "c_2p_2-0_sa-casscf_mo_-_pol_avg"
@@ -443,6 +527,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 6.661338147750939e-16,
       "e_ground": -37.682364620834996,
       "energies_pyscf": [
@@ -464,6 +550,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 1.540577511362484e-33,
+        "p": 2.0000000000000004,
+        "d": 1.0008666661890384e-38
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
@@ -476,6 +567,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 2.6645352591003757e-15,
       "e_ground": -37.68236454895856,
       "energies_pyscf": [
@@ -497,6 +590,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 6.176817630784808e-12,
+        "p": 1.9999999999499,
+        "d": 4.392317480447632e-11
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)"
@@ -509,6 +607,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 3.765179350711979e-15,
       "e_ground": -37.4403700626688,
       "energies_pyscf": [
@@ -530,6 +630,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 5.9868231521991816e-34,
+        "p": 2.0000000000000004,
+        "d": 3.854403610046022e-39
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)"
@@ -542,6 +647,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 6.661338147750939e-16,
       "e_ground": -37.43160772271942,
       "energies_pyscf": [
@@ -565,6 +672,11 @@
         "p": 1.0,
         "d": 0.0
       },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000004,
+        "d": 0.0
+      },
       "n_dev": 0.0,
       "configurations": [
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
@@ -580,6 +692,8 @@
       "n_det": 3,
       "diverged": false,
       "converged": true,
+      "cycles": null,
+      "conv_dE": null,
       "ortho_err": 6.661338147750939e-16,
       "e_ground": -37.68239129282189,
       "energies_pyscf": [
@@ -599,6 +713,11 @@
       "window": {
         "s": 0.0,
         "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000004,
         "d": 0.0
       },
       "n_dev": 0.0,
@@ -632,6 +751,8 @@
       ],
       "n_det": 3,
       "anchor_dev": 0.0,
+      "win_lz": 6.547610293997335e-16,
+      "win_lperp": 9.25971927890472e-16,
       "comm_norm_h_lz": 0.0,
       "comm_norm_h_l2": 0.0,
       "res_h_lz": 1.1102230246251565e-16,
@@ -640,6 +761,1078 @@
         "1s",
         "2s"
       ]
+    },
+    "c_2pno1_2-0_casscf_no_-_pol_avg": {
+      "tag": "c_2pno1_2-0_casscf_no_-_pol_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 13,
+      "conv_dE": 7.105427357601002e-15,
+      "ortho_err": 2.220446049250313e-15,
+      "e_ground": -37.68236462182856,
+      "energies_pyscf": [
+        -37.682417880791085
+      ],
+      "max_de_vs_pyscf": 5.325896252372786e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.6871685449731537,
+      "ground_lz2": 0.022918433498999573,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.023404002811519598,
+      "comm_norm_h_l2": 5.885210396310784e-08,
+      "win_lz": 0.14279936055530654,
+      "win_lperp": 1.1094758456287894,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 7.359811625347952e-11,
+        "p": 1.9999999998265958,
+        "d": 9.98056500517631e-11
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)"
+      ],
+      "cell": "c_2pno1_2-0_casscf_no_-_pol_avg"
+    },
+    "c_2p_2-0_casscf_ao_-_pur_avg": {
+      "tag": "c_2p_2-0_casscf_ao_-_pur_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 16,
+      "conv_dE": 0.0,
+      "ortho_err": 1.2212453270876722e-15,
+      "e_ground": -37.68236463737019,
+      "energies_pyscf": [
+        -37.682417881450576
+      ],
+      "max_de_vs_pyscf": 5.324408038376305e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.6836181701502502,
+      "ground_lz2": 1.0169390269192561e-10,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 2.7892610575936548e-05,
+      "comm_norm_h_l2": 3.052670217834761e-08,
+      "win_lz": 0.026328458749349564,
+      "win_lperp": 1.1246484480315981,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000013,
+        "d": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p_2-0_casscf_ao_-_pur_avg"
+    },
+    "c_2p_2-0_casscf_mo_-_pur_avg": {
+      "tag": "c_2p_2-0_casscf_mo_-_pur_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 4,
+      "conv_dE": 7.105427357601002e-15,
+      "ortho_err": 1.9364310213915846e-15,
+      "e_ground": -37.682364627981585,
+      "energies_pyscf": [
+        -37.682417881457795
+      ],
+      "max_de_vs_pyscf": 5.3253476210102235e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.9176099183767175,
+      "ground_lz2": 0.02415989988822794,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.0063281877416283125,
+      "comm_norm_h_l2": 5.50784198905252e-18,
+      "win_lz": 0.06443693783469667,
+      "win_lperp": 0.5704456218918936,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 3.63411392546125e-32,
+        "p": 2.0000000000000013,
+        "d": 8.096733427645548e-32
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p_2-0_casscf_mo_-_pur_avg"
+    },
+    "c_2pno1_2-0_casscf_no_-_pur_avg": {
+      "tag": "c_2pno1_2-0_casscf_no_-_pur_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 16,
+      "conv_dE": 0.0,
+      "ortho_err": 1.1102230246251565e-15,
+      "e_ground": -37.682364637369105,
+      "energies_pyscf": [
+        -37.68241788145047
+      ],
+      "max_de_vs_pyscf": 5.3244081364312024e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.683617779108726,
+      "ground_lz2": 0.841808858742078,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.14343719633733198,
+      "comm_norm_h_l2": 3.054088126663282e-08,
+      "win_lz": 0.7950286442522184,
+      "win_lperp": 0.7959009601606054,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 1.9999999999999998,
+        "d": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2pno1_2-0_casscf_no_-_pur_avg"
+    },
+    "c_2p_2-0_casscf_mo_frozen_pol_avg": {
+      "tag": "c_2p_2-0_casscf_mo_frozen_pol_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 2,
+      "conv_dE": 0.0,
+      "ortho_err": 1.3139899818319761e-15,
+      "e_ground": -37.6823646207117,
+      "energies_pyscf": [
+        -37.68241788145874
+      ],
+      "max_de_vs_pyscf": 5.3260747037597866e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.9176097034353576,
+      "ground_lz2": 0.024159897180189294,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.006328179686222139,
+      "comm_norm_h_l2": 3.1375349223249276e-18,
+      "win_lz": 0.06443702188700871,
+      "win_lperp": 0.5704463659879841,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.0065653785219997e-33,
+        "p": 1.9999999999999993,
+        "d": 1.0565319926186187e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p_2-0_casscf_mo_frozen_pol_avg"
+    },
+    "c_2pno1_2-0_casscf_no_frozen_pol_avg": {
+      "tag": "c_2pno1_2-0_casscf_no_frozen_pol_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 5,
+      "conv_dE": 0.0,
+      "ortho_err": 1.3465975284094727e-15,
+      "e_ground": -37.44037006348679,
+      "energies_pyscf": [
+        -37.440394030470856
+      ],
+      "max_de_vs_pyscf": 2.396698406670339e-05,
+      "ground_term": "3P",
+      "ground_l2": 2.000000000000001,
+      "ground_lz2": 0.8014415357579777,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 1.5704781462621295e-15,
+      "comm_norm_h_l2": 6.972611193684198e-32,
+      "win_lz": 9.685381272237684e-16,
+      "win_lperp": 1.1716761091077144e-15,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 5.986823152435523e-34,
+        "p": 2.0000000000000004,
+        "d": 3.854403610195529e-39
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)"
+      ],
+      "cell": "c_2pno1_2-0_casscf_no_frozen_pol_avg"
+    },
+    "c_2p_2-0_casscf_mo_frozen_pur_avg": {
+      "tag": "c_2p_2-0_casscf_mo_frozen_pur_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 4,
+      "conv_dE": 0.0,
+      "ortho_err": 1.8412520462154896e-15,
+      "e_ground": -37.68236462796611,
+      "energies_pyscf": [
+        -37.682417881457944
+      ],
+      "max_de_vs_pyscf": 5.3253491834936995e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.917609703435362,
+      "ground_lz2": 0.024159897180189634,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.006328184279937487,
+      "comm_norm_h_l2": 6.82091529281097e-18,
+      "win_lz": 0.0644370218870089,
+      "win_lperp": 0.5704463659879834,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.1941640832833103e-32,
+        "p": 2.000000000000001,
+        "d": 6.343950792365266e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p_2-0_casscf_mo_frozen_pur_avg"
+    },
+    "c_2pno1_2-0_casscf_no_frozen_pur_avg": {
+      "tag": "c_2pno1_2-0_casscf_no_frozen_pur_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 7,
+      "conv_dE": 0.0,
+      "ortho_err": 4.440892098500626e-16,
+      "e_ground": -37.44037006276899,
+      "energies_pyscf": [
+        -37.44039403073093
+      ],
+      "max_de_vs_pyscf": 2.3967961936932625e-05,
+      "ground_term": "3P",
+      "ground_l2": 2.0000000000000018,
+      "ground_lz2": 0.0,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.0,
+      "comm_norm_h_l2": 0.0,
+      "win_lz": 6.547610293997335e-16,
+      "win_lperp": 9.25971927890472e-16,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000004,
+        "d": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2pno1_2-0_casscf_no_frozen_pur_avg"
+    },
+    "c_2pno1_2-0_sa-casscf_no_-_pol_avg": {
+      "tag": "c_2pno1_2-0_sa-casscf_no_-_pol_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 3.961832612711858e-15,
+      "e_ground": -37.682391292825024,
+      "energies_pyscf": [
+        -37.682391293378615,
+        -37.68239129334788,
+        -37.682391291748324
+      ],
+      "max_de_vs_pyscf": 1.0766214586510614e-09,
+      "ground_term": "3P",
+      "ground_l2": 1.9999999999989861,
+      "ground_lz2": 0.39526035774875,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 8.838837963438872e-14,
+      "comm_norm_h_l2": 3.5511079320272795e-26,
+      "win_lz": 1.5431892052178541e-06,
+      "win_lperp": 1.8974736908799341e-06,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 4.9629331530830605e-14,
+        "p": 1.9999999999998959,
+        "d": 5.5953768105853636e-14
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.08)",
+        "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)",
+        "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)"
+      ],
+      "cell": "c_2pno1_2-0_sa-casscf_no_-_pol_avg"
+    },
+    "c_2p_2-0_sa-casscf_mo_-_pur_avg": {
+      "tag": "c_2p_2-0_sa-casscf_mo_-_pur_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 1.7763568394002505e-15,
+      "e_ground": -37.68239129281072,
+      "energies_pyscf": [
+        -37.68239130341638,
+        -37.68239128750139,
+        -37.68239128750139
+      ],
+      "max_de_vs_pyscf": 1.0605660349938262e-08,
+      "ground_term": "3P",
+      "ground_l2": 1.999999999984159,
+      "ground_lz2": 0.9999555098892039,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 2.918580053735853e-12,
+      "comm_norm_h_l2": 1.305959385687834e-26,
+      "win_lz": 1.2637717394013117e-06,
+      "win_lperp": 1.118788508711189e-05,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 1.5546583653443076e-31,
+        "p": 2.0000000000000018,
+        "d": 1.0758941364342403e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.89); p^2.00 (|c|=0.46)",
+        "p^2.00 (|c|=0.89); p^2.00 (|c|=0.46)"
+      ],
+      "cell": "c_2p_2-0_sa-casscf_mo_-_pur_avg"
+    },
+    "c_2pno1_2-0_sa-casscf_no_-_pur_avg": {
+      "tag": "c_2pno1_2-0_sa-casscf_no_-_pur_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 8.881784197001252e-16,
+      "e_ground": -37.68239129282506,
+      "energies_pyscf": [
+        -37.68239129282506,
+        -37.68239129282506,
+        -37.68239129282506
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3P",
+      "ground_l2": 2.0000000000000027,
+      "ground_lz2": 1.0000000000000013,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.0,
+      "comm_norm_h_l2": 0.0,
+      "win_lz": 2.4209481627575662e-15,
+      "win_lperp": 2.0076319851042443e-15,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.000000000000001,
+        "d": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2pno1_2-0_sa-casscf_no_-_pur_avg"
+    },
+    "c_2p_2-0_sa-casscf_ao_frozen_pol_avg": {
+      "tag": "c_2p_2-0_sa-casscf_ao_frozen_pol_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 2.1962050379826464e-15,
+      "e_ground": -37.440382052898485,
+      "energies_pyscf": [
+        -37.44038205379335,
+        -37.44038205332673,
+        -37.44038205157539
+      ],
+      "max_de_vs_pyscf": 1.323094522831525e-09,
+      "ground_term": "3P",
+      "ground_l2": 2.000000000000001,
+      "ground_lz2": 0.0,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 7.562352098108146e-17,
+      "comm_norm_h_l2": 3.486305596842099e-32,
+      "win_lz": 7.353064601275583e-16,
+      "win_lperp": 9.860136467273434e-16,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 1.6907969067037767e-33,
+        "p": 2.0,
+        "d": 1.0796582198385595e-38
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=0.97); p^2.00 (|c|=0.21)",
+        "p^2.00 (|c|=0.96); p^2.00 (|c|=0.22)",
+        "p^2.00 (|c|=0.95); p^2.00 (|c|=0.25)"
+      ],
+      "cell": "c_2p_2-0_sa-casscf_ao_frozen_pol_avg"
+    },
+    "c_2p_2-0_sa-casscf_mo_frozen_pol_avg": {
+      "tag": "c_2p_2-0_sa-casscf_mo_frozen_pol_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 1.3322676295501878e-15,
+      "e_ground": -37.68200071319956,
+      "energies_pyscf": [
+        -37.682010947341425,
+        -37.654382848382966,
+        -37.654382848382966
+      ],
+      "max_de_vs_pyscf": 1.0234141868181723e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.9176097034353576,
+      "ground_lz2": 0.024159897180189294,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.006070424865213572,
+      "comm_norm_h_l2": 1.8756350435601944e-18,
+      "win_lz": 0.06443702188700871,
+      "win_lperp": 0.5704463659879841,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.0065653785219997e-33,
+        "p": 1.9999999999999993,
+        "d": 1.0565319926186187e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.91); p^2.00 (|c|=0.42)",
+        "p^2.00 (|c|=0.91); p^2.00 (|c|=0.42)"
+      ],
+      "cell": "c_2p_2-0_sa-casscf_mo_frozen_pol_avg"
+    },
+    "c_2pno1_2-0_sa-casscf_no_frozen_pol_avg": {
+      "tag": "c_2pno1_2-0_sa-casscf_no_frozen_pol_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 7.823360774682214e-15,
+      "e_ground": -37.440382052898144,
+      "energies_pyscf": [
+        -37.44038205345637,
+        -37.440382053015966,
+        -37.44038205222211
+      ],
+      "max_de_vs_pyscf": 6.760316750842321e-10,
+      "ground_term": "3P",
+      "ground_l2": 2.0000000000000004,
+      "ground_lz2": 0.2780512024529911,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 3.159412125594376e-16,
+      "comm_norm_h_l2": 1.232595164407831e-32,
+      "win_lz": 9.685381272237684e-16,
+      "win_lperp": 1.1716761091077144e-15,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 1.9694003510634485e-33,
+        "p": 1.9999999999999998,
+        "d": 1.2633480701050456e-38
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=0.71); p^2.00 (|c|=0.69)",
+        "p^2.00 (|c|=0.98); p^2.00 (|c|=0.18)",
+        "p^2.00 (|c|=0.72); p^2.00 (|c|=0.68)"
+      ],
+      "cell": "c_2pno1_2-0_sa-casscf_no_frozen_pol_avg"
+    },
+    "c_2p_2-0_sa-casscf_mo_frozen_pur_avg": {
+      "tag": "c_2p_2-0_sa-casscf_mo_frozen_pur_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 1.4492032699344107e-15,
+      "e_ground": -37.68200071534042,
+      "energies_pyscf": [
+        -37.68201094851758,
+        -37.65438284779489,
+        -37.65438284779489
+      ],
+      "max_de_vs_pyscf": 1.0233177157203954e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.917609703435362,
+      "ground_lz2": 0.02415989718018935,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.006070425507566043,
+      "comm_norm_h_l2": 5.083310083282101e-18,
+      "win_lz": 0.0644370218870089,
+      "win_lperp": 0.5704463659879834,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.1941640832833103e-32,
+        "p": 2.000000000000001,
+        "d": 6.343950792365266e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.95); p^2.00 (|c|=0.32)",
+        "p^2.00 (|c|=0.95); p^2.00 (|c|=0.32)"
+      ],
+      "cell": "c_2p_2-0_sa-casscf_mo_frozen_pur_avg"
+    },
+    "c_2pno1_2-0_sa-casscf_no_frozen_pur_avg": {
+      "tag": "c_2pno1_2-0_sa-casscf_no_frozen_pur_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 6.661338147750939e-16,
+      "e_ground": -37.4403820528986,
+      "energies_pyscf": [
+        -37.440382052898606,
+        -37.440382052898606,
+        -37.440382052898606
+      ],
+      "max_de_vs_pyscf": 7.105427357601002e-15,
+      "ground_term": "3P",
+      "ground_l2": 2.0000000000000018,
+      "ground_lz2": 1.0000000000000009,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.0,
+      "comm_norm_h_l2": 0.0,
+      "win_lz": 6.547610293997335e-16,
+      "win_lperp": 9.25971927890472e-16,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000004,
+        "d": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2pno1_2-0_sa-casscf_no_frozen_pur_avg"
+    },
+    "c_2p@1s2s_2-0_casci_ao_-_pol_avg": {
+      "tag": "c_2p@1s2s_2-0_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "conv_dE": null,
+      "ortho_err": 6.661338147750939e-16,
+      "e_ground": -37.06779261213259,
+      "energies_pyscf": [
+        -37.06779261213259,
+        -37.06779261213259,
+        -37.06779261213259
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3P",
+      "ground_l2": 2.0000000000000018,
+      "ground_lz2": 0.0,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.0,
+      "comm_norm_h_l2": 0.0,
+      "win_lz": 6.547610293997335e-16,
+      "win_lperp": 9.25971927890472e-16,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000004,
+        "d": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "core_anisotropy": 0.0,
+      "cell": "c_2p@1s2s_2-0_casci_ao_-_pol_avg"
+    },
+    "c_2p@1s2s_2-0_casscf_ao_-_pol_avg": {
+      "tag": "c_2p@1s2s_2-0_casscf_ao_-_pol_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 12,
+      "conv_dE": 3.5922198549087625e-10,
+      "ortho_err": 7.771561172376096e-16,
+      "e_ground": -37.68236462113385,
+      "energies_pyscf": [
+        -37.682417881458754
+      ],
+      "max_de_vs_pyscf": 5.326032490415855e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.6842174091659812,
+      "ground_lz2": 8.086960503135825e-11,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 1.41103818900307e-06,
+      "comm_norm_h_l2": 2.2156773532650042e-09,
+      "win_lz": 0.0019033309145973466,
+      "win_lperp": 1.1238891140444058,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000004,
+        "d": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p@1s2s_2-0_casscf_ao_-_pol_avg"
+    },
+    "c_2p@1s2s_2-0_sa-casscf_ao_-_pol_avg": {
+      "tag": "c_2p@1s2s_2-0_sa-casscf_ao_-_pol_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 15,
+      "conv_dE": 8.157527986440982e-10,
+      "ortho_err": 6.661338147750939e-16,
+      "e_ground": -37.68239129282525,
+      "energies_pyscf": [
+        -37.68239129282525,
+        -37.68239129282525,
+        -37.68239129282525
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3P",
+      "ground_l2": 2.0000000000000018,
+      "ground_lz2": 0.0,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 3.1401849173675503e-16,
+      "comm_norm_h_l2": 0.0,
+      "win_lz": 4.6164456449319745e-15,
+      "win_lperp": 4.168144532322311e-15,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.000000000000001,
+        "d": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p@1s2s_2-0_sa-casscf_ao_-_pol_avg"
+    },
+    "c_2p@1s2s_2-0_sa-casscf_ao_-_pur_avg": {
+      "cell": "c_2p@1s2s_2-0_sa-casscf_ao_-_pur_avg",
+      "term": [
+        1,
+        "g"
+      ],
+      "energies": [
+        -1.096402068745669,
+        -1.0964020687458143,
+        -1.0964020687457214
+      ],
+      "total": -37.682391292825294,
+      "ptp": 1.4521717162097048e-13,
+      "l2": [
+        2.0000000000000027,
+        2.0000000000000027,
+        2.000000000000002
+      ],
+      "s2": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "n_det": 3,
+      "anchor_dev": 0.0,
+      "win_lz": 1.4580326144803682e-12,
+      "win_lperp": 2.426593781172354e-12,
+      "comm_norm_h_lz": 1.312597295459636e-13,
+      "comm_norm_h_l2": 0.0,
+      "res_h_lz": 9.281464485866309e-14,
+      "res_h_l2": 0.0,
+      "fold": [
+        "1s",
+        "2s"
+      ],
+      "ensemble": -37.682391292825294,
+      "mo_coeff": [
+        [
+          1.0006018960507914,
+          -1.6546127236108258e-06,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.6421488917775496,
+          0.0,
+          0.0,
+          7.731251388313015e-14,
+          4.8265333112444707e-14
+        ],
+        [
+          -3.459512525304572e-08,
+          0.4978333121080279,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -1.6022340912790791,
+          0.0,
+          0.0,
+          -4.386928515748068e-14,
+          -1.2265034624487902e-13
+        ],
+        [
+          -0.003191390572028172,
+          0.5804984608975258,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.564515395618113,
+          0.0,
+          0.0,
+          -6.992857683554596e-14,
+          -6.673427764046677e-14
+        ],
+        [
+          0.0,
+          0.0,
+          0.6688234230305004,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.9720401699450896,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.668823423031209,
+          0.0,
+          0.0,
+          0.0,
+          0.9720401699446022,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.6688234230300999,
+          -0.9720401699453651,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.468841541887076,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0827624262884559,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.4688415418862867,
+          0.0,
+          0.0,
+          0.0,
+          -1.0827624262887974,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.46884154188752214,
+          1.0827624262882625,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -1.974292450558448e-14,
+          -2.4208952537988175e-14,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.7925562045711974e-14,
+          0.0,
+          0.0,
+          0.7885808553538584,
+          -0.6149310811541222
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -9.469519549554767e-14,
+          2.0261230898208984e-13,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -1.4522225287114084e-14,
+          0.0,
+          0.0,
+          0.6149310811541223,
+          0.7885808553538584
+        ]
+      ],
+      "cycles": 12,
+      "conv_dE": 0.0
     }
+  },
+  "uhf": {
+    "e_tot": -37.686544437314076,
+    "s2": 2.0063145704449568,
+    "sigma_min": 0.9968381309590129,
+    "converged": true
   }
 }
