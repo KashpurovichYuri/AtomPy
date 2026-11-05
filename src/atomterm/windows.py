@@ -59,6 +59,7 @@ import numpy as np
 __all__ = [
     "Window",
     "occupied_core_idx",
+    "canonical_order",
     "select_shell_ao",
     "select_valence_ao",
     "select_span",
@@ -609,6 +610,46 @@ def occupied_core_idx(mf, ncore: int) -> list[int]:
             f"{closed[:ncore].tolist()}); folding the occupied block",
             stacklevel=2)
     return closed[:ncore].tolist()
+
+
+def canonical_order(mf, ncore: int) -> list[int]:
+    """The canonical matrix reordered into the run convention: the
+    closed block first (the core prefix), then the remaining occupied
+    columns (the open shell, energy-ordered), then the virtuals
+    (energy-ordered).
+
+    The start='mo' substrate. PySCF's raw canonical ORDER is the
+    m-block listing, not the occupation/energy order -- on uncontracted
+    bases the first columns are diffuse virtual junk while the closed
+    block sits elsewhere (the warning :func:`occupied_core_idx` fires),
+    and ``columns[:ncore]`` would silently fold garbage. On contracted
+    bases the permutation is the identity: the coincidence stays a
+    checked invariant, not an assumption.
+
+    Examples
+    --------
+    >>> perm = canonical_order(mf, 5)      # doctest: +SKIP
+    >>> mf.mo_coeff[:, perm][:, :5].shape  # the closed block
+    (nao, 5)
+    """
+    occ = np.asarray(mf.mo_occ)
+    n_ao = occ.shape[0]
+    closed = list(np.flatnonzero(occ == 2.0))
+    if len(closed) < ncore:
+        raise ValueError(
+            f"asked for {ncore} core orbitals; ROHF closed block has "
+            f"{len(closed)}")
+    open_sh = sorted((i for i in np.flatnonzero((occ > 0) & (occ < 2))),
+                     key=lambda i: mf.mo_energy[i])
+    virt = sorted((i for i in np.flatnonzero(occ == 0)),
+                  key=lambda i: mf.mo_energy[i])
+    perm = closed[:ncore] + closed[ncore:] + open_sh + virt
+    if perm != list(range(n_ao)):
+        warnings.warn(
+            f"canonical order scrambled (closed at {closed[:ncore]}"
+            f"); reordering into closed|open|virtual",
+            stacklevel=2)
+    return perm
 
 
 def _core_block(mf, core_idx, c_core, s):

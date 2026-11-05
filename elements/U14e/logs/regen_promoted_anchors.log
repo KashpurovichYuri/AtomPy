@@ -38,3 +38,31 @@ ROHF E = -50.38185233 Eh
   [cell] u14e_9f10f12d13d_4-0_casci_ao_-_pur_avg
   [void] u14e_9f10f12d13d_4-0_casci_ao_-_pol_frac -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
   [cell] u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pol_raw
+  [cell] u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pol_avg
+  [cell] u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pur_avg
+  [void] u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pol_frac -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
+  [cell] u14e_10f13d_4-0_casci_ao_-_pol_raw
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:629: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:679: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  [cell] u14e_10f13d_4-0_casci_ao_-_pol_avg
+  [cell] u14e_10f13d_4-0_casci_ao_-_pur_avg
+  [void] u14e_10f13d_4-0_casci_ao_-_pol_frac -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
+  [cell] u14e_10f13d7s_5-1_casci_ao_-_pol_raw
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:629: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:229: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  [cell] u14e_10f13d7s_5-1_casci_ao_-_pol_avg
+  [cell] u14e_10f13d7s_5-1_casci_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [void] u14e_10f13d7s_5-1_casci_ao_-_pol_frac -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
+  [cell] u14e_10f13d14p_4-0_casci_ao_-_pol_raw
+  [cell] u14e_10f13d14p_4-0_casci_ao_-_pol_avg
+  [cell] u14e_10f13d14p_4-0_casci_ao_-_pur_avg
+  [void] u14e_10f13d14p_4-0_casci_ao_-_pol_frac -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
+  wrote elements/U14e/cells.json + cells.md
+
+done

@@ -594,7 +594,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
 
     from atomterm.casscf import (constrained_casscf, mask_frozen_window,
                                  mask_no_core_window_mix, run_casci)
-    from atomterm.windows import (build_full_mo, occupied_core_idx,
+    from atomterm.windows import (build_full_mo, canonical_order,
+                                  occupied_core_idx,
                                   radial_basis, mask_radial_rotations, select_valence_ao)
 
     na, nb = key.sector
@@ -633,21 +634,25 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
             mask = mask_radial_rotations(labels, ncore, ncas)
         else:
             mo_full = build_full_mo(mf, core_idx, act_idx, c_core=c_core)
-    else:  # start == "mo": PySCF's default start (canonical MOs,
-        # canonical window). On pol the canonical MO matrix IS the
-        # substrate; on pur the canonical columns are re-orthogonalized
-        # against the pur core span (they are S-orthonormal against
-        # the core they were SOLVED in, not the pur one -- exactly the
-        # input-window defect build_full_mo's projection removes at the
-        # source). Honest
+    else:  # start == "mo": the canonical window in the run convention
+        # (:func:`atomterm.windows.canonical_order`: closed | open |
+        # virtual -- the raw PySCF order is the m-block listing and
+        # would fold virtual junk on uncontracted bases). On pol the
+        # reordered canonical matrix IS the substrate; on pur the
+        # canonical columns are re-orthogonalized against the pur core
+        # span (they are S-orthonormal against the core they were
+        # SOLVED in, not the pur one -- exactly the input-window defect
+        # build_full_mo's projection removes at the source). Honest
         # expectation: the window's own m-delocalization survives
         # (measured: raw-MO spans never rotation-close) -- these
         # cells measure that, they do not fix it.
+        perm = canonical_order(mf, ncore)
+        c_can = mf.mo_coeff[:, perm]
         if key.substrate == "pur":
-            mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
-                                    mf.mo_coeff[:, ncore:], c_core=c_pur)
+            mo_full = build_full_mo(mf, list(range(ncore)),
+                                    c_can[:, ncore:], c_core=c_pur)
         else:
-            mo_full = mf.mo_coeff
+            mo_full = c_can
     if key.mask == "frozen":
         mask = mask_frozen_window
     elif key.mask == "virtmix":

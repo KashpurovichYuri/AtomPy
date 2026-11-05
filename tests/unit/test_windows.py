@@ -11,7 +11,8 @@ import pytest
 from pyscf import gto
 
 from atomterm.windows import (NOBLE_CORES, Window, build_full_mo,
-                              closed_electrons, complete_orthonormal,
+                              canonical_order, closed_electrons,
+                              complete_orthonormal,
                               fold_shells, lm_sectors, lowdin,
                               occupied_core_idx, primitive_chain,
                               select_primitives, select_span,
@@ -278,6 +279,46 @@ def test_occupied_core_idx_selects_the_closed_block_not_canonical_order():
     # asking for more closed orbitals than exist is refused loudly
     with pytest.raises(ValueError, match="closed block has"):
         occupied_core_idx(mf, 4)
+
+
+def test_canonical_order_reorders_into_closed_open_virtual():
+    """The start='mo' substrate takes the canonical matrix in the RUN
+    convention -- closed block | open shell | virtuals, energy-ordered
+    within the classes: the raw PySCF order is the m-block listing and
+    would fold virtual junk on uncontracted bases. Identity (silent)
+    when the canonical order already coincides."""
+    import warnings
+
+    class FakeMF:
+        def __init__(self, mo_occ, mo_energy):
+            self.mo_occ = np.asarray(mo_occ, dtype=float)
+            self.mo_energy = np.asarray(mo_energy, dtype=float)
+
+    # U-style scramble: closed at 4, 7; open at 0, 5; virtuals elsewhere
+    # with energies that order differently than the indices
+    occ = [1.0, 0.0, 2.0, 0.0, 0.0, 1.0, 0.0, 2.0, 0.0, 0.0]
+    eps = [0.05, 0.30, -1.10, 0.10, 0.02, -0.40, 0.01, -0.90, 0.03, 0.20]
+    mf = FakeMF(occ, eps)
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter("always")
+        perm = canonical_order(mf, 2)
+    assert perm[:2] == [2, 7]                     # the closed block first
+    assert perm[2:4] == [5, 0]                    # open, energy-ordered
+    assert perm[4:] == [6, 4, 8, 3, 9, 1]         # virtuals, energy-ordered
+    assert any("reordering" in str(w.message).lower() for w in rec)
+
+    # contracted-style coincidence: closed head, sorted tail -- silent
+    occ = [2.0, 2.0, 1.0, 0.0, 0.0]
+    eps = [-1.0, -0.5, -0.2, 0.1, 0.4]
+    mf = FakeMF(occ, eps)
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter("always")
+        assert canonical_order(mf, 2) == [0, 1, 2, 3, 4]
+    assert not any("reordering" in str(w.message).lower() for w in rec)
+
+    # more core orbitals than closed orbitals is refused loudly
+    with pytest.raises(ValueError, match="closed block has"):
+        canonical_order(mf, 3)
 
 
 def test_primitive_chain_and_select_primitives():
