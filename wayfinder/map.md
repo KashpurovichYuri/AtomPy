@@ -60,9 +60,10 @@ declaration path as a fresh wave. (live)
   `LadderLeg` NamedTuple.  Declined: splitting the ladder sessions
   out of ticket 32 (the ticket IS the provenance mechanism, per the
   Conventions); the map queue-decision placement nit (live prose
-  until the wave closes).  Recorded partials (spec axis): the ladder
-  TABLES omit a sector column (implicit in dets — add when the
-  emitter generates the tables); the ours-vs-solver anchor runs on
+  until the wave closes).  Resolved 2026-11-04: the emitter class is
+  DELETED (the one-table builder owns the render; the sector stays
+  implicit in dets/CAS by design).  Recorded partials (spec axis):
+  the ladder
   one leg per construction, not per leg (the uniform-construction
   argument — revisit if a leg's meters ever disagree).
 - Pinned cells' window intake (the symmetry lane's cross-route

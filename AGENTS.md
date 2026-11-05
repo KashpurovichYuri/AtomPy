@@ -209,8 +209,11 @@ carries a number only when the number IS the fact.
 
 ## Conventions
 
-- Per-atom tables live in `elements/<Atom>/TABLES.md` (committed,
-  log-provenanced); README carries one worked example; cross-atom
+- Per-atom tables live in `elements/<Atom>/TABLE.md` (committed,
+  log-provenanced): the atom heading + the ONE ladder table between
+  the `ladder` markers + the `TABLE.csv` mirror (the generator:
+  `scripts/build_methods_tables.py`, which refuses atoms without
+  TABLE.md); README carries one worked example; cross-atom
   comparisons live in the element files. New atom = new element file + a
   data row, not README growth.
 - Atomic units, ℏ = 1. Spin-orbitals: alpha = `0..norb-1`, beta = `norb..2norb-1`.

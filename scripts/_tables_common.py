@@ -1,4 +1,4 @@
-"""The build_*_tables family's shared vocabulary: the table constants,
+"""The tables' shared vocabulary: the table constants,
 the label helpers, and the TABLES edit protocol's marker form.
 
 ONE home for what every emitter formats the same way (the survey/

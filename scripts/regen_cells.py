@@ -161,9 +161,8 @@ def parse_args(argv) -> argparse.Namespace:
 
 
 def _write_atomic(path: Path, text: str) -> None:
-    """Write through a temp file + verified move (the renderers'
-    TABLES protocol): a killed run never leaves a truncated
-    artifact."""
+    """Write through a temp file + verified move (the render
+    protocol): a killed run never leaves a truncated artifact."""
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(text, encoding="utf-8")
     assert tmp.read_text(encoding="utf-8") == text

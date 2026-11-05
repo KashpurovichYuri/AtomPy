@@ -305,7 +305,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    scenarios=(_ANCHOR_FIRST,),
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
-                       occ_open=("3d",), occ_e_ref=-848.40648875),
+                       occ_open=("3d",), occ_e_ref=-848.40648875,
+                       occ_e_ref_uhf=-848.40991227),
                    planned_windows=("3d4d", "3d4s4p4d"),
                    lattice_windows=("3d", "3d4p", "3d4p4d"),
                    lattice_sector=(2, 0)),

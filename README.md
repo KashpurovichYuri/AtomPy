@@ -254,14 +254,12 @@ machinery.
 ## Results
 
 All tables live in `elements/<Atom>/TABLE.md` (committed,
-regenerable; `TABLES.md` on atoms not yet migrated). This section is
+regenerable). This section is
 the reading key and one excerpt.
 
 **Tables grammar** — the element file is `TABLE.md`: the ONE ladder
 table (below), generated between `ladder` markers, its CSV mirror
-`TABLE.csv` beside it (same rows, ASCII headers). Atoms not yet
-migrated keep `TABLES.md` and its section families (term table,
-multiplet energies, lattices, ladders, studies) until their pass.
+`TABLE.csv` beside it (same rows, ASCII headers).
 The ladder pins certify what the tables report.
 
 Every energy table states its **route** (free — our symmetry-blind
@@ -409,16 +407,20 @@ Class key (row-level discriminators, never assigned by hand):
 - **NOT-CONVERGED** — the optimizer failed; the row waits for a re-run.
 
 The worked example (Ti, the 3d4s window; excerpt — the full table and
-every other atom: `elements/<Atom>/TABLES.md`; frozen, this draw):
+every other atom: `elements/<Atom>/TABLE.md`; frozen, this draw):
 
-| treatment | E, Eh | ΔE (mEh) | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | verdict |
-|---|---|---|---|---|---|---|
-| ROHF (anchor) | −848.4065 | 0 | — | — | — | — |
-| CASCI, averaged | −848.3959 | +10.5 | 12.0000 | 4.2e-09 | 2.3e-08 | exact |
-| CASCI, raw | −848.3959 | +10.5 | 12.0000 | 4.9e-02 | 2.6e-01 | baseline (detector) |
-| CASSCF, free | −848.4377 | −31.3 | 0.0503 | 4.3e-01 | 1.1e+00 | escape |
-| SA-CASSCF, free | −848.4166 | −10.1 | 12.0029 | 1.1e+00 | 6.0e+00 | swap |
-| SA-CASSCF, frozen, pur | −848.3948 | +11.7 | 12.0000 | 1.0e-13 | 4.0e-13 | exact |
+| method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | conv | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ROHF (anchor) | — | — | — | — | — | −848.4065 | 0 | — | — | — | — | forced filling |
+| CASCI | free | 3d4s / AO | (4,6) | Ar | 120 | −848.3959 | +10.5 | — | 12.0000 | 4.2e-09 | 2.3e-08 |  |
+| CASSCF | free | 3d4s / AO | (4,6) | Ar | 120 | −848.4377 | −31.3 | 1e-8/38 | 0.0503 | 4.3e-01 | 1.1e+00 |  |
+| SA-CASSCF | free | 3d4s / AO | (4,6) | Ar | 120 | −848.4166 | −10.1 | 1e-9/33 | 12.0029 | 1.1e+00 | 6.0e+00 |  |
+
+(ΔE against the ROHF anchor; the ellided columns — eV twins, ptp, the
+span certificates — are in the element file. The reading: the free
+CASSCF escapes the declared window — ⟨L²⟩ collapses to 0.05 — while
+the SA restores the term; the classes and their row-level
+discriminators are the reading key above.)
 
 The **window lattice** is the grid's complement — method fixed
 (CASCI, symmetric folds), window grown: the symmetric solution
@@ -450,15 +452,15 @@ meaningful NO source is the term-averaged CI density.
 | `cases` / `cells` | the declaration (`CaseSpec` → `run_case`); the cell addressing layer |
 
 Everything human-readable lives in `elements/<Atom>/`: `TABLE.md` +
-`TABLE.csv` (the one ladder table and its mirror; `TABLES.md` on
-atoms not yet migrated), `report.md/json` (term tables),
+`TABLE.csv` (the one ladder table and its mirror),
+`report.md/json` (term tables),
 `cells.json/md` (the treatment grid),
 plus frozen one-shot artifacts. New atom = new element file, not
 README growth. Regeneration: term tables — `scripts/run.py`
 (the per-atom calls recorded in each report header); cells —
 `scripts/regen_cells.py` (chkfiles land under `rungs/`, gitignored);
-methods tables — `scripts/build_methods_tables.py`; lattice sections —
-`scripts/build_lattice_tables.py`; scans — `scripts/radial_scan.py`;
+the one ladder table — `scripts/build_methods_tables.py`; scans —
+`scripts/radial_scan.py`;
 the U lattices — the `run_u*` scripts (the frozen record until the ECP
 wave). The test suite is the executable documentation.
 

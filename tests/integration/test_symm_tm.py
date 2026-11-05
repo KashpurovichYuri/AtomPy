@@ -30,7 +30,7 @@ window at frozen shells under one uniform construction -- the
 PRODUCTION lane runner (cells.run_lane_cell; the legs and their
 folds are declared data), certified here: every m-complete window
 hosts its term exactly; the ordering, margins, and the cross-atom
-scaling are the recorded verdicts (elements/Ti,Sc TABLES).  The
+scaling are the recorded verdicts (elements/Ti,Sc TABLE.md).  The
 planned {3d,4d} leg is read as declared (a dead-zone window) and
 pinned as NOT hosting the term.
 """
