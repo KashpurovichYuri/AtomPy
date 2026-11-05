@@ -288,6 +288,20 @@ _U14E_ANCHOR_FIRST = Scenario(
     reason="the optimizer class is multi-solution on the f shell "
            "(run_casscf=False's spirit made explicit): the CASCI "
            "anchors run first (2026-11-05)")
+# the frac folds' gate: the fractional-occupation reference has no
+# converged basin on the ECP atom (plain DIIS diverges E ~ +137;
+# Newton-from-minao converges to a collapsed -12.74, 37 Eh above the
+# aufbau RHF -49.04; Newton-from-ROHF does not leave the seed) -- the
+# MOM-anchored block selection (the runner docstring's prescribed fix)
+# is the recorded future step.
+_U14E_FRAC_VOID = Scenario(
+    name="frac-reference-unconverged",
+    cells=tuple(f"u14e_{w}_4-0_casci_ao_-_pol_frac"
+                for w in _U14E_WINDOWS),
+    reason="the fractional-occupation reference has no converged basin "
+           "on the ECP atom: DIIS diverges, Newton collapses or does "
+           "not move; MOM-anchored selection is the recorded fix "
+           "(2026-11-05)")
 
 CAMPAIGN: dict[str, CaseSpec] = {
     "C": CaseSpec("C", "ccpvdz", nelec_act=2, ncore=2,
@@ -348,10 +362,11 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    planned_windows=tuple("".join(_U_TIER[t])
                                          for t in ("3f", "4f", "2f2d",
                                                    "4f2d")),
-                   scenarios=(_U14E_ANCHOR_FIRST,),
+                   scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID),
                    ref=ReferenceSpec(
                        occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
                        occ_e_ref=-50.38185233,
+                       occ_e_ref_uhf=-50.38881343,
                        conv_accelerator="newton")),
 }
 

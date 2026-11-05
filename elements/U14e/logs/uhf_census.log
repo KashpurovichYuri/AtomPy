@@ -1,0 +1,14 @@
+U14e UHF basin census (five arms, the declared Newton class)
+note: all five plain-DIIS arms DIVERGE (E ~ +2.4e3..+3.0e3, conv=False,
+2026-11-05) -- the recorded evidence for the census learning
+ref.conv_accelerator; the arms below run under the declared policy.
+default E=-50.38881343 conv=True S2=6.228940 sigma_min=0.883500
+   sigma: ['0.9999', '0.9992', '0.9984', '0.9977', '0.8835']
+minao E=-50.38881343 conv=True S2=6.228941 sigma_min=0.883499
+   sigma: ['0.9999', '0.9992', '0.9984', '0.9977', '0.8835']
+atom E=-50.38881343 conv=True S2=6.228942 sigma_min=0.883499
+   sigma: ['0.9999', '0.9992', '0.9984', '0.9977', '0.8835']
+huckel E=-50.32311550 conv=False S2=7.012156 sigma_min=0.051682
+   sigma: ['0.9995', '0.9992', '0.9991', '0.9948', '0.0517']
+broken E=-50.38881343 conv=True S2=6.228941 sigma_min=0.883499
+   sigma: ['0.9999', '0.9992', '0.9984', '0.9977', '0.8835']

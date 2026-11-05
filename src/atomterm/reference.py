@@ -444,7 +444,12 @@ def uhf_basin_census(cfg, ref: ReferenceSpec | None = None,
     census measures, the declaration picks. The occupations stay
     character-forced throughout (``ref``): the basins differ in
     orbital SHAPE at fixed occupations, which is exactly what the
-    ``sigma`` spectrum reads. No checkpoint is written.
+    ``sigma`` spectrum reads. No checkpoint is written. The arms run
+    under ``ref``'s declared acceleration policy (the
+    :func:`_accelerated` dispatch -- the production path's own): an
+    atom whose SCF class needs the Newton accelerator diverges under
+    plain DIIS in EVERY arm, which is the evidence the declaration
+    rides (U14e: all five DIIS arms diverge, 2026-11-05).
 
     Parameters
     ----------
@@ -468,8 +473,7 @@ def uhf_basin_census(cfg, ref: ReferenceSpec | None = None,
     mol = build_mol(cfg)
     out = []
     for label, guess, break_ in guesses:
-        mf = _uhf_object(mol, None, ref, guess, break_)
-        mf.run()
+        mf = _accelerated(_uhf_object(mol, None, ref, guess, break_), ref)
         s2, sigma = uhf_contamination(mf)
         out.append({"label": label, "e_tot": float(mf.e_tot),
                     "converged": bool(mf.converged), "s2": float(s2),
@@ -522,7 +526,8 @@ def uhf_contamination(mf) -> tuple[float, np.ndarray]:
 
 
 def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
-                 open_idx: list[int] | None = None):
+                 open_idx: list[int] | None = None,
+                 ref: "ReferenceSpec | None" = None):
     """Average-of-configuration (fractional-occupation) HF,
     chkfile-cached.
 
@@ -547,6 +552,13 @@ def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
         p-containing ensemble). ``None`` = the HOMO block by
         energy (fine for C/Si, where both rules select the same
         orbitals).
+    ref : ReferenceSpec, optional
+        ONLY its acceleration policy is consumed
+        (:func:`_accelerated` -- an atom whose SCF class needs the
+        Newton accelerator diverges under plain DIIS here exactly as
+        in the gated ROHF; U14e evidence 2026-11-05). The occ patterns
+        and gates do not apply: the occupations ARE the fractional
+        block.
 
     Returns
     -------
@@ -608,6 +620,6 @@ def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
         pass
 
     mf.chkfile = chkfile
-    mf.run()
+    mf = _accelerated(mf, ref)
     return mol, mf
 

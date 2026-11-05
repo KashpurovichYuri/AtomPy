@@ -196,15 +196,18 @@ def test_void_reason_gates_scenariod_cells():
 def test_void_reason_voids_the_u14e_optimizer_class():
     """U14e's widened gate: the multi-solution class is void at the key
     on EVERY window (the primary included -- ``run_casscf=False``'s
-    spirit made explicit); exactly the 20 CASCI anchors run."""
+    spirit made explicit) and the frac folds are void with it (the
+    frac reference has no converged basin on the ECP atom); exactly
+    the 15 remaining CASCI anchors run."""
     spec = CAMPAIGN["U14e"]
     sc = scenarios_for(spec)
     keys = grid_keys(spec) + planned(spec)
     assert len(keys) == 165
     for k in keys:
-        assert (void_reason(k, sc) is not None) == (k.method != "casci"), \
-            k.address
-    assert sum(void_reason(k, sc) is None for k in keys) == 20
+        void = void_reason(k, sc) is not None
+        expect = k.method != "casci" or k.fold == "frac"
+        assert void == expect, k.address
+    assert sum(not void_reason(k, sc) for k in keys) == 15
 
 
 @fast
