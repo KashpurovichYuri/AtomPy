@@ -1044,6 +1044,48 @@ DISPOSITIONS RECORDED (spec axis):
   vocabulary is [P,L_perp] (fact 19) -- the ticket line is amended
   here, not in place (history stays).
 
+## The migration sessions closed (2026-11-05 -- C/Si/Ti on the one table)
+
+All four atoms now carry TABLE.md + TABLE.csv (Sc the exemplar):
+- Ti's ROUTE BATCH ran detached (~5 h wall; the two 368k-det
+  optimizer pairs the long poles; per-cell store writes carried
+  every kill) -- 28 twins fresh, the lane families fill (5 rows per
+  leg).  THE RECORDED VERDICTS REPRODUCE IN THE RENDER: CI span
+  identity pinned==free on all 7 legs; SA route agreement 5/6 legs
+  at solver tolerance; the exceptions are the record (3d4s@ar's
+  pinned SA +7.2 mEh from the free route's escape; 3d4d's pinned SA
+  scrambles, <L^2>=6.0-29.9 -- not a 3F window as-declared); the
+  winner (8,13): CI -92.6 -> SA -104.3 both routes, CASSCF's tilt
+  at <L^2>=10.20.
+- The UHF anchors: Ti TWO census basins (default/huckel land +7.8
+  mEh ABOVE the ROHF anchor; atom/broken land the spin-broken
+  ground -3.4 mEh) -> occ_e_ref_uhf=-848.40991227, the gate cycles
+  onto the winner exactly; C and Si single-basin (all five census
+  arms identical), anchored ungated: C -4.1 mEh (<S^2>=2.0063,
+  sigma_min=0.9968), Si -3.6 mEh (<S^2>=2.0110, sigma_min=0.9945).
+  uhf_anchor's contract: the gate is the multi-basin GUARD --
+  a single-basin atom runs ungated, the census verdict being its
+  cover.
+- FIX constrained_casscf (physics-bearing, pinned): a ONE-root
+  weights list IS the single root (PySCF's SA wrapper einsums the
+  energies; nroots=1 returns a scalar) -- Si's sa-casscf_no cells
+  crashed exactly there; tests/integration/test_casscf.py pins it.
+- The stores completed before the renders: C/Si gained their 16
+  missing grid payloads + 4 route twins each (mostly cache hits).
+- THE EMITTERS DEAD: build_{lane,survey,lattice}_tables.py deleted
+  with their pins (the one-table builder is the only render path);
+  the stray old-stage chk files deleted (elements/Si_*.chk at the
+  root, Sc_rohf.chk/Ti_rohf.chk at the element roots -- the
+  pipeline path is rungs/<address>.chk); elements/ecp/ STAYS (the
+  ECP tests' live workdir).
+- Docs lockstep: AGENTS conventions (the TABLE.md grammar), README
+  (the worked example REFRESHED from Ti's render -- the old excerpt
+  still showed the dead verdict-column format), test_symm_tm's
+  record pointer, map.md's sector-column Issue resolved.
+
+Counts: 245 total, 157 fast (the three emitter pins died fast-
+marked; the casscf pin is slow-tier).
+
 ## References
 
 
