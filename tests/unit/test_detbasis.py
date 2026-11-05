@@ -202,6 +202,35 @@ def test_operator_apply_equals_explicit_ladder_application():
         assert np.allclose(f(v), direct, atol=1e-12), (na, nb)
 
 
+def test_operator_apply_wide_sector_one_body():
+    # past int64 (n2 > 63): the packed-key singles path agrees with
+    # BOTH twins -- the dense matrix (the pair-classifier builder,
+    # width-safe) and the explicit a+/a application -- at the width
+    # where the bitmask path refuses
+    from atomterm.detbasis import (determinant_basis, operator_apply,
+                                   slater_condon_matrix)
+    from atomterm.secondquant import apply_one_body
+
+    rng = np.random.default_rng(61)
+    norb = 32                  # 64 spin-orbitals: over the int64 guard
+    h = rng.standard_normal((norb, norb)) \
+        + 1j * rng.standard_normal((norb, norb))
+    for na, nb in [(1, 0), (2, 0)]:
+        dets = determinant_basis(norb, na, nb)
+        mat = slater_condon_matrix(dets, one_body=h)
+        f = operator_apply(dets, one_body=h)
+        v = rng.standard_normal(len(dets)) \
+            + 1j * rng.standard_normal(len(dets))
+        assert np.allclose(f(v), mat @ v, atol=1e-11), (na, nb)
+        index = {d: i for i, d in enumerate(dets)}
+        direct = np.zeros(len(dets), complex)
+        for j, d in enumerate(dets):
+            for o2, a in apply_one_body(d, h).items():
+                if o2 in index:
+                    direct[index[o2]] += v[j] * a
+        assert np.allclose(f(v), direct, atol=1e-11), (na, nb)
+
+
 def test_operator_apply_caches_its_couplings():
     # the closure's contract: the FIRST application builds and caches
     # the signed couplings, every later application is O(#nonzeros)

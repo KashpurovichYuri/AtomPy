@@ -1,0 +1,45 @@
+# Orbital-treatment cells: U14e
+
+ROHF reference energy: -50.38185233 Eh
+
+| cell | E_ground | dE_vs_avg | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | win_l | aniso | max dE | ortho | conv |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+
+configurations per root (top-2 determinants):
+
+
+lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
+
+- `u14e_9f10f11f12d13d_4-0_casci_ao_-_pol_raw` E -50.21153157
+- `u14e_9f10f11f12d13d_4-0_casci_ao_-_pol_avg` E -50.21153157
+- `u14e_9f10f11f12d13d_4-0_casci_ao_-_pur_avg` E -50.20647769
+- `u14e_9f10f11f12d13d_4-0_casci_ao_-_pol_frac` VOID -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_ao_-_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_mo_-_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13dno5_4-0_casscf_no_-_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_ao_virtmix_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_ao_-_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_mo_-_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13dno5_4-0_casscf_no_-_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_ao_radial_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_ao_radial_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_ao_frozen_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_mo_frozen_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13dno5_4-0_casscf_no_frozen_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_ao_frozen_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_casscf_mo_frozen_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13dno5_4-0_casscf_no_frozen_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_ao_-_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_mo_-_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_-_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_ao_-_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_mo_-_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_-_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_ao_radial_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_ao_radial_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_frozen_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_frozen_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)

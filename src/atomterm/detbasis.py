@@ -353,8 +353,9 @@ def _singles_couplings(dets, occ: np.ndarray, cum: np.ndarray):
     if n2 > 63:
         raise ValueError(
             f"the bitmask enumeration addresses {n2} spin-orbitals in "
-            "int64 -- the safe limit is 63; wider sectors need the "
-            "pair classifier's path, not a wider mask")
+            "int64 -- the safe limit is 63; wider sectors route to "
+            "_singles_couplings_wide (the packed-key lookup), not a "
+            "wider mask")
     masks = (occ * (np.int64(1) << np.arange(n2))).sum(axis=1)
     order = np.argsort(masks)
     sorted_masks = masks[order]
@@ -372,6 +373,52 @@ def _singles_couplings(dets, occ: np.ndarray, cum: np.ndarray):
     return ii, jj, ann, cre
 
 
+def _singles_couplings_wide(dets, occ: np.ndarray):
+    """The singles enumeration past int64 (``n2 > 63``): the SAME
+    ``O(n * nelec * nvirt)`` triples as :func:`_singles_couplings`,
+    with the target lookup on packed occupation rows (fixed-width
+    byte keys, lexicographic searchsorted) instead of int64 bitmask
+    arithmetic -- width-unlimited in the spin-orbital count, the
+    triples table the next ceiling.  The signs ride the prefix counts
+    (:func:`_sign_single`), the same rule as the bitmask path; the
+    validity filter stays (a target must EXIST -- the sector's
+    determinant table is complete, so a miss is a bug, never a
+    silent mis-map).
+    """
+    n, n2 = occ.shape
+    nelec = len(dets[0])
+    nvirt = n2 - nelec
+    if nelec == 0 or nvirt == 0:
+        z = np.zeros(0, dtype=np.int64)
+        return z, z, z, z
+    occ_of = np.nonzero(occ)[1].reshape(n, nelec)
+    virt_of = np.nonzero(~occ)[1].reshape(n, nvirt)
+    ii = np.repeat(np.arange(n, dtype=np.int64), nelec * nvirt)
+    ann = np.repeat(occ_of, nvirt, axis=1).ravel()
+    cre = np.tile(virt_of, (1, nelec)).ravel()
+    # the target rows: occ[ii] with the annihilated bit cleared and the
+    # created bit set (disjoint by construction), packed straight to
+    # the byte keys -- a uint8 gather, never the bool table
+    src = np.packbits(occ, axis=1, bitorder="little")
+    k = src.shape[1]
+    rows = src[ii]
+    shift_a = (ann & 7).astype(np.uint8)
+    shift_c = (cre & 7).astype(np.uint8)
+    rows[np.arange(ii.size), ann >> 3] &= ~np.left_shift(
+        np.uint8(1), shift_a)
+    rows[np.arange(ii.size), cre >> 3] |= np.left_shift(np.uint8(1),
+                                                        shift_c)
+    dkeys = src.view(f"S{k}").ravel()
+    order = np.argsort(dkeys)
+    sorted_keys = dkeys[order]
+    query = rows.view(f"S{k}").ravel()
+    pos = np.clip(np.searchsorted(sorted_keys, query), 0, n - 1)
+    valid = sorted_keys[pos] == query
+    ii, ann, cre = ii[valid], ann[valid], cre[valid]
+    jj = order[pos[valid]]
+    return ii, jj, ann, cre
+
+
 def operator_apply(
     dets: list[tuple[int, ...]],
     one_body: np.ndarray | None = None,
@@ -381,9 +428,11 @@ def operator_apply(
     pair: returns ``apply(v) -> O @ v`` -- the operator exists only
     through its action, the ``len(dets)^2`` container never forms.
 
-    The one-body class rides the bitmask enumeration, which addresses
-    at most 63 spin-orbitals in int64 (wider sectors are refused,
-    never silently truncated).
+    The one-body class rides the singles enumeration: bitmask
+    searchsorted at up to 63 spin-orbitals (int64), the packed-key
+    lookup past that (:func:`_singles_couplings_wide`) -- the same
+    signed triples either way, wider sectors never silently
+    truncated.
 
     The nonzero pattern is exact, not heuristic: an operator of this
     form connects determinants differing by at most two spin-orbitals
@@ -448,7 +497,10 @@ def operator_apply(
         # anything with a two-body part uses the chunked classifier
         out = []
         if two_body is None:
-            ii, jj, ann, cre = _singles_couplings(dets, occ, cum)
+            n2 = occ.shape[1]
+            pick = (_singles_couplings_wide(dets, occ) if n2 > 63
+                    else _singles_couplings(dets, occ, cum))
+            ii, jj, ann, cre = pick
             # ii enumerates the SOURCE determinants (the kets the
             # operator acts on), jj their single-excitation partners;
             # the sign is the source's transition sign, and the
