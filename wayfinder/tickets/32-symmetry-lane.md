@@ -1089,6 +1089,40 @@ All four atoms now carry TABLE.md + TABLE.csv (Sc the exemplar):
 Counts: 253 total, 164 fast (the three emitter pins died fast-
 marked; the casscf pin is slow-tier).
 
+## The wave close (2026-11-05 -- review, survey, refactoring round)
+
+- THE TWO-AXIS REVIEW DELTA (e165240..70d2568, applied 12e4773 +
+  e9952b9): the slow mark on test_casscf; the empty-weights R5
+  refusal + pin (observed |dE| = 1.4e-14 cited); the ladder-
+  protocol wordings; the separator derivation; THE RECORD CORRECTED
+  (CI span identity 6/7 legs -- 3d4d's scramble reads different
+  states per route; SA agreement 5/7).
+- THE FULL src/ DESIGN SURVEY (three lenses: cells/cases deep-
+  dive, the 14-module health skim, the test/scripts hygiene pass):
+  the architecture HELD -- no upward edges, windows the substrate
+  root, natural pure at module level, reference's _uhf_object a
+  real two-adapter seam, every cells/cases export consumed.  The
+  findings fed the round.
+- THE REFACTORING ROUND (6395de7; the full list in the commit +
+  map.md's resolved entry): the two cells one-homes (_key_core,
+  _apply_family), run_carbon reads the row, void_reason's
+  double-check gone, the dead main() deleted, the max_cycle schema
+  bump (identity flagging, legacy fallback), the verbose kwarg
+  dead, the scripts one-homes + docstring truths + the cas_label
+  NO branch deleted, the V1 splits (3-way + 6-way), the V7
+  citations captured -- AND A GRAZE CAUGHT: test_symm_tm's l2 band
+  widened to 1e-6 (observed worst 8.2e-9, Ti 3d3p4s SA leg; 1.2x
+  headroom was the flake class).
+- THE DELTA REVIEW OF THE ROUND (both axes over e9952b9..6395de7):
+  R6/V6/V7 verified clean by the sub-agents (the extraction order
+  reproduced verbatim; the max_cycle chain consistent store to
+  builder; the SA roots path carries the optimizer mc).  One delta
+  found + dispositioned: run_carbon's artifact stem aligns to the
+  declaration ("C"; no committed artifact affected -- recorded in
+  map.md).  map.md dispositions landed with this entry.
+
+Counts after the round: 253 total, 164 fast.
+
 ## References
 
 

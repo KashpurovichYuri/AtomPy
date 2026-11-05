@@ -40,19 +40,34 @@ declaration path as a fresh wave. (live)
   ReferenceSpec (the declaration-owns-intent rule held).  The one
   real shallowness finding is item (1) below.  The scripts'
   vocabulary module tightened (comm_text deleted).
-  RECORDED, not fixed: (1) the kernel/lane residual block is written
-  twice (`kernel_cell_payload` vs `run_lane_cell` -- the apply/residual
-  loop and its imports) -- the one-home candidate for the wave-close
-  refactoring round; (2) multi-invariant pins (`test_pyscf_apply_is_
-  the_slater_condon_action` x3, `test_method_ladder_one_table`) --
-  V1 splits at the wave close, the pins are load-bearing; (3) the new
-  residual bands (`< 1e-8`) carry no observed fresh-value comment
-  (V7) -- capture at the next natural fixture run; (4) the "cycle
-  cap" note keys on the DECLARED 200 while the payload carries only
-  the count -- the proper fix stores max_cycle in the payload (a
-  schema bump; rides the next store migration); (5) `cas_label`'s
-  NO branch is a hypothetical seam (NO starts never reach labels) --
-  delete at the wave close unless a consumer appears.
+  RESOLVED 2026-11-05 (the wave-close refactoring round, 6395de7,
+  after the full-scope design survey): (1) the kernel/lane residual
+  block found its one home (`_apply_family`; plus `_key_core`, the
+  STRONGER triple-duplication the survey caught) -- both runners
+  kept (the deletion test: the fold/cache/store paths genuinely
+  differ); (2) the V1 splits done (the apply-boundary pin three
+  ways, the ladder pin six ways); (3) the V7 citations captured on
+  the frozen twins (and the capture CAUGHT a graze: test_symm_tm's
+  l2 band widened 1e-8 -> 1e-6 with the observed 8.2e-9 cited --
+  1.2x headroom on an SA-leg solver-noise quantity); (4) max_cycle
+  rides the payload beside cycles (read off the live mc, flags by
+  identity; the builder keeps the legacy ==200 key for stores
+  predating the field); (5) cas_label's NO branch deleted (dead --
+  cells makes the span+start combination unrepresentable and the
+  builder filters start=="no").  Also in the round: the verbose
+  duplication RESOLVED (the run_cell kwarg died; the budgets key is
+  the one channel); run_carbon reads the DECLARED row (NOTE: its
+  artifacts now label "C" where the pre-declaration path labeled
+  "C_ccpvdz_s2" -- alignment with run.py's row-driven path, no
+  committed artifact affected); scripts one-homes (payload_of,
+  atomic_write_text).
+- Declinations of the round (2026-11-05, reasons recorded here):
+  stage_facts' c_act absorption -- rides the ECP adapter retirement
+  (ticket 31, its one caller-change moment); the ECP term-exactness
+  and symm_lane L^2 pins' V7 citations -- textbook-integer class,
+  docstrings carry the physics, not the residual class the item
+  targeted; the unknown-atom CLI guard dedup -- four lines, two
+  CLIs, a dedup that adds an import for a TODO's worth of code.
 
 - The ladder-wave review round (2026-11-01, `701b31c..c02d0c6`, both
   axes): applied — the module-docstring lockstep, the shared
@@ -79,11 +94,13 @@ declaration path as a fresh wave. (live)
   not grammar values.
 - `run_casscf`/`run_sa_casscf` are pass-throughs carrying the stage
   name — retire at the ECP wave together with `run_u*` (their second
-  consumer); the stage `name=` lives at the call site (2026-10-30).
+  consumer); the stage `name=` lives at the call site (2026-10-30;
+  the 2026-11-05 survey confirmed the inventory: one caller + two,
+  both the ticket-31 retirement set).
 - `stage_facts`'s `c_act` parameter: every production caller passes the
-  same derived slice — deepening candidate, deferred (2026-10-30).
-- The `verbose` duplication (a `run_cell` kwarg AND a budgets key) —
-  the 2026-10-19 finding; confirm done-or-dead at the next cells touch.
+  same derived slice — absorb at the ECP wave with the adapter
+  retirement (2026-11-05 survey re-confirmed; the deepening lands
+  with its one caller-change moment).
 - Ti escape comm band (test_treatments, the sa_free band): quiet
   through recent suites; capture-not-widen stands (no observed value
   recorded).
