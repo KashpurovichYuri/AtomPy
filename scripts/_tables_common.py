@@ -1,10 +1,10 @@
-"""The tables' shared vocabulary: the table constants,
-the label helpers, and the TABLES edit protocol's marker form.
+"""The tables' shared vocabulary: the table constants, the label
+helpers, and the ladder edit protocol's marker form.
 
-ONE home for what every emitter formats the same way (the survey/
-ladder/lattice/methods tables); the per-table policy -- headings,
-column sets, row grouping -- lives with each emitter.  Presentation
-only: nothing here touches physics or the store.
+ONE home for what the renderers format the same way (the methods
+ladder, the regen cells.md); the per-table policy -- headings, column
+sets, row grouping -- lives with each renderer.  Presentation only:
+nothing here touches physics or the store.
 """
 
 import math
@@ -114,7 +114,7 @@ def payload_of(cells: dict, key) -> dict | None:
 
 
 def replace_block(src: Path, begin: str, end: str, new_block: str) -> str:
-    """The TABLES edit protocol's marker form: splice ``new_block``
+    """The ladder edit protocol's marker form: splice ``new_block``
     between the section's marker pair, structural-check the splice,
     write through a verified ``.md.tmp`` move.  Returns the new file
     text; the caller owns the block's own structural assertions.
