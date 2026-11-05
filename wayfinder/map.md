@@ -84,6 +84,23 @@ user decision; the partial verdict 91/91-isolation-green).
   the regen head's guards unlink at refusal -- the deeper fix is
   writers persisting only converged chks).
 
+- Character-selected folds (2026-11-05, the promoted-pair wave): the
+  fold-tag grammar cannot express a multi-band fold -- the basis
+  carries the physical 6s on bands 14s+15s, the 6p trio on
+  13p/14p/15p, the 7s on 18s/19s/20s (labels are exponent-grid
+  coordinates, not principal numbers), and `closed_electrons`'s
+  per-shell arithmetic assumes one band per shell (a tag like
+  `@14s15s14p15p18s19s` counts 20 closed of 14 valence electrons).
+  So the m-complete 6p PROMOTION -- CAS(10,15), the record's own
+  "inner core-pair valence, to be done m-complete" open question --
+  has no expressible cell: the occupied-prefix fold cannot skip the
+  6p trio (m-set violation at ncore=2), and the p trio enters the
+  window only as virtual columns (the `10f13d14p` probe).  The fix
+  (when wanted): the fold span selected by orbital character (the
+  dominant band set of the named MOs), with the closed count read
+  off the reference occupations -- a real seam extension, not a tag
+  hack.
+
 - The ladder-wave review round (2026-11-01, `701b31c..c02d0c6`, both
   axes): applied — the module-docstring lockstep, the shared
   `_substrate` builder, the V1 test split, the `_FOLD_*` renames, the

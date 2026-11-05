@@ -131,9 +131,31 @@ campaign's output; `run_u*` stays the frozen record until then).
      class (145 cells, all windows incl. the NO forms) + the frac
      class → 15 CASCI anchors run. IN FLIGHT (detached; priced on
      the real primary cell: 272 s, kernel-only payload class).
-- Part 3 (next): uhf_anchor.py U14e → build_methods_tables.py U14e
-  (the first modern U14e TABLE.md) → THE RETIREMENT (G5): `run_u*` +
-  `run_casscf`/`run_sa_casscf` die, `stage_facts`' `c_act` absorbs.
+- Part 2b: THE RESTRICTED OPTIMIZER BATCH (2026-11-05, user-directed:
+  "145 too much, restrict"; commits 2b3624c, f3fa9ce): three
+  promoted-pair windows declared over the band probe's identities
+  (elements/U14e/logs/probe_bands.log -- the valence f/d character
+  sits on 10f/13d; the CASCI pair ranking picked 10f+13d, the only
+  pair hosting the f3d1 manifold, ground 5I at <L^2> = 42 exact):
+  `10f13d` (4,0) the record's minimal f+d; `10f13d7s` (5,1) the
+  record's six13 -- the 7s pair promoted, the fold follows the new
+  per-window sector (`CaseSpec.planned_sectors` -- window_grid reads
+  it; ncore_of(14,6) = 4 = the full core minus the 7s pair, the
+  record's own fold); `10f13d14p` (4,0) the p-entry probe -- the
+  physical 6p trio's dominant band in-window (the Ti 3d4s4p4d
+  pattern; band labels are exponent-grid coordinates -- the label
+  "6p" is a compact core-like band the CI never touches, caught by
+  its exactly-zero spectrum shift; the trio lives on 13p/14p/15p).
+  The batch's cells: free CASSCF + free SA per window + the PRIMARY
+  window's free SA (the 17x5L term cell -- the minimal windows read
+  5I ground, the 5L root +22 mEh mixed at <L^2> = 64.7; the record's
+  AO 1f+1d row read the same 42) -- materialized through filtered
+  --full passes after the anchors are read.  The m-complete 6p
+  promotion (CAS(10,15)) is NOT expressible -- the fold-tag grammar
+  assumes one band per shell (map Issues: character-selected folds).
+- Part 3 (next): the batch + render + review → THE RETIREMENT (G5):
+  `run_u*` + `run_casscf`/`run_sa_casscf` die, `stage_facts`' `c_act`
+  absorbs.
 
 ## References
 
