@@ -235,9 +235,9 @@ carries a number only when the number IS the fact.
 
 ## Tests
 
-`pytest` runs 246 tests (~25 min unloaded; the CAS-ladder fixture in
+`pytest` runs 253 tests (~25 min unloaded; the CAS-ladder fixture in
 `test_symm_tm` dominates at ~15 min; slower under load). The fast
-tier: `pytest -m fast` = 157 tests in seconds (machine-light
+tier: `pytest -m fast` = 164 tests in seconds (machine-light
 selection).
 **The per-commit gate** (user-directed 2026-11-04): the fast tier
 plus the diff's targeted files, together 5–10 minutes MAXIMUM — the

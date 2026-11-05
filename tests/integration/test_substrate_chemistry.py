@@ -64,7 +64,8 @@ def test_build_full_mo_blocks_orthonormal_and_span_preserving(build_full_mo_refs
         assert _s_ortho_err(mo, s) < 1e-10, cfg.symbol
 
         # core SPAN preserved: the block projectors agree with the plain
-        # canonical core projector (Löwdin within the span must not move it)
+        # canonical core projector (Löwdin within the span must not move it;
+        # observed: 2.2e-16 C / 5.6e-16 Si)
         c_can = mf.mo_coeff[:, :ncore]
         c_new = mo[:, :ncore]
         p_can = c_can @ c_can.conj().T @ s

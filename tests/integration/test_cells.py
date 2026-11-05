@@ -622,6 +622,7 @@ def test_kernel_cell_payload_meters_match_the_dense_path(carbon, tmp_path):
     kern = kernel_cell_payload(key, mol, mf, workdir=tmp_path)
     assert kern["energies_pyscf"] == dense["energies_pyscf"]
     assert abs(kern["ground_l2"] - dense["ground_l2"]) < 1e-9
+    # observed on the frozen carbon: 1.2e-16 / 5.0e-16 (the apply floor)
     assert 0.0 <= kern["res_h_lz"] < 1e-8
     assert 0.0 <= kern["res_h_l2"] < 1e-8
     # no substrate given: the kernel-only shape (NaN meters, no
@@ -724,6 +725,7 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
         assert abs(v - 2.0) < 1e-8
     # the state residual: the closed window's term components are
     # symmetry eigenstates -- the residual sits at the apply floor
+    # (observed on the frozen D2h twin: 1.1e-16 / 2.2e-16)
     assert 0.0 <= p["res_h_lz"] < 1e-8
     assert 0.0 <= p["res_h_l2"] < 1e-8
     # the store round-trips (and a fresh run is a cache hit)
@@ -773,7 +775,8 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
 
     # the span-identity certificate at CI level: the free driver's
     # ground TOTAL equals the pinned leg's TERM total (the components
-    # are degenerate -- same span, same fold, different construction)
+    # are degenerate -- same span, same fold, different construction;
+    # observed on the frozen twins: 7.1e-15)
     pinned = run_lane_cell(leg, mol_d2h, mf_d2h, cs.term, workdir=tmp_path)
     free = cell_payload(
         replace(leg, substrate="pol"),
@@ -795,7 +798,7 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
     # the pinned SA runner: the two-pass payload, term exact
     sa = run_lane_cell(replace(leg, method="sa-casscf"), mol_d2h, mf_d2h,
                        cs.term, workdir=tmp_path)
-    assert "ensemble" in sa and sa["ptp"] < 1e-8
+    assert "ensemble" in sa and sa["ptp"] < 1e-8  # observed: 1.3e-14
     # the SA TOTAL is the kernel ensemble (the optimizer rotates
     # same-irrep core/window columns -- the readout's absolutes are of
     # the run's own partition; only the kernel bookkeeping compares)
@@ -815,15 +818,9 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
     assert sa_q["conv_dE"] == sa["conv_dE"] >= 0.0
 
 
-@fast
-def test_method_ladder_one_table():
-    """THE LADDER (one table per atom, between the markers): byte-
-    deterministic; EVERY run cell a row -- CASCI beside its optimizer
-    variants, the method bare + restriction only; the window cell
-    carries the start (slash form); NO starts are not ladder rows;
-    the ROHF anchor leads; ptp computes where a root set exists; the
-    closure columns carry the span certificate; the note column
-    carries the cycle cap; gated planned windows follow as pointers."""
+def ladder_module():
+    """The methods-table builder, loaded once per call site (a script,
+    not a package import)."""
     import importlib.util
     from pathlib import Path as _Path
 
@@ -833,29 +830,45 @@ def test_method_ladder_one_table():
         / "build_methods_tables.py")
     mod = importlib.util.module_from_spec(loader)
     loader.loader.exec_module(mod)
+    return mod
 
+
+def _ladder_payload(e, roots=1):
+    """A minimal run payload for ladder rendering."""
+    return {"energies_pyscf": [e] * roots, "n_det": 90,
+            "ground_l2": 12.0, "comm_norm_h_lz": 1e-9,
+            "comm_norm_h_l2": 1e-8, "win_lz": 1e-15,
+            "win_lperp": 2e-15}
+
+
+@fast
+def test_ladder_table_is_byte_deterministic():
+    """THE LADDER (one table per atom, between the markers): the
+    section builds byte-identically from the same store, once."""
+    mod = ladder_module()
     cs = CAMPAIGN["Ti"]
-    keys = grid_keys(cs)          # the primary window's factor grid
+    keys = grid_keys(cs)
+    agree = {k.address: _ladder_payload(-848.4) for k in keys}
+    text = "\n".join(mod.ladder_section(cs, agree, -848.4065))
+    assert text == "\n".join(mod.ladder_section(cs, agree, -848.4065))
+    assert text.count(mod.BEGIN) == 1 and text.count(mod.END) == 1
 
-    def payload(e, roots=1):
-        return {"energies_pyscf": [e] * roots, "n_det": 90,
-                "ground_l2": 12.0, "comm_norm_h_lz": 1e-9,
-                "comm_norm_h_l2": 1e-8, "win_lz": 1e-15,
-                "win_lperp": 2e-15}
+
+@fast
+def test_ladder_anchors_lead_and_families_follow():
+    """The ROHF anchor leads; the UHF anchor row follows when the
+    store carries the record (DeltaE against the same zero, the meter
+    in the note); the first family follows directly."""
+    mod = ladder_module()
+    cs = CAMPAIGN["Ti"]
+    keys = grid_keys(cs)
+    agree = {k.address: _ladder_payload(-848.4) for k in keys}
 
     def body(cells, uhf=None):
         return "\n".join(mod.ladder_section(cs, cells, -848.4065, uhf=uhf))
 
-    # every cell ran: CI rows render beside the optimizers, NO never
-    agree = {k.address: payload(-848.4) for k in keys}
-    assert body(agree) == body(agree)
-    text = body(agree)
-    assert text.count(mod.BEGIN) == 1 and text.count(mod.END) == 1
-    rows = [r for r in text.splitlines() if r.startswith("|")]
+    rows = [r for r in body(agree).splitlines() if r.startswith("|")]
     assert rows[2].startswith("| ROHF (anchor) |")
-    # the UHF anchor row follows when the store carries the record:
-    # DeltaE against the same zero (Unicode minus), the meter in the
-    # note; the first family follows it directly
     with_uhf = body(agree, uhf={"e_tot": -848.41, "s2": 4.02,
                                 "sigma_min": 0.98})
     rows_uhf = [r for r in with_uhf.splitlines() if r.startswith("|")]
@@ -865,39 +878,98 @@ def test_method_ladder_one_table():
     assert cells_uhf[7] == "−3.5"
     assert "⟨S²⟩=4.0200" in cells_uhf[17]
     assert rows_uhf[4].startswith("| CASCI |")  # the first family follows
-    rows = rows_uhf
+
+
+@fast
+def test_ladder_every_run_cell_a_row_no_starts_excluded():
+    """EVERY run cell a row -- the four fold variants' CI rows beside
+    their optimizer variants, the method bare + restriction only, the
+    window cell in slash form; NO starts are not ladder rows; free
+    optimizer rows carry no lane marker."""
+    mod = ladder_module()
+    cs = CAMPAIGN["Ti"]
+    keys = grid_keys(cs)
+    agree = {k.address: _ladder_payload(-848.4) for k in keys}
+    text = "\n".join(mod.ladder_section(cs, agree, -848.4065))
+    rows = [r for r in text.splitlines() if r.startswith("|")]
     ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / AO |")]
     assert len(ci) == 4            # the four fold variants' CI rows
     assert not any("/ NO |" in r for r in rows)   # NO starts excluded
     opt = [r for r in rows
            if r.startswith("| CASSCF | free | 3d4s / AO |")]
     assert len(opt) == 2 and not any("·lane" in r for r in opt)  # Ar + Ar·pur substrates
-    # the closure columns render (values here)
+
+
+@fast
+def test_ladder_meter_and_ptp_columns_render():
+    """The closure columns carry the span certificate; ptp computes
+    where a root set exists and stays dash on single roots; the conv
+    column carries precision/count."""
+    mod = ladder_module()
+    cs = CAMPAIGN["Ti"]
+    keys = grid_keys(cs)
+    agree = {k.address: _ladder_payload(-848.4) for k in keys}
+
+    def body(cells):
+        return "\n".join(mod.ladder_section(cs, cells, -848.4065))
+
+    text = body(agree)
+    rows = [r for r in text.splitlines() if r.startswith("|")]
+    opt = [r for r in rows
+           if r.startswith("| CASSCF | free | 3d4s / AO |")]
     assert opt[0].split("|")[14].strip() == "1e-15"
     assert opt[0].split("|")[15].strip() == "2e-15"
-
-    # ptp computed where a root set exists; single roots stay dash;
-    # the cap notes the row
+    assert opt[0].split("|")[13].strip() == "—"  # the single root: no set
     sa = next(k for k in keys if k.method == "sa-casscf"
               and k.mask is None and k.start == "ao"
               and k.substrate == "pol")
     traced = dict(agree)
-    traced[sa.address] = {**payload(-848.4, roots=5), "conv_dE": 2.3e-9,
-                          "cycles": 5}
+    traced[sa.address] = {**_ladder_payload(-848.4, roots=5),
+                          "conv_dE": 2.3e-9, "cycles": 5}
     row = [r for r in body(traced).splitlines()
            if r.startswith("| SA-CASSCF | free | 3d4s / AO |")][0]
     assert "| 1e-9/5 |" in row and "| 0e+00 |" in row
-    assert opt[0].split("|")[13].strip() == "—"  # the single root: no set
-    capped = dict(traced)
-    capped[sa.address] = {**capped[sa.address], "cycles": 200}
-    assert "cycle cap" in [r for r in body(capped).splitlines()
-                           if r.startswith("| SA-CASSCF | free "
-                                           "| 3d4s / AO |")][0]
 
-    # no optimizer run cells anywhere: CI rows still render, the
-    # planned pointers follow the table
-    text = body({k.address: payload(-848.4) for k in keys
-                 if k.method == "casci"})
+
+@fast
+def test_ladder_cycle_cap_note():
+    """The cap note fires by IDENTITY on payloads carrying the cap
+    (the store's ``max_cycle`` field -- the run's actual mc cap) and
+    keeps the legacy ``== 200`` key for payloads predating the field;
+    a mid-cap count never flags."""
+    mod = ladder_module()
+    cs = CAMPAIGN["Ti"]
+    keys = grid_keys(cs)
+    agree = {k.address: _ladder_payload(-848.4) for k in keys}
+    sa = next(k for k in keys if k.method == "sa-casscf"
+              and k.mask is None and k.start == "ao"
+              and k.substrate == "pol")
+
+    def row_of(extra):
+        cells = dict(agree)
+        cells[sa.address] = {**_ladder_payload(-848.4, roots=5),
+                             "conv_dE": 2.3e-9, **extra}
+        row = [r for r in "\n".join(
+                   mod.ladder_section(cs, cells, -848.4065)).splitlines()
+               if r.startswith("| SA-CASSCF | free | 3d4s / AO |")][0]
+        return "cycle cap" in row
+
+    assert row_of({"cycles": 5, "max_cycle": 5})       # identity fires
+    assert not row_of({"cycles": 5, "max_cycle": 200})  # below the cap
+    assert row_of({"cycles": 200})                     # legacy key fires
+    assert not row_of({"cycles": 5})                   # legacy, mid-cap
+
+
+@fast
+def test_ladder_ci_only_store_renders_planned_pointers():
+    """No optimizer run cells anywhere: the CI rows still render, the
+    gated planned windows follow as pointers."""
+    mod = ladder_module()
+    cs = CAMPAIGN["Ti"]
+    keys = grid_keys(cs)
+    text = "\n".join(mod.ladder_section(
+        cs, {k.address: _ladder_payload(-848.4) for k in keys
+             if k.method == "casci"}, -848.4065))
     assert "| CASCI | free | 3d4s / AO |" in text
     assert "regen_cells.py Ti --window 3d4d" in text
     assert "| CASSCF" not in text and "| SA-CASSCF" not in text
@@ -909,16 +981,7 @@ def test_method_ladder_lane_families():
     the free CASSCF/SA, and the pinned SA in one family block; the
     tagged folds carry the lane marker; un-run lane families are
     absent; families are separated by the rule row."""
-    import importlib.util
-    from pathlib import Path as _Path
-
-    loader = importlib.util.spec_from_file_location(
-        "build_methods_tables",
-        _Path(__file__).resolve().parents[2] / "scripts"
-        / "build_methods_tables.py")
-    mod = importlib.util.module_from_spec(loader)
-    loader.loader.exec_module(mod)
-
+    mod = ladder_module()
     cs = CAMPAIGN["Sc"]
 
     def p(e, pinned=False, ci=False):

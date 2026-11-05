@@ -290,6 +290,13 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
         :func:`run_casci`).
     verbose : int
         Verbosity passed to the mc object.
+
+    Raises
+    ------
+    ValueError
+        ``weights=[]`` -- the empty list is a caller bug (the
+        measured-block rule never yields it); refuse here, not
+        inside PySCF's SA wrapper.
     """
     mc = mcscf.CASSCF(mf, ncas, nelecas)
     if mo_full is not None:

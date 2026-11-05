@@ -95,6 +95,11 @@ class StageFacts:
     cycles : int or None
         The optimizer's macro-cycle count (``CASResult.cycles``);
         ``None`` for CASCI stages and cache hits.
+    max_cycle : int or None
+        The stage's optimizer's ACTUAL macro-cycle cap
+        (``mc.max_cycle_macro`` -- declared or PySCF's default);
+        ``cycles == max_cycle`` is the cap-hitting flag by identity.
+        ``None`` for CASCI stages and cache hits.
     conv_dE : float or None
         The final macro-cycle |delta e_tot| (``CASResult.conv_dE``)
         -- the convergence precision beside the count; ``None``
@@ -117,6 +122,7 @@ class StageFacts:
     core_anisotropy: float | None = None
     converged: bool = True
     cycles: int | None = None  # optimizer macro-cycles (CI/cache: None)
+    max_cycle: int | None = None  # the declared cap (identity flag)
     conv_dE: float | None = None  # final |delta e_tot| (beside cycles)
 
     # --- shared readouts (thin pass-throughs: renderers never reach
@@ -174,6 +180,7 @@ class StageFacts:
             "diverged": self.diverged,
             "converged": self.converged,
             "cycles": self.cycles,
+            "max_cycle": self.max_cycle,
             "conv_dE": self.conv_dE,
             "ortho_err": self.ortho_err,
             "e_ground": self.e_ground,
@@ -299,5 +306,9 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         # mutation discipline); CASCI stages and cache hits carry no mc
         converged=bool(getattr(getattr(cas, "mc", None), "converged", True)),
         cycles=getattr(cas, "cycles", None),
+        # the optimizer's ACTUAL macro-cycle cap (declared or PySCF's
+        # default) -- the payload flags cap-hitting by identity
+        max_cycle=getattr(getattr(cas, "mc", None), "max_cycle_macro",
+                          None),
         conv_dE=getattr(cas, "conv_dE", None),
     )

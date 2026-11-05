@@ -49,7 +49,7 @@ from atomterm.stages import stage_facts
 from atomterm.analysis import format_report
 
 __all__ = ["CaseSpec", "Scenario", "CAMPAIGN", "scenarios_for",
-           "run_case", "run_atom", "run_carbon", "main"]
+           "run_case", "run_atom", "run_carbon"]
 
 
 # the declaration ----------------------------------------------------
@@ -543,20 +543,18 @@ def run_atom(
 
 
 def run_carbon(cfg: AtomConfig | None = None, workdir: str = "elements") -> dict:
-    """Carbon pilot (2p^2, CAS(2,3)): the generic pipeline with carbon data."""
+    """Carbon pilot (2p^2, CAS(2,3)): the generic pipeline driven by
+    the DECLARED row -- the anatomy (window, spin, SA weights) reads
+    off :data:`CAMPAIGN`\\ ['C'], never re-declared here."""
+    row = CAMPAIGN["C"]
     return run_atom(
-        cfg or AtomConfig(),
-        ["2p"],
-        2,
+        cfg or row.atom_config(),
+        row.shell_patterns,
+        row.nelec_act,
         workdir=workdir,
-        sa_weights=[1 / 3] * 3,  # SA over the three 3P M_L components (Ms=1)
+        sa_weights=row.sa_weights,
     )
 
 
-def main():
-    """Run the carbon pilot (the ``python -m`` entry)."""
+if __name__ == "__main__":  # pragma: no cover
     run_carbon()
-
-
-if __name__ == "__main__":
-    main()

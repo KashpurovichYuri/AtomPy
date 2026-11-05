@@ -1086,7 +1086,7 @@ All four atoms now carry TABLE.md + TABLE.csv (Sc the exemplar):
   still showed the dead verdict-column format), test_symm_tm's
   record pointer, map.md's sector-column Issue resolved.
 
-Counts: 246 total, 157 fast (the three emitter pins died fast-
+Counts: 253 total, 164 fast (the three emitter pins died fast-
 marked; the casscf pin is slow-tier).
 
 ## References

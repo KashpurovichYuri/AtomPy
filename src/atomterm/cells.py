@@ -337,6 +337,9 @@ class CellData:
     cycles : the optimizer's macro-cycle count (cost pricing +
         restart audits); 0 for runs without an optimizer and for
         stores predating the field.
+    max_cycle : the DECLARED optimizer cap (``cycles == max_cycle``
+        is the cap-hitting flag by identity); ``None`` for runs
+        without a declared cap and for stores predating the field.
     conv_dE : the final macro-cycle |delta e_tot| (``None`` where
         ``cycles`` is 0).
     """
@@ -348,6 +351,7 @@ class CellData:
     core_energy: float
     ncas: int = 0
     cycles: int = 0
+    max_cycle: int | None = None
     conv_dE: float | None = None
 
 
@@ -415,10 +419,13 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
     energies, ci, core_energy = store
     ncas = lib.chkfile.load(str(chk), f"atomterm/{key.address}/ncas")
     cycles = lib.chkfile.load(str(chk), f"atomterm/{key.address}/cycles")
+    max_cycle = lib.chkfile.load(str(chk),
+                                 f"atomterm/{key.address}/max_cycle")
     conv_dE = lib.chkfile.load(str(chk), f"atomterm/{key.address}/conv_dE")
     return CellData(key, np.asarray(mo), energies, ci, core_energy,
                     int(ncas) if ncas is not None else 0,
                     int(cycles) if cycles is not None else 0,
+                    int(max_cycle) if max_cycle is not None else None,
                     float(conv_dE) if conv_dE is not None else None)
 
 
@@ -483,8 +490,34 @@ def _fold_span(key: CellKey, mol, mf) -> tuple[tuple[str, ...], np.ndarray]:
     return fold, lowdin(np.eye(mol.nao_nr())[:, fold_rows], mf.get_ovlp())
 
 
+def _key_core(key: CellKey, mol, mf) -> tuple[int, np.ndarray | None,
+                                              np.ndarray | None]:
+    """One home for the key->core resolution shared by the run
+    (:func:`run_cell`), the cache path (:func:`analyze_cell`), and the
+    kernel payload (:func:`kernel_cell_payload`): returns
+    ``(ncore, c_core, c_pur)`` -- a tagged fold's raw-shell span IS
+    the core (``ncore`` follows it), else the pur substrate's
+    purified span when declared, else ``None`` folds the occupied
+    prefix.  ``c_pur`` is separate because the NO-start branch and
+    the anisotropy reference need the pur substrate even when a fold
+    supplied ``c_core``."""
+    from atomterm.core import purified_core_orbitals
+    from atomterm.system import ncore_of
+
+    na, nb = key.sector
+    ncore = ncore_of(mol.nelectron, na + nb)
+    c_run = None
+    if key.fold_tag is not None:
+        _, c_run = _fold_span(key, mol, mf)
+        ncore = c_run.shape[1]
+    c_pur = (None if c_run is not None
+             else purified_core_orbitals(mol, mf, ncore)[0]
+             if key.substrate == "pur" else None)
+    return ncore, (c_run if c_run is not None else c_pur), c_pur
+
+
 def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
-             fresh: bool = False, verbose: int = 0,
+             fresh: bool = False,
              workdir: str | Path = "elements") -> "StageFacts | None":
     """Execute one cell: resolve every axis through its OWNER, run,
     store, analyze. The unit of the run queue.
@@ -557,31 +590,13 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
 
     from atomterm.casscf import (constrained_casscf, mask_frozen_window,
                                  mask_no_core_window_mix, run_casci)
-    from atomterm.core import purified_core_orbitals
-    from atomterm.system import ncore_of
     from atomterm.windows import (build_full_mo, occupied_core_idx,
                                   radial_basis, mask_radial_rotations, select_valence_ao)
 
     na, nb = key.sector
-    ncore = ncore_of(mol.nelectron, na + nb)
+    ncore, c_core, c_pur = _key_core(key, mol, mf)
     act_idx = select_valence_ao(mol, key.shell_patterns)
     ncas = len(act_idx)
-
-    # a fold-tagged window: the tag names the core partition (the
-    # route-class grammar validated above); the fold's raw-shell
-    # Loewdin span IS the substrate (:func:`_fold_span` owns the
-    # construction and its refusals)
-    c_run = None
-    if key.fold_tag is not None:
-        _, c_run = _fold_span(key, mol, mf)
-        ncore = c_run.shape[1]
-
-    c_pur = (None if c_run is not None
-             else purified_core_orbitals(mol, mf, ncore)[0]
-             if key.substrate == "pur" else None)
-    # the core span every fold in this run uses (the tagged substrate
-    # above, else the pur class's; None folds the occupied prefix)
-    c_core = c_run if c_run is not None else c_pur
 
     # start x mask -> the substrate MO matrix + the optimizer mask.
     # frozen/virtmix are START-INDEPENDENT (they pin the window columns
@@ -604,7 +619,9 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         ncas = win.c_win.shape[1]
         mo_full = win.columns(mf, ncore, c_core=c_pur)
     elif key.start == "ao":
-        core_idx = (list(range(ncore)) if c_run is not None
+        # a tagged fold supplied the core columns (the run substrate's
+        # prefix); otherwise the occupied prefix folds
+        core_idx = (list(range(ncore)) if key.fold_tag is not None
                     else occupied_core_idx(mf, ncore))
         if key.mask == "radial":
             mo_full, labels = radial_basis(
@@ -632,7 +649,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     elif key.mask == "virtmix":
         mask = mask_no_core_window_mix
 
-    verbose = budgets.get("verbose", verbose)
+    verbose = budgets.get("verbose", 0)
     common = dict(mc_opts=budgets.get("mc_opts"),
                   fci_opts=budgets.get("fci_opts"), verbose=verbose)
     if key.method == "casci":
@@ -663,16 +680,16 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                                  name=key.address, **common)
 
     _store_cell(chk, key, cas, ncas,
-                  store_name=f"{key.address}_roots"
-                            if key.method == "sa-casscf"
-                  else None)
+                store_name=f"{key.address}_roots"
+                           if key.method == "sa-casscf"
+                else None)
     # the dense stage analysis (operator matrices over the sector) is
     # budgeted like the lane's meters: past _COMM_CAP the cell stores
     # KERNEL-ONLY (the run's own energies; the meters read em-dash) --
     # None is the caller's signal (:func:`kernel_cell_payload`)
     if sector_dimension(ncas, na, nb) > _COMM_CAP:
         return None
-    return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_pur=c_core)
+    return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_core=c_core)
 
 
 # analysis + persistence ---------------------------------------------
@@ -689,8 +706,6 @@ def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
     trusted cached stage).
     """
     from atomterm.casscf import CASResult
-    from atomterm.core import purified_core_orbitals
-    from atomterm.system import ncore_of
     from atomterm.windows import select_valence_ao
 
     data = load_cell(key, workdir)
@@ -699,19 +714,11 @@ def analyze_cell(key: CellKey, mol, mf, workdir: str | Path = "elements"):
                     cycles=data.cycles or None,
                     conv_dE=data.conv_dE)
     na, nb = key.sector
-    ncore = ncore_of(mol.nelectron, na + nb)
     ncas = data.ncas or len(select_valence_ao(mol, key.shell_patterns))
-    c_run = None
-    if key.fold_tag is not None:
-        _, c_run = _fold_span(key, mol, mf)
-        ncore = c_run.shape[1]
     if sector_dimension(ncas, na, nb) > _COMM_CAP:
         return None
-    c_pur = (None if c_run is not None
-             else purified_core_orbitals(mol, mf, ncore)[0]
-             if key.substrate == "pur" else None)
-    return _facts(key, mol, mf, cas, ncore, ncas, na, nb,
-                  c_pur=c_run if c_run is not None else c_pur)
+    ncore, c_core, _ = _key_core(key, mol, mf)
+    return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_core=c_core)
 
 
 def cell_payload(key: CellKey, facts) -> dict:
@@ -719,6 +726,27 @@ def cell_payload(key: CellKey, facts) -> dict:
     out = facts.payload(key.method)
     out["cell"] = key.address
     return out
+
+
+def _apply_family(mol, mf, c_win, parts, ncore, c_core, ncas, na, nb):
+    """One home for the size-independent apply family of a window:
+    ``(apply_h, apply_m, apply_l2)`` -- H through the PySCF
+    C-contraction boundary (:func:`atomterm.operators.pyscf_apply`),
+    Lz as its real form ``M = -i Lz`` (norms unchanged), L2 with its
+    two-body part.  Shared by :func:`kernel_cell_payload` and
+    :func:`run_lane_cell`; the callers own their root loops."""
+    from pyscf import ao2mo
+
+    from atomterm.detbasis import operator_apply
+    from atomterm.operators import active_space_integrals, pyscf_apply
+
+    h1, _ = active_space_integrals(mol, mf, c_win, ncore, c_core=c_core)
+    apply_h = pyscf_apply(h1, ao2mo.kernel(mol, c_win), ncas, na, nb)
+    apply_m = operator_apply(parts["dets"],
+                             one_body=(-1j * parts["Lz"][0]).real)
+    apply_l2 = operator_apply(parts["dets"], one_body=parts["L2"][0],
+                              two_body=parts["L2"][1])
+    return apply_h, apply_m, apply_l2
 
 
 def kernel_cell_payload(key: CellKey, mol=None, mf=None,
@@ -744,6 +772,7 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
         "comm_norm_h_l2": float("nan"),
         "converged": True,
         "cycles": data.cycles or None,
+        "max_cycle": data.max_cycle,
         "conv_dE": data.conv_dE,
         "win_lz": float("nan"),
         "win_lperp": float("nan"),
@@ -752,44 +781,26 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
         # frac cells ran under the fractional reference (not this mf);
         # their meters belong to the dense path
         return out
-    from pyscf import ao2mo
-
-    from atomterm.core import purified_core_orbitals
-    from atomterm.detbasis import operator_apply
-    from atomterm.operators import (active_space_integrals,
-                                    build_operator_parts,
-                                    ci_in_detbasis_order, pyscf_apply)
-    from atomterm.system import ncore_of
+    from atomterm.operators import (build_operator_parts,
+                                    ci_in_detbasis_order, window_closure)
     from atomterm.windows import select_valence_ao
 
     na, nb = key.sector
-    ncore = ncore_of(mol.nelectron, na + nb)
-    c_run = None
-    if key.fold_tag is not None:
-        _, c_run = _fold_span(key, mol, mf)
-        ncore = c_run.shape[1]
-    c_core = (c_run if c_run is not None
-              else purified_core_orbitals(mol, mf, ncore)[0]
-              if key.substrate == "pur" else None)
+    ncore, c_core, _ = _key_core(key, mol, mf)
     ncas = data.ncas or len(select_valence_ao(mol, key.shell_patterns))
     c_act = np.asarray(data.mo_coeff)[:, ncore:ncore + ncas]
     parts = build_operator_parts(mol, mf, c_act, ncore, na, nb,
                                  c_core=c_core)
-    dets = parts["dets"]
     # the one-particle closure certificate of the stored window (the
     # span projector's commutators -- cheap at any sector size)
-    from atomterm.operators import window_closure
     closure = window_closure(mol, c_act)
     out["win_lz"] = float(closure["lz"])
     out["win_lperp"] = float(closure["lperp"])
     k = int(np.argmin(np.atleast_1d(data.energies)))
     w = ci_in_detbasis_order(np.asarray(data.ci)[k], ncas, na, nb)
-    apply_l2 = operator_apply(dets, one_body=parts["L2"][0],
-                              two_body=parts["L2"][1])
+    apply_h, apply_m, apply_l2 = _apply_family(mol, mf, c_act, parts,
+                                               ncore, c_core, ncas, na, nb)
     out["ground_l2"] = float(np.real(w @ apply_l2(w)))
-    h1, _ = active_space_integrals(mol, mf, c_act, ncore, c_core=c_core)
-    apply_h = pyscf_apply(h1, ao2mo.kernel(mol, c_act), ncas, na, nb)
-    apply_m = operator_apply(dets, one_body=(-1j * parts["Lz"][0]).real)
     out["res_h_lz"] = float(np.linalg.norm(
         apply_h(apply_m(w)) - apply_m(apply_h(w))))
     out["res_h_l2"] = float(np.linalg.norm(
@@ -826,6 +837,12 @@ def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
     if cycles is not None:
         lib.chkfile.save(str(chk), f"atomterm/{key.address}/cycles",
                          int(cycles))
+        # the cap rides the count: the cap-hitting flag compares by
+        # identity in the payloads (never a bare literal)
+        cap = getattr(getattr(cas, "mc", None), "max_cycle_macro", None)
+        if cap is not None:
+            lib.chkfile.save(str(chk), f"atomterm/{key.address}/max_cycle",
+                             int(cap))
     conv_dE = getattr(cas, "conv_dE", None)
     if conv_dE is not None:
         lib.chkfile.save(str(chk), f"atomterm/{key.address}/conv_dE",
@@ -833,7 +850,7 @@ def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
 
 
 def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
-           na: int, nb: int, c_pur=None):
+           na: int, nb: int, c_core=None):
     """The cell layer's one facts call: the fold's spherical convention
     and the CASCI anisotropy report are the only cell-specific
     choices; everything else is :func:`atomterm.stages.stage_facts`."""
@@ -846,7 +863,7 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
         # every CASCI cell reports its reference core's anisotropy (the
         # raw fold's is the detector; the pur fold's is the ~0
         # certificate; row parity across the fold block)
-        anisotropy_ref=(mf, c_pur) if key.method == "casci" else None,
+        anisotropy_ref=(mf, c_core) if key.method == "casci" else None,
     )
 
 
@@ -1041,16 +1058,11 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     # SIZE-INDEPENDENT symmetry certificate (exact 0 iff a symmetry
     # eigenstate; the operator Frobenius norm it backs up past the
     # dense budget needs every matrix element).  Lz enters as its real
-    # form M = -i Lz (norms unchanged -- the one-body apply's singles
-    # enumeration keeps this cheap at any sector we run); H through
-    # the C contraction boundary on the readout window's own feed.
-    from atomterm.detbasis import operator_apply
-    from atomterm.operators import active_space_integrals, pyscf_apply
-    from pyscf import ao2mo
-
-    h1r, _ = active_space_integrals(mol, mf, c_read, nf, c_core=c_fold)
-    apply_h = pyscf_apply(h1r, ao2mo.kernel(mol, c_read), ncas, na, nb)
-    apply_m = operator_apply(dets, one_body=(-1j * parts["Lz"][0]).real)
+    # form M = -i Lz; H through the C contraction boundary on the
+    # readout window's own feed (:func:`_apply_family` is the ONE
+    # construction).
+    apply_h, apply_m, apply_l2 = _apply_family(mol, mf, c_read, parts,
+                                               nf, c_fold, ncas, na, nb)
     res_lz = 0.0
     for w in w_all:
         r = apply_h(apply_m(w)) - apply_m(apply_h(w))
@@ -1058,11 +1070,9 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     # the L2 residual: L2 carries a two-body part, so its closure pays
     # the pair classification once (minutes-class at the 2e5-det
     # sector, cached after) -- priced by measurement, not declined
-    apply_l2r = operator_apply(dets, one_body=parts["L2"][0],
-                               two_body=parts["L2"][1])
     res_l2 = 0.0
     for w in w_all:
-        r = apply_h(apply_l2r(w)) - apply_l2r(apply_h(w))
+        r = apply_h(apply_l2(w)) - apply_l2(apply_h(w))
         res_l2 = max(res_l2, float(np.linalg.norm(r)))
 
     es = np.asarray(es)
@@ -1371,6 +1381,7 @@ def void_reason(address, scenarios) -> str | None:
     """
     a = address.address if isinstance(address, CellKey) else address
     for s in scenarios:
-        if s.enabled and s.gates(a):
+        # gates() owns the enabled check -- no second copy here
+        if s.gates(a):
             return f"{s.name}: {s.reason}"
     return None

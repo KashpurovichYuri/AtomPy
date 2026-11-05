@@ -1,10 +1,11 @@
 """The tables' shared vocabulary: the table constants, the label
-helpers, and the ladder edit protocol's marker form.
+helpers, and the write protocols (the verified-move atomic write,
+the ladder edit protocol's marker form).
 
-ONE home for what the renderers format the same way (the methods
-ladder, the regen cells.md); the per-table policy -- headings, column
-sets, row grouping -- lives with each renderer.  Presentation only:
-nothing here touches physics or the store.
+ONE home for what the scripts' writers share (the methods-table
+builder, the regen store writer); the per-table policy -- headings,
+column sets, row grouping -- lives with each renderer.  Presentation
+only: nothing here touches physics or the store's content.
 """
 
 import math
@@ -56,13 +57,9 @@ def fold_label(tag: str) -> str:
 
 def cas_label(key) -> str:
     """The CAS(nelec, ncas) label: electrons from the key's sector,
-    columns from the window span's summed m-set sizes (an occupation-
-    GROUP window names its group count -- ``3d4sno2`` is 2 groups)."""
-    if m := re.search(r"no(\d+)$", key.span_label):
-        cols = int(m.group(1))
-    else:
-        cols = sum(SHELL_COLS[l] for l in
-                   re.findall(r"\d+([spdfgh])", key.span_label))
+    columns from the window span's summed m-set sizes."""
+    cols = sum(SHELL_COLS[l] for l in
+               re.findall(r"\d+([spdfgh])", key.span_label))
     return f"({sum(key.sector)},{cols})"
 
 
@@ -113,10 +110,19 @@ def payload_of(cells: dict, key) -> dict | None:
     return p
 
 
+def atomic_write_text(path: Path, text: str) -> None:
+    """Write through a verified ``.tmp`` move: the file appears whole
+    or not at all (a killed writer cannot leave a truncated artifact)."""
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    assert tmp.read_text(encoding="utf-8") == text
+    tmp.replace(path)
+
+
 def replace_block(src: Path, begin: str, end: str, new_block: str) -> str:
     """The ladder edit protocol's marker form: splice ``new_block``
     between the section's marker pair, structural-check the splice,
-    write through a verified ``.md.tmp`` move.  Returns the new file
+    write through :func:`atomic_write_text`.  Returns the new file
     text; the caller owns the block's own structural assertions.
     """
     text = src.read_text()
@@ -128,8 +134,5 @@ def replace_block(src: Path, begin: str, end: str, new_block: str) -> str:
     _, tail = rest.split(end)
     new = head + new_block + tail
     assert new.count(begin) == 1 and new.count(end) == 1
-    tmp = src.with_suffix(".md.tmp")
-    tmp.write_text(new)
-    assert tmp.read_text() == new
-    tmp.replace(src)
+    atomic_write_text(src, new)
     return new

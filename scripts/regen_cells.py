@@ -56,6 +56,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from pyscf import gto, scf  # noqa: E402
 
+from _tables_common import atomic_write_text  # noqa: E402
 from atomterm.cases import CAMPAIGN, scenarios_for  # noqa: E402
 from atomterm.cells import (CellKey, cell_payload, diagnostics,  # noqa: E402
                             grid_keys, lane_keys, lattice_keys, planned,
@@ -158,15 +159,6 @@ def parse_args(argv) -> argparse.Namespace:
     args.sector = (tuple(int(x) for x in args.sector.split("-"))
                    if args.sector else None)
     return args
-
-
-def _write_atomic(path: Path, text: str) -> None:
-    """Write through a temp file + verified move (the render
-    protocol): a killed run never leaves a truncated artifact."""
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(text, encoding="utf-8")
-    assert tmp.read_text(encoding="utf-8") == text
-    tmp.replace(path)
 
 
 def render(atom, rohf_e, cells: dict, ruler: str) -> str:
@@ -304,11 +296,11 @@ def main() -> None:
                     else kernel_cell_payload(key, mol, mf))
             # the store writes PER-CELL: a kill mid-group (the shell
             # host caps background jobs) keeps every finished cell
-            _write_atomic(out / "cells.json",
+            atomic_write_text(out / "cells.json",
                           json.dumps({"atom": name,
                                       "rohf_energy": float(mf.e_tot),
                                       "cells": cells}, indent=2))
-        _write_atomic(out / "cells.md",
+        atomic_write_text(out / "cells.md",
                       render(name, mf.e_tot, cells,
                              ruler=CellKey(name, base.window, sector,
                                            fold="avg").address))

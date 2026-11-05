@@ -54,7 +54,7 @@ from atomterm.cells import (grid_keys, lattice_keys,  # noqa: E402
                             route_keys, window_grid)
 from _tables_common import (DASH, EV, cas_label,  # noqa: E402
                             comm_cell, conv_cell, fold_col,
-                            l2_text, minus, replace_block)
+                            l2_text, minus, payload_of, replace_block)
 BOUNDARY = "## Studies (frozen history; ticket 28)"
 POINTER = ("Declared, not yet run -- the optimizer cells are void "
            "until their CASCI anchors are read (the anchor-first "
@@ -115,13 +115,6 @@ def _method(k) -> str:
     return name
 
 
-def _run(p: dict | None) -> dict | None:
-    """The payload of a RUN cell (None for pending and void cells)."""
-    if p is None or "void_reason" in p:
-        return None
-    return p
-
-
 def _e0(p: dict) -> float:
     """A payload's as-run comparison energy (the collapse ruler):
     the lane payloads' TERM total or the free cells' run total."""
@@ -147,10 +140,13 @@ def _row(k, p, anchor, spec) -> str:
     ptp = p.get("ptp")
     if ptp is None and len(p.get("energies_pyscf", [])) > 1:
         ptp = float(np.ptp(p["energies_pyscf"]))   # the SA root set
-    note = "cycle cap" if p.get("cycles") == 200 else ""
-    # ^ 200 = the cycle cap a measurement run DECLARES in its
-    # mc_opts (production runs on PySCF's 50 default); the payload
-    # carries only the count, so the note keys on the declared cap.
+    cyc, cap = p.get("cycles"), p.get("max_cycle")
+    # the cap-hitting flag by IDENTITY on payloads carrying the cap
+    # (the store's max_cycle field -- the run's actual mc cap);
+    # payloads predating the field keep the legacy == 200 key (the
+    # cap the measurement runs declared; PySCF's default is 50)
+    note = "cycle cap" if cyc and cyc == (cap if cap is not None else 200) \
+        else ""
     cells = [
         _method(k), route, f"{k.span_label} / {START_NAMES[k.start]}",
         cas_label(k), fold, f"{p['n_det']:,}",
@@ -176,7 +172,7 @@ def _rows(keys, cells, anchor, spec) -> list[str]:
     return [_row(k, p, anchor, spec)
             for k in keys
             if k.start != "no"
-            and (p := _run(cells.get(k.address))) is not None]
+            and (p := payload_of(cells, k)) is not None]
 
 
 def _anchor_row(anchor: float) -> str:
@@ -245,7 +241,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
                 if k.substrate == "pur" and k.method == "sa-casscf"]:
         twins = [k for k in routes if k.window == leg.window]
         if any(k.method != "casci" and k.start != "no"
-               and _run(cells.get(k.address)) for k in twins):
+               and payload_of(cells, k) for k in twins):
             _fam([k for k in twins if k.start != "no"])
 
     out = [BEGIN, HEAD, SEP, _anchor_row(anchor)]
@@ -256,7 +252,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     for w in spec.planned_windows:
         keys = window_grid(spec, w)
         if not any(k.method != "casci" and k.start != "no"
-                   and _run(cells.get(k.address)) for k in keys):
+                   and payload_of(cells, k) for k in keys):
             out[-1:-1] = ["", POINTER.format(atom=spec.symbol, window=w)]
     return out
 

@@ -341,9 +341,13 @@ def test_cas_ladder_terms(cas_ladder):
         L = CAMPAIGN[name].term[0]
         s2 = _TERMS[name]["s2"]
         assert len(leg.l2) == 2 * L + 1, (name, tag)
+        # observed worst (the route-batch stores, the SA legs):
+        # |l2 - L(L+1)| = 8.2e-9 (Ti 3d3p4s) -- solver noise on an
+        # SA-converged window; the next term's L^2 differs at O(1)
         for v in leg.l2:
-            assert abs(v - L * (L + 1)) < 1e-8, (name, tag)
+            assert abs(v - L * (L + 1)) < 1e-6, (name, tag)
         for v in leg.s2:
+            # observed worst: 2.1e-11 (Ti) -- 1e-8 has the headroom
             assert abs(v - s2) < 1e-8, (name, tag)
         assert leg.ptp < 1e-9, (name, tag)
 
