@@ -45,6 +45,18 @@ ti_3d4s_3-1_casscf_mo_-_pur_avg                 -848.43497262 -4.181e-02   0.050
 ti_3d4s_3-1_casscf_mo_frozen_pur_avg            -848.41431378 -2.115e-02   0.00508   1.55e-01   3.86e-01   2.8e+00   4.0e+00  0.500       nan   2.8e-03   2.6e-13
 ti_3d4s_3-1_sa-casscf_mo_-_pur_avg              -848.42881374 -3.565e-02   0.02552   2.95e-01   7.38e-01   2.8e+00   4.0e+00  0.500       nan   2.8e-03   2.1e-13
 ti_3d4s_3-1_sa-casscf_mo_frozen_pur_avg         -848.41424046 -2.107e-02   0.00513   1.55e-01   3.86e-01   2.8e+00   4.0e+00  0.500       nan   2.8e-03   2.8e-13
+ti_3d4s@ar_3-1_casci_ao_-_pol_avg               -848.39307837  8.729e-05  12.00000   2.75e-14   2.53e-13   5.9e-15   7.6e-15  0.833   0.0e+00   1.1e-13   5.2e-12
+ti_3d4d@ar_3-1_casci_ao_-_pol_avg               -848.23708448  1.561e-01   6.00000   3.28e-13   1.90e-12   7.0e-15   1.1e-14  1.000   0.0e+00   1.2e-08   5.1e-12
+ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg           -848.43744803 -4.428e-02  12.00000   8.57e-13   4.04e-12   2.2e-13   4.4e-13  0.714   0.0e+00   1.2e-03   4.1e-12
+ti_3d3p@semi_5-3_casci_ao_-_pol_avg             -848.45198083        nan  12.00000   5.71e-13   4.20e-12   9.3e-14   1.0e-13  0.625   0.0e+00   2.1e-11   3.7e-12
+ti_3d4s@ar_3-1_casscf_ao_-_pol_avg              -848.40945388 -1.629e-02   4.57298   3.56e+00   7.79e+00   3.0e+00   4.1e+00  0.667       nan   2.8e-03   4.1e-12
+ti_3d4d@ar_3-1_casscf_ao_-_pol_avg              -848.44450315 -5.134e-02   0.05920   2.80e+00   7.53e+00   4.5e+00   6.9e+00  0.400       nan   2.7e-03   4.4e-12
+ti_3d4s4p4d@ar_3-1_casscf_ao_-_pol_avg          -848.44855240 -5.539e-02   5.89270   3.41e+01   1.61e+02   5.1e+00   7.6e+00  0.429       nan   2.7e-03   4.9e-12
+ti_3d3p@semi_5-3_casscf_ao_-_pol_avg            -848.49407394        nan  10.45293   1.39e+01   9.28e+01   1.4e+00   2.0e+00  0.625       nan   6.7e-06   4.8e-12
+ti_3d4s@ar_3-1_sa-casscf_ao_-_pol_avg           -849.26763595 -8.745e-01  12.00286   1.15e+00   6.01e+00   1.4e+00   1.4e+00  0.833       nan   8.5e-01   3.9e-12
+ti_3d4d@ar_3-1_sa-casscf_ao_-_pol_avg           -848.43822018 -4.505e-02  12.00000   1.03e-02   5.20e-02   5.8e-03   5.2e-03  0.500       nan   1.6e-07   5.0e-12
+ti_3d4s4p4d@ar_3-1_sa-casscf_ao_-_pol_avg       -848.44237385 -4.921e-02  12.00000   1.93e-02   9.65e-02   1.9e-03   2.0e-03  0.714       nan   3.6e-08   4.2e-12
+ti_3d3p@semi_5-3_sa-casscf_ao_-_pol_avg         -848.47562952        nan  12.00000   1.63e-05   1.94e-04   6.8e-06   1.4e-05  0.625       nan   1.0e-08   4.4e-12
 
 configurations per root (top-2 determinants):
   ti_3d4s_3-1_casci_ao_-_pol_raw               root 0: s^2.00d^2.00 (|c|=0.97); s^2.00d^2.00 (|c|=0.19)
@@ -277,6 +289,74 @@ configurations per root (top-2 determinants):
   ti_3d4s_3-1_sa-casscf_mo_frozen_pur_avg      root 4: s^1.00p^1.00d^2.00 (|c|=0.59); s^1.00p^1.00d^2.00 (|c|=0.49)
   ti_3d4s_3-1_sa-casscf_mo_frozen_pur_avg      root 5: s^1.00p^1.00d^2.00 (|c|=0.59); s^1.00p^1.00d^2.00 (|c|=0.49)
   ti_3d4s_3-1_sa-casscf_mo_frozen_pur_avg      root 6: s^1.00p^1.00d^2.00 (|c|=0.60); s^1.00p^1.00d^2.00 (|c|=0.51)
+  ti_3d4s@ar_3-1_casci_ao_-_pol_avg            root 0: s^2.00d^2.00 (|c|=0.79); s^2.00d^2.00 (|c|=0.55)
+  ti_3d4s@ar_3-1_casci_ao_-_pol_avg            root 1: s^2.00d^2.00 (|c|=0.84); s^2.00d^2.00 (|c|=0.53)
+  ti_3d4s@ar_3-1_casci_ao_-_pol_avg            root 2: s^2.00d^2.00 (|c|=0.95); s^2.00d^2.00 (|c|=0.25)
+  ti_3d4s@ar_3-1_casci_ao_-_pol_avg            root 3: s^2.00d^2.00 (|c|=0.89); s^2.00d^2.00 (|c|=0.34)
+  ti_3d4s@ar_3-1_casci_ao_-_pol_avg            root 4: s^2.00d^2.00 (|c|=0.75); s^2.00d^2.00 (|c|=0.51)
+  ti_3d4s@ar_3-1_casci_ao_-_pol_avg            root 5: s^2.00d^2.00 (|c|=0.79); s^2.00d^2.00 (|c|=0.44)
+  ti_3d4s@ar_3-1_casci_ao_-_pol_avg            root 6: s^2.00d^2.00 (|c|=0.68); s^2.00d^2.00 (|c|=0.61)
+  ti_3d4s@ar_3-1_casci_ao_-_pol_avg            root 7: s^1.00d^3.00 (|c|=0.49); s^1.00d^3.00 (|c|=0.49)
+  ti_3d4s@ar_3-1_casci_ao_-_pol_avg            root 8: s^1.00d^3.00 (|c|=0.44); s^1.00d^3.00 (|c|=0.44)
+  ti_3d4d@ar_3-1_casci_ao_-_pol_avg            root 0: d^4.00 (|c|=0.49); d^4.00 (|c|=0.49)
+  ti_3d4d@ar_3-1_casci_ao_-_pol_avg            root 1: d^4.00 (|c|=0.49); d^4.00 (|c|=0.49)
+  ti_3d4d@ar_3-1_casci_ao_-_pol_avg            root 2: d^4.00 (|c|=0.49); d^4.00 (|c|=0.49)
+  ti_3d4d@ar_3-1_casci_ao_-_pol_avg            root 3: d^4.00 (|c|=0.49); d^4.00 (|c|=0.49)
+  ti_3d4d@ar_3-1_casci_ao_-_pol_avg            root 4: d^4.00 (|c|=0.49); d^4.00 (|c|=0.49)
+  ti_3d4d@ar_3-1_casci_ao_-_pol_avg            root 5: d^4.00 (|c|=0.53); d^4.00 (|c|=0.53)
+  ti_3d4d@ar_3-1_casci_ao_-_pol_avg            root 6: d^4.00 (|c|=0.53); d^4.00 (|c|=0.53)
+  ti_3d4d@ar_3-1_casci_ao_-_pol_avg            root 7: d^4.00 (|c|=0.54); d^4.00 (|c|=0.40)
+  ti_3d4d@ar_3-1_casci_ao_-_pol_avg            root 8: d^4.00 (|c|=0.43); d^4.00 (|c|=0.37)
+  ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg        root 0: s^2.00d^2.00 (|c|=0.93); s^2.00d^2.00 (|c|=0.16)
+  ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg        root 1: s^2.00d^2.00 (|c|=0.93); s^2.00d^2.00 (|c|=0.16)
+  ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg        root 2: s^2.00d^2.00 (|c|=0.83); s^2.00d^2.00 (|c|=0.41)
+  ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg        root 3: s^2.00d^2.00 (|c|=0.49); s^2.00d^2.00 (|c|=0.43)
+  ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg        root 4: s^2.00d^2.00 (|c|=0.49); s^2.00d^2.00 (|c|=0.43)
+  ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg        root 5: s^2.00d^2.00 (|c|=0.66); s^2.00d^2.00 (|c|=0.64)
+  ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg        root 6: s^2.00d^2.00 (|c|=0.66); s^2.00d^2.00 (|c|=0.64)
+  ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg        root 7: s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)
+  ti_3d4s4p4d@ar_3-1_casci_ao_-_pol_avg        root 8: s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)
+  ti_3d3p@semi_5-3_casci_ao_-_pol_avg          root 0: p^6.00d^2.00 (|c|=0.99); p^4.00d^4.00 (|c|=0.04)
+  ti_3d3p@semi_5-3_casci_ao_-_pol_avg          root 1: p^6.00d^2.00 (|c|=0.72); p^6.00d^2.00 (|c|=0.45)
+  ti_3d3p@semi_5-3_casci_ao_-_pol_avg          root 2: p^6.00d^2.00 (|c|=0.72); p^6.00d^2.00 (|c|=0.45)
+  ti_3d3p@semi_5-3_casci_ao_-_pol_avg          root 3: p^6.00d^2.00 (|c|=0.99); p^4.00d^4.00 (|c|=0.04)
+  ti_3d3p@semi_5-3_casci_ao_-_pol_avg          root 4: p^6.00d^2.00 (|c|=0.87); p^6.00d^2.00 (|c|=0.33)
+  ti_3d3p@semi_5-3_casci_ao_-_pol_avg          root 5: p^6.00d^2.00 (|c|=0.87); p^6.00d^2.00 (|c|=0.33)
+  ti_3d3p@semi_5-3_casci_ao_-_pol_avg          root 6: p^6.00d^2.00 (|c|=0.89); p^6.00d^2.00 (|c|=0.44)
+  ti_3d3p@semi_5-3_casci_ao_-_pol_avg          root 7: p^6.00d^2.00 (|c|=0.68); p^6.00d^2.00 (|c|=0.39)
+  ti_3d3p@semi_5-3_casci_ao_-_pol_avg          root 8: p^6.00d^2.00 (|c|=0.68); p^6.00d^2.00 (|c|=0.39)
+  ti_3d4s@ar_3-1_casscf_ao_-_pol_avg           root 0: s^2.00d^2.00 (|c|=0.99); s^0.03d^3.97 (|c|=0.06)
+  ti_3d4d@ar_3-1_casscf_ao_-_pol_avg           root 0: s^1.45p^0.20d^2.04f^0.31 (|c|=0.41); s^1.38p^0.20d^2.15f^0.27 (|c|=0.33)
+  ti_3d4s4p4d@ar_3-1_casscf_ao_-_pol_avg       root 0: s^2.00d^2.00 (|c|=0.93); s^2.00d^2.00 (|c|=0.15)
+  ti_3d3p@semi_5-3_casscf_ao_-_pol_avg         root 0: p^6.00d^2.00 (|c|=0.99); p^4.00d^4.00 (|c|=0.04)
+  ti_3d4s@ar_3-1_sa-casscf_ao_-_pol_avg        root 0: p^2.00d^2.00 (|c|=0.67); p^2.00d^2.00 (|c|=0.53)
+  ti_3d4s@ar_3-1_sa-casscf_ao_-_pol_avg        root 1: p^2.00d^2.00 (|c|=0.51); p^2.00d^2.00 (|c|=0.45)
+  ti_3d4s@ar_3-1_sa-casscf_ao_-_pol_avg        root 2: p^2.00d^2.00 (|c|=0.65); p^2.00d^2.00 (|c|=0.41)
+  ti_3d4s@ar_3-1_sa-casscf_ao_-_pol_avg        root 3: p^2.00d^2.00 (|c|=0.50); p^2.00d^2.00 (|c|=0.44)
+  ti_3d4s@ar_3-1_sa-casscf_ao_-_pol_avg        root 4: p^2.00d^2.00 (|c|=0.73); p^2.00d^2.00 (|c|=0.48)
+  ti_3d4s@ar_3-1_sa-casscf_ao_-_pol_avg        root 5: p^2.00d^2.00 (|c|=0.80); p^2.00d^2.00 (|c|=0.48)
+  ti_3d4s@ar_3-1_sa-casscf_ao_-_pol_avg        root 6: p^2.00d^2.00 (|c|=0.64); p^2.00d^2.00 (|c|=0.38)
+  ti_3d4d@ar_3-1_sa-casscf_ao_-_pol_avg        root 0: s^1.05p^0.39d^2.57 (|c|=0.19); s^0.74p^0.40d^2.86 (|c|=0.17)
+  ti_3d4d@ar_3-1_sa-casscf_ao_-_pol_avg        root 1: s^0.86p^0.39d^2.74 (|c|=0.21); s^1.17p^0.38d^2.45 (|c|=0.20)
+  ti_3d4d@ar_3-1_sa-casscf_ao_-_pol_avg        root 2: s^1.07p^0.38d^2.55 (|c|=0.21); s^0.79p^0.10d^3.11 (|c|=0.21)
+  ti_3d4d@ar_3-1_sa-casscf_ao_-_pol_avg        root 3: s^0.91p^0.10d^3.00 (|c|=0.27); s^0.86p^0.39d^2.74 (|c|=0.25)
+  ti_3d4d@ar_3-1_sa-casscf_ao_-_pol_avg        root 4: s^0.76p^0.39d^2.85 (|c|=0.23); s^0.81p^0.09d^3.10 (|c|=0.23)
+  ti_3d4d@ar_3-1_sa-casscf_ao_-_pol_avg        root 5: s^1.17p^0.38d^2.45 (|c|=0.26); s^1.12p^0.68d^2.20 (|c|=0.23)
+  ti_3d4d@ar_3-1_sa-casscf_ao_-_pol_avg        root 6: s^1.07p^0.38d^2.55 (|c|=0.24); s^1.02p^0.68d^2.30 (|c|=0.21)
+  ti_3d4s4p4d@ar_3-1_sa-casscf_ao_-_pol_avg    root 0: s^2.00d^2.00 (|c|=0.72); s^2.00d^2.00 (|c|=0.40)
+  ti_3d4s4p4d@ar_3-1_sa-casscf_ao_-_pol_avg    root 1: s^2.00d^2.00 (|c|=0.56); s^2.00d^2.00 (|c|=0.45)
+  ti_3d4s4p4d@ar_3-1_sa-casscf_ao_-_pol_avg    root 2: s^2.00d^2.00 (|c|=0.55); s^2.00d^2.00 (|c|=0.43)
+  ti_3d4s4p4d@ar_3-1_sa-casscf_ao_-_pol_avg    root 3: s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.38)
+  ti_3d4s4p4d@ar_3-1_sa-casscf_ao_-_pol_avg    root 4: s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.35)
+  ti_3d4s4p4d@ar_3-1_sa-casscf_ao_-_pol_avg    root 5: s^2.00d^2.00 (|c|=0.60); s^2.00d^2.00 (|c|=0.56)
+  ti_3d4s4p4d@ar_3-1_sa-casscf_ao_-_pol_avg    root 6: s^2.00d^2.00 (|c|=0.68); s^2.00d^2.00 (|c|=0.54)
+  ti_3d3p@semi_5-3_sa-casscf_ao_-_pol_avg      root 0: p^6.00d^2.00 (|c|=0.65); p^6.00d^2.00 (|c|=0.53)
+  ti_3d3p@semi_5-3_sa-casscf_ao_-_pol_avg      root 1: p^6.00d^2.00 (|c|=0.53); p^6.00d^2.00 (|c|=0.44)
+  ti_3d3p@semi_5-3_sa-casscf_ao_-_pol_avg      root 2: p^6.00d^2.00 (|c|=0.49); p^6.00d^2.00 (|c|=0.48)
+  ti_3d3p@semi_5-3_sa-casscf_ao_-_pol_avg      root 3: p^6.00d^2.00 (|c|=0.54); p^6.00d^2.00 (|c|=0.52)
+  ti_3d3p@semi_5-3_sa-casscf_ao_-_pol_avg      root 4: p^6.00d^2.00 (|c|=0.56); p^6.00d^2.00 (|c|=0.49)
+  ti_3d3p@semi_5-3_sa-casscf_ao_-_pol_avg      root 5: p^6.00d^2.00 (|c|=0.92); p^6.00d^2.00 (|c|=0.26)
+  ti_3d3p@semi_5-3_sa-casscf_ao_-_pol_avg      root 6: p^6.00d^2.00 (|c|=0.95); p^6.00d^2.00 (|c|=0.16)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
   ti_3d4s@ar_3-1_casci_ao_-_pur_avg            E_term    -848.39307837  ptp 4.9e-15  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
@@ -286,3 +366,19 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
   ti_3d3p4d@semi_5-3_casci_ao_-_pur_avg        E_term    -848.49911928  ptp 1.1e-13  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
   ti_3s3p3d@1s2s2p4s_6-4_casci_ao_-_pur_avg    E_term    -848.45488332  ptp 5.7e-14  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
   ti_3d3p4s@1s2s2p3s_6-4_casci_ao_-_pur_avg    E_term    -848.45291987  ptp 3.3e-13  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
+  ti_3d3p4d@semi_5-3_casci_ao_-_pol_avg        E         -848.49911928
+  ti_3s3p3d@1s2s2p4s_6-4_casci_ao_-_pol_avg    E         -848.45488332
+  ti_3d3p4s@1s2s2p3s_6-4_casci_ao_-_pol_avg    E         -848.45291987
+  ti_3d3p4d@semi_5-3_casscf_ao_-_pol_avg       E         -848.52998425
+  ti_3s3p3d@1s2s2p4s_6-4_casscf_ao_-_pol_avg   E         -848.49928614
+  ti_3d3p4s@1s2s2p3s_6-4_casscf_ao_-_pol_avg   E         -848.49928614
+  ti_3d4s@ar_3-1_sa-casscf_ao_-_pur_avg        E_term    -848.40937042  ptp 3.0e-07  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
+  ti_3d4d@ar_3-1_sa-casscf_ao_-_pur_avg        E_term    -848.28065456  ptp 3.7e-02  L2 ['6.001', '6.002', '29.866', '6.001', '29.911', '6.002', '29.910']
+  ti_3d4s4p4d@ar_3-1_sa-casscf_ao_-_pur_avg    E_term    -848.44237367  ptp 1.5e-07  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
+  ti_3d3p@semi_5-3_sa-casscf_ao_-_pur_avg      E_term    -848.47562943  ptp 4.4e-07  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
+  ti_3d3p4d@semi_5-3_sa-casscf_ao_-_pol_avg    E         -848.51076496
+  ti_3d3p4d@semi_5-3_sa-casscf_ao_-_pur_avg    E_term    -848.51076495  ptp 9.9e-09  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
+  ti_3s3p3d@1s2s2p4s_6-4_sa-casscf_ao_-_pol_avg E         -848.47932677
+  ti_3s3p3d@1s2s2p4s_6-4_sa-casscf_ao_-_pur_avg E_term    -848.47930659  ptp 4.5e-08  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
+  ti_3d3p4s@1s2s2p3s_6-4_sa-casscf_ao_-_pol_avg E         -848.47932907
+  ti_3d3p4s@1s2s2p3s_6-4_sa-casscf_ao_-_pur_avg E_term    -848.47932461  ptp 2.9e-06  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
