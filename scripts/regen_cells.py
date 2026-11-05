@@ -174,15 +174,18 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
     (key-addressed, the ruler's ΔE within its sector only), plus
     per-root configuration lines; the other payload shapes render in
     their own sections (lane cells: term energies; void cells: their
-    scenario's reason)."""
+    scenario's reason).  Markdown pipe tables (the meter names are
+    the ladder's; a value column may hold ``nan`` -- no common zero
+    for ΔE, or the meter not carried by that payload)."""
     facts_cells = {a: r for a, r in cells.items() if "e_ground" in r}
     other = [(a, r) for a, r in cells.items() if "e_ground" not in r]
     ref = facts_cells.get(ruler)
+    head = ("| cell | E_ground | dE_vs_avg | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ "
+            "| ‖[P,Lz]‖ | ‖[P,L⊥]‖ | win_l | aniso | max dE | ortho | conv |")
     lines = [f"# Orbital-treatment cells: {atom}", "",
              f"ROHF reference energy: {rohf_e:.8f} Eh", "",
-             f"{'cell':<44} {'E_ground':>16} {'dE_vs_avg':>10} {'<L^2>':>9} "
-             f"{'|[H,Lz]|':>10} {'|[H,L2]|':>10} {'|[P,Lz]|':>9} {'|[P,Lp]|':>9} "
-             f"{'win_l':>6} {'aniso':>9} {'max|dE|':>9} {'ortho':>9}  conv"]
+             head,
+             "|---" * 13 + "|"]
     ruler_sec = CellKey.from_address(ruler).sector
     for addr, r in facts_cells.items():
         # ΔE vs the ruler only within its sector -- cross-sector rows
@@ -198,32 +201,33 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
         if r.get("converged", True) is False:
             flag += " NOT-CONVERGED"
         lines.append(
-            f"{addr:<44} {r['e_ground']:>16.8f} {d_e:>10.3e} "
-            f"{r['ground_l2']:>9.5f} "
-            f"{r['comm_norm_h_lz']:>10.2e} {r['comm_norm_h_l2']:>10.2e} "
-            f"{r['win_lz']:>9.1e} {r['win_lperp']:>9.1e} "
-            f"{purity:>6.3f} {aniso if aniso is not None else float('nan'):>9.1e} "
-            f"{r['max_de_vs_pyscf']:>9.1e} {r['ortho_err']:>9.1e}"
-            f"{flag}")
-    lines += ["", "configurations per root (top-2 determinants):"]
+            f"| {addr} | {r['e_ground']:.8f} | {d_e:.3e} "
+            f"| {r['ground_l2']:.5f} "
+            f"| {r['comm_norm_h_lz']:.2e} | {r['comm_norm_h_l2']:.2e} "
+            f"| {r['win_lz']:.1e} | {r['win_lperp']:.1e} "
+            f"| {purity:.3f} "
+            f"| {aniso if aniso is not None else float('nan'):.1e} "
+            f"| {r['max_de_vs_pyscf']:.1e} | {r['ortho_err']:.1e} "
+            f"| {flag.strip()} |")
+    lines += ["", "configurations per root (top-2 determinants):", ""]
     for addr, r in facts_cells.items():
         for i, cfg_str in enumerate(r["configurations"][:9]):
-            lines.append(f"  {addr:<44} root {i}: {cfg_str}")
+            lines.append(f"- `{addr}` root {i}: {cfg_str}")
     if other:
         lines += ["", "lane cells (tagged windows; the pinned rows "
                       "carry term energies) and void cells "
-                      "(scenario-gated):"]
+                      "(scenario-gated):", ""]
         for addr, r in other:
             if "void_reason" in r:
-                lines.append(f"  {addr:<44} VOID -- {r['void_reason']}")
+                lines.append(f"- `{addr}` VOID -- {r['void_reason']}")
             elif "total" in r:
                 lines.append(
-                    f"  {addr:<44} E_term {r['total']:>16.8f}"
+                    f"- `{addr}` E_term {r['total']:.8f}"
                     f"  ptp {r['ptp']:.1e}"
                     f"  L2 {['%.3f' % v for v in r['l2']]}")
             else:                      # a free-route twin (cell payload)
                 e = r["energies_pyscf"][0]
-                lines.append(f"  {addr:<44} E      {e:>16.8f}")
+                lines.append(f"- `{addr}` E {e:.8f}")
     return "\n".join(lines) + "\n"
 
 
