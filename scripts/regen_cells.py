@@ -301,23 +301,26 @@ def main() -> None:
                 print(f"  [void] {key.address} -- {reason}", flush=True)
                 cells[key.address] = {"cell": key.address,
                                       "void_reason": reason}
-                continue
-            print(f"  [cell] {key.address}", flush=True)
-            if key.fold_tag is not None and key.substrate == "pur":
-                if lane_sub is None:
-                    lane_sub = lane_substrate(spec)
-                cells[key.address] = run_lane_cell(
-                    key, lane_sub[0], lane_sub[1], spec.term,
-                    fresh=args.fresh, workdir="elements")
             else:
-                facts = run_cell(key, mf, frac_mf=mf_f, fresh=args.fresh,
-                                 workdir="elements",
-                                 budgets={"sa_weights": spec.sa_weights})
-                cells[key.address] = (
-                    cell_payload(key, facts) if facts is not None
-                    else kernel_cell_payload(key, mol, mf))
-            # the store writes PER-CELL: a kill mid-group (the shell
-            # host caps background jobs) keeps every finished cell
+                print(f"  [cell] {key.address}", flush=True)
+                if key.fold_tag is not None and key.substrate == "pur":
+                    if lane_sub is None:
+                        lane_sub = lane_substrate(spec)
+                    cells[key.address] = run_lane_cell(
+                        key, lane_sub[0], lane_sub[1], spec.term,
+                        fresh=args.fresh, workdir="elements")
+                else:
+                    facts = run_cell(key, mf, frac_mf=mf_f,
+                                     fresh=args.fresh, workdir="elements",
+                                     budgets={"sa_weights": spec.sa_weights})
+                    cells[key.address] = (
+                        cell_payload(key, facts) if facts is not None
+                        else kernel_cell_payload(key, mol, mf))
+            # the store writes PER ENTRY -- run and void alike (a void
+            # entry that never wrote would vanish from the merge chain:
+            # the next run loads a store without it): a kill mid-group
+            # (the shell host caps background jobs) keeps every
+            # finished cell
             atomic_write_text(out / "cells.json",
                           json.dumps({"atom": name,
                                       "rohf_energy": float(mf.e_tot),

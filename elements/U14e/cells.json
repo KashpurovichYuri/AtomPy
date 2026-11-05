@@ -163,6 +163,849 @@
       "win_lperp": 1.4224464039072397e-12,
       "res_h_lz": 2.5861935690127227e-14,
       "res_h_l2": 4.594871840625165e-13
+    },
+    "u14e_9f10f11f13d_4-0_casci_ao_-_pol_frac": {
+      "cell": "u14e_9f10f11f13d_4-0_casci_ao_-_pol_frac",
+      "void_reason": "frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_ao_-_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_mo_-_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13dno4_4-0_casscf_no_-_pol_avg": {
+      "cell": "u14e_9f10f11f13dno4_4-0_casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_ao_virtmix_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_ao_virtmix_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_ao_-_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_mo_-_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13dno4_4-0_casscf_no_-_pur_avg": {
+      "cell": "u14e_9f10f11f13dno4_4-0_casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_ao_radial_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_ao_radial_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13dno4_4-0_casscf_no_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f13dno4_4-0_casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13dno4_4-0_casscf_no_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f13dno4_4-0_casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_ao_-_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_mo_-_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13dno4_4-0_sa-casscf_no_-_pol_avg": {
+      "cell": "u14e_9f10f11f13dno4_4-0_sa-casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_ao_-_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_mo_-_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13dno4_4-0_sa-casscf_no_-_pur_avg": {
+      "cell": "u14e_9f10f11f13dno4_4-0_sa-casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_ao_radial_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_ao_radial_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13dno4_4-0_sa-casscf_no_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f13dno4_4-0_sa-casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13d_4-0_sa-casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f13d_4-0_sa-casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f13dno4_4-0_sa-casscf_no_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f13dno4_4-0_sa-casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casci_ao_-_pol_raw": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casci_ao_-_pol_raw",
+      "kind": "casci",
+      "n_det": 40920,
+      "energies_pyscf": [
+        -50.188713500668875,
+        -50.184111425026295,
+        -50.1836281583716,
+        -50.18209440096503,
+        -50.07240436955319,
+        -50.07233484379443,
+        -50.07181813299832,
+        -50.06960983210323,
+        -50.06931171729252
+      ],
+      "ground_l2": 40.01497355266007,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 0.0734392066962512,
+      "win_lperp": 0.38684165391481445,
+      "res_h_lz": 0.0019539509783249925,
+      "res_h_l2": 0.026849664921524276
+    },
+    "u14e_8f9f10f11f13d_4-0_casci_ao_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 40920,
+      "energies_pyscf": [
+        -50.18871350066887,
+        -50.18411142502629,
+        -50.18362815837158,
+        -50.182094400965006,
+        -50.07240436955319,
+        -50.07233484379442,
+        -50.07181813299832,
+        -50.069609832103225,
+        -50.06931171729252
+      ],
+      "ground_l2": 40.01497355265957,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 0.0734392066962512,
+      "win_lperp": 0.38684165391481445,
+      "res_h_lz": 0.0019539509783250085,
+      "res_h_l2": 0.02684966492152816
+    },
+    "u14e_8f9f10f11f13d_4-0_casci_ao_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casci_ao_-_pur_avg",
+      "kind": "casci",
+      "n_det": 40920,
+      "energies_pyscf": [
+        -50.19515162997195,
+        -50.194304068227844,
+        -50.19104266635121,
+        -50.17958037838004,
+        -50.06942587689379,
+        -50.0694171365491,
+        -50.06933806452936,
+        -50.06916875890766,
+        -50.06916875890765
+      ],
+      "ground_l2": 41.334600906974465,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 1.7510400358132846e-12,
+      "win_lperp": 2.1923367526458475e-12,
+      "res_h_lz": 1.2008297136530155e-13,
+      "res_h_l2": 1.011354369038165e-12
+    },
+    "u14e_8f9f10f11f13d_4-0_casci_ao_-_pol_frac": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casci_ao_-_pol_frac",
+      "void_reason": "frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_ao_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_mo_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13dno5_4-0_casscf_no_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f13dno5_4-0_casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_ao_virtmix_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_ao_virtmix_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_ao_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_mo_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13dno5_4-0_casscf_no_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f13dno5_4-0_casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_ao_radial_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_ao_radial_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13dno5_4-0_casscf_no_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f13dno5_4-0_casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13dno5_4-0_casscf_no_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f13dno5_4-0_casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_mo_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13dno5_4-0_sa-casscf_no_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f13dno5_4-0_sa-casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_mo_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13dno5_4-0_sa-casscf_no_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f13dno5_4-0_sa-casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_radial_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_radial_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13dno5_4-0_sa-casscf_no_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f13dno5_4-0_sa-casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13d_4-0_sa-casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f13d_4-0_sa-casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f13dno5_4-0_sa-casscf_no_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f13dno5_4-0_sa-casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casci_ao_-_pol_raw": {
+      "cell": "u14e_9f10f12d13d_4-0_casci_ao_-_pol_raw",
+      "kind": "casci",
+      "n_det": 10626,
+      "energies_pyscf": [
+        -49.734280751066834,
+        -49.733913087324325,
+        -49.731922630775834,
+        -49.731749047128794,
+        -49.73163899345297,
+        -49.731529183625604,
+        -49.72998124249384,
+        -49.72896620767441,
+        -49.724778787689736
+      ],
+      "ground_l2": 35.03911496580793,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 0.0701076730477187,
+      "win_lperp": 0.3835287391008816,
+      "res_h_lz": 0.0019238315286460674,
+      "res_h_l2": 0.044431514481559756
+    },
+    "u14e_9f10f12d13d_4-0_casci_ao_-_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 10626,
+      "energies_pyscf": [
+        -49.73428075106683,
+        -49.733913087324325,
+        -49.73192263077585,
+        -49.731749047128794,
+        -49.73163899345297,
+        -49.731529183625604,
+        -49.72998124249385,
+        -49.72896620767441,
+        -49.724778787689736
+      ],
+      "ground_l2": 35.03911496580629,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 0.0701076730477187,
+      "win_lperp": 0.3835287391008816,
+      "res_h_lz": 0.0019238315286445146,
+      "res_h_l2": 0.04443151448156269
+    },
+    "u14e_9f10f12d13d_4-0_casci_ao_-_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casci_ao_-_pur_avg",
+      "kind": "casci",
+      "n_det": 10626,
+      "energies_pyscf": [
+        -49.73198471036065,
+        -49.73198261301978,
+        -49.73198260317785,
+        -49.731487366613344,
+        -49.731487366613344,
+        -49.72839858597432,
+        -49.72673667447041,
+        -49.72673667447041,
+        -49.72576909455434
+      ],
+      "ground_l2": 6.006178339684034,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 9.09262570822769e-13,
+      "win_lperp": 1.1020292805331932e-12,
+      "res_h_lz": 1.4152525911090272e-14,
+      "res_h_l2": 1.236011396309313e-13
+    },
+    "u14e_9f10f12d13d_4-0_casci_ao_-_pol_frac": {
+      "cell": "u14e_9f10f12d13d_4-0_casci_ao_-_pol_frac",
+      "void_reason": "frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_ao_-_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_mo_-_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13dno4_4-0_casscf_no_-_pol_avg": {
+      "cell": "u14e_9f10f12d13dno4_4-0_casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_ao_virtmix_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_ao_virtmix_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_ao_-_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_mo_-_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13dno4_4-0_casscf_no_-_pur_avg": {
+      "cell": "u14e_9f10f12d13dno4_4-0_casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_ao_radial_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_ao_radial_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13dno4_4-0_casscf_no_frozen_pol_avg": {
+      "cell": "u14e_9f10f12d13dno4_4-0_casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13dno4_4-0_casscf_no_frozen_pur_avg": {
+      "cell": "u14e_9f10f12d13dno4_4-0_casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_ao_-_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_mo_-_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13dno4_4-0_sa-casscf_no_-_pol_avg": {
+      "cell": "u14e_9f10f12d13dno4_4-0_sa-casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_ao_-_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_mo_-_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13dno4_4-0_sa-casscf_no_-_pur_avg": {
+      "cell": "u14e_9f10f12d13dno4_4-0_sa-casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_ao_radial_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_ao_radial_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13dno4_4-0_sa-casscf_no_frozen_pol_avg": {
+      "cell": "u14e_9f10f12d13dno4_4-0_sa-casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13d_4-0_sa-casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_9f10f12d13d_4-0_sa-casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f12d13dno4_4-0_sa-casscf_no_frozen_pur_avg": {
+      "cell": "u14e_9f10f12d13dno4_4-0_sa-casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pol_raw": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pol_raw",
+      "kind": "casci",
+      "n_det": 73815,
+      "energies_pyscf": [
+        -50.21491725664705,
+        -50.214567126728554,
+        -50.213946167465004,
+        -50.21355850006371,
+        -50.21348605268618,
+        -50.21000053128215,
+        -50.208213820871286,
+        -50.17497679611651,
+        -50.17240275447567
+      ],
+      "ground_l2": 29.26469238551685,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 0.0734895482303052,
+      "win_lperp": 0.38724386734263205,
+      "res_h_lz": 0.003426178659869967,
+      "res_h_l2": 0.05502341560989934
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 73815,
+      "energies_pyscf": [
+        -50.21491725664705,
+        -50.21456712672856,
+        -50.21394616746501,
+        -50.21355850006371,
+        -50.21348605268618,
+        -50.21000053128214,
+        -50.20821382087128,
+        -50.17497679611653,
+        -50.17240275447566
+      ],
+      "ground_l2": 29.264692385516714,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 0.0734895482303052,
+      "win_lperp": 0.38724386734263205,
+      "res_h_lz": 0.003426178659870561,
+      "res_h_l2": 0.05502341560989972
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pur_avg",
+      "kind": "casci",
+      "n_det": 73815,
+      "energies_pyscf": [
+        -50.214431976299146,
+        -50.21442831559484,
+        -50.213290863302426,
+        -50.21117435852147,
+        -50.20589515146327,
+        -50.200447172190366,
+        -50.18950178673597,
+        -50.18939173491978,
+        -50.17778868493608
+      ],
+      "ground_l2": 29.325166847822032,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 1.7717496409727583e-12,
+      "win_lperp": 2.2493405838203974e-12,
+      "res_h_lz": 8.955049430119337e-14,
+      "res_h_l2": 7.75118206126448e-13
+    },
+    "u14e_9f10f11f12d13d_4-0_casci_ao_-_pol_frac": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casci_ao_-_pol_frac",
+      "void_reason": "frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_ao_-_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_mo_-_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13dno5_4-0_casscf_no_-_pol_avg": {
+      "cell": "u14e_9f10f11f12d13dno5_4-0_casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_ao_virtmix_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_ao_virtmix_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_ao_-_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_mo_-_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13dno5_4-0_casscf_no_-_pur_avg": {
+      "cell": "u14e_9f10f11f12d13dno5_4-0_casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_ao_radial_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_ao_radial_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13dno5_4-0_casscf_no_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f12d13dno5_4-0_casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13dno5_4-0_casscf_no_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f12d13dno5_4-0_casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_-_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_mo_-_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_-_pol_avg": {
+      "cell": "u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_-_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_mo_-_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_-_pur_avg": {
+      "cell": "u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_radial_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_radial_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_frozen_pol_avg": {
+      "cell": "u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_frozen_pur_avg": {
+      "cell": "u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pol_frac": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casci_ao_-_pol_frac",
+      "void_reason": "frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_ao_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_mo_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13dno6_4-0_casscf_no_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13dno6_4-0_casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_ao_virtmix_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_ao_virtmix_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_ao_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_mo_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13dno6_4-0_casscf_no_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13dno6_4-0_casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_ao_radial_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_ao_radial_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13dno6_4-0_casscf_no_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13dno6_4-0_casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13dno6_4-0_casscf_no_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13dno6_4-0_casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_mo_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13dno6_4-0_sa-casscf_no_-_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13dno6_4-0_sa-casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_mo_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13dno6_4-0_sa-casscf_no_-_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13dno6_4-0_sa-casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_radial_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_radial_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13dno6_4-0_sa-casscf_no_frozen_pol_avg": {
+      "cell": "u14e_8f9f10f11f12d13dno6_4-0_sa-casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13d_4-0_sa-casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
+    },
+    "u14e_8f9f10f11f12d13dno6_4-0_sa-casscf_no_frozen_pur_avg": {
+      "cell": "u14e_8f9f10f11f12d13dno6_4-0_sa-casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)"
     }
   }
 }
