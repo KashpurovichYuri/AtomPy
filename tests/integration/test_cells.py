@@ -285,7 +285,7 @@ def test_planned_sector_override_shrinks_the_fold():
     for k in keys:
         by_window.setdefault(k.window, []).append(k)
     assert all(k.sector == (4, 0) for k in by_window["10f13d"])
-    assert all(k.sector == (4, 0) for k in by_window["10f13d6p"])
+    assert all(k.sector == (4, 0) for k in by_window["10f13d14p"])
     assert all(k.sector == (5, 1) for k in by_window["10f13d7s"])
     # the tier windows (no override) and the NO-forms keep their
     # window's sector

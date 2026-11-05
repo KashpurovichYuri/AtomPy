@@ -295,13 +295,13 @@ _ANCHOR_FIRST = Scenario(
 #   10f13d7s CAS(6,13)  the record's six13 -- the 7s pair promoted,
 #                       the fold shrinks to 4 (the full core minus the
 #                       7s pair); it carries its own sector
-#   10f13d6p CAS(4,15)  the p-entry probe -- the 6p trio in-window,
-#                       its pair folded (the Ti 3d4s4p4d pattern); the
-#                       m-complete 6p PROMOTION would need a
-#                       character-selected fold (new machinery -- the
-#                       recorded future step, the record's own open
-#                       question)
-_U14E_PROMOTED = ("10f13d", "10f13d7s", "10f13d6p")
+#   10f13d14p CAS(4,15) the p-entry probe -- the physical 6p trio's
+#                       dominant band in-window, its pair folded (the
+#                       Ti 3d4s4p4d pattern); the m-complete 6p
+#                       PROMOTION would need a character-selected fold
+#                       (new machinery -- the recorded future step, the
+#                       record's own open question)
+_U14E_PROMOTED = ("10f13d", "10f13d7s", "10f13d14p")
 _U14E_PROMOTED_SECTORS = {"10f13d7s": (5, 1)}
 
 _U14E_WINDOWS = ("".join(_U_TIER["3f2d"]),) + tuple(
