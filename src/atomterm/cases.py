@@ -138,6 +138,11 @@ class CaseSpec:
     planned_windows : further window labels of the campaign, declared
         but not yet run (Ti: the (4,10)/(4,14) partitions) -- the cell
         grid derives their full factor grids (:func:`atomterm.cells.planned`).
+    planned_sectors : per-window sector overrides for planned windows
+        (window label -> (na, nb)) -- a promoted-pair window's fold
+        count follows its sector (:func:`atomterm.system.ncore_of`:
+        the (5,1) key folds 4 of the 5 core pairs).  Absent = the
+        case's default sector.
     lattice_windows : the lattice spans (empty = none) -- CASCI cells
         over growing m-complete shell spans at ``lattice_sector``
         (:func:`atomterm.cells.lattice_keys`).
@@ -183,6 +188,7 @@ class CaseSpec:
     run_casscf: bool = True
     nroots_primary: int = 9
     planned_windows: tuple[str, ...] = ()
+    planned_sectors: dict[str, tuple[int, int]] | None = None
     lattice_windows: tuple[str, ...] = ()
     lattice_sector: tuple[int, int] | None = None
     scan: ScanSpec | None = None
@@ -195,6 +201,8 @@ class CaseSpec:
         every lane window (its tag resolves, its fold stays out of its
         window).  Fail here, at the seam that owns the grammar."""
         object.__setattr__(self, "key", self.key or self.symbol)
+        object.__setattr__(self, "planned_sectors",
+                           self.planned_sectors or {})
         if self.lane_windows and self.term is None:
             raise ValueError(
                 "lane windows need the term target (term=(L, 'g' | 'u'))")
@@ -278,11 +286,40 @@ _ANCHOR_FIRST = Scenario(
 # ``--full`` away.  The third prefix per window catches the NO-label
 # form (``<w>no<k>`` -- start='no' never occurs on a casci cell, so
 # the prefix cannot touch an anchor).
+
+# the promoted-pair windows (the restricted optimizer batch,
+# user-directed 2026-11-05; shell identities from the band probe --
+# logs/probe_bands.log: the valence f/d character sits on 10f/13d,
+# the core 6s on 14s+15s, the 6p trio on 14p+15p, the 7s on 18s+19s):
+#   10f13d   CAS(4,12)  the record's minimal f+d window
+#   10f13d7s CAS(6,13)  the record's six13 -- the 7s pair promoted,
+#                       the fold shrinks to 4 (the full core minus the
+#                       7s pair); it carries its own sector
+#   10f13d6p CAS(4,15)  the p-entry probe -- the 6p trio in-window,
+#                       its pair folded (the Ti 3d4s4p4d pattern); the
+#                       m-complete 6p PROMOTION would need a
+#                       character-selected fold (new machinery -- the
+#                       recorded future step, the record's own open
+#                       question)
+_U14E_PROMOTED = ("10f13d", "10f13d7s", "10f13d6p")
+_U14E_PROMOTED_SECTORS = {"10f13d7s": (5, 1)}
+
 _U14E_WINDOWS = ("".join(_U_TIER["3f2d"]),) + tuple(
-    "".join(_U_TIER[t]) for t in ("3f", "4f", "2f2d", "4f2d"))
+    "".join(_U_TIER[t]) for t in ("3f", "4f", "2f2d", "4f2d")) \
+    + _U14E_PROMOTED
+
+
+def _u14e_sector(window: str) -> tuple[int, int]:
+    """A U14e window's sector: the promoted-pair override, else the
+    case's primary sector."""
+    return _U14E_PROMOTED_SECTORS.get(window, (4, 0))
+
+
 _U14E_ANCHOR_FIRST = Scenario(
     name="anchor-first",
-    cells=tuple(f"u14e_{w}_4-0_{m}_" for w in _U14E_WINDOWS
+    cells=tuple(f"u14e_{w}_{na}-{nb}_{m}_"
+                for w in _U14E_WINDOWS
+                for na, nb in (_u14e_sector(w),)
                 for m in ("casscf", "sa-casscf"))
     + tuple(f"u14e_{w}no" for w in _U14E_WINDOWS),
     reason="the optimizer class is multi-solution on the f shell "
@@ -296,8 +333,9 @@ _U14E_ANCHOR_FIRST = Scenario(
 # is the recorded future step.
 _U14E_FRAC_VOID = Scenario(
     name="frac-reference-unconverged",
-    cells=tuple(f"u14e_{w}_4-0_casci_ao_-_pol_frac"
-                for w in _U14E_WINDOWS),
+    cells=tuple(f"u14e_{w}_{na}-{nb}_casci_ao_-_pol_frac"
+                for w in _U14E_WINDOWS
+                for na, nb in (_u14e_sector(w),)),
     reason="the fractional-occupation reference has no converged basin "
            "on the ECP atom: DIIS diverges, Newton collapses or does "
            "not move; MOM-anchored selection is the recorded fix "
@@ -361,7 +399,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    nroots_primary=48,
                    planned_windows=tuple("".join(_U_TIER[t])
                                          for t in ("3f", "4f", "2f2d",
-                                                   "4f2d")),
+                                                   "4f2d")) + _U14E_PROMOTED,
+                   planned_sectors=_U14E_PROMOTED_SECTORS,
                    scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID),
                    ref=ReferenceSpec(
                        occ_closed=("l0", "l1"), occ_open=("l2", "l3"),

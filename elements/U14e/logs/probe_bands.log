@@ -1,0 +1,51 @@
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:679: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:629: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+n AO 177  n shells 49
+  s: ['6s', '7s', '8s', '9s', '10s', '11s', '12s', '13s', '14s', '15s', '16s', '17s', '18s', '19s', '20s']
+  p: ['6p', '7p', '8p', '9p', '10p', '11p', '12p', '13p', '14p', '15p', '16p', '17p', '18p', '19p']
+  d: ['6d', '7d', '8d', '9d', '10d', '11d', '12d', '13d', '14d', '15d']
+  f: ['5f', '6f', '7f', '8f', '9f', '10f', '11f', '12f', '13f', '14f']
+
+closed columns [22, 61, 88, 120, 143]  open columns [107, 108, 109, 142]
+
+-- closed core (the fold) --
+  mo[22]       eps=-2.2311  14s:0.577  15s:0.500  13s:0.163
+  mo[61]       eps=-1.0673  14p:0.532  15p:0.335  13p:0.205
+  mo[88]       eps=-1.0646  14p:0.531  15p:0.335  13p:0.204
+  mo[120]      eps=-1.0566  14p:0.525  15p:0.337  13p:0.204
+  mo[143]      eps=-0.1983  19s:0.446  18s:0.392  20s:0.094
+-- open shells --
+  mo[107]      eps=-0.0309  13d:0.405  12d:0.297  14d:0.216
+  mo[108]      eps=-0.0184  10f:0.377  11f:0.305  9f:0.180
+  mo[109]      eps=-0.0139  10f:0.370  11f:0.303  9f:0.176
+  mo[142]      eps=-0.0127  10f:0.370  11f:0.302  9f:0.176
+-- lowest virtuals (by eps) --
+  mo[0]        eps= 0.0151  19p:1.199  17p:0.272  14p:0.009
+  mo[1]        eps= 0.0151  19p:1.202  17p:0.271  14p:0.009
+  mo[2]        eps= 0.0177  19p:1.299  17p:0.264  14p:0.008
+  mo[3]        eps= 0.0388  20s:1.686  17s:0.634  14s:0.089
+  mo[4]        eps= 0.0572  15d:0.657  13d:0.238  12d:0.058
+  mo[5]        eps= 0.0572  15d:0.658  13d:0.237  12d:0.058
+  mo[6]        eps= 0.0600  18p:1.531  16p:0.253  13p:0.022
+  mo[7]        eps= 0.0601  18p:1.538  16p:0.252  13p:0.022
+  mo[8]        eps= 0.0640  18p:1.710  16p:0.259  13p:0.023
+  mo[9]        eps= 0.0640  15d:0.756  13d:0.217  12d:0.039
+  mo[10]       eps= 0.0643  15d:0.763  13d:0.215  12d:0.038
+  mo[11]       eps= 0.1095  15d:1.209  12d:0.049
+  mo[12]       eps= 0.1346  15d:0.518  14d:0.310  12d:0.221
+  mo[13]       eps= 0.1347  15d:0.516  14d:0.312  12d:0.221
+  mo[14]       eps= 0.1414  15d:0.415  14d:0.398  12d:0.236
+
+-- run_cell ranking (anchor construction), 1f+1d pairs --
+  u14e_8f12d_4-0_casci_ao_-_pol_avg: E = -3.074681  <L2> = 5.9585  term = 5D  |[P,Lz]| = 4.2e-02  |[P,Lp]| = 2.9e-01
+  u14e_8f13d_4-0_casci_ao_-_pol_avg: E = -2.954605  <L2> = 6.0000  term = 5D  |[P,Lz]| = 5.1e-02  |[P,Lp]| = 3.7e-01
+  u14e_9f12d_4-0_casci_ao_-_pol_avg: E = -3.074994  <L2> = 5.9585  term = 5D  |[P,Lz]| = 5.4e-02  |[P,Lp]| = 3.0e-01
+  u14e_9f13d_4-0_casci_ao_-_pol_avg: E = -2.954609  <L2> = 6.0000  term = 5D  |[P,Lz]| = 6.1e-02  |[P,Lp]| = 3.8e-01
+  u14e_10f12d_4-0_casci_ao_-_pol_avg: E = -3.125718  <L2> = 41.9776  term = 5I  |[P,Lz]| = 6.4e-02  |[P,Lp]| = 3.1e-01
+  u14e_10f13d_4-0_casci_ao_-_pol_avg: E = -3.211247  <L2> = 41.9649  term = 5I  |[P,Lz]| = 7.0e-02  |[P,Lp]| = 3.8e-01
+  u14e_11f12d_4-0_casci_ao_-_pol_avg: E = -3.140510  <L2> = 5.9598  term = 5D  |[P,Lz]| = 6.3e-02  |[P,Lp]| = 3.1e-01
+  u14e_11f13d_4-0_casci_ao_-_pol_avg: E = -2.965866  <L2> = 6.0000  term = 5D  |[P,Lz]| = 6.9e-02  |[P,Lp]| = 3.8e-01
+
+scratch chks removed

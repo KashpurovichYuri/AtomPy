@@ -1222,7 +1222,7 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     Parameters
     ----------
     spec : the :class:`~atomterm.cases.CaseSpec` (duck-typed: key,
-        shell_patterns, nelec_act, spin are read).
+        shell_patterns, nelec_act, spin, planned_sectors are read).
     window : the window label; None = the case's primary window.
 
     The ORDER is presentation and lives HERE, once -- renderers receive
@@ -1238,7 +1238,9 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     from atomterm.system import sector_na_nb
 
     w = window or "".join(spec.shell_patterns)
-    atom, sec = spec.key, sector_na_nb(spec.nelec_act, spec.spin)
+    atom = spec.key
+    sec = (spec.planned_sectors.get(w)
+           or sector_na_nb(spec.nelec_act, spec.spin))
     keys = [
         CellKey(atom, w, sec, fold="raw"),
         CellKey(atom, w, sec, fold="avg"),

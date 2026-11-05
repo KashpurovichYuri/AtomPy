@@ -198,16 +198,17 @@ def test_void_reason_voids_the_u14e_optimizer_class():
     on EVERY window (the primary included -- ``run_casscf=False``'s
     spirit made explicit) and the frac folds are void with it (the
     frac reference has no converged basin on the ECP atom); exactly
-    the 15 remaining CASCI anchors run."""
+    the 24 remaining CASCI anchors run (the primary's and tiers'
+    15, the promoted-pair batch's 9)."""
     spec = CAMPAIGN["U14e"]
     sc = scenarios_for(spec)
     keys = grid_keys(spec) + planned(spec)
-    assert len(keys) == 165
+    assert len(keys) == 264
     for k in keys:
         void = void_reason(k, sc) is not None
         expect = k.method != "casci" or k.fold == "frac"
         assert void == expect, k.address
-    assert sum(not void_reason(k, sc) for k in keys) == 15
+    assert sum(not void_reason(k, sc) for k in keys) == 24
 
 
 @fast
@@ -270,6 +271,30 @@ def test_window_grid_is_the_one_declaration():
     assert {k.window for k in pl} == {
         "3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4"}
     assert all(k.address not in addrs for k in pl)   # disjoint windows
+
+
+@fast
+def test_planned_sector_override_shrinks_the_fold():
+    """A planned window's declared sector overrides the case default in
+    its whole grid -- the promoted-pair windows' fold count follows the
+    sector (ncore_of(14, 6) = 4: the full core minus the 7s pair);
+    windows without the override stay at the default, and the NO-form
+    keys inherit their window's sector."""
+    keys = planned(CAMPAIGN["U14e"])
+    by_window = {}
+    for k in keys:
+        by_window.setdefault(k.window, []).append(k)
+    assert all(k.sector == (4, 0) for k in by_window["10f13d"])
+    assert all(k.sector == (4, 0) for k in by_window["10f13d6p"])
+    assert all(k.sector == (5, 1) for k in by_window["10f13d7s"])
+    # the tier windows (no override) and the NO-forms keep their
+    # window's sector
+    assert all(k.sector == (4, 0)
+               for w, ks in by_window.items() if w.startswith("9f")
+               for k in ks)
+    no7 = [k for k in by_window if k.startswith("10f13d7sno")]
+    assert no7 and all(k.sector == (5, 1)
+                       for k in by_window[no7[0]])
 
 
 @fast
