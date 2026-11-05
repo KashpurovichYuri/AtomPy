@@ -185,7 +185,7 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
     lines = [f"# Orbital-treatment cells: {atom}", "",
              f"ROHF reference energy: {rohf_e:.8f} Eh", "",
              head,
-             "|---" * 13 + "|"]
+             "|---" * (head.count("|") - 1) + "|"]
     ruler_sec = CellKey.from_address(ruler).sector
     for addr, r in facts_cells.items():
         # ΔE vs the ruler only within its sector -- cross-sector rows

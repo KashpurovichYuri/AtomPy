@@ -300,6 +300,11 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
         setattr(mc.fcisolver, k, v)
     if mask is not None:
         mc.uniq_var_indices = types.MethodType(mask, mc)
+    if weights is not None and not len(weights):
+        raise ValueError(
+            "an empty weights list is a caller bug (the measured-block "
+            "rule never yields []; pass weights=None for the plain "
+            "single-root kernel)")
     if weights is None or len(weights) == 1:
         # a one-root SA IS the single root (PySCF's SA wrapper einsums
         # the energies -- with nroots=1 the base kernel returns a

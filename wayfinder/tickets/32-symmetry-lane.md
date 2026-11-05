@@ -1051,12 +1051,15 @@ All four atoms now carry TABLE.md + TABLE.csv (Sc the exemplar):
   optimizer pairs the long poles; per-cell store writes carried
   every kill) -- 28 twins fresh, the lane families fill (5 rows per
   leg).  THE RECORDED VERDICTS REPRODUCE IN THE RENDER: CI span
-  identity pinned==free on all 7 legs; SA route agreement 5/6 legs
-  at solver tolerance; the exceptions are the record (3d4s@ar's
-  pinned SA +7.2 mEh from the free route's escape; 3d4d's pinned SA
-  scrambles, <L^2>=6.0-29.9 -- not a 3F window as-declared); the
-  winner (8,13): CI -92.6 -> SA -104.3 both routes, CASSCF's tilt
-  at <L^2>=10.20.
+  identity pinned==free on 6/7 legs; the EXCEPTION IS THE RECORD --
+  3d4d's scramble window reads DIFFERENT STATES per route (the
+  pinned blocks report the targeted term components, <L^2>=6.0-30.0,
+  21.5 mEh from the free CI's sector ground: the recorded
+  not-a-3F-window verdict); SA route agreement 5/7 legs at solver
+  tolerance; the other exception: 3d4s@ar's pinned SA +7.2 mEh from
+  the free route's escape (the core<->active swap is cross-irrep);
+  the winner (8,13): CI -92.6 -> SA -104.3 both routes, CASSCF's
+  tilt at <L^2>=10.20.
 - The UHF anchors: Ti TWO census basins (default/huckel land +7.8
   mEh ABOVE the ROHF anchor; atom/broken land the spin-broken
   ground -3.4 mEh) -> occ_e_ref_uhf=-848.40991227, the gate cycles

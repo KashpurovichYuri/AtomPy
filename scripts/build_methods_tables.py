@@ -35,7 +35,7 @@ Applicability: any declared atom (``cases.CAMPAIGN``; windows and
 cell addresses derive from the declaration -- this file owns
 presentation only: headings, notes, value formatting).
 
-TABLES edit protocol lives here: sections are rebuilt from constructed
+ladder edit protocol lives here: sections are rebuilt from constructed
 blocks, structural assertions checked (each heading once, row counts,
 no pending rows), temp file + verified move.
 """
@@ -263,7 +263,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
 
 def main(atom: str) -> None:
     """Rebuild ``<atom>``'s ladder block (the one table) from
-    cells.json under the TABLES edit protocol (the marker pair;
+    cells.json under the ladder edit protocol (the marker pair;
     structural checks; verified move) and write the CSV mirror."""
     src = Path(f"elements/{atom}/TABLE.md")
     if not src.exists():
@@ -276,7 +276,7 @@ def main(atom: str) -> None:
     body = "\n".join(ladder_section(spec, cells, anchor,
                                     uhf=data.get("uhf")))
 
-    # structural assertions (the TABLES protocol): no pending rows,
+    # structural assertions (the ladder protocol): no pending rows,
     # no starred gauge numbers, every table row well-formed
     assert "pending" not in body
     assert not re.search(r"\d\*", body)      # no starred gauge numbers
