@@ -1123,6 +1123,25 @@ marked; the casscf pin is slow-tier).
 
 Counts after the round: 253 total, 164 fast.
 
+## The suite verdict + the policy amendment (2026-11-05, user-directed)
+
+The wave-close full suite ran detached and was KILLED at the user's
+decision ~30 min in (the heavy tail re-priced live: the test_symm_tm
+fixture carries the (8,13) SA-leg optimizer pairs, 1-2 h class --
+the stale "~15 min" record predated their admission).  PARTIAL
+VERDICT: 91 tests completed before the kill -- one F (test_symm_si's
+head-to-head, the RECORDED rotating graze class) GREEN on its
+isolation rerun minutes later; the other 90 passed.  The REMAINDER
+WAIVED: the wave closes on the gates (the fast tier + the targeted
+files, all green today, including every file the round touched).
+THE POLICY AMENDMENT (AGENTS Tests, user-directed 2026-11-05): the
+full-suite run RETIRED -- no wave-close full run, the gates close a
+wave; heavy pins run isolation on evidence; THE BOUNDARY: tests
+verify constructions at pinned small sizes, heavy compute belongs
+to the atomic calculations (the campaign runs -- the project's
+goal); test_symm_tm's SA legs re-scope to store-anchored
+verification (the map carries the item).
+
 ## References
 
 
