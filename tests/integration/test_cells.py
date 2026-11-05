@@ -58,6 +58,8 @@ def test_address_round_trip():
         CellKey("Sc", "3d4s", (1, 1), method="casscf", mask="frozen",
                 fold="frac"),
         CellKey("U", "3f2d", (4, 2), method="sa-casscf", start="ao"),
+        CellKey("U14e", "9f10f11f12d13dno2", (4, 0), method="sa-casscf",
+                start="no"),
     ]
     for k in keys:
         assert CellKey.from_address(k.address) == k
@@ -171,7 +173,7 @@ def test_lane_keys_derive_from_the_declaration():
         ("3d4s@ar", (2, 1)), ("3d3p@semi", (4, 3)),
         ("3d3p4d@semi", (4, 3)), ("3d3p4s@1s2s2p3s", (5, 4)),
         ("3s3p3d@1s2s2p4s", (5, 4))]
-    assert lane_keys(CAMPAIGN["U"]) == []
+    assert lane_keys(CAMPAIGN["U14e"]) == []
 
 
 @fast
@@ -188,6 +190,21 @@ def test_void_reason_gates_scenariod_cells():
     assert all(void_reason(k, sc) is None for k in grid_keys(spec))
     reason = void_reason("ti_3d4d_3-1_casscf_ao_-_pol_avg", sc)
     assert reason.startswith("anchor-first") and "2026-11-02" in reason
+
+
+@fast
+def test_void_reason_voids_the_u14e_optimizer_class():
+    """U14e's widened gate: the multi-solution class is void at the key
+    on EVERY window (the primary included -- ``run_casscf=False``'s
+    spirit made explicit); exactly the 20 CASCI anchors run."""
+    spec = CAMPAIGN["U14e"]
+    sc = scenarios_for(spec)
+    keys = grid_keys(spec) + planned(spec)
+    assert len(keys) == 165
+    for k in keys:
+        assert (void_reason(k, sc) is not None) == (k.method != "casci"), \
+            k.address
+    assert sum(void_reason(k, sc) is None for k in keys) == 20
 
 
 @fast

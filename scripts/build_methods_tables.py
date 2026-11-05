@@ -49,7 +49,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from atomterm.cases import CAMPAIGN  # noqa: E402
+from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.cells import (grid_keys, lattice_keys,  # noqa: E402
                             route_keys, window_grid)
 from _tables_common import (DASH, EV, cas_label,  # noqa: E402
@@ -253,7 +253,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         keys = window_grid(spec, w)
         if not any(k.method != "casci" and k.start != "no"
                    and payload_of(cells, k) for k in keys):
-            out[-1:-1] = ["", POINTER.format(atom=spec.symbol, window=w)]
+            out[-1:-1] = ["", POINTER.format(atom=spec.key, window=w)]
     return out
 
 
@@ -267,7 +267,7 @@ def main(atom: str) -> None:
                  "atom's pass migrates it")
     data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
     cells, anchor = data["cells"], data["rohf_energy"]
-    spec = CAMPAIGN[atom]
+    spec = campaign_spec(atom)
 
     body = "\n".join(ladder_section(spec, cells, anchor,
                                     uhf=data.get("uhf")))

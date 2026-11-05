@@ -48,8 +48,8 @@ from atomterm.casscf import (
 from atomterm.stages import stage_facts
 from atomterm.analysis import format_report
 
-__all__ = ["CaseSpec", "Scenario", "CAMPAIGN", "scenarios_for",
-           "run_case", "run_atom", "run_carbon"]
+__all__ = ["CaseSpec", "Scenario", "CAMPAIGN", "campaign_spec",
+           "scenarios_for", "run_case", "run_atom", "run_carbon"]
 
 
 # the declaration ----------------------------------------------------
@@ -125,6 +125,10 @@ class CaseSpec:
 
     Attributes
     ----------
+    key : the campaign key -- the ``elements/<Key>/`` dir name and the
+        cell addresses' atom token (defaults to the symbol; a declared
+        ECP atom carries its own, e.g. ``"U14e"``).  Must match the
+        spec's ``CAMPAIGN`` registry key.
     symbol / basis / ecp / spin : the atom (:class:`~atomterm.system.AtomConfig`
         inputs; ``basis`` is a label like ``"ccpvdz"`` or a dict).
     nelec_act / ncore : the active-electron count and the closed-shell
@@ -173,6 +177,7 @@ class CaseSpec:
     ecp: str | None = None
     spin: int = 0
     tag: str | None = None
+    key: str | None = None
     ref: ReferenceSpec | None = None
     sa_weights: list[float] | None = None
     run_casscf: bool = True
@@ -189,6 +194,7 @@ class CaseSpec:
         """Validate the declaration's own grammar: the term target and
         every lane window (its tag resolves, its fold stays out of its
         window).  Fail here, at the seam that owns the grammar."""
+        object.__setattr__(self, "key", self.key or self.symbol)
         if self.lane_windows and self.term is None:
             raise ValueError(
                 "lane windows need the term target (term=(L, 'g' | 'u'))")
@@ -264,6 +270,25 @@ _ANCHOR_FIRST = Scenario(
     reason="planned windows anchor first: no optimizer cell of a window "
            "whose CASCI anchors are unread (2026-11-02)")
 
+# U14e's gate (Ti's pattern, widened to the whole optimizer class):
+# the f-shell optimizer class is the declared multi-solution class
+# (``run_casscf=False``'s spirit made explicit) -- the CASCI anchors
+# (the primary's four folds, the four tiers' four) run; every
+# casscf/sa-casscf cell of every window stays void at the key, one
+# ``--full`` away.  The third prefix per window catches the NO-label
+# form (``<w>no<k>`` -- start='no' never occurs on a casci cell, so
+# the prefix cannot touch an anchor).
+_U14E_WINDOWS = ("".join(_U_TIER["3f2d"]),) + tuple(
+    "".join(_U_TIER[t]) for t in ("3f", "4f", "2f2d", "4f2d"))
+_U14E_ANCHOR_FIRST = Scenario(
+    name="anchor-first",
+    cells=tuple(f"u14e_{w}_4-0_{m}_" for w in _U14E_WINDOWS
+                for m in ("casscf", "sa-casscf"))
+    + tuple(f"u14e_{w}no" for w in _U14E_WINDOWS),
+    reason="the optimizer class is multi-solution on the f shell "
+           "(run_casscf=False's spirit made explicit): the CASCI "
+           "anchors run first (2026-11-05)")
+
 CAMPAIGN: dict[str, CaseSpec] = {
     "C": CaseSpec("C", "ccpvdz", nelec_act=2, ncore=2,
                   shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3,
@@ -310,19 +335,24 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    planned_windows=("3d4d", "3d4s4p4d"),
                    lattice_windows=("3d", "3d4p", "3d4p4d"),
                    lattice_sector=(2, 0)),
-    "U": CaseSpec("U", _U_BASIS, nelec_act=4, ncore=5,
-                  shell_patterns=list(_U_TIER["3f2d"]), spin=4,
-                  ecp=_U_ECP, tag="U_stuttgart78_dyall",
-                  sa_weights=[1 / 17] * 17,  # the ground term's M_L set
-                  run_casscf=False,          # the multi-solution class
-                  nroots_primary=48,
-                  planned_windows=tuple("".join(_U_TIER[t])
-                                        for t in ("3f", "4f", "2f2d",
-                                                  "4f2d")),
-                  ref=ReferenceSpec(
-                      occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
-                      occ_e_ref=-50.38185233,
-                      conv_accelerator="newton")),
+    # CAMPAIGN key `U14e`: the ECP-atom record's element dir
+    # (``elements/U14e/``); the SYMBOL stays `U` (PySCF builds the
+    # element; the ECP removes its 78 core electrons) and the `tag`
+    # stays `U_stuttgart78_dyall` (the basis/psp label on chk names).
+    "U14e": CaseSpec("U", _U_BASIS, nelec_act=4, ncore=5,
+                   shell_patterns=list(_U_TIER["3f2d"]), spin=4,
+                   ecp=_U_ECP, tag="U_stuttgart78_dyall", key="U14e",
+                   sa_weights=[1 / 17] * 17,  # the ground term's M_L set
+                   run_casscf=False,          # the multi-solution class
+                   nroots_primary=48,
+                   planned_windows=tuple("".join(_U_TIER[t])
+                                         for t in ("3f", "4f", "2f2d",
+                                                   "4f2d")),
+                   scenarios=(_U14E_ANCHOR_FIRST,),
+                   ref=ReferenceSpec(
+                       occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
+                       occ_e_ref=-50.38185233,
+                       conv_accelerator="newton")),
 }
 
 
@@ -335,6 +365,28 @@ def scenarios_for(spec: CaseSpec) -> tuple[Scenario, ...]:
     """
     merged = {**DEFAULT_SCENARIOS, **{s.name: s for s in spec.scenarios}}
     return tuple(merged.values())
+
+
+def campaign_spec(atom: str) -> CaseSpec:
+    """The declared spec by campaign key -- the ONE lookup, owning the
+    ``key == registry key`` contract: every element dir, store, and
+    chkfile path derives from the key, so a spec whose ``key`` field
+    disagrees with its ``CAMPAIGN`` entry refuses here instead of
+    splitting the artifacts across two dirs.
+
+    Raises
+    ------
+    KeyError
+        the atom is not declared.
+    ValueError
+        the spec's ``key`` field disagrees with its registry key.
+    """
+    spec = CAMPAIGN[atom]
+    if spec.key != atom:
+        raise ValueError(
+            f"CAMPAIGN key {atom!r} != spec.key {spec.key!r} -- the "
+            "element dir would split between the two; fix the row")
+    return spec
 
 
 # the executor -------------------------------------------------------

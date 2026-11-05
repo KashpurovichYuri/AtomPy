@@ -145,7 +145,9 @@ class CellKey:
 
     Attributes
     ----------
-    atom : element label, e.g. ``"Ti"`` (the ``elements/<Atom>/`` dir).
+    atom : campaign key, e.g. ``"Ti"``, ``"U14e"`` (the
+        ``elements/<Atom>/`` dir; a plain element symbol or a declared
+        ECP-atom label).
     window : NOMINAL span label, e.g. ``"3d4s"`` -- names the table
         row; the construction is the ``start`` axis (window = the
         span, start = the columns defining it).  A LANE window
@@ -183,9 +185,11 @@ class CellKey:
     def __post_init__(self):
         """Validate and canonicalize: axis vocabularies, void
         combinations, and the pur fold rule (raw -> avg)."""
-        if not (isinstance(self.atom, str) and self.atom.isalpha()
-                and len(self.atom) <= 2):
-            raise ValueError(f"atom {self.atom!r} must be an element label")
+        if not (isinstance(self.atom, str) and self.atom.isalnum()
+                and 1 <= len(self.atom) <= 8):
+            raise ValueError(f"atom {self.atom!r} must be a campaign key "
+                             "(an element symbol or a declared label "
+                             "like 'U14e')")
         object.__setattr__(self, "atom", self.atom.capitalize())
         if not (isinstance(self.window, str) and _WINDOW_RE.match(self.window)):
             raise ValueError(
@@ -1217,7 +1221,7 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
 
     Parameters
     ----------
-    spec : the :class:`~atomterm.cases.CaseSpec` (duck-typed: symbol,
+    spec : the :class:`~atomterm.cases.CaseSpec` (duck-typed: key,
         shell_patterns, nelec_act, spin are read).
     window : the window label; None = the case's primary window.
 
@@ -1234,7 +1238,7 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     from atomterm.system import sector_na_nb
 
     w = window or "".join(spec.shell_patterns)
-    atom, sec = spec.symbol, sector_na_nb(spec.nelec_act, spec.spin)
+    atom, sec = spec.key, sector_na_nb(spec.nelec_act, spec.spin)
     keys = [
         CellKey(atom, w, sec, fold="raw"),
         CellKey(atom, w, sec, fold="avg"),
@@ -1308,9 +1312,9 @@ def lattice_keys(spec) -> list[CellKey]:
     sec = spec.lattice_sector
     keys = []
     for w in spec.lattice_windows:
-        keys.append(CellKey(spec.symbol, w, sec, method="casci",
+        keys.append(CellKey(spec.key, w, sec, method="casci",
                             fold="avg"))
-        keys.append(CellKey(spec.symbol, w, sec, method="casci",
+        keys.append(CellKey(spec.key, w, sec, method="casci",
                             start="mo", fold="avg"))
     return keys
 
@@ -1338,7 +1342,7 @@ def lane_keys(spec) -> list[CellKey]:
     base = sector_na_nb(spec.nelec_act, spec.spin)
     keys = []
     for label in spec.lane_windows:
-        k = CellKey(spec.symbol, label, base, method="casci",
+        k = CellKey(spec.key, label, base, method="casci",
                     substrate="pur", fold="avg")
         nelec = (spec.nelec_act + 2 * spec.ncore
                  - closed_electrons(k.fold_shells()))

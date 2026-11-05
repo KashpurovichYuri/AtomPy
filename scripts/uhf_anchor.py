@@ -17,12 +17,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from atomterm.cases import CAMPAIGN  # noqa: E402
+from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.reference import run_uhf, uhf_contamination  # noqa: E402
 
 
 def main(atom: str) -> None:
-    spec = CAMPAIGN[atom]
+    spec = campaign_spec(atom)
     store = Path("elements") / atom / "cells.json"
     data = json.loads(store.read_text())
     chk = str(Path("elements") / atom / "rungs" / "uhf.chk")

@@ -57,7 +57,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from pyscf import gto, scf  # noqa: E402
 
 from _tables_common import atomic_write_text  # noqa: E402
-from atomterm.cases import CAMPAIGN, scenarios_for  # noqa: E402
+from atomterm.cases import CAMPAIGN, campaign_spec, scenarios_for  # noqa: E402
 from atomterm.cells import (CellKey, cell_payload, diagnostics,  # noqa: E402
                             grid_keys, lane_keys, lattice_keys, planned,
                             kernel_cell_payload, route_keys, run_cell,
@@ -232,9 +232,10 @@ def main() -> None:
     filtered = bool(args.group or args.method or args.window or args.mask
                     or args.start or args.substrate or args.fold
                     or args.sector)
-    for name, spec in CAMPAIGN.items():
+    for name in CAMPAIGN:
         if args.atoms and name not in args.atoms:
             continue
+        spec = campaign_spec(name)
         print(f"\n===== cells {name} =====", flush=True)
         out = Path("elements") / name
         (out / "rungs").mkdir(parents=True, exist_ok=True)
