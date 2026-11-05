@@ -235,7 +235,7 @@ carries a number only when the number IS the fact.
 
 ## Tests
 
-`pytest` runs 245 tests (~25 min unloaded; the CAS-ladder fixture in
+`pytest` runs 246 tests (~25 min unloaded; the CAS-ladder fixture in
 `test_symm_tm` dominates at ~15 min; slower under load). The fast
 tier: `pytest -m fast` = 157 tests in seconds (machine-light
 selection).
