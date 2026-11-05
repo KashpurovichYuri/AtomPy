@@ -1,6 +1,7 @@
 # Ticket 31 — The ECP wave: declare the ECP atom
 
-STATUS: queued (opens on the user's go, after ticket 30 closes).
+STATUS: queued (opens after ticket 32's close; the door plan SETTLED
+with the user 2026-11-05).
 
 ## Goal
 
@@ -8,6 +9,37 @@ Declare the ECP atom in `cases.CAMPAIGN` — ECP basis + pseudopotential
 through the existing `AtomConfig.ecp` pairing — and retire the `run_u*`
 scripts into the modern path (the U tables become the declared
 campaign's output; `run_u*` stays the frozen record until then).
+
+## The U14e door plan (settled with the user, 2026-11-05)
+
+1. THE ELEMENT DIR IS `elements/U14e/`: rename the CAMPAIGN key
+   `U` -> `U14e` (regen derives the element dir from the key -- that
+   is the whole trick); the `tag` stays `U_stuttgart78_dyall` (the
+   basis/psp label on chk names).  `elements/U/` STAYS FROZEN (the
+   user's call; archive-or-keep revisited later).
+2. CACHE-WARM: the record's reference chk
+   (`elements/U/cache/U_stuttgart78_dyall_rohf.chk`) copies ONE TIME
+   to `elements/U14e/rungs/rohf.chk` (the trusted-cache convention --
+   cached chks never re-gate), or a gated fresh SCF.
+3. THE UHF CENSUS: five arms at Dyall size (~30 min budget) ->
+   declare `occ_e_ref_uhf` -> `scripts/uhf_anchor.py` -> the anchor
+   row.  ONE FLAG: the census arms run without the Newton accelerator
+   U's ROHF class needed (fact 22) -- if an arm diverges, the census
+   learns `ref.conv_accelerator` (extend only on evidence).
+4. THE FIRST REGEN IS ANCHOR-FIRST (~20 cells, NOT the full grid):
+   declare an `anchor-first` Scenario for U14e (Ti's pattern) --
+   the primary window's CI cells + the raw detector run; the four
+   tier windows run their CASCI anchors only (~2/tier); SA and the
+   optimizer variants stay VOID at the key (the multi-solution
+   class; `run_casscf=False`'s spirit made explicit), one `--full`
+   away.  U has NO scenarios today -- an unfiltered regen would
+   charge into the 33-cell grid + all 132 tier cells.
+5. THE RETIREMENT (G5): `run_u*` + `run_casscf`/`run_sa_casscf` die
+   with the first modern U tables; `stage_facts`' `c_act` absorbs
+   here (the one caller-change moment).
+6. Ticket 29's T2/M batches stay user-gated.  The .chk restart
+   anatomy needs NO work (every rung's chkfile IS the restart
+   artifact: orbitals + CI vectors persist per address).
 
 ## Design (pre-verified)
 
@@ -67,12 +99,9 @@ campaign's output; `run_u*` stays the frozen record until then).
   end (mol builds ECP-honest: nelectron 14, ncore 5; the sector and
   the label<->patterns round trip; the primary grid = 33 cells, the
   planned tiers = 132). NO SCF anywhere.
-- Part 2 (next): the reference cache-warm — the classic pipeline
-  expects `elements/<label>_rohf.chk`; the record's reference sits at
-  `elements/U/cache/U_stuttgart78_dyall_rohf.chk` (one-time copy, a
-  committed data move) or a gated fresh SCF; then the term tables
-  (gated), the tier CASCI anchors (gated), the landscape survey
-  (below).
+- Part 2 (next): THE DOOR PLAN ABOVE (cache-warm -> census ->
+  anchor-first regen -> the retirement); the term tables and the
+  landscape survey stay gated on the user's enable.
 - run_u* + the two stage adapters retire TOGETHER when the tables
   regenerate through the modern path (their second consumer's death).
 
