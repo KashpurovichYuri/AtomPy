@@ -211,13 +211,16 @@ campaign's output; `run_u*` stays the frozen record until then).
 - Part 3 (REVISED — the shell-layer wave, Sc-unc/Ti-unc FIRST,
   user-directed: develop on a cheap certified system, compare with
   the existing): THE PROBLEM — the fold resolution matches AO LABELS
-  and assumes 1 folded column = 1 doubly-occupied orbital; both hold
-  only on contracted bases (one contraction block = one shell = one
-  orbital).  THE RESOLUTION — (1) the uncontracted cc-pVDZ variant
-  for Sc/Ti (the mechanical split script; CAMPAIGN keys Sc-unc /
-  Ti-unc, element dirs elements/Sc-unc/ elements/Ti-unc/); (2) THE
-  SHELL LAYER on the declaration: each chemical shell names its AO
-  realization (the band list, certified by the productized
+  and assumes 1 folded column = 1 doubly-occupied orbital; the
+  assumption is BASIS-SPECIFIC and fails more often than not (the
+  uncontracted U14e: labels are radial counters, the chemical fold
+  is 5 pairs over 13 columns; MEASURED on contracted cc-pVDZ Sc/Ti:
+  three d bands, six s bands — the chemical 3d = at least two
+  contractions).  THE RESOLUTION — (1) the uncontracted cc-pVDZ
+  variant for Sc/Ti (the mechanical split script; CAMPAIGN keys
+  Sc-unc / Ti-unc, element dirs elements/Sc-unc/ elements/Ti-unc/);
+  (2) THE SHELL LAYER on the declaration: each chemical shell names
+  its AO realization (the band list, certified by the productized
   scripts/band_composition.py — the probe productized, any atom);
   (3) the multi-column shell-span fold: the fold resolution through
   the shell layer + the projected-density core energy
@@ -233,9 +236,18 @@ campaign's output; `run_u*` stays the frozen record until then).
   stage_facts' c_act absorption) + the AGENTS/map/ticket lockstep.
   THE USER'S DESIGN PRINCIPLE (2026-11-06, do not re-open): AOs are
   never tracked by labels directly — the chemical shell with its
-  DECLARED AO realization is the primary object; contracted bases
-  work because the basis itself declares the shells; uncontracted
-  bases need the shell layer.
+  DECLARED AO realization is the primary object — FOR ALL BASES.
+  MEASURED: cc-pVDZ Sc/Ti carry three d bands and six s bands (the
+  chemical 3d = at least the "3d"+"4d" contractions) — contracted
+  bases do NOT automatically hold the 1:1 shell-to-block match; the
+  certified Ti/Sc lanes were 1:1 because their folds (ar/semi) named
+  single-block inner shells.  The shell layer + the multi-column
+  fold + the projected core energy are the GENERAL construction; the
+  1:1 case is the certification special case.  QUEUED REVIEW (the
+  user, 2026-11-06): the CASCI calculations (the window-poverty
+  readings, the echo roots, the raw-fold anchor mixing) get their
+  own review pass later — record the verdicts before any
+  construction rides them.
 
 ## References
 
