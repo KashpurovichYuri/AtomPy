@@ -208,32 +208,54 @@ campaign's output; `run_u*` stays the frozen record until then).
   (term=(8,"u") stays).  KEPT: the C1-seeded lane_substrate fix (the
   seeded D2h reproduces −50.38185233 exactly; plain DIIS diverges,
   from-scratch Newton lands −41.2 — measured).
-- Part 3 (REVISED — the shell-layer wave, Sc-unc/Ti-unc FIRST,
-  user-directed: develop on a cheap certified system, compare with
-  the existing): THE PROBLEM — the fold resolution matches AO LABELS
-  and assumes 1 folded column = 1 doubly-occupied orbital; the
-  assumption is BASIS-SPECIFIC and fails more often than not (the
-  uncontracted U14e: labels are radial counters, the chemical fold
-  is 5 pairs over 13 columns; MEASURED on contracted cc-pVDZ Sc/Ti:
-  three d bands, six s bands — the chemical 3d = at least two
-  contractions).  THE RESOLUTION — (1) the uncontracted cc-pVDZ
-  variant for Sc/Ti (the mechanical split script; CAMPAIGN keys
-  Sc-unc / Ti-unc, element dirs elements/Sc-unc/ elements/Ti-unc/);
-  (2) THE SHELL LAYER on the declaration: each chemical shell names
-  its AO realization (the band list, certified by the productized
-  scripts/band_composition.py — the probe productized, any atom);
-  (3) the multi-column shell-span fold: the fold resolution through
-  the shell layer + the projected-density core energy
-  (E = 2Tr(hD) + (2J−K)(D), D = the closed density projected on the
-  fold span; certified EXACT against closed_shell_core_energy on
-  every 1:1 fold + a synthetic multi-band pin); (4) the cheap
-  validation legs (the pinned lane CI on 3d4s@ar-unc + the free CI
-  beside it; the ²D/³F term readout exact); (5) the comparison vs
-  the certified cc-pVDZ records (the constructions exact, the
-  terms/orderings qualitative); (6) THEN the U14e lane port
-  (declaration only — the machinery proven).  THEN the close: the
-  G5 retirement (run_u* + casscf.run_casscf/run_sa_casscf +
-  stage_facts' c_act absorption) + the AGENTS/map/ticket lockstep.
+- Part 3a: THE SHELL-LAYER WAVE EXECUTED (2026-11-06, the session
+  after the plan; commits 34d9542, a64d8dd): the machinery —
+  (1) `windows.shell_realization`/`realized_patterns` (the layer; the
+  identity default = the contracted behavior, bit-exact; empty and
+  other-l realizations refuse) + `CaseSpec.shell_bands`, threaded
+  through `_fold_span`/`run_cell`/`analyze_cell`/`kernel_cell_payload`/
+  `run_lane_cell`/regen; (2) `core.confined_core_orbitals`: the
+  closed core ON a fold span = the SPAN'S OWN closed-shell Roothaan
+  filling the lowest n_pairs (the first design — the span-truncated
+  projection of the SCF core — DIED on the measurement: the S-weight
+  capture is a NORM statement blind to the nuclear cusp, 99.99%
+  capture with +13 Eh core-energy error on Sc-unc; the Roothaan is
+  draw-free, monotone in the span, the span itself on 1:1, and on the
+  whole AO space it reproduces the (2·n_pairs)-ion RHF EXACTLY — the
+  pinned external anchor); the convergence certificate = the
+  density-Fock commutator (the energy settles quadratically earlier);
+  (3) the fold span = the UNION of its bands' rows (shared bands
+  across shells duplicated rows = an exactly singular Gram — pinned
+  live); (4) the pinned Davidson can deterministically SKIP
+  near-degenerate lowest roots (the Sc-unc Ag ground pair: the
+  solver's second root four eigenvalues up, reproducible) — the lane
+  readout now DENSELY ADJUDICATES every CI block ≤ 12k dets with our
+  exact H (the conventions certificate promoted to the correction
+  source; `anchor_corrected` records the replaced blocks); (5) the
+  per-root meters ride the apply family — matrix-free at any sector
+  size (S²'s ladder terms are TWO-body — pinned).  THE DECLARATIONS —
+  keys `Scunc`/`Tiunc` (the CellKey grammar is alnum; hyphens collide
+  with the capitalize canonicalization), the split bases
+  data/{sc,ti}_ccpvdz_unc.txt (scripts/make_uncontracted.py,
+  self-verifying), the shell layer as CONTIGUOUS BAND RANGES
+  partitioning each l-family (disjoint; the fold families FULL down
+  to the cusp — the Roothaan fills the lowest, so a fold span must
+  exclude every skipped/active shell's bands; the reference is the
+  PLAIN aufbau ROHF — the composition log certifies its filling; the
+  l-span forcing DIVERGES on this basis, measured).  THE SC VERDICT
+  (elements/Scunc/): the free pur-fold row ²D exact at closure 8e-14
+  (CAS(3,43), E = −759.7467, the certified contracted record
+  −759.7274 below it variationaly); THE LANE 3d4s@ar = the
+  multi-column fold exercised: 9 pairs over the 65-column family
+  span, the Roothaan core 18 cycles at E_core = the free-ion value
+  (−758.2147), ALL FIVE ²D components degenerate at −1.502958 (ptp
+  3.7e-12, ⟨L²⟩ = 6.0, ⟨S²⟩ = 0.75 exact), total −759.7177,
+  anchor_corrected ['Ag'] honestly recorded.  THE BAND MEASUREMENT —
+  scripts/band_composition.py productized: per-band Mulliken
+  populations (the display meter — WILD (±2) on near-dependent
+  primitives, partition-unity-checked) + the greedy projector-capture
+  suggestion (the certificate meter, bounded); the logs are the
+  declaration's evidence (elements/{Scunc,Tiunc}/logs/).
   THE USER'S DESIGN PRINCIPLE (2026-11-06, do not re-open): AOs are
   never tracked by labels directly — the chemical shell with its
   DECLARED AO realization is the primary object — FOR ALL BASES.

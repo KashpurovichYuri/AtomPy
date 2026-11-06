@@ -236,10 +236,16 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
             if "void_reason" in r:
                 lines.append(f"- `{addr}` VOID -- {r['void_reason']}")
             elif "total" in r:
-                lines.append(
-                    f"- `{addr}` E_term {r['total']:.8f}"
-                    f"  ptp {r['ptp']:.1e}"
-                    f"  L2 {['%.3f' % v for v in r['l2']]}")
+                line = (f"- `{addr}` E_term {r['total']:.8f}"
+                        f"  ptp {r['ptp']:.1e}"
+                        f"  L2 {['%.3f' % v for v in r['l2']]}")
+                if "core_pairs" in r:
+                    line += (f"  core {r['core_pairs']}p"
+                             f"/{r.get('core_cycles', 0)}c")
+                if r.get("anchor_corrected"):
+                    line += (f"  anchor-corrected "
+                             f"{r['anchor_corrected']}")
+                lines.append(line)
             else:                      # a free-route twin (cell payload)
                 e = r["energies_pyscf"][0]
                 lines.append(f"- `{addr}` E {e:.8f}")
