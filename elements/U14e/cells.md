@@ -14,6 +14,12 @@ ROHF reference energy: -50.38185233 Eh
 | u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg | -50.42381070 | nan | 72.00000 | 1.64e-04 | 1.18e-03 | 6.2e-04 | 7.4e-04 | 0.583 | nan | 1.1e-06 | 1.7e-11 |  |
 | u14e_10f13d14p_4-0_casscf_ao_-_pol_avg | -50.42341954 | nan | 66.86715 | 2.83e+02 | 1.94e+03 | 5.9e+00 | 7.2e+00 | 0.690 | nan | 7.6e-03 | 1.6e-11 | NOT-CONVERGED |
 | u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg | -50.42638482 | nan | 71.77902 | 8.03e+00 | 6.04e+01 | 4.9e+00 | 6.9e+00 | 0.667 | nan | 1.3e-06 | 1.7e-11 | NOT-CONVERGED |
+| u14e_10f13d_4-0_casci_moc_-_pol_avg | -50.37696255 | nan | 0.01594 | 8.17e-01 | 1.11e+01 | 7.1e+00 | 9.4e+00 | 0.500 | 3.2e-02 | 5.2e-03 | 2.0e-11 |  |
+| u14e_10f13d_4-0_casci_moc_-_pur_avg | -50.37832810 | nan | 0.01603 | 8.27e-01 | 1.12e+01 | 7.1e+00 | 9.4e+00 | 0.500 | 0.0e+00 | 1.0e-09 | 1.6e-11 |  |
+| u14e_10f13d_4-0_casscf_moc_-_pol_avg | -50.42329099 | nan | 64.73586 | 9.22e+00 | 5.49e+01 | 5.7e+00 | 6.4e+00 | 0.627 | nan | 7.4e-03 | 1.7e-11 |  |
+| u14e_10f13d_4-0_casscf_moc_-_pur_avg | -50.42252810 | nan | 49.84028 | 8.32e+00 | 5.97e+01 | 6.8e+00 | 7.7e+00 | 0.683 | nan | 5.1e-03 | 1.8e-11 | NOT-CONVERGED |
+| u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg | -50.42381153 | nan | 72.00000 | 1.09e-04 | 2.16e-03 | 2.1e-04 | 6.6e-04 | 0.583 | nan | 7.2e-06 | 2.0e-11 |  |
+| u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg | -50.42015387 | nan | 59.60745 | 1.60e+01 | 2.36e+02 | 5.5e+00 | 5.1e+00 | 0.534 | nan | 2.5e-03 | 1.8e-11 | NOT-CONVERGED |
 
 configurations per root (top-2 determinants):
 
@@ -91,6 +97,44 @@ configurations per root (top-2 determinants):
 - `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 6: d^1.00f^3.00 (|c|=0.23); d^1.00f^3.00 (|c|=0.22)
 - `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 7: d^1.00f^3.00 (|c|=0.24); d^1.00f^3.00 (|c|=0.22)
 - `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 8: d^1.00f^3.00 (|c|=0.22); d^1.00f^3.00 (|c|=0.20)
+- `u14e_10f13d_4-0_casci_moc_-_pol_avg` root 0: s^0.01d^0.99f^3.00 (|c|=1.00); s^0.02d^2.98f^1.00 (|c|=0.00)
+- `u14e_10f13d_4-0_casci_moc_-_pol_avg` root 1: d^1.00f^3.00 (|c|=0.99); d^1.00f^3.00 (|c|=0.11)
+- `u14e_10f13d_4-0_casci_moc_-_pol_avg` root 2: d^1.00f^3.00 (|c|=1.00); s^0.01d^2.99f^1.00 (|c|=0.01)
+- `u14e_10f13d_4-0_casci_moc_-_pol_avg` root 3: d^1.00f^3.00 (|c|=1.00); s^0.01d^2.99f^1.00 (|c|=0.01)
+- `u14e_10f13d_4-0_casci_moc_-_pol_avg` root 4: d^1.00f^3.00 (|c|=0.99); d^1.00f^3.00 (|c|=0.11)
+- `u14e_10f13d_4-0_casci_moc_-_pol_avg` root 5: d^1.00f^3.00 (|c|=1.00); s^0.01d^2.99f^1.00 (|c|=0.01)
+- `u14e_10f13d_4-0_casci_moc_-_pol_avg` root 6: s^0.01d^1.99f^2.00 (|c|=0.85); s^0.01d^1.99f^2.00 (|c|=0.42)
+- `u14e_10f13d_4-0_casci_moc_-_pol_avg` root 7: s^0.02d^1.98f^2.00 (|c|=0.82); s^0.01d^1.99f^2.00 (|c|=0.43)
+- `u14e_10f13d_4-0_casci_moc_-_pol_avg` root 8: s^0.01d^1.99f^2.00 (|c|=0.90); s^0.01d^1.99f^2.00 (|c|=0.34)
+- `u14e_10f13d_4-0_casci_moc_-_pur_avg` root 0: d^1.00f^3.00 (|c|=1.00); d^2.99f^1.00 (|c|=0.00)
+- `u14e_10f13d_4-0_casci_moc_-_pur_avg` root 1: d^1.00f^3.00 (|c|=0.99); d^1.00f^3.00 (|c|=0.14)
+- `u14e_10f13d_4-0_casci_moc_-_pur_avg` root 2: d^1.00f^3.00 (|c|=1.00); d^3.00f^1.00 (|c|=0.01)
+- `u14e_10f13d_4-0_casci_moc_-_pur_avg` root 3: d^1.00f^3.00 (|c|=1.00); d^3.00f^1.00 (|c|=0.01)
+- `u14e_10f13d_4-0_casci_moc_-_pur_avg` root 4: d^1.00f^3.00 (|c|=0.99); d^1.00f^3.00 (|c|=0.14)
+- `u14e_10f13d_4-0_casci_moc_-_pur_avg` root 5: d^1.00f^3.00 (|c|=1.00); d^3.00f^1.00 (|c|=0.01)
+- `u14e_10f13d_4-0_casci_moc_-_pur_avg` root 6: d^2.00f^2.00 (|c|=0.76); d^2.00f^2.00 (|c|=0.49)
+- `u14e_10f13d_4-0_casci_moc_-_pur_avg` root 7: d^2.00f^2.00 (|c|=0.75); d^2.00f^2.00 (|c|=0.53)
+- `u14e_10f13d_4-0_casci_moc_-_pur_avg` root 8: d^2.00f^2.00 (|c|=0.95); d^2.00f^2.00 (|c|=0.28)
+- `u14e_10f13d_4-0_casscf_moc_-_pol_avg` root 0: d^1.00f^3.00 (|c|=0.35); d^1.00f^3.00 (|c|=0.35)
+- `u14e_10f13d_4-0_casscf_moc_-_pur_avg` root 0: d^0.85f^3.14 (|c|=0.44); d^0.99f^3.00 (|c|=0.39)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg` root 0: d^1.00f^3.00 (|c|=0.35); d^1.24f^2.76 (|c|=0.35)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg` root 1: d^0.91f^3.09 (|c|=0.35); d^1.34f^2.66 (|c|=0.31)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg` root 2: d^1.62f^2.38 (|c|=0.26); d^1.30f^2.70 (|c|=0.23)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg` root 3: d^0.91f^3.09 (|c|=0.22); d^1.12f^2.88 (|c|=0.18)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg` root 4: d^1.24f^2.76 (|c|=0.22); d^1.28f^2.72 (|c|=0.21)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg` root 5: d^1.33f^2.67 (|c|=0.31); d^1.01f^2.99 (|c|=0.30)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg` root 6: d^1.29f^2.71 (|c|=0.33); d^1.53f^2.47 (|c|=0.27)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg` root 7: d^1.06f^2.94 (|c|=0.37); d^1.38f^2.62 (|c|=0.27)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg` root 8: d^1.01f^2.99 (|c|=0.39); d^0.91f^3.09 (|c|=0.26)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg` root 0: d^0.91f^3.08 (|c|=0.37); p^0.08d^1.17f^2.74 (|c|=0.29)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg` root 1: d^0.98f^3.02 (|c|=0.33); p^0.09d^1.11f^2.80 (|c|=0.30)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg` root 2: d^0.98f^3.02 (|c|=0.25); p^0.09d^1.80f^2.10 (|c|=0.19)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg` root 3: d^1.61f^2.39 (|c|=0.20); p^0.09d^1.74f^2.16 (|c|=0.17)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg` root 4: d^0.63f^3.36 (|c|=0.31); p^0.01d^1.10f^2.89 (|c|=0.28)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg` root 5: d^0.98f^3.02 (|c|=0.28); d^1.54f^2.45 (|c|=0.20)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg` root 6: p^0.02d^1.03f^2.95 (|c|=0.26); p^0.08d^1.17f^2.74 (|c|=0.24)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg` root 7: d^0.98f^3.02 (|c|=0.30); p^0.02d^0.96f^3.02 (|c|=0.20)
+- `u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg` root 8: d^0.67f^3.32 (|c|=0.21); d^0.98f^3.02 (|c|=0.20)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 
@@ -267,3 +311,10 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `u14e_10f13d14p_4-0_casci_ao_-_pol_frac` VOID -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
 - `u14e_10f13d7s_5-1_casscf_ao_-_pol_avg` E -50.45354624
 - `u14e_10f13d7s_5-1_sa-casscf_ao_-_pol_avg` E -50.45285242
+- `u14e_9f10f11f12d13d_4-0_casci_moc_-_pol_avg` E -50.38308895
+- `u14e_10f13d7s_5-1_casci_moc_-_pol_avg` E -50.38204480
+- `u14e_10f13d7s_5-1_casci_moc_-_pur_avg` E -50.38024000
+- `u14e_10f13d7s_5-1_casscf_moc_-_pol_avg` E -50.45611121
+- `u14e_10f13d7s_5-1_casscf_moc_-_pur_avg` E -50.42307666
+- `u14e_10f13d7s_5-1_sa-casscf_moc_-_pol_avg` E -50.40889417
+- `u14e_10f13d7s_5-1_sa-casscf_moc_-_pur_avg` E -50.38596418
