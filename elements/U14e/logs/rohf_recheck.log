@@ -1,28 +1,46 @@
-== ROHF recheck (fresh from-scratch SCF, basin-gated) ==
-  fresh E = -50.38185233  trusted = -50.38185233  |dE| = 3.85e-09
-  converged = True
-  occupations: 5 closed pairs (occ=2), opens [np.int64(107), np.int64(108), np.int64(126), np.int64(142)] (occ [np.float64(1.0), np.float64(1.0), np.float64(1.0), np.float64(1.0)])
-Traceback (most recent call last):
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 157, in <module>
-    main()
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 110, in main
-    certify_l2_identity(mol, mf)
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 81, in certify_l2_identity
-    idx = dets.index(det)
-          ^^^^^^^^^^^^^^^
-ValueError: (0, 1, 2, 6, 7) is not in list
-== ROHF recheck (fresh from-scratch SCF, basin-gated) ==
-  fresh E = -50.38185233  trusted = -50.38185233  |dE| = 3.85e-09
-  converged = True
-  occupations: 5 closed pairs (occ=2), opens [np.int64(107), np.int64(108), np.int64(126), np.int64(142)] (occ [np.float64(1.0), np.float64(1.0), np.float64(1.0), np.float64(1.0)])
+== ROHF recheck: fresh from-scratch SCF, basin-gated ==
+  fresh  E = -50.38185233
+  trusted E = -50.38185233  (the frozen chk's own header)
+  |dE| = 3.85e-09  (basin comparison, never bitwise -- fact 10); converged = True
   certification: matrix 1.513758376428 formula 1.513758376428 |diff| 2.22e-16
-Traceback (most recent call last):
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 157, in <module>
-    main()
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 112, in main
-    bands = band_ao_groups(mol)
-            ^^^^^^^^^^^^^^^^^^^
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 45, in band_ao_groups
-    for mu, (_, label, _sym) in enumerate(mol.ao_labels(fmt=False)):
-            ^^^^^^^^^^^^^^^^
-ValueError: too many values to unpack (expected 3)
+-- the FRESH draw: E = -50.38185233 --
+  occupations: 5 closed pairs, opens [108, 109, 142, 161]
+  -- the closed core (the fold) --
+  mo[ 22]  eps=  -2.2311  12s:0.749  14s:0.522  10s:0.460
+  mo[ 61]  eps=  -1.0673  14p:0.310  15p:0.122  13p:0.080
+  mo[ 88]  eps=  -1.0646  14p:0.310  15p:0.122  13p:0.080
+  mo[120]  eps=  -1.0566  14p:0.303  15p:0.123  13p:0.080
+  mo[143]  eps=  -0.1983  18s:0.274  19s:0.256  15s:0.134
+  -- the open shells --
+  mo[108]  eps=  -0.0309  <Lz> +0.0000   13d:0.179  12d:0.123  14d:0.077
+  mo[109]  eps=  -0.0184  <Lz> +0.0000   10f:0.170  11f:0.118  9f:0.069
+  mo[142]  eps=  -0.0139  <Lz> +0.0000   10f:0.166  11f:0.117  9f:0.067
+  mo[161]  eps=  -0.0127  <Lz> +0.0000   10f:0.166  11f:0.116  9f:0.067
+  open-shell span certificate: ||[P,Lz]|| = 4.7386  ||[P,Lperp]|| = 7.6752
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:679: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  core m-scalarity (anisotropy): 3.165e-02
+  determinant <L^2> = 40.853110  (gauge: a pure 5S component reads 0, the 5L term 72; the draw rotates the open manifold freely)
+== the trusted reference (the frozen chk, cache path) ==
+-- the TRUSTED draw: E = -50.38185233 --
+  occupations: 5 closed pairs, opens [107, 108, 109, 142]
+  -- the closed core (the fold) --
+  mo[ 22]  eps=  -2.2311  12s:0.749  14s:0.522  10s:0.460
+  mo[ 61]  eps=  -1.0673  14p:0.310  15p:0.122  13p:0.080
+  mo[ 88]  eps=  -1.0646  14p:0.310  15p:0.122  13p:0.080
+  mo[120]  eps=  -1.0566  14p:0.303  15p:0.123  13p:0.080
+  mo[143]  eps=  -0.1983  18s:0.274  19s:0.256  15s:0.134
+  -- the open shells --
+  mo[107]  eps=  -0.0309  <Lz> +0.0000   13d:0.179  12d:0.123  14d:0.077
+  mo[108]  eps=  -0.0184  <Lz> +0.0000   10f:0.170  11f:0.118  9f:0.069
+  mo[109]  eps=  -0.0139  <Lz> +0.0000   10f:0.166  11f:0.117  9f:0.067
+  mo[142]  eps=  -0.0127  <Lz> +0.0000   10f:0.166  11f:0.116  9f:0.067
+  open-shell span certificate: ||[P,Lz]|| = 4.7157  ||[P,Lperp]|| = 7.6893
+  core m-scalarity (anisotropy): 3.165e-02
+  determinant <L^2> = 40.853111  (gauge: a pure 5S component reads 0, the 5L term 72; the draw rotates the open manifold freely)
+== verdicts ==
+  open-column indices identical across draws: False
+    fresh [108, 109, 142, 161] vs trusted [107, 108, 109, 142] -- the degenerate open-shell gauge rotated (same basin, same energy); the determinant's <L^2> is a draw number, the span certificate is the invariant
+  certificate agreement: |d|[P,Lz]|| = 2.29e-02
+  both certificates BROKEN (the record's m-delocalization verdict reproduced: raw-ROHF spans never rotation-close)
+probe chk removed
