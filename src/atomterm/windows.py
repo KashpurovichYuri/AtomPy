@@ -70,6 +70,8 @@ __all__ = [
     "select_shell_ao",
     "select_valence_ao",
     "select_span",
+    "shell_realization",
+    "realized_patterns",
     "primitive_chain",
     "select_primitives",
     "fold_shells",
@@ -482,6 +484,72 @@ NOBLE_CORES = {
 }
 
 _SHELL_M = {"s": 1, "p": 3, "d": 5, "f": 7, "g": 9, "h": 11}
+
+
+# --------------------------------------------------------- the shell layer
+
+def shell_realization(shell: str, layer: dict | None = None) -> tuple[str, ...]:
+    """The AO bands realizing one chemical shell -- the shell layer.
+
+    The chemical shell (``"3d"``, ``"6s"``) is the primary object; its
+    AO realization is BASIS-SPECIFIC and DECLARED, never read off the
+    labels: a contracted basis often holds one block per shell (the
+    1:1 identity), but multi-zeta shells split it (a chemical 3d over
+    two d contractions) and uncontracted bases count radial primitives
+    (``"10d"`` is a counter, not a shell). The declaration lives on
+    the campaign (:attr:`atomterm.cases.CaseSpec.shell_bands`),
+    certified by the measured composition
+    (:func:`scripts.band_composition`-style profiles).
+
+    Parameters
+    ----------
+    shell : the chemical shell name.
+    layer : the declared realization mapping (shell -> band tuple);
+        ``None`` or an undeclared shell = the 1:1 identity (the shell
+        IS its own band -- the contracted-basis behavior, bit-exact
+        with the label selectors).
+
+    Returns
+    -------
+    the shell's bands, in declared order.
+
+    Examples
+    --------
+    >>> shell_realization("3d")
+    ('3d',)
+    >>> shell_realization("3d", {"3d": ("12d", "13d")})
+    ('12d', '13d')
+    """
+    if layer is not None and shell in layer:
+        bands = tuple(layer[shell])
+        if not bands:
+            raise ValueError(
+                f"the declared realization of shell {shell!r} is empty -- "
+                "an unrepresented shell is a missing band, not an "
+                "empty tuple")
+        stray = [b for b in bands if b[-1] != shell[-1]]
+        if stray:
+            raise ValueError(
+                f"the declared realization of shell {shell!r} names "
+                f"other-l bands {stray} -- a chemical shell is realized "
+                "by bands of its own angular momentum")
+        return bands
+    return (shell,)
+
+
+def realized_patterns(patterns, layer: dict | None = None) -> list[str]:
+    """A shell-pattern list expanded through the shell layer -- the
+    form the AO selectors consume (``select_valence_ao``-style
+    row lookups run on bands, never on chemical names directly).
+
+    Examples
+    --------
+    >>> realized_patterns(["3d", "4s"])
+    ['3d', '4s']
+    >>> realized_patterns(["3d", "4s"], {"3d": ("12d", "13d")})
+    ['12d', '13d', '4s']
+    """
+    return [b for p in patterns for b in shell_realization(p, layer)]
 
 # which noble core ends at n p -- the semi rule's starting prefix per
 # open-d period (3d -> ar, 4d -> kr, ...)

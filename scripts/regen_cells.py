@@ -330,14 +330,18 @@ def main() -> None:
                         lane_sub = lane_substrate(spec)
                     cells[key.address] = run_lane_cell(
                         key, lane_sub[0], lane_sub[1], spec.term,
-                        fresh=args.fresh, workdir="elements")
+                        fresh=args.fresh, shell_bands=spec.shell_bands,
+                        workdir="elements")
                 else:
                     facts = run_cell(key, mf, frac_mf=mf_f,
                                      fresh=args.fresh, workdir="elements",
-                                     budgets={"sa_weights": spec.sa_weights})
+                                     shell_bands=spec.shell_bands,
+                                     budgets={"sa_weights":
+                                              spec.sa_weights})
                     cells[key.address] = (
                         cell_payload(key, facts) if facts is not None
-                        else kernel_cell_payload(key, mol, mf))
+                        else kernel_cell_payload(key, mol, mf,
+                                                 shell_bands=spec.shell_bands))
             # the store writes PER ENTRY -- run and void alike (a void
             # entry that never wrote would vanish from the merge chain:
             # the next run loads a store without it): a kill mid-group

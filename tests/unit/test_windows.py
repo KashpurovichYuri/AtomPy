@@ -480,3 +480,23 @@ def test_closed_electrons():
     assert closed_electrons(fold_shells("semi", open_d="3d")) == 14
     assert 22 - closed_electrons(("1s", "2s", "2p", "4s")) == 10
     assert 22 - closed_electrons(("1s", "2s", "2p", "3s")) == 10
+
+
+def test_shell_realization_is_identity_until_declared():
+    """The shell layer: an undeclared shell (or no layer) is its own
+    band -- the contracted-basis behavior, exactly the label the
+    selectors would have matched; a declared shell expands to its
+    bands in declared order; an empty realization refuses (an
+    unrepresented shell is a missing band, not an empty tuple)."""
+    from atomterm.windows import realized_patterns, shell_realization
+
+    assert shell_realization("3d") == ("3d",)
+    assert shell_realization("3d", {"4s": ("14s",)}) == ("3d",)
+    assert shell_realization("3d", {"3d": ("12d", "13d")}) == ("12d", "13d")
+    with pytest.raises(ValueError, match="empty"):
+        shell_realization("3d", {"3d": ()})
+    with pytest.raises(ValueError, match="other-l"):
+        shell_realization("2s", {"2s": ("2s", "3p")})
+    assert realized_patterns(["3d", "4s"]) == ["3d", "4s"]
+    assert realized_patterns(["3d", "4s"],
+                             {"3d": ("12d", "13d")}) == ["12d", "13d", "4s"]

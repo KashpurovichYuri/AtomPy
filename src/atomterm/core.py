@@ -32,7 +32,8 @@ import numpy as np
 from atomterm.windows import (lm_sectors, lowdin, occupied_core_idx,
                               shell_weights)
 
-__all__ = ["purified_core_orbitals", "closed_shell_core_energy"]
+__all__ = ["purified_core_orbitals", "confined_core_orbitals",
+           "closed_shell_core_energy"]
 
 
 # the core span ------------------------------------------------------
@@ -156,6 +157,96 @@ def purified_core_orbitals(mol, mf, ncore: int):
     # one global Loewdin (S = 0 between different l -> l-purity survives;
     # within-l mixing is span-preserving)
     return lowdin(c_pur, s), contamination
+
+
+# the closed core on a fold span --------------------------------------
+
+def confined_core_orbitals(mf, c_span: np.ndarray,
+                           n_pairs: int) -> tuple[np.ndarray, np.ndarray]:
+    """The closed core ON a fold span: ``n_pairs`` doubly-occupied
+    columns confined to the span.
+
+    A shell-span fold declares its CHEMISTRY by the electron count
+    (``n_pairs``) and its AO realization by the span; on a
+    multi-column realization (n_pairs pairs over M > n_pairs columns)
+    the two disagree, and the frozen core must be selected INSIDE the
+    span. The construction: rank the reference's closed MOs (occupation
+    2) by their S-weight on the span, keep the top ``n_pairs`` with a
+    clean cut (a gap below the last kept), S-project them onto the
+    span, and Loewdin-orthonormalize. The span is m-complete by the
+    fold grammar, so the confined density stays m-scalar and the fold
+    field remains exactly spherically averageable.
+
+    The degenerate shortcut ``n_pairs == M`` returns the span itself:
+    every column then IS one doubly-occupied orbital (the certified
+    1:1 raw-shell fold -- this path reproduces it bit-exactly).
+
+    Parameters
+    ----------
+    mf : the converged reference (its ``mo_coeff``, ``mo_occ``, and
+        ``get_ovlp``).
+    c_span : (nao, M) S-orthonormal span columns (the fold's raw-AO
+        span, :func:`atomterm.cells._fold_span`).
+    n_pairs : the fold's doubly-occupied pair count (the CHEMISTRY:
+        :func:`atomterm.windows.closed_electrons` over the fold's
+        shells, halved).
+
+    Returns
+    -------
+    (c_core, weights) : ``(nao, n_pairs)`` S-orthonormal columns, and
+        the kept MOs' S-weights on the span (each ≈ 1 certifies the
+        span captures its closed shell; the confined core degrades
+        gracefully as these drop -- a recorded number, not a refusal).
+
+    Raises
+    ------
+    ValueError
+        If ``n_pairs`` exceeds the span width or the closed supply; if
+        the weight cut is not clean (the last kept and first dropped
+        MOs nearly tied -- the fold's chemistry is then ambiguous at
+        this span, and the realization should be re-declared).
+
+    Notes
+    -----
+    The projected columns span the occupied subspace of the
+    span-restricted closed density, so the fold's bookkeeping
+    :func:`closed_shell_core_energy` over these columns IS the
+    projected-density form ``E = 2 tr(h D) + (2J - K)(D)``,
+    ``D = sum_i |c_i><c_i|`` -- basis-independent within the span.
+    """
+    m = c_span.shape[1]
+    if n_pairs > m:
+        raise ValueError(
+            f"{n_pairs} closed pairs over a {m}-column span -- the fold "
+            "declares more electrons than its realization holds columns")
+    if n_pairs == m:
+        return c_span, np.ones(n_pairs)
+
+    s = mf.get_ovlp()
+    closed = [i for i, occ in enumerate(mf.mo_occ)
+              if abs(occ - 2.0) < 1e-12]
+    if n_pairs > len(closed):
+        raise ValueError(
+            f"{n_pairs} closed pairs wanted, the reference supplies "
+            f"{len(closed)}")
+    # w_i = |c_span^dag S c_i|^2: the S-weight of closed MO i on the
+    # S-orthonormal span (1 = the MO lives in the span)
+    c = mf.mo_coeff
+    ov = c_span.conj().T @ s @ c          # (M, nmo) span overlaps
+    w = np.einsum("mi,mi->i", ov, ov.conj()).real
+    order = np.argsort(w[closed])[::-1]
+    keep = [closed[i] for i in order[:n_pairs]]
+    if n_pairs < len(closed):
+        gap = w[keep[-1]] - w[closed[order[n_pairs]]]
+        if gap < 0.1:
+            raise ValueError(
+                f"the closed-shell cut is not clean at this span: kept "
+                f"weight {w[keep[-1]]:.4f} vs dropped "
+                f"{w[closed[order[n_pairs]]]:.4f}"
+                " -- the fold's shells are ambiguous on this realization; "
+                "re-declare it (scripts/band_composition.py measures)")
+    proj = c_span @ ov[:, keep]
+    return lowdin(proj, s), w[keep]
 
 
 # the core energy ----------------------------------------------------

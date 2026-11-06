@@ -809,9 +809,46 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
     with pytest.raises(ValueError, match="active electrons"):
         run_lane_cell(CellKey("C", "2p@1s2s", (3, 1), substrate="pur"),
                       mol, mf, (1, "g"), workdir=tmp_path)
-    with pytest.raises(ValueError, match="no 5s shell"):
+    with pytest.raises(ValueError, match="no 5s band"):
         run_lane_cell(CellKey("C", "2p@1s5s", (2, 0), substrate="pur"),
                       mol, mf, (1, "g"), workdir=tmp_path)
+
+
+@slow
+def test_run_lane_cell_multicolumn_fold(carbon_d2h, tmp_path):
+    """The multi-column fold end to end: the SAME lane leg with the
+    shell layer declaring the 1s2s chemistry over three s bands (two
+    pairs over a three-column span) still hosts its term EXACTLY (the
+    confined core is m-scalar like the 1:1 raw span), while the core
+    axes read the CHEMISTRY: the payload's pair count is 2 (never the
+    span width 3) and the confinement weights record the capture.  A
+    declared band shared by window and fold refuses at the ROW level
+    (the layer's own ambiguity, not the labels')."""
+    cfg, mol, mf, _ = carbon_d2h
+    key = lane_keys(CAMPAIGN["C"])[0]
+    layer = {"2s": ("2s", "3s")}
+    p = run_lane_cell(key, mol, mf, CAMPAIGN["C"].term, shell_bands=layer,
+                      workdir=tmp_path)
+    assert p["core_pairs"] == 2
+    assert len(p["confinement"]) == 2 and min(p["confinement"]) > 0.99
+    assert p["ptp"] < 1e-9
+    for v in p["l2"]:
+        assert abs(v - 2.0) < 1e-8              # 3P: L(L+1) = 2 exact
+    for v in p["s2"]:
+        assert abs(v - 2.0) < 1e-8
+    assert 0.0 <= p["res_h_lz"] < 1e-8
+    # the 1:1 leg (no layer) stays the certified record: same term,
+    # its own model core (the energies differ -- DIFFERENT folds)
+    q = run_lane_cell(key, mol, mf, CAMPAIGN["C"].term, workdir=tmp_path,
+                      fresh=True)
+    assert q["core_pairs"] == 2 and np.allclose(q["confinement"], 1.0)
+    assert q["total"] != p["total"]
+    # a band claimed by both sides of the partition refuses by rows
+    # (the fold's 2s realized over the 3s band the window occupies)
+    with pytest.raises(ValueError, match="sit in both"):
+        run_lane_cell(CellKey("C", "2p3s@1s2s", (2, 0), substrate="pur"),
+                      mol, mf, (1, "g"), shell_bands={"2s": ("2s", "3s")},
+                      workdir=tmp_path)
 
 
 @slow

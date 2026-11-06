@@ -135,6 +135,18 @@ class CaseSpec:
         count (the fold).
     shell_patterns : the valence-shell label prefixes of the standard
         window (e.g. ``["2p"]``; ``["3d", "4s"]``).
+    shell_bands : the declared SHELL LAYER -- chemical shell -> the
+        AO bands realizing it on this basis (``{"3d": ("12d", "13d")}``);
+        every shell/window/fold resolution goes through it
+        (:func:`atomterm.windows.shell_realization`).  None = the 1:1
+        identity (each shell IS its own band -- the contracted-basis
+        behavior).  The realization is BASIS-SPECIFIC and certified by
+        the measured composition (``scripts/band_composition.py``):
+        a chemical shell over multi-zeta contractions or uncontracted
+        primitive bands is multi-column, and its FOLD freezes
+        ``closed_electrons`` pairs over that span
+        (:func:`atomterm.core.confined_core_orbitals`) -- never one
+        pair per column.
     planned_windows : further window labels of the campaign, declared
         but not yet run (Ti: the (4,10)/(4,14) partitions) -- the cell
         grid derives their full factor grids (:func:`atomterm.cells.planned`).
@@ -190,6 +202,7 @@ class CaseSpec:
     nelec_act: int
     ncore: int
     shell_patterns: list[str]
+    shell_bands: dict[str, tuple[str, ...]] | None = None
     ecp: str | None = None
     spin: int = 0
     tag: str | None = None
