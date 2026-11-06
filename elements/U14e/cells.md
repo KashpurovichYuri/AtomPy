@@ -10,6 +10,10 @@ ROHF reference energy: -50.38185233 Eh
 | u14e_10f13d14p_4-0_casci_ao_-_pol_raw | -49.45881441 | nan | 38.93780 | 1.52e+00 | 3.81e+01 | 1.1e-01 | 4.4e-01 | 0.467 | 3.2e-02 | 1.2e-08 | 1.7e-11 |  |
 | u14e_10f13d14p_4-0_casci_ao_-_pol_avg | -49.45825023 | nan | 41.96494 | 1.54e+00 | 3.64e+01 | 1.1e-01 | 4.4e-01 | 0.467 | 3.2e-02 | 1.4e-03 | 1.6e-11 |  |
 | u14e_10f13d14p_4-0_casci_ao_-_pur_avg | -49.45874073 | nan | 42.00000 | 1.44e-12 | 1.77e-11 | 3.1e-13 | 4.8e-13 | 0.467 | 0.0e+00 | 1.5e-03 | 1.7e-11 |  |
+| u14e_10f13d_4-0_casscf_ao_-_pol_avg | -50.42228826 | nan | 64.59909 | 1.74e+01 | 1.25e+02 | 5.3e+00 | 7.5e+00 | 0.732 | nan | 7.4e-03 | 1.7e-11 | NOT-CONVERGED |
+| u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg | -50.42381070 | nan | 72.00000 | 1.64e-04 | 1.18e-03 | 6.2e-04 | 7.4e-04 | 0.583 | nan | 1.1e-06 | 1.7e-11 |  |
+| u14e_10f13d14p_4-0_casscf_ao_-_pol_avg | -50.42341954 | nan | 66.86715 | 2.83e+02 | 1.94e+03 | 5.9e+00 | 7.2e+00 | 0.690 | nan | 7.6e-03 | 1.6e-11 | NOT-CONVERGED |
+| u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg | -50.42638482 | nan | 71.77902 | 8.03e+00 | 6.04e+01 | 4.9e+00 | 6.9e+00 | 0.667 | nan | 1.3e-06 | 1.7e-11 | NOT-CONVERGED |
 
 configurations per root (top-2 determinants):
 
@@ -67,6 +71,26 @@ configurations per root (top-2 determinants):
 - `u14e_10f13d14p_4-0_casci_ao_-_pur_avg` root 6: d^3.00f^1.00 (|c|=0.45); d^3.00f^1.00 (|c|=0.41)
 - `u14e_10f13d14p_4-0_casci_ao_-_pur_avg` root 7: d^3.00f^1.00 (|c|=0.52); d^3.00f^1.00 (|c|=0.52)
 - `u14e_10f13d14p_4-0_casci_ao_-_pur_avg` root 8: d^3.00f^1.00 (|c|=0.38); d^3.00f^1.00 (|c|=0.38)
+- `u14e_10f13d_4-0_casscf_ao_-_pol_avg` root 0: d^0.74f^3.25 (|c|=0.20); d^0.76f^3.23 (|c|=0.18)
+- `u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg` root 0: d^1.00f^3.00 (|c|=0.26); d^1.00f^3.00 (|c|=0.23)
+- `u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg` root 1: d^1.00f^3.00 (|c|=0.25); d^1.00f^3.00 (|c|=0.23)
+- `u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg` root 2: d^1.00f^3.00 (|c|=0.29); d^1.00f^3.00 (|c|=0.25)
+- `u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg` root 3: d^1.00f^3.00 (|c|=0.31); d^1.00f^3.00 (|c|=0.23)
+- `u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg` root 4: d^1.00f^3.00 (|c|=0.20); d^1.00f^3.00 (|c|=0.17)
+- `u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg` root 5: d^1.00f^3.00 (|c|=0.23); d^1.00f^3.00 (|c|=0.22)
+- `u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg` root 6: d^1.00f^3.00 (|c|=0.32); d^1.00f^3.00 (|c|=0.22)
+- `u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg` root 7: d^1.00f^3.00 (|c|=0.22); d^1.00f^3.00 (|c|=0.20)
+- `u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg` root 8: d^1.00f^3.00 (|c|=0.22); d^1.00f^3.00 (|c|=0.21)
+- `u14e_10f13d14p_4-0_casscf_ao_-_pol_avg` root 0: d^0.98f^3.02 (|c|=0.25); d^1.00f^3.00 (|c|=0.18)
+- `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 0: d^1.00f^3.00 (|c|=0.19); d^1.00f^3.00 (|c|=0.18)
+- `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 1: d^1.00f^3.00 (|c|=0.20); d^1.00f^3.00 (|c|=0.19)
+- `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 2: d^1.00f^3.00 (|c|=0.24); d^1.00f^3.00 (|c|=0.23)
+- `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 3: d^1.00f^3.00 (|c|=0.27); d^1.00f^3.00 (|c|=0.21)
+- `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 4: d^1.00f^3.00 (|c|=0.23); d^1.00f^3.00 (|c|=0.23)
+- `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 5: d^1.00f^3.00 (|c|=0.22); d^1.00f^3.00 (|c|=0.22)
+- `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 6: d^1.00f^3.00 (|c|=0.23); d^1.00f^3.00 (|c|=0.22)
+- `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 7: d^1.00f^3.00 (|c|=0.24); d^1.00f^3.00 (|c|=0.22)
+- `u14e_10f13d14p_4-0_sa-casscf_ao_-_pol_avg` root 8: d^1.00f^3.00 (|c|=0.22); d^1.00f^3.00 (|c|=0.20)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 
@@ -191,7 +215,7 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `u14e_9f10f11f12d13d_4-0_casscf_ao_frozen_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
 - `u14e_9f10f11f12d13d_4-0_casscf_mo_frozen_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
 - `u14e_9f10f11f12d13dno5_4-0_casscf_no_frozen_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
-- `u14e_9f10f11f12d13d_4-0_sa-casscf_ao_-_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
+- `u14e_9f10f11f12d13d_4-0_sa-casscf_ao_-_pol_avg` E -50.38637708
 - `u14e_9f10f11f12d13d_4-0_sa-casscf_mo_-_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
 - `u14e_9f10f11f12d13dno5_4-0_sa-casscf_no_-_pol_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
 - `u14e_9f10f11f12d13d_4-0_sa-casscf_ao_-_pur_avg` VOID -- anchor-first: the optimizer class is multi-solution on the f shell (run_casscf=False's spirit made explicit): the CASCI anchors run first (2026-11-05)
@@ -241,3 +265,5 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `u14e_10f13d7s_5-1_casci_ao_-_pur_avg` E -49.31639422
 - `u14e_10f13d7s_5-1_casci_ao_-_pol_frac` VOID -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
 - `u14e_10f13d14p_4-0_casci_ao_-_pol_frac` VOID -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
+- `u14e_10f13d7s_5-1_casscf_ao_-_pol_avg` E -50.45354624
+- `u14e_10f13d7s_5-1_sa-casscf_ao_-_pol_avg` E -50.45285242
