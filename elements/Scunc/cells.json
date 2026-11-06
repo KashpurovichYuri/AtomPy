@@ -1,0 +1,344 @@
+{
+  "atom": "Scunc",
+  "rohf_energy": -759.7373848622801,
+  "cells": {
+    "scunc_3d4s_2-1_casci_ao_-_pol_raw": {
+      "cell": "scunc_3d4s_2-1_casci_ao_-_pol_raw",
+      "kind": "casci",
+      "n_det": 38829,
+      "energies_pyscf": [
+        -759.7479036775861,
+        -759.7445963011896,
+        -759.7445962929128,
+        -759.7435610545668,
+        -759.7435610532716,
+        -759.7005280581321,
+        -759.6996215671513,
+        -759.6930234920146,
+        -759.6706247711502
+      ],
+      "ground_l2": 5.998968518957751,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 0.027737765344037883,
+      "win_lperp": 0.04109960941622915,
+      "res_h_lz": 0.0011688861206757607,
+      "res_h_l2": 0.009675706077260827
+    },
+    "scunc_3d4s_2-1_casci_ao_-_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 38829,
+      "energies_pyscf": [
+        -759.7479036775861,
+        -759.7445963011896,
+        -759.7445962929128,
+        -759.7435610545668,
+        -759.7435610532716,
+        -759.7005280581205,
+        -759.6996215671946,
+        -759.6930234920067,
+        -759.6706247711496
+      ],
+      "ground_l2": 5.99896851895774,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 0.027737765344037883,
+      "win_lperp": 0.04109960941622915,
+      "res_h_lz": 0.001168886120675651,
+      "res_h_l2": 0.00967570607726112
+    },
+    "scunc_3d4s_2-1_casci_ao_-_pur_avg": {
+      "cell": "scunc_3d4s_2-1_casci_ao_-_pur_avg",
+      "kind": "casci",
+      "n_det": 38829,
+      "energies_pyscf": [
+        -759.7466602499729,
+        -759.7466602499699,
+        -759.7466602499602,
+        -759.7466602498218,
+        -759.6699237131089,
+        -759.6698704526856,
+        -759.6698651209786,
+        -759.669863483187,
+        -759.6165092435683
+      ],
+      "ground_l2": 6.000000000185715,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 8.03816822202736e-14,
+      "win_lperp": 1.8155803798186175e-13,
+      "res_h_lz": 3.6130002971497185e-13,
+      "res_h_l2": 1.1345533155696092e-12
+    },
+    "scunc_3d4s_2-1_casci_ao_-_pol_frac": {
+      "cell": "scunc_3d4s_2-1_casci_ao_-_pol_frac",
+      "void_reason": "frac-reference-unmeasured: no measured fractional-occupation basin on the uncontracted basis yet (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casci_moc_-_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casci_moc_-_pol_avg",
+      "kind": "casci",
+      "n_det": 38829,
+      "energies_pyscf": [
+        -759.7759531119679,
+        -759.7723155034947,
+        -759.7723154922494,
+        -759.7711603025583,
+        -759.7711602957219,
+        -759.7109015746104,
+        -759.710901567035,
+        -759.7104691774904,
+        -759.7100860953636
+      ],
+      "ground_l2": 5.998548647045222,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 2.0618463998348924,
+      "win_lperp": 2.7873773438287976,
+      "res_h_lz": 0.0028510866931961342,
+      "res_h_l2": 0.013329666014933413
+    },
+    "scunc_3d4s_2-1_casci_moc_-_pur_avg": {
+      "cell": "scunc_3d4s_2-1_casci_moc_-_pur_avg",
+      "kind": "casci",
+      "n_det": 38829,
+      "energies_pyscf": [
+        -759.7746988980919,
+        -759.7743430487953,
+        -759.7743430482938,
+        -759.7743312642968,
+        -759.7743312619309,
+        -759.7107937767827,
+        -759.710793774122,
+        -759.7100135094219,
+        -759.7100132799717
+      ],
+      "ground_l2": 5.999515264557373,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 2.0615297959312118,
+      "win_lperp": 2.7868631592727793,
+      "res_h_lz": 0.0025278913088425913,
+      "res_h_l2": 0.012854033324604837
+    },
+    "scunc_3d4s_2-1_casscf_ao_-_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_mo_-_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_moc_-_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_moc_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4sno2_2-1_casscf_no_-_pol_avg": {
+      "cell": "scunc_3d4sno2_2-1_casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_ao_virtmix_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_ao_virtmix_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_ao_-_pur_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_mo_-_pur_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_moc_-_pur_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_moc_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4sno2_2-1_casscf_no_-_pur_avg": {
+      "cell": "scunc_3d4sno2_2-1_casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_ao_radial_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_ao_radial_pur_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_ao_frozen_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_mo_frozen_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_moc_frozen_pol_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_moc_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4sno2_2-1_casscf_no_frozen_pol_avg": {
+      "cell": "scunc_3d4sno2_2-1_casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_ao_frozen_pur_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_mo_frozen_pur_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_casscf_moc_frozen_pur_avg": {
+      "cell": "scunc_3d4s_2-1_casscf_moc_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4sno2_2-1_casscf_no_frozen_pur_avg": {
+      "cell": "scunc_3d4sno2_2-1_casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_ao_-_pol_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_mo_-_pol_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_moc_-_pol_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_moc_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4sno2_2-1_sa-casscf_no_-_pol_avg": {
+      "cell": "scunc_3d4sno2_2-1_sa-casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_ao_-_pur_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_mo_-_pur_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_moc_-_pur_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_moc_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4sno2_2-1_sa-casscf_no_-_pur_avg": {
+      "cell": "scunc_3d4sno2_2-1_sa-casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_ao_radial_pol_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_ao_radial_pur_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_ao_frozen_pol_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_mo_frozen_pol_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_moc_frozen_pol_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_moc_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4sno2_2-1_sa-casscf_no_frozen_pol_avg": {
+      "cell": "scunc_3d4sno2_2-1_sa-casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_mo_frozen_pur_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s_2-1_sa-casscf_moc_frozen_pur_avg": {
+      "cell": "scunc_3d4s_2-1_sa-casscf_moc_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4sno2_2-1_sa-casscf_no_frozen_pur_avg": {
+      "cell": "scunc_3d4sno2_2-1_sa-casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"
+    },
+    "scunc_3d4s@ar_2-1_casci_ao_-_pur_avg": {
+      "cell": "scunc_3d4s@ar_2-1_casci_ao_-_pur_avg",
+      "term": [
+        2,
+        "g"
+      ],
+      "energies": [
+        -1.5029583306199892,
+        -1.5029583306197976,
+        -1.5029583306164398,
+        -1.5029583306162833,
+        -1.5029583306162844
+      ],
+      "total": -759.7176597216941,
+      "ptp": 3.7059244561987725e-12,
+      "l2": [
+        6.0,
+        6.000000000000014,
+        6.000000000000026,
+        6.000000000000018,
+        6.0000000000000195
+      ],
+      "s2": [
+        0.7499999999999999,
+        0.7500000000000018,
+        0.7500000000005276,
+        0.7500000000005449,
+        0.7500000000005447
+      ],
+      "n_det": 38829,
+      "anchor_dev": 0.13592424570199868,
+      "win_lz": 8.038192039966667e-14,
+      "win_lperp": 1.8155820828813278e-13,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "res_h_lz": 3.2262829425205636e-13,
+      "res_h_l2": 1.2981574058535724e-12,
+      "fold": [
+        "1s",
+        "2s",
+        "2p",
+        "3s",
+        "3p"
+      ],
+      "core_pairs": 9,
+      "core_cycles": 18,
+      "core_comm": 3.100097956121317e-11,
+      "anchor_corrected": [
+        "Ag"
+      ]
+    }
+  }
+}

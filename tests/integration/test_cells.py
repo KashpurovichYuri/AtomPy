@@ -815,13 +815,13 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
 
 
 @slow
-def test_run_lane_cell_multicolumn_fold(carbon_d2h, tmp_path):
+def test_run_lane_cell_multicolumn_fold(carbon_d2h, carbon, tmp_path):
     """The multi-column fold end to end: the SAME lane leg with the
     shell layer declaring the 1s2s chemistry over three s bands (two
     pairs over a three-column span) still hosts its term EXACTLY (the
-    confined core is m-scalar like the 1:1 raw span), while the core
-    axes read the CHEMISTRY: the payload's pair count is 2 (never the
-    span width 3) and the confinement weights record the capture.  A
+    span's own closed-core Roothaan is m-scalar like the 1:1 raw
+    span), while the core axes read the CHEMISTRY: the payload's pair
+    count is 2 (never the span width 3) with the Roothaan report.  A
     declared band shared by window and fold refuses at the ROW level
     (the layer's own ambiguity, not the labels')."""
     cfg, mol, mf, _ = carbon_d2h
@@ -830,7 +830,7 @@ def test_run_lane_cell_multicolumn_fold(carbon_d2h, tmp_path):
     p = run_lane_cell(key, mol, mf, CAMPAIGN["C"].term, shell_bands=layer,
                       workdir=tmp_path)
     assert p["core_pairs"] == 2
-    assert len(p["confinement"]) == 2 and min(p["confinement"]) > 0.99
+    assert p["core_cycles"] >= 1 and p["core_comm"] < 1e-10
     assert p["ptp"] < 1e-9
     for v in p["l2"]:
         assert abs(v - 2.0) < 1e-8              # 3P: L(L+1) = 2 exact
@@ -841,14 +841,57 @@ def test_run_lane_cell_multicolumn_fold(carbon_d2h, tmp_path):
     # its own model core (the energies differ -- DIFFERENT folds)
     q = run_lane_cell(key, mol, mf, CAMPAIGN["C"].term, workdir=tmp_path,
                       fresh=True)
-    assert q["core_pairs"] == 2 and np.allclose(q["confinement"], 1.0)
+    assert q["core_pairs"] == 2 and q["core_cycles"] == 0
     assert q["total"] != p["total"]
-    # a band claimed by both sides of the partition refuses by rows
-    # (the fold's 2s realized over the 3s band the window occupies)
+    # the partition is CHEMICAL: a shell in both sides refuses...
     with pytest.raises(ValueError, match="sit in both"):
-        run_lane_cell(CellKey("C", "2p3s@1s2s", (2, 0), substrate="pur"),
-                      mol, mf, (1, "g"), shell_bands={"2s": ("2s", "3s")},
-                      workdir=tmp_path)
+        run_lane_cell(CellKey("C", "2p2s@1s2s", (2, 0), substrate="pur"),
+                      mol, mf, (1, "g"), workdir=tmp_path)
+    # ...while shared BANDS are physical (the fold's 2s realized over
+    # the window's 3s band): the projection owns the shared rows
+    # -- the leg RUNS, its own model core
+    p_shared = run_lane_cell(
+        CellKey("C", "2p3s@1s2s", (2, 0), substrate="pur"), mol, mf,
+        (1, "g"), shell_bands={"2s": ("2s", "3s")}, workdir=tmp_path)
+    assert p_shared["core_pairs"] == 2
+    assert p_shared["ptp"] < 1e-9
+    for v in p_shared["l2"]:
+        assert abs(v - 2.0) < 1e-8
+    # a band shared by TWO FOLD SHELLS duplicates its rows -- the span
+    # is the UNION (a duplicated row would make the Gram exactly
+    # singular; pinned after the Scunc lane hit it live)
+    p_union = run_lane_cell(
+        CellKey("C", "2p@1s2s", (2, 0), substrate="pur"), mol, mf,
+        (1, "g"), shell_bands={"1s": ("1s", "2s"), "2s": ("2s",)},
+        workdir=tmp_path)
+    assert p_union["core_pairs"] == 2
+    assert p_union["ptp"] < 1e-9
+
+
+@slow
+def test_confined_core_reproduces_the_ion_rhf(carbon):
+    """The EXTERNAL anchor of the confined-core construction (the one
+    certificate the internal identities cannot give): on the WHOLE AO
+    space the mini-Roothaan over n_pairs pairs is the closed-shell
+    ion of the same charge in the same basis -- its RHF energy, to
+    the Roothaan convergence floor.  The frozen reference supplies
+    the field pieces; the ion SCF is the independent construction."""
+    from pyscf import gto, scf
+
+    from atomterm.core import closed_shell_core_energy, confined_core_orbitals
+    from atomterm.windows import lowdin
+
+    _, mol, mf, _ = carbon
+    ion_mol = gto.M(atom="C 0 0 0", basis="ccpvdz", charge=2, verbose=0)
+    ion = scf.RHF(ion_mol)
+    ion.conv_tol = 1e-12
+    ion.kernel()
+    assert ion.converged
+    c_span = lowdin(np.eye(mol.nao_nr()), mf.get_ovlp())
+    c_core, report = confined_core_orbitals(mf, c_span, 2)
+    assert report["comm"] < 1e-10
+    assert abs(closed_shell_core_energy(mf, c_core)
+               - ion.e_tot) < 1e-8          # C2+ closed shell, 2 pairs
 
 
 @slow

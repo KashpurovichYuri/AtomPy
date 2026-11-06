@@ -1,0 +1,8 @@
+
+===== cells Scunc =====
+ROHF E = -759.73738486 Eh
+  [cell] scunc_3d4s@ar_2-1_casci_ao_-_pur_avg
+lane substrate D2h ROHF E = -759.73708452 Eh
+  wrote elements/Scunc/cells.json + cells.md
+
+done

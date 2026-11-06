@@ -1,6 +1,6 @@
-"""Unit pins of atomterm.core: the confined closed core on a fold
-span (the multi-column fold's construction) and the closed-shell core
-energy's two forms -- the columnwise bookkeeping and the
+"""Unit pins of atomterm.core: the closed core ON a fold span (the
+multi-column fold's mini-Roothaan construction) and the closed-shell
+core energy's two forms -- the columnwise bookkeeping and the
 projected-density form (independent summation orders) -- on the
 frozen carbon reference (no SCF)."""
 
@@ -42,72 +42,77 @@ def _density_form_energy(mol, mf, c):
 def test_confined_core_is_the_span_on_a_one_to_one_realization(carbon):
     """n_pairs == span width returns the span ITSELF (the certified
     1:1 raw-shell fold reproduced bit-exactly -- the identity, not a
-    re-computation)."""
+    re-computation; the mini-Roothaan never runs)."""
     _, mol, mf, _ = carbon
     c_span = _span(mol, mf, ("1s", "2s"))
     n_pairs = closed_electrons(("1s", "2s")) // 2
     assert n_pairs == c_span.shape[1]
-    c_core, weights = confined_core_orbitals(mf, c_span, n_pairs)
+    c_core, report = confined_core_orbitals(mf, c_span, n_pairs)
     assert c_core is c_span
-    assert np.all(weights == 1.0)
+    assert report == {"cycles": 0, "comm": 0.0}
 
 
-def test_confined_core_returns_the_closed_mos_on_the_whole_space(carbon):
-    """The degenerate anchor: the whole AO space as the span confines
-    to the closed MOs THEMSELVES (the projection is the identity), so
-    the confined core equals the reference's closed block and the
-    folded operators are IDENTICAL to the canonical-prefix fold --
-    exact by construction, any deviation is a bug."""
+def test_confined_core_is_self_consistent_and_variational(carbon):
+    """The mini-Roothaan's exact-by-construction identities on a
+    MULTI-column realization (the 1s2s chemistry realized by all
+    three s bands -- two pairs over a three-column span): the
+    converged density COMMUTES with its own Fock (the
+    self-consistency equation itself), the two energy forms agree
+    (the RHF trace form vs the columnwise bookkeeping), and the
+    construction is VARIATIONAL -- the bigger span's core sits at or
+    below the 1:1 raw-span core's energy."""
     _, mol, mf, _ = carbon
-    closed = [i for i, o in enumerate(mf.mo_occ) if o == 2.0]
-    c_closed = np.asarray(mf.mo_coeff[:, closed])
-    c_span = lowdin(np.eye(mol.nao_nr()), mf.get_ovlp())
-    c_core, weights = confined_core_orbitals(mf, c_span, len(closed))
-    assert np.allclose(c_core, c_closed, atol=1e-12)
-    assert np.allclose(weights, 1.0, atol=1e-12)
+    n_pairs = 2
+    c_span = _span(mol, mf, ("1s", "2s", "3s"))
+    assert c_span.shape[1] == 3
+    c_core, report = confined_core_orbitals(mf, c_span, n_pairs)
+    assert c_core.shape[1] == n_pairs
+    assert report["comm"] < 1e-10 and report["cycles"] >= 1
 
-    act = np.eye(mol.nao_nr())[:, select_shell_ao(mol, "2p")]
-    a = build_operator_parts(mol, mf, act, len(closed), 2, 0,
-                             c_core=c_closed)
-    b = build_operator_parts(mol, mf, act, len(closed), 2, 0,
-                             c_core=c_core)
-    assert np.abs(a["h1"] - b["h1"]).max() < 1e-12
+    # the self-consistency equation, in the SPAN basis (the invariance
+    # the Roothaan delivers: the occupied space is invariant under the
+    # SPAN-RESTRICTED Fock -- the full-space Fock has off-span blocks
+    # by construction).  The span basis is S-ORTHONORMAL: the
+    # coefficient rep of the core columns rides the S metric
+    # (``c^dag S c_core``, not the Euclidean ``c^dag c_core``).
+    h = mf.get_hcore()
+    eri = mol.intor("int2e", aosym="s1")
+    sm = mf.get_ovlp()
+    d_ao = 2.0 * c_core @ c_core.conj().T
+    f_ao = (h
+            + np.einsum("ls,mnls->mn", d_ao, eri, optimize=True)
+            - 0.5 * np.einsum("ls,mlns->mn", d_ao, eri, optimize=True))
+    f_sp = c_span.conj().T @ f_ao @ c_span
+    occ_sp = c_span.conj().T @ sm @ c_core
+    d_sp = 2.0 * occ_sp @ occ_sp.conj().T
+    comm = f_sp @ d_sp - d_sp @ f_sp
+    assert np.abs(comm).max() < 1e-9
+
+    # the two energy forms (independent summation orders)
+    e_cols = closed_shell_core_energy(mf, c_core)
+    e_rhf = 0.5 * float(np.trace(d_ao @ (h + f_ao)))
+    assert abs(e_cols - e_rhf) < 1e-9
+    assert abs(e_cols - _density_form_energy(mol, mf, c_core)) < 1e-9
+
+    # variational monotonicity: the superset span's core is not above
+    # the 1:1 raw-span core ({1s, 2s} columns sit inside the span)
+    c_11, _ = confined_core_orbitals(mf, _span(mol, mf, ("1s", "2s")),
+                                     n_pairs)
+    assert e_cols <= closed_shell_core_energy(mf, c_11) + 1e-12
 
 
 def test_confined_core_energy_equals_the_density_form(carbon):
-    """The projected-density certification: on a MULTI-column
-    realization (the 1s2s chemistry realized by all three s bands --
-    two pairs over a three-column span) the columnwise bookkeeping
-    over the confined columns equals the AO density form, an
-    independent summation order; and the 1:1 columnwise form equals it
-    too (one formula, both regimes)."""
+    """The projected-density certification on the 1:1 regime too: one
+    formula, both regimes."""
     _, mol, mf, _ = carbon
-    c_span = _span(mol, mf, ("1s", "2s", "3s"))
-    assert c_span.shape[1] == 3
-    c_core, weights = confined_core_orbitals(mf, c_span, 2)
-    assert c_core.shape[1] == 2
-    # the s bands capture C's closed pair to numerical completeness
-    assert weights.min() > 0.99, weights
-    e_cols = closed_shell_core_energy(mf, c_core)
-    assert abs(e_cols - _density_form_energy(mol, mf, c_core)) < 1e-9
-
     c_11 = _span(mol, mf, ("1s", "2s"))
     assert abs(closed_shell_core_energy(mf, c_11)
                - _density_form_energy(mol, mf, c_11)) < 1e-9
 
 
-def test_confined_core_refuses_the_ambiguous_cut_and_the_impossible(carbon):
-    """The refusals: more pairs than columns; more pairs than the
-    closed supply; a cut without a gap (the whole-space span at
-    n_pairs=1 sees two closed MOs at weight 1 -- the fold's shells are
-    ambiguous there, and the construction says so)."""
+def test_confined_core_refuses_the_impossible(carbon):
+    """The refusal: more pairs than the span holds columns."""
     _, mol, mf, _ = carbon
     c_span = _span(mol, mf, ("1s", "2s"))
     with pytest.raises(ValueError, match="holds columns"):
         confined_core_orbitals(mf, c_span, 3)
-    whole = lowdin(np.eye(mol.nao_nr()), mf.get_ovlp())
-    with pytest.raises(ValueError, match="not clean"):
-        confined_core_orbitals(mf, whole, 1)
-    with pytest.raises(ValueError, match="supplies"):
-        confined_core_orbitals(
-            mf, lowdin(np.eye(mol.nao_nr())[:, :8], mf.get_ovlp()), 6)

@@ -35,6 +35,10 @@ from atomterm.windows import (lm_sectors, lowdin, occupied_core_idx,
 __all__ = ["purified_core_orbitals", "confined_core_orbitals",
            "closed_shell_core_energy"]
 
+# the closed-core Roothaan's cycle budget (a fold span that cannot
+# settle is a declaration error, not a patience question)
+_CORE_MAXCYCLES = 100
+
 
 # the core span ------------------------------------------------------
 
@@ -162,20 +166,27 @@ def purified_core_orbitals(mol, mf, ncore: int):
 # the closed core on a fold span --------------------------------------
 
 def confined_core_orbitals(mf, c_span: np.ndarray,
-                           n_pairs: int) -> tuple[np.ndarray, np.ndarray]:
-    """The closed core ON a fold span: ``n_pairs`` doubly-occupied
-    columns confined to the span.
+                           n_pairs: int) -> tuple[np.ndarray, dict]:
+    """The closed core ON a fold span: the span's OWN best closed-shell
+    pairs -- a Loewdin-span-basis closed-shell Roothaan, self-consistent
+    under the nuclear field and the core's own two-body field.
 
     A shell-span fold declares its CHEMISTRY by the electron count
     (``n_pairs``) and its AO realization by the span; on a
     multi-column realization (n_pairs pairs over M > n_pairs columns)
-    the two disagree, and the frozen core must be selected INSIDE the
-    span. The construction: rank the reference's closed MOs (occupation
-    2) by their S-weight on the span, keep the top ``n_pairs`` with a
-    clean cut (a gap below the last kept), S-project them onto the
-    span, and Loewdin-orthonormalize. The span is m-complete by the
-    fold grammar, so the confined density stays m-scalar and the fold
-    field remains exactly spherically averageable.
+    the frozen core must be selected INSIDE the span, and the
+    span-truncated projection of the SCF core is NOT that selection:
+    the S-weight capture is a NORM statement blind to the nuclear
+    cusp (a tiny-norm, Eh-scale region -- measured on Sc-unc: 99.99%
+    capture with +13 Eh core-energy error). The span's own minimum
+    is: diagonalize, fill the lowest ``n_pairs`` doubly, rebuild the
+    closed-shell Fock, iterate -- converging in a few cycles to the
+    closed-shell (ion-like) core the span can host, monotone in the
+    span, and reading NO converged orbitals (the fold stays
+    draw-free). The span's MEMBERSHIP carries the shell grammar: the
+    lowest pairs of the fold's family span are its declared shells,
+    so a fold that skips a shell must leave that shell's bands out of
+    its realization.
 
     The degenerate shortcut ``n_pairs == M`` returns the span itself:
     every column then IS one doubly-occupied orbital (the certified
@@ -183,8 +194,8 @@ def confined_core_orbitals(mf, c_span: np.ndarray,
 
     Parameters
     ----------
-    mf : the converged reference (its ``mo_coeff``, ``mo_occ``, and
-        ``get_ovlp``).
+    mf : the reference (``get_hcore``; ``mol`` for the eri). No
+        converged orbitals are read.
     c_span : (nao, M) S-orthonormal span columns (the fold's raw-AO
         span, :func:`atomterm.cells._fold_span`).
     n_pairs : the fold's doubly-occupied pair count (the CHEMISTRY:
@@ -193,60 +204,62 @@ def confined_core_orbitals(mf, c_span: np.ndarray,
 
     Returns
     -------
-    (c_core, weights) : ``(nao, n_pairs)`` S-orthonormal columns, and
-        the kept MOs' S-weights on the span (each ≈ 1 certifies the
-        span captures its closed shell; the confined core degrades
-        gracefully as these drop -- a recorded number, not a refusal).
+    (c_core, report) : ``(nao, n_pairs)`` S-orthonormal columns, and
+        the mini-SCF's convergence report ``{"cycles", "comm"}``
+        (``comm`` = the final density-Fock commutator norm -- the
+        self-consistency certificate; ``{"cycles": 0, "comm": 0.0}``
+        on the 1:1 path).
 
     Raises
     ------
     ValueError
-        If ``n_pairs`` exceeds the span width or the closed supply; if
-        the weight cut is not clean (the last kept and first dropped
-        MOs nearly tied -- the fold's chemistry is then ambiguous at
-        this span, and the realization should be re-declared).
+        If ``n_pairs`` exceeds the span width, or the Roothaan loop
+        does not converge (``max_cycles``) -- a span the closed-shell
+        problem cannot settle in is a declaration error.
 
     Notes
     -----
-    The projected columns span the occupied subspace of the
-    span-restricted closed density, so the fold's bookkeeping
-    :func:`closed_shell_core_energy` over these columns IS the
-    projected-density form ``E = 2 tr(h D) + (2J - K)(D)``,
-    ``D = sum_i |c_i><c_i|`` -- basis-independent within the span.
+    The converged columns are occupied eigenvectors of their own
+    Fock, so the fold's bookkeeping :func:`closed_shell_core_energy`
+    over them is the span's closed-shell variational value; on the
+    whole AO space the construction reproduces the (2·n_pairs)-ion
+    RHF exactly (pinned in the tests).
     """
+    from pyscf import ao2mo
+
     m = c_span.shape[1]
     if n_pairs > m:
         raise ValueError(
             f"{n_pairs} closed pairs over a {m}-column span -- the fold "
             "declares more electrons than its realization holds columns")
     if n_pairs == m:
-        return c_span, np.ones(n_pairs)
+        return c_span, {"cycles": 0, "comm": 0.0}
 
-    s = mf.get_ovlp()
-    closed = [i for i, occ in enumerate(mf.mo_occ)
-              if abs(occ - 2.0) < 1e-12]
-    if n_pairs > len(closed):
+    h = c_span.conj().T @ mf.get_hcore() @ c_span
+    eri = ao2mo.restore(1, ao2mo.kernel(mf.mol, c_span), m)
+    f = h.copy()
+    comm = float("inf")
+    occ = None
+    cycles = 0
+    for cycles in range(1, _CORE_MAXCYCLES + 1):
+        _, u = np.linalg.eigh(f)
+        occ = u[:, :n_pairs]
+        d = 2.0 * (occ @ occ.conj().T)          # the closed-shell density
+        f = (h
+             + np.einsum("rs,pqrs->pq", d, eri, optimize=True)
+             - 0.5 * np.einsum("rs,prqs->pq", d, eri, optimize=True))
+        # the stationarity measure: the total energy settles long
+        # before the orbitals do (quadratic vs linear), so the break
+        # reads the DENSITY-Fock commutator itself
+        comm = float(np.abs(f @ d - d @ f).max())
+        if comm < 1e-10:
+            break
+    else:
         raise ValueError(
-            f"{n_pairs} closed pairs wanted, the reference supplies "
-            f"{len(closed)}")
-    # w_i = |c_span^dag S c_i|^2: the S-weight of closed MO i on the
-    # S-orthonormal span (1 = the MO lives in the span)
-    c = mf.mo_coeff
-    ov = c_span.conj().T @ s @ c          # (M, nmo) span overlaps
-    w = np.einsum("mi,mi->i", ov, ov.conj()).real
-    order = np.argsort(w[closed])[::-1]
-    keep = [closed[i] for i in order[:n_pairs]]
-    if n_pairs < len(closed):
-        gap = w[keep[-1]] - w[closed[order[n_pairs]]]
-        if gap < 0.1:
-            raise ValueError(
-                f"the closed-shell cut is not clean at this span: kept "
-                f"weight {w[keep[-1]]:.4f} vs dropped "
-                f"{w[closed[order[n_pairs]]]:.4f}"
-                " -- the fold's shells are ambiguous on this realization; "
-                "re-declare it (scripts/band_composition.py measures)")
-    proj = c_span @ ov[:, keep]
-    return lowdin(proj, s), w[keep]
+            f"the closed-core Roothaan did not settle in {_CORE_MAXCYCLES}"
+            f" cycles (last |[F, D]| = {comm:.2e}) -- the fold span "
+            "declaration needs revisiting")
+    return c_span @ occ, {"cycles": cycles, "comm": comm}
 
 
 # the core energy ----------------------------------------------------

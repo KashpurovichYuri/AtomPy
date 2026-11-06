@@ -380,6 +380,63 @@ _U14E_FRAC_VOID = Scenario(
            "not move; MOM-anchored selection is the recorded fix "
            "(2026-11-05)")
 
+# The uncontracted validation twins (the shell-layer wave): the same
+# chemical shells and term targets as the certified rows, on the
+# primitive split of the same basis (data/<el>_ccpvdz_unc.txt, the
+# make_uncontracted.py split).  The SHELL LAYER is declared as
+# CONTIGUOUS BAND RANGES partitioning each l-family (disjoint across
+# shells; the boundaries from the measured composition,
+# elements/<Key>/logs/band_composition.log -- the greedy capture
+# tables locate each shell's MOs; the RANGES are the generous
+# declaration).  The fold spans are family-covering because the
+# confined core is the span's OWN closed-shell Roothaan
+# (core.confined_core_orbitals): its pairs fill the lowest orbitals
+# of the span, so the fold's realization must cover its shells'
+# radial space DOWN TO THE CUSP (a norm-capture minimal list misses
+# the tight primitives -- measured: 99.99% capture with +13 Eh
+# core-energy error) and must EXCLUDE every skipped or active shell's
+# bands (else the Roothaan fills them).  The reference is the PLAIN
+# aufbau ROHF (ref=None): the measurement log certifies its filling
+# IS the intended one; the l-span forcing diverges on this basis
+# (measured).
+_SC_UNC_BANDS = {
+    "1s": tuple(f"{k}s" for k in range(1, 9)),
+    "2s": tuple(f"{k}s" for k in range(9, 15)),
+    "3s": tuple(f"{k}s" for k in range(15, 18)),
+    "4s": ("18s", "19s", "20s"),
+    "2p": tuple(f"{k}p" for k in range(2, 12)),
+    "3p": tuple(f"{k}p" for k in range(12, 18)),
+    "3d": tuple(f"{k}d" for k in range(3, 11)),
+}
+_TI_UNC_BANDS = dict(_SC_UNC_BANDS)
+_SC_UNC_BASIS = gto.parse((_DATA / "sc_ccpvdz_unc.txt").read_text())
+_TI_UNC_BASIS = gto.parse((_DATA / "ti_ccpvdz_unc.txt").read_text())
+
+# the validation-wave gates: the optimizer class stays void on the
+# uncontracted bases (not declared this wave -- the CASCI anchors and
+# the lane legs are the deliverable), and the frac folds wait for a
+# measured fractional-occupation basin (the same conservatism the ECP
+# atom's record set).
+def _unc_gates(key: str, sec: tuple[int, int]) -> tuple[Scenario, ...]:
+    w = "3d4s"
+    return (
+        Scenario(
+            name="anchor-first",
+            cells=tuple(f"{key}_{w}_{na}-{nb}_{m}_"
+                        for m in ("casscf", "sa-casscf")
+                        for na, nb in (sec,)) + (f"{key}_{w}no",),
+            reason="the optimizer class is not declared on the "
+            "uncontracted bases this wave: the CASCI anchors and the "
+            "multi-column lane legs run first (2026-11-06)"),
+        Scenario(
+            name="frac-reference-unmeasured",
+            cells=tuple(f"{key}_{w}_{na}-{nb}_casci_ao_-_pol_frac"
+                        for na, nb in (sec,)),
+            reason="no measured fractional-occupation basin on the "
+            "uncontracted basis yet (2026-11-06)"),
+    )
+
+
 CAMPAIGN: dict[str, CaseSpec] = {
     "C": CaseSpec("C", "ccpvdz", nelec_act=2, ncore=2,
                   shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3,
@@ -426,6 +483,25 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    planned_windows=("3d4d", "3d4s4p4d"),
                    lattice_windows=("3d", "3d4p", "3d4p4d"),
                    lattice_sector=(2, 0)),
+    # The uncontracted twins: the multi-column fold's validation atoms
+    # (the ar fold = 9 pairs over a 27-column declared span; the 3d4s
+    # window over its bands).  CASCI-class only this wave
+    # (run_casscf=False: the optimizer class is not declared on the
+    # uncontracted bases yet).
+    "Scunc": CaseSpec("Sc", _SC_UNC_BASIS, nelec_act=3, ncore=9,
+                       shell_patterns=["3d", "4s"], spin=1,
+                       shell_bands=_SC_UNC_BANDS,
+                       sa_weights=[1 / 5] * 5,
+                       run_casscf=False, key="Scunc",
+                       scenarios=_unc_gates("scunc", (2, 1)),
+                       term=(2, "g"), lane_windows=("3d4s@ar",)),
+    "Tiunc": CaseSpec("Ti", _TI_UNC_BASIS, nelec_act=4, ncore=9,
+                       shell_patterns=["3d", "4s"], spin=2,
+                       shell_bands=_TI_UNC_BANDS,
+                       sa_weights=[1 / 7] * 7,
+                       run_casscf=False, key="Tiunc",
+                       scenarios=_unc_gates("tiunc", (3, 1)),
+                       term=(3, "g"), lane_windows=("3d4s@ar",)),
     # CAMPAIGN key `U14e`: the ECP-atom record's element dir
     # (``elements/U14e/``); the SYMBOL stays `U` (PySCF builds the
     # element; the ECP removes its 78 core electrons) and the `tag`

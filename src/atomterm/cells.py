@@ -442,6 +442,12 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
 # exact [H, L] commutators (O(ndet^2) memory) -- the ladder's em-dash
 _COMM_CAP = 6000
 
+# the dense-adjudication budget: CI lane blocks up to this determinant
+# count get our exact H eigen-solved per block (the conventions
+# certificate AND the correction source for the pinned solver's
+# near-degenerate root skips; eigenvectors included, O(block^3))
+_ANCHOR_CAP = 12000
+
 
 def _pick_no_window(wins, k: int):
     """The k-GROUP-PREFIX window from no_group_windows's COMPACT list.
@@ -470,28 +476,38 @@ def _fold_span(key: CellKey, mol, mf,
     :func:`atomterm.windows.shell_realization`), refuse the malformed
     keys, and return the fold's shell tuple, its DOUBLY-OCCUPIED PAIR
     count (the chemistry: ``closed_electrons`` halved -- never the
-    span's column count), the confined core columns, and their
-    confinement weights (:func:`atomterm.core.confined_core_orbitals`:
-    the raw-AO span itself on a 1:1 realization, the span-confined
-    closed MOs on a multi-column one).
+    span's column count), the confined core columns, and the
+    mini-SCF's convergence report
+    (:func:`atomterm.core.confined_core_orbitals`: the raw-AO span
+    itself on a 1:1 realization, the span's own closed-shell Roothaan
+    on a multi-column one).
 
     Raises
     ------
     ValueError
-        AO rows sitting in both the window and its fold (the
-        row-level check -- two chemical shells sharing a declared band
-        is caught here, not at the label level); the sector
-        disagreeing with the fold-derived electron count; the basis
-        lacking one of the fold's bands.
+        a CHEMICAL shell sitting in both the window and its fold (the
+        partition is chemical: a pair is frozen or active, never both;
+        the shells' BAND realizations may OVERLAP -- shared radial
+        primitives are physical, and the window columns are projected
+        against the confined core span, which owns the shared rows);
+        the sector disagreeing with the fold-derived electron count;
+        the basis lacking one of the fold's bands.
     """
     from atomterm.core import confined_core_orbitals
     from atomterm.windows import (closed_electrons, lowdin,
-                                  realized_patterns, select_shell_ao,
-                                  select_valence_ao, shell_realization)
+                                  select_shell_ao, shell_realization)
 
     fold = key.fold_shells()
-    win_rows = set(select_valence_ao(
-        mol, realized_patterns(key.shell_patterns, shell_bands)))
+    overlap = sorted(set(key.shell_patterns) & set(fold))
+    if overlap:
+        raise ValueError(
+            f"{key.address}: {overlap} sit in both the window and its fold")
+    na, nb = key.sector
+    nelec = mol.nelectron - closed_electrons(fold)
+    if na + nb != nelec:
+        raise ValueError(
+            f"{key.address}: the sector holds {na + nb} active electrons; "
+            f"the fold {list(fold)} leaves {nelec}")
     fold_rows: list[int] = []
     for sh in fold:
         for band in shell_realization(sh, shell_bands):
@@ -502,20 +518,14 @@ def _fold_span(key: CellKey, mol, mf,
                     + (f" (the declared realization of shell {sh!r})"
                        if band != sh else ""))
             fold_rows.extend(rows)
-    overlap = sorted(win_rows & set(fold_rows))
-    if overlap:
-        raise ValueError(
-            f"{key.address}: {overlap} sit in both the window and its fold")
-    na, nb = key.sector
-    nelec = mol.nelectron - closed_electrons(fold)
-    if na + nb != nelec:
-        raise ValueError(
-            f"{key.address}: the sector holds {na + nb} active electrons; "
-            f"the fold {list(fold)} leaves {nelec}")
+    # the shells' realizations may SHARE bands (physical, see above) --
+    # the span is the UNION of rows: a duplicate row would make the
+    # Gram exactly singular
+    fold_rows = sorted(set(fold_rows))
     c_span = lowdin(np.eye(mol.nao_nr())[:, fold_rows], mf.get_ovlp())
     n_pairs = closed_electrons(fold) // 2
-    c_core, weights = confined_core_orbitals(mf, c_span, n_pairs)
-    return fold, n_pairs, c_core, weights
+    c_core, report = confined_core_orbitals(mf, c_span, n_pairs)
+    return fold, n_pairs, c_core, report
 
 
 def _key_core(key: CellKey, mol, mf,
@@ -794,11 +804,11 @@ def cell_payload(key: CellKey, facts) -> dict:
 
 def _apply_family(mol, mf, c_win, parts, ncore, c_core, ncas, na, nb):
     """One home for the size-independent apply family of a window:
-    ``(apply_h, apply_m, apply_l2)`` -- H through the PySCF
+    ``(apply_h, apply_m, apply_l2, apply_s2)`` -- H through the PySCF
     C-contraction boundary (:func:`atomterm.operators.pyscf_apply`),
     Lz as its real form ``M = -i Lz`` (norms unchanged), L2 with its
-    two-body part.  Shared by :func:`kernel_cell_payload` and
-    :func:`run_lane_cell`; the callers own their root loops."""
+    two-body part, S2 one-body.  Shared by :func:`kernel_cell_payload`
+    and :func:`run_lane_cell`; the callers own their root loops."""
     from pyscf import ao2mo
 
     from atomterm.detbasis import operator_apply
@@ -810,7 +820,9 @@ def _apply_family(mol, mf, c_win, parts, ncore, c_core, ncas, na, nb):
                              one_body=(-1j * parts["Lz"][0]).real)
     apply_l2 = operator_apply(parts["dets"], one_body=parts["L2"][0],
                               two_body=parts["L2"][1])
-    return apply_h, apply_m, apply_l2
+    apply_s2 = operator_apply(parts["dets"], one_body=parts["S2"][0],
+                              two_body=parts["S2"][1])
+    return apply_h, apply_m, apply_l2, apply_s2
 
 
 def kernel_cell_payload(key: CellKey, mol=None, mf=None,
@@ -865,8 +877,8 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
     out["win_lperp"] = float(closure["lperp"])
     k = int(np.argmin(np.atleast_1d(data.energies)))
     w = ci_in_detbasis_order(np.asarray(data.ci)[k], ncas, na, nb)
-    apply_h, apply_m, apply_l2 = _apply_family(mol, mf, c_act, parts,
-                                               ncore, c_core, ncas, na, nb)
+    apply_h, apply_m, apply_l2, _apply_s2 = _apply_family(
+        mol, mf, c_act, parts, ncore, c_core, ncas, na, nb)
     out["ground_l2"] = float(np.real(w @ apply_l2(w)))
     out["res_h_lz"] = float(np.linalg.norm(
         apply_h(apply_m(w)) - apply_m(apply_h(w))))
@@ -950,7 +962,8 @@ _LANE_FIELDS = ("term", "energies", "total", "ptp", "l2", "s2",
 # the multi-column fold's certificates (pair count + confinement
 # weights; the pre-shell-layer stores predate them)
 _LANE_FIELDS_OPT = ("ensemble", "mo_coeff", "cycles", "conv_dE",
-                    "core_pairs", "confinement")
+                    "core_pairs", "core_cycles", "core_comm",
+                    "anchor_corrected")
 
 
 def _root_vectors(ci):
@@ -968,7 +981,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     The fold resolves through the shell layer to its raw AO-shell span
     (Loewdin-orthonormalized), and the FROZEN CORE is the fold's
     ``n_pairs`` closed pairs confined to that span -- the span itself
-    on a 1:1 realization, the span-confined closed MOs on a
+    on a 1:1 realization, the span's own closed-shell Roothaan on a
     multi-column one (:func:`atomterm.core.confined_core_orbitals`;
     ``ncore`` follows the pair count, never the span width); the
     window placed by :func:`atomterm.windows.build_full_mo` against
@@ -990,9 +1003,12 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     term : the target ``(L, parity)`` (:attr:`~atomterm.cases.CaseSpec.term`);
         parity is the configuration's total inversion parity.
     conv_tol : the pinned solvers' CI tolerance.
-    anchor : also eigen-solve each block with OUR H and record the
-        max deviation from the pinned solver (the conventions
-        certificate; O(block^3) -- keep off large blocks).
+    anchor : also eigen-solve each block PAST the dense-adjudication
+        budget with OUR H and record the max deviation from the
+        pinned solver (the conventions certificate; O(block^3) --
+        keep deliberate).  Blocks UNDER that budget adjudicate
+        automatically, deviation correcting the roots (recorded in
+        ``anchor_corrected``).
     fresh : ignore a stored payload and re-run.
     shell_bands : the case's declared shell layer (chemical shell ->
         its AO bands; None = the 1:1 identity).
@@ -1047,7 +1063,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
 
     L, parity = term
     na, nb = key.sector
-    fold, nf, c_core, weights = _fold_span(key, mol, mf, shell_bands)
+    fold, nf, c_core, core_report = _fold_span(key, mol, mf, shell_bands)
     rows = select_valence_ao(
         mol, realized_patterns(key.shell_patterns, shell_bands))
     mo = build_full_mo(mf, list(range(nf)), rows, c_core=c_core)
@@ -1103,23 +1119,59 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
                                  c_core=c_core)
     dets = parts["dets"]
     ids = det_irreps(orbsyms, na, nb)
+    # the apply family FIRST: the per-root meters (L2/S2 expectations,
+    # the state residuals) ride it -- matrix-free and exact at any
+    # sector size, where the per-block dense meter matrices would be
+    # O(block^2) memory
+    apply_h, apply_m, apply_l2, apply_s2 = _apply_family(
+        mol, mf, c_read, parts, nf, c_core, ncas, na, nb)
     w_all: list[np.ndarray] = []
+    corrected: list[str] = []
     for irrep, mult in branch_d2h(L, parity).items():
         e_arr, ci = roots[irrep]
         e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
-        es.extend(float(x) for x in e_arr[:mult])
         sel = ids == IRREP_IDS[irrep]
         block = [d for d, m in zip(dets, sel) if m]
+        # the DENSE ADJUDICATION (every CI block the budget fits): the
+        # pinned Davidson can deterministically SKIP near-degenerate
+        # lowest roots (measured on the Scunc lane: the Ag ground
+        # PAIR of the 2D term -- the solver's second root landed four
+        # eigenvalues up), so our own exact H restricted to the block
+        # is both the conventions certificate (anchor_dev) and, on
+        # deviation, the CORRECTION source (the corrected blocks are
+        # recorded; the vectors rebuild from the dense eigenvectors)
+        ours_vecs = None
+        if key.method == "casci" and len(block) <= _ANCHOR_CAP:
+            hb = slater_condon_matrix(block,
+                                      one_body=parts["H"][0],
+                                      two_body=parts["H"][1])
+            ev, evec = np.linalg.eigh(hb)
+            dev = float(np.max(np.abs(np.sort(e_arr)[:mult]
+                                      - ev[:mult])))
+            anchor_dev = max(anchor_dev, dev)
+            if dev > 1e-8:
+                corrected.append(irrep)
+                e_arr = ev[:mult].copy()
+                ours_vecs = evec[:, :mult]
+            del hb
+        es.extend(float(x) for x in e_arr[:mult])
         w_blk = []
-        for vec in _root_vectors(ci):
-            w = ci_in_detbasis_order(vec, ncas, na, nb)
-            # the pinned vector lives entirely in its block
-            assert abs(np.linalg.norm(w[sel]) - 1.0) < 1e-8, irrep
-            w_blk.append(w)
+        if ours_vecs is None:
+            for vec in _root_vectors(ci):
+                w = ci_in_detbasis_order(vec, ncas, na, nb)
+                # the pinned vector lives entirely in its block
+                assert abs(np.linalg.norm(w[sel]) - 1.0) < 1e-8, irrep
+                w_blk.append(w)
+        else:
+            idx = np.flatnonzero(sel)
+            for k in range(ours_vecs.shape[1]):
+                w = np.zeros(len(dets))
+                w[idx] = np.real(ours_vecs[:, k])
+                w_blk.append(w)
         w_all.extend(w_blk)
-        if anchor and key.method == "casci":
-            # our own H restricted to the block must reproduce the
-            # pinned solver's roots (the conventions certificate)
+        if anchor and key.method == "casci" and len(block) > _ANCHOR_CAP:
+            # the opt-in anchor for blocks past the dense-adjudication
+            # budget (O(block^3) -- keep deliberate)
             hb = slater_condon_matrix(block,
                                       one_body=parts["H"][0],
                                       two_body=parts["H"][1])
@@ -1127,12 +1179,11 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
             anchor_dev = max(anchor_dev,
                              float(np.max(np.abs(np.sort(e_arr) - ours))))
             del hb
-        for meters, op in ((l2s, "L2"), (s2s, "S2")):
-            mb = slater_condon_matrix(block, one_body=parts[op][0],
-                                      two_body=parts[op][1])
-            for w in w_blk:
-                meters.append(float(np.real(w[sel] @ mb @ w[sel])))
-            del mb
+        for w in w_blk:
+            # the meters read the roots through the apply family
+            # (matrix-free, size-independent)
+            l2s.append(float(np.real(w @ apply_l2(w))))
+            s2s.append(float(np.real(w @ apply_s2(w))))
 
     # the state residual ||[H, Lz]psi|| over the component roots -- the
     # SIZE-INDEPENDENT symmetry certificate (exact 0 iff a symmetry
@@ -1140,9 +1191,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     # dense budget needs every matrix element).  Lz enters as its real
     # form M = -i Lz; H through the C contraction boundary on the
     # readout window's own feed (:func:`_apply_family` is the ONE
-    # construction).
-    apply_h, apply_m, apply_l2 = _apply_family(mol, mf, c_read, parts,
-                                               nf, c_core, ncas, na, nb)
+    # construction -- built once above, shared with the meters).
     res_lz = 0.0
     for w in w_all:
         r = apply_h(apply_m(w)) - apply_m(apply_h(w))
@@ -1201,10 +1250,14 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         "res_h_l2": float(res_l2),
         "fold": list(fold),
         # the multi-column fold's certificates: the pair count the
-        # core freezes and the closed MOs' capture on the declared
-        # span (1.0 each on a 1:1 realization, by construction)
+        # core freezes and the span's closed-core Roothaan report
+        # (0 cycles on a 1:1 realization -- the span IS the core)
         "core_pairs": int(nf),
-        "confinement": [float(x) for x in weights],
+        "core_cycles": int(core_report["cycles"]),
+        "core_comm": float(core_report["comm"]),
+        # the blocks whose pinned-solver roots our dense H replaced
+        # (the Davidson's near-degenerate root skips; empty = agreement)
+        "anchor_corrected": corrected,
     }
     if ensemble is not None:
         payload["ensemble"] = ensemble

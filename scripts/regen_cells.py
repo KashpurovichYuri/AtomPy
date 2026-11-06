@@ -65,7 +65,8 @@ from atomterm.cells import (CellKey, cell_payload, diagnostics,  # noqa: E402
                             void_reason)
 from atomterm.reference import run_frac_occ, run_rohf  # noqa: E402
 from atomterm.system import sector_na_nb  # noqa: E402
-from atomterm.windows import select_valence_ao  # noqa: E402
+from atomterm.windows import (realized_patterns,  # noqa: E402
+                              select_valence_ao)
 
 
 def lane_substrate(spec):
@@ -295,7 +296,8 @@ def main() -> None:
                      "basin gate needs revisiting before any cell runs")
         print(f"ROHF E = {mf.e_tot:.8f} Eh", flush=True)
         base = CellKey(name, "".join(spec.shell_patterns), sector)
-        act_idx = select_valence_ao(mol, base.shell_patterns)
+        act_idx = select_valence_ao(
+            mol, realized_patterns(spec.shell_patterns, spec.shell_bands))
         # the fractional-occupation reference is built only when a
         # NON-VOID frac fold runs (a voided frac class -- e.g. the ECP
         # atom's unconverged basin -- skips the head; --full

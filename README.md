@@ -166,7 +166,13 @@ metals, Ar − 3p + 4s = {1s,2s,2p,3s,4s}. Every other fold is written
 as an explicit shell list, e.g. {1s,2s,2p,4s}. The machine form
 (addresses, declarations) is the concatenated list — `1s2s2p4s` —
 resolved by `windows.fold_shells`; a lane window carries its fold as
-a tag on the label (`3d3p@semi`).
+a tag on the label (`3d3p@semi`). Folds count **electrons
+chemically** — a fold of N pairs freezes N pairs whatever its AO
+realization: on contracted bases the named shells are usually one AO
+block each, while on multi-band realizations (multi-zeta or
+uncontracted bases) each shell names its **declared band list** (the
+shell layer) and the frozen core is the span's own closed-shell
+solution over those bands.
 
 The fold column's **variant markers**: `·raw` — the raw AO shell
 columns as the fold span (no SCF averaging; the anisotropy control);

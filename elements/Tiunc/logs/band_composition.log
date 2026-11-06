@@ -1,0 +1,19 @@
+# Ti plain ROHF E = -848.39639007 Eh (measurement substrate; the closed MOs are basin-independent)
+
+# the display table (Mulliken populations -- wild on near-dependent bands; the certificate is the projector capture below; floor 0.5%)
+   1s occ=2 MOs=[0]  10s:0.35 11s:0.24 9s:0.23 8s:0.10 12s:0.04 7s:0.03 6s:0.01
+   2s occ=2 MOs=[1]  14s:0.47 13s:0.43 15s:0.08 12s:0.03 9s:0.02 8s:0.01 10s:0.01
+   3s occ=2 MOs=[5]  16s:0.56 17s:0.38 13s:0.04 15s:0.03 18s:0.01
+   4s occ=2 MOs=[9]  19s:0.53 20s:0.25 18s:0.24 16s:0.02
+   2p occ=2 MOs=[2, 3, 4]  9p:0.32 10p:0.31 8p:0.17 11p:0.12 7p:0.06 6p:0.01 12p:0.01
+   3p occ=2 MOs=[6, 7, 8]  13p:0.44 14p:0.25 12p:0.24 15p:0.02 9p:0.02 8p:0.02 11p:0.01 7p:0.01
+   3d occ=1 MOs=[10, 11]  7d:0.34 8d:0.32 6d:0.18 9d:0.11 5d:0.05 4d:0.01
+
+# the certificate: the greedy realization (worst-MO projector capture >= 99.5%; the DECLARATION takes these lists)
+   1s -> (10s, 8s, 12s)  capture 0.9984
+   2s -> (14s, 9s, 13s, 11s)  capture 0.9979
+   3s -> (17s, 13s, 16s, 11s, 14s)  capture 0.9963
+   4s -> (19s, 17s, 13s, 16s, 20s, 18s)  capture 0.9971
+   2p -> (9p, 11p, 7p)  capture 0.9984
+   3p -> (13p, 9p, 15p, 11p, 7p)  capture 0.9952
+   3d -> (7d, 9d, 5d, 8d, 6d)  capture 0.9993
