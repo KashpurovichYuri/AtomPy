@@ -149,7 +149,7 @@ def parse_args(argv) -> argparse.Namespace:
     p.add_argument("--mask",
                    help="keep this mask: radial | frozen | virtmix | - "
                         "(the maskless cells)")
-    p.add_argument("--start", help="keep this start: ao | mo | no")
+    p.add_argument("--start", help="keep this start: ao | mo | moc | no")
     p.add_argument("--substrate",
                    help="keep this substrate: pol | pur")
     p.add_argument("--fold", help="keep this fold: raw | avg | frac")

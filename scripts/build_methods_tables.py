@@ -73,7 +73,7 @@ BEGIN, END = "<!-- ladder:begin -->", "<!-- ladder:end -->"
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
                 "sa-casscf": "SA-CASSCF"}
-START_NAMES = {"ao": "AO", "mo": "MO", "no": "NO"}
+START_NAMES = {"ao": "AO", "mo": "MO", "moc": "MO-char", "no": "NO"}
 MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
               "virtmix": "virtual-mix"}
 

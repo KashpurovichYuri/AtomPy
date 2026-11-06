@@ -1,0 +1,28 @@
+== ROHF recheck (fresh from-scratch SCF, basin-gated) ==
+  fresh E = -50.38185233  trusted = -50.38185233  |dE| = 3.85e-09
+  converged = True
+  occupations: 5 closed pairs (occ=2), opens [np.int64(107), np.int64(108), np.int64(126), np.int64(142)] (occ [np.float64(1.0), np.float64(1.0), np.float64(1.0), np.float64(1.0)])
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 157, in <module>
+    main()
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 110, in main
+    certify_l2_identity(mol, mf)
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 81, in certify_l2_identity
+    idx = dets.index(det)
+          ^^^^^^^^^^^^^^^
+ValueError: (0, 1, 2, 6, 7) is not in list
+== ROHF recheck (fresh from-scratch SCF, basin-gated) ==
+  fresh E = -50.38185233  trusted = -50.38185233  |dE| = 3.85e-09
+  converged = True
+  occupations: 5 closed pairs (occ=2), opens [np.int64(107), np.int64(108), np.int64(126), np.int64(142)] (occ [np.float64(1.0), np.float64(1.0), np.float64(1.0), np.float64(1.0)])
+  certification: matrix 1.513758376428 formula 1.513758376428 |diff| 2.22e-16
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 157, in <module>
+    main()
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 112, in main
+    bands = band_ao_groups(mol)
+            ^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/probe_rohf_recheck.py", line 45, in band_ao_groups
+    for mu, (_, label, _sym) in enumerate(mol.ao_labels(fmt=False)):
+            ^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 3)

@@ -17,6 +17,7 @@ from atomterm.windows import (NOBLE_CORES, Window, build_full_mo,
                               occupied_core_idx, primitive_chain,
                               select_primitives, select_span,
                               select_valence_ao, select_shell_ao,
+                              select_valence_mo,
                               shell_weights, span_projector)
 from helpers import uncontracted_carbon_mole
 
@@ -319,6 +320,77 @@ def test_canonical_order_reorders_into_closed_open_virtual():
     # more core orbitals than closed orbitals is refused loudly
     with pytest.raises(ValueError, match="closed block has"):
         canonical_order(mf, 3)
+
+
+def test_select_valence_mo_ranks_by_named_band_character():
+    """The start='moc' window: the SCF's own valence rides (the closed
+    tail, then the open shells), the virtual complement is ranked by
+    Mulliken character on the named bands -- a higher-energy on-band
+    column beats a lower-energy off-band one (different-l rows are
+    exactly orthogonal, so an s-band virtual scores ZERO on a p-band
+    pattern) -- and the window size is the AO label's own count."""
+    mol = gto.M(atom="C 0 0 0", basis="ccpvdz", spin=2, verbose=0)
+    nao = mol.nao_nr()
+    r_1s = select_shell_ao(mol, "1s")[0]
+    r_2s = select_shell_ao(mol, "2s")[0]
+    r_2p = select_shell_ao(mol, "2p")
+    r_3p = select_shell_ao(mol, "3p")[0]
+    r_3s = select_shell_ao(mol, "3s")[0]
+    # columns: [1s, 2s] closed core, two 2p opens, then virtuals where
+    # the ENERGY order (the 3s row first, eps .05) disagrees with the
+    # character order -- the high virtual is a 3p+2p combination whose
+    # content sits partly ON the named 2p rows (eps .30); a pure other-
+    # band row would score exactly zero (block-restricted metric)
+    v_lo = np.zeros(nao); v_lo[r_3s] = 1.0
+    v_hi = np.zeros(nao); v_hi[r_3p] = 1.0; v_hi[r_2p[0]] = 0.6
+    mo = np.column_stack([np.eye(nao)[:, [r_1s, r_2s, *r_2p[:2]]],
+                          v_lo, v_hi])
+    occ = [2.0, 2.0, 1.0, 1.0, 0.0, 0.0]
+    eps = [-11.0, -2.5, -0.4, -0.3, 0.05, 0.30]
+
+    class FakeMF:
+        pass
+
+    mf = FakeMF()
+    mf.mol, mf.mo_coeff = mol, mo
+    mf.mo_occ, mf.mo_energy = np.asarray(occ), np.asarray(eps)
+    mf.get_ovlp = lambda: mol.intor_symmetric("int1e_ovlp")
+
+    ncas = len(select_valence_ao(mol, ["2p"]))
+    assert ncas == 3
+    perm = select_valence_mo(mf, ["2p"], 2)
+    assert sorted(perm) == list(range(mo.shape[1]))   # a permutation
+    assert perm[:2] == [0, 1]                        # the core prefix
+    assert perm[2:5] == [2, 3, 5]                    # opens, then the
+    # ... on-band virtual (col 5, eps .30) over the off-band one
+    # (col 4, eps .05) -- the energy order would pick [2, 3, 4]
+    assert perm[5] == 4
+
+    # the closed tail rides the window (a promoted pair's columns):
+    # ncore=1 leaves the 2s column to the valence block
+    perm1 = select_valence_mo(mf, ["2p"], 1)
+    assert perm1[:4] == [0, 1, 2, 3]
+
+    # a label smaller than the SCF's own valence is refused loudly
+    with pytest.raises(ValueError, match="already exceeds"):
+        select_valence_mo(mf, ["2s"], 2)
+
+
+def test_select_valence_mo_on_frozen_carbon_matches_the_true_argmax(carbon):
+    """On the frozen reference the picked virtual is the virtual with
+    the largest 2p-row S-projection weight, scored independently of
+    the selector (an explicit block quadratic), and the permutation
+    covers every column exactly once."""
+    _cfg, mol, mf, act_idx = carbon
+    s = mf.get_ovlp()
+    ss = s[np.ix_(act_idx, act_idx)]
+    cb = mf.mo_coeff[act_idx, :]
+    score = np.einsum("ij,ij->j", cb, ss @ cb).real
+    virt = [i for i in range(mf.mo_coeff.shape[1]) if mf.mo_occ[i] == 0]
+    best = max(virt, key=lambda i: score[i])
+    perm = select_valence_mo(mf, ["2p"], 2)
+    assert sorted(perm) == list(range(mf.mo_coeff.shape[1]))
+    assert perm[2 + 2] == best          # the single complement slot
 
 
 def test_primitive_chain_and_select_primitives():

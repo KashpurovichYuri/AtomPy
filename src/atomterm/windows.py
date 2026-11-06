@@ -26,9 +26,15 @@ The kinds
     shells; labels are shell COUNTERS there. Use on uncontracted
     bases, where shell labels lie about n.
   Both are m-complete by construction.
-* scf_mo -- converged MO columns: open MOs + k virtuals ranked by
-  the CALLER (campaign metric: descending valence-row S-weight,
-  never energy order). NEVER rotation-closed.
+* scf_mo -- converged MO columns, two constructions:
+  - the character-selected valence window
+    (:func:`select_valence_mo`, start='moc'): the SCF's own valence
+    + the virtual complement ranked by the named bands'
+    S-projection weight. The physics window.
+  - the canonical slice (:func:`canonical_order`, start='mo'):
+    closed | open | virtual, energy-ordered -- the m-delocalized
+    control (the lattice arm; the reference echo).
+  NEVER rotation-closed, either of them.
 * no -- occupation groups of a term-averaged density; closed iff
   the source density was m-scalar.
 * custom -- any S-orthonormal columns (your MO selection, a
@@ -60,6 +66,7 @@ __all__ = [
     "Window",
     "occupied_core_idx",
     "canonical_order",
+    "select_valence_mo",
     "select_shell_ao",
     "select_valence_ao",
     "select_span",
@@ -649,6 +656,85 @@ def canonical_order(mf, ncore: int) -> list[int]:
             f"canonical order scrambled (closed at {closed[:ncore]}"
             f"); reordering into closed|open|virtual",
             stacklevel=2)
+    return perm
+
+
+def select_valence_mo(mf, patterns: list[str], ncore: int) -> list[int]:
+    """Canonical columns of the window's character, in the run
+    convention -- the start='moc' substrate (the character-selected
+    valence window; ``canonical_order``'s slice is the
+    m-delocalized control).
+
+    The column permutation placing the window at ``[ncore :
+    ncore + ncas]``: the core prefix (:func:`occupied_core_idx`), the
+    SCF's own valence -- the closed tail (a promoted pair's columns)
+    then the open shells, energy-ordered -- then the virtual
+    complement ranked by the named bands' S-projection weight (ties
+    broken by energy); the unselected virtuals trail, energy-ordered.
+
+    The count contract is the AO window's: ``ncas`` =
+    ``len(select_valence_ao(mol, patterns))`` -- the same label
+    declares the same window size on both starts; the columns are
+    the orbitals the raw bands are the material of. The bands, not
+    the energy order, drive the ranking: the energy-ordered slice is
+    diffuse-dominated on uncontracted bases -- the reference echo
+    (the span contains the ROHF's own broken determinant; singles
+    are Brillouin-dead; the CASCI reads the mean field back), not a
+    valence window.
+
+    Returns
+    -------
+    The full column permutation -- ``mf.mo_coeff[:, perm]`` carries
+    the window at ``[ncore : ncore + ncas]``.
+
+    Raises
+    ------
+    ValueError
+        If the SCF's own valence already exceeds the declared window
+        size (the label underdeclares its own electrons), or a
+        pattern matches no AO (via :func:`select_valence_ao`).
+
+    Examples
+    --------
+    >>> perm = select_valence_mo(mf, ["10f", "13d"], 5)  # doctest: +SKIP
+    >>> perm[5:5 + 12]  # the window: 4 open shells + 8 f/d virtuals
+    [...]              # doctest: +SKIP
+    """
+    mol = mf.mol
+    ncas = len(select_valence_ao(mol, patterns))
+    core = occupied_core_idx(mf, ncore)
+    core_set = set(core)
+    occ = np.asarray(mf.mo_occ)
+    closed_tail = sorted((i for i in np.flatnonzero(occ == 2.0)
+                          if i not in core_set),
+                         key=lambda i: mf.mo_energy[i])
+    opens = sorted((i for i in np.flatnonzero((occ > 0) & (occ < 2))),
+                   key=lambda i: mf.mo_energy[i])
+    valence = closed_tail + opens
+    n_virt = ncas - len(valence)
+    if n_virt < 0:
+        raise ValueError(
+            f"the SCF's own valence ({len(valence)} columns: closed "
+            f"tail {closed_tail} + opens {opens}) already exceeds the "
+            f"declared window size ncas = {ncas}")
+    band_rows = [mu for pattern in patterns
+                 for mu in select_shell_ao(mol, pattern)]
+    # the named bands' S-projection weight (the shell_weights metric
+    # at band resolution): the row-block quadratic form -- canonical
+    # columns spread over their same-l radials, so the valence
+    # virtuals outscore the diffuse junk
+    s = mf.get_ovlp()
+    ss = s[np.ix_(band_rows, band_rows)]
+    cb = mf.mo_coeff[band_rows, :]
+    score = np.einsum("ij,ij->j", cb, ss @ cb).real
+    virt = sorted((i for i in np.flatnonzero(occ == 0)),
+                  key=lambda i: mf.mo_energy[i])
+    picked = sorted(virt, key=lambda i: (-score[i], mf.mo_energy[i]))
+    rest = picked[n_virt:]
+    picked = picked[:n_virt]
+    perm = (core + valence
+            + sorted(picked, key=lambda i: mf.mo_energy[i])
+            + sorted(rest, key=lambda i: mf.mo_energy[i]))
     return perm
 
 

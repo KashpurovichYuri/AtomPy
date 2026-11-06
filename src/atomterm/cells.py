@@ -45,7 +45,7 @@ the objective / the optimizer freedom / the core::
 
     <atom>_<window>_<na>-<nb>_<method>_<start>_<mask|->_<substrate>_<fold>
 
-with SINGULAR axis values throughout (``ao``/``mo``/``no``), the
+with SINGULAR axis values throughout (``ao``/``mo``/``moc``/``no``), the
 sector as ``na-nb`` (fixes Ms AND nelec), and ``-`` for no mask
 (free optimization; a mask exists only for optimizer methods --
 ``virtmix`` is a MASK -- :func:`atomterm.casscf.mask_no_core_window_mix
@@ -124,7 +124,7 @@ __all__ = [
 ]
 
 METHODS = ("casci", "casscf", "sa-casscf")
-STARTS = ("ao", "mo", "no")       # window constructions (the span is the window)
+STARTS = ("ao", "mo", "moc", "no")  # window constructions (the span is the window)
 MASKS = ("radial", "frozen", "virtmix")   # None = free optimization
 SUBSTRATES = ("pol", "pur")
 FOLDS = ("raw", "avg", "frac")
@@ -158,8 +158,11 @@ class CellKey:
     sector : ``(na, nb)`` -- alpha/beta active electrons; fixes Ms
         and nelec together.
     method : ``"casci"`` | ``"casscf"`` | ``"sa-casscf"``.
-    start : ``"ao"`` (shell AOs) | ``"mo"`` (canonical SCF slice) |
-        ``"no"`` (natural-orbital groups; the label grammar is
+    start : ``"ao"`` (shell AOs) | ``"mo"`` (canonical SCF slice --
+        the m-delocalized control) | ``"moc"`` (the character-selected
+        valence window:
+        :func:`atomterm.windows.select_valence_mo`) | ``"no"``
+        (natural-orbital groups; the label grammar is
         ``<source>no<k>``, see :attr:`no_source`).
     mask : optimizer restriction -- ``None`` (free) | ``"radial"`` |
         ``"frozen"`` | ``"virtmix"``; only meaningful for optimizer
@@ -595,8 +598,9 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     from atomterm.casscf import (constrained_casscf, mask_frozen_window,
                                  mask_no_core_window_mix, run_casci)
     from atomterm.windows import (build_full_mo, canonical_order,
-                                  occupied_core_idx,
-                                  radial_basis, mask_radial_rotations, select_valence_ao)
+                                  occupied_core_idx, radial_basis,
+                                  mask_radial_rotations, select_valence_ao,
+                                  select_valence_mo)
 
     na, nb = key.sector
     ncore, c_core, c_pur = _key_core(key, mol, mf)
@@ -634,6 +638,27 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
             mask = mask_radial_rotations(labels, ncore, ncas)
         else:
             mo_full = build_full_mo(mf, core_idx, act_idx, c_core=c_core)
+    elif key.start == "moc":
+        # the character-selected valence window
+        # (:func:`windows.select_valence_mo`: the SCF's own valence +
+        # the virtual complement ranked by the named bands'
+        # S-projection weight -- never energy order, the diffuse
+        # echo). pol
+        # rides the canonical matrix itself (S-orthonormal in the
+        # core it was solved in); pur re-projects the window on the
+        # pur core span (:func:`windows.build_full_mo`'s honest
+        # re-orthogonalization). Honest expectation: the columns'
+        # own m-delocalization survives (measured: raw-MO spans never
+        # rotation-close) -- these cells measure that, they do not
+        # fix it.
+        perm = select_valence_mo(mf, key.shell_patterns, ncore)
+        c_can = mf.mo_coeff[:, perm]
+        if key.substrate == "pur":
+            mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
+                                    c_can[:, ncore:ncore + ncas],
+                                    c_core=c_pur)
+        else:
+            mo_full = c_can
     else:  # start == "mo": the canonical window in the run convention
         # (:func:`atomterm.windows.canonical_order`: closed | open |
         # virtual -- the raw PySCF order is the m-block listing and
@@ -1233,12 +1258,15 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     The ORDER is presentation and lives HERE, once -- renderers receive
     this list ready-made and format (branching on key identity only):
     the CASCI fold block first (identity: method=casci, start=ao; the
-    pur fold third), then the optimizer product method x mask x
-    substrate x start with the virtual-mix diagnostic after the CASSCF
+    pur fold third), then the character-selected MO CASCI pair (the
+    AO-vs-MO comparison at fixed window; raw/frac have no canonical
+    meaning), then the optimizer product method x mask x substrate x
+    start with the virtual-mix diagnostic after the CASSCF
     free/polarized starts, and the NO start addressing the full-span
-    group prefix (:func:`_no_label`). mo x pur IS part of the grid
-    (the mo branch re-projects the canonical columns on the pur
-    span); radial stays ao-only (validated at the key).
+    group prefix (:func:`_no_label`). mo x pur and moc x pur ARE part
+    of the grid (the canonical/character-selected columns are
+    re-orthogonalized against the pur span); radial stays ao-only
+    (validated at the key).
     """
     from atomterm.system import sector_na_nb
 
@@ -1251,11 +1279,15 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
         CellKey(atom, w, sec, fold="avg"),
         CellKey(atom, w, sec, substrate="pur"),   # the CASCI pur fold
         CellKey(atom, w, sec, fold="frac"),
+        CellKey(atom, w, sec, method="casci", start="moc", fold="avg"),
+        CellKey(atom, w, sec, method="casci", start="moc",
+                substrate="pur"),
     ]
     for m in ("casscf", "sa-casscf"):
         for mask in (None, "radial", "frozen"):
             for sub in ("pol", "pur"):
-                starts = ("ao", "mo", "no") if mask != "radial" else ("ao",)
+                starts = (("ao", "mo", "moc", "no") if mask != "radial"
+                          else ("ao",))
                 for st in starts:
                     keys.append(CellKey(atom, _no_label(w) if st == "no"
                                         else w, sec, method=m, start=st,
