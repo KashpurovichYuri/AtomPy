@@ -153,9 +153,89 @@ campaign's output; `run_u*` stays the frozen record until then).
   --full passes after the anchors are read.  The m-complete 6p
   promotion (CAS(10,15)) is NOT expressible -- the fold-tag grammar
   assumes one band per shell (map Issues: character-selected folds).
-- Part 3 (next): the batch + render + review → THE RETIREMENT (G5):
-  `run_u*` + `run_casscf`/`run_sa_casscf` die, `stage_facts`' `c_act`
-  absorbs.
+- Part 2c: THE REVIEW ROUND (2026-11-06; commits 29a6aad, cb81663,
+  86c7f5e, 034b4b1): the ROHF RECHECK (fresh SCF = the same basin,
+  |dE| = 4e-09; the open-shell gauge rotates per draw — the
+  determinant ⟨L²⟩ = 40.85, neither ⁵S nor ⁵L; the identity
+  construction certified against the detbasis matrix at 2.2e-16
+  first; `logs/rohf_recheck.log`); the WINDOW-COMPOSITION AUDIT (the
+  optimizers stay ON-CLASS in l-space — the SA windows exactly
+  12.000/12, 13.000/13, 15.000/15; the "escape" folklore was same-l
+  RADIAL mixing, gauge not leakage; `logs/window_audit_ao.log`);
+  start=`moc` (select_valence_mo: the character-selected canonical
+  window — the SCF's own valence + the virtual complement ranked by
+  the named bands' S-projection; the energy-ordered slice stays as
+  the control); the PINNED-ROUTE PROBE (the irreps AUTO-DERIVED from
+  term=(8,"u"); the MO windows STRUCTURALLY OFF the pinned route —
+  irrep-mixed columns, the dominant-irrep repair collapses the span
+  (overlap 0.647); the AO windows need a 1e-3 repair (overlap
+  0.9999); the D2h substrate = C1-SEEDED NEWTON — from-scratch
+  Newton lands −41.2, the seeded restriction reproduces −50.38185233
+  exactly; `logs/pinned_route_probe.log`).
+- Part 2d: THE CHEMISTRY + THE AO-PUR ROUND (2026-11-06; commits
+  52cc9db, d1b89a7, 230f08d): the render chemistry on CaseSpec
+  (window_names — the table speaks 5f6d / 5f6d7s / 5f6d6p;
+  fold_chemistry — the folds read 6s6p7s / 6s6p, not "Ne";
+  anchor_note — "forced filling: 6s²6p⁶7s² closed, 5f³6d¹ open";
+  render_primary=False — the primary family suppressed; the tier
+  families retired; the heading trimmed, the mapping sentence lives
+  in README's reading key).  THE UHF ANCHOR WARMED (the census ran,
+  the anchor script had not): E = −50.38881343 (occ_e_ref_uhf
+  exactly), ⟨S²⟩ = 6.2289, σ_min = 0.8835.  THE AO-PUR VINDICATION
+  (the user's diagnosis — the unclosed MO gauge breaks the pur
+  optimizer start): the 5f6d AO-pur SA reads −50.423810 at
+  ⟨L²⟩ = 72.0000 exact in 50 CYCLES (the fastest start of all: AO-pol
+  56, MO-pol 160, MO-pur capped); the 5f6d7s AO-pur SA RE-REACHES
+  THE L=9 STATE (89.9987, 114 cycles, 1.1e-08 — the MO starts miss
+  the basin within the cap; the pol start needed 190).  The MO-pur
+  rows stay as the recorded gauge finding.  The 6p window's MO rows
+  landed (the echo CASCI + the broken optimizer class — the full
+  AO/MO comparison on all three promoted windows).  METHOD COVERAGE
+  CLOSED (user-reviewed): frac void (no converged reference), NO
+  unrunnable at k=2/3 (recorded), the masks = the diagnostics class,
+  SO/TM/g-factors = the future waves; the pinned route was the one
+  missing piece.
+- Part 2e: THE LANE FORK (2026-11-06): the pinned-lane declaration
+  exposed the fold-grammar limitation — the chemical fold (6s6p7s)
+  is 5 PAIRS spread over THIRTEEN radial columns on this
+  uncontracted basis; spelled in band labels the electron-count
+  contract refuses it (13 "pairs"); spelled chemically the shell-span
+  fold breaks the 1:1 closed_shell_core_energy bookkeeping (it
+  doubly-occupies every column — 26 frozen electrons).  The first
+  route cells ran on the compact-band fold (the tag "6s6p7s" matched
+  BANDS — compact core-like primitives) and read +1234 Eh — killed,
+  the payloads deleted, the lane_windows declaration reverted
+  (term=(8,"u") stays).  KEPT: the C1-seeded lane_substrate fix (the
+  seeded D2h reproduces −50.38185233 exactly; plain DIIS diverges,
+  from-scratch Newton lands −41.2 — measured).
+- Part 3 (REVISED — the shell-layer wave, Sc-unc/Ti-unc FIRST,
+  user-directed: develop on a cheap certified system, compare with
+  the existing): THE PROBLEM — the fold resolution matches AO LABELS
+  and assumes 1 folded column = 1 doubly-occupied orbital; both hold
+  only on contracted bases (one contraction block = one shell = one
+  orbital).  THE RESOLUTION — (1) the uncontracted cc-pVDZ variant
+  for Sc/Ti (the mechanical split script; CAMPAIGN keys Sc-unc /
+  Ti-unc, element dirs elements/Sc-unc/ elements/Ti-unc/); (2) THE
+  SHELL LAYER on the declaration: each chemical shell names its AO
+  realization (the band list, certified by the productized
+  scripts/band_composition.py — the probe productized, any atom);
+  (3) the multi-column shell-span fold: the fold resolution through
+  the shell layer + the projected-density core energy
+  (E = 2Tr(hD) + (2J−K)(D), D = the closed density projected on the
+  fold span; certified EXACT against closed_shell_core_energy on
+  every 1:1 fold + a synthetic multi-band pin); (4) the cheap
+  validation legs (the pinned lane CI on 3d4s@ar-unc + the free CI
+  beside it; the ²D/³F term readout exact); (5) the comparison vs
+  the certified cc-pVDZ records (the constructions exact, the
+  terms/orderings qualitative); (6) THEN the U14e lane port
+  (declaration only — the machinery proven).  THEN the close: the
+  G5 retirement (run_u* + casscf.run_casscf/run_sa_casscf +
+  stage_facts' c_act absorption) + the AGENTS/map/ticket lockstep.
+  THE USER'S DESIGN PRINCIPLE (2026-11-06, do not re-open): AOs are
+  never tracked by labels directly — the chemical shell with its
+  DECLARED AO realization is the primary object; contracted bases
+  work because the basis itself declares the shells; uncontracted
+  bases need the shell layer.
 
 ## References
 
