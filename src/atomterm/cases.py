@@ -397,9 +397,15 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    sa_weights=[1 / 17] * 17,  # the ground term's M_L set
                    run_casscf=False,          # the multi-solution class
                    nroots_primary=48,
-                   planned_windows=_U14E_PROMOTED
-                   + tuple("".join(_U_TIER[t])
-                           for t in ("3f", "4f", "2f2d", "4f2d")),
+                   # the tier CAS(4,>20) families: RETIRED for now
+                   # (user-directed 2026-11-06 -- "most of CASCI
+                   # results (4,>20) can be deleted for now": the
+                   # band-lattice anchor rows left the table with the
+                   # declaration; the windows stay in git history and
+                   # the store, re-declarable by re-adding the tuple)
+                   # + tuple("".join(_U_TIER[t])
+                   #         for t in ("3f", "4f", "2f2d", "4f2d")),
+                   planned_windows=_U14E_PROMOTED,
                    planned_sectors=_U14E_PROMOTED_SECTORS,
                    scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID),
                    ref=ReferenceSpec(

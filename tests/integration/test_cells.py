@@ -198,17 +198,18 @@ def test_void_reason_voids_the_u14e_optimizer_class():
     on EVERY window (the primary included -- ``run_casscf=False``'s
     spirit made explicit) and the frac folds are void with it (the
     frac reference has no converged basin on the ECP atom); exactly
-    the 40 remaining CASCI anchors run (the primary's and tiers'
-    15 + 8 moc, the promoted-pair batch's 9 + 8 moc)."""
+    the 20 remaining CASCI anchors run (the primary's 5 + the three
+    promoted windows' 15 -- the tier families retired from the
+    declaration 2026-11-06)."""
     spec = CAMPAIGN["U14e"]
     sc = scenarios_for(spec)
     keys = grid_keys(spec) + planned(spec)
-    assert len(keys) == 344
+    assert len(keys) == 172
     for k in keys:
         void = void_reason(k, sc) is not None
         expect = k.method != "casci" or k.fold == "frac"
         assert void == expect, k.address
-    assert sum(not void_reason(k, sc) for k in keys) == 40
+    assert sum(not void_reason(k, sc) for k in keys) == 20
 
 
 @fast
