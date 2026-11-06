@@ -318,3 +318,4 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `u14e_10f13d7s_5-1_casscf_moc_-_pur_avg` E -50.42307666
 - `u14e_10f13d7s_5-1_sa-casscf_moc_-_pol_avg` E -50.40889417
 - `u14e_10f13d7s_5-1_sa-casscf_moc_-_pur_avg` E -50.38596418
+- `u14e_9f10f11f12d13d_4-0_casci_moc_-_pur_avg` E -50.37929837

@@ -1,0 +1,16 @@
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_9f10f11f12d13d_4-0_casci_moc_-_pol_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/windows.py:705: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  core = occupied_core_idx(mf, ncore)
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:229: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  [cell] u14e_9f10f11f12d13d_4-0_casci_moc_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:657: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
+  wrote elements/U14e/cells.json + cells.md
+
+done
