@@ -50,3 +50,83 @@ ROHF E = -50.38185233 Eh
   mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act_idx,
 /home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:229: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
   c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+[no-arm] source ground block: 1 roots
+[no-arm] occupation groups: [1, 2, 3, 5, 1, 1]
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 338, in <module>
+    main()
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 313, in main
+    facts = run_cell(key, mf, frac_mf=mf_f,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 621, in run_cell
+    wins = no_group_windows(mol, mf, ncore, c_src, na, nb,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/natural.py", line 237, in no_group_windows
+    raise ValueError(
+ValueError: the no6 prefix opens a 16731-determinant sector (> cap=12000): raise the cap or narrow the source
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d7sno3_5-1_sa-casscf_no_-_pol_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:618: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act_idx,
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:229: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+[no-arm] source ground block: 1 roots
+[no-arm] occupation groups: [1, 2, 3, 5, 1, 1]
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 338, in <module>
+    main()
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 313, in main
+    facts = run_cell(key, mf, frac_mf=mf_f,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 621, in run_cell
+    wins = no_group_windows(mol, mf, ncore, c_src, na, nb,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/natural.py", line 237, in no_group_windows
+    raise ValueError(
+ValueError: the no6 prefix opens a 16731-determinant sector (> cap=12000): raise the cap or narrow the source
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d14pno3_4-0_casscf_no_-_pol_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:618: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act_idx,
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:229: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+[no-arm] source ground block: 1 roots
+[no-arm] occupation groups: [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3]
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 338, in <module>
+    main()
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 313, in main
+    facts = run_cell(key, mf, frac_mf=mf_f,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 623, in run_cell
+    win = _pick_no_window(wins, key.no_source[1])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 453, in _pick_no_window
+    raise ValueError(
+ValueError: the source's usable group prefixes are ['no4', 'no5', 'no6', 'no7', 'no8', 'no9', 'no10', 'no11']; no3 is not among them (absent, or skipped as too small to open the sector)
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d14pno3_4-0_sa-casscf_no_-_pol_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:618: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act_idx,
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:229: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+[no-arm] source ground block: 1 roots
+[no-arm] occupation groups: [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3]
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 338, in <module>
+    main()
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 313, in main
+    facts = run_cell(key, mf, frac_mf=mf_f,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 623, in run_cell
+    win = _pick_no_window(wins, key.no_source[1])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 453, in _pick_no_window
+    raise ValueError(
+ValueError: the source's usable group prefixes are ['no4', 'no5', 'no6', 'no7', 'no8', 'no9', 'no10', 'no11']; no3 is not among them (absent, or skipped as too small to open the sector)
