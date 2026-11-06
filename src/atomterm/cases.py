@@ -172,6 +172,17 @@ class CaseSpec:
         cell: a tagged window NEVER collides with a free-route label.
     scenarios : this atom's :class:`Scenario` declarations (merged
         over :data:`DEFAULT_SCENARIOS` by :func:`scenarios_for`).
+    window_names : window label -> chemical display name for the
+        renderers (an uncontracted basis counts radial primitives,
+        not shells: the stored addresses keep the construction
+        labels; the table speaks shells).
+    fold_chemistry : effective fold count -> the fold's shell set
+        (the noble-guess fallback lies when the ECP leaves
+        non-noble closed shells: U14e's fold is 6s6p7s, not Ne).
+    anchor_note : the ROHF anchor row's filling note, in shells.
+    render_primary : the primary window's family renders (False =
+        the promoted windows carry the results; the primary rows
+        stay in the store).
     """
 
     symbol: str
@@ -195,6 +206,21 @@ class CaseSpec:
     term: tuple[int, str] | None = None
     lane_windows: tuple[str, ...] = ()
     scenarios: tuple[Scenario, ...] = ()
+    # the chemistry display layer (the renderers' vocabulary; the
+    # stored addresses keep their construction labels):
+    # window_names: window label -> chemical display name (the
+    #   uncontracted bases count radial primitives, not shells).
+    # fold_chemistry: effective fold count -> its shell set (the
+    #   noble-guess fallback lies when the ECP leaves non-noble
+    #   closed shells).
+    # anchor_note: the ROHF row's filling note, in shells.
+    # render_primary: the primary window's family renders (False =
+    #   the promoted windows carry the results; the primary rows stay
+    #   in the store).
+    window_names: dict[str, str] | None = None
+    fold_chemistry: dict[int, str] | None = None
+    anchor_note: str | None = None
+    render_primary: bool = True
 
     def __post_init__(self):
         """Validate the declaration's own grammar: the term target and
@@ -408,6 +434,14 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    planned_windows=_U14E_PROMOTED,
                    planned_sectors=_U14E_PROMOTED_SECTORS,
                    scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID),
+                   window_names={"9f10f11f12d13d": "5f6d (3f2d radials)",
+                                 "10f13d": "5f6d",
+                                 "10f13d7s": "5f6d7s",
+                                 "10f13d14p": "5f6d6p"},
+                   fold_chemistry={5: "6s6p7s", 4: "6s6p"},
+                   anchor_note="forced filling: 6s²6p⁶7s² closed, "
+                               "5f³6d¹ open",
+                   render_primary=False,
                    ref=ReferenceSpec(
                        occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
                        occ_e_ref=-50.38185233,

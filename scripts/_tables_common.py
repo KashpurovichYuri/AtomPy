@@ -28,14 +28,21 @@ def minus(text: str) -> str:
 
 def fold_col(k, spec) -> str:
     """The fold column (every table's one grammar): a tagged window's
-    own fold; an untagged cell's prefix -- the noble whose closed
-    count fills ``spec.ncore`` orbitals, the variants naming their
-    deviation."""
+    own fold; an untagged cell's prefix -- the declared chemical shell
+    set of the key's EFFECTIVE fold (``fold_chemistry``: the count
+    follows the key's sector -- a promoted-pair window folds fewer
+    pairs), else the noble whose closed count fills ``spec.ncore``
+    orbitals; the variants naming their deviation."""
     if k.fold_tag is not None:
         return fold_label(k.fold_tag)
-    base = next((n.capitalize() for n, sh in NOBLE_CORES.items()
-                 if sum(SHELL_COLS[s[-1]] for s in sh) == spec.ncore),
-                f"n={spec.ncore}")
+    if spec.fold_chemistry:
+        n_eff = (2 * spec.ncore + spec.nelec_act
+                 - k.sector[0] - k.sector[1]) // 2
+        base = spec.fold_chemistry.get(n_eff, f"n={n_eff}")
+    else:
+        base = next((n.capitalize() for n, sh in NOBLE_CORES.items()
+                     if sum(SHELL_COLS[s[-1]] for s in sh) == spec.ncore),
+                    f"n={spec.ncore}")
     if k.fold == "raw":
         return f"{base}·raw"
     if k.fold == "frac":

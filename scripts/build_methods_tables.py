@@ -73,7 +73,7 @@ BEGIN, END = "<!-- ladder:begin -->", "<!-- ladder:end -->"
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
                 "sa-casscf": "SA-CASSCF"}
-START_NAMES = {"ao": "AO", "mo": "MO", "moc": "MO-char", "no": "NO"}
+START_NAMES = {"ao": "AO", "mo": "MO", "moc": "MO", "no": "NO"}
 MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
               "virtmix": "virtual-mix"}
 
@@ -147,8 +147,9 @@ def _row(k, p, anchor, spec) -> str:
     # cap the measurement runs declared; PySCF's default is 50)
     note = "cycle cap" if cyc and cyc == (cap if cap is not None else 200) \
         else ""
+    wname = (spec.window_names or {}).get(k.span_label, k.span_label)
     cells = [
-        _method(k), route, f"{k.span_label} / {START_NAMES[k.start]}",
+        _method(k), route, f"{wname} / {START_NAMES[k.start]}",
         cas_label(k), fold, f"{p['n_det']:,}",
         f"{e:.4f}", f"{de * 1e3:+.1f}", f"{e * EV:.4f}",
         f"{de * EV:+.4f}", conv_cell(p), l2_text(p),
@@ -175,11 +176,13 @@ def _rows(keys, cells, anchor, spec) -> list[str]:
             and (p := payload_of(cells, k)) is not None]
 
 
-def _anchor_row(anchor: float) -> str:
-    """The ROHF anchor row: ΔE's zero (the caption states it)."""
+def _anchor_row(anchor: float, spec) -> str:
+    """The ROHF anchor row: ΔE's zero (the caption states it); the
+    filling note in the declared chemistry when the row declares it."""
     cells = ["ROHF (anchor)", "—", "—", "—", "—", "—",
              f"{anchor:.4f}", "0", f"{anchor * EV:.4f}", "+0.0000",
-             DASH, DASH, DASH, DASH, DASH, DASH, DASH, "forced filling"]
+             DASH, DASH, DASH, DASH, DASH, DASH, DASH,
+             spec.anchor_note or "forced filling"]
     for i in (6, 8):
         cells[i] = minus(cells[i])
     return "| " + " | ".join(cells) + " |"
@@ -205,17 +208,13 @@ def _uhf_anchor_row(anchor: float, uhf: dict) -> str:
 def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     """THE LADDER: one table for the whole atom.  Families in
     declaration order, separated by the rule row -- the lattice
-    spans (CI only), the primary window (each fold group's CASCI
-    BESIDE its optimizer variants), the planned windows whose CASCI
-    anchors are read (the anchor-first protocol's readable half: the
-    tier families render their anchor rows while the optimizer cells
-    stay void at the key, ``--full`` materializing them into the same
-    families), then every lane window whose route twins ran (the
-    pinned and free CI, the free CASSCF/SA, the pinned SA).  The ROHF
-    anchor row leads, the UHF anchor row follows when the store
-    carries the record; NO-start cells are not ladder rows; a lane
-    family without run optimizer twins is not this table's story
-    yet."""
+    spans (CI only), the primary window when ``render_primary``
+    (each fold group's CASCI beside its optimizer variants), the
+    planned windows whose CASCI anchors are read, then every lane
+    window whose route twins ran.  The ROHF anchor row leads, the
+    UHF anchor row follows when the store carries the record;
+    NO-start cells are not ladder rows; a lane family without run
+    optimizer twins is not this table's story yet."""
     body: list[str] = []
     seen: set[str] = set()
 
@@ -232,13 +231,16 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         _fam([k for k in lattice_keys(spec) if k.window == span])
 
     # the primary family: fold groups in declaration order, each
-    # group's CASCI beside its optimizer variants
-    grid = [k for k in grid_keys(spec) if k.start != "no"]
-    groups: dict[str, list] = {}
-    for k in grid:
-        groups.setdefault(fold_col(k, spec), []).append(k)
-    for keys in groups.values():
-        _fam(keys)
+    # group's CASCI beside its optimizer variants; suppressed by the
+    # declaration (render_primary=False -- the promoted windows carry
+    # the results; the primary rows stay in the store)
+    if spec.render_primary:
+        grid = [k for k in grid_keys(spec) if k.start != "no"]
+        groups: dict[str, list] = {}
+        for k in grid:
+            groups.setdefault(fold_col(k, spec), []).append(k)
+        for keys in groups.values():
+            _fam(keys)
 
     routes = route_keys(spec)
     for leg in [k for k in routes
@@ -255,7 +257,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     for w in spec.planned_windows:
         _fam([k for k in window_grid(spec, w) if k.start != "no"])
 
-    out = [BEGIN, HEAD, SEP, _anchor_row(anchor)]
+    out = [BEGIN, HEAD, SEP, _anchor_row(anchor, spec)]
     if uhf is not None:
         out.append(_uhf_anchor_row(anchor, uhf))
     out.extend([*body, END])

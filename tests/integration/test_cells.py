@@ -193,6 +193,22 @@ def test_void_reason_gates_scenariod_cells():
 
 
 @fast
+def test_u14e_chemistry_declaration():
+    """The U14e render chemistry lives in the declaration: the window
+    display names (chemical shells -- the uncontracted basis counts
+    radial primitives), the fold shell sets (the (5,1) promoted
+    window folds 6s6p -- four pairs -- the (4,0) ones 6s6p7s), the
+    chemical filling note, and the primary-family suppression."""
+    spec = CAMPAIGN["U14e"]
+    assert spec.window_names["10f13d"] == "5f6d"
+    assert spec.window_names["10f13d7s"] == "5f6d7s"
+    assert spec.window_names["10f13d14p"] == "5f6d6p"
+    assert spec.fold_chemistry == {5: "6s6p7s", 4: "6s6p"}
+    assert spec.render_primary is False
+    assert spec.anchor_note.startswith("forced filling: 6s²6p⁶7s²")
+
+
+@fast
 def test_void_reason_voids_the_u14e_optimizer_class():
     """U14e's widened gate: the multi-solution class is void at the key
     on EVERY window (the primary included -- ``run_casscf=False``'s
