@@ -1,0 +1,138 @@
++ cd /home/kashpur/pylibgrpp/test/AtomTerm
++ export OMP_NUM_THREADS=64 OPENBLAS_NUM_THREADS=64 PYSCF_NUM_THREADS=64
++ OMP_NUM_THREADS=64
++ OPENBLAS_NUM_THREADS=64
++ PYSCF_NUM_THREADS=64
++ P=/home/kashpur/miniconda3/envs/pyscf/bin/python
++ for W in 10f13d 10f13d7s 10f13d14p
++ for M in casscf sa-casscf
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group planned --full --mask - --start ao --substrate pur --method casscf --window 10f13d
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d_4-0_casscf_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:634: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ for M in casscf sa-casscf
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group planned --full --mask - --start ao --substrate pur --method sa-casscf --window 10f13d
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:634: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ for W in 10f13d 10f13d7s 10f13d14p
++ for M in casscf sa-casscf
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group planned --full --mask - --start ao --substrate pur --method casscf --window 10f13d7s
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d7s_5-1_casscf_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:634: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ for M in casscf sa-casscf
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group planned --full --mask - --start ao --substrate pur --method sa-casscf --window 10f13d7s
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d7s_5-1_sa-casscf_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:634: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ for W in 10f13d 10f13d7s 10f13d14p
++ for M in casscf sa-casscf
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group planned --full --mask - --start ao --substrate pur --method casscf --window 10f13d14p
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d14p_4-0_casscf_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:634: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ for M in casscf sa-casscf
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group planned --full --mask - --start ao --substrate pur --method sa-casscf --window 10f13d14p
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d14p_4-0_sa-casscf_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:634: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group planned --start moc --method casci --window 10f13d14p
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d14p_4-0_casci_moc_-_pol_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/windows.py:705: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  core = occupied_core_idx(mf, ncore)
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:679: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  [cell] u14e_10f13d14p_4-0_casci_moc_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:657: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ for M in casscf sa-casscf
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group planned --full --mask - --start moc --method casscf --window 10f13d14p
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d14p_4-0_casscf_moc_-_pol_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/windows.py:705: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  core = occupied_core_idx(mf, ncore)
+  [cell] u14e_10f13d14p_4-0_casscf_moc_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:657: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ for M in casscf sa-casscf
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group planned --full --mask - --start moc --method sa-casscf --window 10f13d14p
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d14p_4-0_sa-casscf_moc_-_pol_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/windows.py:705: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  core = occupied_core_idx(mf, ncore)
+  [cell] u14e_10f13d14p_4-0_sa-casscf_moc_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:109: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:657: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ echo BATCH1-DONE
+BATCH1-DONE

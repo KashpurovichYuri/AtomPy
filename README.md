@@ -317,7 +317,19 @@ basin escape):
 
 - **start — MO / NO**: a different initial window gauge (canonical
   MO slice; the density-picked occupation groups) when the AO start
-  stalls or lands in a wrong basin;
+  stalls or lands in a wrong basin; on uncontracted bases MO names
+  the **character-selected** canonical columns (the SCF's own
+  valence + the virtual complement ranked by the named bands'
+  S-projection weight), and **window names are chemical shells** —
+  the uncontracted basis counts radial primitives, so one shell
+  spans several bands (U14e: 5f³ reads on 9f–11f, 6d¹ on 12d–14d,
+  7s² on 18s–19s, 6p⁶ on 13p–15p; the certificate lives in the
+  element's `logs/probe_bands.log`), and the fold column names the
+  fold's shells when the noble guess would lie (`fold_chemistry`:
+  U14e folds 6s6p7s / 6s6p, not Ne).  A band-named shell in a window
+  is its DOMINANT radial, not the whole shell -- the AO 5f6d7s
+  window's s radial is the compact band-7s function, not the
+  physical 7s orbital (the MO rows carry the true 7s column);
 - **mask — radial / frozen**: same-(l,member)-only rotations / a
   frozen window — to separate correlation hunger from window-identity
   drift when free optimization escapes;

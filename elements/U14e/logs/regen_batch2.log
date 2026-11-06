@@ -1,0 +1,29 @@
++ cd /home/kashpur/pylibgrpp/test/AtomTerm
++ export OMP_NUM_THREADS=64 OPENBLAS_NUM_THREADS=64 PYSCF_NUM_THREADS=64
++ OMP_NUM_THREADS=64
++ OPENBLAS_NUM_THREADS=64
++ PYSCF_NUM_THREADS=64
++ P=/home/kashpur/miniconda3/envs/pyscf/bin/python
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group lane
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d@6s6p7s_4-0_casci_ao_-_pur_avg
+  from-scratch D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
+lane substrate D2h ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d7s@6s6p_5-1_casci_ao_-_pur_avg
+  wrote elements/U14e/cells.json + cells.md
+
+done
++ /home/kashpur/miniconda3/envs/pyscf/bin/python scripts/regen_cells.py U14e --group route
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d@6s6p7s_4-0_casci_ao_-_pur_avg
+  from-scratch D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
+lane substrate D2h ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d7s@6s6p_5-1_casci_ao_-_pur_avg
+  [cell] u14e_10f13d@6s6p7s_4-0_casci_ao_-_pol_avg
+  [cell] u14e_10f13d@6s6p7s_4-0_casscf_ao_-_pol_avg
+  [cell] u14e_10f13d@6s6p7s_4-0_sa-casscf_ao_-_pol_avg
+  [cell] u14e_10f13d@6s6p7s_4-0_sa-casscf_ao_-_pur_avg

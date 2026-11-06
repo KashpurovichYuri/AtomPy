@@ -442,6 +442,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    anchor_note="forced filling: 6s²6p⁶7s² closed, "
                                "5f³6d¹ open",
                    render_primary=False,
+                   term=(8, "u"),
                    ref=ReferenceSpec(
                        occ_closed=("l0", "l1"), occ_open=("l2", "l3"),
                        occ_e_ref=-50.38185233,

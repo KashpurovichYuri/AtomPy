@@ -72,12 +72,34 @@ def lane_substrate(spec):
     """The pinned lane's D2h substrate: plain ROHF at tight tolerance
     (the certified lane construction's substrate; the reference
     spec's occupation forcing is deliberately NOT applied -- the lane
-    record was measured on the plain substrate)."""
+    record was measured on the plain substrate).  On atoms where the
+    from-scratch D2h SCF does not converge (U14e: plain DIIS
+    diverges -- the census record), the substrate retries C1-SEEDED:
+    the trusted reference MOs start the D2h SCF under the declared
+    accelerator with the character-forced occupations (the C1
+    density is D2h-symmetric, so the restriction reproduces the
+    reference energy exactly -- only the column gauge differs, and
+    the lane's AO fold construction is gauge-independent)."""
     mol = gto.M(atom=f"{spec.symbol} 0 0 0", basis=spec.basis,
                 spin=spec.spin, ecp=spec.ecp, symmetry="D2h", verbose=0)
     mf = scf.ROHF(mol)
     mf.conv_tol = 1e-12
     mf.kernel()
+    if not mf.converged and spec.ref is not None:
+        seed = Path("elements") / spec.key / "rungs" / "rohf.chk"
+        if seed.exists():
+            from atomterm.reference import _accelerated, _forced_rohf_occ
+            print(f"  from-scratch D2h SCF diverged -- retrying "
+                  f"C1-seeded ({seed})", flush=True)
+            m = scf.ROHF(mol)
+            m.conv_tol = 1e-12
+            m.get_occ = _forced_rohf_occ(mol, list(spec.ref.occ_closed),
+                                         list(spec.ref.occ_open))
+            _, rec = scf.chkfile.load_scf(str(seed))
+            m.mo_coeff = rec["mo_coeff"]
+            m.mo_occ = rec["mo_occ"]
+            m.mo_energy = rec["mo_energy"]
+            mf = _accelerated(m, spec.ref)
     if not mf.converged:
         sys.exit(f"the lane substrate SCF did not converge "
                  f"({spec.symbol}, D2h)")
