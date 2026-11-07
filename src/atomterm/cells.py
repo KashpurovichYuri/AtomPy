@@ -1201,7 +1201,8 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     # form M = -i Lz; H through the C contraction boundary on the
     # readout window's own feed (:func:`_apply_family` is the ONE
     # construction -- built once above, shared with the meters).
-    res_lz = 0.0    for w in w_all:
+    res_lz = 0.0
+    for w in w_all:
         r = apply_h(apply_m(w)) - apply_m(apply_h(w))
         res_lz = max(res_lz, float(np.linalg.norm(r)))
     # the L2 residual: L2 carries a two-body part, so its closure pays
