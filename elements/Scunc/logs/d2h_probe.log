@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "<string>", line 39, in <module>
+AttributeError: module 'pyscf.scf.addons' has no attribute 'symmetrize_space'
+===== Scunc: trusted C1 reference E = -759.73738486
+  A plain D2h       : E = -759.73708452 conv=True closed=10
+    open mo[10] irrep B2g dom 7dxz    e=-0.052355
+  B seeded raw MOs  : E = -759.73708452 conv=True closed=10
+    open mo[10] irrep B2g dom 7dxz    e=-0.052355
+===== Scunc: trusted C1 reference E = -759.73738486
+  the seed open MOs -> irreps [(10, np.str_('B2g'))]
+  C seeded SYMM MOs : E = -759.55477380 conv=True closed=10
+    open mo[10] irrep B1u dom 17pz    e=-0.025005
+  B seeded raw MOs  : E = -759.73708452 conv=True closed=10
+    open mo[10] irrep B2g dom 7dxz    e=-0.052355
+  (reference energy gap check: sym-seed vs trusted = +182.611 mEh)
+===== Tiunc: trusted C1 reference E = -848.40648875
+  the seed open MOs -> irreps [(10, np.str_('Ag')), (11, np.str_('B1g'))]
+  C seeded SYMM MOs : E = -848.31241103 conv=True closed=10
+    open mo[10] irrep Ag  dom 19s     e=-0.083534
+    open mo[11] irrep B1g dom 8dxy    e=+0.007950
+  B seeded raw MOs  : E = -848.40744343 conv=True closed=10
+    open mo[10] irrep Ag  dom 8dz^2   e=-0.090219
+    open mo[11] irrep B1g dom 8dxy    e=-0.090219
+  (reference energy gap check: sym-seed vs trusted = +94.078 mEh)
+Scunc trusted C1: open MOs [np.int64(10)] energies ['-0.052228']
+Tiunc trusted C1: open MOs [np.int64(10), np.int64(11)] energies ['-0.092628', '-0.092628']
+Scunc: D2h solution E = -759.73708452
+  reverse-seeded C1 Newton: E = -759.73708452 conv=True open=[np.int64(10)] dom 7dxz
+Tiunc: D2h solution E = -848.40744343
+  reverse-seeded C1 Newton: E = -848.40744343 conv=True open=[np.int64(10), np.int64(11)] dom 8dz^2
+Tiunc span-symmetrized seed: E = -848.28679562 open irreps [np.str_('Ag'), np.str_('B3u')] energies ['-0.139304', '-0.038033']

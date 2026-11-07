@@ -71,17 +71,26 @@ from atomterm.windows import (realized_patterns,  # noqa: E402
 
 def lane_substrate(spec):
     """The pinned lane's D2h substrate: plain ROHF at tight tolerance,
-    CONSISTENT with the case's trusted reference.  The from-scratch
-    D2h draw is basin-chaotic -- the same multi-basin the reference
-    layer gates -- so when the trusted ``rungs/rohf.chk`` exists the
-    plain energy is verified against it and a disagreement past 1e-5
-    Eh (or a divergence) retries the D2h SCF C1-SEEDED from the
-    reference MOs, under the reference's forced occupations when it
-    declares them: the reference density is D2h-symmetric, so the
-    restriction reproduces the reference energy exactly -- only the
-    column gauge differs, and the lane's AO fold construction is
-    gauge-independent.  Cached lane cells never re-run (the
-    certified records stand); the rule governs fresh legs."""
+    steered to the case's trusted reference basin.  The D2h landscape
+    is the SAME multi-basin zoo as the spherical one (measured:
+    same-filling stationary points at the 0.3-11 mEh scale, each
+    reverse-seed-stable on C1; the plain D2h draw itself has landed
+    the aufbau runaway on one atom and the intended basin on its
+    twin), so when the trusted ``rungs/rohf.chk`` exists the plain
+    energy is verified against it and a disagreement past 1e-5 Eh
+    (or a divergence) retries the D2h SCF C1-SEEDED from the
+    reference MOs -- the seed steers the OCCUPATION basin; the
+    solver's irrep-blocked diagonals then land the D2h-canonical
+    solution in it (its own energy, NOT the seed's: the restriction
+    draws its own stationary point, sometimes deeper than the
+    trusted record).  Never symmetrize the seed first: both
+    symmetrizers damage degenerate-gauge seeds (the per-orbital one
+    amputates the open MO; the span-mixing one scrambles the
+    occupation-column pairing -- measured in the d2h probe log).
+    Benign for the lanes: their certificates are basin-blind (the
+    fold is the span's own Roothaan).  Cached lane cells never
+    re-run (the certified records stand); the rule governs fresh
+    legs."""
     mol = gto.M(atom=f"{spec.symbol} 0 0 0", basis=spec.basis,
                 spin=spec.spin, ecp=spec.ecp, symmetry="D2h", verbose=0)
     mf = scf.ROHF(mol)

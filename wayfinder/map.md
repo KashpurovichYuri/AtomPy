@@ -20,6 +20,28 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- The D2h substrate layer, UNDERSTOOD (2026-11-07, the user-directed
+  probe -- elements/Scunc/logs/d2h_probe.log is the record):
+  (1) the D2h ROHF landscape is the SAME multi-basin zoo as C1 --
+  same-filling stationary points at the 0.3-11 mEh scale, each
+  reverse-seed-stable on C1 (the D2h solutions are genuine C1
+  stationary points, not symmetry artifacts); (2) the seed's job is
+  the OCCUPATION basin only -- the solver's irrep-blocked diagonals
+  erase the gauge and land the D2h-canonical solution (Scunc: plain
+  and seeded land IDENTICALLY); (3) NEVER symmetrize a degenerate-
+  gauge seed: pyscf.symm.symmetrize_orb AMPUTATES the open MO
+  (measured: the open d became a pz, +183 mEh) and symmetrize_space
+  scrambles the occupation-column pairing (measured: the runaway
+  class) -- the user's MO-selection-by-irreps hypothesis evaluated
+  and declined ON THE SEED SIDE; the solver already irrep-adapts;
+  (4) the Tiunc basin zoo now has three same-filling members:
+  -848.39639 (the plain D2h draw), -848.40648875 (the trusted
+  record), and -848.40744343 (the seeded-D2h draw, the DEEPEST
+  known, open pair degenerate at -0.090219) -- the trusted reference
+  is NOT certified-global, it is certified-REPRODUCIBLE; promoting
+  the deeper basin is a user decision (the free cells would shift
+  ~1 mEh uniformly; the compressed cells are minutes to re-run).
+  Scunc: the trusted record is already the deeper of its two.
 - The lane substrate's D2h basin wander (2026-11-07, the compressed
   round): the from-scratch plain D2h draw is basin-chaotic (the
   contracted Ti's plain D2h lands the RUNAWAY -848.2834 while Sc's
@@ -37,6 +59,9 @@ user decision; the partial verdict 91/91-isolation-green).
   these atoms -- the follow-ups: the substrate filling check, the
   Newton-stays-in-basin question, and whether -848.4074 is a real
   deeper basin (then the SEEDED reference itself re-derives).
+  [Superseded by the probe above: the filling IS 3d2 4s2 (verified),
+  the -848.4074 basin IS real (reverse-seed-stable), and the
+  docstring now states the measured truth.]
 - The Ti multi-basin finding (2026-11-07, the consistency probe):
   the Ti 3d2 4s2 ROHF hosts SAME-FILLING basins 11 mEh apart on the
   CONTRACTED basis itself (the record's gated -848.40648875 vs an
