@@ -70,33 +70,42 @@ from atomterm.windows import (realized_patterns,  # noqa: E402
 
 
 def lane_substrate(spec):
-    """The pinned lane's D2h substrate: plain ROHF at tight tolerance
-    (the certified lane construction's substrate; the reference
-    spec's occupation forcing is deliberately NOT applied -- the lane
-    record was measured on the plain substrate).  On atoms where the
-    from-scratch D2h SCF does not converge (U14e: plain DIIS
-    diverges -- the census record), the substrate retries C1-SEEDED:
-    the trusted reference MOs start the D2h SCF under the declared
-    accelerator with the character-forced occupations (the C1
-    density is D2h-symmetric, so the restriction reproduces the
-    reference energy exactly -- only the column gauge differs, and
-    the lane's AO fold construction is gauge-independent)."""
+    """The pinned lane's D2h substrate: plain ROHF at tight tolerance,
+    CONSISTENT with the case's trusted reference.  The from-scratch
+    D2h draw is basin-chaotic -- the same multi-basin the reference
+    layer gates -- so when the trusted ``rungs/rohf.chk`` exists the
+    plain energy is verified against it and a disagreement past 1e-5
+    Eh (or a divergence) retries the D2h SCF C1-SEEDED from the
+    reference MOs, under the reference's forced occupations when it
+    declares them: the reference density is D2h-symmetric, so the
+    restriction reproduces the reference energy exactly -- only the
+    column gauge differs, and the lane's AO fold construction is
+    gauge-independent.  Cached lane cells never re-run (the
+    certified records stand); the rule governs fresh legs."""
     mol = gto.M(atom=f"{spec.symbol} 0 0 0", basis=spec.basis,
                 spin=spec.spin, ecp=spec.ecp, symmetry="D2h", verbose=0)
     mf = scf.ROHF(mol)
     mf.conv_tol = 1e-12
     mf.kernel()
-    if not mf.converged and spec.ref is not None:
-        seed = Path("elements") / spec.key / "rungs" / "rohf.chk"
-        if seed.exists():
+    seed = Path("elements") / spec.key / "rungs" / "rohf.chk"
+    rec = None
+    if seed.exists():
+        _, rec = scf.chkfile.load_scf(str(seed))
+    if (not mf.converged or (rec is not None
+                             and abs(mf.e_tot - rec["e_tot"]) > 1e-5)):
+        if rec is not None:
+            why = ("diverged" if not mf.converged else
+                   f"a wrong basin ({mf.e_tot:.8f} vs the trusted "
+                   f"{float(rec['e_tot']):.8f})")
+            print(f"  plain D2h SCF {why} -- retrying C1-seeded "
+                  f"({seed})", flush=True)
             from atomterm.reference import _accelerated, _forced_rohf_occ
-            print(f"  from-scratch D2h SCF diverged -- retrying "
-                  f"C1-seeded ({seed})", flush=True)
             m = scf.ROHF(mol)
             m.conv_tol = 1e-12
-            m.get_occ = _forced_rohf_occ(mol, list(spec.ref.occ_closed),
-                                         list(spec.ref.occ_open))
-            _, rec = scf.chkfile.load_scf(str(seed))
+            if spec.ref is not None and spec.ref.occ_closed is not None:
+                m.get_occ = _forced_rohf_occ(
+                    mol, list(spec.ref.occ_closed),
+                    list(spec.ref.occ_open))
             m.mo_coeff = rec["mo_coeff"]
             m.mo_occ = rec["mo_occ"]
             m.mo_energy = rec["mo_energy"]
@@ -339,17 +348,20 @@ def main() -> None:
                     cells[key.address] = run_lane_cell(
                         key, lane_sub[0], lane_sub[1], spec.term,
                         fresh=args.fresh, shell_bands=spec.shell_bands,
+                        shell_radials=spec.shell_radials,
                         workdir="elements")
                 else:
                     facts = run_cell(key, mf, frac_mf=mf_f,
                                      fresh=args.fresh, workdir="elements",
                                      shell_bands=spec.shell_bands,
+                                     shell_radials=spec.shell_radials,
                                      budgets={"sa_weights":
                                               spec.sa_weights})
                     cells[key.address] = (
                         cell_payload(key, facts) if facts is not None
                         else kernel_cell_payload(key, mol, mf,
-                                                 shell_bands=spec.shell_bands))
+                                                 shell_bands=spec.shell_bands,
+                                                 shell_radials=spec.shell_radials))
             # the store writes PER ENTRY -- run and void alike (a void
             # entry that never wrote would vanish from the merge chain:
             # the next run loads a store without it): a kill mid-group

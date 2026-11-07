@@ -72,6 +72,8 @@ __all__ = [
     "select_span",
     "shell_realization",
     "realized_patterns",
+    "compressed_ncas",
+    "window_compressed",
     "primitive_chain",
     "select_primitives",
     "fold_shells",
@@ -550,6 +552,242 @@ def realized_patterns(patterns, layer: dict | None = None) -> list[str]:
     ['12d', '13d', '4s']
     """
     return [b for p in patterns for b in shell_realization(p, layer)]
+
+
+def compressed_ncas(patterns, radials) -> int:
+    """The column count of a compressed window declaration: the
+    summed ``k * (2l+1)`` over the pattern shells.
+
+    The counting rule of :func:`window_compressed` without building
+    the columns (the analysis fallbacks and the table renderers count;
+    the run builds).
+
+    Raises
+    ------
+    ValueError
+        A pattern shell absent from ``radials`` (the compression is
+        declared per shell; a mixed compressed/raw window is not a
+        construct this module offers).
+
+    Examples
+    --------
+    >>> compressed_ncas(["3d", "4s"], {"3d": 1, "4s": 1})
+    6
+    """
+    undeclared = [p for p in patterns if p not in radials]
+    if undeclared:
+        raise ValueError(
+            f"the compression is undeclared for {undeclared} -- every "
+            "window shell carries its k (a mixed compressed/raw "
+            "window is not a construct this module offers)")
+    return sum(radials[p] * (2 * "spdfgh".index(p[-1]) + 1)
+               for p in patterns)
+
+
+def window_compressed(mol, c_ref, s, patterns, layer=None, radials=None,
+                      dominance: float = 0.5, tail: float = 1e-8):
+    """The COMPRESSED-SHELL window: each chemical shell as its best k
+    reference radials x (2l+1) members -- the chemically-sized window
+    on a multi-band realization.
+
+    The problem it solves: on an uncontracted (or multi-zeta) basis a
+    shell's declared realization spans many primitive bands, and a
+    raw AO window over the family counts every band -- the CAS label
+    stops speaking chemistry.  The compression takes the span down to
+    the k radial directions the reference's own occupied MOs carry
+    (the radial the SCF actually uses -- the uncontracted analog of
+    one contraction), replicated on every m-member: m-complete by
+    construction at every k, the same member-resolved radial Gram
+    logic the purified core span uses
+    (:func:`atomterm.core.purified_core_orbitals`).
+
+    Parameters
+    ----------
+    mol : the built Mole (the shell walker's substrate).
+    c_ref : ``(nao, n)`` the reference's OCCUPIED MO columns -- the
+        radial signal (the shell-dominated subset is selected here).
+    s : ``(nao, nao)`` the overlap metric.
+    patterns : the window's chemical shell names, in slot order.
+    layer : the declared realization mapping (shell -> band tuple),
+        :func:`shell_realization`; the FOLD keeps reading the same
+        layer at full family width -- the compression is a
+        window-side choice only.
+    radials : the declared compression depth, shell -> k.  Every
+        pattern shell must declare one.
+    dominance : the minimum SPAN-projection weight a reference
+        column must carry to count as the shell's radial signal (the
+        shell's own MO, selected among the occupied columns).  The
+        default is permissive by measurement: on a multi-band
+        realization the ns valence MO projects ~0.85 on its family
+        (its orthogonality nodes live partly on the inner same-l
+        families' rows) while every foreign MO sits far below -- the
+        identifiability is the gap, not the absolute height.
+    tail : the discarded Gram spectrum must sit below this fraction
+        of the leading eigenvalue -- the certificate that the
+        reference carries k radials and the rest is tail.
+
+    Returns
+    -------
+    ``(columns, report)`` : the ``(nao, sum_k k*(2l+1))``
+    S-orthonormal window columns (radial-major: each radial's full
+    m-set adjacent), and the per-shell report (bands, dominated
+    columns, their span weights and capture, the Gram spectrum) --
+    the composition log's compression entry.
+
+    Raises
+    ------
+    ValueError
+        ``radials`` is None; a pattern shell undeclared; a declared
+        band absent from the basis; a shell with no dominated
+        reference column (a virtual window shell has no occupied
+        radial signal to compress); member chains whose overlap
+        blocks differ (the construction's symmetry premise); the
+        kept spectrum at/below ``tail`` (k exceeds the radial
+        signal) or the discarded spectrum above it (k would discard
+        signal); an assembled window that is not S-orthonormal
+        (same-l shell blocks overlap -- the member-preserving
+        cross-shell treatment is a future seam).
+
+    Notes
+    -----
+    Different-(l, m) sectors never overlap, so each member's k
+    columns are S-orthonormal against every other member's and every
+    different-l shell's: the assembled window is S-orthonormal
+    without further treatment, and its span is rotation-closed
+    (member-complete per radial) whatever the capture -- the capture
+    certificate is a quality reading, never a symmetry one.  The
+    honest reading is capture <= band weight: the discarded radials
+    are gone by declaration.
+
+    Examples
+    --------
+    On a 1:1 realization (one band per shell, the contracted-basis
+    behavior) k=1 reproduces the shell's own m-set: the compressed
+    window IS the label-selected one.
+    """
+    if radials is None:
+        raise ValueError(
+            "radials is None -- the uncompressed window is "
+            "select_valence_ao's business (realized_patterns -> rows)")
+    undeclared = [p for p in patterns if p not in radials]
+    if undeclared:
+        raise ValueError(
+            f"the compression is undeclared for {undeclared} -- every "
+            "window shell carries its k")
+    labels = [line.split()[-1] for line in mol.ao_labels()]
+    n = mol.nao_nr()
+    blocks: list[np.ndarray] = []
+    report: dict[str, dict] = {}
+    for shell in patterns:
+        k = radials[shell]
+        if k < 1:
+            raise ValueError(f"shell {shell!r}: k must be >= 1")
+        bands = shell_realization(shell, layer)
+        l = "spdfgh".index(shell[-1])
+        M = 2 * l + 1
+        # the member chains: per member m, the shell's band rows in
+        # DECLARED band order (one fixed radial-basis order; every
+        # member must share it) -- through the shell walker, never
+        # label lists (fused shells)
+        band_member: dict[str, dict[int, list[int]]] = {b: {} for b in bands}
+        for _ib, sl, _c, rows in shell_slots(mol):
+            if sl != l:
+                continue
+            name = labels[rows[0]]
+            name = name[: name.index(shell[-1]) + 1]
+            if name in band_member:
+                for m, r in enumerate(rows):
+                    band_member[name].setdefault(m, []).append(r)
+        absent = [b for b in bands if not band_member[b]]
+        if absent:
+            raise ValueError(
+                f"the basis has no band(s) {absent} -- the declared "
+                f"realization of shell {shell!r}")
+        chain = [[r for b in bands for r in band_member[b][m]]
+                 for m in range(M)]
+        s_r = s[np.ix_(chain[0], chain[0])]
+        for m in range(1, M):
+            if not np.allclose(s[np.ix_(chain[m], chain[m])], s_r,
+                               atol=1e-10):
+                raise ValueError(
+                    f"shell {shell!r}: the member chains' overlap "
+                    "blocks differ -- the member replication premise "
+                    "(a spherical one-center basis) is broken")
+        # the dominated reference columns: the S-orthogonal
+        # projection weight on the shell's family SPAN (bounded [0,1]
+        # -- a raw row-block weight is not: same-l families share the
+        # l-chain, and a truncated quadratic form overshoots on the
+        # node tails)
+        rows_flat = sorted(r for m in range(M) for r in chain[m])
+        p = span_projector(s, rows_flat)
+        norm = np.einsum("ai,ab,bi->i", c_ref, s, c_ref).real
+        w = (np.einsum("ai,ab,bi->i", c_ref, p, c_ref).real / norm)
+        dominated = np.flatnonzero(w >= dominance)
+        if dominated.size == 0:
+            raise ValueError(
+                f"shell {shell!r}: no reference column carries "
+                f">={dominance} S-weight on its bands {list(bands)} "
+                f"(best {w.max():.4f}) -- no occupied radial signal "
+                "to compress (a virtual shell cannot be compressed "
+                "from the reference)")
+        # the member-resolved radial Gram: R = [C^0 C^1 ... C^{M-1}],
+        # the dominated columns' rows on each member chain
+        R = np.hstack([c_ref[chain[m], :][:, dominated] for m in range(M)])
+        G = R.conj().T @ (s_r @ R)
+        lam, Q = np.linalg.eigh(G)
+        lam, Q = lam[::-1].real, Q[:, ::-1]
+        if lam[0] <= 0:
+            raise ValueError(
+                f"shell {shell!r}: the dominated Gram is numerically "
+                f"zero (leading eigenvalue {lam[0]:.2e})")
+        if lam[k - 1] <= tail * lam[0]:
+            raise ValueError(
+                f"shell {shell!r}: the declared k={k} exceeds the "
+                f"radial signal -- the k-th Gram eigenvalue "
+                f"{lam[k - 1]:.2e} is tail against the leading "
+                f"{lam[0]:.6f} (the reference carries fewer radials "
+                "than declared; lower k)")
+        if k < len(lam) and lam[k] > tail * lam[0]:
+            raise ValueError(
+                f"shell {shell!r}: the discarded spectrum is NOT tail "
+                f"-- eigenvalue {k} reads {lam[k]:.6f} against the "
+                f"leading {lam[0]:.6f} (tail fraction {tail}); the "
+                "compression would discard signal -- raise k")
+        E = R @ Q[:, :k] @ np.diag(lam[:k] ** -0.5)   # S_r-orthonormal
+        # member replication, radial-major: each radial's full m-set
+        # adjacent (k=1 reads exactly like a label-selected m-set)
+        block = np.zeros((n, k * M))
+        col = 0
+        for j in range(k):
+            for m in range(M):
+                block[chain[m], col] = E[:, j]
+                col += 1
+        # the capture certificate: each dominated column's
+        # S-projection on the compressed span
+        cross = block.T @ (s @ c_ref[:, dominated])
+        capture = (np.einsum("ij,ij->j", cross, cross).real
+                   / norm[dominated])
+        blocks.append(block)
+        report[shell] = {
+            "bands": list(bands), "k": k,
+            "dominated": dominated.tolist(),
+            "span_weight": w[dominated].round(4).tolist(),
+            "capture": capture.round(6).tolist(),
+            "spectrum": lam.round(6).tolist(),
+        }
+    columns = np.hstack(blocks)
+    # the assembled certificate: sector orthogonality should make it
+    # exact; same-l shell overlap is the undeclared case
+    err = np.abs(columns.T @ s @ columns
+                 - np.eye(columns.shape[1])).max()
+    if err > 1e-9:
+        raise ValueError(
+            f"the assembled compressed window is not S-orthonormal "
+            f"(max deviation {err:.2e}) -- same-l shell blocks "
+            "overlap; the member-preserving cross-shell "
+            "orthogonalization is a future seam")
+    return columns, report
+
 
 # which noble core ends at n p -- the semi rule's starting prefix per
 # open-d period (3d -> ar, 4d -> kr, ...)

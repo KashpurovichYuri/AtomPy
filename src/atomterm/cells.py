@@ -559,8 +559,52 @@ def _key_core(key: CellKey, mol, mf,
     return ncore, (c_run if c_run is not None else c_pur), c_pur
 
 
+def _window_columns(key, mol, mf, shell_bands, shell_radials):
+    """The window object ``build_full_mo`` consumes: the raw AO rows,
+    or the compressed-shell columns when the case declares radials --
+    ONE resolution shared by the free run, the pinned lane, and the
+    NO-start source window (start-independent by the same rule as the
+    frozen masks: the compression is the case's WINDOW DEFINITION, the
+    mo/moc starts express their own gauge within its width).  Prints
+    the compression report (the composition log's entry).
+
+    Returns ``(act, ncas)``: row indices, or S-orthonormal columns
+    (:func:`atomterm.windows.window_compressed` -- the dominated-MO
+    signal is the OCCUPIED reference block).
+    """
+    from atomterm.windows import (realized_patterns, select_valence_ao,
+                                  window_compressed)
+
+    act = select_valence_ao(
+        mol, realized_patterns(key.shell_patterns, shell_bands))
+    if shell_radials is None:
+        return act, len(act)
+    c_occ = mf.mo_coeff[:, np.asarray(mf.mo_occ) > 0]
+    act, report = window_compressed(
+        mol, c_occ, mf.get_ovlp(), key.shell_patterns,
+        shell_bands, shell_radials)
+    print("  [window] compressed " + "; ".join(
+        f"{sh}: k={r['k']} of {len(r['bands'])} bands, "
+        f"capture {min(r['capture']):.4f}-{max(r['capture']):.4f}"
+        for sh, r in report.items()), flush=True)
+    return act, act.shape[1]
+
+
+def _window_ncas(key, mol, shell_bands, shell_radials) -> int:
+    """The stored-absent ``ncas`` fallback: the compressed width when
+    the case declares radials, else the raw band-row count."""
+    from atomterm.windows import (compressed_ncas, realized_patterns,
+                                  select_valence_ao)
+
+    if shell_radials is not None:
+        return compressed_ncas(key.shell_patterns, shell_radials)
+    return len(select_valence_ao(
+        mol, realized_patterns(key.shell_patterns, shell_bands)))
+
+
 def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
              fresh: bool = False, shell_bands: dict | None = None,
+             shell_radials: dict | None = None,
              workdir: str | Path = "elements") -> "StageFacts | None":
     """Execute one cell: resolve every axis through its OWNER, run,
     store, analyze. The unit of the run queue.
@@ -598,6 +642,14 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         (:attr:`atomterm.cases.CaseSpec.shell_bands`) -- chemical
         shells resolve to their declared AO bands through it (None =
         the 1:1 identity, the contracted-basis behavior).
+    shell_radials : the case's declared WINDOW compression
+        (:attr:`atomterm.cases.CaseSpec.shell_radials`; None = the
+        raw band rows).  Start-independent: the ao/no starts carry
+        the compressed columns, the mo/moc starts their own canonical
+        gauge at the compressed width.  Undeclared combinations fail
+        fast: the frac fold and the radial mask have no compressed
+        meaning (the fractional reference's open shell and the
+        member-labeled radial substrate are row-space constructs).
     workdir : the store root (``<workdir>/<Atom>/rungs/``).
 
     Returns
@@ -641,13 +693,18 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     from atomterm.windows import (build_full_mo, canonical_order,
                                   occupied_core_idx, radial_basis,
                                   mask_radial_rotations, realized_patterns,
-                                  select_valence_ao, select_valence_mo)
+                                  select_valence_mo)
 
     na, nb = key.sector
+    if shell_radials is not None and (key.fold == "frac"
+                                      or key.mask == "radial"):
+        raise ValueError(
+            f"{key.address}: the compressed window is undeclared for "
+            f"fold={key.fold}, mask={key.mask} -- the fractional "
+            "reference's open shell and the member-labeled radial "
+            "substrate are row-space constructs")
     ncore, c_core, c_pur = _key_core(key, mol, mf, shell_bands)
-    act_idx = select_valence_ao(
-        mol, realized_patterns(key.shell_patterns, shell_bands))
-    ncas = len(act_idx)
+    act, ncas = _window_columns(key, mol, mf, shell_bands, shell_radials)
 
     # start x mask -> the substrate MO matrix + the optimizer mask.
     # frozen/virtmix are START-INDEPENDENT (they pin the window columns
@@ -661,7 +718,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         # density was m-scalar -- natural.no_group_windows verifies)
         from atomterm.natural import no_group_windows
 
-        mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act_idx,
+        mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act,
                                c_core=c_pur)
         c_src = mo_src[:, ncore:ncore + ncas]
         wins = no_group_windows(mol, mf, ncore, c_src, na, nb,
@@ -676,10 +733,10 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                     else occupied_core_idx(mf, ncore))
         if key.mask == "radial":
             mo_full, labels = radial_basis(
-                mf, core_idx, act_idx, c_core=c_core)
+                mf, core_idx, act, c_core=c_core)
             mask = mask_radial_rotations(labels, ncore, ncas)
         else:
-            mo_full = build_full_mo(mf, core_idx, act_idx, c_core=c_core)
+            mo_full = build_full_mo(mf, core_idx, act, c_core=c_core)
     elif key.start == "moc":
         # the character-selected valence window
         # (:func:`windows.select_valence_mo`: the SCF's own valence +
@@ -776,6 +833,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
 # analysis + persistence ---------------------------------------------
 
 def analyze_cell(key: CellKey, mol, mf, shell_bands: dict | None = None,
+                 shell_radials: dict | None = None,
                  workdir: str | Path = "elements"):
     """Re-analyze a stored cell (load + one facts pass) -- no mol/mf-bound
     optimizer re-run, no re-solving. The two-function lean: loading is
@@ -789,7 +847,6 @@ def analyze_cell(key: CellKey, mol, mf, shell_bands: dict | None = None,
     trusted cached stage).
     """
     from atomterm.casscf import CASResult
-    from atomterm.windows import realized_patterns, select_valence_ao
 
     data = load_cell(key, workdir)
     cas = CASResult(data.energies, data.ci, data.mo_coeff,
@@ -797,8 +854,7 @@ def analyze_cell(key: CellKey, mol, mf, shell_bands: dict | None = None,
                     cycles=data.cycles or None,
                     conv_dE=data.conv_dE)
     na, nb = key.sector
-    ncas = data.ncas or len(select_valence_ao(
-        mol, realized_patterns(key.shell_patterns, shell_bands)))
+    ncas = data.ncas or _window_ncas(key, mol, shell_bands, shell_radials)
     if sector_dimension(ncas, na, nb) > _COMM_CAP:
         return None
     ncore, c_core, _ = _key_core(key, mol, mf, shell_bands)
@@ -837,6 +893,7 @@ def _apply_family(mol, mf, c_win, parts, ncore, c_core, ncas, na, nb):
 
 def kernel_cell_payload(key: CellKey, mol=None, mf=None,
                         shell_bands: dict | None = None,
+                        shell_radials: dict | None = None,
                         workdir: str | Path = "elements") -> dict:
     """The kernel-only payload of a big-sector cell (run_cell returns
     None past the dense-meter budget): the run's own energies from the
@@ -871,12 +928,10 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
         return out
     from atomterm.operators import (build_operator_parts,
                                     ci_in_detbasis_order, window_closure)
-    from atomterm.windows import realized_patterns, select_valence_ao
 
     na, nb = key.sector
     ncore, c_core, _ = _key_core(key, mol, mf, shell_bands)
-    ncas = data.ncas or len(select_valence_ao(
-        mol, realized_patterns(key.shell_patterns, shell_bands)))
+    ncas = data.ncas or _window_ncas(key, mol, shell_bands, shell_radials)
     c_act = np.asarray(data.mo_coeff)[:, ncore:ncore + ncas]
     parts = build_operator_parts(mol, mf, c_act, ncore, na, nb,
                                  c_core=c_core)
@@ -986,6 +1041,7 @@ def _root_vectors(ci):
 def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
                   anchor: bool = False, fresh: bool = False, verbose: int = 0,
                   shell_bands: dict | None = None,
+                  shell_radials: dict | None = None,
                   workdir: str | Path = "elements") -> dict:
     """Run one pinned-lane cell: the CAS ladder's UNIFORM construction.
     The fold resolves through the shell layer to its raw AO-shell span
@@ -1022,6 +1078,10 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     fresh : ignore a stored payload and re-run.
     shell_bands : the case's declared shell layer (chemical shell ->
         its AO bands; None = the 1:1 identity).
+    shell_radials : the case's declared WINDOW compression
+        (:attr:`atomterm.cases.CaseSpec.shell_radials`; None = the raw
+        band rows) -- the pinned term readout at the chemically-sized
+        window; the FOLD stays at full family width either way.
     verbose : print each block as it solves.
     workdir : the store root.
 
@@ -1061,8 +1121,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
                                     ci_in_detbasis_order,
                                     window_closure)
     from atomterm.detbasis import sector_dimension, slater_condon_matrix
-    from atomterm.windows import (build_full_mo, realized_patterns,
-                                  select_valence_ao)
+    from atomterm.windows import build_full_mo
 
     if (key.method, key.start, key.mask, key.substrate,
             key.fold) not in (("casci", "ao", None, "pur", "avg"),
@@ -1078,11 +1137,9 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     L, parity = term
     na, nb = key.sector
     fold, nf, c_core, core_report = _fold_core(key, mol, mf, shell_bands)
-    rows = select_valence_ao(
-        mol, realized_patterns(key.shell_patterns, shell_bands))
-    mo = build_full_mo(mf, list(range(nf)), rows, c_core=c_core)
-    c = mo[:, nf:nf + len(rows)]
-    ncas = c.shape[1]
+    act, ncas = _window_columns(key, mol, mf, shell_bands, shell_radials)
+    mo = build_full_mo(mf, list(range(nf)), act, c_core=c_core)
+    c = mo[:, nf:nf + ncas]
 
     # the kernel half: the pinned solvers live in the evaluator (one
     # per branch component, multiplicity as nroots) -- SA returns the

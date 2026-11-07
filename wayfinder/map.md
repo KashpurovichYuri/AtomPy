@@ -20,6 +20,23 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- The lane substrate's D2h basin wander (2026-11-07, the compressed
+  round): the from-scratch plain D2h draw is basin-chaotic (the
+  contracted Ti's plain D2h lands the RUNAWAY -848.2834 while Sc's
+  hits its reference exactly) -- lane_substrate now VERIFIES the
+  plain energy against the trusted rungs/rohf.chk and retries
+  C1-seeded on disagreement past 1e-5.  But the SEEDED D2h run does
+  NOT pin the seed's basin either: under DIIS it slides to its own
+  solution (measured: Scunc -759.73708 vs the seed -759.73738;
+  Tiunc -848.40744, one mEh BELOW the trusted reference -- possibly
+  a deeper 3d2 4s2 basin than the census record's, filling
+  unverified).  Benign for the lanes (their certificates are
+  basin-blind: the fold is the span's own Roothaan; the compressed
+  twins validated EXACTLY, ptp e-15 class) but the docstring's
+  "reproduces the reference energy exactly" is measured FALSE on
+  these atoms -- the follow-ups: the substrate filling check, the
+  Newton-stays-in-basin question, and whether -848.4074 is a real
+  deeper basin (then the SEEDED reference itself re-derives).
 - The Ti multi-basin finding (2026-11-07, the consistency probe):
   the Ti 3d2 4s2 ROHF hosts SAME-FILLING basins 11 mEh apart on the
   CONTRACTED basis itself (the record's gated -848.40648875 vs an

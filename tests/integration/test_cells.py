@@ -881,12 +881,20 @@ def test_unc_lanes_load_exact_from_the_store():
     near-degenerate skips -- the branch the live runs exercised)."""
     from atomterm.cells import load_lane_cell
 
+    # the compressed twins' sectors are tiny -- the dense adjudication
+    # eigen-solves every block and the pinned solver agrees to the
+    # machine floor (observed: 8.9e-16 / 2.2e-15, no corrections);
+    # U14e's 17-component lane is the live-skip class (the recorded
+    # correction's deviation, observed 3.0e-14 ptp era: > 1e-3)
     cases = (
-        ("Scunc", "scunc_3d4s@ar_2-1_casci_ao_-_pur_avg", 6.0, 0.75, 9),
-        ("Tiunc", "tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg", 12.0, 2.0, 9),
-        ("U14e", "u14e_5f6d@6s6p7s_4-0_casci_ao_-_pur_avg", 72.0, 6.0, 5),
+        ("Scunc", "scunc_3d4s@ar_2-1_casci_ao_-_pur_avg", 6.0, 0.75, 9,
+         "exact"),
+        ("Tiunc", "tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg", 12.0, 2.0, 9,
+         "exact"),
+        ("U14e", "u14e_5f6d@6s6p7s_4-0_casci_ao_-_pur_avg", 72.0, 6.0, 5,
+         "skip"),
     )
-    for key_token, addr, l2, s2, pairs in cases:
+    for key_token, addr, l2, s2, pairs, cls in cases:
         p = load_lane_cell(CellKey.from_address(addr))
         assert p["core_pairs"] == pairs               # the chemistry
         assert p["core_comm"] < 1e-9                   # the Roothaan
@@ -896,8 +904,12 @@ def test_unc_lanes_load_exact_from_the_store():
         for v in p["s2"]:
             assert abs(v - s2) < 1e-8
         assert 0.0 <= p["res_h_lz"] < 1e-8
-        assert p["anchor_corrected"]                    # the live skip
-        assert p["anchor_dev"] > 1e-3                   # honestly recorded
+        if cls == "exact":
+            assert p["anchor_dev"] < 1e-12
+            assert not p["anchor_corrected"]
+        else:
+            assert p["anchor_corrected"]                # the live skip
+            assert p["anchor_dev"] > 1e-3               # honestly recorded
 
 
 @slow
@@ -1056,7 +1068,9 @@ def test_ladder_anchors_lead_and_families_follow():
     assert cells_uhf[0] == "UHF (anchor)"
     assert cells_uhf[7] == "−3.5"
     assert "⟨S²⟩=4.0200" in cells_uhf[17]
-    assert rows_uhf[4].startswith("| CASCI |")  # the first family follows
+    # the anchor block set apart by a rule row, the first family follows
+    assert all(c.strip() == "---" for c in rows_uhf[4].split("|")[1:-1])
+    assert rows_uhf[5].startswith("| CASCI |")
 
 
 @fast
@@ -1188,7 +1202,8 @@ def test_method_ladder_lane_families():
     assert lines[3].startswith("| ROHF (anchor) |")
     rules = [l for l in lines
              if set(l.replace("|", "").replace(" ", "")) == {"-"}]
-    assert len(rules) == 1    # the SEP only: the lone family leads
+    assert len(rules) == 2    # the column SEP + the anchor block's
+    #                          rule; the lone family leads without one
     assert sum(l.startswith("| CASCI | pinned | 3d3p4d / AO |")
                for l in lines) == 1
     assert sum(l.startswith("| CASCI | free | 3d3p4d / AO |")

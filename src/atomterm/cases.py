@@ -146,6 +146,14 @@ class CaseSpec:
         ``closed_electrons`` pairs over that span
         (:func:`atomterm.core.confined_core_orbitals`) -- never one
         pair per column.
+    shell_radials : the declared WINDOW compression (chemical shell ->
+        k reference radials; ``None`` = no compression, the raw band
+        rows).  A multi-band realization's chemically-sized window:
+        each shell's best k radial directions measured from the
+        reference's occupied MOs, replicated on every m-member
+        (:func:`atomterm.windows.window_compressed`) -- the CAS label
+        reads the delivered records' shapes (CAS(3,6), not CAS(3,43)).
+        Window-side only: the FOLD stays at full family width.
     planned_windows : further window labels of the campaign, declared
         but not yet run (Ti: the (4,10)/(4,14) partitions) -- the cell
         grid derives their full factor grids (:func:`atomterm.cells.planned`).
@@ -202,6 +210,13 @@ class CaseSpec:
     ncore: int
     shell_patterns: list[str]
     shell_bands: dict[str, tuple[str, ...]] | None = None
+    # the WINDOW-side compression depth (chemical shell -> k reference
+    # radials x the m-set): a multi-band realization's chemically
+    # sized window -- CAS(3,6)-shaped, not CAS(3,43)-shaped.  The FOLD
+    # ignores it (full family spans; the compression is a window-side
+    # choice only); every shell of every window the case declares must
+    # carry one (a mixed compressed/raw window is not offered).
+    shell_radials: dict[str, int] | None = None
     ecp: str | None = None
     spin: int = 0
     tag: str | None = None
@@ -273,6 +288,18 @@ class CaseSpec:
                 raise ValueError(
                     f"lane window {label!r}: {overlap} sit in both the "
                     "window and its fold")
+        if self.shell_radials is not None:
+            windows = ["".join(self.shell_patterns), *self.lattice_windows,
+                       *(w.partition("@")[0]
+                         for w in self.lane_windows), *self.planned_windows]
+            shells = {s for w in windows
+                      for s in re.findall(r"\d+[spdfgh]", w)}
+            bare = sorted(shells - set(self.shell_radials))
+            if bare:
+                raise ValueError(
+                    f"shell_radials is undeclared for {bare} -- every "
+                    "window shell the case names carries its k (a mixed "
+                    "compressed/raw window is not offered)")
 
     def atom_config(self) -> AtomConfig:
         """The spec as an :class:`AtomConfig` (``tag`` defaults to the
@@ -411,11 +438,13 @@ _U14E_FRAC_VOID = Scenario(
 # radial space DOWN TO THE CUSP (a norm-capture minimal list misses
 # the tight primitives -- measured: 99.99% capture with +13 Eh
 # core-energy error) and must EXCLUDE every skipped or active shell's
-# bands (else the Roothaan fills them).  The reference is the PLAIN
-# aufbau ROHF (ref=None): the measurement log certifies its filling
-# IS the intended one; the l-span forcing diverges on this basis
-# (measured).
-_SC_UNC_BANDS = {
+# bands (else the Roothaan fills them).  The references are
+# trusted-cache chks: Scunc's own plain aufbau lands the deep basin;
+# Tiunc's plain aufbau lands a SHALLOW same-filling basin 11 mEh high
+# (the measured multi-basin, map.md Issues) -- its rungs/rohf.chk is
+# the SEEDED deep-basin reference (logs/basin_probe.log), trusted as
+# every cached chk is.
+_TM_UNC_BANDS = {
     "1s": tuple(f"{k}s" for k in range(1, 9)),
     "2s": tuple(f"{k}s" for k in range(9, 15)),
     "3s": tuple(f"{k}s" for k in range(15, 18)),
@@ -424,15 +453,12 @@ _SC_UNC_BANDS = {
     "3p": tuple(f"{k}p" for k in range(12, 18)),
     "3d": tuple(f"{k}d" for k in range(3, 11)),
 }
-# Ti's validation window is the DOMINANT-5 d realization (the greedy
-# capture's 0.999-band set from the measurement log): the (3,1)
-# sector over the full 8-band family is 530k determinants -- hours
-# per cell for a validation leg; the dominant-5 window (28 columns,
-# 92k dets) carries the same fold chemistry and term readout.  The
-# FOLD families stay full (the cusp is the fold's business, not the
-# window's).
-_TI_UNC_BANDS = dict(_SC_UNC_BANDS,
-                     **{"3d": ("5d", "6d", "7d", "8d", "9d")})
+# the twins' WINDOW compression (k=1: the single reference radial per
+# shell, the uncontracted analog of one contraction): the CAS labels
+# mirror the certified contracted records' shapes (CAS(3,6)/CAS(4,6))
+# at minutes per cell.  The FOLD families stay full -- the cusp is
+# the fold's business; the compression is a window-side choice only.
+_TM_UNC_RADIALS = {"3d": 1, "4s": 1}
 _SC_UNC_BASIS = gto.parse((_DATA / "sc_ccpvdz_unc.txt").read_text())
 _TI_UNC_BASIS = gto.parse((_DATA / "ti_ccpvdz_unc.txt").read_text())
 
@@ -509,23 +535,28 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    lattice_sector=(2, 0)),
     # The uncontracted twins: the multi-column fold's validation atoms
     # (the ar fold = 9 pairs over a 27-column declared span; the 3d4s
-    # window over its bands).  CASCI-class only this wave
+    # window COMPRESSED to its reference radials -- CAS(3,6)/CAS(4,6),
+    # the certified records' shapes).  CASCI-class only this wave
     # (run_casscf=False: the optimizer class is not declared on the
     # uncontracted bases yet).
     "Scunc": CaseSpec("Sc", _SC_UNC_BASIS, nelec_act=3, ncore=9,
                        shell_patterns=["3d", "4s"], spin=1,
-                       shell_bands=_SC_UNC_BANDS,
+                       shell_bands=_TM_UNC_BANDS,
+                       shell_radials=_TM_UNC_RADIALS,
                        sa_weights=[1 / 5] * 5,
                        run_casscf=False, key="Scunc",
                        scenarios=_unc_gates("scunc", (2, 1)),
-                       term=(2, "g"), lane_windows=("3d4s@ar",)),
+                       term=(2, "g"), lane_windows=("3d4s@ar",),
+                       lattice_windows=("3d",), lattice_sector=(2, 1)),
     "Tiunc": CaseSpec("Ti", _TI_UNC_BASIS, nelec_act=4, ncore=9,
                        shell_patterns=["3d", "4s"], spin=2,
-                       shell_bands=_TI_UNC_BANDS,
+                       shell_bands=_TM_UNC_BANDS,
+                       shell_radials=_TM_UNC_RADIALS,
                        sa_weights=[1 / 7] * 7,
                        run_casscf=False, key="Tiunc",
                        scenarios=_unc_gates("tiunc", (3, 1)),
-                       term=(3, "g"), lane_windows=("3d4s@ar",)),
+                       term=(3, "g"), lane_windows=("3d4s@ar",),
+                       lattice_windows=("3d",), lattice_sector=(2, 0)),
     # CAMPAIGN key `U14e`: the ECP-atom record's element dir
     # (``elements/U14e/``); the SYMBOL stays `U` (PySCF builds the
     # element; the ECP removes its 78 core electrons) and the `tag`

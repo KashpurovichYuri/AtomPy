@@ -110,3 +110,23 @@ def test_casespec_validates_lane_windows():
     with pytest.raises(ValueError):   # legs without the term target
         CaseSpec(**{k: v for k, v in ti.items() if k != "term"},
                  lane_windows=("3d3p@semi",))
+
+
+def test_shell_radials_must_cover_every_declared_window():
+    """The compression grammar: every window shell the case names
+    (primary, lattice, lane spans, planned) carries its k -- a mixed
+    compressed/raw window is refused at the declaration, not at the
+    first run."""
+    ti = dict(symbol="Ti", basis="ccpvdz", nelec_act=4, ncore=9,
+              shell_patterns=["3d", "4s"], spin=2, term=(3, "g"))
+    CaseSpec(**ti, shell_radials={"3d": 1, "4s": 1},
+             lattice_windows=("3d",), lattice_sector=(2, 0),
+             lane_windows=("3d4s@ar",))
+    for rad, kw in (
+            ({"3d": 1}, {}),                                   # primary
+            ({"3d": 1, "4s": 1}, {"lattice_windows": ("3d4d",),
+                                  "lattice_sector": (2, 0)}),   # lattice
+            ({"3d": 1, "4s": 1}, {"planned_windows": ("3d4p",)})):
+        with pytest.raises(ValueError, match="shell_radials"):
+            CaseSpec(**ti, shell_radials=rad,
+                     lane_windows=("3d4s@ar",), **kw)
