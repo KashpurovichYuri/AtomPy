@@ -2,3 +2,13 @@
 ===== cells Scunc =====
 ROHF E = -759.73738486 Eh
   [cell] scunc_3d4s_2-1_casci_moc_-_pol_avg
+  [cell] scunc_3d4s_2-1_casci_moc_-_pur_avg
+  wrote elements/Scunc/cells.json + cells.md
+
+===== cells Tiunc =====
+ROHF E = -848.39639007 Eh
+  [cell] tiunc_3d4s_3-1_casci_moc_-_pol_avg
+  [cell] tiunc_3d4s_3-1_casci_moc_-_pur_avg
+  wrote elements/Tiunc/cells.json + cells.md
+
+done

@@ -347,6 +347,23 @@ _U14E_WINDOWS = ("".join(_U_TIER["3f2d"]),) + tuple(
     "".join(_U_TIER[t]) for t in ("3f", "4f", "2f2d", "4f2d")) \
     + _U14E_PROMOTED
 
+# THE SHELL LAYER (the port of the multi-column fold, the machinery
+# proven on Scunc/Tiunc): the measured realizations from the record's
+# band probe (elements/U14e/logs/probe_bands.log -- the closed 6s on
+# 13s-15s, the 6p trio on 13p-15p, the 7s on 18s-20s; the open 5f on
+# 9f-11f, the 6d on 12d-14d).  The BAND-labeled windows above stay
+# their own identities (an undeclared pattern passes through the
+# layer unchanged); the LANE window is chemical -- 5f6d@6s6p7s, the
+# fold 5 pairs over the 15-column family span, its frozen core the
+# span's own closed-shell Roothaan.
+_U14E_BANDS = {
+    "5f": ("9f", "10f", "11f"),
+    "6d": ("12d", "13d", "14d"),
+    "6s": ("13s", "14s", "15s"),
+    "6p": ("13p", "14p", "15p"),
+    "7s": ("18s", "19s", "20s"),
+}
+
 
 def _u14e_sector(window: str) -> tuple[int, int]:
     """A U14e window's sector: the promoted-pair override, else the
@@ -517,8 +534,15 @@ CAMPAIGN: dict[str, CaseSpec] = {
     "U14e": CaseSpec("U", _U_BASIS, nelec_act=4, ncore=5,
                    shell_patterns=list(_U_TIER["3f2d"]), spin=4,
                    ecp=_U_ECP, tag="U_stuttgart78_dyall", key="U14e",
+                   shell_bands=_U14E_BANDS,
                    sa_weights=[1 / 17] * 17,  # the ground term's M_L set
                    run_casscf=False,          # the multi-solution class
+                   # THE LANE PORT (the shell-layer wave's destination):
+                   # the chemical window 5f6d over its measured bands,
+                   # the fold 6s6p7s = 5 pairs over the 15-column
+                   # family span (the multi-column fold; the frozen
+                   # core the span's own closed-shell Roothaan).
+                   lane_windows=("5f6d@6s6p7s",),
                    nroots_primary=48,
                    # the tier CAS(4,>20) families: RETIRED for now
                    # (user-directed 2026-11-06 -- "most of CASCI

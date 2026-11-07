@@ -277,6 +277,28 @@ campaign's output; `run_u*` stays the frozen record until then).
   contracted twins: the confined ION-core vs the contraction core;
   the free pur rows sit BELOW the contracted free records —
   variational, bigger windows).  BOTH ATOMS PASS.
+- Part 3c: THE U14E PORT (2026-11-07; the review round first — both
+  axes, the findings fixed/declined/disposed in map.md; the moc
+  layer bypass was the one real bug).  The declaration:
+  shell_bands from the probe_bands record (5f on 9f-11f, 6d on
+  12d-14d, 6s on 13s-15s, 6p on 13p-15p, 7s on 18s-20s) + the lane
+  leg 5f6d@6s6p7s at (4,0); the band-labeled windows keep their
+  identities (an undeclared pattern passes through the layer
+  unchanged — the port is purely additive).  TWO findings on the
+  first run: (1) the Part-2e FORK RESOLVED — the chemical fold
+  6s6p7s = 5 pairs over the 15-column family span, the frozen core
+  the span's own Roothaan (17 cycles, comm 2.6e-11), the C1-seeded
+  substrate reproducing −50.38185233 exactly; (2) the declared ⁵Lᵤ
+  (L=8) is NOT this window's block-ground — an L=6 quintet sits
+  6 mEh below (the block-lowest readout interleaved the terms; every
+  root a clean symmetry eigenstate at floor residuals) — the
+  adjudication now TARGETS: the dense spectrum holds every root,
+  the term meter (⟨L²⟩ per eigenvector) SELECTS the block's lowest
+  `mult` components OF THE DECLARED L (the fallback records itself
+  in the payload's l2).  THE VERDICT: all SEVENTEEN ⁵Lᵤ components
+  degenerate at −3.106617 (ptp 3.0e-14, ⟨L²⟩ = 72.0, ⟨S²⟩ = 6.0
+  exact), total −49.0374, anchor_corrected all four blocks.  The
+  store-anchored pin carries all three validation lanes.
   THE USER'S DESIGN PRINCIPLE (2026-11-06, do not re-open): AOs are
   never tracked by labels directly — the chemical shell with its
   DECLARED AO realization is the primary object — FOR ALL BASES.

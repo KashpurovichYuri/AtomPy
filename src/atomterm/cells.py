@@ -448,6 +448,11 @@ _COMM_CAP = 6000
 # near-degenerate root skips; eigenvectors included, O(block^3))
 _ANCHOR_CAP = 40000
 
+# how deep the targeted selection scans the dense spectrum for the
+# declared term's components (in units of the block's multiplicity --
+# the target need not be the block's ground)
+_SELECT_DEPTH = 3
+
 
 def _pick_no_window(wins, k: int):
     """The k-GROUP-PREFIX window from no_group_windows's COMPACT list.
@@ -1026,7 +1031,11 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     through :func:`load_lane_cell`): per-component ``energies`` /
     ``l2`` / ``s2`` in branch order, the TERM ``total`` (component
     mean + the closed-shell core energy), the component spread
-    ``ptp``, the sector size ``n_det``, ``anchor_dev``, and the dense
+    ``ptp``, the sector size ``n_det``, ``anchor_dev``,
+    the dense-adjudication record (``anchor_corrected`` -- the blocks
+    whose roots our exact H replaced or re-selected: the pinned
+    Davidson's near-degenerate skips, and the targeted selection when
+    the declared term is not the block's ground), the dense
     assembled-treatment commutators ``comm_norm_h_lz`` /
     ``comm_norm_h_l2`` (NaN above :data:`_COMM_CAP` -- sectors past
     the dense-meter budget; the certified fold class makes them
@@ -1155,13 +1164,33 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
                                       one_body=parts["H"][0],
                                       two_body=parts["H"][1])
             ev, evec = np.linalg.eigh(hb)
+            # the TARGETED selection: the declared term need not be the
+            # block's ground (measured on the U14e port: an L=6 quintet
+            # sits BELOW the declared L=8 in the raw band window -- the
+            # block-lowest readout interleaves the terms).  The dense
+            # spectrum holds every root; the term meter (<L2> per
+            # eigenvector, cheap through the apply family) SELECTS the
+            # block's lowest `mult` eigenvectors of the TARGET L
+            # (falling back to the lowest when the target is not
+            # found -- the payload's l2 then shows it)
+            want = min(len(ev), _SELECT_DEPTH * mult)
+            idx = np.flatnonzero(sel)
+            l2_of = []
+            for k in range(want):
+                wv = np.zeros(len(dets))
+                wv[idx] = np.real(evec[:, k])
+                l2_of.append(float(np.real(wv @ apply_l2(wv))))
+            l2_of = np.asarray(l2_of)
+            hit = np.flatnonzero(np.abs(l2_of - L * (L + 1)) < 1e-4)
+            pick = (hit[:mult] if len(hit) >= mult
+                    else np.arange(mult))          # the fallback
             dev = float(np.max(np.abs(np.sort(e_arr)[:mult]
-                                      - ev[:mult])))
+                                      - ev[pick])))
             anchor_dev = max(anchor_dev, dev)
-            if dev > 1e-8:
+            if dev > 1e-8 or not np.array_equal(pick, np.arange(mult)):
                 corrected.append(irrep)
-                e_arr = ev[:mult].copy()
-                ours_vecs = evec[:, :mult]
+                e_arr = ev[pick].copy()
+                ours_vecs = evec[:, pick]
             del hb
         es.extend(float(x) for x in e_arr[:mult])
         w_blk = []

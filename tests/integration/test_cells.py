@@ -173,7 +173,8 @@ def test_lane_keys_derive_from_the_declaration():
         ("3d4s@ar", (2, 1)), ("3d3p@semi", (4, 3)),
         ("3d3p4d@semi", (4, 3)), ("3d3p4s@1s2s2p3s", (5, 4)),
         ("3s3p3d@1s2s2p4s", (5, 4))]
-    assert lane_keys(CAMPAIGN["U14e"]) == []
+    assert [(k.window, k.sector) for k in lane_keys(CAMPAIGN["U14e"])] \
+        == [("5f6d@6s6p7s", (4, 0))]     # the shell-layer port leg
 
 
 @fast
@@ -881,12 +882,13 @@ def test_unc_lanes_load_exact_from_the_store():
     from atomterm.cells import load_lane_cell
 
     cases = (
-        ("Scunc", "scunc_3d4s@ar_2-1_casci_ao_-_pur_avg", 6.0, 0.75),
-        ("Tiunc", "tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg", 12.0, 2.0),
+        ("Scunc", "scunc_3d4s@ar_2-1_casci_ao_-_pur_avg", 6.0, 0.75, 9),
+        ("Tiunc", "tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg", 12.0, 2.0, 9),
+        ("U14e", "u14e_5f6d@6s6p7s_4-0_casci_ao_-_pur_avg", 72.0, 6.0, 5),
     )
-    for key_token, addr, l2, s2 in cases:
+    for key_token, addr, l2, s2, pairs in cases:
         p = load_lane_cell(CellKey.from_address(addr))
-        assert p["core_pairs"] == 9                    # the chemistry
+        assert p["core_pairs"] == pairs               # the chemistry
         assert p["core_comm"] < 1e-9                   # the Roothaan
         assert p["ptp"] < 1e-9                         # degenerate
         for v in p["l2"]:

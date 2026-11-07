@@ -14,8 +14,8 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `scunc_3d4s_2-1_casci_ao_-_pol_avg` E -759.74790368
 - `scunc_3d4s_2-1_casci_ao_-_pur_avg` E -759.74666025
 - `scunc_3d4s_2-1_casci_ao_-_pol_frac` VOID -- frac-reference-unmeasured: no measured fractional-occupation basin on the uncontracted basis yet (2026-11-06)
-- `scunc_3d4s_2-1_casci_moc_-_pol_avg` E -759.77595311
-- `scunc_3d4s_2-1_casci_moc_-_pur_avg` E -759.77469890
+- `scunc_3d4s_2-1_casci_moc_-_pol_avg` E -759.74943376
+- `scunc_3d4s_2-1_casci_moc_-_pur_avg` E -759.74817373
 - `scunc_3d4s_2-1_casscf_ao_-_pol_avg` VOID -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)
 - `scunc_3d4s_2-1_casscf_mo_-_pol_avg` VOID -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)
 - `scunc_3d4s_2-1_casscf_moc_-_pol_avg` VOID -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)
