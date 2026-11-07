@@ -150,7 +150,7 @@ def _row(k, p, anchor, spec) -> str:
     wname = (spec.window_names or {}).get(k.span_label, k.span_label)
     cells = [
         _method(k), route, f"{wname} / {START_NAMES[k.start]}",
-        cas_label(k), fold, f"{p['n_det']:,}",
+        cas_label(k, spec), fold, f"{p['n_det']:,}",
         f"{e:.4f}", f"{de * 1e3:+.1f}", f"{e * EV:.4f}",
         f"{de * EV:+.4f}", conv_cell(p), l2_text(p),
         _num(ptp, ".0e"),
@@ -246,8 +246,10 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     for leg in [k for k in routes
                 if k.substrate == "pur" and k.method == "sa-casscf"]:
         twins = [k for k in routes if k.window == leg.window]
-        if any(k.method != "casci" and k.start != "no"
-               and payload_of(cells, k) for k in twins):
+        # the family renders when ANY twin ran (the validation atoms'
+        # pinned leg alone is their story; the campaign atoms' route
+        # studies render the fuller family)
+        if any(k.start != "no" and payload_of(cells, k) for k in twins):
             _fam([k for k in twins if k.start != "no"])
 
     # the planned windows whose CASCI anchors are read: the tier
@@ -260,6 +262,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     out = [BEGIN, HEAD, SEP, _anchor_row(anchor, spec)]
     if uhf is not None:
         out.append(_uhf_anchor_row(anchor, uhf))
+    out.append(RULE)      # the anchor block set apart from the CAS rows
     out.extend([*body, END])
 
     for w in spec.planned_windows:

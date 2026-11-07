@@ -3264,6 +3264,52 @@
         "B2u",
         "B3u"
       ]
+    },
+    "u14e_5f6d@6s6p7s_4-0_casci_ao_-_pol_avg": {
+      "cell": "u14e_5f6d@6s6p7s_4-0_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 58905,
+      "energies_pyscf": [
+        -49.112877379272724,
+        -49.112857833354276,
+        -49.10674202046522,
+        -49.106331072242995,
+        -49.09422484237751,
+        -49.09420624098073,
+        -49.09419478545207,
+        -49.09016423856467,
+        -49.074708075981796
+      ],
+      "ground_l2": 40.99993465090076,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "win_lz": 1.223368225379089e-12,
+      "win_lperp": 1.684428319756859e-12,
+      "res_h_lz": 6.756530514003392e-14,
+      "res_h_l2": 5.024646957783012e-13
+    },
+    "u14e_5f6d@6s6p7s_4-0_casscf_ao_-_pol_avg": {
+      "cell": "u14e_5f6d@6s6p7s_4-0_casscf_ao_-_pol_avg",
+      "kind": "casscf",
+      "n_det": 58905,
+      "energies_pyscf": [
+        -50.43923663048938
+      ],
+      "ground_l2": 71.53243554202446,
+      "comm_norm_h_lz": NaN,
+      "comm_norm_h_l2": NaN,
+      "converged": true,
+      "cycles": 200,
+      "max_cycle": 50,
+      "conv_dE": 1.5712430766257057e-05,
+      "win_lz": 3.4702262588387183,
+      "win_lperp": 4.895877497074299,
+      "res_h_lz": 0.4963771130248896,
+      "res_h_l2": 0.8479553678226532
     }
   }
 }

@@ -62,11 +62,19 @@ def fold_label(tag: str) -> str:
     return "{" + ",".join(fold_shells(tag)) + "}"
 
 
-def cas_label(key) -> str:
+def cas_label(key, spec=None) -> str:
     """The CAS(nelec, ncas) label: electrons from the key's sector,
-    columns from the window span's summed m-set sizes."""
-    cols = sum(SHELL_COLS[l] for l in
-               re.findall(r"\d+([spdfgh])", key.span_label))
+    columns from the window span's summed m-set sizes -- THROUGH THE
+    SHELL LAYER when the case declares one (a chemical shell's
+    realization is its band list; a multi-band shell contributes its
+    bands' m-sets, not one)."""
+    shells = re.findall(r"\d+[spdfgh]", key.span_label)
+    if spec is not None:
+        from atomterm.windows import realized_patterns
+        bands = realized_patterns(shells, spec.shell_bands)
+        cols = sum(SHELL_COLS[b[-1]] for b in bands)
+    else:
+        cols = sum(SHELL_COLS[sh[-1]] for sh in shells)
     return f"({sum(key.sector)},{cols})"
 
 

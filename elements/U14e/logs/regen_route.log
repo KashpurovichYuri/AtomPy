@@ -1,0 +1,9 @@
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_5f6d@6s6p7s_4-0_casci_ao_-_pur_avg
+  from-scratch D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
+lane substrate D2h ROHF E = -50.38185233 Eh
+  [cell] u14e_5f6d@6s6p7s_4-0_casci_ao_-_pol_avg
+  [cell] u14e_5f6d@6s6p7s_4-0_casscf_ao_-_pol_avg
+  [cell] u14e_5f6d@6s6p7s_4-0_sa-casscf_ao_-_pol_avg
