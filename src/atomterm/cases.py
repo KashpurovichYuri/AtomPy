@@ -42,8 +42,7 @@ from atomterm.windows import (build_full_mo, closed_electrons, fold_shells,
                               occupied_core_idx, select_valence_ao)
 from atomterm.casscf import (
     run_casci,
-    run_casscf as casscf_stage,
-    run_sa_casscf,
+    constrained_casscf,
 )
 from atomterm.stages import stage_facts
 from atomterm.analysis import format_report
@@ -768,7 +767,8 @@ def run_atom(
     # ---- stage 3: CASSCF (single root) on the primary sector ---------------
     if run_casscf:
         casscf_chk = str(out / f"{label}_casscf.chk")
-        cass = casscf_stage(mf, ncas, (na_p, nb_p), mo_p, casscf_chk, verbose=0)
+        cass = constrained_casscf(mf, ncas, (na_p, nb_p), casscf_chk,
+                                  mo_full=mo_p, name="casscf", verbose=0)
         print(f"[CASSCF    ] E = {cass.energies[0]:.8f} Eh")
         c_cass = cass.mo_coeff[:, ncore_p : ncore_p + ncas]
         stage_analysis("casscf", cass, c_cass, na_p, nb_p)
@@ -776,8 +776,9 @@ def run_atom(
     # ---- stage 4: SA-CASSCF over the requested state weights ---------------
     if sa_weights:
         sa_chk = str(out / f"{label}_sa-casscf.chk")
-        sa = run_sa_casscf(mf, ncas, (na_p, nb_p), mo_p, list(sa_weights),
-                           sa_chk, verbose=0)
+        sa = constrained_casscf(mf, ncas, (na_p, nb_p), sa_chk,
+                                mo_full=mo_p, weights=list(sa_weights),
+                                name="sa-casscf", verbose=0)
         print(f"[SA-CASSCF ] roots: {np.round(sa.energies, 6)}")
         c_sa = sa.mo_coeff[:, ncore_p : ncore_p + ncas]
         stage_analysis("sa-casscf", sa, c_sa, na_p, nb_p)

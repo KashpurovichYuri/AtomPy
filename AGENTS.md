@@ -44,7 +44,7 @@ restrictions lift). Mechanical enforcement: the global
 | `secondquant.py` | `annihilate`, `create`, `apply_one_body`, `apply_two_body`, `one_body_matrix`, `two_body_matrix`, `secondquant_matrix` | **pure numpy, no pyscf** — the same matrices via explicit a+/a application on occupation vectors; the elementwise twin of detbasis (random non-particle-symmetric-G pins certify the string contraction terms physical integrals are blind to) |
 | `operators.py` | `build_operators`, `active_space_integrals`, `full_space_integrals`, `window_closure`, `core_anisotropy`, `ground_block`, `pyscf_ci_permutation`/`ci_in_detbasis_order`, `pyscf_apply` | the first-quantized assembly: H, Lz, L², S², Sz, N, the EXACT parity (exterior power), population labels; owns BOTH PySCF↔ours convention boundaries (the integral transpose + the CI-ordering bridge) and the measured-block family (closure certificate, core anisotropy, `ground_block` = the SA-anchoring/NO-averaging rule); `pyscf_apply` = the Hamiltonian through PySCF's C contractions at any sector size (the absorb-`.5` pairing; the one-body C leg does not exist — the kernel packs the triangle and would corrupt Lz); core folded into h1 (m-scalar density; `c_core` for optimized stages); `method=` switches the evaluator |
 | `reference.py` | `ReferenceSpec`, `run_rohf`, `run_uhf`, `uhf_basin_census`, `uhf_contamination`, `run_frac_occ` | the SCF reference engine: character-forced occupations + basin gate thread every runner (the cache/gate skeleton and the acceleration dispatch are shared; the UHF gate anchors on `occ_e_ref_uhf`, the census-measured UHF basin — `uhf_basin_census` measures it, any atom one call); the UHF class is a REFERENCE-LAYER product, not a cells axis (the folds consume one closed-shell core density — the broken-core fold is the declared future step); `uhf_contamination` = the spin-honesty meter (the overlap formula, certified against the exact determinant-space S²); module Conventions own the caching-trust (cached chks TRUSTED, never re-gated) and the S-projector occupation-metric contract (`span_projector` is the one home) |
-| `casscf.py` | `run_cassci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_casscf`, `run_sa_casscf`, `run_irrep_casci`/`run_irrep_sa`, `CASResult` | the ONE deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable; every recipe is a `constrained_casscf` call or a thin stage adapter over it, never a new kernel path; SA = the two-pass pattern (ensemble kernel → exact roots readout in the frozen window); the two stage adapters are pass-throughs carrying the stage name — scheduled retirement with `run_u*` at the ECP wave; the symmetry-lane evaluators (`run_irrep_*`) are pinned-route twins on the substrate signature -- ONE pinned solver per `irreps.branch_d2h` component, no mask/checkpoint vocabulary (the cells axis arrives with the declaration wave); module Conventions own the mcscf mutation semantics and the full-MO contract |
+| `casscf.py` | `run_cassci`, `constrained_casscf(mo_full=, mask=, weights=, mc_opts=)`, masks, `run_irrep_casci`/`run_irrep_sa`, `CASResult` | the ONE deep optimizer driver — a mask is any `uniq_var_indices`-shaped callable; every recipe is a `constrained_casscf` call (the cases stages included — the one-line stage adapters retired at the ECP wave's close), never a new kernel path; SA = the two-pass pattern (ensemble kernel → exact roots readout in the frozen window); the symmetry-lane evaluators (`run_irrep_*`) are pinned-route twins on the substrate signature -- ONE pinned solver per `irreps.branch_d2h` component, no mask/checkpoint vocabulary; module Conventions own the mcscf mutation semantics and the full-MO contract |
 | `windows.py` | `Window(.columns)`, `select_*` (incl. `select_span`, `select_primitives`), `shell_realization`/`realized_patterns`, `primitive_chain`, `fold_shells`/`closed_electrons`/`NOBLE_CORES` (the fold vocabulary), `shell_weights`, `window_avas`, `span_overlap`, `span_projector`, `s_metric_roots`, `shell_slots`, `lowdin(tol=)`, `complete_orthonormal`, `build_full_mo`, `lm_sectors`, `l_per_row`, `radial_basis`, `mask_radial_rotations` | window construction + selection + the kind vocabulary + the SHELL LAYER (a chemical shell's AO realization is DECLARED band-by-band — basis-specific, certified by measurement; the identity default = the contracted behavior) (module docstring owns: purpose, the m-completeness contract, the five kinds, the internal layering — `shell_slots` the one shell walker, the S-metric algebra beneath, the two substrate builders); `build_full_mo` takes AO rows OR column vectors through ONE project-renormalize-assemble treatment; `lowdin` raises on near-linear dependence |
 | `core.py` | `purified_core_orbitals`, `confined_core_orbitals`, `closed_shell_core_energy` | the exactly rotation-closed core span (the pur substrate fixing the input-window baseline) + the closed core ON a fold span (the span's own closed-shell Roothaan filling the lowest `n_pairs` — the span itself on a 1:1 realization; `ncore` follows the PAIRS, never the span width) + the closed-shell core energy (the pur-fold bookkeeping constant; over confined columns it IS the projected-density form) |
 | `stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: fold + analyze + energies vs PySCF + window purity + ortho divergence guard; module Conventions own the two ruler readings (the reconstruction is the ANALYSIS ruler; max\|dE\| decomposes into anisotropy + window definition + bookkeeping) |
@@ -183,8 +183,8 @@ carries a number only when the number IS the fact.
     basin gate land the intended reference (`reference`); the gate also
     fixes downstream substrates. Leave real headroom on
     degenerate-but-numerical test bands.
-22. **ECP-atom campaign verdicts** (the f-shell record; `run_u*` until
-    the ECP wave declares the atom): the gated-Newton ROHF reference
+22. **ECP-atom campaign verdicts** (the f-shell record; the `run_u*`
+    scripts retired at the wave's close — git history): the gated-Newton ROHF reference
     determinant can be a numerically pure L=0 mean field — "below ROHF"
     then means beating a pure state, and windows below the
     representability threshold all sit above it; raw-ROHF MO spans
@@ -451,12 +451,14 @@ Update it when a decision is made; keep tickets one-session sized.
 Resolved tickets are DELETED (git history is the archive); each live
 ticket is self-contained (no conversation context needed).
 
-State: the atom campaign (C, Si, Sc, Ti) and the project walk (ticket
-30) are COMPLETE. Next wave: **ECP** — ticket 31 declares the ECP atom
-in `CAMPAIGN` (ECP basis + pseudopotential via `AtomConfig.ecp`; retires
-`run_u*` into the modern path AND the two stage adapters with them).
-Gated measurement batches (T2/M) run only on the user's enable. Beyond
-ECP the candidate list: spin–orbit, transition moments, g-factors.
+State: the atom campaign (C, Si, Sc, Ti), the project walk (ticket
+30), and the ECP wave (ticket 31: the U14e campaign, the shell layer
++ the multi-column fold validated on Scunc/Tiunc and ported, the G5
+retirement — `run_u*` and the stage adapters deleted; git history is
+the archive) are COMPLETE.  Gated measurement batches (T2/M) run
+only on the user's enable.  The queued CASCI review (map.md Issues)
+precedes the next physics wave; beyond it the candidate list:
+spin–orbit, transition moments, g-factors.
 
 Review protocol after each ticket wave, then a design survey:
 

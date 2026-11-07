@@ -7,7 +7,8 @@ import numpy as np
 import pytest
 from pyscf import gto, scf
 
-from atomterm.casscf import run_irrep_casci, run_irrep_sa, run_sa_casscf
+from atomterm.casscf import (constrained_casscf, run_irrep_casci,
+                             run_irrep_sa)
 from atomterm.irreps import IRREP_IDS, det_irreps, orb_irreps
 from atomterm.operators import (
     build_operators,
@@ -82,8 +83,10 @@ def test_si_sa_head_to_head(si_lane, tmp_path):
     assert pinned_sa["converged"]
     mo_start_c1 = build_full_mo(mf_c1, occupied_core_idx(mf_c1, _NCORE),
                         np.eye(mol_c1.nao_nr())[:, select_shell_ao(mol_c1, "3p")])
-    free_sa = run_sa_casscf(mf_c1, 3, (2, 0), mo_start_c1, [1 / 3] * 3,
-                            str(tmp_path / "si_sa.chk"))
+    free_sa = constrained_casscf(mf_c1, 3, (2, 0),
+                                 str(tmp_path / "si_sa.chk"),
+                                 mo_full=mo_start_c1,
+                                 weights=[1 / 3] * 3, name="sa-casscf")
 
     assert abs(float(np.mean(free_sa.energies)) - pinned_sa["e_tot"]) < 1e-7
     # (observed Si |dEns| ~3e-11 over three fresh draws)

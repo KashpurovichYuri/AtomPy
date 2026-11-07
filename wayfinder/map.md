@@ -9,10 +9,6 @@ dies).
 
 - [29 — gated measurement batches](tickets/29-ti-first.md): the T2 Ti
   cells + the M store migration; runs only on the user's enable.
-- [31 — the ECP wave / U14e](tickets/31-ecp-wave.md): the door plan
-  SETTLED (2026-11-05, in the ticket) — opens NOW: ticket 32 closed
-  2026-11-05 (git history is the archive; the closing record lives
-  in the deleted ticket's last commit and map.md's resolved entries).
 - [33 — the symmetry-breaking anatomy deliverable](tickets/33-symmetry-anatomy.md):
   design-first — the frozen-landscape tables that replace the retired
   scan pointers.
@@ -24,6 +20,11 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- The queued CASCI review (the user, 2026-11-06; PRECEDES the next
+  physics wave): the CASCI calculations get their own review pass —
+  the window-poverty readings (+923 mEh class), the reference-echo
+  roots, the raw-fold anchor <L2> mixing — before any construction
+  rides them.  (From ticket 31, kept alive at its deletion.)
 - The 61c5529..642ac8e review (2026-11-07, both axes; the
   shell-layer wave).  FIXED IN ROUND: the moc start bypassed the
   shell layer (`select_valence_mo` on raw patterns -- the unc moc

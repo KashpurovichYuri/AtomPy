@@ -1,7 +1,6 @@
 """The orbital-optimization engine: CASCI, CASSCF, and SA-CASSCF --
 one deep driver (constrained_casscf) with declarative restriction
-masks, plus the classic pipeline's stage adapters (run_casscf,
-run_sa_casscf -- the cases stage names; every other recipe is a direct
+masks; every recipe is a direct
 constrained_casscf call, as cells does).
 
 Conventions
@@ -52,8 +51,6 @@ __all__ = [
     "constrained_casscf",
     "mask_frozen_window",
     "mask_no_core_window_mix",
-    "run_casscf",
-    "run_sa_casscf",
     "run_irrep_casci",
     "run_irrep_sa",
 ]
@@ -326,38 +323,6 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
     res.energies = rr.energies
     res.core_energy = rr.core_energy
     return res
-
-
-# ------------------------------------------------------------ stage adapters
-# One line each: a named (start, mask, weights) recipe over the ONE
-# driver. The two survivors are the classic pipeline's stage names
-# (cases); anything else calls constrained_casscf directly (cells) --
-# never a new kernel path.
-
-def run_casscf(mf, ncas, nelecas, mo_full, chkfile, verbose=0) -> CASResult:
-    """Free CASSCF from the given start.
-
-    Parameters: as :func:`constrained_casscf` with ``mo_full``
-    mandatory (raw-shell columns by convention), no mask.
-    """
-    return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
-                              name="casscf", verbose=verbose)
-
-
-def run_sa_casscf(mf, ncas, nelecas, mo_full, weights, chkfile, verbose=0,
-                  mask=None) -> CASResult:
-    """SA-CASSCF over the given state weights (primary sector). PySCF's SA
-    kernel returns only the ensemble energy; per-root energies come from
-    the CASCI pass in the converged window -- see
-    :func:`constrained_casscf` (``weights``).
-
-    Parameters: as :func:`constrained_casscf` plus ``weights`` (the
-    state-average weights over the roots).
-    """
-    return constrained_casscf(mf, ncas, nelecas, chkfile, mo_full=mo_full,
-                              weights=list(weights), mask=mask,
-                              name="sa-casscf", verbose=verbose)
-
 
 
 

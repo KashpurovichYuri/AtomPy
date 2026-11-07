@@ -40,7 +40,8 @@ import pytest
 from pyscf import gto, scf
 from typing import NamedTuple
 
-from atomterm.casscf import run_irrep_casci, run_irrep_sa, run_sa_casscf
+from atomterm.casscf import (constrained_casscf, run_irrep_casci,
+                             run_irrep_sa)
 from atomterm.cases import CAMPAIGN
 from atomterm.cells import lane_keys, run_lane_cell
 from atomterm.irreps import IRREP_IDS, branch_d2h, det_irreps, orb_irreps
@@ -194,9 +195,11 @@ def test_tm_sa_head_to_head(tm_lane, tmp_path):
         mf_c1, occupied_core_idx(mf_c1, spec.ncore),
         np.eye(mol_c1.nao_nr())[
             :, select_valence_ao(mol_c1, list(spec.shell_patterns))])
-    free_sa = run_sa_casscf(mf_c1, ncas, (na, nb), mo_start_c1,
-                            list(spec.sa_weights),
-                            str(tmp_path / f"{name.lower()}_sa.chk"))
+    free_sa = constrained_casscf(mf_c1, ncas, (na, nb),
+                                 str(tmp_path / f"{name.lower()}_sa.chk"),
+                                 mo_full=mo_start_c1,
+                                 weights=list(spec.sa_weights),
+                                 name="sa-casscf")
     ens_free = float(np.mean(free_sa.energies))
     active = slice(spec.ncore, spec.ncore + ncas)
 

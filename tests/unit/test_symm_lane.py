@@ -8,7 +8,8 @@ import pytest
 from pyscf import ao2mo, fci
 from pyscf.lib.exceptions import WfnSymmetryError
 
-from atomterm.casscf import run_irrep_casci, run_irrep_sa, run_sa_casscf
+from atomterm.casscf import (constrained_casscf, run_irrep_casci,
+                             run_irrep_sa)
 from atomterm.irreps import (
     IRREP_IDS,
     IRREP_NAMES,
@@ -155,8 +156,10 @@ def test_sa_head_to_head(twin, carbon, tmp_path):
     assert pinned_sa["converged"]
     mo_start_c1 = build_full_mo(mf_c1, occupied_core_idx(mf_c1, 2),
                         np.eye(mol_c1.nao_nr())[:, act_c1])
-    free_sa = run_sa_casscf(mf_c1, 3, (2, 0), mo_start_c1, [1 / 3] * 3,
-                            str(tmp_path / "sa_a.chk"))
+    free_sa = constrained_casscf(mf_c1, 3, (2, 0),
+                                 str(tmp_path / "sa_a.chk"),
+                                 mo_full=mo_start_c1,
+                                 weights=[1 / 3] * 3, name="sa-casscf")
 
     ens_free = float(np.mean(free_sa.energies))  # uniform over the set
     assert abs(ens_free - pinned_sa["e_tot"]) < 1e-8  # observed 2e-12
