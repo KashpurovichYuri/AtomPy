@@ -446,7 +446,7 @@ _COMM_CAP = 6000
 # count get our exact H eigen-solved per block (the conventions
 # certificate AND the correction source for the pinned solver's
 # near-degenerate root skips; eigenvectors included, O(block^3))
-_ANCHOR_CAP = 12000
+_ANCHOR_CAP = 40000
 
 
 def _pick_no_window(wins, k: int):

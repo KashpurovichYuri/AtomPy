@@ -408,7 +408,15 @@ _SC_UNC_BANDS = {
     "3p": tuple(f"{k}p" for k in range(12, 18)),
     "3d": tuple(f"{k}d" for k in range(3, 11)),
 }
-_TI_UNC_BANDS = dict(_SC_UNC_BANDS)
+# Ti's validation window is the DOMINANT-5 d realization (the greedy
+# capture's 0.999-band set from the measurement log): the (3,1)
+# sector over the full 8-band family is 530k determinants -- hours
+# per cell for a validation leg; the dominant-5 window (28 columns,
+# 92k dets) carries the same fold chemistry and term readout.  The
+# FOLD families stay full (the cusp is the fold's business, not the
+# window's).
+_TI_UNC_BANDS = dict(_SC_UNC_BANDS,
+                     **{"3d": ("5d", "6d", "7d", "8d", "9d")})
 _SC_UNC_BASIS = gto.parse((_DATA / "sc_ccpvdz_unc.txt").read_text())
 _TI_UNC_BASIS = gto.parse((_DATA / "ti_ccpvdz_unc.txt").read_text())
 

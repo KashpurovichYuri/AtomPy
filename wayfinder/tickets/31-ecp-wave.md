@@ -256,6 +256,25 @@ campaign's output; `run_u*` stays the frozen record until then).
   primitives, partition-unity-checked) + the greedy projector-capture
   suggestion (the certificate meter, bounded); the logs are the
   declaration's evidence (elements/{Scunc,Tiunc}/logs/).
+- Part 3b: THE TI VERDICT (2026-11-07): the (3,1) sector over the
+  full 8-band d family is 530k determinants (hours per cell — the
+  first attempt killed at 75 min on one cell); the Ti window
+  realization redeclared as the DOMINANT-5 d bands (the greedy's
+  0.999-capture set; 28 columns, 92k dets) — the FOLD families stay
+  full (the cusp is the fold's business).  _ANCHOR_CAP raised to
+  40k dets (the box holds 3 TB — the 12k guess was timid).  THE LANE
+  3d4s@ar: the Roothaan core 17 cycles; ALL SEVEN ³F components
+  degenerate at −3.088057 (ptp 1.3e-13, ⟨L²⟩ = 12.0, ⟨S²⟩ = 2.0
+  exact), total −848.2786 — and the adjudication corrected ALL FOUR
+  blocks (Ag/B1g/B2g/B3g, dev 0.127): the Davidson skip is not an
+  Sc accident but the pinned solver's CLASS behavior at these block
+  sizes; the correction machinery carried the lane.  THE COMPARISON
+  vs the certified contracted records — the CONSTRUCTIONS exact by
+  certificate (²D/³F exact on both bases; the fold electron counts
+  chemical); the TOTALS model-class (the unc lanes sit above their
+  contracted twins: the confined ION-core vs the contraction core;
+  the free pur rows sit BELOW the contracted free records —
+  variational, bigger windows).  BOTH ATOMS PASS.
   THE USER'S DESIGN PRINCIPLE (2026-11-06, do not re-open): AOs are
   never tracked by labels directly — the chemical shell with its
   DECLARED AO realization is the primary object — FOR ALL BASES.
