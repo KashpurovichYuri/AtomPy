@@ -465,14 +465,14 @@ def _pick_no_window(wins, k: int):
         "open the sector)")
 
 
-def _fold_span(key: CellKey, mol, mf,
+def _fold_core(key: CellKey, mol, mf,
                shell_bands: dict | None = None
-               ) -> tuple[tuple[str, ...], int, np.ndarray, np.ndarray]:
-    """One home for the fold construction shared by the free fold
-    branch (:func:`run_cell`), the cache path (:func:`analyze_cell`),
-    and the pinned lane (:func:`run_lane_cell`): resolve the tag's
-    shells THROUGH THE SHELL LAYER (a chemical shell's AO realization
-    is declared, not read off labels --
+               ) -> tuple[tuple[str, ...], int, np.ndarray, dict]:
+    """One home for the fold resolution shared by the free fold branch
+    (:func:`run_cell`), the cache path (:func:`analyze_cell`), and the
+    pinned lane (:func:`run_lane_cell`): resolve the tag's shells
+    THROUGH THE SHELL LAYER (a chemical shell's AO realization is
+    declared, not read off labels --
     :func:`atomterm.windows.shell_realization`), refuse the malformed
     keys, and return the fold's shell tuple, its DOUBLY-OCCUPIED PAIR
     count (the chemistry: ``closed_electrons`` halved -- never the
@@ -547,7 +547,7 @@ def _key_core(key: CellKey, mol, mf,
     ncore = ncore_of(mol.nelectron, na + nb)
     c_run = None
     if key.fold_tag is not None:
-        _, ncore, c_run, _w = _fold_span(key, mol, mf, shell_bands)
+        _, ncore, c_run, _w = _fold_core(key, mol, mf, shell_bands)
     c_pur = (None if c_run is not None
              else purified_core_orbitals(mol, mf, ncore)[0]
              if key.substrate == "pur" else None)
@@ -688,7 +688,12 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         # own m-delocalization survives (measured: raw-MO spans never
         # rotation-close) -- these cells measure that, they do not
         # fix it.
-        perm = select_valence_mo(mf, key.shell_patterns, ncore)
+        # the character ranking runs on the REALIZED bands (the
+        # layer): on uncontracted bases the raw patterns name
+        # single primitives, not the declared families
+        perm = select_valence_mo(
+            mf, realized_patterns(key.shell_patterns, shell_bands),
+            ncore)
         c_can = mf.mo_coeff[:, perm]
         if key.substrate == "pur":
             mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
@@ -1034,7 +1039,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     ------
     ValueError
         the key is not a lane cell; the fold construction refuses the
-        key (:func:`_fold_span`: window/fold overlap, a sector
+        key (:func:`_fold_core`: window/fold overlap, a sector
         disagreeing with the fold-derived electron count, an absent
         fold shell).
     """
@@ -1063,7 +1068,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
 
     L, parity = term
     na, nb = key.sector
-    fold, nf, c_core, core_report = _fold_span(key, mol, mf, shell_bands)
+    fold, nf, c_core, core_report = _fold_core(key, mol, mf, shell_bands)
     rows = select_valence_ao(
         mol, realized_patterns(key.shell_patterns, shell_bands))
     mo = build_full_mo(mf, list(range(nf)), rows, c_core=c_core)
@@ -1136,10 +1141,14 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         # pinned Davidson can deterministically SKIP near-degenerate
         # lowest roots (measured on the Scunc lane: the Ag ground
         # PAIR of the 2D term -- the solver's second root landed four
-        # eigenvalues up), so our own exact H restricted to the block
-        # is both the conventions certificate (anchor_dev) and, on
-        # deviation, the CORRECTION source (the corrected blocks are
-        # recorded; the vectors rebuild from the dense eigenvectors)
+        # eigenvalues up; on Tiunc ALL FOUR blocks skipped), so our
+        # own exact H restricted to the block is the ADJUDICATOR: it
+        # certifies the pinned roots (anchor_dev) and, on deviation,
+        # REPLACES them (the corrected blocks recorded; the vectors
+        # rebuild from the dense eigenvectors).  The external anchor
+        # stands -- both numbers are kept; the lane's truth is the
+        # exact construction, the solver's deviation the recorded
+        # diagnostic.
         ours_vecs = None
         if key.method == "casci" and len(block) <= _ANCHOR_CAP:
             hb = slater_condon_matrix(block,
@@ -1192,8 +1201,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     # form M = -i Lz; H through the C contraction boundary on the
     # readout window's own feed (:func:`_apply_family` is the ONE
     # construction -- built once above, shared with the meters).
-    res_lz = 0.0
-    for w in w_all:
+    res_lz = 0.0    for w in w_all:
         r = apply_h(apply_m(w)) - apply_m(apply_h(w))
         res_lz = max(res_lz, float(np.linalg.norm(r)))
     # the L2 residual: L2 carries a two-body part, so its closure pays

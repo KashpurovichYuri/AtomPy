@@ -229,7 +229,9 @@ campaign's output; `run_u*` stays the frozen record until then).
   live); (4) the pinned Davidson can deterministically SKIP
   near-degenerate lowest roots (the Sc-unc Ag ground pair: the
   solver's second root four eigenvalues up, reproducible) — the lane
-  readout now DENSELY ADJUDICATES every CI block ≤ 12k dets with our
+  readout now DENSELY ADJUDICATES every CI block under the
+  adjudication budget (12k dets at this commit, raised to 40k in
+  Part 3b) with our
   exact H (the conventions certificate promoted to the correction
   source; `anchor_corrected` records the replaced blocks); (5) the
   per-root meters ride the apply family — matrix-free at any sector

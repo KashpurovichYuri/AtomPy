@@ -869,6 +869,36 @@ def test_run_lane_cell_multicolumn_fold(carbon_d2h, carbon, tmp_path):
 
 
 @slow
+def test_unc_lanes_load_exact_from_the_store():
+    """The validation lanes re-verified from the COMMITTED stores (the
+    heavy-pin pattern: fresh legs run in the campaign; the verdicts
+    load and re-check their meters): Scunc hosts 2D and Tiunc 3F
+    EXACTLY through the multi-column folds -- every component at its
+    L(L+1) and S(S+1), degenerate to the ptp floor, the core pair
+    count chemical (9), the Roothaan converged, and the dense
+    adjudication's corrections recorded (the pinned solver's
+    near-degenerate skips -- the branch the live runs exercised)."""
+    from atomterm.cells import load_lane_cell
+
+    cases = (
+        ("Scunc", "scunc_3d4s@ar_2-1_casci_ao_-_pur_avg", 6.0, 0.75),
+        ("Tiunc", "tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg", 12.0, 2.0),
+    )
+    for key_token, addr, l2, s2 in cases:
+        p = load_lane_cell(CellKey.from_address(addr))
+        assert p["core_pairs"] == 9                    # the chemistry
+        assert p["core_comm"] < 1e-9                   # the Roothaan
+        assert p["ptp"] < 1e-9                         # degenerate
+        for v in p["l2"]:
+            assert abs(v - l2) < 1e-8
+        for v in p["s2"]:
+            assert abs(v - s2) < 1e-8
+        assert 0.0 <= p["res_h_lz"] < 1e-8
+        assert p["anchor_corrected"]                    # the live skip
+        assert p["anchor_dev"] > 1e-3                   # honestly recorded
+
+
+@slow
 def test_confined_core_reproduces_the_ion_rhf(carbon):
     """The EXTERNAL anchor of the confined-core construction (the one
     certificate the internal identities cannot give): on the WHOLE AO

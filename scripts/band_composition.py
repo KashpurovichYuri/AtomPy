@@ -41,7 +41,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from pyscf import gto, scf  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from atomterm.windows import lowdin, select_shell_ao  # noqa: E402
 
 _FIRST_N = {"s": 1, "p": 2, "d": 3, "f": 4, "g": 5}
@@ -51,7 +50,10 @@ _ANG = "spdfgh"
 def band_labels(mol) -> list[str]:
     """The AO band label per AO row (a band = one label token with the
     Cartesian member suffixes stripped -- a band is the full m-set,
-    the unit the shell layer declares)."""
+    the unit the shell layer declares).  This is the DISPLAY-layer
+    name derivation, not AO selection: row selection stays with the
+    prefix matcher (:func:`atomterm.windows.select_shell_ao`) -- the
+    strip merely groups the labeled members of one primitive."""
     import re
 
     return [re.sub(r"[xyz0-9^+-]*$", "", line.split()[-1])

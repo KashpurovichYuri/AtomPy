@@ -24,6 +24,48 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- The 61c5529..642ac8e review (2026-11-07, both axes; the
+  shell-layer wave).  FIXED IN ROUND: the moc start bypassed the
+  shell layer (`select_valence_mo` on raw patterns -- the unc moc
+  cells selected single-band character; expanded through
+  `realized_patterns`, the four cells rerun); the correction branch
+  of the dense adjudication unpinned (the store-anchored
+  `test_unc_lanes_load_exact_from_the_store` re-verifies the
+  committed Scunc/Tiunc lanes -- ptp, L2/S2, core_pairs, the
+  recorded corrections); `_fold_span` misnamed after the redesign
+  (renamed `_fold_core` with its consumers); the ticket/code
+  adjudication-cap mismatch; the duplicate `sys.path` in
+  band_composition.  DECLINED (with reasons): the `shell_bands`
+  threading as a data clump -- the substrate signature IS the repo's
+  documented convention, and a context object for one new field is
+  speculative (the store-vs-layer divergence the reviewer notes is
+  real but bounded: the layer is case-declaration data like the
+  basis itself, and the lane payloads now carry `core_pairs` to
+  cross-check); moving the band-name derivation out of
+  band_composition -- it is display-layer grouping, not AO selection
+  (fact 1 governs selection; the docstring now says so); bundling
+  the scripts' `_ANG`-class constants into windows -- no consumer
+  variance, a hypothetical seam.  DESIGN SURVEY (the wave's seams,
+  the codebase-design vocabulary): the shell layer is a deliberately
+  small module whose value is LOCALITY (the chemical->band grammar
+  in one home; the deletion test scatters it across six call sites);
+  `confined_core_orbitals` is DEEP (a Roothaan, the cusp physics,
+  and the ion limit behind three parameters; the interface is the
+  test surface -- the unit pins and the ion anchor cross it
+  directly); `_fold_core` concentrates the refusal family; the
+  adjudication INVERTED the anchor's direction (our exact H
+  adjudicates the pinned solver, both numbers kept) -- an epistemic
+  shift recorded in the docstring and below.
+- The adjudication watch (2026-11-07): the lane's independent-solver
+  verification became SELF-verification under the adjudication
+  budget -- the pinned solver's roots are a proposal our exact H
+  corrects (deterministic Davidson skips measured on both validation
+  atoms, all four Ti blocks).  Both numbers are kept (`anchor_dev`,
+  `anchor_corrected`); the risk is a shared-convention error our H
+  and the solver make identically -- covered by the dense commutator
+  certificates and the ion anchor, not by solver independence.
+  Revisit if a block class appears where adjudication is
+  unaffordable (> the budget) AND the solver skips.
 - The f41bb51..HEAD review (2026-11-04, both axes; fixes in the
   round's commit, ticket 32's closing entry is the record).
   DESIGN SURVEY (the delta seams; the full src/ survey stays at the
