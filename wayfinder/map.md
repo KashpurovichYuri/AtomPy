@@ -20,6 +20,22 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- The Ti multi-basin finding (2026-11-07, the consistency probe):
+  the Ti 3d2 4s2 ROHF hosts SAME-FILLING basins 11 mEh apart on the
+  CONTRACTED basis itself (the record's gated -848.40648875 vs an
+  ungated -848.3953); the unc plain aufbau lands the SHALLOW class
+  (-848.39639) -- no variationality violation (the primitive sets
+  are identical, the subspace exact; SEEDED from the contracted
+  record through the cross-overlap, the unc basis reproduces
+  -848.40648875 EXACTLY).  The Tiunc reference was the shallow
+  basin; the SEEDED deep-basin reference now sits in
+  elements/Tiunc/rungs/rohf.chk (the trusted-cache convention
+  carries it) -- the Tiunc cells owe a rerun against it (~5 h: the
+  free cells + the lane; the anchor and every dE column shift).
+  logs/basin_probe.log is the record.  Fact 21 gains a measured
+  instance: even at the right filling, plain aufbau can land 11 mEh
+  high; the seed (not the gate) is the cure when the gate's cycling
+  diverges on the basis.
 - The queued CASCI review (the user, 2026-11-06; PRECEDES the next
   physics wave): the CASCI calculations get their own review pass —
   the window-poverty readings (+923 mEh class), the reference-echo
