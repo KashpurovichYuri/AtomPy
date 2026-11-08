@@ -80,7 +80,9 @@ unrestricted AO combinations near MOs collapse to (ii); the middle =
 wider-span radials via a declared support set -- only if the numbers
 ask).  The k decision is data-driven: the per-radial spectrum + the
 NO occupations (k=2 for the 4s stays one declaration away,
-CAS(4,7)).
+CAS(4,7)); the m-symmetric radial SCAN (scans.radial_scan,
+optimizer-free) is the cheap oracle for whether the second radial
+direction is energetically live before paying for it.
 
 The MO default is DECLARED after its meters pass -- if a meter fails,
 the default stays AO and this ticket records why.  The AO class
