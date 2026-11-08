@@ -1,0 +1,8 @@
+anchor (trusted cache): E = -848.40744343
+fold span: 65 rows -> 65 cols; n_pairs = 9
+folded: E = -848.00772956  conv = True
+  vs anchor: +399.71 mEh
+  closed pairs = 10 (frozen 9 + valence 1), opens = 2
+  closed valence col 9: s-w = 0.6851  d-w = 0.0000  eps = -0.2400
+  open col 10: d-w = 0.3895  eps = -0.0997
+  open col 11: d-w = 0.3895  eps = -0.0997

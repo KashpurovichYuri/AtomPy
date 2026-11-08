@@ -53,7 +53,7 @@ from pyscf import scf
 from atomterm.windows import select_span, span_projector
 
 __all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "uhf_basin_census",
-           "run_frac_occ", "uhf_contamination"]
+           "run_frac_occ", "uhf_contamination", "run_folded"]
 
 
 # the occupation contract --------------------------------------------
@@ -622,4 +622,253 @@ def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
     mf.chkfile = chkfile
     mf = _accelerated(mf, ref)
     return mol, mf
+
+
+# the folded reference -------------------------------------------------
+
+def _closed_field(mf, dm: np.ndarray) -> np.ndarray:
+    """The spin-summed closed-shell field ``V[dm]`` of the substrate
+    (PySCF's ROHF ``get_veff`` returns the per-spin pair -- the two
+    entries coincide for a closed-shell density; take one)."""
+    v = mf.get_veff(mf.mol, dm)
+    return np.asarray(v[0] if np.ndim(v) == 3 else v)
+
+
+def _spin_summed(dm: np.ndarray) -> np.ndarray:
+    """PySCF's ROHF kernel hands its hooks either the spin-summed
+    density or the per-spin pair, by call site -- normalize to the
+    summed form."""
+    d = np.asarray(dm)
+    return d.sum(axis=0) if d.ndim == 3 else d
+
+
+def run_folded(mf, c_span: np.ndarray, n_pairs: int,
+               occ_closed: tuple[str, ...], occ_open: tuple[str, ...]):
+    """The folded reference: the valence ROHF self-consistent in the
+    frozen confined-core field.
+
+    The lane's reference class.  The fold's confined core
+    (:func:`atomterm.core.confined_core_orbitals` -- the span's own
+    closed-shell Roothaan, the ion-like field) is FROZEN, and the
+    valence electrons solve ROHF in its field, in the complement of
+    the confined columns.  This is the reference the lane's
+    construction assumes: a window cut on it carries the ion-field
+    valence, not the neutral-field one.  Deterministic given its
+    inputs (the confined solve reads no converged orbitals; the
+    valence SCF seeds from the substrate's own valence, projected --
+    same trusted cache, same folded reference), so it needs no
+    trusted cache of its own.
+
+    Mechanics: PySCF's ROHF kernel runs UNMODIFIED on the complement
+    basis -- an orthonormal Euclidean space (``get_ovlp = I``,
+    ``get_hcore`` = the projected frozen-field h, ``get_veff`` = the
+    shim translating the complement density to the AO field and
+    projecting the result back).  The complement localization is what
+    makes the solve converge: a pinned core block inside the cycle
+    would carry a NEVER-dying error vector (the confined core
+    diagonalizes its own Fock, never the total one), so the block
+    must exist in no cycle object at all.  The filling is
+    CHARACTER-FORCED (the :func:`_forced_rohf_occ` rule, restricted
+    to the complement): the valence closed pairs by closed-span
+    weight, then the opens by the ``2 w_open + w_closed`` premium,
+    three-level picks (class, then energy, then the MOM anchor
+    across cycles -- the :func:`run_frac_occ` cure for the
+    degenerate-shell gauge chase).  The solve SEEDS from the
+    substrate's own valence orbitals, projected against the confined
+    core -- the basin-census cure (this atom's d^2 open-shell
+    problems diverge from every scratch start; the projected valence
+    starts the DIIS inside the declared basin).  Plain DIIS.
+
+    The bookkeeping (the total, computed explicitly each cycle):
+
+        E = E_conf + Tr[D_v h_eff] + 1/2 Tr[D_v V[D_v]]
+
+    with ``E_conf`` = :func:`atomterm.core.closed_shell_core_energy`
+    of the confined core and ``h_eff = h + V[D_conf]`` -- the core
+    energy enters once, the valence pays its interaction with the
+    frozen field once, no double counting.  The variational bound:
+    the frozen core constrains the full same-filling problem, so
+    the folded total sits at or above the full ROHF.
+
+    Parameters
+    ----------
+    mf : the reference substrate (``mol``, ``get_hcore``,
+        ``get_ovlp``, ``get_veff``; no converged orbitals are read).
+    c_span : (nao, M) S-orthonormal fold-span columns -- the SAME
+        realization the lane's fold declares.
+    n_pairs : the confined pairs (the fold's chemistry).
+    occ_closed, occ_open : AO span patterns
+        (:class:`ReferenceSpec` vocabulary) -- the character spans
+        of the open-shell premium.
+
+    Returns
+    -------
+    (mol, mf)
+        The molecule and the folded ROHF object (converged; the
+        explicit ``e_tot``; ``mo_coeff`` = [the confined core | the
+        valence complement], S-orthonormal; ``mo_energy``'s frozen
+        block = the confined Fock's occupied eigenvalues).  The
+        accessors are restored after the solve -- the object reads
+        as a standard ROHF on the real mol.  The open pair's gauge
+        is the solve's own choice -- the fold and window
+        constructions are gauge-blind to it.
+
+    Raises
+    ------
+    ValueError
+        If the complement cannot host the valence filling, or the
+        patterns match no AO labels.
+    RuntimeError
+        If the valence SCF does not converge under plain DIIS.
+    """
+    from pyscf import scf
+
+    from atomterm.core import (closed_shell_core_energy,
+                               confined_core_orbitals)
+    from atomterm.windows import (complete_orthonormal, select_span,
+                                  span_projector)
+
+    mol = mf.mol
+    n_open = mol.spin
+    n_closed_val = (mol.nelectron - 2 * n_pairs - mol.spin) // 2
+    if n_closed_val < 0:
+        raise ValueError(
+            f"{n_pairs} confined pairs leave {mol.nelectron - 2 * n_pairs} "
+            f"valence electrons but the sector wants {mol.spin} open -- "
+            "the fold over-freezes the atom")
+
+    c_conf, _ = confined_core_orbitals(mf, c_span, n_pairs)
+    s = mf.get_ovlp()
+    dm_conf = 2.0 * (c_conf @ c_conf.conj().T)
+    h_eff = mf.get_hcore() + _closed_field(mf, dm_conf)
+    e_conf = closed_shell_core_energy(mf, c_conf)
+
+    # the complement: the S-orthonormal columns completing the frozen block
+    compl = complete_orthonormal(c_conf, s)[:, n_pairs:]
+    if compl.shape[1] < n_closed_val + n_open:
+        raise ValueError(
+            f"the complement of {n_pairs} confined columns holds "
+            f"{compl.shape[1]} columns; the valence filling wants "
+            f"{n_closed_val + n_open} occupied")
+    p_open = span_projector(
+        s, sum((select_span(mol, p) for p in occ_open), []))
+    p_closed = span_projector(
+        s, sum((select_span(mol, p) for p in occ_closed), []))
+    eps_conf = np.einsum("ai,ab,bi->i", c_conf.conj(), h_eff,
+                         c_conf).real
+    prev_open = [None]   # the previous cycle's open columns (the MOM anchor)
+    prev_closed = [None]  # ditto for the valence closed pair
+
+    # the seed: the substrate's own valence orbitals, projected against
+    # the confined core (normalized -- the projection removes the
+    # confined-core content).  The MOM anchors start on the seed, so
+    # the DIIS never leaves the projected basin.
+    occ_rows = [i for i, o in enumerate(mf.mo_occ) if o > 0]
+    n_seed = n_closed_val + n_open
+    if len(occ_rows) < n_pairs + n_seed:
+        raise ValueError(
+            f"the substrate fills {len(occ_rows)} orbitals; the fold's "
+            f"{n_pairs} pairs + the valence {n_seed} need more -- wrong "
+            "reference for this fold")
+    val_cols = occ_rows[n_pairs:n_pairs + n_seed]
+    c_seed = (compl.conj().T @ s @ mf.mo_coeff[:, val_cols])
+    c_seed = c_seed / np.linalg.norm(c_seed, axis=0)
+    dm_seed = (c_seed * np.concatenate([np.full(n_closed_val, 2.0),
+                                        np.ones(n_open)])) @ c_seed.conj().T
+    prev_closed[0] = c_seed[:, :n_closed_val].copy()
+    prev_open[0] = c_seed[:, n_closed_val:].copy()
+
+    hc_compl = compl.conj().T @ h_eff @ compl
+    eye = np.eye(compl.shape[1])
+
+    fm = scf.ROHF(mol)
+    fm.conv_tol = 1e-12
+    fm.verbose = 0
+    fm.get_hcore = lambda *args, **kw: hc_compl
+    fm.get_ovlp = lambda *args, **kw: eye
+
+    def _veff(mol_=None, dm=None, dm_last=0, v_last=None, hermi=1):
+        d_ao = compl @ _spin_summed(dm) @ compl.conj().T
+        v = compl.conj().T @ _closed_field(mf, d_ao) @ compl
+        return np.array((v, v))
+
+    fm.get_veff = _veff
+
+    def _init_guess(mol_=None, key=None, **kw):
+        # the projected-valence seed (see above): the substrate's own
+        # valence, confined-core-orthogonal, in the declared filling
+        return dm_seed
+
+    fm.get_init_guess = _init_guess
+
+    def _occ(mo_energy, mo_coeff):
+        # the filling is CHARACTER-FORCED (the _forced_rohf_occ rule,
+        # restricted to the complement): the closed pairs by
+        # closed-span weight, then the opens by the premium.
+        occ = np.zeros(len(mo_energy))
+        c_ao = compl @ mo_coeff
+        w_open = np.einsum("ai,ab,bi->i", c_ao.conj(), p_open,
+                           c_ao).real
+        w_closed = np.einsum("ai,ab,bi->i", c_ao.conj(), p_closed,
+                             c_ao).real
+        # the picks are three-level: the CHARACTER class (rounded -- a
+        # degenerate shell ties exactly), then the ENERGY ascending
+        # (the tight core-shell radials in the complement carry the
+        # same pure s/p character as the valence pair -- only the
+        # energy separates them; the ion field's d-below-s inversion
+        # is why the closed pair must not be picked by energy ALONE),
+        # then the MOM anchor (the previous cycle's columns -- the
+        # run_frac_occ cure for the degenerate-shell gauge chase).
+        mom_c = np.zeros(len(occ))
+        mom_o = np.zeros(len(occ))
+        if prev_open[0] is not None:
+            mom_o = np.abs(prev_open[0].conj().T @ mo_coeff).sum(axis=0)
+        if prev_closed[0] is not None:
+            mom_c = np.abs(prev_closed[0].conj().T @ mo_coeff).sum(axis=0)
+        cls_c = np.round(w_closed, 8)
+        closed = sorted(range(len(occ)),
+                        key=lambda i: (-cls_c[i],
+                                       round(float(mo_energy[i]), 6),
+                                       -mom_c[i]))[:n_closed_val]
+        occ[closed] = 2.0
+        rest = [i for i in range(len(occ)) if occ[i] == 0.0]
+        cls_o = np.round(2 * w_open + w_closed, 8)
+        opens = sorted(rest,
+                       key=lambda i: (-cls_o[i],
+                                      round(float(mo_energy[i]), 6),
+                                      -mom_o[i]))[:n_open]
+        occ[opens] = 1.0
+        prev_open[0] = mo_coeff[:, opens].copy()
+        prev_closed[0] = mo_coeff[:, closed].copy()
+        return occ
+
+    fm.get_occ = _occ
+
+    def _energy_elec(dm=None, h1e=None, vhf=None):
+        d_v = compl @ _spin_summed(dm) @ compl.conj().T
+        e_val = (float(np.einsum("ij,ji->", h_eff, d_v).real)
+                 + 0.5 * float(
+                     np.einsum("ij,ji->", _closed_field(mf, d_v),
+                               d_v).real))
+        fm.scf_summary["e1"] = e_val
+        fm.scf_summary["e2"] = 0.5 * e_val
+        return e_conf + e_val, e_val
+
+    fm.energy_elec = _energy_elec
+
+    fm.kernel()
+    if not fm.converged:
+        raise RuntimeError(
+            f"the folded valence SCF did not converge "
+            f"(E = {fm.e_tot:.8f}) -- the complement-local DIIS "
+            "needs revisiting")
+    # reassemble on the real substrate: the pinned block prepended,
+    # the accessors restored (the consumers see a standard ROHF)
+    fm.mo_coeff = np.hstack([c_conf, compl @ fm.mo_coeff])
+    fm.mo_energy = np.concatenate([eps_conf, fm.mo_energy])
+    fm.mo_occ = np.concatenate([np.full(n_pairs, 2.0), fm.mo_occ])
+    for name in ("get_occ", "get_init_guess", "energy_elec",
+                 "get_hcore", "get_ovlp", "get_veff"):
+        del fm.__dict__[name]
+    return mol, fm
 
