@@ -441,9 +441,10 @@ _U14E_FRAC_VOID = Scenario(
 # bands (else the Roothaan fills them).  The references are
 # trusted-cache chks: Scunc's own plain aufbau lands the deep basin;
 # Tiunc's plain aufbau lands a SHALLOW same-filling basin 11 mEh high
-# (the measured multi-basin, map.md Issues) -- its rungs/rohf.chk is
-# the SEEDED deep-basin reference (logs/basin_probe.log), trusted as
-# every cached chk is.
+# and NO fresh start reaches the deepest one (the forced hooks
+# diverge under every policy from every start) -- its rungs/rohf.chk
+# is the CENSUSED deepest basin (logs/census.log: the seed-refinement
+# DIIS attractor), trusted as every cached chk is.
 _TM_UNC_BANDS = {
     "1s": tuple(f"{k}s" for k in range(1, 9)),
     "2s": tuple(f"{k}s" for k in range(9, 15)),

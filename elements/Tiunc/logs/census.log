@@ -1,0 +1,41 @@
+== the Tiunc basin census (conv_tol 1e-12; forced = whole-l spans: l0+l1 closed, l2 open) ==
+  C1 plain (unforced)        E = -848.39639007  conv=True  closed=10 open=2 d-char=['0.3982', '0.3982']
+  C1 default (forced)        E = 14697748.05755255  conv=False  closed=10 open=2 d-char=['1.0843', '2.9787']
+  C1 atom (forced)           E = 15229710.84050641  conv=False  closed=10 open=2 d-char=['2.9563', '2.9563']
+  C1 huckel (forced)         E = 14680163.33062496  conv=False  closed=10 open=2 d-char=['7.5826', '5.4204']
+  C1 minao (forced)          E = 14697830.50049182  conv=False  closed=10 open=2 d-char=['5.3517', '2.9681']
+  C1 cross-seed contracted   E = 14548457.09113917  conv=False  closed=10 open=2 d-char=['0.0001', '0.0151']
+  D2h plain (unforced)       E = -848.39639007  conv=True  closed=10 open=2 d-char=['0.3982', '0.3982']
+  D2h seeded <- trusted      E = 15386534.73653172  conv=False  closed=10 open=2 d-char=['0.8309', '0.8309']
+  C1 reverse-seed <- D2h     E = 14697489.38192863  conv=False  closed=10 open=2 d-char=['4.4619', '6.2462']
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/census_tiunc.tmp.py", line 103, in <module>
+    name, mf_best = min(ok.items(), key=lambda kv: kv[1].e_tot)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: min() iterable argument is empty
+
+== census v2: newton-forced fresh guesses; hook-free DIIS seeds ==
+  C1 DIIS <- trusted (no hook)       E = -848.40744343  conv=True  closed=10 open=2 d-char=['0.3987', '0.3987']
+  C1 newton <- default (forced)      E = 30794.90171566  conv=False  closed=10 open=2 d-char=['0.0000', '0.0000']
+  C1 newton <- atom (forced)         E = 18920.15589956  conv=False  closed=10 open=2 d-char=['0.0102', '0.0000']
+  C1 newton <- huckel (forced)       E = 14548247.94414282  conv=False  closed=10 open=2 d-char=['0.3284', '0.9103']
+  C1 newton <- minao (forced)        E = 28308.55520268  conv=False  closed=10 open=2 d-char=['0.0000', '0.0000']
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/census_tiunc.tmp.py", line 92, in <module>
+    results["C1 DIIS <- contracted seed (no hook)"] = one(
+                                                      ^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/census_tiunc.tmp.py", line 58, in one
+    mf.mo_occ = hook(np.zeros(X.shape[1]), mf.mo_coeff)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+== census v3: the seed family ==
+  CACHED trusted chk (no SCF)            E = -848.40648875  conv=True  closed=10 open=2 d-char=['0.3982', '0.3982'] eps-open=['-0.092628', '-0.092628']
+  C1 DIIS <- contracted seed (no hook)   E = -848.40744343  conv=True  closed=10 open=2 d-char=['0.3987', '0.3987'] eps-open=['-0.090219', '-0.090219']
+  C1 newton <- contracted seed (forced)  E = -848.40648875  conv=True  closed=10 open=2 d-char=['0.3982', '0.3982'] eps-open=['-0.092628', '-0.092628']
+  C1 DIIS <- trusted (no hook)           E = -848.40744343  conv=True  closed=10 open=2 d-char=['0.3987', '0.3987'] eps-open=['-0.090219', '-0.090219']
+  D2h DIIS <- trusted (no hook)          E = -848.40744343  conv=True  closed=10 open=2 d-char=['0.3987', '0.3987'] eps-open=['-0.090219', '-0.090219']
+  C1 DIIS <- D2h solution (no hook)      E = -848.40744343  conv=True  closed=10 open=2 d-char=['0.3987', '0.3987'] eps-open=['-0.090219', '-0.090219']
+  D2h newton <- trusted (forced)         E = -848.40648875  conv=True  closed=10 open=2 d-char=['0.3982', '0.3982'] eps-open=['-0.092628', '-0.092628']
+
+ADOPTED D2h DIIS <- trusted (no hook): E = -848.40744343 Eh -> elements/Tiunc/rungs/rohf.chk

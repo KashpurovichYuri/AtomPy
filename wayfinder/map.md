@@ -50,34 +50,27 @@ user decision; the partial verdict 91/91-isolation-green).
   scrambles the occupation-column pairing (measured: the runaway
   class) -- the user's MO-selection-by-irreps hypothesis evaluated
   and declined ON THE SEED SIDE; the solver already irrep-adapts;
-  (4) the Tiunc basin zoo now has three same-filling members:
-  -848.39639 (the plain D2h draw), -848.40648875 (the trusted
-  record), and -848.40744343 (the seeded-D2h draw, the DEEPEST
-  known, open pair degenerate at -0.090219) -- the trusted reference
-  is NOT certified-global, it is certified-REPRODUCIBLE; promoting
-  the deeper basin is a user decision (the free cells would shift
-  ~1 mEh uniformly; the compressed cells are minutes to re-run).
+  (4) the Tiunc basin zoo, CENSUS-RESOLVED (2026-11-08,
+  elements/Tiunc/logs/census.log): two stationary basins on the unc
+  basis -- the forced-Newton class -848.40648875 (the old trusted
+  record) and the seed-refinement DIIS attractor -848.40744343,
+  1 mEh deeper -- both with s/d-HYBRID opens (~0.4 d per open MO:
+  pure-3d opens are a contracted-subspace property; every fresh
+  forced start DIVERGES, so no ReferenceSpec gate is declared -- the
+  trusted cache is the one mechanism).  The user promoted the deeper
+  basin; the free cells re-run on it.
   Scunc: the trusted record is already the deeper of its two.
 - The lane substrate's D2h basin wander (2026-11-07, the compressed
   round): the from-scratch plain D2h draw is basin-chaotic (the
   contracted Ti's plain D2h lands the RUNAWAY -848.2834 while Sc's
-  hits its reference exactly) -- lane_substrate now VERIFIES the
-  plain energy against the trusted rungs/rohf.chk and retries
-  C1-seeded on disagreement past 1e-5.  But the SEEDED D2h run does
-  NOT pin the seed's basin either: under DIIS it slides to its own
-  solution (measured: Scunc -759.73708 vs the seed -759.73738;
-  Tiunc -848.40744, one mEh BELOW the trusted reference -- possibly
-  a deeper 3d2 4s2 basin than the census record's, filling
-  unverified).  Benign for the lanes (their certificates are
-  basin-blind: the fold is the span's own Roothaan; the compressed
-  twins validated EXACTLY, ptp e-15 class) but the docstring's
-  "reproduces the reference energy exactly" is measured FALSE on
-  these atoms -- the follow-ups: the substrate filling check, the
-  Newton-stays-in-basin question, and whether -848.4074 is a real
-  deeper basin (then the SEEDED reference itself re-derives).
-  [Superseded by the probe above: the filling IS 3d2 4s2 (verified),
-  the -848.4074 basin IS real (reverse-seed-stable), and the
-  docstring now states the measured truth.]
+  hits its reference exactly) -- lane_substrate VERIFIES the plain
+  energy against the trusted rungs/rohf.chk and retries C1-seeded on
+  disagreement past 1e-5.  The seeded retry slides to its own
+  solution -- which the census resolved: the attractor it slides to
+  IS the adopted deepest basin (-848.40744343, reverse-seed-stable,
+  reached identically from every seed tested), so after the
+  promotion the retry lands the reference basin EXACTLY -- the
+  substrate and the free route run the same field again.
 - The Ti multi-basin finding (2026-11-07, the consistency probe):
   the Ti 3d2 4s2 ROHF hosts SAME-FILLING basins 11 mEh apart on the
   CONTRACTED basis itself (the record's gated -848.40648875 vs an
@@ -85,15 +78,13 @@ user decision; the partial verdict 91/91-isolation-green).
   (-848.39639) -- no variationality violation (the primitive sets
   are identical, the subspace exact; SEEDED from the contracted
   record through the cross-overlap, the unc basis reproduces
-  -848.40648875 EXACTLY).  The Tiunc reference was the shallow
-  basin; the SEEDED deep-basin reference now sits in
-  elements/Tiunc/rungs/rohf.chk (the trusted-cache convention
-  carries it) -- the Tiunc cells owe a rerun against it (~5 h: the
-  free cells + the lane; the anchor and every dE column shift).
-  logs/basin_probe.log is the record.  Fact 21 gains a measured
-  instance: even at the right filling, plain aufbau can land 11 mEh
-  high; the seed (not the gate) is the cure when the gate's cycling
-  diverges on the basis.
+  -848.40648875 EXACTLY).  2026-11-08: the Tiunc reference is now
+  the CENSUSED deepest basin (logs/census.log -- the seeded record
+  itself re-derives: DIIS from it rolls to -848.40744343); the
+  Tiunc cells re-run on it.  Fact 21 gains a measured instance:
+  even at the right filling, plain aufbau can land 11 mEh high; the
+  seed (not the gate) is the cure when the gate's cycling diverges
+  on the basis.
 - The queued CASCI review (the user, 2026-11-06; PRECEDES the next
   physics wave): the CASCI calculations get their own review pass —
   the window-poverty readings (+923 mEh class), the reference-echo
