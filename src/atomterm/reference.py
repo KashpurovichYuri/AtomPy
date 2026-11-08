@@ -721,7 +721,7 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     RuntimeError
         If the valence SCF does not converge under plain DIIS.
     """
-    from pyscf import scf
+    from pyscf import gto, scf
 
     from atomterm.core import (closed_shell_core_energy,
                                confined_core_orbitals)
@@ -781,7 +781,18 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     hc_compl = compl.conj().T @ h_eff @ compl
     eye = np.eye(compl.shape[1])
 
-    fm = scf.ROHF(mol)
+    mol_scf = mol
+    if getattr(mol, "symmetry", False):
+        # the symmetry layer symmetrizes get_ovlp against the
+        # AO-adapted basis -- it would strangle the complement-space
+        # shims.  The folded certificates are the SO(3) closures,
+        # never the D2h bookkeeping: strip the symmetry for the SCF,
+        # restore the real mol after (the MO columns are AO columns,
+        # valid on both).
+        mol_scf = gto.M(atom=mol.atom, basis=mol.basis, spin=mol.spin,
+                        ecp=mol.ecp, charge=mol.charge, verbose=0)
+
+    fm = scf.ROHF(mol_scf)
     fm.conv_tol = 1e-12
     fm.verbose = 0
     fm.get_hcore = lambda *args, **kw: hc_compl
@@ -867,6 +878,7 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     fm.mo_coeff = np.hstack([c_conf, compl @ fm.mo_coeff])
     fm.mo_energy = np.concatenate([eps_conf, fm.mo_energy])
     fm.mo_occ = np.concatenate([np.full(n_pairs, 2.0), fm.mo_occ])
+    fm.mol = mol
     for name in ("get_occ", "get_init_guess", "energy_elec",
                  "get_hcore", "get_ovlp", "get_veff"):
         del fm.__dict__[name]

@@ -1,0 +1,42 @@
+anchor (neutral field): E = -848.40744343
+folded reference: E = -848.00772956 (+399.7 mEh vs the anchor)
+
+  [window] compressed 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.8201-0.8201
+--- tiunc_3d4s_3-1_casci_ao_-_pol_raw
+{"tag": "tiunc_3d4s_3-1_casci_ao_-_pol_raw", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.3026025530725747e-13, "e_ground": -848.2720737702284, "energies_pyscf": [-848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2394328025456, -848.2394328025455], "max_de_vs_pyscf": 1.1368683772161603e-13, "ground_term": "3F", "ground_l2": 11.999999999999993, "ground_lz2": 1.1603146458179268, "terms": {"3F": 35, "3P": 15, "5F"
+
+  [window] compressed 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.8201-0.8201
+--- tiunc_3d4s_3-1_casci_ao_-_pol_avg
+{"tag": "tiunc_3d4s_3-1_casci_ao_-_pol_avg", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.2071233729548112e-13, "e_ground": -848.2720737702284, "energies_pyscf": [-848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2720737702284, -848.2394328025455, -848.2394328025455], "max_de_vs_pyscf": 0.0, "ground_term": "3F", "ground_l2": 12.000000000000028, "ground_lz2": 3.8615799448349066, "terms": {"3F": 35, "3P": 15, "5F": 7, "5P": 3, "3G":
+
+  [window] compressed 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.8201-0.8201
+--- tiunc_3d4s_3-1_casci_ao_-_pur_avg
+{"tag": "tiunc_3d4s_3-1_casci_ao_-_pur_avg", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.2093438190040615e-13, "e_ground": -848.2720737702267, "energies_pyscf": [-848.2720737702267, -848.2720737702267, -848.2720737702267, -848.2720737702267, -848.2720737702267, -848.2720737702267, -848.2720737702267, -848.2394328025439, -848.2394328025439], "max_de_vs_pyscf": 0.0, "ground_term": "3F", "ground_l2": 11.999999999999991, "ground_lz2": 1.5261359010068882, "terms": {"3F": 35, "3P": 15, "5F": 7, "5P": 3, "3G":
+
+  [window] compressed 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.8201-0.8201
+--- tiunc_3d4s_3-1_casci_mo_-_pol_avg
+{"tag": "tiunc_3d4s_3-1_casci_mo_-_pol_avg", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.1471713296250527e-13, "e_ground": -848.2896413635292, "energies_pyscf": [-848.2896413635292, -848.2192730948054, -848.2192730946801, -848.2192730946389, -848.18917521727, -848.1891752169959, -848.1891752169396, -848.1692808891407, -848.1692808890895], "max_de_vs_pyscf": 0.0, "ground_term": "3S", "ground_l2": 0.03380598539363653, "ground_lz2": 0.011268661818781365, "terms": {"3S": 7, "5P": 12, "3P": 68, "3D": 30, "5S
+
+  [window] compressed 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.8201-0.8201
+--- tiunc_3d4s_3-1_casci_mo_-_pur_avg
+{"tag": "tiunc_3d4s_3-1_casci_mo_-_pur_avg", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.020605904817785e-14, "e_ground": -848.2896413635273, "energies_pyscf": [-848.2896413635273, -848.2192730948036, -848.2192730946782, -848.219273094637, -848.1891752172681, -848.1891752169939, -848.1891752169377, -848.1692808891388, -848.1692808890876], "max_de_vs_pyscf": 1.1368683772161603e-13, "ground_term": "3S", "ground_l2": 0.03380598539363372, "ground_lz2": 0.01126866181878068, "terms": {"3S": 7, "5P": 12, "3P":
+
+  [window] compressed 3d: k=1 of 8 bands, capture 1.0000-1.0000
+--- tiunc_3d_2-0_casci_ao_-_pol_avg
+{"tag": "tiunc_3d_2-0_casci_ao_-_pol_avg", "kind": "casci", "n_det": 10, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.1582735598713043e-13, "e_ground": -848.2770878095562, "energies_pyscf": [-848.2770878096603, -848.2770878096602, -848.2770878095591, -848.2770878095562, -848.2770878095059, -848.2770878094814, -848.2770878094703, -848.2345173190387, -848.2345173186462], "max_de_vs_pyscf": 2.902424967032857e-10, "ground_term": "3F", "ground_l2": 12.000000000000004, "ground_lz2": 3.612979689348243, "terms": {"3F": 7, "3P": 3}, "comm_norm
+
+  [window] compressed 3d: k=1 of 8 bands, capture 1.0000-1.0000
+--- tiunc_3d_2-0_casci_mo_-_pol_avg
+{"tag": "tiunc_3d_2-0_casci_mo_-_pol_avg", "kind": "casci", "n_det": 10, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.2004620348070603e-13, "e_ground": -848.2770878095563, "energies_pyscf": [-848.2770878095563, -848.0840610275923, -848.0840610273807, -848.08406102731, -848.0837844547956, -848.0837844547212, -848.0837844540323, -847.6826250467607, -847.6826250467172], "max_de_vs_pyscf": 2.6705038180807605e-10, "ground_term": "3S", "ground_l2": 2.018851376677276e-19, "ground_lz2": 2.0549576180512448e-20, "terms": {"3S": 1, "3P": 9}, "co
+
+[no-arm] source ground block: 7 roots
+[no-arm] occupation groups: [1, 5]
+--- (iii) no2: ncas = 6 E = -848.272074  dE(vs folded) = -264.3 mEh  L2 = 11.9036  closure = {'lz': '1.3e-14', 'lperp': '1.6e-14'}
+
+D2h substrate: E = -848.40744343
+folded D2h substrate: E = -848.00772956
+  [window] compressed 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.8201-0.8201
+--- lane (folded substrate)
+{"cell": "tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg", "term": [3, "g"], "energies": [-3.0814823057360203, -3.08148230573602, -3.08148230573602, -3.0814823057360208, -3.0814823057360186, -3.0814823057360194, -3.0814823057360163], "total": -848.2720737702128, "ptp": 4.440892098500626e-15, "l2": [12.000000000000009, 12.000000000000012, 11.999999999999996, 12.000000000000002, 12.000000000000009, 12.00000000000001, 12.000000000000007], "s2": [2.0000000000000004, 2.000000000000001, 1.9999999999999984, 1.9999999999999991, 2.0, 2.0000000000000004, 1.9999999999999996], "n_det": 120, "anchor_dev": 2.6645352591003757e-15, "win_lz": 1.2652566836080862e-14, "win_lperp": 1.6421029887508298e-14, "comm_norm_h_lz": 1.8988578453669764e-14, "comm_norm_h_l2": 1.3631369904960327e-13, "res_h_lz": 2.6870627897736997e-15, "res_h_l2": 1.3282186223341439e-14, "fold": ["1s", "2s", "2p", "3s", "3p"], "core_pairs": 9, "c
+
+sandbox removed
