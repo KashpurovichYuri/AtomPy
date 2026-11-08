@@ -12,6 +12,12 @@ dies).
 - [33 — the symmetry-breaking anatomy deliverable](tickets/33-symmetry-anatomy.md):
   design-first — the frozen-landscape tables that replace the retired
   scan pointers.
+- [34 — the folded reference + the window characterization matrix](tickets/34-folded-reference.md):
+  the field-window consistency fix (the confined core = the free ion
+  on a wide span; the valence pays +257.7 for a window cut on the
+  wrong field); the Tiunc census + promotion; the MO-default window
+  matrix; then the Sc port.  The queue tail (T-B..T-E) rides in the
+  ticket's After section.
 
 Resolved: ticket 32 (the symmetry lane) — the campaign complete
 (C/Si/Sc/Ti on the one table, the route axis, the UHF anchors), the
@@ -20,6 +26,16 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- The projected-Gram alternative, DECLINED (2026-11-08, the design
+  round): forming the compression Gram from S-PROJECTED member
+  vectors (bounded spectra, self-interpretable shares) instead of
+  the truncated ones.  The cons beyond the recompute: the idiom fork
+  (the truncated Gram is shared with the pur construction -- changing
+  both is a global re-certification), the marginal gain (the post-hoc
+  per-radial spectrum delivers the interpretability without touching
+  the construction), and the unmeasured ranking difference.  REVISIT
+  CONDITION: the per-radial spectrum showing truncated-ranking
+  distortions (ticket 34's riding-along installs the spectrum).
 - The D2h substrate layer, UNDERSTOOD (2026-11-07, the user-directed
   probe -- elements/Scunc/logs/d2h_probe.log is the record):
   (1) the D2h ROHF landscape is the SAME multi-basin zoo as C1 --
