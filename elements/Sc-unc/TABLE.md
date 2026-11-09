@@ -1,4 +1,4 @@
-# Scunc (3d¹ 4s², the uncontracted cc-pVDZ split)
+# Sc-unc (3d¹ 4s², the uncontracted cc-pVDZ split)
 
 Primitive split of Sc/cc-pVDZ (data/sc_ccpvdz_unc.txt). Windows:
 DISTILLED, k=1 per shell (`window_distilled` — the reference's own

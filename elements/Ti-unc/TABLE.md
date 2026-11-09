@@ -1,4 +1,4 @@
-# Tiunc (3d² 4s², the uncontracted cc-pVDZ split)
+# Ti-unc (3d² 4s², the uncontracted cc-pVDZ split)
 
 Primitive split of Ti/cc-pVDZ (data/ti_ccpvdz_unc.txt). Windows:
 DISTILLED, k=1 per shell (`window_distilled` — the reference's own

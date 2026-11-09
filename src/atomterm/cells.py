@@ -147,6 +147,12 @@ FIELDS = ("neutral", "folded")  # the reference field (an optional 9th slot)
 # window appends its fold tag: "3d3p@semi", "3s3p3d@1s2s2p4s"
 _WINDOW_RE = re.compile(r"[0-9][0-9a-z]*(?:@[0-9a-z]+)?\Z")
 
+# the campaign key: a plain alphanumeric token (an element symbol or a
+# declared label) or ONE hyphenated variant suffix (the uncontracted
+# twins: "Ti-unc") -- no leading/trailing/double hyphen; the hyphen
+# rides inside the address's first "_"-slot unharmed
+_ATOM_RE = re.compile(r"[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)?\Z")
+
 
 # the cell key -------------------------------------------------------
 
@@ -158,9 +164,10 @@ class CellKey:
 
     Attributes
     ----------
-    atom : campaign key, e.g. ``"Ti"``, ``"U14e"`` (the
-        ``elements/<Atom>/`` dir; a plain element symbol or a declared
-        ECP-atom label).
+    atom : campaign key, e.g. ``"Ti"``, ``"U14e"``, ``"Ti-unc"`` (the
+        ``elements/<Atom>/`` dir; a plain element symbol, a declared
+        ECP-atom label, or a hyphenated basis-variant label -- at most
+        one hyphen, no leading/trailing).
     window : NOMINAL span label, e.g. ``"3d4s"`` -- names the table
         row; the construction is the ``start`` axis (window = the
         span, start = the columns defining it).  A LANE window
@@ -222,11 +229,12 @@ class CellKey:
     def __post_init__(self):
         """Validate and canonicalize: axis vocabularies, void
         combinations, and the pur fold rule (raw -> avg)."""
-        if not (isinstance(self.atom, str) and self.atom.isalnum()
-                and 1 <= len(self.atom) <= 8):
+        if not (isinstance(self.atom, str)
+                and 1 <= len(self.atom) <= 8
+                and _ATOM_RE.match(self.atom)):
             raise ValueError(f"atom {self.atom!r} must be a campaign key "
                              "(an element symbol or a declared label "
-                             "like 'U14e')")
+                             "like 'U14e', 'Ti-unc')")
         object.__setattr__(self, "atom", self.atom.capitalize())
         if not (isinstance(self.window, str) and _WINDOW_RE.match(self.window)):
             raise ValueError(
@@ -1285,9 +1293,9 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         block = [d for d, m in zip(dets, sel) if m]
         # the DENSE ADJUDICATION (every CI block the budget fits): the
         # pinned Davidson can deterministically SKIP near-degenerate
-        # lowest roots (measured on the Scunc lane: the Ag ground
+        # lowest roots (measured on the Sc-unc lane: the Ag ground
         # PAIR of the 2D term -- the solver's second root landed four
-        # eigenvalues up; on Tiunc ALL FOUR blocks skipped), so our
+        # eigenvalues up; on Ti-unc ALL FOUR blocks skipped), so our
         # own exact H restricted to the block is the ADJUDICATOR: it
         # certifies the pinned roots (anchor_dev) and, on deviation,
         # REPLACES them (the corrected blocks recorded; the vectors

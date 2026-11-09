@@ -375,7 +375,7 @@ _U14E_WINDOWS = ("".join(_U_TIER["3f2d"]),) + tuple(
     + _U14E_PROMOTED
 
 # THE SHELL LAYER (the port of the multi-column fold, the machinery
-# proven on Scunc/Tiunc): the measured realizations from the record's
+# proven on Sc-unc/Ti-unc): the measured realizations from the record's
 # band probe (elements/U14e/logs/probe_bands.log -- the closed 6s on
 # 13s-15s, the 6p trio on 13p-15p, the 7s on 18s-20s; the open 5f on
 # 9f-11f, the 6d on 12d-14d).  The BAND-labeled windows above stay
@@ -440,8 +440,8 @@ _U14E_FRAC_VOID = Scenario(
 # the tight primitives -- measured: 99.99% capture with +13 Eh
 # core-energy error) and must EXCLUDE every skipped or active shell's
 # bands (else the Roothaan fills them).  The references are
-# trusted-cache chks: Scunc's own plain aufbau lands the deep basin;
-# Tiunc's plain aufbau lands a SHALLOW same-filling basin 11 mEh high
+# trusted-cache chks: Sc-unc's own plain aufbau lands the deep basin;
+# Ti-unc's plain aufbau lands a SHALLOW same-filling basin 11 mEh high
 # and NO fresh start reaches the deepest one (the forced hooks
 # diverge under every policy from every start) -- its rungs/rohf.chk
 # is the CENSUSED deepest basin (logs/census.log: the seed-refinement
@@ -545,24 +545,24 @@ CAMPAIGN: dict[str, CaseSpec] = {
     # the certified records' shapes).  CASCI-class only this wave
     # (run_casscf=False: the optimizer class is not declared on the
     # uncontracted bases yet).
-    "Scunc": CaseSpec("Sc", _SC_UNC_BASIS, nelec_act=3, ncore=9,
-                       shell_patterns=["3d", "4s"], spin=1,
-                       shell_bands=_TM_UNC_BANDS,
-                       shell_radials=_TM_UNC_RADIALS,
-                       sa_weights=[1 / 5] * 5,
-                       run_casscf=False, key="Scunc",
-                       scenarios=_unc_gates("scunc", (2, 1)),
-                       term=(2, "g"), lane_windows=("3d4s@ar",),
-                       lattice_windows=("3d",), lattice_sector=(2, 1)),
-    "Tiunc": CaseSpec("Ti", _TI_UNC_BASIS, nelec_act=4, ncore=9,
-                       shell_patterns=["3d", "4s"], spin=2,
-                       shell_bands=_TM_UNC_BANDS,
-                       shell_radials=_TM_UNC_RADIALS,
-                       sa_weights=[1 / 7] * 7,
-                       run_casscf=False, key="Tiunc",
-                       scenarios=_unc_gates("tiunc", (3, 1)),
-                       term=(3, "g"), lane_windows=("3d4s@ar",),
-                       lattice_windows=("3d",), lattice_sector=(2, 0)),
+    "Sc-unc": CaseSpec("Sc", _SC_UNC_BASIS, nelec_act=3, ncore=9,
+                        shell_patterns=["3d", "4s"], spin=1,
+                        shell_bands=_TM_UNC_BANDS,
+                        shell_radials=_TM_UNC_RADIALS,
+                        sa_weights=[1 / 5] * 5,
+                        run_casscf=False, key="Sc-unc",
+                        scenarios=_unc_gates("sc-unc", (2, 1)),
+                        term=(2, "g"), lane_windows=("3d4s@ar",),
+                        lattice_windows=("3d",), lattice_sector=(2, 1)),
+    "Ti-unc": CaseSpec("Ti", _TI_UNC_BASIS, nelec_act=4, ncore=9,
+                        shell_patterns=["3d", "4s"], spin=2,
+                        shell_bands=_TM_UNC_BANDS,
+                        shell_radials=_TM_UNC_RADIALS,
+                        sa_weights=[1 / 7] * 7,
+                        run_casscf=False, key="Ti-unc",
+                        scenarios=_unc_gates("ti-unc", (3, 1)),
+                        term=(3, "g"), lane_windows=("3d4s@ar",),
+                        lattice_windows=("3d",), lattice_sector=(2, 0)),
     # CAMPAIGN key `U14e`: the ECP-atom record's element dir
     # (``elements/U14e/``); the SYMBOL stays `U` (PySCF builds the
     # element; the ECP removes its 78 core electrons) and the `tag`

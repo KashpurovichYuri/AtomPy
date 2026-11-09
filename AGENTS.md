@@ -458,7 +458,7 @@ ticket is self-contained (no conversation context needed).
 
 State: the atom campaign (C, Si, Sc, Ti), the project walk (ticket
 30), and the ECP wave (ticket 31: the U14e campaign, the shell layer
-+ the multi-column fold validated on Scunc/Tiunc and ported, the G5
++ the multi-column fold validated on Sc-unc/Ti-unc and ported, the G5
 retirement — `run_u*` and the stage adapters deleted; git history is
 the archive) are COMPLETE.  Gated measurement batches (T2/M) run
 only on the user's enable.  The queued CASCI review (map.md Issues)

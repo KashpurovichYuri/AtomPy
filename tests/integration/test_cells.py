@@ -156,13 +156,29 @@ def test_lane_window_grammar():
 
 
 @fast
+def test_atom_grammar_admits_one_variant_hyphen():
+    """The campaign key is a plain token or ONE hyphenated variant
+    suffix (the uncontracted twins): the hyphen rides inside the
+    address's first ``_``-slot unharmed (round-trip exact), and the
+    malformed forms -- leading, trailing, double hyphen, pure digits --
+    are unrepresentable."""
+    k = CellKey.from_address("ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg")
+    assert k.atom == "Ti-unc"
+    assert k.address == "ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg"
+    assert CellKey("ti-unc", "3d4s", (3, 1)).atom == "Ti-unc"  # normalized
+    for bad in ("Ti--unc", "-tiunc", "tiunc-", "1ti", "ti_unc", ""):
+        with pytest.raises(ValueError, match="campaign key"):
+            CellKey(bad, "3d4s", (3, 1))
+
+
+@fast
 def test_field_axis_default_keeps_every_store_name():
     """The field axis is an OPTIONAL ninth slot, appended only when
     folded: an eight-slot address parses as neutral and re-serializes
     byte-identical (the stores minted before the axis need no
     migration), and a folded cell can never collide with its neutral
     twin (the identity the folded probe ran under is now unambiguous)."""
-    pre_axis = "tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg"
+    pre_axis = "ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg"
     k = CellKey.from_address(pre_axis)
     assert k.field == "neutral"
     assert k.address == pre_axis
@@ -178,11 +194,11 @@ def test_field_axis_folded_requires_tagged_window():
     """A folded key names a folded reference, and that field is
     defined BY its confined span -- an untagged window has no span to
     define it, so the combination is unrepresentable."""
-    CellKey("Tiunc", "3d4s@ar", (3, 1), substrate="pur", field="folded")
+    CellKey("Ti-unc", "3d4s@ar", (3, 1), substrate="pur", field="folded")
     with pytest.raises(ValueError, match="fold-tagged"):
-        CellKey("Tiunc", "3d4s", (3, 1), field="folded")
+        CellKey("Ti-unc", "3d4s", (3, 1), field="folded")
     with pytest.raises(ValueError, match="not in"):
-        CellKey("Tiunc", "3d4s@ar", (3, 1), field="frozen")
+        CellKey("Ti-unc", "3d4s@ar", (3, 1), field="frozen")
 
 
 @fast
@@ -893,7 +909,7 @@ def test_run_lane_cell_multicolumn_fold(carbon_d2h, carbon, tmp_path):
         assert abs(v - 2.0) < 1e-8
     # a band shared by TWO FOLD SHELLS duplicates its rows -- the span
     # is the UNION (a duplicated row would make the Gram exactly
-    # singular; pinned after the Scunc lane hit it live)
+    # singular; pinned after the Sc-unc lane hit it live)
     p_union = run_lane_cell(
         CellKey("C", "2p@1s2s", (2, 0), substrate="pur"), mol, mf,
         (1, "g"), shell_bands={"1s": ("1s", "2s"), "2s": ("2s",)},
@@ -906,7 +922,7 @@ def test_run_lane_cell_multicolumn_fold(carbon_d2h, carbon, tmp_path):
 def test_unc_lanes_load_exact_from_the_store():
     """The validation lanes re-verified from the COMMITTED stores (the
     heavy-pin pattern: fresh legs run in the campaign; the verdicts
-    load and re-check their meters): Scunc hosts 2D and Tiunc 3F
+    load and re-check their meters): Sc-unc hosts 2D and Ti-unc 3F
     EXACTLY through the multi-column folds -- every component at its
     L(L+1) and S(S+1), degenerate to the ptp floor, the core pair
     count chemical (9), the Roothaan converged, and the dense
@@ -920,9 +936,9 @@ def test_unc_lanes_load_exact_from_the_store():
     # U14e's 17-component lane is the live-skip class (the recorded
     # correction's deviation, observed 3.0e-14 ptp era: > 1e-3)
     cases = (
-        ("Scunc", "scunc_3d4s@ar_2-1_casci_ao_-_pur_avg", 6.0, 0.75, 9,
+        ("Sc-unc", "sc-unc_3d4s@ar_2-1_casci_ao_-_pur_avg", 6.0, 0.75, 9,
          "exact"),
-        ("Tiunc", "tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg", 12.0, 2.0, 9,
+        ("Ti-unc", "ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg", 12.0, 2.0, 9,
          "exact"),
         ("U14e", "u14e_5f6d@6s6p7s_4-0_casci_ao_-_pur_avg", 72.0, 6.0, 5,
          "skip"),
