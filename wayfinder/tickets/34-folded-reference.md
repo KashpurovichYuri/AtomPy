@@ -154,6 +154,39 @@ T-D docs /code-review (anti-inflation); T-E the term-ID round (NIST
 as the acceptance test).  Stop after T-E's review -- no physics waves
 before it.
 
+## The first round CLOSED (2026-11-09, the clarity pass)
+
+The end state the user asked for -- C/Si/Sc/Ti/Scunc/Tiunc, clear
+with no questions:
+
+- The distilled windows are the ONE window-side construction
+  (certified step 1; the compression deleted step 2); the
+  contracted verification reproduced every certified total at
+  0.00e+00 mEh (the 1:1 identity in production); the twins
+  re-anchored, 3F/2D exact, unc lower by 3.2-7.7 mEh (variational).
+- THE LANE-CORE REPAIR (3293a5c): the frozen core = the reference's
+  OWN core (span-restricted SCF columns) -- +124.3/+38.7 collapse to
+  +6.1/+5.1 (the projected-density bookkeeping form, disclosed);
+  certificates exact.
+- The clarity pass (81046b5): the window-kind vocabulary (start =
+  the SOURCE: distilled / controls / NO), the k contract (k=1 usual;
+  k>=2 needs a correlated source -- the SCF Gram is rank-1 --
+  and the CAS budget), the six tables regenerated with the verdict
+  language, the twins' preambles cut to ~10 lines.
+- The controls are EXPLAINED, not failed: mo/moc = m-incomplete by
+  construction (the SCF's hybrid-open gauge; 2 opens cannot fill
+  5 m-slots); their scrambled term readings are the certified
+  fingerprints.  Refining them converges onto the distilled
+  machinery itself (the Gram-replication IS the refinement).
+- One disclosed outlier: the Scunc 3d (2,1) quartet +100.6 mEh above
+  its contracted counterpart (a window-shape effect: the SCF-fit
+  radial vs the contracted band serving the d3-like quartet).
+
+NEXT (user-gated, after review): the U14e round on the DISTILLED
+5f6d (CAS(4,12)) and/or the promoted ladder; then the tail
+(projector_weights, anisotropy column, docstring review) and
+T-B -> T-E.
+
 ## The first round, scoped (2026-11-09, user)
 
 **Ti and Sc fully first (contracted verification + the unc re-anchor),
