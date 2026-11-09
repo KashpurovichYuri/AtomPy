@@ -695,16 +695,34 @@ def ground_block(ops: dict) -> tuple[float, int, np.ndarray, np.ndarray]:
     lowest nroots states": the SA-anchoring rule and the NO-source
     averaging rule (never hardcode a term).
 
+    The energy window is SCALE-AWARE: a residual core-field anisotropy
+    splits the multiplet's energies AND perturbs the states' ``<L^2>``
+    (they are no longer exact eigenstates of a non-scalar H), so the
+    term is identified by L^2 within 0.1 -- far above the anisotropy
+    perturbation, far below any term spacing (>= 2 between L values)
+    -- and the energy window spans one percent of the gap to the
+    first state OUTSIDE that L^2 band.  When every near state shares
+    the band, the window falls back to roundoff (1e-6).
+
     Parameters
     ----------
     ops : a :func:`build_operators` dict -- the block is measured on
         that operator set.
+
+    Notes
+    -----
+    A same-``L^2`` excited term QUASI-DEGENERATE with the ground term
+    (within the window) joins the block -- there the "ground block"
+    is genuinely ill-defined, whatever the window; the L^2 identity,
+    not the energy, carries the term.
     """
     ev, vec = np.linalg.eigh(ops["H"].real)
     nchk = min(60, len(ev))
     l2 = [vec[:, r] @ ops["L2"].real @ vec[:, r] for r in range(nchk)]
+    other = [r for r in range(1, nchk) if abs(l2[r] - l2[0]) >= 0.1]
+    tol = max(1e-6, 0.01 * (ev[other[0]] - ev[0])) if other else 1e-6
     block = [r for r in range(nchk)
-             if abs(l2[r] - l2[0]) < 1e-6 and ev[r] - ev[0] < 1e-6]
+             if abs(l2[r] - l2[0]) < 0.1 and ev[r] - ev[0] < tol]
     w = np.zeros(len(ev))
     w[block] = 1.0 / len(block)
     return float(ev[0]), len(block), w, vec

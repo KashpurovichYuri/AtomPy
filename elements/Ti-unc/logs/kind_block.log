@@ -1,0 +1,147 @@
+
+===== cells Sc-unc =====
+ROHF E = -759.73738486 Eh
+  [cell] sc-unc_3d4s_2-1_casci_ao_-_pol_raw
+  [cell] sc-unc_3d4s_2-1_casci_ao_-_pol_avg
+  [cell] sc-unc_3d4s_2-1_casci_ao_-_pur_avg
+  [void] sc-unc_3d4s_2-1_casci_ao_-_pol_frac -- frac-reference-unmeasured: no measured fractional-occupation basin on the uncontracted basis yet (2026-11-06)
+  [cell] sc-unc_3d4s_2-1_casci_mo_-_pol_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 0.9987-0.9987; 4s: k=1 of 3 bands, capture 0.1757-0.8121
+  [cell] sc-unc_3d4s_2-1_casci_moc_-_pol_avg
+  [cell] sc-unc_3d4sno2_2-1_casci_no_-_pol_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 0.9987-0.9987; 4s: k=1 of 3 bands, capture 0.1757-0.8121
+[no-arm] source ground block: 1 roots
+[no-arm] occupation groups: [1, 1, 2, 2]
+  [cell] sc-unc_3d4s_2-1_casci_mo_-_pur_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 0.9987-0.9987; 4s: k=1 of 3 bands, capture 0.1757-0.8121
+  [cell] sc-unc_3d4s_2-1_casci_moc_-_pur_avg
+  [cell] sc-unc_3d4sno2_2-1_casci_no_-_pur_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 0.9987-0.9987; 4s: k=1 of 3 bands, capture 0.1757-0.8121
+[no-arm] source ground block: 5 roots
+[no-arm] occupation groups: [1, 5]
+  [void] sc-unc_3d4s_2-1_casscf_ao_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_mo_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_moc_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4sno2_2-1_casscf_no_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_ao_virtmix_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_ao_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_mo_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_moc_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4sno2_2-1_casscf_no_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_ao_radial_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_ao_radial_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_ao_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_mo_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_moc_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4sno2_2-1_casscf_no_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_ao_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_mo_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_casscf_moc_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4sno2_2-1_casscf_no_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_ao_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_mo_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_moc_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4sno2_2-1_sa-casscf_no_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_ao_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_mo_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_moc_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4sno2_2-1_sa-casscf_no_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_ao_radial_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_ao_radial_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_ao_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_mo_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_moc_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4sno2_2-1_sa-casscf_no_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_mo_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4s_2-1_sa-casscf_moc_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] sc-unc_3d4sno2_2-1_sa-casscf_no_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [cell] sc-unc_3d_2-1_casci_ao_-_pol_avg
+  [cell] sc-unc_3d_2-1_casci_mo_-_pol_avg
+  wrote elements/Sc-unc/cells.json + cells.md
+
+===== cells Ti-unc =====
+ROHF E = -848.40744343 Eh
+  [cell] ti-unc_3d4s_3-1_casci_ao_-_pol_raw
+  [cell] ti-unc_3d4s_3-1_casci_ao_-_pol_avg
+  [cell] ti-unc_3d4s_3-1_casci_ao_-_pur_avg
+  [void] ti-unc_3d4s_3-1_casci_ao_-_pol_frac -- frac-reference-unmeasured: no measured fractional-occupation basin on the uncontracted basis yet (2026-11-06)
+  [cell] ti-unc_3d4s_3-1_casci_mo_-_pol_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.1685-0.8211
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:862: UserWarning: canonical order scrambled (closed at [np.int64(0), np.int64(1), np.int64(2), np.int64(3), np.int64(4), np.int64(5), np.int64(6), np.int64(7), np.int64(8)]); reordering into closed|open|virtual
+  perm = canonical_order(mf, ncore)
+  [cell] ti-unc_3d4s_3-1_casci_moc_-_pol_avg
+  [cell] ti-unc_3d4sno2_3-1_casci_no_-_pol_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.1685-0.8211
+[no-arm] source ground block: 7 roots
+[no-arm] occupation groups: [1, 5]
+  [cell] ti-unc_3d4s_3-1_casci_mo_-_pur_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.1685-0.8211
+  [cell] ti-unc_3d4s_3-1_casci_moc_-_pur_avg
+  [cell] ti-unc_3d4sno2_3-1_casci_no_-_pur_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.1685-0.8211
+[no-arm] source ground block: 7 roots
+[no-arm] occupation groups: [1, 5]
+  [void] ti-unc_3d4s_3-1_casscf_ao_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_mo_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_moc_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4sno2_3-1_casscf_no_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_ao_virtmix_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_ao_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_mo_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_moc_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4sno2_3-1_casscf_no_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_ao_radial_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_ao_radial_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_ao_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_mo_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_moc_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4sno2_3-1_casscf_no_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_ao_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_mo_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_casscf_moc_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4sno2_3-1_casscf_no_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_ao_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_mo_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_moc_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4sno2_3-1_sa-casscf_no_-_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_ao_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_mo_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_moc_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4sno2_3-1_sa-casscf_no_-_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_ao_radial_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_ao_radial_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pol_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [void] ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pur_avg -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
+  [cell] ti-unc_3d_2-0_casci_ao_-_pol_avg
+  [cell] ti-unc_3d_2-0_casci_mo_-_pol_avg
+  wrote elements/Ti-unc/cells.json + cells.md
+
+done
+
+===== cells Sc-unc =====
+ROHF E = -759.73738486 Eh
+  [cell] sc-unc_3d4s@ar_2-1_casci_ao_-_pur_avg
+  plain D2h SCF a wrong basin (-759.73708452 vs the trusted -759.73738486) -- retrying C1-seeded (elements/Sc-unc/rungs/rohf.chk)
+lane substrate D2h ROHF E = -759.73708452 Eh
+  [cell] sc-unc_3d4s@ar_2-1_casci_ao_-_pol_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 0.9987-0.9987; 4s: k=1 of 3 bands, capture 0.1757-0.8121
+  wrote elements/Sc-unc/cells.json + cells.md
+
+===== cells Ti-unc =====
+ROHF E = -848.40744343 Eh
+  [cell] ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg
+  plain D2h SCF a wrong basin (-848.39639007 vs the trusted -848.40744343) -- retrying C1-seeded (elements/Ti-unc/rungs/rohf.chk)
+lane substrate D2h ROHF E = -848.40744343 Eh
+  [cell] ti-unc_3d4s@ar_3-1_casci_ao_-_pol_avg
+  [window] distilled 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.1685-0.8211
+  wrote elements/Ti-unc/cells.json + cells.md
+
+done
+ALL-DONE

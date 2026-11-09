@@ -73,7 +73,7 @@ BEGIN, END = "<!-- ladder:begin -->", "<!-- ladder:end -->"
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
                 "sa-casscf": "SA-CASSCF"}
-START_NAMES = {"ao": "AO", "mo": "MO", "moc": "MO", "no": "NO"}
+START_NAMES = {"ao": "AO", "mo": "MO", "moc": "MOC", "no": "NO"}
 MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
               "virtmix": "virtual-mix"}
 
@@ -179,12 +179,12 @@ def _row(k, p, anchor, spec) -> str:
 
 
 def _rows(keys, cells, anchor, spec) -> list[str]:
-    """Every RUN cell of the key set except NO starts (the
-    occupation-group windows -- diagnostics, not ladder rows), in
-    the given order."""
+    """Every RUN cell of the key set (a NO-start CASCI cell included --
+    the kind block's density leg; NO-start OPTIMIZER cells are starts,
+    not ladder rows), in the given order."""
     return [_row(k, p, anchor, spec)
             for k in keys
-            if k.start != "no"
+            if (k.start != "no" or k.method == "casci")
             and (p := payload_of(cells, k)) is not None]
 
 
@@ -225,14 +225,16 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     planned windows whose CASCI anchors are read, then every lane
     window whose route twins ran.  The ROHF anchor row leads, the
     UHF anchor row follows when the store carries the record;
-    NO-start cells are not ladder rows; a lane family without run
+    a NO-start CASCI cell IS a ladder row (the kind block's density
+    leg); NO-start OPTIMIZER cells are not (a start, not a family);
     optimizer twins is not this table's story yet."""
     body: list[str] = []
     seen: set[str] = set()
 
     def _fam(keys) -> None:
         rows = _rows([k for k in keys
-                      if k.address not in seen and k.start != "no"],
+                      if k.address not in seen
+                      and (k.start != "no" or k.method == "casci")],
                      cells, anchor, spec)
         seen.update(k.address for k in keys)
         if rows:
@@ -247,7 +249,8 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     # declaration (render_primary=False -- the promoted windows carry
     # the results; the primary rows stay in the store)
     if spec.render_primary:
-        grid = [k for k in grid_keys(spec) if k.start != "no"]
+        grid = [k for k in grid_keys(spec)
+                if k.start != "no" or k.method == "casci"]
         groups: dict[str, list] = {}
         for k in grid:
             groups.setdefault(fold_col(k, spec), []).append(k)

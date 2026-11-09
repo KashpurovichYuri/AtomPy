@@ -261,18 +261,19 @@ def test_void_reason_voids_the_u14e_optimizer_class():
     on EVERY window (the primary included -- ``run_casscf=False``'s
     spirit made explicit) and the frac folds are void with it (the
     frac reference has no converged basin on the ECP atom); exactly
-    the 20 remaining CASCI anchors run (the primary's 5 + the three
-    promoted windows' 15 -- the tier families retired from the
-    declaration 2026-11-06)."""
+    the 36 remaining CASCI cells run (the 20 anchors + the kind
+    block's mo/no cells at both ruler folds, 4 per window -- the tier
+    families retired from the declaration 2026-11-06; the kind
+    amendment 2026-11-09)."""
     spec = CAMPAIGN["U14e"]
     sc = scenarios_for(spec)
     keys = grid_keys(spec) + planned(spec)
-    assert len(keys) == 172
+    assert len(keys) == 188
     for k in keys:
         void = void_reason(k, sc) is not None
         expect = k.method != "casci" or k.fold == "frac"
         assert void == expect, k.address
-    assert sum(not void_reason(k, sc) for k in keys) == 20
+    assert sum(not void_reason(k, sc) for k in keys) == 36
 
 
 @fast
@@ -306,21 +307,27 @@ def test_window_grid_is_the_one_declaration():
     addrs = [k.address for k in grid]
     # the manifest count: 29 established + the 4 mo x pur cells
     # + the moc block (2 CASCI + 8 optimizer keys)
-    assert len(grid) == 43
-    assert len(set(addrs)) == 43
+    # + the kind-completion block (mo/no CASCI at both ruler folds)
+    assert len(grid) == 47
+    assert len(set(addrs)) == 47
     assert addrs[:4] == [           # the CASCI fold block, pur third
         "ti_3d4s_3-1_casci_ao_-_pol_raw",
         "ti_3d4s_3-1_casci_ao_-_pol_avg",
         "ti_3d4s_3-1_casci_ao_-_pur_avg",
         "ti_3d4s_3-1_casci_ao_-_pol_frac",
     ]
-    assert addrs[4:6] == [          # the character-selected CASCI pair
+    assert addrs[4:10] == [         # the kind block at each ruler fold
+        "ti_3d4s_3-1_casci_mo_-_pol_avg",
         "ti_3d4s_3-1_casci_moc_-_pol_avg",
+        "ti_3d4sno2_3-1_casci_no_-_pol_avg",
+        "ti_3d4s_3-1_casci_mo_-_pur_avg",
         "ti_3d4s_3-1_casci_moc_-_pur_avg",
+        "ti_3d4sno2_3-1_casci_no_-_pur_avg",
     ]
     mopur = [a for a in addrs if a.split("_")[4] == "mo"
              and a.split("_")[6] == "pur"]
     assert mopur == [                   # method-major, like every block
+        "ti_3d4s_3-1_casci_mo_-_pur_avg",
         "ti_3d4s_3-1_casscf_mo_-_pur_avg",
         "ti_3d4s_3-1_casscf_mo_frozen_pur_avg",
         "ti_3d4s_3-1_sa-casscf_mo_-_pur_avg",
@@ -919,6 +926,38 @@ def test_run_lane_cell_multicolumn_fold(carbon_d2h, carbon, tmp_path):
 
 
 @slow
+def test_no_arm_refuses_the_m_unequal_source_density():
+    """The NO arm's construction certificate: a source CI whose ground
+    block averages a SPLIT multiplet (the canonical-core field on the
+    anisotropic substrate -- the eigenstates carry inter-term
+    admixture, their average is m-scalar only to that order) is
+    REFUSED at the closure meter, never silently stored -- the exact
+    case that fired live on the uncontracted twin (measured: block 5
+    roots, groups [1,5], closures 2.7e-2/4.0e-2 against the m-complete
+    class at <= 4e-9)."""
+    import numpy as np
+    from pyscf import scf
+
+    from atomterm.cases import campaign_spec
+    from atomterm.natural import no_group_windows
+    from atomterm.windows import (build_full_mo, occupied_core_idx,
+                                  window_distilled)
+
+    spec = campaign_spec("Sc-unc")
+    mol, rec = scf.chkfile.load_scf("elements/Sc-unc/rungs/rohf.chk")
+    mf = scf.RHF(mol)
+    mf.__dict__.update(rec)
+    c_occ = mf.mo_coeff[:, np.asarray(mf.mo_occ) > 0]
+    win, _ = window_distilled(mol, c_occ, mf.get_ovlp(), ["3d", "4s"],
+                              spec.shell_bands, {"3d": 1, "4s": 1})
+    cols = win.columns if hasattr(win, "columns") else win
+    # the source on the CANONICAL core (c_core=None) -- the split
+    # substrate; the run path folds the purified span instead
+    mo = build_full_mo(mf, occupied_core_idx(mf, 9), cols)
+    with pytest.raises(ValueError, match="not rotation-closed"):
+        no_group_windows(mol, mf, 9, mo[:, 9:9 + cols.shape[1]], 2, 1)
+
+
 def test_unc_lanes_load_exact_from_the_store():
     """The validation lanes re-verified from the COMMITTED stores (the
     heavy-pin pattern: fresh legs run in the campaign; the verdicts
@@ -1129,10 +1168,12 @@ def test_ladder_anchors_lead_and_families_follow():
 
 
 @fast
-def test_ladder_every_run_cell_a_row_no_starts_excluded():
+def test_ladder_every_run_cell_a_row_no_starts_scoped_to_optimizers():
     """EVERY run cell a row -- the four fold variants' CI rows beside
     their optimizer variants, the method bare + restriction only, the
-    window cell in slash form; NO starts are not ladder rows; free
+    window cell in slash form; a NO-start CASCI cell IS a row (the
+    kind block's density leg, both ruler folds) while NO-start
+    OPTIMIZER cells stay excluded (a start, not a family); free
     optimizer rows carry no lane marker."""
     mod = ladder_module()
     cs = CAMPAIGN["Ti"]
@@ -1142,7 +1183,9 @@ def test_ladder_every_run_cell_a_row_no_starts_excluded():
     rows = [r for r in text.splitlines() if r.startswith("|")]
     ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / AO |")]
     assert len(ci) == 4            # the four fold variants' CI rows
-    assert not any("/ NO |" in r for r in rows)   # NO starts excluded
+    no_ci = [r for r in rows if "/ NO |" in r]
+    assert len(no_ci) == 2         # the density leg, both ruler folds
+    assert all(r.startswith("| CASCI |") for r in no_ci)
     opt = [r for r in rows
            if r.startswith("| CASSCF | free | 3d4s / AO |")]
     assert len(opt) == 2 and not any("·lane" in r for r in opt)  # Ar + Ar·pur substrates

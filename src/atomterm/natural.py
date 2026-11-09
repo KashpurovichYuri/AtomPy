@@ -216,7 +216,7 @@ def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
     data; each Window carries its own columns and m_complete=True).
     """
     from atomterm.detbasis import sector_dimension
-    from atomterm.operators import build_operators, ground_block
+    from atomterm.operators import build_operators, ground_block, window_closure
     from atomterm.windows import Window
 
     ops = build_operators(mol, mf, c_act, ncore, na, nb, c_core=c_core)
@@ -232,6 +232,20 @@ def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
         if n_max < max(na, nb):
             continue          # fewer columns than electrons: no sector
         c_win, _ = select_no_window(c_no, occ, n_max)
+        # the CONSTRUCTION'S OWN CERTIFICATE, verified here (never
+        # asserted): a term-averaged gamma yields m-complete groups; a
+        # single-|L,M> source density yields m-unequal occupations and
+        # breaks closure at O(1) -- refused, not stored (observed: the
+        # m-complete windows close at <= 4e-9, the m-unequal class at
+        # ~2e0)
+        cert = window_closure(mol, c_win)
+        if max(cert.values()) > 1e-6:
+            raise ValueError(
+                f"the no{nk} prefix is not rotation-closed "
+                f"(||[P,Lz]||={cert['lz']:.1e}, "
+                f"||[P,Lperp]||={cert['lperp']:.1e}): the source "
+                "density was not term-averaged -- the ground block "
+                "missed the term's eigenspace")
         ndet = sector_dimension(c_win.shape[1], na, nb)
         if ndet > cap:
             raise ValueError(

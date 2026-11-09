@@ -1,1 +1,992 @@
-{"atom": "Ti-unc", "rohf_energy": -848.4074434287603, "cells": {"ti-unc_3d4s_3-1_casci_ao_-_pol_raw": {"tag": "ti-unc_3d4s_3-1_casci_ao_-_pol_raw", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.2137847111025621e-13, "e_ground": -848.4036669448318, "energies_pyscf": [-848.4036669448318, -848.4006158010031, -848.4006158009348, -848.4006158008954, -848.398201660369, -848.398201660119, -848.3982016599417, -848.3424501909927, -848.342450190784], "max_de_vs_pyscf": 0.0, "ground_term": "3F", "ground_l2": 12.000000000000004, "ground_lz2": 3.9999999999999982, "terms": {"3F": 38, "3P": 9, "5F": 7, "5P": 3, "3G": 24, "3H": 16, "3D": 18, "5D": 5}, "comm_norm_h_lz": 0.0646551268587103, "comm_norm_h_l2": 0.34386386628257326, "win_lz": 3.6671174019601182e-09, "win_lperp": 3.7183310841187736e-09, "window": {"s": 0.166667, "p": 0.0, "d": 0.833333, "f": 0.0}, "electrons": {"s": 1.9982707240267685, "p": 4.6427264304797164e-32, "d": 2.00172927597323, "f": 8.016364847640325e-38}, "n_dev": 0.0, "configurations": ["s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.01)", "s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)", "s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)", "s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)", "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)", "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.47)", "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)", "s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.46)", "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.46)"], "core_anisotropy": 0.008094020583, "cell": "ti-unc_3d4s_3-1_casci_ao_-_pol_raw"}, "ti-unc_3d4s_3-1_casci_ao_-_pol_avg": {"tag": "ti-unc_3d4s_3-1_casci_ao_-_pol_avg", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.1604940059205546e-13, "e_ground": -848.400005558747, "energies_pyscf": [-848.4036669448318, -848.4006158010031, -848.4006158009348, -848.4006158008954, -848.398201660369, -848.398201660119, -848.3982016599417, -848.3424501909927, -848.342450190784], "max_de_vs_pyscf": 0.0036613860847865, "ground_term": "3F", "ground_l2": 12.000000000000037, "ground_lz2": 2.4929652756285283, "terms": {"3F": 35, "3P": 15, "5F": 7, "5P": 3, "3G": 18, "3H": 22, "3D": 15, "5D": 5}, "comm_norm_h_lz": 2.643186263326155e-09, "comm_norm_h_l2": 1.3220578934733719e-08, "win_lz": 3.6671174019601182e-09, "win_lperp": 3.7183310841187736e-09, "window": {"s": 0.166667, "p": 0.0, "d": 0.833333, "f": 0.0}, "electrons": {"s": 1.998270724026771, "p": 4.6427264304797225e-32, "d": 2.001729275973233, "f": 8.016364847640334e-38}, "n_dev": 0.0, "configurations": ["s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.01)", "s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)", "s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)", "s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)", "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)", "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.47)", "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)", "s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.46)", "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.46)"], "core_anisotropy": 0.008094020583, "cell": "ti-unc_3d4s_3-1_casci_ao_-_pol_avg"}, "ti-unc_3d4s_3-1_casci_ao_-_pur_avg": {"tag": "ti-unc_3d4s_3-1_casci_ao_-_pur_avg", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.493722142724814e-13, "e_ground": -848.4018380263939, "energies_pyscf": [-848.4018380263939, -848.4018380263939, -848.4018380263939, -848.4018380263939, -848.4018380263939, -848.4018380263939, -848.4018380263939, -848.3443084694416, -848.3443084694416], "max_de_vs_pyscf": 0.0, "ground_term": "3F", "ground_l2": 11.999999999999998, "ground_lz2": 7.475195915949468, "terms": {"3F": 35, "3P": 15, "5F": 7, "5P": 3, "3G": 18, "3H": 22, "3D": 15, "5D": 5}, "comm_norm_h_lz": 1.0514516429238227e-14, "comm_norm_h_l2": 2.6218402884195173e-13, "win_lz": 1.357521934592434e-14, "win_lperp": 1.7195242598080386e-14, "window": {"s": 0.166667, "p": 0.0, "d": 0.833333, "f": 0.0}, "electrons": {"s": 1.9982382993926797, "p": 0.0, "d": 2.001761700607323, "f": 0.0}, "n_dev": 0.0, "configurations": ["s^2.00d^2.00 (|c|=0.81); s^2.00d^2.00 (|c|=0.42)", "s^2.00d^2.00 (|c|=0.89); s^2.00d^2.00 (|c|=0.44)", "s^2.00d^2.00 (|c|=0.63); s^2.00d^2.00 (|c|=0.52)", "s^2.00d^2.00 (|c|=0.68); s^2.00d^2.00 (|c|=0.64)", "s^2.00d^2.00 (|c|=0.69); s^2.00d^2.00 (|c|=0.62)", "s^2.00d^2.00 (|c|=0.81); s^2.00d^2.00 (|c|=0.56)", "s^2.00d^2.00 (|c|=0.99); s^2.00d^2.00 (|c|=0.10)", "s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.44)", "s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.44)"], "core_anisotropy": 0.0, "cell": "ti-unc_3d4s_3-1_casci_ao_-_pur_avg"}, "ti-unc_3d4s_3-1_casci_ao_-_pol_frac": {"cell": "ti-unc_3d4s_3-1_casci_ao_-_pol_frac", "void_reason": "frac-reference-unmeasured: no measured fractional-occupation basin on the uncontracted basis yet (2026-11-06)"}, "ti-unc_3d4s_3-1_casci_moc_-_pol_avg": {"tag": "ti-unc_3d4s_3-1_casci_moc_-_pol_avg", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 1.4022116801015727e-13, "e_ground": -848.4066957832166, "energies_pyscf": [-848.4103541341216, -848.3074450564505, -848.3074450538401, -848.3074450508644, -848.2808309824744, -848.2808309809001, -848.2808309787348, -848.263350313031, -848.2633503104357], "max_de_vs_pyscf": 0.0036583509049705754, "ground_term": "3D", "ground_l2": 4.904146386808505, "ground_lz2": 1.6347154157294004, "terms": {"3D": 68, "5D": 7, "3F": 34, "5P": 8, "3P": 3}, "comm_norm_h_lz": 3.703945279318861, "comm_norm_h_l2": 13.834570913445928, "win_lz": 3.0763512145838905, "win_lperp": 4.350617546131905, "window": {"s": 0.166667, "p": 0.0, "d": 0.833333, "f": 0.0}, "electrons": {"s": 1.9814921215208237, "p": 0.0, "d": 2.018507878479177, "f": 0.0}, "n_dev": 0.0, "configurations": ["s^2.00d^2.00 (|c|=1.00); d^4.00 (|c|=0.05)", "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)", "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)", "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)", "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)", "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.54)", "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)", "s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)", "s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)"], "core_anisotropy": 0.008094020583, "cell": "ti-unc_3d4s_3-1_casci_moc_-_pol_avg"}, "ti-unc_3d4s_3-1_casci_moc_-_pur_avg": {"tag": "ti-unc_3d4s_3-1_casci_moc_-_pur_avg", "kind": "casci", "n_det": 120, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.220446049250313e-13, "e_ground": -848.4085304885316, "energies_pyscf": [-848.4085304885316, -848.305930112406, -848.3059301097138, -848.3059301067333, -848.2793194949998, -848.2793194933676, -848.2793194911728, -848.2618390733285, -848.2618390706863], "max_de_vs_pyscf": 0.0, "ground_term": "3D", "ground_l2": 4.904146871011016, "ground_lz2": 1.634715577130183, "terms": {"3D": 68, "5D": 7, "3F": 34, "5P": 8, "3P": 3}, "comm_norm_h_lz": 3.7033599784568736, "comm_norm_h_l2": 13.832107906838626, "win_lz": 3.0763512145838896, "win_lperp": 4.350617546131905, "window": {"s": 0.166667, "p": 0.0, "d": 0.833333, "f": 0.0}, "electrons": {"s": 1.9814090793646217, "p": 0.0, "d": 2.0185909206353783, "f": 0.0}, "n_dev": 0.0, "configurations": ["s^2.00d^2.00 (|c|=1.00); d^4.00 (|c|=0.05)", "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)", "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)", "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)", "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)", "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.54)", "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)", "s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)", "s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)"], "core_anisotropy": 0.0, "cell": "ti-unc_3d4s_3-1_casci_moc_-_pur_avg"}, "ti-unc_3d4s_3-1_casscf_ao_-_pol_avg": {"cell": "ti-unc_3d4s_3-1_casscf_ao_-_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_mo_-_pol_avg": {"cell": "ti-unc_3d4s_3-1_casscf_mo_-_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_moc_-_pol_avg": {"cell": "ti-unc_3d4s_3-1_casscf_moc_-_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4sno2_3-1_casscf_no_-_pol_avg": {"cell": "ti-unc_3d4sno2_3-1_casscf_no_-_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_ao_virtmix_pol_avg": {"cell": "ti-unc_3d4s_3-1_casscf_ao_virtmix_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_ao_-_pur_avg": {"cell": "ti-unc_3d4s_3-1_casscf_ao_-_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_mo_-_pur_avg": {"cell": "ti-unc_3d4s_3-1_casscf_mo_-_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_moc_-_pur_avg": {"cell": "ti-unc_3d4s_3-1_casscf_moc_-_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4sno2_3-1_casscf_no_-_pur_avg": {"cell": "ti-unc_3d4sno2_3-1_casscf_no_-_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_ao_radial_pol_avg": {"cell": "ti-unc_3d4s_3-1_casscf_ao_radial_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_ao_radial_pur_avg": {"cell": "ti-unc_3d4s_3-1_casscf_ao_radial_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_ao_frozen_pol_avg": {"cell": "ti-unc_3d4s_3-1_casscf_ao_frozen_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_mo_frozen_pol_avg": {"cell": "ti-unc_3d4s_3-1_casscf_mo_frozen_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_moc_frozen_pol_avg": {"cell": "ti-unc_3d4s_3-1_casscf_moc_frozen_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4sno2_3-1_casscf_no_frozen_pol_avg": {"cell": "ti-unc_3d4sno2_3-1_casscf_no_frozen_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_ao_frozen_pur_avg": {"cell": "ti-unc_3d4s_3-1_casscf_ao_frozen_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_mo_frozen_pur_avg": {"cell": "ti-unc_3d4s_3-1_casscf_mo_frozen_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_casscf_moc_frozen_pur_avg": {"cell": "ti-unc_3d4s_3-1_casscf_moc_frozen_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4sno2_3-1_casscf_no_frozen_pur_avg": {"cell": "ti-unc_3d4sno2_3-1_casscf_no_frozen_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_ao_-_pol_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_ao_-_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_mo_-_pol_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_mo_-_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_moc_-_pol_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_moc_-_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4sno2_3-1_sa-casscf_no_-_pol_avg": {"cell": "ti-unc_3d4sno2_3-1_sa-casscf_no_-_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_ao_-_pur_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_ao_-_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_mo_-_pur_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_mo_-_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_moc_-_pur_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_moc_-_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4sno2_3-1_sa-casscf_no_-_pur_avg": {"cell": "ti-unc_3d4sno2_3-1_sa-casscf_no_-_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_ao_radial_pol_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_ao_radial_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_ao_radial_pur_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_ao_radial_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pol_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pol_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pol_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pol_avg": {"cell": "ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pol_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pur_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pur_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pur_avg": {"cell": "ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pur_avg": {"cell": "ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pur_avg", "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)"}, "ti-unc_3d_2-0_casci_ao_-_pol_avg": {"tag": "ti-unc_3d_2-0_casci_ao_-_pol_avg", "kind": "casci", "n_det": 10, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 2.2448709557920665e-13, "e_ground": -848.4037778276296, "energies_pyscf": [-848.4074434287606, -848.4043887612708, -848.4043887611418, -848.4043887610417, -848.4019713433225, -848.4019713432044, -848.401971342911, -848.3452132134848, -848.345213212619], "max_de_vs_pyscf": 0.0036656011310469694, "ground_term": "3F", "ground_l2": 11.999999999999998, "ground_lz2": 0.881738960498776, "terms": {"3F": 7, "3P": 3}, "comm_norm_h_lz": 4.540597042554641e-15, "comm_norm_h_l2": 3.689496842617392e-14, "win_lz": 1.2838113590118026e-08, "win_lperp": 9.493495355844932e-09, "window": {"s": 0.0, "p": 0.0, "d": 1.0, "f": 0.0}, "electrons": {"s": 6.431563108062724e-19, "p": 1.031264658139621e-49, "d": 1.9999999999999998, "f": 6.230699136488001e-55}, "n_dev": 0.0, "configurations": ["d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)", "d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)", "d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)", "d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)", "d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)", "d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)", "d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)", "d^2.00 (|c|=0.77); d^2.00 (|c|=0.47)", "d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)"], "core_anisotropy": 0.007169277251, "cell": "ti-unc_3d_2-0_casci_ao_-_pol_avg"}, "ti-unc_3d_2-0_casci_mo_-_pol_avg": {"tag": "ti-unc_3d_2-0_casci_mo_-_pol_avg", "kind": "casci", "n_det": 10, "diverged": false, "converged": true, "cycles": null, "max_cycle": null, "conv_dE": null, "ortho_err": 1.3511414209688155e-13, "e_ground": -848.4037778276294, "energies_pyscf": [-848.4074434287604, -848.1316847716143, -848.131684771396, -848.1316847703948, -848.1283845293273, -848.1283845290698, -848.1283845266537, -847.5159934504911, -847.5159934496959], "max_de_vs_pyscf": 0.0036656011310469694, "ground_term": "3S", "ground_l2": 1.825114058731132e-20, "ground_lz2": 4.1761562018084433e-51, "terms": {"3S": 1, "3P": 9}, "comm_norm_h_lz": 0.005716161570356976, "comm_norm_h_l2": 9.989059145700825e-10, "win_lz": 2.828440215657251, "win_lperp": 4.000018513341625, "window": {"s": 0.0, "p": 0.599999, "d": 0.4, "f": 1e-06}, "electrons": {"s": 3.211448346573883e-16, "p": 1.8101461696699413e-20, "d": 1.9999999999999998, "f": 3.351203223731426e-26}, "n_dev": 0.0, "configurations": ["d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)", "p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)", "p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)", "p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)", "p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)", "p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)", "p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)", "p^2.00 (|c|=1.00); d^2.00 (|c|=0.00)", "p^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)"], "core_anisotropy": 0.007169277251, "cell": "ti-unc_3d_2-0_casci_mo_-_pol_avg"}, "ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg": {"cell": "ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg", "term": [3, "g"], "energies": [-3.339455460565717, -3.3394554605657185, -3.339455460565716, -3.339455460565717, -3.339455460565717, -3.339455460565718, -3.3394554605657163], "total": -848.4013815936105, "ptp": 2.6645352591003757e-15, "l2": [12.000000000000007, 12.000000000000009, 12.000000000000005, 12.00000000000001, 12.00000000000001, 12.000000000000018, 12.0], "s2": [2.0, 2.0000000000000004, 2.0, 2.0000000000000004, 2.0000000000000004, 2.0000000000000013, 1.999999999999999], "n_det": 120, "anchor_dev": 1.3322676295501878e-15, "win_lz": 1.3418939451814055e-14, "win_lperp": 1.7324988490323908e-14, "comm_norm_h_lz": 2.4467633088192288e-14, "comm_norm_h_l2": 1.4942220838767714e-13, "res_h_lz": 3.553095123607063e-15, "res_h_l2": 1.599902890826111e-14, "fold": ["1s", "2s", "2p", "3s", "3p"], "core_pairs": 9, "core_in_span_min": 0.999913, "anchor_corrected": []}}}
+{
+  "atom": "Ti-unc",
+  "rohf_energy": -848.4074434287603,
+  "cells": {
+    "ti-unc_3d4s_3-1_casci_ao_-_pol_raw": {
+      "tag": "ti-unc_3d4s_3-1_casci_ao_-_pol_raw",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.2137847111025621e-13,
+      "e_ground": -848.4036669448318,
+      "energies_pyscf": [
+        -848.4036669448318,
+        -848.4006158010031,
+        -848.4006158009348,
+        -848.4006158008954,
+        -848.398201660369,
+        -848.398201660119,
+        -848.3982016599417,
+        -848.3424501909927,
+        -848.342450190784
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3F",
+      "ground_l2": 12.000000000000004,
+      "ground_lz2": 3.9999999999999982,
+      "terms": {
+        "3F": 38,
+        "3P": 9,
+        "5F": 7,
+        "5P": 3,
+        "3G": 24,
+        "3H": 16,
+        "3D": 18,
+        "5D": 5
+      },
+      "comm_norm_h_lz": 0.0646551268587103,
+      "comm_norm_h_l2": 0.34386386628257326,
+      "win_lz": 3.6671174019601182e-09,
+      "win_lperp": 3.7183310841187736e-09,
+      "window": {
+        "s": 0.166667,
+        "p": 0.0,
+        "d": 0.833333,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9982707240267685,
+        "p": 4.6427264304797164e-32,
+        "d": 2.00172927597323,
+        "f": 8.016364847640325e-38
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.01)",
+        "s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)",
+        "s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)",
+        "s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)",
+        "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)",
+        "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.47)",
+        "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)",
+        "s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.46)",
+        "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.46)"
+      ],
+      "core_anisotropy": 0.008094020583,
+      "cell": "ti-unc_3d4s_3-1_casci_ao_-_pol_raw"
+    },
+    "ti-unc_3d4s_3-1_casci_ao_-_pol_avg": {
+      "tag": "ti-unc_3d4s_3-1_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.1604940059205546e-13,
+      "e_ground": -848.400005558747,
+      "energies_pyscf": [
+        -848.4036669448318,
+        -848.4006158010031,
+        -848.4006158009348,
+        -848.4006158008954,
+        -848.398201660369,
+        -848.398201660119,
+        -848.3982016599417,
+        -848.3424501909927,
+        -848.342450190784
+      ],
+      "max_de_vs_pyscf": 0.0036613860847865,
+      "ground_term": "3F",
+      "ground_l2": 12.000000000000037,
+      "ground_lz2": 2.4929652756285283,
+      "terms": {
+        "3F": 35,
+        "3P": 15,
+        "5F": 7,
+        "5P": 3,
+        "3G": 18,
+        "3H": 22,
+        "3D": 15,
+        "5D": 5
+      },
+      "comm_norm_h_lz": 2.643186263326155e-09,
+      "comm_norm_h_l2": 1.3220578934733719e-08,
+      "win_lz": 3.6671174019601182e-09,
+      "win_lperp": 3.7183310841187736e-09,
+      "window": {
+        "s": 0.166667,
+        "p": 0.0,
+        "d": 0.833333,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.998270724026771,
+        "p": 4.6427264304797225e-32,
+        "d": 2.001729275973233,
+        "f": 8.016364847640334e-38
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.01)",
+        "s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)",
+        "s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)",
+        "s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)",
+        "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)",
+        "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.47)",
+        "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)",
+        "s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.46)",
+        "s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.46)"
+      ],
+      "core_anisotropy": 0.008094020583,
+      "cell": "ti-unc_3d4s_3-1_casci_ao_-_pol_avg"
+    },
+    "ti-unc_3d4s_3-1_casci_ao_-_pur_avg": {
+      "tag": "ti-unc_3d4s_3-1_casci_ao_-_pur_avg",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.493722142724814e-13,
+      "e_ground": -848.4018380263939,
+      "energies_pyscf": [
+        -848.4018380263939,
+        -848.4018380263939,
+        -848.4018380263939,
+        -848.4018380263939,
+        -848.4018380263939,
+        -848.4018380263939,
+        -848.4018380263939,
+        -848.3443084694416,
+        -848.3443084694416
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3F",
+      "ground_l2": 11.999999999999998,
+      "ground_lz2": 7.475195915949468,
+      "terms": {
+        "3F": 35,
+        "3P": 15,
+        "5F": 7,
+        "5P": 3,
+        "3G": 18,
+        "3H": 22,
+        "3D": 15,
+        "5D": 5
+      },
+      "comm_norm_h_lz": 1.0514516429238227e-14,
+      "comm_norm_h_l2": 2.6218402884195173e-13,
+      "win_lz": 1.357521934592434e-14,
+      "win_lperp": 1.7195242598080386e-14,
+      "window": {
+        "s": 0.166667,
+        "p": 0.0,
+        "d": 0.833333,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9982382993926797,
+        "p": 0.0,
+        "d": 2.001761700607323,
+        "f": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=0.81); s^2.00d^2.00 (|c|=0.42)",
+        "s^2.00d^2.00 (|c|=0.89); s^2.00d^2.00 (|c|=0.44)",
+        "s^2.00d^2.00 (|c|=0.63); s^2.00d^2.00 (|c|=0.52)",
+        "s^2.00d^2.00 (|c|=0.68); s^2.00d^2.00 (|c|=0.64)",
+        "s^2.00d^2.00 (|c|=0.69); s^2.00d^2.00 (|c|=0.62)",
+        "s^2.00d^2.00 (|c|=0.81); s^2.00d^2.00 (|c|=0.56)",
+        "s^2.00d^2.00 (|c|=0.99); s^2.00d^2.00 (|c|=0.10)",
+        "s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.44)",
+        "s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.44)"
+      ],
+      "core_anisotropy": 0.0,
+      "cell": "ti-unc_3d4s_3-1_casci_ao_-_pur_avg"
+    },
+    "ti-unc_3d4s_3-1_casci_ao_-_pol_frac": {
+      "cell": "ti-unc_3d4s_3-1_casci_ao_-_pol_frac",
+      "void_reason": "frac-reference-unmeasured: no measured fractional-occupation basin on the uncontracted basis yet (2026-11-06)"
+    },
+    "ti-unc_3d4s_3-1_casci_mo_-_pol_avg": {
+      "tag": "ti-unc_3d4s_3-1_casci_mo_-_pol_avg",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.4421797089880783e-13,
+      "e_ground": -848.4135793227232,
+      "energies_pyscf": [
+        -848.4172434414133,
+        -848.3447684870512,
+        -848.3447684855392,
+        -848.3447684851435,
+        -848.3272189384295,
+        -848.3272189370798,
+        -848.3272189364038,
+        -848.2766506393962,
+        -848.2766506389786
+      ],
+      "max_de_vs_pyscf": 0.0036720959374179074,
+      "ground_term": "3S",
+      "ground_l2": 0.004803086727543626,
+      "ground_lz2": 0.001601028813786451,
+      "terms": {
+        "3S": 9,
+        "5P": 12,
+        "3P": 66,
+        "3D": 30,
+        "5S": 3
+      },
+      "comm_norm_h_lz": 0.15158540933274928,
+      "comm_norm_h_l2": 0.37682019814825424,
+      "win_lz": 2.828440215657251,
+      "win_lperp": 4.000018513341625,
+      "window": {
+        "s": 0.166667,
+        "p": 0.499999,
+        "d": 0.333333,
+        "f": 1e-06
+      },
+      "electrons": {
+        "s": 1.9344855468556823,
+        "p": 0.06630857103031765,
+        "d": 1.9992057593540185,
+        "f": 1.2275998146173736e-07
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=0.98); p^2.00d^2.00 (|c|=0.10)",
+        "s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)",
+        "s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)",
+        "s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)",
+        "s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.51)",
+        "s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.51)",
+        "s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.53)",
+        "s^1.00p^1.00d^2.00 (|c|=0.58); s^1.00p^1.00d^2.00 (|c|=0.56)",
+        "s^1.00p^1.00d^2.00 (|c|=0.58); s^1.00p^1.00d^2.00 (|c|=0.43)"
+      ],
+      "core_anisotropy": 0.008094020583,
+      "cell": "ti-unc_3d4s_3-1_casci_mo_-_pol_avg"
+    },
+    "ti-unc_3d4s_3-1_casci_moc_-_pol_avg": {
+      "tag": "ti-unc_3d4s_3-1_casci_moc_-_pol_avg",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.4022116801015727e-13,
+      "e_ground": -848.4066957832166,
+      "energies_pyscf": [
+        -848.4103541341216,
+        -848.3074450564505,
+        -848.3074450538401,
+        -848.3074450508644,
+        -848.2808309824744,
+        -848.2808309809001,
+        -848.2808309787348,
+        -848.263350313031,
+        -848.2633503104357
+      ],
+      "max_de_vs_pyscf": 0.0036583509049705754,
+      "ground_term": "3D",
+      "ground_l2": 4.904146386808505,
+      "ground_lz2": 1.6347154157294004,
+      "terms": {
+        "3D": 68,
+        "5D": 7,
+        "3F": 34,
+        "5P": 8,
+        "3P": 3
+      },
+      "comm_norm_h_lz": 3.703945279318861,
+      "comm_norm_h_l2": 13.834570913445928,
+      "win_lz": 3.0763512145838905,
+      "win_lperp": 4.350617546131905,
+      "window": {
+        "s": 0.166667,
+        "p": 0.0,
+        "d": 0.833333,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9814921215208237,
+        "p": 0.0,
+        "d": 2.018507878479177,
+        "f": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=1.00); d^4.00 (|c|=0.05)",
+        "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)",
+        "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)",
+        "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)",
+        "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)",
+        "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.54)",
+        "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)",
+        "s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)",
+        "s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)"
+      ],
+      "core_anisotropy": 0.008094020583,
+      "cell": "ti-unc_3d4s_3-1_casci_moc_-_pol_avg"
+    },
+    "ti-unc_3d4sno2_3-1_casci_no_-_pol_avg": {
+      "tag": "ti-unc_3d4sno2_3-1_casci_no_-_pol_avg",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.1960211427085596e-13,
+      "e_ground": -848.4000022952206,
+      "energies_pyscf": [
+        -848.4036636808067,
+        -848.4006125373949,
+        -848.4006125373322,
+        -848.4006125372983,
+        -848.3981983971419,
+        -848.3981983968911,
+        -848.3981983967132,
+        -848.342447006244,
+        -848.3424470060527
+      ],
+      "max_de_vs_pyscf": 0.0036613855861560296,
+      "ground_term": "3F",
+      "ground_l2": 11.99999999999999,
+      "ground_lz2": 2.4756127743972987,
+      "terms": {
+        "3F": 35,
+        "3P": 15,
+        "5F": 7,
+        "5P": 3,
+        "3G": 18,
+        "3H": 22,
+        "3D": 15,
+        "5D": 5
+      },
+      "comm_norm_h_lz": 2.7551433476453393e-09,
+      "comm_norm_h_l2": 1.3700956075785119e-08,
+      "win_lz": 3.575394016203639e-09,
+      "win_lperp": 3.6715109095545934e-09,
+      "window": {
+        "s": 0.166667,
+        "p": 0.0,
+        "d": 0.833333,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9982704408049967,
+        "p": 1.081201311008096e-38,
+        "d": 2.0017295591950037,
+        "f": 4.555029969335215e-44
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=0.90); s^2.00d^2.00 (|c|=0.36)",
+        "s^2.00d^2.00 (|c|=0.80); s^2.00d^2.00 (|c|=0.45)",
+        "s^2.00d^2.00 (|c|=0.99); s^2.00d^2.00 (|c|=0.09)",
+        "s^2.00d^2.00 (|c|=0.86); s^2.00d^2.00 (|c|=0.48)",
+        "s^2.00d^2.00 (|c|=0.72); s^2.00d^2.00 (|c|=0.54)",
+        "s^2.00d^2.00 (|c|=0.80); s^2.00d^2.00 (|c|=0.39)",
+        "s^2.00d^2.00 (|c|=0.95); s^2.00d^2.00 (|c|=0.23)",
+        "s^2.00d^2.00 (|c|=0.84); s^2.00d^2.00 (|c|=0.44)",
+        "s^2.00d^2.00 (|c|=0.81); s^2.00d^2.00 (|c|=0.46)"
+      ],
+      "core_anisotropy": 0.008094020583,
+      "cell": "ti-unc_3d4sno2_3-1_casci_no_-_pol_avg"
+    },
+    "ti-unc_3d4s_3-1_casci_mo_-_pur_avg": {
+      "tag": "ti-unc_3d4s_3-1_casci_mo_-_pur_avg",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 3.444952396403855e-14,
+      "e_ground": -848.4154146119388,
+      "energies_pyscf": [
+        -848.4154146119388,
+        -848.3429432636036,
+        -848.3429432620434,
+        -848.3429432616923,
+        -848.3253951985553,
+        -848.3253951971587,
+        -848.3253951965254,
+        -848.2748183058081,
+        -848.2748183052921
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3S",
+      "ground_l2": 0.004804802205500356,
+      "ground_lz2": 0.0016016006402539446,
+      "terms": {
+        "3S": 9,
+        "5P": 12,
+        "3P": 66,
+        "3D": 30,
+        "5S": 3
+      },
+      "comm_norm_h_lz": 0.15158942210441137,
+      "comm_norm_h_l2": 0.37683089510353296,
+      "win_lz": 2.8284402164612934,
+      "win_lperp": 4.000018514478703,
+      "window": {
+        "s": 0.166667,
+        "p": 0.499999,
+        "d": 0.333333,
+        "f": 1e-06
+      },
+      "electrons": {
+        "s": 1.9344743629718315,
+        "p": 0.06632632200864799,
+        "d": 1.999199192219136,
+        "f": 1.2280038655180026e-07
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=0.98); p^2.00d^2.00 (|c|=0.10)",
+        "s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)",
+        "s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)",
+        "s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)",
+        "s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.51)",
+        "s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.51)",
+        "s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.53)",
+        "s^1.00p^1.00d^2.00 (|c|=0.58); s^1.00p^1.00d^2.00 (|c|=0.56)",
+        "s^1.00p^1.00d^2.00 (|c|=0.58); s^1.00p^1.00d^2.00 (|c|=0.43)"
+      ],
+      "core_anisotropy": 0.0,
+      "cell": "ti-unc_3d4s_3-1_casci_mo_-_pur_avg"
+    },
+    "ti-unc_3d4s_3-1_casci_moc_-_pur_avg": {
+      "tag": "ti-unc_3d4s_3-1_casci_moc_-_pur_avg",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.220446049250313e-13,
+      "e_ground": -848.4085304885316,
+      "energies_pyscf": [
+        -848.4085304885316,
+        -848.305930112406,
+        -848.3059301097138,
+        -848.3059301067333,
+        -848.2793194949998,
+        -848.2793194933676,
+        -848.2793194911728,
+        -848.2618390733285,
+        -848.2618390706863
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3D",
+      "ground_l2": 4.904146871011016,
+      "ground_lz2": 1.634715577130183,
+      "terms": {
+        "3D": 68,
+        "5D": 7,
+        "3F": 34,
+        "5P": 8,
+        "3P": 3
+      },
+      "comm_norm_h_lz": 3.7033599784568736,
+      "comm_norm_h_l2": 13.832107906838626,
+      "win_lz": 3.0763512145838896,
+      "win_lperp": 4.350617546131905,
+      "window": {
+        "s": 0.166667,
+        "p": 0.0,
+        "d": 0.833333,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9814090793646217,
+        "p": 0.0,
+        "d": 2.0185909206353783,
+        "f": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=1.00); d^4.00 (|c|=0.05)",
+        "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)",
+        "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)",
+        "s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)",
+        "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)",
+        "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.54)",
+        "s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)",
+        "s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)",
+        "s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)"
+      ],
+      "core_anisotropy": 0.0,
+      "cell": "ti-unc_3d4s_3-1_casci_moc_-_pur_avg"
+    },
+    "ti-unc_3d4sno2_3-1_casci_no_-_pur_avg": {
+      "tag": "ti-unc_3d4sno2_3-1_casci_no_-_pur_avg",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.74728483284959e-13,
+      "e_ground": -848.4018347606919,
+      "energies_pyscf": [
+        -848.4018347606919,
+        -848.4018347606919,
+        -848.4018347606919,
+        -848.4018347606919,
+        -848.4018347606919,
+        -848.4018347606919,
+        -848.4018347606919,
+        -848.3443052825513,
+        -848.3443052825513
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3F",
+      "ground_l2": 12.000000000000005,
+      "ground_lz2": 7.738814373388959,
+      "terms": {
+        "3F": 35,
+        "3P": 15,
+        "5F": 7,
+        "5P": 3,
+        "3G": 18,
+        "3H": 22,
+        "3D": 15,
+        "5D": 5
+      },
+      "comm_norm_h_lz": 2.1989086061487426e-14,
+      "comm_norm_h_l2": 2.7074147924164047e-13,
+      "win_lz": 1.355885927441993e-14,
+      "win_lperp": 1.7413980521384884e-14,
+      "window": {
+        "s": 0.166667,
+        "p": 0.0,
+        "d": 0.833333,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9982380129588617,
+        "p": 0.0,
+        "d": 2.001761987041144,
+        "f": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=0.68); s^2.00d^2.00 (|c|=0.44)",
+        "s^2.00d^2.00 (|c|=0.50); s^2.00d^2.00 (|c|=0.44)",
+        "s^2.00d^2.00 (|c|=0.66); s^2.00d^2.00 (|c|=0.43)",
+        "s^2.00d^2.00 (|c|=0.61); s^2.00d^2.00 (|c|=0.50)",
+        "s^2.00d^2.00 (|c|=0.72); s^2.00d^2.00 (|c|=0.47)",
+        "s^2.00d^2.00 (|c|=0.52); s^2.00d^2.00 (|c|=0.50)",
+        "s^2.00d^2.00 (|c|=0.63); s^2.00d^2.00 (|c|=0.52)",
+        "s^2.00d^2.00 (|c|=0.58); s^2.00d^2.00 (|c|=0.45)",
+        "s^2.00d^2.00 (|c|=0.81); s^2.00d^2.00 (|c|=0.42)"
+      ],
+      "core_anisotropy": 0.0,
+      "cell": "ti-unc_3d4sno2_3-1_casci_no_-_pur_avg"
+    },
+    "ti-unc_3d4s_3-1_casscf_ao_-_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_mo_-_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_moc_-_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_moc_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4sno2_3-1_casscf_no_-_pol_avg": {
+      "cell": "ti-unc_3d4sno2_3-1_casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_ao_virtmix_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_ao_virtmix_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_ao_-_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_mo_-_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_moc_-_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_moc_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4sno2_3-1_casscf_no_-_pur_avg": {
+      "cell": "ti-unc_3d4sno2_3-1_casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_ao_radial_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_ao_radial_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_ao_frozen_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_mo_frozen_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_moc_frozen_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_moc_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4sno2_3-1_casscf_no_frozen_pol_avg": {
+      "cell": "ti-unc_3d4sno2_3-1_casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_ao_frozen_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_mo_frozen_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_casscf_moc_frozen_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_casscf_moc_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4sno2_3-1_casscf_no_frozen_pur_avg": {
+      "cell": "ti-unc_3d4sno2_3-1_casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_ao_-_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_ao_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_mo_-_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_mo_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_moc_-_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_moc_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4sno2_3-1_sa-casscf_no_-_pol_avg": {
+      "cell": "ti-unc_3d4sno2_3-1_sa-casscf_no_-_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_ao_-_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_ao_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_mo_-_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_mo_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_moc_-_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_moc_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4sno2_3-1_sa-casscf_no_-_pur_avg": {
+      "cell": "ti-unc_3d4sno2_3-1_sa-casscf_no_-_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_ao_radial_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_ao_radial_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_ao_radial_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_ao_radial_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pol_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pol_avg": {
+      "cell": "ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pol_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_ao_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_mo_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pur_avg": {
+      "cell": "ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pur_avg": {
+      "cell": "ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pur_avg",
+      "void_reason": "anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)"
+    },
+    "ti-unc_3d_2-0_casci_ao_-_pol_avg": {
+      "tag": "ti-unc_3d_2-0_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 10,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.2448709557920665e-13,
+      "e_ground": -848.4037778276296,
+      "energies_pyscf": [
+        -848.4074434287606,
+        -848.4043887612708,
+        -848.4043887611418,
+        -848.4043887610417,
+        -848.4019713433225,
+        -848.4019713432044,
+        -848.401971342911,
+        -848.3452132134848,
+        -848.345213212619
+      ],
+      "max_de_vs_pyscf": 0.0036656011310469694,
+      "ground_term": "3F",
+      "ground_l2": 11.999999999999998,
+      "ground_lz2": 0.881738960498776,
+      "terms": {
+        "3F": 7,
+        "3P": 3
+      },
+      "comm_norm_h_lz": 4.540597042554641e-15,
+      "comm_norm_h_l2": 3.689496842617392e-14,
+      "win_lz": 1.2838113590118026e-08,
+      "win_lperp": 9.493495355844932e-09,
+      "window": {
+        "s": 0.0,
+        "p": 0.0,
+        "d": 1.0,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 6.431563108062724e-19,
+        "p": 1.031264658139621e-49,
+        "d": 1.9999999999999998,
+        "f": 6.230699136488001e-55
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)",
+        "d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)",
+        "d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)",
+        "d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)",
+        "d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)",
+        "d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)",
+        "d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)",
+        "d^2.00 (|c|=0.77); d^2.00 (|c|=0.47)",
+        "d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)"
+      ],
+      "core_anisotropy": 0.007169277251,
+      "cell": "ti-unc_3d_2-0_casci_ao_-_pol_avg"
+    },
+    "ti-unc_3d_2-0_casci_mo_-_pol_avg": {
+      "tag": "ti-unc_3d_2-0_casci_mo_-_pol_avg",
+      "kind": "casci",
+      "n_det": 10,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.3511414209688155e-13,
+      "e_ground": -848.4037778276294,
+      "energies_pyscf": [
+        -848.4074434287604,
+        -848.1316847716143,
+        -848.131684771396,
+        -848.1316847703948,
+        -848.1283845293273,
+        -848.1283845290698,
+        -848.1283845266537,
+        -847.5159934504911,
+        -847.5159934496959
+      ],
+      "max_de_vs_pyscf": 0.0036656011310469694,
+      "ground_term": "3S",
+      "ground_l2": 1.825114058731132e-20,
+      "ground_lz2": 4.1761562018084433e-51,
+      "terms": {
+        "3S": 1,
+        "3P": 9
+      },
+      "comm_norm_h_lz": 0.005716161570356976,
+      "comm_norm_h_l2": 9.989059145700825e-10,
+      "win_lz": 2.828440215657251,
+      "win_lperp": 4.000018513341625,
+      "window": {
+        "s": 0.0,
+        "p": 0.599999,
+        "d": 0.4,
+        "f": 1e-06
+      },
+      "electrons": {
+        "s": 3.211448346573883e-16,
+        "p": 1.8101461696699413e-20,
+        "d": 1.9999999999999998,
+        "f": 3.351203223731426e-26
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)",
+        "p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)",
+        "p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)",
+        "p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)",
+        "p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)",
+        "p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); d^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)"
+      ],
+      "core_anisotropy": 0.007169277251,
+      "cell": "ti-unc_3d_2-0_casci_mo_-_pol_avg"
+    },
+    "ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg": {
+      "cell": "ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg",
+      "term": [
+        3,
+        "g"
+      ],
+      "energies": [
+        -3.339455460565717,
+        -3.3394554605657185,
+        -3.339455460565716,
+        -3.339455460565717,
+        -3.339455460565717,
+        -3.339455460565718,
+        -3.3394554605657163
+      ],
+      "total": -848.4013815936105,
+      "ptp": 2.6645352591003757e-15,
+      "l2": [
+        12.000000000000007,
+        12.000000000000009,
+        12.000000000000005,
+        12.00000000000001,
+        12.00000000000001,
+        12.000000000000018,
+        12.0
+      ],
+      "s2": [
+        2.0,
+        2.0000000000000004,
+        2.0,
+        2.0000000000000004,
+        2.0000000000000004,
+        2.0000000000000013,
+        1.999999999999999
+      ],
+      "n_det": 120,
+      "anchor_dev": 1.3322676295501878e-15,
+      "win_lz": 1.3418939451814055e-14,
+      "win_lperp": 1.7324988490323908e-14,
+      "comm_norm_h_lz": 2.4467633088192288e-14,
+      "comm_norm_h_l2": 1.4942220838767714e-13,
+      "res_h_lz": 3.553095123607063e-15,
+      "res_h_l2": 1.599902890826111e-14,
+      "fold": [
+        "1s",
+        "2s",
+        "2p",
+        "3s",
+        "3p"
+      ],
+      "core_pairs": 9,
+      "core_in_span_min": 0.999913,
+      "anchor_corrected": []
+    },
+    "ti-unc_3d4s@ar_3-1_casci_ao_-_pol_avg": {
+      "tag": "ti-unc_3d4s@ar_3-1_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 120,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.465946379823167e-13,
+      "e_ground": -848.4013815936295,
+      "energies_pyscf": [
+        -848.4013815936371,
+        -848.4013815936371,
+        -848.4013815936304,
+        -848.4013815936295,
+        -848.4013815936268,
+        -848.401381593623,
+        -848.4013815936227,
+        -848.3439344035887,
+        -848.3439344035648
+      ],
+      "max_de_vs_pyscf": 2.0122570276726037e-11,
+      "ground_term": "3F",
+      "ground_l2": 12.0,
+      "ground_lz2": 4.823079712731795,
+      "terms": {
+        "3F": 35,
+        "3P": 15,
+        "5F": 7,
+        "5P": 3,
+        "3G": 18,
+        "3H": 22,
+        "3D": 15,
+        "5D": 5
+      },
+      "comm_norm_h_lz": 2.2117644420113668e-14,
+      "comm_norm_h_l2": 2.668373266280117e-13,
+      "win_lz": 1.3575219360628493e-14,
+      "win_lperp": 1.7195168597390938e-14,
+      "window": {
+        "s": 0.166667,
+        "p": 0.0,
+        "d": 0.833333,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9981795122258008,
+        "p": 0.0,
+        "d": 2.001820487774196,
+        "f": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.59)",
+        "s^2.00d^2.00 (|c|=0.68); s^2.00d^2.00 (|c|=0.66)",
+        "s^2.00d^2.00 (|c|=0.89); s^2.00d^2.00 (|c|=0.34)",
+        "s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)",
+        "s^2.00d^2.00 (|c|=0.86); s^2.00d^2.00 (|c|=0.46)",
+        "s^2.00d^2.00 (|c|=0.73); s^2.00d^2.00 (|c|=0.61)",
+        "s^2.00d^2.00 (|c|=0.84); s^2.00d^2.00 (|c|=0.53)",
+        "s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.44)",
+        "s^2.00d^2.00 (|c|=0.89); s^2.00d^2.00 (|c|=0.44)"
+      ],
+      "core_anisotropy": 6.18e-10,
+      "cell": "ti-unc_3d4s@ar_3-1_casci_ao_-_pol_avg"
+    }
+  }
+}

@@ -799,17 +799,29 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         # the parent-prefix policy: the label names the SOURCE window,
         # the k-th occupation-group prefix of its term-averaged density
         # is the window (never splits an m-set; exactly closed when the
-        # density was m-scalar -- natural.no_group_windows verifies)
+        # density was m-scalar -- natural.no_group_windows verifies).
+        # The SOURCE rides the PURIFIED span whatever the cell's
+        # substrate: the density is a measurement device (like the
+        # distilled columns, substrate-independent), and only the
+        # closed core gives the exact degenerate block an exactly
+        # m-scalar average (measured: the canonical-core block splits,
+        # and the split states' average is m-scalar only to the
+        # admixture level); the cell's own substrate applies at the
+        # final assembly below.
+        from atomterm.core import purified_core_orbitals
         from atomterm.natural import no_group_windows
 
+        c_src_core = (c_pur if c_pur is not None
+                      else purified_core_orbitals(mol, mf, ncore)[0])
         mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act,
-                               c_core=c_pur)
+                               c_core=c_src_core)
         c_src = mo_src[:, ncore:ncore + ncas]
         wins = no_group_windows(mol, mf, ncore, c_src, na, nb,
-                                c_core=c_pur, cap=budgets.get("no_cap", 12000))
+                                c_core=c_src_core,
+                                cap=budgets.get("no_cap", 12000))
         win = _pick_no_window(wins, key.no_source[1])
         ncas = win.c_win.shape[1]
-        mo_full = win.columns(mf, ncore, c_core=c_pur)
+        mo_full = win.columns(mf, ncore, c_core=c_core)
     elif key.start == "ao":
         # a tagged fold supplied the core columns (the run substrate's
         # prefix); otherwise the occupied prefix folds
@@ -1545,10 +1557,12 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     The ORDER is presentation and lives HERE, once -- renderers receive
     this list ready-made and format (branching on key identity only):
     the CASCI fold block first (identity: method=casci, start=ao; the
-    pur fold third), then the character-selected MO CASCI pair (the
-    AO-vs-MO comparison at fixed window; raw/frac have no canonical
-    meaning), then the optimizer product method x mask x substrate x
-    start with the virtual-mix diagnostic after the CASSCF
+    pur fold third), each ruler fold (avg, pur) carrying the COMPLETE
+    KIND BLOCK -- mo, moc, no beside ao (the window-source comparison
+    at fixed window and fold; raw/frac are core-field controls and
+    stay ao-only -- an m-incomplete start there would confound two
+    diseases in one row) -- then the optimizer product method x mask x
+    substrate x start with the virtual-mix diagnostic after the CASSCF
     free/polarized starts, and the NO start addressing the full-span
     group prefix (:func:`_no_label`). mo x pur and moc x pur ARE part
     of the grid (the canonical/character-selected columns are
@@ -1566,8 +1580,19 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
         CellKey(atom, w, sec, fold="avg"),
         CellKey(atom, w, sec, substrate="pur"),   # the CASCI pur fold
         CellKey(atom, w, sec, fold="frac"),
+        # the COMPLETE KIND BLOCK at each ruler fold: the window-source
+        # comparison (mo/moc/no beside ao) at fixed window and fold --
+        # raw/frac are core-field controls and stay ao-only (an
+        # m-incomplete start there would confound two diseases in one
+        # row)
+        CellKey(atom, w, sec, method="casci", start="mo", fold="avg"),
         CellKey(atom, w, sec, method="casci", start="moc", fold="avg"),
+        CellKey(atom, _no_label(w), sec, method="casci", start="no",
+                fold="avg"),
+        CellKey(atom, w, sec, method="casci", start="mo", substrate="pur"),
         CellKey(atom, w, sec, method="casci", start="moc",
+                substrate="pur"),
+        CellKey(atom, _no_label(w), sec, method="casci", start="no",
                 substrate="pur"),
     ]
     for m in ("casscf", "sa-casscf"):

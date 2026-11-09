@@ -404,10 +404,15 @@ _U14E_ANCHOR_FIRST = Scenario(
                 for w in _U14E_WINDOWS
                 for na, nb in (_u14e_sector(w),)
                 for m in ("casscf", "sa-casscf"))
-    + tuple(f"u14e_{w}no" for w in _U14E_WINDOWS),
+    + tuple(f"u14e_{w}no{k}_{na}-{nb}_{m}_"
+            for w in _U14E_WINDOWS
+            for na, nb in (_u14e_sector(w),)
+            for k in (2, 3, 4, 5)
+            for m in ("casscf", "sa-casscf")),
     reason="the optimizer class is multi-solution on the f shell "
            "(run_casscf=False's spirit made explicit): the CASCI "
-           "anchors run first (2026-11-05)")
+           "anchors run first (2026-11-05; the kind block's casci "
+           "cells -- mo/moc/no -- run: amended 2026-11-09)")
 # the frac folds' gate: the fractional-occupation reference has no
 # converged basin on the ECP atom (plain DIIS diverges E ~ +137;
 # Newton-from-minao converges to a collapsed -12.74, 37 Eh above the
@@ -474,12 +479,15 @@ def _unc_gates(key: str, sec: tuple[int, int]) -> tuple[Scenario, ...]:
     return (
         Scenario(
             name="anchor-first",
-            cells=tuple(f"{key}_{w}_{na}-{nb}_{m}_"
+            cells=tuple(f"{key}_{win}_{na}-{nb}_{m}_"
+                        for win in (w, w + "no2", w + "@ar")
                         for m in ("casscf", "sa-casscf")
-                        for na, nb in (sec,)) + (f"{key}_{w}no",),
+                        for na, nb in (sec,)),
             reason="the optimizer class is not declared on the "
             "uncontracted bases this wave: the CASCI anchors and the "
-            "multi-column lane legs run first (2026-11-06)"),
+            "multi-column lane legs run first (2026-11-06; the kind "
+            "block's casci cells -- mo/moc/no -- run: amended "
+            "2026-11-09)"),
         Scenario(
             name="frac-reference-unmeasured",
             cells=tuple(f"{key}_{w}_{na}-{nb}_casci_ao_-_pol_frac"
