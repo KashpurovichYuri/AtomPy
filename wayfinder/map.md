@@ -28,6 +28,20 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- THE EACH-BY-EACH ROUND's review dispositions (2026-11-09, ticket
+  34's round section carries the record; the fixes = 44e0ed4):
+  DECLINED -- (a) the `_fold_core` report's `"core": "scf"` era tag
+  stays: the payload's era-awareness is load-bearing (the
+  store-anchored test reads era fields: `core_in_span_min` vs
+  `core_comm`); (b) the no-label prefix idiom in scenarios stays:
+  threading `cells._no_label` against the cells→cases import
+  direction costs more than the two declarations it would clean;
+  (c) the lattice windows keep their ao+mo pair: the kind block is
+  the PRIMARY window's comparison (running four kinds per lattice
+  span is scope growth; the preambles scope it).  WATCH -- the
+  unfiltered regen is a full free-grid REBUILD (merge only when
+  filtered): it drops lane/route payloads; run the merge groups
+  after it (bitten once, 2026-11-09).
 - The folded-reference round, MEASURED (2026-11-08/09, ticket 34
   steps 1-5 -- the logs: elements/{Ti-unc,Sc-unc}/logs/{census,
   folded_probe,matrix_folded}.log): (1) the unc ROHF basins are ALL
