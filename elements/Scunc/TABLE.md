@@ -3,31 +3,34 @@
 The primitive split of Sc/cc-pVDZ (data/sc_ccpvdz_unc.txt — every
 contraction a single-primitive block); the shell layer declares each
 chemical shell's band realization (the composition certificate:
-logs/band_composition.log). The windows are the COMPRESSED-SHELL
-form (k=1 reference radial × the m-set per shell, `shell_radials`):
-the CAS labels mirror the certified contracted record's shapes —
-CAS(3,5) [3d], CAS(3,6) [3d4s] — with the capture certificates in
-logs/regen_compressed.log (the 3d family holds its MO to 0.999; the
-4s family's single radial to 0.81 — the node-tail honesty of a raw
-family vs a baked-in contraction). The folds stay FULL-family (the
-mini-Roothaan grammar). Validation atom of the shell-layer wave.
-Sector M_S = ½. Certified sibling: `elements/Sc/` (contracted).
+logs/band_composition.log). The windows are the DISTILLED form
+(window_distilled: k=1 radial per shell, distilled from the
+reference's occupied MOs by the member-summed radial Gram,
+replicated on the m-set, `shell_radials`): the CAS labels mirror the
+certified contracted record's shapes — CAS(3,5) [3d], CAS(3,6)
+[3d4s] — and the whole ladder is construction-uniform with
+`elements/Sc/` (the contracted sibling's windows are the 1:1
+identity of the same construction — its verification legs
+reproduced the certified records at 0.00e+00 mEh). The captures
+(3d 0.999; 4s 0.81 — the node-tail honesty of a raw family vs a
+baked-in contraction) are the window-shape readout. The folds stay
+FULL-family (the mini-Roothaan grammar). Validation atom of the
+shell-layer wave. Sector M_S = ½. Certified sibling:
+`elements/Sc/` (contracted).
 
 **Field disclosure.** Every row anchors on the TRUE neutral ROHF (the
-ROHF row — the tables are NOT re-anchored). The folded-reference round
-adds a second reference class: the confined-core field with the
-valence re-relaxed (`run_folded`, logs/folded_probe.log —
-−759.58645602, +150.9 mEh above the anchor BY ZERO: the frozen
-confined core is the free ion on a wide span, plus the variational
-cost). On that field the lane closes the lane-vs-free gap to
-0.085 mEh — the residual is the C1/D2h gauge of the window cut; the
-free-route cut declares its dominance gate at 0.4 (the C1 gauge's 4s
-signal 0.4628, D2h's gauge passes 0.5; measured honest, ⟨L²⟩ = 6
-exact). Full record: logs/matrix_folded.log (the ²D lane total
-−759.689259, +48.1 mEh vs the anchor); folded-field cells carry the
-`folded` tag in their addresses (the ninth address slot). The
-ladder's pinned row is the HISTORICAL neutral-field lane record — the
-+38.7 mEh gap that motivated the fold — kept for provenance.
+ROHF row — the tables are NOT re-anchored). The lane's pinned row
+runs on the neutral field with the confined core on the FULL-family
+span — its offset vs the free rows (+38.7 mEh) is STRUCTURAL (the
+confined core ≠ the SCF core on a wide span; measured basis-stable
+on the contracted control too, elements/Ti/logs/folded_review.log)
+— the lane's value is the independent machine-exact term
+certification (²D: L² = 6 ×5, ptp 3e-15). The folded-reference
+round (logs/matrix_folded.log, draw-documented) proved the field
+fix: on the folded field the lane closes to the free route at
+0.085 mEh (the dominance declaration 0.4 was that round's cut);
+folded-field cells carry the `folded` tag in their addresses and
+sit BY ZERO above the anchors (+150.9 mEh reference, +48.1 lane).
 
 <!-- ladder:begin -->
 | method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |

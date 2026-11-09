@@ -1,0 +1,48 @@
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d4s_2-1_casci_ao_-_pol_raw
+  [cell] sc_3d4s_2-1_casci_ao_-_pol_avg
+  [cell] sc_3d4s_2-1_casci_ao_-_pur_avg
+  [cell] sc_3d4s_2-1_casci_ao_-_pol_frac
+  [cell] sc_3d4s_2-1_casci_moc_-_pol_avg
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9919-0.9919; 4s: k=1 of 1 bands, capture 0.9705-0.9705
+  [cell] sc_3d4s_2-1_casci_moc_-_pur_avg
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9919-0.9919; 4s: k=1 of 1 bands, capture 0.9705-0.9705
+  [cell] sc_3d_2-1_casci_ao_-_pol_avg
+  [cell] sc_3d_2-1_casci_mo_-_pol_avg
+  [cell] sc_3d4s_2-1_casci_ao_-_pol_avg
+  [cell] sc_3d4s_2-1_casci_mo_-_pol_avg
+  [cell] sc_3d4d_2-1_casci_ao_-_pol_avg
+  [cell] sc_3d4d_2-1_casci_mo_-_pol_avg
+  [cell] sc_3d4s4p_2-1_casci_ao_-_pol_avg
+  [cell] sc_3d4s4p_2-1_casci_mo_-_pol_avg
+  [cell] sc_3d4s4d_2-1_casci_ao_-_pol_avg
+  [cell] sc_3d4s4d_2-1_casci_mo_-_pol_avg
+  [cell] sc_3d4s4p4d_2-1_casci_ao_-_pol_avg
+  [cell] sc_3d4s4p4d_2-1_casci_mo_-_pol_avg
+  [cell] sc_3d4s4p4d5d_2-1_casci_ao_-_pol_avg
+  [cell] sc_3d4s4p4d5d_2-1_casci_mo_-_pol_avg
+  [cell] sc_3d4s4p4d4f_2-1_casci_ao_-_pol_avg
+  [cell] sc_3d4s4p4d4f_2-1_casci_mo_-_pol_avg
+  wrote elements/Sc/cells.json + cells.md
+
+===== cells Ti =====
+ROHF E = -848.40648875 Eh
+  [cell] ti_3d4s_3-1_casci_ao_-_pol_raw
+  [cell] ti_3d4s_3-1_casci_ao_-_pol_avg
+  [cell] ti_3d4s_3-1_casci_ao_-_pur_avg
+  [cell] ti_3d4s_3-1_casci_ao_-_pol_frac
+  [cell] ti_3d4s_3-1_casci_moc_-_pol_avg
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9966-0.9966; 4s: k=1 of 1 bands, capture 0.9729-0.9729
+  [cell] ti_3d4s_3-1_casci_moc_-_pur_avg
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9966-0.9966; 4s: k=1 of 1 bands, capture 0.9729-0.9729
+  [cell] ti_3d_2-0_casci_ao_-_pol_avg
+  [cell] ti_3d_2-0_casci_mo_-_pol_avg
+  [cell] ti_3d4p_2-0_casci_ao_-_pol_avg
+  [cell] ti_3d4p_2-0_casci_mo_-_pol_avg
+  [cell] ti_3d4p4d_2-0_casci_ao_-_pol_avg
+  [cell] ti_3d4p4d_2-0_casci_mo_-_pol_avg
+  wrote elements/Ti/cells.json + cells.md
+
+done
