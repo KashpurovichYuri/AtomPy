@@ -13,11 +13,13 @@ dies).
   design-first — the frozen-landscape tables that replace the retired
   scan pointers.
 - [34 — the folded reference + the window characterization matrix](tickets/34-folded-reference.md):
-  the field-window consistency fix (the confined core = the free ion
-  on a wide span; the valence pays +257.7 for a window cut on the
-  wrong field); the Tiunc census + promotion; the MO-default window
-  matrix; then the Sc port.  The queue tail (T-B..T-E) rides in the
-  ticket's After section.
+  **STEPS 1-5 COMPLETE (2026-11-08/09)**: the Tiunc census + the
+  promotion; run_folded (reference.py) + its tests; the matrix on the
+  folded field; the lane re-runs -- THE GAPS CLOSED (Tiunc +124.3 →
+  5.5e-13 Eh; Scunc +38.7 → 0.085 mEh); the Sc port.  The riding-along
+  tail (the anisotropy column, the per-radial spectrum, the docstring
+  review, the table preambles) + the folded-field campaign-schema
+  decision remain; then T-B/T-C/T-D/T-E per the ticket's After.
 
 Resolved: ticket 32 (the symmetry lane) — the campaign complete
 (C/Si/Sc/Ti on the one table, the route axis, the UHF anchors), the
@@ -26,6 +28,31 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- The folded-reference round, MEASURED (2026-11-08/09, ticket 34
+  steps 1-5 -- the logs: elements/{Tiunc,Scunc}/logs/{census,
+  folded_probe,matrix_folded}.log): (1) the unc ROHF basins are ALL
+  s/d-HYBRID-open (~0.4 d per open MO; pure-3d opens are a
+  contracted-subspace property) and no fresh start reaches the
+  deepest basin -- the trusted cache is the one mechanism; (2)
+  run_folded's pick rule is MOM-PRIMARY within dominance gates
+  (character alone loses to the complement's tight core-shell
+  radials at w = 1.0; energy alone declares the ion field's
+  d-BELOW-s inverted filling, eps -1.53 vs -1.19 on Ti); (3) the
+  ion-field valence hybridizes (the folded closed pair ~0.69 s on
+  both twins) -- the C1-gauge Scunc cut carries only 0.4628 4s-band
+  weight, below the compression's 0.5 dominance gate (the D2h
+  solver's gauge lands >=0.5; the neutral field's signal is 0.8988)
+  -- a free-route folded cut needs a declared dominance (0.4
+  measured honest: L2 = 6 exact); (4) THE GAPS CLOSED: Tiunc
+  +124.3 -> 5.5e-13 Eh, Scunc +38.7 -> 0.085 mEh (the residual = the
+  C1/D2h gauge of the window cut); (5) the MO-picked windows fail
+  the meters on BOTH fields (the m-incomplete set) -- the AO class
+  is the certified default; the NO arm degenerates with the source
+  at k=1 (the groups [1,5] = the chemistry).  OPEN DECISION: the
+  folded-field cells' campaign identity (the substrate tag in the
+  key grammar, the free-route dominance declaration, the table
+  re-anchoring) -- user-visible before the tables carry the folded
+  rows.
 - The projected-Gram alternative, DECLINED (2026-11-08, the design
   round): forming the compression Gram from S-PROJECTED member
   vectors (bounded spectra, self-interpretable shares) instead of
