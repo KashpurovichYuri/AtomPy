@@ -1,0 +1,17 @@
+anchor (neutral field): E = -759.73738486
+folded reference: E = -759.58645602 (+150.9 mEh vs the anchor)
+  valence col 9: s-w = 0.6883  d-w = 0.0058  eps = -0.2259
+  valence col 10: s-w = 0.0371  d-w = 0.3893  eps = -0.0569
+  neutral field: the best 4s-band weight among the occupied = 0.8988
+--- cut dominance=0.4: ncas = 6 E = -759.689344  dE(vs folded) = -102.9 mEh  L2 = 6.0000  closure = {'lz': '1.4e-14', 'lperp': '1.9e-14'}
+[no-arm] source ground block: 5 roots
+[no-arm] occupation groups: [1, 5]
+--- (iii) no2: ncas = 6 E = -759.689344  dE(vs folded) = -102.9 mEh  L2 = 6.0000  closure = {'lz': '1.4e-14', 'lperp': '2.0e-14'}
+
+D2h substrate: E = -759.73708452
+folded D2h substrate: E = -759.58623848
+  [window] compressed 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.8075-0.8075
+--- lane (folded substrate)
+{"cell": "scunc_3d4s@ar_2-1_casci_ao_-_pur_avg", "term": [2, "g"], "energies": [-1.474557935697276, -1.4745579356972758, -1.4745579356972756, -1.4745579356972756, -1.4745579356972747], "total": -759.6892593267729, "ptp": 1.3322676295501878e-15, "l2": [5.999999999999999, 6.0, 6.000000000000002, 6.000000000000003, 6.000000000000003], "s2": [0.75, 0.7499999999999998, 0.7499999999999999, 0.7500000000000001, 0.7500000000000002], "n_det": 90, "anchor_dev": 1.9984014443252818e-15, "win_lz": 1.4405825748088177e-14, "win_lperp": 1.9486806178865878e-14, "comm_norm_h_lz": 7.037840911197661e-15, "comm_norm_h_l2": 5.4841908290260234e-14, "res_h_lz": 9.129505521834353e-16, "res_h_l2": 3.672334109346976e-15, "fold": ["1s", "2s", "2p", "3s", "3p"], "core_pairs": 9, "core_cycles": 18, "core_comm": 3.148148408627094e-11, "anchor_corrected": []}
+
+sandbox removed

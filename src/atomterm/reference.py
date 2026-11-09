@@ -668,16 +668,14 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     would carry a NEVER-dying error vector (the confined core
     diagonalizes its own Fock, never the total one), so the block
     must exist in no cycle object at all.  The filling is
-    CHARACTER-FORCED (the :func:`_forced_rohf_occ` rule, restricted
-    to the complement): the valence closed pairs by closed-span
-    weight, then the opens by the ``2 w_open + w_closed`` premium,
-    three-level picks (class, then energy, then the MOM anchor
-    across cycles -- the :func:`run_frac_occ` cure for the
-    degenerate-shell gauge chase).  The solve SEEDS from the
-    substrate's own valence orbitals, projected against the confined
-    core -- the basin-census cure (this atom's d^2 open-shell
-    problems diverge from every scratch start; the projected valence
-    starts the DIIS inside the declared basin).  Plain DIIS.
+    CHARACTER-GATED and MOM-ANCHORED: the picks follow the previous
+    cycle's columns (from the seed on) within dominance gates --
+    the closed pairs among the closed-span-dominated columns
+    (``w > 0.5``), the opens among the d-premium columns.  Neither
+    character alone nor energy alone can pick here: the complement's
+    tight core-shell radials carry near-perfect s/p character at
+    +1e1 Eh, and the ion field's aufbau order is d-BELOW-s (the
+    inversion that makes the ion configs d^n).  Plain DIIS.
 
     The bookkeeping (the total, computed explicitly each cycle):
 
@@ -822,32 +820,30 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
                            c_ao).real
         w_closed = np.einsum("ai,ab,bi->i", c_ao.conj(), p_closed,
                              c_ao).real
-        # the picks are three-level: the CHARACTER class (rounded -- a
-        # degenerate shell ties exactly), then the ENERGY ascending
-        # (the tight core-shell radials in the complement carry the
-        # same pure s/p character as the valence pair -- only the
-        # energy separates them; the ion field's d-below-s inversion
-        # is why the closed pair must not be picked by energy ALONE),
-        # then the MOM anchor (the previous cycle's columns -- the
-        # run_frac_occ cure for the degenerate-shell gauge chase).
+        # the picks are MOM-PRIMARY within dominance gates: the seed
+        # (the projected substrate valence) declares the basin, the
+        # previous cycle's columns anchor it, and the gates keep the
+        # character honest.  Neither character alone nor energy alone
+        # can pick here: the complement's tight core-shell radials
+        # carry near-perfect s/p character at +1e1 Eh (they beat the
+        # valence pair's 0.9993 weight in a class tie), and the ion
+        # field's aufbau order is d-BELOW-s (the inversion that makes
+        # the ion configs d^n -- energy ordering would declare a d
+        # pair).  The MOM anchor is the run_frac_occ cure, applied
+        # from the seed onward.
         mom_c = np.zeros(len(occ))
         mom_o = np.zeros(len(occ))
         if prev_open[0] is not None:
             mom_o = np.abs(prev_open[0].conj().T @ mo_coeff).sum(axis=0)
         if prev_closed[0] is not None:
             mom_c = np.abs(prev_closed[0].conj().T @ mo_coeff).sum(axis=0)
-        cls_c = np.round(w_closed, 8)
-        closed = sorted(range(len(occ)),
-                        key=lambda i: (-cls_c[i],
-                                       round(float(mo_energy[i]), 6),
-                                       -mom_c[i]))[:n_closed_val]
+        qualified_c = [i for i in range(len(occ)) if w_closed[i] > 0.5]
+        closed = sorted(qualified_c, key=lambda i: -mom_c[i])[:n_closed_val]
         occ[closed] = 2.0
         rest = [i for i in range(len(occ)) if occ[i] == 0.0]
-        cls_o = np.round(2 * w_open + w_closed, 8)
-        opens = sorted(rest,
-                       key=lambda i: (-cls_o[i],
-                                      round(float(mo_energy[i]), 6),
-                                      -mom_o[i]))[:n_open]
+        qualified_o = [i for i in rest
+                       if 2 * w_open[i] + w_closed[i] > 1.0]
+        opens = sorted(qualified_o, key=lambda i: -mom_o[i])[:n_open]
         occ[opens] = 1.0
         prev_open[0] = mo_coeff[:, opens].copy()
         prev_closed[0] = mo_coeff[:, closed].copy()
