@@ -408,3 +408,66 @@ SCF core, and the lane joins the true minimum's zero by construction.
    column, the docstring review (the per-radial spectrum died with
    the compression), T-C gated on the U14e batch, T-B, T-D, T-E
    (splittings vs NIST).
+
+## The each-by-each round (2026-11-09, the user's review round)
+
+The user's review of the first round's tables drove this round;
+every question landed as a fix or a disclosure:
+
+- WHY ONLY AO AT Ar.raw (and frac): the fold-axis rows are
+  CORE-FIELD controls, declared ao-only -- an m-incomplete start
+  there would confound two diseases in one row.  Documented (the
+  window_grid contract + the kind legend).
+- THE ROUTE PARAGRAPH: free vs pinned vs what 'lane' names, and the
+  E-semantics split (free = the run's total; pinned = the TERM
+  energy) -- the README reading key carries it; ΔE's zero restated
+  as the TRUE anchor row (the old "pinned row" claim was stale).
+- THE KIND BLOCK COMPLETE: window_grid declares mo/moc/no CASCI
+  beside ao at BOTH ruler folds; the twins ran it.  Measured: NO
+  degenerate with distilled at the closed substrates (Ti-unc
+  +3.3 µEh both folds; Sc-unc +3.2 µEh at pur), the occupation
+  groups [1,5]; the mo controls are l-impure on the unc basis
+  (win_l 0.60-class, 50% p-weight) -- the reference-echo class
+  below the anchor, disclosed by the meters.  MOC displays as
+  itself.
+- THE ROUTE FREE-CI TWIN: Ti-unc agrees with the pinned lane to
+  1e-9 Eh; Sc-unc to 8e-6.  The route axis closes.
+- THE RENAME: Tiunc/Scunc -> Ti-unc/Sc-unc everywhere (the grammar
+  admits ONE hyphen; the stores migrated identity-only, certified
+  payload-identical; the historical logs keep the old names).
+
+TWO PHYSICS REPAIRS the round forced (both pinned):
+1. ground_block SCALE-AWARE: a residual core-field anisotropy splits
+   the multiplet AND perturbs <L^2> -- the Sc-unc source's 2D block
+   splits 7e-4 Eh under ||[H,L2]|| 8.4e-2 with the next term 9e-2
+   away; the roundoff window saw ONE root and the NO arm built an
+   m-unequal density from it (2-determinant window, silently).
+   The rule now: the term identified by <L^2> within 0.1, the
+   energy window spanning 1% of the different-term gap.
+2. THE NO ARM'S CERTIFICATE: the source rides the PURIFIED span
+   (substrate-independent, like the distilled columns -- only the
+   closed core gives the exactly m-scalar average; the split
+   eigenstates' average is m-scalar only to the admixture level,
+   measured 3e-2) and every group prefix's closure is VERIFIED; the
+   m-unequal class REFUSES (fired live; pinned store-anchored).
+
+DISCOVERED EN ROUTE: the unfiltered regen is a full free-grid
+REBUILD (merge only when filtered) -- it dropped the lane payloads;
+restored via the merge groups.  The Sc-unc canonical core is the
+ANISOTROPIC class (the pol rows' closures ~3e-2, L2 5.9989,
+identical across kinds; the closed comparisons are the pur rows and
+the lanes) -- disclosed in its preamble.
+
+THE REVIEW (158de72...HEAD, both axes): the standards findings
+fixed (44e0ed4: _ladder_row one home -- two of five hand-copies
+kept the pre-kind-block form; the measured record out of
+definitional prose; the named constants; the stale names); the spec
+axis clean (the rename complete, the promised rows present, the
+README covers every column/stamp).  DECLINED with reasons (map.md
+Issues): the _fold_core 'core' era tag stays (the payload's
+era-awareness, like core_in_span_min vs core_comm); the no-label
+prefix idiom in scenarios stays (threading cells._no_label against
+the import direction costs more than two declarations); the lattice
+windows keep their ao+mo pair (the kind block is the PRIMARY
+window's comparison; running four kinds per lattice span is scope
+growth, the preamble scopes it).
