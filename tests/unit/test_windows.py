@@ -602,3 +602,105 @@ def test_window_compressed_on_a_1_1_realization_is_the_label_span(carbon):
                  s)
     assert span_overlap(cols, raw, s) > 1 - 1e-12
     assert rep["2p"]["dominated"] == [2, 3]      # the two open 2p MOs
+
+
+# --------------------------------------------- the distilled window
+
+def test_distilled_ncas_counts_the_declared_radials():
+    """The counting rule without building: each shell contributes
+    k x (2l+1); an undeclared window shell refuses."""
+    from atomterm.windows import distilled_ncas
+
+    assert distilled_ncas(["3d", "4s"], {"3d": 1, "4s": 1}) == 6
+    assert distilled_ncas(["3d"], {"3d": 1, "4s": 1}) == 5
+    assert distilled_ncas(["3d"], {"3d": 2}) == 10
+    with pytest.raises(ValueError, match="undeclared"):
+        distilled_ncas(["3d", "4s"], {"3d": 1})
+
+
+def test_window_distilled_recovers_the_planted_radial():
+    """The construction's exact anchor: an m-complete planted MO over
+    a multi-band family is recovered exactly -- the top radial IS the
+    planted one on every member, the columns are S-orthonormal, and
+    the span is rotation-CLOSED (member-complete at every k by
+    construction)."""
+    from atomterm.operators import window_closure
+    from atomterm.windows import window_distilled
+
+    mol = uncontracted_carbon_mole()
+    layer = {"2s": ("1s", "2s"), "2p": ("2p", "3p")}
+    s = mol.intor_symmetric("int1e_ovlp")
+    c_ref = _planted_reference(mol, layer, ["2p"])
+    cols, rep = window_distilled(mol, c_ref, s, ["2p"], layer,
+                                 {"2p": 1})
+    assert cols.shape == (mol.nao_nr(), 3)
+    assert rep["2p"]["significant"] == [0]
+    assert abs(rep["2p"]["capture"][0] - 1.0) < 1e-10
+    assert np.abs(cols.T @ s @ cols - np.eye(3)).max() < 1e-10
+    lz, lperp = window_closure(mol, cols).values()
+    assert lz < 1e-12 and lperp < 1e-12
+
+
+def test_window_distilled_admits_the_hybrid_signal():
+    """The behavioral difference from the dominance gate: a reference
+    column whose home-band weight lands SUB-dominance (the planted
+    radial mixed with foreign-l content -- the S-weight is
+    scale-invariant, so the mix, not an amplitude, sets it) still
+    enters the radial signal at the permissive default, and the
+    distilled radial stays the planted one -- the selection is a
+    noise floor, not an ownership test."""
+    from atomterm.operators import window_closure
+    from atomterm.windows import window_distilled
+
+    mol = uncontracted_carbon_mole()
+    layer = {"2p": ("2p", "3p")}
+    s = mol.intor_symmetric("int1e_ovlp")
+    c_ref = _planted_reference(mol, layer, ["2p"])
+    hybrid = c_ref[:, [0]] + 2.0 * c_ref[:, [-1]]   # weight reads ~0.2
+    c_hyb = np.hstack([hybrid, c_ref])
+    cols, rep = window_distilled(mol, c_hyb, s, ["2p"], layer,
+                                 {"2p": 1})
+    assert rep["2p"]["significant"] == [0, 1]
+    assert rep["2p"]["span_weight"][0] < 0.5  # sub-dominance, admitted
+    assert abs(max(rep["2p"]["capture"]) - 1.0) < 1e-10
+    lz, lperp = window_closure(mol, cols).values()
+    assert lz < 1e-12 and lperp < 1e-12
+
+
+def test_window_distilled_refusals():
+    """The fail-fast branches: k beyond the radial signal (the kept
+    spectrum is tail), a shell with no significant column (the forced
+    cut), and radials=None (the uncompressed window is the row
+    selectors' business)."""
+    from atomterm.windows import window_distilled
+
+    mol = uncontracted_carbon_mole()
+    layer = {"2p": ("2p", "3p")}
+    s = mol.intor_symmetric("int1e_ovlp")
+    c_ref = _planted_reference(mol, layer, ["2p"])
+    with pytest.raises(ValueError, match="exceeds the radial signal"):
+        window_distilled(mol, c_ref, s, ["2p"], layer, {"2p": 2})
+    with pytest.raises(ValueError, match="no reference column"):
+        # w is bounded by 1: a cut past the bound leaves no
+        # qualified column (the forced form of a family no occupied
+        # MO calls home)
+        window_distilled(mol, c_ref, s, ["2p"], layer, {"2p": 1},
+                         significance=1.1)
+    with pytest.raises(ValueError, match="select_valence_ao"):
+        window_distilled(mol, c_ref, s, ["2p"], layer, None)
+
+
+def test_window_distilled_on_a_1_1_realization_is_the_label_span(carbon):
+    """The degenerate anchor: on a one-band-per-shell realization
+    (the contracted bases) k=1 reproduces the label-selected m-set's
+    span exactly -- the distillation is the identity there."""
+    from atomterm.windows import span_overlap, window_distilled
+
+    _cfg, mol, mf, _act = carbon
+    s = mol.intor_symmetric("int1e_ovlp")
+    c_occ = np.asarray(mf.mo_coeff)[:, np.asarray(mf.mo_occ) > 0]
+    cols, _rep = window_distilled(mol, c_occ, s, ["2p"], None,
+                                  {"2p": 1})
+    raw = lowdin(np.eye(mol.nao_nr())[:, select_valence_ao(mol, ["2p"])],
+                 s)
+    assert span_overlap(cols, raw, s) > 1 - 1e-12
