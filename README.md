@@ -232,7 +232,8 @@ slices are interesting; the runners execute the declared set:
 | sector (M_S) | `(na, nb)`, from spin + electron parity | `run.py` |
 | method | casci / casscf / sa-casscf | `regen_cells.py` |
 | mask | free / frozen / radial / virtmix | `regen_cells.py` |
-| start | ao / mo / no | `regen_cells.py` |
+| start (the window kind) | **ao** — the distilled windows: MO-informed (the radial Gram of the reference's occupied columns), AO-expressed, m-complete — the production kind; **mo** / **moc** — the SCF's own MOs, the *controls* (m-incomplete by construction: the SCF's hybrid-open gauge, certified scrambled-term fingerprints); **no** — the term-averaged density's occupation groups, m-complete by sphericity | `regen_cells.py` |
+| radials (k) | the distillation depth, per shell — **k = 1 is the usual case** (it already spans the full shell, k·(2l+1) columns, the contraction analog); k ≥ 2 only when a correlated source supplies real second radials (the SCF's Gram is rank-1) *and* the CAS budget allows — the tail certificate refuses barren k | the case declaration (`shell_radials`) |
 | substrate | pol (canonical core) / pur (closed span) | `regen_cells.py` |
 | fold | raw / avg / frac | `regen_cells.py` |
 | field | neutral (default) / folded — the reference the cell's substrate lives on; ninth address slot, written only when `folded` | `run_cell` / `run_lane_cell` (the substrate on the key's field) |

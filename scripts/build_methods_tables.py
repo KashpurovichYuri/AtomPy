@@ -147,6 +147,18 @@ def _row(k, p, anchor, spec) -> str:
     # cap the measurement runs declared; PySCF's default is 50)
     note = "cycle cap" if cyc and cyc == (cap if cap is not None else 200) \
         else ""
+    if note:
+        note += "; "
+    # the kind vocabulary's verdict language: the SCF-MO kinds are
+    # CONTROLS (m-incomplete by construction -- the SCF's hybrid-open
+    # gauge; the scrambled term reading is the certified fingerprint,
+    # an explained expectation, never a construction failure); the
+    # pinned rows carry the bookkeeping-form disclosure (the residual
+    # vs the anchor is the projected-density ruler's form, mEh-class)
+    if k.start in ("mo", "moc"):
+        note += "control: m-incomplete by construction"
+    elif route == "pinned":
+        note += "SCF core; offset = bookkeeping form"
     wname = (spec.window_names or {}).get(k.span_label, k.span_label)
     cells = [
         _method(k), route, f"{wname} / {START_NAMES[k.start]}",

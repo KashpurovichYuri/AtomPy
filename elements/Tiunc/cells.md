@@ -118,4 +118,4 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `tiunc_3d4s_3-1_sa-casscf_mo_frozen_pur_avg` VOID -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)
 - `tiunc_3d4s_3-1_sa-casscf_moc_frozen_pur_avg` VOID -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)
 - `tiunc_3d4sno2_3-1_sa-casscf_no_frozen_pur_avg` VOID -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06)
-- `tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg` E_term -848.28318951  ptp 5.3e-15  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']  core 9p/17c
+- `tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg` E_term -848.40138159  ptp 2.7e-15  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']  core 9p/span 0.9999
