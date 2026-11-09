@@ -8,8 +8,9 @@ records at 0.00e+00 mEh). The kind block compares the four window
 sources at both ruler folds: `MO`/`MOC` are CONTROLS (m-incomplete
 by construction — the SCF's hybrid-open gauge; MO is l-impure here,
 win_l 0.60-class), `NO` is the density leg, degenerate with AO
-(+3.3 µEh, both folds). The optimizer class is out of scope this
-wave (void at the key, one `--full` away). Reference: the trusted
+(+3.3 µEh, both folds). The optimizer class and the frac fold (no
+measured fractional-occupation basin on this basis) are out of scope
+this wave (void at the key, one `--full` away). Reference: the trusted
 deep-basin ROHF (−848.40744343, logs/census.log). The pinned row and
 its free twin (route agreement at 1e-9 Eh) freeze the reference's
 OWN core; their residual vs the anchor (+6.1 mEh) is the

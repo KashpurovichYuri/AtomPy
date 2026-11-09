@@ -552,11 +552,17 @@ def _fold_core(key: CellKey, mol, mf,
     m-scalar anisotropy rule applies downstream (the averaged fold,
     ``active_space_integrals``'s default).  The retired alternative
     -- the span's own closed-shell Roothaan
-    (:func:`atomterm.core.confined_core_orbitals`) -- measures
-    +124.3/+38.7 mEh off the anchors on the uncontracted twins (the
-    bare core, solved without the valence, over-relaxes on a wide
-    span; basis-stable per the contracted control,
-    elements/Ti/logs/folded_review.log).
+    (:func:`atomterm.core.confined_core_orbitals`) -- over-relaxes on
+    a wide span (the bare core, solved without the valence); its
+    measured record lives in the committed artifacts.
+
+    Notes
+    -----
+    The retirement measurement: the confined-Roothaan core sat
+    +124.3/+38.7 mEh off the anchors on the uncontracted twins,
+    basis-stable per the contracted control
+    (``elements/Ti/logs/folded_review.log``); the repair collapsed
+    the offsets to the projected-density bookkeeping form.
 
     Raises
     ------

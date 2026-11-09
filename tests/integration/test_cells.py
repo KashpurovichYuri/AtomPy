@@ -969,7 +969,7 @@ def test_unc_lanes_load_exact_from_the_store():
     near-degenerate skips -- the branch the live runs exercised)."""
     from atomterm.cells import load_lane_cell
 
-    # the compressed twins' sectors are tiny -- the dense adjudication
+    # the distilled twins' sectors are tiny -- the dense adjudication
     # eigen-solves every block and the pinned solver agrees to the
     # machine floor (observed: 8.9e-16 / 2.2e-15, no corrections);
     # U14e's 17-component lane is the live-skip class (the recorded

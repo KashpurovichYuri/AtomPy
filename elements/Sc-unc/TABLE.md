@@ -13,8 +13,9 @@ rows carry the assembly defect (closures ~3e-2, ⟨L²⟩ 5.9989 —
 identical across kinds) and their ground-root energies are
 gauge-sensitive at the split scale (the ²D block splits 0.7 mEh
 under ‖[H,L²]‖ 8e-2); the CLOSED comparisons are the Ar·pur rows and
-the lanes. The optimizer class is out of scope this wave (void at
-the key, one `--full` away). Reference: the trusted ROHF
+the lanes. The optimizer class and the frac fold (no measured
+fractional-occupation basin on this basis) are out of scope this
+wave (void at the key, one `--full` away). Reference: the trusted ROHF
 (−759.73738486, rungs/rohf.chk). The pinned row and its free twin
 freeze the reference's OWN core; their residual vs the anchor
 (+5.1 mEh) is the projected-density bookkeeping form. Sector

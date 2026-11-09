@@ -719,10 +719,12 @@ def ground_block(ops: dict) -> tuple[float, int, np.ndarray, np.ndarray]:
     ev, vec = np.linalg.eigh(ops["H"].real)
     nchk = min(60, len(ev))
     l2 = [vec[:, r] @ ops["L2"].real @ vec[:, r] for r in range(nchk)]
-    other = [r for r in range(1, nchk) if abs(l2[r] - l2[0]) >= 0.1]
-    tol = max(1e-6, 0.01 * (ev[other[0]] - ev[0])) if other else 1e-6
+    band = 0.1        # the L^2 identity's width (ONE home: `other`
+    floor = 1e-6      # and `block` must agree on both)
+    other = [r for r in range(1, nchk) if abs(l2[r] - l2[0]) >= band]
+    tol = max(floor, 0.01 * (ev[other[0]] - ev[0])) if other else floor
     block = [r for r in range(nchk)
-             if abs(l2[r] - l2[0]) < 0.1 and ev[r] - ev[0] < tol]
+             if abs(l2[r] - l2[0]) < band and ev[r] - ev[0] < tol]
     w = np.zeros(len(ev))
     w[block] = 1.0 / len(block)
     return float(ev[0]), len(block), w, vec

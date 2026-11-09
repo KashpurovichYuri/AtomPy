@@ -13,10 +13,10 @@ dies).
   design-first — the frozen-landscape tables that replace the retired
   scan pointers.
 - [34 — the folded reference + the window characterization matrix](tickets/34-folded-reference.md):
-  **STEPS 1-5 COMPLETE (2026-11-08/09)**: the Tiunc census + the
+  **STEPS 1-5 COMPLETE (2026-11-08/09)**: the Ti-unc census + the
   promotion; run_folded (reference.py) + its tests; the matrix on the
-  folded field; the lane re-runs -- THE GAPS CLOSED (Tiunc +124.3 →
-  5.5e-13 Eh; Scunc +38.7 → 0.085 mEh); the Sc port.  The riding-along
+  folded field; the lane re-runs -- THE GAPS CLOSED (Ti-unc +124.3 →
+  5.5e-13 Eh; Sc-unc +38.7 → 0.085 mEh); the Sc port.  The riding-along
   tail (the anisotropy column, the per-radial spectrum, the docstring
   review, the table preambles) + the folded-field campaign-schema
   decision remain; then T-B/T-C/T-D/T-E per the ticket's After.
@@ -29,7 +29,7 @@ user decision; the partial verdict 91/91-isolation-green).
 ## Issues (open dispositions + watchlist)
 
 - The folded-reference round, MEASURED (2026-11-08/09, ticket 34
-  steps 1-5 -- the logs: elements/{Tiunc,Scunc}/logs/{census,
+  steps 1-5 -- the logs: elements/{Ti-unc,Sc-unc}/logs/{census,
   folded_probe,matrix_folded}.log): (1) the unc ROHF basins are ALL
   s/d-HYBRID-open (~0.4 d per open MO; pure-3d opens are a
   contracted-subspace property) and no fresh start reaches the
@@ -39,12 +39,12 @@ user decision; the partial verdict 91/91-isolation-green).
   radials at w = 1.0; energy alone declares the ion field's
   d-BELOW-s inverted filling, eps -1.53 vs -1.19 on Ti); (3) the
   ion-field valence hybridizes (the folded closed pair ~0.69 s on
-  both twins) -- the C1-gauge Scunc cut carries only 0.4628 4s-band
+  both twins) -- the C1-gauge Sc-unc cut carries only 0.4628 4s-band
   weight, below the compression's 0.5 dominance gate (the D2h
   solver's gauge lands >=0.5; the neutral field's signal is 0.8988)
   -- a free-route folded cut needs a declared dominance (0.4
-  measured honest: L2 = 6 exact); (4) THE GAPS CLOSED: Tiunc
-  +124.3 -> 5.5e-13 Eh, Scunc +38.7 -> 0.085 mEh (the residual = the
+  measured honest: L2 = 6 exact); (4) THE GAPS CLOSED: Ti-unc
+  +124.3 -> 5.5e-13 Eh, Sc-unc +38.7 -> 0.085 mEh (the residual = the
   C1/D2h gauge of the window cut); (5) the MO-picked windows fail
   the meters on BOTH fields (the m-incomplete set) -- the AO class
   is the certified default; the NO arm degenerates with the source
@@ -54,11 +54,11 @@ user decision; the partial verdict 91/91-isolation-green).
   re-anchoring) -- user-visible before the tables carry the folded
   rows.
 - The folded-field draw chaos, MEASURED (2026-11-09, ticket 34's
-  tail -- elements/Tiunc/logs/folded_repro.log is the replay matrix):
+  tail -- elements/Ti-unc/logs/folded_repro.log is the replay matrix):
   the certified folded fields do NOT replay -- same chks (mtime
   predates the certified commits), the exact old module, the same
   frozen env, both thread counts land wrong basins or the +53877.9
-  garbage basin; Scunc fails the same way.  The certified runs were
+  garbage basin; Sc-unc fails the same way.  The certified runs were
   single draws at a basin boundary.  run_folded now carries the
   post-kernel converged-filling certificate (the certified-era code
   returned wrong-fill fields silently on replay) and a DECLARED pick
@@ -102,21 +102,21 @@ user decision; the partial verdict 91/91-isolation-green).
   CONDITION: the per-radial spectrum showing truncated-ranking
   distortions (the riding-along tail installs the spectrum).
 - The D2h substrate layer, UNDERSTOOD (2026-11-07, the user-directed
-  probe -- elements/Scunc/logs/d2h_probe.log is the record):
+  probe -- elements/Sc-unc/logs/d2h_probe.log is the record):
   (1) the D2h ROHF landscape is the SAME multi-basin zoo as C1 --
   same-filling stationary points at the 0.3-11 mEh scale, each
   reverse-seed-stable on C1 (the D2h solutions are genuine C1
   stationary points, not symmetry artifacts); (2) the seed's job is
   the OCCUPATION basin only -- the solver's irrep-blocked diagonals
-  erase the gauge and land the D2h-canonical solution (Scunc: plain
+  erase the gauge and land the D2h-canonical solution (Sc-unc: plain
   and seeded land IDENTICALLY); (3) NEVER symmetrize a degenerate-
   gauge seed: pyscf.symm.symmetrize_orb AMPUTATES the open MO
   (measured: the open d became a pz, +183 mEh) and symmetrize_space
   scrambles the occupation-column pairing (measured: the runaway
   class) -- the user's MO-selection-by-irreps hypothesis evaluated
   and declined ON THE SEED SIDE; the solver already irrep-adapts;
-  (4) the Tiunc basin zoo, CENSUS-RESOLVED (2026-11-08,
-  elements/Tiunc/logs/census.log): two stationary basins on the unc
+  (4) the Ti-unc basin zoo, CENSUS-RESOLVED (2026-11-08,
+  elements/Ti-unc/logs/census.log): two stationary basins on the unc
   basis -- the forced-Newton class -848.40648875 (the old trusted
   record) and the seed-refinement DIIS attractor -848.40744343,
   1 mEh deeper -- both with s/d-HYBRID opens (~0.4 d per open MO:
@@ -124,7 +124,7 @@ user decision; the partial verdict 91/91-isolation-green).
   forced start DIVERGES, so no ReferenceSpec gate is declared -- the
   trusted cache is the one mechanism).  The user promoted the deeper
   basin; the free cells re-run on it.
-  Scunc: the trusted record is already the deeper of its two.
+  Sc-unc: the trusted record is already the deeper of its two.
 - The lane substrate's D2h basin wander (2026-11-07, the compressed
   round): the from-scratch plain D2h draw is basin-chaotic (the
   contracted Ti's plain D2h lands the RUNAWAY -848.2834 while Sc's
@@ -143,10 +143,10 @@ user decision; the partial verdict 91/91-isolation-green).
   (-848.39639) -- no variationality violation (the primitive sets
   are identical, the subspace exact; SEEDED from the contracted
   record through the cross-overlap, the unc basis reproduces
-  -848.40648875 EXACTLY).  2026-11-08: the Tiunc reference is now
+  -848.40648875 EXACTLY).  2026-11-08: the Ti-unc reference is now
   the CENSUSED deepest basin (logs/census.log -- the seeded record
   itself re-derives: DIIS from it rolls to -848.40744343); the
-  Tiunc cells re-run on it.  Fact 21 gains a measured instance:
+  Ti-unc cells re-run on it.  Fact 21 gains a measured instance:
   even at the right filling, plain aufbau can land 11 mEh high; the
   seed (not the gate) is the cure when the gate's cycling diverges
   on the basis.
@@ -162,7 +162,7 @@ user decision; the partial verdict 91/91-isolation-green).
   `realized_patterns`, the four cells rerun); the correction branch
   of the dense adjudication unpinned (the store-anchored
   `test_unc_lanes_load_exact_from_the_store` re-verifies the
-  committed Scunc/Tiunc lanes -- ptp, L2/S2, core_pairs, the
+  committed Sc-unc/Ti-unc lanes -- ptp, L2/S2, core_pairs, the
   recorded corrections); `_fold_span` misnamed after the redesign
   (renamed `_fold_core` with its consumers); the ticket/code
   adjudication-cap mismatch; the duplicate `sys.path` in

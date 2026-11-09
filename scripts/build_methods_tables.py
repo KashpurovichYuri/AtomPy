@@ -178,13 +178,20 @@ def _row(k, p, anchor, spec) -> str:
     return "| " + " | ".join(cells) + " |"
 
 
+def _ladder_row(k) -> bool:
+    """The ladder-row policy, ONE home: a NO-start CASCI cell IS a
+    ladder row (the kind block's density leg); a NO-start OPTIMIZER
+    cell is a start, not a family. Every filter in the ladder
+    section routes through here."""
+    return k.start != "no" or k.method == "casci"
+
+
 def _rows(keys, cells, anchor, spec) -> list[str]:
-    """Every RUN cell of the key set (a NO-start CASCI cell included --
-    the kind block's density leg; NO-start OPTIMIZER cells are starts,
-    not ladder rows), in the given order."""
+    """Every RUN cell of the key set (the :func:`_ladder_row` policy),
+    in the given order."""
     return [_row(k, p, anchor, spec)
             for k in keys
-            if (k.start != "no" or k.method == "casci")
+            if _ladder_row(k)
             and (p := payload_of(cells, k)) is not None]
 
 
@@ -233,8 +240,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
 
     def _fam(keys) -> None:
         rows = _rows([k for k in keys
-                      if k.address not in seen
-                      and (k.start != "no" or k.method == "casci")],
+                      if k.address not in seen and _ladder_row(k)],
                      cells, anchor, spec)
         seen.update(k.address for k in keys)
         if rows:
@@ -249,8 +255,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     # declaration (render_primary=False -- the promoted windows carry
     # the results; the primary rows stay in the store)
     if spec.render_primary:
-        grid = [k for k in grid_keys(spec)
-                if k.start != "no" or k.method == "casci"]
+        grid = [k for k in grid_keys(spec) if _ladder_row(k)]
         groups: dict[str, list] = {}
         for k in grid:
             groups.setdefault(fold_col(k, spec), []).append(k)
@@ -264,15 +269,15 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         # the family renders when ANY twin ran (the validation atoms'
         # pinned leg alone is their story; the campaign atoms' route
         # studies render the fuller family)
-        if any(k.start != "no" and payload_of(cells, k) for k in twins):
-            _fam([k for k in twins if k.start != "no"])
+        if any(_ladder_row(k) and payload_of(cells, k) for k in twins):
+            _fam([k for k in twins if _ladder_row(k)])
 
     # the planned windows whose CASCI anchors are read: the tier
     # families (the whole window's non-NO cells at once -- the optimizer
     # cells are void at the key under the anchor-first gate and join
     # the family when --full materializes them)
     for w in spec.planned_windows:
-        _fam([k for k in window_grid(spec, w) if k.start != "no"])
+        _fam([k for k in window_grid(spec, w) if _ladder_row(k)])
 
     out = [BEGIN, HEAD, SEP, _anchor_row(anchor, spec)]
     if uhf is not None:
