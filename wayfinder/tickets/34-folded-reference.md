@@ -153,3 +153,79 @@ columns sharing 19 primitives + 1 free, nao 43); T-C U14e (gated);
 T-D docs /code-review (anti-inflation); T-E the term-ID round (NIST
 as the acceptance test).  Stop after T-E's review -- no physics waves
 before it.
+
+## The wave review (2026-11-09) -- the two-axis code-review triage
+
+The review of `8bb62e9...HEAD` (the code-review skill, Standards +
+Spec sub-agents).  Verdict: the physics core clean (steps 1/5, tests
+(a)/(b), the ³F/²D re-verification delivered as specified; the
+ReferenceSpec non-declaration a documented measured outcome).
+
+FIXED (158de72): the AGENTS.md lockstep row (rule 6); the run_folded
+docstring generalized (rule 1 amended -- the measured numbers moved
+to map/logs); the _occ fail-loud gate-shortfall guard (the silent
+short-fill finding); the scf_summary honesty (e1 + e2 = e_val); the
+redundant local imports.  map.md tense word.
+
+HELD (accepted, no action): the watcher script + its absolute path
+(the operational record); the private `_closed_field` test import
+(defensible micro-pin); the docstring-length norm-stretch; the
+recovery-prediction deviation (disclosed).
+
+ADDED TO THE TAIL (this ticket's remaining work):
+- the projector_weights helper extraction (the einsum idiom, ~8
+  call sites across modules -- mechanical, lockstep with tests);
+- the radial-scan oracle leg: the k=1 verdict currently rests on
+  captures + NO groups alone -- run the scan alongside the
+  MO-subspace probe below.
+
+DECLINED (recorded): no full rename migration of the key grammar
+(the addresses are store identities; the semantics get documented
+instead).
+
+## The decisions (2026-11-09, user)
+
+- **The Sc free-route folded cut: dominance 0.4 APPROVED** (the C1
+  gauge's 0.4628 signal declared; measured honest -- L2 = 6 exact).
+- **The re-anchor DECLINED**: the tables keep the TRUE ROHF (and
+  UHF) anchors -- "we should compare to true ROHF and UHF".  The
+  folded-field rows, when they enter the campaign, carry the field
+  tag + the offset disclosure (their zero = the confined core = the
+  free ion on a wide span) alongside the true-anchored rows.
+- **The m-complete MO-subspace leg APPROVED**: the window = the
+  top-5-dimensional d-subspace (the member-summed Gram of the
+  projected significant-d columns) + the 4s column -- rotation-closed
+  by the pur theorem; the meters decide against the AO default at
+  the same CAS size.  Attribution note: per-column labels are gauge
+  (the weight vector + the natural occupations are the honest
+  per-column identity); subspace projector traces are the physical
+  certificates.
+- **The nested-basis integration test APPROVED** (the user's design):
+  the contracted AO space is a 43-dim subspace of the unc 122-dim
+  space (identical primitives), so (i) the unc machinery restricted
+  to the contracted subspace on the neutral field reproduces the
+  certified contracted record -- the strongest machinery anchor;
+  (ii) the same restriction on the folded field quantifies the
+  contraction cost in the folded regime; (iii) the carbon pinned
+  version at unit-tier sizes (both mols already in the tier) is the
+  permanent keeper.  Feeds T-B (the authors' contraction = the
+  k=1 analog, quantified against ours).
+- **T-E sharpened**: the term splittings, folded field vs neutral
+  field vs NIST -- the infrastructure now supports both fields
+  consistently.
+
+## The remaining execution order
+
+1. The schema commit: the field tag in the key grammar (neutral/
+   folded; the identity without it is ambiguous -- the probe ran the
+   same addresses on a different field), the disclosure preambles in
+   the twins' TABLE.md (the true-anchored zero + the folded offset
+   note; the field caveat on the old lane records), the README
+   outline (the cell axes + guarantees + combination rules).
+2. The MO-subspace leg + the scan-oracle leg + the nested-basis
+   legs (the Ti probe + the carbon pinned test).
+3. The projector_weights extraction.
+4. The tail: the anisotropy column, the per-radial spectrum, the
+   docstring review (core/operators/windows/casscf).
+5. T-B -> T-C (check the U14e batch/watcher exited first) -> T-D ->
+   T-E.  Stop before physics waves.
