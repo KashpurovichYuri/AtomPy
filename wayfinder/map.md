@@ -70,7 +70,19 @@ user decision; the partial verdict 91/91-isolation-green).
   DIRECTIONS user-gated: (a) the folded field as a STORED artifact
   (a folded-field chk beside the ROHF chk); (b) a folded-basin
   census; (c) the claims stay draw-documented.  The carbon
-  nested-basis keeper is DELIVERED (05af7b9).
+  nested-basis keeper is DELIVERED (05af7b9).  AMENDED (2026-11-09,
+  the user's review): the +400 mEh is NOT physics and NOT basis
+  convergence -- it is the bare-confined-core construction's cost
+  (the core solved without the valence over-relaxes on a rich span:
+  ≈ −139.4 + ≈ +539 mEh); the physical frozen-core scale is +1.5 mEh,
+  basis-stable; E_folded ≥ E_neutral always, and freezing the SCF's
+  own core collapses every gap to mEh.  The PROGRAM amended: span
+  repair over field repair -- m-complete MO-subspace windows on the
+  neutral field for the first round (C/Si/Sc/Ti/U14e); the compression
+  DELETED once the replacement is certified; the folded field stays a
+  draw-documented study; the basis pipeline (the per-shell
+  radial-vector contract, the exporter, the on-basis road) and NOs
+  are specced future stages.
 - The projected-Gram alternative, DECLINED (2026-11-08, the design
   round): forming the compression Gram from S-PROJECTED member
   vectors (bounded spectra, self-interpretable shares) instead of

@@ -250,18 +250,66 @@ instead).
   field vs NIST -- the infrastructure now supports both fields
   consistently.
 
-## The remaining execution order
+## The amended program (2026-11-09, post-finding; supersedes "The
+## remaining execution order")
 
-1. The schema commit: the field tag in the key grammar (neutral/
-   folded; the identity without it is ambiguous -- the probe ran the
-   same addresses on a different field), the disclosure preambles in
-   the twins' TABLE.md (the true-anchored zero + the folded offset
-   note; the field caveat on the old lane records), the README
-   outline (the cell axes + guarantees + combination rules).
-2. The MO-subspace leg + the scan-oracle leg + the nested-basis
-   legs (the Ti probe + the carbon pinned test).
-3. The projector_weights extraction.
-4. The tail: the anisotropy column, the per-radial spectrum, the
-   docstring review (core/operators/windows/casscf).
-5. T-B -> T-C (check the U14e batch/watcher exited first) -> T-D ->
-   T-E.  Stop before physics waves.
+The user's narrowing after the draw-chaos finding and the +400 mEh
+review.  The corrected interpretation first:
+
+**The +400 mEh is NOT expected physics and NOT basis convergence.**
+It is the cost of freezing the BARE confined core (the span's own
+Roothaan, solved in the ABSENCE of the valence), which over-relaxes
+on a rich span: measured decomposition ≈ −139.4 mEh (the core
+deeper -- no valence repulsion shapes it) + ≈ +539 mEh (the valence's
+strain in the mismatched field).  The PHYSICAL frozen-core cost is
+the +1.5 mEh scale, basis-stable -- the contracted basis shows it
+because its stiffness keeps both constructions' cores coincident.
+Variational truth: E_folded ≥ E_neutral ALWAYS (the folded
+configuration is accessible to the neutral minimization); freeze the
+SCF's own core and the gap collapses to the mEh relaxation scale on
+ANY basis.  The old +124.3 lane-vs-free gap is the same
+confined-core-mismatch disease in a milder form.  Both die with the
+bloated span: on distilled (narrow) windows the confined core ≈ the
+SCF core, and the lane joins the true minimum's zero by construction.
+
+**Locked decisions:**
+- The m-complete MO-subspace windows are ENOUGH for the start window
+  and the first round (C/Si/Sc/Ti/U14e).  NOs, the basis exporter,
+  and the auto-basis-optimization scheme are FUTURE stages.
+- The compression is DELETED (user: "bad and unclear" -- top-k of one
+  reference's occupied space is not how bases are built).  Sequencing:
+  step 1 certifies the replacement, deletion follows immediately.
+- The folded field: demoted to a draw-documented study.  The lane
+  runs on the neutral field.  Stage 2/3 of the basis pipeline are
+  specced, not built: the CONTRACT is "a distillation delivers,
+  per chemical shell, k radial vectors over that shell's primitives,
+  m-complete by replication" -- sources pluggable (SCF-MO subspace,
+  NO groups, the authors' coefficients); stage 2 = the exporter
+  (inverse make_uncontracted, certified by the nested-basis seam);
+  stage 3 = the on-basis road (own zero).
+
+**Execution order:**
+1. The m-complete MO-subspace window (neutral field): the Ti probe --
+   meters (window_closure), the ³F readout vs the AO-compressed
+   default at the same CAS size, the radial-scan oracle alongside;
+   unit-tier tests (carbon fixture).  Home in windows.py only if the
+   deletion test admits it (probe first).
+2. Delete the compression: window_compressed, compressed_ncas,
+   _TM_UNC_RADIALS, the capture plumbing, their tests; re-anchor the
+   twins; amend AGENTS.md fact 26 + the windows.py layout row; logs
+   and committed records stay as history.
+3. The contracted-vs-unc folded review (the control experiment):
+   run_folded on CONTRACTED Ti/Sc ONLY -- expected mEh-scale offset,
+   replay-clean (the unc side stays draw-documented; it does not
+   replay).  Optional diagnostic leg: the SCF-core-frozen variant on
+   unc (predicted mEh -- proves the +400 was the confined-core
+   choice).
+4. Finish the first round: C/Si/Sc/Ti/U14e on the m-complete MO
+   windows; the OWED verification -- the lane legs on the distilled
+   windows vs the free rows, residual at mEh scale expected.
+5. Deferred: NOs, the exporter, stage 3, the auto-optimization
+   scheme -- discussed after the round.
+6. The tail/queue: projector_weights extraction, the anisotropy
+   column, the docstring review (the per-radial spectrum died with
+   the compression), T-C gated on the U14e batch, T-B, T-D, T-E
+   (splittings vs NIST).
