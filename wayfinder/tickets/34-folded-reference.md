@@ -154,6 +154,42 @@ T-D docs /code-review (anti-inflation); T-E the term-ID round (NIST
 as the acceptance test).  Stop after T-E's review -- no physics waves
 before it.
 
+## The folded-field draw-chaos finding (2026-11-09)
+
+The tail's window legs exposed it (the probe diverged where the
+certified round converged): the certified folded fields do NOT
+replay -- same chks (mtime predates the certified commits), the
+exact old module re-imported, the same frozen env, both thread
+counts.  Full replay matrix: elements/Tiunc/logs/folded_repro.log.
+
+- The certified Ti/Sc folded numbers (the matrix logs, the lane
+  recoveries 5.5e-13/0.085 mEh, the zero disclosures) stand as
+  measurements of their draws -- not replayable artifacts.
+- run_folded's "deterministic given its inputs" claim was falsified
+  on the twins; the docstrings/AGENTS row state the honest form.
+- Code forced by the finding (0df7491): the post-kernel converged-
+  filling certificate (the certified-era code silently returned
+  wrong-fill fields on replay -- the certificate catches all); the
+  pick rule DECLARED per atom-gauge (picks='gates' | 'three-level' --
+  each form certified on one twin, each fails the other by a
+  recorded mechanism); the gates' dominance is a declared parameter.
+- The pick-rule history's "each failure was a physics fact" record
+  gains: the rules are ALSO draw-fragile -- on today's replays both
+  forms abandon the projected basin on both twins.
+- BLOCKED on this: the MO-subspace leg, the scan-oracle leg, the
+  nested-basis Ti/Sc integration legs, the folded-field rows' entry
+  into any store (their addresses exist -- the field tag -- but no
+  replayable payload can be minted today).
+- NOT blocked, delivered: the schema commit (e6123fe), the
+  nested-basis carbon keeper (05af7b9 -- the contracted basis
+  certified as its own split's realization, convention stack exact).
+- FIX DIRECTIONS (user-gated): (a) the folded reference as a STORED
+  artifact (a folded-field chk beside the ROHF chk -- the draw
+  becomes the trusted input, the reproducibility unit moves to the
+  store); (b) a folded-basin census (multi-start + the certificates,
+  the ROHF census pattern); (c) re-scope the folded-field claims to
+  draw-documented results.
+
 ## The wave review (2026-11-09) -- the two-axis code-review triage
 
 The review of `8bb62e9...HEAD` (the code-review skill, Standards +

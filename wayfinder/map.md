@@ -53,6 +53,24 @@ user decision; the partial verdict 91/91-isolation-green).
   key grammar, the free-route dominance declaration, the table
   re-anchoring) -- user-visible before the tables carry the folded
   rows.
+- The folded-field draw chaos, MEASURED (2026-11-09, ticket 34's
+  tail -- elements/Tiunc/logs/folded_repro.log is the replay matrix):
+  the certified folded fields do NOT replay -- same chks (mtime
+  predates the certified commits), the exact old module, the same
+  frozen env, both thread counts land wrong basins or the +53877.9
+  garbage basin; Scunc fails the same way.  The certified runs were
+  single draws at a basin boundary.  run_folded now carries the
+  post-kernel converged-filling certificate (the certified-era code
+  returned wrong-fill fields silently on replay) and a DECLARED pick
+  rule (picks='gates' | 'three-level' -- each form certified on one
+  twin, each fails the other; the gates' dominance is a declared
+  parameter).  The round's certified numbers stand as
+  draw-documented measurements.  BLOCKED: the window legs, the
+  nested-basis Ti/Sc legs, any folded-field store payload.  FIX
+  DIRECTIONS user-gated: (a) the folded field as a STORED artifact
+  (a folded-field chk beside the ROHF chk); (b) a folded-basin
+  census; (c) the claims stay draw-documented.  The carbon
+  nested-basis keeper is DELIVERED (05af7b9).
 - The projected-Gram alternative, DECLINED (2026-11-08, the design
   round): forming the compression Gram from S-PROJECTED member
   vectors (bounded spectra, self-interpretable shares) instead of
