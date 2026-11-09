@@ -259,7 +259,7 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
                         f"  L2 {['%.3f' % v for v in r['l2']]}")
                 if "core_pairs" in r:
                     line += (f"  core {r['core_pairs']}p"
-                             f"/{r.get('core_cycles', 0)}c")
+                             f"/span {r.get('core_in_span_min', 0):.4f}")
                 if r.get("anchor_corrected"):
                     line += (f"  anchor-corrected "
                              f"{r['anchor_corrected']}")

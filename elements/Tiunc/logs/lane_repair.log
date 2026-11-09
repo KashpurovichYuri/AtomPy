@@ -1,0 +1,19 @@
+
+===== cells Scunc =====
+ROHF E = -759.73738486 Eh
+  [cell] scunc_3d4s@ar_2-1_casci_ao_-_pur_avg
+  plain D2h SCF a wrong basin (-759.73708452 vs the trusted -759.73738486) -- retrying C1-seeded (elements/Scunc/rungs/rohf.chk)
+lane substrate D2h ROHF E = -759.73708452 Eh
+  [window] distilled 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.1759-0.8126
+  wrote elements/Scunc/cells.json + cells.md
+
+===== cells Tiunc =====
+ROHF E = -848.40744343 Eh
+  [cell] tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg
+  plain D2h SCF a wrong basin (-848.39639007 vs the trusted -848.40744343) -- retrying C1-seeded (elements/Tiunc/rungs/rohf.chk)
+lane substrate D2h ROHF E = -848.40744343 Eh
+  [window] distilled 3d: k=1 of 8 bands, capture 1.0000-1.0000; 4s: k=1 of 3 bands, capture 0.1685-0.8211
+  wrote elements/Tiunc/cells.json + cells.md
+
+done
+DONE

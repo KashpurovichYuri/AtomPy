@@ -51,7 +51,7 @@ restrictions lift). Mechanical enforcement: the global
 | `scans.py` | `ScanSpec`, `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free and DETERMINISTIC given the reference: m-symmetric radial curves (exactly closed windows) + member-tilt maps; `ScanSpec` = the declared per-atom anatomy carried by `CaseSpec.scan` |
 | `analysis.py` | `analyze`, `configuration_summary`, `shell_occupations`, `format_report` | term symbols from ⟨L²⟩/⟨S²⟩ (half-integer S grid), commutator norms, configuration labels per root (PySCF-order CI in — the bridge runs inside; l-grouping via `lm_sectors`, no label parsing) |
 | `cases.py` | `CaseSpec`, `Scenario`, `CAMPAIGN`, `scenarios_for`, `run_case`, `run_atom`, `run_carbon` | the DECLARED campaign (the intent manifest): `CaseSpec` fixes atom/reference/window/sectors/term-target/lane-legs/scenarios — and the render chemistry (window/fold display names, the filling note, the primary-family suppression) — and `shell_bands` (the SHELL LAYER: each chemical shell's declared AO realization, measured-certified) + `shell_radials` (the WINDOW-SIDE distillation depth, one k per shell, coverage validated at the declaration) before anything runs; `CAMPAIGN` is the ONE declaration — the cell grid, regen, and the renderers all derive from it; new atom = a registry row |
-| `cells.py` | `CellKey`, `run_cell`, `load_cell`, `analyze_cell`, `cell_payload`, `spine_keys`, `window_grid`/`grid_keys`/`diagnostics`/`planned`/`lattice_keys`, `lane_keys`, `run_lane_cell`/`load_lane_cell`, `void_reason` | THE addressing layer: one frozen `CellKey` per grid point, the address grammar as chk name/payload key (a lane window carries its `@fold` tag — part of the identity; the reference field rides as an OPTIONAL ninth slot, appended only when `folded` — an eight-slot address is a neutral cell, the pre-axis store names untouched); VOID cells validated at the key; the declared key-set derives from `CaseSpec` (`window_grid` = the one render order); the scenario RUN GATE (`void_reason` — first enabled match, `--full` materializes); the pinned lane = the CI-level ladder legs as cells under the uniform construction (folds resolve through the shell layer — the chemical partition; shared bands are physical, the window projection owns the rows; the lane payload records `core_pairs` + `confinement`); the self-owned store (`ci_stack` stays PySCF order — the bridge lives in operators); SA weights default to the measured ground block |
+| `cells.py` | `CellKey`, `run_cell`, `load_cell`, `analyze_cell`, `cell_payload`, `spine_keys`, `window_grid`/`grid_keys`/`diagnostics`/`planned`/`lattice_keys`, `lane_keys`, `run_lane_cell`/`load_lane_cell`, `void_reason` | THE addressing layer: one frozen `CellKey` per grid point, the address grammar as chk name/payload key (a lane window carries its `@fold` tag — part of the identity; the reference field rides as an OPTIONAL ninth slot, appended only when `folded` — an eight-slot address is a neutral cell, the pre-axis store names untouched); VOID cells validated at the key; the declared key-set derives from `CaseSpec` (`window_grid` = the one render order); the scenario RUN GATE (`void_reason` — first enabled match, `--full` materializes); the pinned lane = the CI-level ladder legs as cells under the uniform construction (folds resolve through the shell layer — the chemical partition; the frozen core is the reference's OWN core — the occupied columns S-projected onto the fold span, joining the neutral zero by construction: the retired confined-Roothaan core measured +124.3/+38.7 mEh off on the twins, the repair left +6.1/+5.1 = the projected-density bookkeeping form; the lane payload records `core_pairs` + the in-span certificate); the self-owned store (`ci_stack` stays PySCF order — the bridge lives in operators); SA weights default to the measured ground block |
 | `natural.py` | `ci_rdm1`, `natural_orbitals`, `occupation_groups`, `select_no_window`, `no_group_windows` | the NO mathematics: spin-summed 1-RDM from CI roots, NOs = density eigenvectors, occupation-GROUP selection never splits an m-set (scale-aware tolerance); symmetry-safe only from a term-AVERAGED root set; the Window object + selectors live in `windows.py` |
 
 ## Hard-won facts (do not re-derive)
@@ -214,12 +214,17 @@ carries a number only when the number IS the fact.
     (cc-pVDZ Sc/Ti: three d bands, six s bands; the certified lanes
     were 1:1 because their folds named single-block inner shells). A
     fold's ELECTRON count is chemical (`closed_electrons`), never its
-    span width: on a multi-column realization the frozen core is the
-    span's OWN closed-shell Roothaan
-    (`core.confined_core_orbitals` — the span's lowest `n_pairs`,
-    self-consistent; the span itself on 1:1, bit-exact with the
-    certified class; on the whole AO space it reproduces the
-    (2·n_pairs)-ion RHF exactly, pinned). The span carries the shell
+    span width: the PRODUCTION frozen core (the cells' lane + free
+    folds) is the reference's OWN core — the occupied columns
+    S-projected onto the fold span (`cells._fold_core`), joining the
+    neutral zero by construction (2026-11-09: the confined-Roothaan
+    core measured +124.3/+38.7 mEh off the anchors on the twins —
+    the bare core, solved without the valence, over-relaxes on a
+    wide span; basis-stable per the contracted control).  The
+    confined Roothaan itself stays `core.confined_core_orbitals` —
+    `run_folded`'s construction and the certified class (on the
+    whole AO space it reproduces the (2·n_pairs)-ion RHF exactly,
+    pinned). The span carries the shell
     grammar: family-covering down to the CUSP, excluding every
     skipped or active shell's bands (the Roothaan fills the lowest —
     a norm-capture minimal list misses the tight primitives:

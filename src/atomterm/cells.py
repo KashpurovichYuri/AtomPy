@@ -171,11 +171,25 @@ class CellKey:
     sector : ``(na, nb)`` -- alpha/beta active electrons; fixes Ms
         and nelec together.
     method : ``"casci"`` | ``"casscf"`` | ``"sa-casscf"``.
-    start : ``"ao"`` (shell AOs) | ``"mo"`` (canonical SCF slice --
-        the m-delocalized control) | ``"moc"`` (the character-selected
-        valence window:
-        :func:`atomterm.windows.select_valence_mo`) | ``"no"``
-        (natural-orbital groups; the label grammar is
+    start : the window KIND -- where the window's information comes
+        from, always expressed as AO-basis columns (the CI consumes
+        AO-basis columns; the kind names the SOURCE, never the
+        expression basis):
+        ``"ao"`` -- the shell rows of the declared realization,
+        DISTILLED when the case declares ``shell_radials`` (the
+        member-summed radial Gram of the reference's significant
+        occupied columns, top-k replicated on the m-set): MO-informed,
+        AO-expressed, m-complete by construction -- the production
+        kind;
+        ``"mo"`` -- the canonical SCF slice (CONTROL: m-delocalized,
+        m-incomplete by construction -- the SCF's hybrid-open gauge;
+        the certified fingerprint is a scrambled term reading);
+        ``"moc"`` -- the character-selected SCF valence MOs
+        (:func:`atomterm.windows.select_valence_mo`; CONTROL: same
+        disease, a different pick);
+        ``"no"`` -- the occupation groups of a term-averaged density
+        (natural-orbital kind; m-complete by sphericity -- the
+        density sibling of the distilled kind; the label grammar is
         ``<source>no<k>``, see :attr:`no_source`).
     mask : optimizer restriction -- ``None`` (free) | ``"radial"`` |
         ``"frozen"`` | ``"virtmix"``; only meaningful for optimizer
@@ -520,11 +534,21 @@ def _fold_core(key: CellKey, mol, mf,
     :func:`atomterm.windows.shell_realization`), refuse the malformed
     keys, and return the fold's shell tuple, its DOUBLY-OCCUPIED PAIR
     count (the chemistry: ``closed_electrons`` halved -- never the
-    span's column count), the confined core columns, and the
-    mini-SCF's convergence report
-    (:func:`atomterm.core.confined_core_orbitals`: the raw-AO span
-    itself on a 1:1 realization, the span's own closed-shell Roothaan
-    on a multi-column one).
+    span's column count), the frozen core columns, and the core's
+    certificate report.
+
+    The frozen core is the reference's OWN core -- the occupied core
+    columns (by occupation), S-projected onto the fold span and
+    orthonormalized within it.  The field and the bookkeeping then
+    join the neutral anchor BY CONSTRUCTION on any basis.  The
+    m-scalar anisotropy rule applies downstream (the averaged fold,
+    ``active_space_integrals``'s default).  The retired alternative
+    -- the span's own closed-shell Roothaan
+    (:func:`atomterm.core.confined_core_orbitals`) -- measures
+    +124.3/+38.7 mEh off the anchors on the uncontracted twins (the
+    bare core, solved without the valence, over-relaxes on a wide
+    span; basis-stable per the contracted control,
+    elements/Ti/logs/folded_review.log).
 
     Raises
     ------
@@ -533,13 +557,13 @@ def _fold_core(key: CellKey, mol, mf,
         partition is chemical: a pair is frozen or active, never both;
         the shells' BAND realizations may OVERLAP -- shared radial
         primitives are physical, and the window columns are projected
-        against the confined core span, which owns the shared rows);
+        against the frozen core span, which owns the shared rows);
         the sector disagreeing with the fold-derived electron count;
         the basis lacking one of the fold's bands.
     """
-    from atomterm.core import confined_core_orbitals
     from atomterm.windows import (closed_electrons, lowdin,
-                                  select_shell_ao, shell_realization)
+                                  occupied_core_idx, select_shell_ao,
+                                  shell_realization)
 
     fold = key.fold_shells()
     overlap = sorted(set(key.shell_patterns) & set(fold))
@@ -568,7 +592,17 @@ def _fold_core(key: CellKey, mol, mf,
     fold_rows = sorted(set(fold_rows))
     c_span = lowdin(np.eye(mol.nao_nr())[:, fold_rows], mf.get_ovlp())
     n_pairs = closed_electrons(fold) // 2
-    c_core, report = confined_core_orbitals(mf, c_span, n_pairs)
+    # the reference's own core: the occupied columns, S-projected onto
+    # the fold span and orthonormalized within it -- the span hosts
+    # the core shells' full family, so the projection is near-identity
+    # (the in-span weights are the certificate)
+    s = mf.get_ovlp()
+    c_scf = mf.mo_coeff[:, occupied_core_idx(mf, n_pairs)]
+    proj = c_span @ (c_span.conj().T @ (s @ c_scf))
+    in_span = np.einsum("ai,ab,bi->i", c_scf.conj(), s,
+                        proj).real.clip(0, 1)
+    c_core = lowdin(proj, s)
+    report = {"core": "scf", "in_span": in_span.round(6).tolist()}
     return fold, n_pairs, c_core, report
 
 
@@ -578,7 +612,7 @@ def _key_core(key: CellKey, mol, mf,
     """One home for the key->core resolution shared by the run
     (:func:`run_cell`), the cache path (:func:`analyze_cell`), and the
     kernel payload (:func:`kernel_cell_payload`): returns
-    ``(ncore, c_core, c_pur)`` -- a tagged fold's confined core IS
+    ``(ncore, c_core, c_pur)`` -- a tagged fold's SCF core IS
     the core (``ncore`` follows the fold's PAIR count, not its span
     width), else the pur substrate's purified span when declared,
     else ``None`` folds the occupied prefix.  ``c_pur`` is separate
@@ -881,7 +915,7 @@ def analyze_cell(key: CellKey, mol, mf, shell_bands: dict | None = None,
     optimizer re-run, no re-solving. The two-function lean: loading is
     pure data (:func:`load_cell`), analysis needs the live reference.
 
-    Fold-tagged windows analyze against their tag's confined core
+    Fold-tagged windows analyze against their tag's SCF core
     (the core size is the fold's PAIR count -- the span width on a
     multi-column realization); sectors past the dense-meter budget
     return None -- the kernel-only class
@@ -1066,11 +1100,12 @@ _LANE_FIELDS = ("term", "energies", "total", "ptp", "l2", "s2",
 # optional fields, loaded when present: the SA ensemble and, on
 # optimizer cells, the converged FULL MO matrix (restart +
 # orbital-level route comparisons) with the optimizer's cycle count;
-# the multi-column fold's certificates (pair count + confinement
-# weights; the pre-shell-layer stores predate them)
+# the frozen-core certificate (the SCF core's minimum in-span weight;
+# the pre-repair stores carry the retired confined-core Roothaan's
+# cycles/comm instead)
 _LANE_FIELDS_OPT = ("ensemble", "mo_coeff", "cycles", "conv_dE",
                     "core_pairs", "core_cycles", "core_comm",
-                    "anchor_corrected")
+                    "core_in_span_min", "anchor_corrected")
 
 
 def _root_vectors(ci):
@@ -1087,17 +1122,17 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
                   workdir: str | Path = "elements") -> dict:
     """Run one pinned-lane cell: the CAS ladder's UNIFORM construction.
     The fold resolves through the shell layer to its raw AO-shell span
-    (Loewdin-orthonormalized), and the FROZEN CORE is the fold's
-    ``n_pairs`` closed pairs confined to that span -- the span itself
-    on a 1:1 realization, the span's own closed-shell Roothaan on a
-    multi-column one (:func:`atomterm.core.confined_core_orbitals`;
-    ``ncore`` follows the pair count, never the span width); the
+    (Loewdin-orthonormalized), and the FROZEN CORE is the reference's
+    OWN core -- the occupied columns S-projected onto that span
+    (:func:`_fold_core`; the field and the bookkeeping join the
+    neutral anchor BY CONSTRUCTION; ``ncore`` follows the pair count,
+    never the span width); the
     window placed by :func:`atomterm.windows.build_full_mo` against
     it; one ``wfnsym``-pinned solver per branch component
     (:func:`atomterm.irreps.branch_d2h`); meters per irrep block
     (L2/S2/H are totally symmetric, so the block restriction is
     exact); the fold-independent bookkeeping ruler
-    (:func:`atomterm.core.closed_shell_core_energy` over the confined
+    (:func:`atomterm.core.closed_shell_core_energy` over the frozen
     columns -- the projected-density form).  Deterministic: raw AO
     spans on both sides of the fold.
 
@@ -1389,12 +1424,12 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         "res_h_lz": float(res_lz),
         "res_h_l2": float(res_l2),
         "fold": list(fold),
-        # the multi-column fold's certificates: the pair count the
-        # core freezes and the span's closed-core Roothaan report
-        # (0 cycles on a 1:1 realization -- the span IS the core)
+        # the frozen-core certificates: the pair count the core
+        # freezes, and the SCF core's in-span weights (the span
+        # hosts the core shells' full family -- the minimum weight
+        # is the restriction certificate)
         "core_pairs": int(nf),
-        "core_cycles": int(core_report["cycles"]),
-        "core_comm": float(core_report["comm"]),
+        "core_in_span_min": float(min(core_report["in_span"])),
         # the blocks whose pinned-solver roots our dense H replaced
         # (the Davidson's near-degenerate root skips; empty = agreement)
         "anchor_corrected": corrected,

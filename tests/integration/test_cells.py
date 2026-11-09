@@ -850,29 +850,32 @@ def test_run_lane_cell_multicolumn_fold(carbon_d2h, carbon, tmp_path):
     """The multi-column fold end to end: the SAME lane leg with the
     shell layer declaring the 1s2s chemistry over three s bands (two
     pairs over a three-column span) still hosts its term EXACTLY (the
-    span's own closed-core Roothaan is m-scalar like the 1:1 raw
-    span), while the core axes read the CHEMISTRY: the payload's pair
-    count is 2 (never the span width 3) with the Roothaan report.  A
-    declared band shared by window and fold refuses at the ROW level
-    (the layer's own ambiguity, not the labels')."""
+    frozen core is the reference's OWN core restricted to the span --
+    the term certificates are core-blind), while the core axes read
+    the CHEMISTRY: the payload's pair count is 2 (never the span
+    width 3) with the in-span restriction certificate.  A declared
+    band shared by window and fold refuses at the ROW level (the
+    layer's own ambiguity, not the labels')."""
     cfg, mol, mf, _ = carbon_d2h
     key = lane_keys(CAMPAIGN["C"])[0]
     layer = {"2s": ("2s", "3s")}
     p = run_lane_cell(key, mol, mf, CAMPAIGN["C"].term, shell_bands=layer,
                       workdir=tmp_path)
     assert p["core_pairs"] == 2
-    assert p["core_cycles"] >= 1 and p["core_comm"] < 1e-10
+    assert p["core_in_span_min"] > 1 - 1e-4   # the span hosts the core
+    # (observed 0.999994: the core's orthogonality tails reach the
+    # valence bands' rows past even the full-family span)
     assert p["ptp"] < 1e-9
     for v in p["l2"]:
         assert abs(v - 2.0) < 1e-8              # 3P: L(L+1) = 2 exact
     for v in p["s2"]:
         assert abs(v - 2.0) < 1e-8
     assert 0.0 <= p["res_h_lz"] < 1e-8
-    # the 1:1 leg (no layer) stays the certified record: same term,
-    # its own model core (the energies differ -- DIFFERENT folds)
+    # the 1:1 leg (no layer): same term, its own span (the energies
+    # differ -- DIFFERENT fold spans)
     q = run_lane_cell(key, mol, mf, CAMPAIGN["C"].term, workdir=tmp_path,
                       fresh=True)
-    assert q["core_pairs"] == 2 and q["core_cycles"] == 0
+    assert q["core_pairs"] == 2
     assert q["total"] != p["total"]
     # the partition is CHEMICAL: a shell in both sides refuses...
     with pytest.raises(ValueError, match="sit in both"):
@@ -927,7 +930,13 @@ def test_unc_lanes_load_exact_from_the_store():
     for key_token, addr, l2, s2, pairs, cls in cases:
         p = load_lane_cell(CellKey.from_address(addr))
         assert p["core_pairs"] == pairs               # the chemistry
-        assert p["core_comm"] < 1e-9                   # the Roothaan
+        # the frozen-core certificate of its era: the repaired lane
+        # (the SCF core) carries the in-span weight (observed
+        # 0.99991: the core's tails reach past the full-family span);
+        # the committed confined-era stores carry the Roothaan's
+        # commutator
+        assert (p.get("core_in_span_min", 0) > 1 - 1e-3
+                or p["core_comm"] < 1e-9)
         assert p["ptp"] < 1e-9                         # degenerate
         for v in p["l2"]:
             assert abs(v - l2) < 1e-8
