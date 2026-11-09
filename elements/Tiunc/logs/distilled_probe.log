@@ -1,0 +1,28 @@
+anchor (neutral ROHF, the true minimum): E = -848.40744343
+3d-weights of the occupied columns: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+4s-weights of the occupied columns: [0.0007, 0.0375, 0.0, 0.0, 0.0, 0.4674, 0.0, 0.0, 0.0, 0.9016, 0.0, 0.0]
+[AO-compressed] closures lz=3.7e-09 lperp=3.7e-09
+[AO-compressed] ground block: n=7
+[AO-compressed] <L2> per member: [12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0]
+[AO-compressed] <S2> per member: [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
+[AO-compressed] total=-848.400005559
+[AO-compressed] report: {'3d': {'bands': ['3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d'], 'k': 1, 'dominated': [10, 11], 'span_weight': [1.0, 1.0], 'capture': [1.0, 1.0], 'spectrum': [2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.0, -0.0]}, '4s': {'bands': ['18s', '19s', '20s'], 'k': 1, 'dominated': [9], 'span_weight': [0.9016], 'capture': [0.821118], 'spectrum': [1.254216]}}
+[distilled] closures lz=3.7e-09 lperp=3.7e-09
+[distilled] ground block: n=7
+[distilled] <L2> per member: [12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0]
+[distilled] <S2> per member: [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
+[distilled] total=-848.400002295
+[distilled] report: {'3d': {'bands': ['3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d'], 'k': 1, 'significant': [10, 11], 'span_weight': [1.0, 1.0], 'capture': [1.0, 1.0], 'spectrum': [2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.0, -0.0]}, '4s': {'bands': ['18s', '19s', '20s'], 'k': 1, 'significant': [5, 9], 'span_weight': [0.4674, 0.9016], 'capture': [0.168506, 0.821089], 'spectrum': [1.254341, 4.6e-05]}}
+VERDICT legs A/A': compressed -848.400005559 | distilled -848.400002295 | delta +0.0033 mEh
+radial weight over the d bands: {'3d': np.float64(0.0), '4d': np.float64(0.0008), '5d': np.float64(0.011), '6d': np.float64(0.0627), '7d': np.float64(0.1437), '8d': np.float64(0.1441), '9d': np.float64(0.0359), '10d': np.float64(0.0003)}
+radial scan 8d -> 7d on the neutral field (the distilled 4s column fixed):
+  theta=0.000 dE_active=     +0.0 uEh  d_one=     +0.0  d_two=     +0.0  |[H,Lz]|=3.8e-14
+  theta=0.050 dE_active= -61331.8 uEh  d_one= -75013.7  d_two= +13681.9  |[H,Lz]|=4.1e-14
+  theta=0.100 dE_active=-113411.9 uEh  d_one=-140658.2  d_two= +27246.3  |[H,Lz]|=2.8e-14
+  theta=0.150 dE_active=-157436.0 uEh  d_one=-198089.6  d_two= +40653.6  |[H,Lz]|=3.3e-14
+  theta=0.200 dE_active=-194422.7 uEh  d_one=-248304.6  d_two= +53881.9  |[H,Lz]|=2.6e-14
+  theta=0.250 dE_active=-225233.4 uEh  d_one=-292155.8  d_two= +66922.4  |[H,Lz]|=2.3e-14
+  theta=0.300 dE_active=-250591.9 uEh  d_one=-330367.9  d_two= +79776.1  |[H,Lz]|=2.0e-14
+  theta=0.350 dE_active=-271103.1 uEh  d_one=-363554.0  d_two= +92450.8  |[H,Lz]|=1.6e-14
+  theta=0.400 dE_active=-287269.6 uEh  d_one=-392229.4  d_two=+104959.8  |[H,Lz]|=1.7e-14
+scan optimum: theta=0.400 E_active=-4.093138584; vs the distilled window total -753.5230 mEh

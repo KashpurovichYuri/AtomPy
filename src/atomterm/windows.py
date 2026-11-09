@@ -806,7 +806,7 @@ def distilled_ncas(patterns, radials) -> int:
 
 
 def window_distilled(mol, c_ref, s, patterns, layer=None, radials=None,
-                     significance: float = 0.05, tail: float = 1e-8):
+                     significance: float = 0.05, tail: float = 1e-4):
     """The DISTILLED window: each chemical shell as its declared k
     radial directions, distilled from the reference's occupied MOs by
     the member-summed radial Gram, replicated on the full m-set -- the
@@ -846,7 +846,11 @@ def window_distilled(mol, c_ref, s, patterns, layer=None, radials=None,
         home shell still carries the shell's radial.
     tail : the discarded Gram spectrum must sit below this fraction
         of the leading eigenvalue -- the certificate that the
-        reference carries exactly k radials and the rest is tail.
+        reference carries exactly k radials.  The default sits above
+        numerical near-parallelism (the permissive significance
+        admits columns whose band projections are nearly parallel --
+        their extra Gram mass is a direction, not a radial) and
+        orders of magnitude below any real radial content.
 
     Returns
     -------
