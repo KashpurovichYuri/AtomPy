@@ -232,7 +232,7 @@ slices are interesting; the runners execute the declared set:
 | sector (M_S) | `(na, nb)`, from spin + electron parity | `run.py` |
 | method | casci / casscf / sa-casscf | `regen_cells.py` |
 | mask | free / frozen / radial / virtmix | `regen_cells.py` |
-| start (the window kind) | **ao** — the distilled windows: MO-informed (the radial Gram of the reference's occupied columns), AO-expressed, m-complete — the production kind; **mo** / **moc** — the SCF's own MOs, the *controls* (m-incomplete by construction: the SCF's hybrid-open gauge, certified scrambled-term fingerprints); **no** — the term-averaged density's occupation groups, m-complete by sphericity | `regen_cells.py` |
+| start (the window kind) | **ao** — the distilled windows: MO-informed (the radial Gram of the reference's occupied columns), AO-expressed, m-complete — the production kind; **mo** / **moc** (rendered `MO` / `MOC`) — the SCF's own canonical slice / character-selected columns, the *controls* (m-incomplete by construction: the SCF's hybrid-open gauge, certified scrambled-term fingerprints); **no** — the term-averaged density's occupation groups (`<source>no<k>` label), m-complete by sphericity — the density leg, expected degenerate with `ao` at k=1 | `regen_cells.py` |
 | radials (k) | the distillation depth, per shell — **k = 1 is the usual case** (it already spans the full shell, k·(2l+1) columns, the contraction analog); k ≥ 2 only when a correlated source supplies real second radials (the SCF's Gram is rank-1) *and* the CAS budget allows — the tail certificate refuses barren k | the case declaration (`shell_radials`) |
 | substrate | pol (canonical core) / pur (closed span) | `regen_cells.py` |
 | fold | raw / avg / frac | `regen_cells.py` |
@@ -285,19 +285,41 @@ component), its **partition** (the fold — Fold notation; a column
 when it varies, stated once when uniform), and its **source**, as a
 one-line tag under the heading. Per-section legends live nowhere.
 
+**Route (free vs pinned).** The *free* route is the native
+symmetry-blind driver: one Davidson CI over the whole sector;
+symmetry is *measured* afterwards (⟨L²⟩, the commutators, ptp). The
+*pinned* route builds symmetry by construction: the declared term's
+2L+1 components are distributed over D2h irreps (`branch_d2h`), one
+PySCF `wfnsym` solver per component, each component's identity
+guaranteed by its irrep. The E column's semantics follow the route:
+**free rows carry the run's own total; pinned rows carry the TERM
+energy** — the branch components' mean at CI plus the
+fold-independent bookkeeping constant (their ΔE residual vs the
+anchor is that constant's projected-density form, mEh-class,
+disclosed in the note). `·lane` in the fold column names the ladder
+family's uniform construction — the fold span's core with the window
+placed through `build_full_mo` — the label under which the pinned
+route runs; the lane family's *free* twin (same window, same fold,
+free driver) demonstrates route agreement at the same partition.
+
 Columns of the CI window survey (one row per declared CI cell):
 
 - **window / CAS / dets** — the span and its active size; **fold** —
   the partition: the pinned rows carry their own tags (`semi`,
   explicit lists), free rows the prefix name, with `·raw`/`·frac`/
   `·pur` marking the free variants' deviation; **start** — the
-  construction (AO shell span / canonical MO slice); **route** — free
+  window kind (`AO` distilled / `MO` canonical slice / `MOC`
+  character-selected / `NO` density groups — the kind block compares
+  them at the ruler folds; the controls carry the m-incomplete
+  fingerprint note); **route** — free
   (the native driver) or pinned (D2h construction).
 - **E** — **rows compare across folds only.** Free rows: the run's
   own total. Pinned rows: the TERM energy — the branch components'
   mean at CI plus the fold-independent bookkeeping constant.
-- **ΔE** — zero at the primary window's pinned AO row (the anchor
-  every ΔE is taken against).
+- **ΔE** — against the anchor row that leads the table (the TRUE
+  reference — ROHF, or UHF where the campaign anchors there); the
+  pinned rows' residual is the projected-density bookkeeping form,
+  disclosed in their note.
 - **⟨L²⟩** — the free rows' ground root; the pinned rows' components
   (one value when they agree, a range when they scramble). The
   commutator columns are the assembled meters, em-dash past the
@@ -324,17 +346,23 @@ render what ran):
   move it) — zero certifies the span itself is m-closed; cheap at any
   size.
 - **note** — terse, data-derived flags only (`cycle cap` at the
-  optimizer's 200-cycle limit); never verdicts.
+  optimizer's 200-cycle limit; the standing stamps: `control:
+  m-incomplete by construction` on the MO/MOC rows — an explained
+  expectation, never a failure; `SCF core; offset = bookkeeping
+  form` on the pinned rows — their anchor residual's identity);
+  never fresh verdicts.
 
 **Further variants** — the tables render what ran; other combinations
 of the treatment axes are possible, one regen away, and are the
 first levers when a run misbehaves (bad convergence, a suspected
 basin escape):
 
-- **start — MO / NO**: a different initial window gauge (canonical
-  MO slice; the density-picked occupation groups) when the AO start
-  stalls or lands in a wrong basin; on uncontracted bases MO names
-  the **character-selected** canonical columns (the SCF's own
+- **start — MO / MOC / NO**: the control and density legs of the kind
+  block (the canonical slice, the character-selected columns, the
+  occupation groups) — the m-complete kinds should land the term and
+  degenerate; the controls' scrambled readings are the certified
+  m-incompleteness fingerprints; on uncontracted bases MO names the
+  **character-selected** canonical columns (the SCF's own
   valence + the virtual complement ranked by the named bands'
   S-projection weight), and **window names are chemical shells** —
   the uncontracted basis counts radial primitives, so one shell
