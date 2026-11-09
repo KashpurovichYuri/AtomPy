@@ -156,6 +156,36 @@ def test_lane_window_grammar():
 
 
 @fast
+def test_field_axis_default_keeps_every_store_name():
+    """The field axis is an OPTIONAL ninth slot, appended only when
+    folded: an eight-slot address parses as neutral and re-serializes
+    byte-identical (the stores minted before the axis need no
+    migration), and a folded cell can never collide with its neutral
+    twin (the identity the folded probe ran under is now unambiguous)."""
+    pre_axis = "tiunc_3d4s@ar_3-1_casci_ao_-_pur_avg"
+    k = CellKey.from_address(pre_axis)
+    assert k.field == "neutral"
+    assert k.address == pre_axis
+    assert CellKey.from_address(k.address) == k
+    folded = CellKey.from_address(pre_axis + "_folded")
+    assert folded.field == "folded"
+    assert CellKey.from_address(folded.address) == folded
+    assert folded.address != k.address
+
+
+@fast
+def test_field_axis_folded_requires_tagged_window():
+    """A folded key names a folded reference, and that field is
+    defined BY its confined span -- an untagged window has no span to
+    define it, so the combination is unrepresentable."""
+    CellKey("Tiunc", "3d4s@ar", (3, 1), substrate="pur", field="folded")
+    with pytest.raises(ValueError, match="fold-tagged"):
+        CellKey("Tiunc", "3d4s", (3, 1), field="folded")
+    with pytest.raises(ValueError, match="not in"):
+        CellKey("Tiunc", "3d4s@ar", (3, 1), field="frozen")
+
+
+@fast
 def test_lane_keys_derive_from_the_declaration():
     """The lane legs and their SECTORS derive from the declaration:
     activating a shell moves its electrons into the window, so the

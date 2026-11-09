@@ -15,6 +15,19 @@ stay FULL-family. The reference is the SEEDED deep-basin ROHF
 high on this basis). Validation atom of the shell-layer wave.
 Sector M_S = 1. Certified sibling: `elements/Ti/` (contracted).
 
+**Field disclosure.** Every row anchors on the TRUE neutral ROHF (the
+ROHF row — the tables are NOT re-anchored). The folded-reference round
+adds a second reference class: the confined-core field with the
+valence re-relaxed (`run_folded`, logs/folded_probe.log —
+−848.00772956, +399.7 mEh above the anchor BY ZERO: the frozen
+confined core is the free ion on a wide span, plus the variational
+cost). On that field the lane closes the lane-vs-free gap to machine
+zero — 5.5e-13 Eh (logs/matrix_folded.log: the ³F lane total
+−848.272074, +135.3 mEh vs the anchor); folded-field cells carry the
+`folded` tag in their addresses (the ninth address slot). The
+ladder's pinned row is the HISTORICAL neutral-field lane record — the
++124.3 mEh gap that motivated the fold — kept for provenance.
+
 <!-- ladder:begin -->
 | method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|

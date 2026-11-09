@@ -13,6 +13,22 @@ family vs a baked-in contraction). The folds stay FULL-family (the
 mini-Roothaan grammar). Validation atom of the shell-layer wave.
 Sector M_S = ½. Certified sibling: `elements/Sc/` (contracted).
 
+**Field disclosure.** Every row anchors on the TRUE neutral ROHF (the
+ROHF row — the tables are NOT re-anchored). The folded-reference round
+adds a second reference class: the confined-core field with the
+valence re-relaxed (`run_folded`, logs/folded_probe.log —
+−759.58645602, +150.9 mEh above the anchor BY ZERO: the frozen
+confined core is the free ion on a wide span, plus the variational
+cost). On that field the lane closes the lane-vs-free gap to
+0.085 mEh — the residual is the C1/D2h gauge of the window cut; the
+free-route cut declares its dominance gate at 0.4 (the C1 gauge's 4s
+signal 0.4628, D2h's gauge passes 0.5; measured honest, ⟨L²⟩ = 6
+exact). Full record: logs/matrix_folded.log (the ²D lane total
+−759.689259, +48.1 mEh vs the anchor); folded-field cells carry the
+`folded` tag in their addresses (the ninth address slot). The
+ladder's pinned row is the HISTORICAL neutral-field lane record — the
++38.7 mEh gap that motivated the fold — kept for provenance.
+
 <!-- ladder:begin -->
 | method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|

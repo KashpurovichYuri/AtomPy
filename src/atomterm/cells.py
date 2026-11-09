@@ -60,6 +60,18 @@ declares the cell's core partition AND marks the pinned-lane cell
 (:func:`lane_keys`, :func:`run_lane_cell`) -- a tagged window never
 collides with a free-route label.
 
+The REFERENCE FIELD sits outside the eight slots: a cell runs on the
+neutral-atom SCF (``field="neutral"`` -- the default, and every store
+predating the axis) or on the folded reference
+(:func:`atomterm.reference.run_folded` -- the confined-core field
+with the valence re-relaxed, the lane's reference class).  The field
+serializes as an OPTIONAL ninth slot, appended ONLY when non-default
+(``..._<substrate>_<fold>_folded``): an eight-slot address parses as
+``neutral`` and re-serializes unchanged -- the store identities minted
+before the axis keep their exact names.  A folded key requires a
+fold-tagged window: the folded field is defined BY its confined span,
+and the tag is that span's name.
+
 One real address, decoded slot by slot::
 
     ti_3d4sno2_3-1_sa-casscf_no_-_pol_avg
@@ -128,6 +140,7 @@ STARTS = ("ao", "mo", "moc", "no")  # window constructions (the span is the wind
 MASKS = ("radial", "frozen", "virtmix")   # None = free optimization
 SUBSTRATES = ("pol", "pur")
 FOLDS = ("raw", "avg", "frac")
+FIELDS = ("neutral", "folded")  # the reference field (an optional 9th slot)
 
 # the nominal window label: shell tokens like "2p", "3d4s" -- lowercase
 # alphanumerics, no separators (the address splits on "_"); a lane
@@ -174,6 +187,12 @@ class CellKey:
         For fold-tagged windows the substrate axis NAMES THE ROUTE:
         ``pur`` = the pinned lane class (run_lane_cell), ``pol`` = the
         free driver (:func:`run_cell`'s fold branch -- the twins).
+    field : ``"neutral"`` | ``"folded"`` -- the REFERENCE field the
+        cell's substrate lives on (the module docstring).  Default
+        ``neutral``, serialized only when ``folded``: an address
+        without the tag IS a neutral cell (stores predating the axis
+        need no migration).  A folded key requires a fold-tagged
+        window.
     """
 
     atom: str
@@ -184,6 +203,7 @@ class CellKey:
     mask: str | None = None
     substrate: str = "pol"
     fold: str = "avg"
+    field: str = "neutral"
 
     def __post_init__(self):
         """Validate and canonicalize: axis vocabularies, void
@@ -208,10 +228,16 @@ class CellKey:
                 ("method", self.method, METHODS),
                 ("start", self.start, STARTS),
                 ("substrate", self.substrate, SUBSTRATES),
-                ("fold", self.fold, FOLDS)):
+                ("fold", self.fold, FOLDS),
+                ("field", self.field, FIELDS)):
             if value not in vocab:
                 raise ValueError(
                     f"{axis} {value!r} not in {vocab}")
+        if self.field == "folded" and self.fold_tag is None:
+            raise ValueError(
+                f"field='folded' needs a fold-tagged window (the tag "
+                f"names the confined span that defines the field); "
+                f"{self.window!r} carries none")
         if (self.start == "no") != (self.no_source is not None):
             raise ValueError(
                 f"start='no' and the window label must agree: NO windows "
@@ -248,24 +274,37 @@ class CellKey:
 
     @property
     def address(self) -> str:
-        """The derived serialization: chk name, payload key, table-row id."""
+        """The derived serialization: chk name, payload key, table-row
+        id.  The field rides as an optional ninth slot, appended only
+        when ``folded`` -- an eight-slot address is a neutral cell, so
+        every store name minted before the axis is untouched."""
         na, nb = self.sector
-        return "_".join((self.atom.lower(), self.window, f"{na}-{nb}",
-                         self.method, self.start, self.mask or "-",
-                         self.substrate, self.fold))
+        parts = [self.atom.lower(), self.window, f"{na}-{nb}",
+                 self.method, self.start, self.mask or "-",
+                 self.substrate, self.fold]
+        if self.field != "neutral":
+            parts.append(self.field)
+        return "_".join(parts)
 
     @classmethod
     def from_address(cls, address: str) -> "CellKey":
-        """Parse an address (inverse of :attr:`address`)."""
+        """Parse an address (inverse of :attr:`address`).  Eight slots
+        = a neutral cell (the pre-axis spelling); nine = the ninth
+        names the field."""
         parts = address.split("_")
-        if len(parts) != 8:
+        if len(parts) == 8:
+            parts.append("neutral")
+        if len(parts) != 9:
             raise ValueError(
-                f"address {address!r} does not have 8 fields: "
-                "atom_window_na-nb_method_start_mask_substrate_fold")
-        atom, window, sector, method, start, mask, substrate, fold = parts
+                f"address {address!r} does not have 8 slots (9 with "
+                "the field tag): atom_window_na-nb_method_start_mask_"
+                "substrate_fold[_field]")
+        atom, window, sector, method, start, mask, substrate, fold, \
+            field_name = parts
         na, nb = sector.split("-")
         return cls(atom, window, (int(na), int(nb)), method, start,
-                   None if mask == "-" else mask, substrate, fold)
+                   None if mask == "-" else mask, substrate, fold,
+                   field=field_name)
 
     @property
     def shell_patterns(self) -> list[str]:
@@ -615,7 +654,10 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     mf : the atom's converged reference (REQUIRED -- reference
         construction, including character-forced occupations and the
         basin gate, belongs to cases/reference, not to cells). On
-        ``fold="frac"`` this is REPLACED by ``frac_mf``.
+        ``fold="frac"`` this is REPLACED by ``frac_mf``.  The
+        reference must live on the KEY's field: a folded key takes
+        the folded reference (:func:`atomterm.reference.run_folded`'s
+        product) in place of the neutral one.
     mol : the analysis mol; defaults to ``mf.mol``. Only a
         ``fold="frac"`` run needs it stated separately (the run basis
         is ``frac_mf.mol``).
@@ -1065,7 +1107,10 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         with a tagged window).  Its sector must hold exactly the
         electrons its fold leaves active.
     mol, mf : the PINNED substrate -- ``mol`` a converged-reference
-        D2h molecule, ``mf`` its ROHF.
+        D2h molecule, ``mf`` its ROHF.  The substrate lives on the
+        KEY's field: a folded key takes the folded reference
+        (:func:`atomterm.reference.run_folded`'s product, its own D2h
+        clone) in place of the neutral one.
     term : the target ``(L, parity)`` (:attr:`~atomterm.cases.CaseSpec.term`);
         parity is the configuration's total inversion parity.
     conv_tol : the pinned solvers' CI tolerance.

@@ -235,7 +235,16 @@ slices are interesting; the runners execute the declared set:
 | start | ao / mo / no | `regen_cells.py` |
 | substrate | pol (canonical core) / pur (closed span) | `regen_cells.py` |
 | fold | raw / avg / frac | `regen_cells.py` |
+| field | neutral (default) / folded — the reference the cell's substrate lives on; ninth address slot, written only when `folded` | `run_cell` / `run_lane_cell` (the substrate on the key's field) |
 | reference | default / gated / UHF / fractional-occupation | both runners |
+
+**Address guarantees** — the address IS the store identity (chk name,
+payload key, table row) and never renames: a new axis serializes as
+an extra slot only when non-default (an eight-slot address is a
+neutral cell and re-serializes unchanged), lane windows carry their
+`@fold` tag and NO windows their `<source>no<k>` prefix as part of
+the window identity, and illegal combinations are rejected at the key
+(`frac` on `pur`, `folded` without a fold tag, a mask on `casci`).
 
 Two runners, two deliverables — `run.py <atoms>` runs the fixed staged
 pipeline (the term tables); `regen_cells.py <atoms>` runs the methods
