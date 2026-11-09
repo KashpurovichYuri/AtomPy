@@ -1,0 +1,48 @@
+== the folded-reference reproducibility finding (2026-11-09) ==
+
+The certified folded fields (ticket 34's matrix round) do NOT replay
+from the current caches, code, and environment.  Every combination
+tried lands in a wrong basin or diverges; the certificates catch each
+(the converged-filling check, added this round -- the certified-era
+code would have returned the wrong-fill fields silently).
+
+Certified record (17c05f6 / b56048b, the committed logs):
+  Tiunc C1  folded E = -848.00772956  (closed s-w 0.6851, opens d-w 0.3895)
+  Tiunc D2h folded E = -848.00772956  (the lane recovery 5.5e-13)
+  Scunc     folded E = -759.58645602  (closed s-w 0.6883, open d-w 0.3893)
+
+Today's replays (same chks -- Ti mtime Nov 8 23:15 PREdates the
+certified commit; Sc Nov 6; both unmodified; pyscf 2.13.1 unchanged
+since Jul 18; the exact 17c05f6 reference.py module re-imported):
+
+  Tiunc C1   three-level  OMP 8  -> diverged, E = +53877.99 (garbage basin)
+  Tiunc C1   three-level  OMP 16 -> diverged, E = +53877.95 (same basin)
+  Tiunc C1   three-level  (old module, exact 17c05f6) OMP 8 -> +53877.93
+  Tiunc C1   gates 0.5    OMP 8/16 -> "converged" on 2 valence electrons
+             (the closed pair never qualifies: the field's 4s w ~ 0.43
+             -- the C1-gauge finding, caught by the filling check)
+  Tiunc C1   gates 0.4    OMP 8  -> "converged", E = +53877.78 (garbage,
+             the RIGHT count -- the count alone does not certify)
+  Tiunc D2h  gates 0.5    -> converged on 2 valence electrons (caught)
+  Tiunc D2h  three-level  -> diverged, E = +53877.85
+  Scunc      gates 0.5    -> converged on 1 valence electron (caught)
+  carbon     gates/three-level -> both converge, two DIFFERENT basins
+             (-37.39253719 / -35.18841295 -- pinned in the test)
+
+The garbage-basin E values agree across replays to ~1e-1 Eh while
+differing across rule/code variants -- the executions are
+deterministic-given-microstate; the certified runs' good basins were
+single draws at a basin boundary.  Same input file + same code +
+same env does NOT pin the basin on the uncontracted twins.
+
+Consequences (recorded in ticket 34 + map.md):
+- run_folded's "deterministic given its inputs" claim is falsified on
+  the twins; the docstring and the AGENTS row now state the honest
+  form (certificates judge every draw).
+- The certified folded-field numbers (the matrix logs, the lane
+  recoveries, the zero disclosures) stand as measurements of their
+  draws; they are not replayable artifacts.
+- The tail's window legs (the MO-subspace variant, the scan oracle)
+  are BLOCKED on a reproducible folded field -- a stored-draw cache
+  (the folded reference as a cached artifact, like the ROHF chks) or
+  a folded-basin census is the declared fix, user-gated.

@@ -81,3 +81,29 @@ def test_folded_reference_filling_and_orthonormality(carbon):
                        span_projector(s, select_span(mol, "l1")),
                        fm.mo_coeff[:, opens]).real
     assert np.all(w_open > 0.99)
+
+
+def test_folded_reference_pick_rule_is_declared(carbon):
+    """The pick rules are DECLARED per atom-gauge (both certified
+    forms, neither universal -- and on the uncontracted twins the
+    folded landscape is draw-chaotic, so the converged-filling
+    certificate judges every draw).  An unknown rule is rejected; the
+    three-level form converges on the carbon fixture to its own
+    certified field (a DIFFERENT basin than the gates default's,
+    measured -- both hold the declared filling and the variational
+    bound)."""
+    _, mol, mf, _ = carbon
+    span = _span(mol, mf, ("1s",))
+    with pytest.raises(ValueError, match="picks"):
+        run_folded(mf, span, 1, ("l0",), ("l1",), picks="energy-only")
+    _, fm_a = run_folded(mf, span, 1, ("l0",), ("l1",))
+    _, fm_b = run_folded(mf, span, 1, ("l0",), ("l1",),
+                         picks="three-level")
+    for fm in (fm_a, fm_b):
+        assert fm.converged
+        assert fm.e_tot >= mf.e_tot - 1e-9   # the variational bound
+        assert (fm.mo_occ == 2).sum() == 2   # 1 frozen + 1 closed valence
+        assert (fm.mo_occ == 1).sum() == 2   # the p opens
+    # the measured fields (the gates default is the deeper basin here)
+    assert fm_a.e_tot == pytest.approx(-37.3925371924919, abs=1e-9)
+    assert fm_b.e_tot == pytest.approx(-35.188412949352745, abs=1e-9)

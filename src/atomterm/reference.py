@@ -643,7 +643,8 @@ def _spin_summed(dm: np.ndarray) -> np.ndarray:
 
 
 def run_folded(mf, c_span: np.ndarray, n_pairs: int,
-               occ_closed: tuple[str, ...], occ_open: tuple[str, ...]):
+               occ_closed: tuple[str, ...], occ_open: tuple[str, ...],
+               dominance: float = 0.5, picks: str = "gates"):
     """The folded reference: the valence ROHF self-consistent in the
     frozen confined-core field.
 
@@ -653,11 +654,13 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     valence electrons solve ROHF in its field, in the complement of
     the confined columns.  This is the reference the lane's
     construction assumes: a window cut on it carries the ion-field
-    valence, not the neutral-field one.  Deterministic given its
-    inputs (the confined solve reads no converged orbitals; the
-    valence SCF seeds from the substrate's own valence, projected --
-    same trusted cache, same folded reference), so it needs no
-    trusted cache of its own.
+    valence, not the neutral-field one.  The valence SCF seeds from
+    the substrate's own valence, projected.  Deterministic given its
+    inputs on a well-behaved landscape (the carbon fixture replays
+    bit-stable); the uncontracted twins' folded landscape sits at a
+    basin boundary -- execution micro-state selects the basin, so a
+    draw is judged by the certificates (the converged-filling
+    check below, then the term meters), never assumed.
 
     Mechanics: PySCF's ROHF kernel runs UNMODIFIED on the complement
     basis -- an orthonormal Euclidean space (``get_ovlp = I``,
@@ -699,6 +702,21 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     occ_closed, occ_open : AO span patterns
         (:class:`ReferenceSpec` vocabulary) -- the character spans
         of the open-shell premium.
+    dominance : the closed-pair gate of the ``gates`` picks (the
+        column's closed-span weight; inert for ``three-level``).  The
+        signal is GAUGE-dependent -- the same field's C1 gauge carries
+        a lower 4s weight than the D2h one -- so the cut is DECLARED
+        per gauge, not universal: the default 0.5 serves the D2h
+        gauges; a C1 gauge whose measured signal sits below it
+        declares its own cut (0.4 on the uncontracted twins, the
+        measured-honesty certificates judging the result).
+    picks : the valence pick rule, DECLARED per atom-gauge -- both
+        forms are measured-certified and neither is universal:
+        ``"gates"`` (the default) = MOM-primary within dominance
+        gates; ``"three-level"`` = the character class (rounded --
+        a degenerate shell ties exactly), then the energy ascending,
+        then the MOM anchor.  See the Notes for which atom certified
+        which form and why the other form fails there.
 
     Returns
     -------
@@ -718,7 +736,24 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
         If the complement cannot host the valence filling, or the
         patterns match no AO labels.
     RuntimeError
-        If the valence SCF does not converge under plain DIIS.
+        If the valence SCF does not converge under plain DIIS, or the
+        converged filling does not hold the declared electron count.
+
+    Notes
+    -----
+    The pick rule is not universal -- measured on the uncontracted
+    twins.  ``three-level`` is the certified form where the valence
+    closed pair is a HYBRID (its closed-span weight sits below the
+    tight radials' perfect s/p character, so only the energy
+    separates the classes; the ion field's aufbau inversion is why
+    energy alone must not pick).  ``gates`` is the certified form
+    where the closed pair is NEARLY PURE (its weight ties the tight
+    radials' class and the energy-ascending leg loses the tie-break
+    to them; the seed declares the basin and the gates keep every
+    pick inside it).  On the wrong landscape each form abandons the
+    projected basin -- and the twins' folded landscape is
+    draw-chaotic besides (the basin boundary sits inside the solve;
+    the certificates judge every draw).
     """
     # the core family is this runner's only consumer (a fresh local
     # import, no module-level coupling)
@@ -729,6 +764,10 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     mol = mf.mol
     n_open = mol.spin
     n_closed_val = (mol.nelectron - 2 * n_pairs - mol.spin) // 2
+    if picks not in ("gates", "three-level"):
+        raise ValueError(
+            f"picks {picks!r} not in ('gates', 'three-level') -- the "
+            "declared valence pick rules")
     if n_closed_val < 0:
         raise ValueError(
             f"{n_pairs} confined pairs leave {mol.nelectron - 2 * n_pairs} "
@@ -813,7 +852,9 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     def _occ(mo_energy, mo_coeff):
         # MOM-primary picks within the dominance gates -- the rule is
         # the docstring's; the seed declared the basin this anchor
-        # keeps.
+        # keeps.  A cycle's qualification can dip transiently (the
+        # certified solves recover); the CONVERGED state is what must
+        # hold the filling, and run_folded verifies it post-kernel.
         occ = np.zeros(len(mo_energy))
         c_ao = compl @ mo_coeff
         w_open = np.einsum("ai,ab,bi->i", c_ao.conj(), p_open,
@@ -826,23 +867,35 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
             mom_o = np.abs(prev_open[0].conj().T @ mo_coeff).sum(axis=0)
         if prev_closed[0] is not None:
             mom_c = np.abs(prev_closed[0].conj().T @ mo_coeff).sum(axis=0)
-        qualified_c = [i for i in range(len(occ)) if w_closed[i] > 0.5]
-        if len(qualified_c) < n_closed_val:
-            raise ValueError(
-                f"only {len(qualified_c)} complement columns are "
-                f"closed-span-dominated; the filling wants "
-                f"{n_closed_val} closed pairs -- the basin is lost")
-        closed = sorted(qualified_c, key=lambda i: -mom_c[i])[:n_closed_val]
-        occ[closed] = 2.0
-        rest = [i for i in range(len(occ)) if occ[i] == 0.0]
-        qualified_o = [i for i in rest
-                       if 2 * w_open[i] + w_closed[i] > 1.0]
-        if len(qualified_o) < n_open:
-            raise ValueError(
-                f"only {len(qualified_o)} columns pass the d-premium "
-                f"gate; the filling wants {n_open} opens -- the basin "
-                "is lost")
-        opens = sorted(qualified_o, key=lambda i: -mom_o[i])[:n_open]
+        if picks == "gates":
+            qualified_c = [i for i in range(len(occ))
+                           if w_closed[i] > dominance]
+            closed = sorted(qualified_c,
+                            key=lambda i: -mom_c[i])[:n_closed_val]
+            occ[closed] = 2.0
+            rest = [i for i in range(len(occ)) if occ[i] == 0.0]
+            qualified_o = [i for i in rest
+                           if 2 * w_open[i] + w_closed[i] > 1.0]
+            opens = sorted(qualified_o,
+                           key=lambda i: -mom_o[i])[:n_open]
+        else:
+            # the three-level key: the CHARACTER class (rounded -- a
+            # degenerate shell ties exactly), then the ENERGY
+            # ascending (the tight core-shell radials carry the same
+            # pure s/p character as the valence pair -- only the
+            # energy separates them), then the MOM anchor
+            cls_c = np.round(w_closed, 8)
+            closed = sorted(range(len(occ)),
+                            key=lambda i: (-cls_c[i],
+                                           round(float(mo_energy[i]), 6),
+                                           -mom_c[i]))[:n_closed_val]
+            occ[closed] = 2.0
+            rest = [i for i in range(len(occ)) if occ[i] == 0.0]
+            cls_o = np.round(2 * w_open + w_closed, 8)
+            opens = sorted(rest,
+                           key=lambda i: (-cls_o[i],
+                                          round(float(mo_energy[i]), 6),
+                                          -mom_o[i]))[:n_open]
         occ[opens] = 1.0
         prev_open[0] = mo_coeff[:, opens].copy()
         prev_closed[0] = mo_coeff[:, closed].copy()
@@ -867,6 +920,18 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
             f"the folded valence SCF did not converge "
             f"(E = {fm.e_tot:.8f}) -- the complement-local DIIS "
             "needs revisiting")
+    # the filling certificate: a cycle's gate qualification may dip
+    # transiently (the MOM picks ride through and recover), but the
+    # CONVERGED state must hold the declared filling -- a short-filled
+    # convergence is a lost basin, not a result (the electron count of
+    # the final cycle's occupancy is the honesty check)
+    n_val = int(round(float(np.sum(fm.mo_occ))))
+    if n_val != 2 * n_closed_val + n_open:
+        raise RuntimeError(
+            f"the folded valence SCF converged on {n_val} valence "
+            f"electrons; the declared filling wants "
+            f"{2 * n_closed_val + n_open} -- the dominance gates lost "
+            "the basin")
     # reassemble on the real substrate: the pinned block prepended,
     # the accessors restored (the consumers see a standard ROHF)
     fm.mo_coeff = np.hstack([c_conf, compl @ fm.mo_coeff])
