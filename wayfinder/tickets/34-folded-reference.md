@@ -154,6 +154,35 @@ T-D docs /code-review (anti-inflation); T-E the term-ID round (NIST
 as the acceptance test).  Stop after T-E's review -- no physics waves
 before it.
 
+## The first round, scoped (2026-11-09, user)
+
+**Ti and Sc fully first (contracted verification + the unc re-anchor),
+user review, then U14e.**  The U14e route batch (the CAS(4,31)
+lane's SA pur leg) was stopped by decision -- CAS(4,31) is too big
+for now; the pol legs (casci/casscf/sa-casscf) are banked in the
+store; the future U14e round reviews the DISTILLED 5f6d
+(k=1 per shell = CAS(4,12), the m-complete minimal window) and the
+promoted ladder (10f13d7s at (5,1) = CAS(6,19)) -- pick then.
+
+The cells:
+- Ti/Sc CONTRACTED: the spine/diagnostics CASCI legs re-run with
+  `shell_radials = {"3d": 1, "4s": 1}` declared (the distilled
+  construction) -- VERIFICATION legs: the 1:1 identity predicts
+  span-identical energies vs the certified stores; a discrepancy
+  stops the round.
+- Tiunc/Scunc: the re-anchor -- the same structure as their
+  contracted siblings (3d, 3d4s at the case sectors, casci,
+  ao/mo/moc starts, raw/avg/pur folds) + the `3d4s@ar` lane leg on
+  the NEUTRAL field (the offset structural ~+124 mEh, disclosed;
+  the value = the independent machine-exact term certification).
+  SKIPPED: the raw full-family AO windows (the monster spans), the
+  optimizer class (gated this wave), the frac fold (unmeasured).
+  The mo start STAYS (the m-delocalized control arm).
+- C/Si: untouched (the 1:1 identity covers them; their certified
+  tables stand).
+- Consistency readout: one construction both sides -- term
+  identities, splittings, energies (unc <= contracted), captures.
+
 ## The folded review (2026-11-09, step 3): the corrected interpretation,
 ## second revision -- the offset is basis-STABLE construction physics
 
