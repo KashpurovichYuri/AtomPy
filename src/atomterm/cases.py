@@ -146,12 +146,13 @@ class CaseSpec:
         ``closed_electrons`` pairs over that span
         (:func:`atomterm.core.confined_core_orbitals`) -- never one
         pair per column.
-    shell_radials : the declared WINDOW compression (chemical shell ->
-        k reference radials; ``None`` = no compression, the raw band
-        rows).  A multi-band realization's chemically-sized window:
-        each shell's best k radial directions measured from the
-        reference's occupied MOs, replicated on every m-member
-        (:func:`atomterm.windows.window_compressed`) -- the CAS label
+    shell_radials : the declared WINDOW distillation depth (chemical
+        shell -> k radial directions; ``None`` = no distillation, the
+        raw band rows).  A multi-band realization's chemically-sized
+        window: each shell's k radial directions distilled from the
+        reference's occupied MOs by the member-summed radial Gram,
+        replicated on every m-member
+        (:func:`atomterm.windows.window_distilled`) -- the CAS label
         reads the delivered records' shapes (CAS(3,6), not CAS(3,43)).
         Window-side only: the FOLD stays at full family width.
     planned_windows : further window labels of the campaign, declared
@@ -215,7 +216,7 @@ class CaseSpec:
     # sized window -- CAS(3,6)-shaped, not CAS(3,43)-shaped.  The FOLD
     # ignores it (full family spans; the compression is a window-side
     # choice only); every shell of every window the case declares must
-    # carry one (a mixed compressed/raw window is not offered).
+    # carry one (a mixed distilled/raw window is not offered).
     shell_radials: dict[str, int] | None = None
     ecp: str | None = None
     spin: int = 0
@@ -299,7 +300,7 @@ class CaseSpec:
                 raise ValueError(
                     f"shell_radials is undeclared for {bare} -- every "
                     "window shell the case names carries its k (a mixed "
-                    "compressed/raw window is not offered)")
+                    "distilled/raw window is not offered)")
 
     def atom_config(self) -> AtomConfig:
         """The spec as an :class:`AtomConfig` (``tag`` defaults to the
@@ -454,11 +455,11 @@ _TM_UNC_BANDS = {
     "3p": tuple(f"{k}p" for k in range(12, 18)),
     "3d": tuple(f"{k}d" for k in range(3, 11)),
 }
-# the twins' WINDOW compression (k=1: the single reference radial per
-# shell, the uncontracted analog of one contraction): the CAS labels
-# mirror the certified contracted records' shapes (CAS(3,6)/CAS(4,6))
-# at minutes per cell.  The FOLD families stay full -- the cusp is
-# the fold's business; the compression is a window-side choice only.
+# the twins' WINDOW distillation depth (k=1: the single reference
+# radial per shell, replicated on the m-set): the CAS labels mirror
+# the certified contracted records' shapes (CAS(3,6)/CAS(4,6)) at
+# minutes per cell.  The FOLD families stay full -- the cusp is the
+# fold's business; the distillation is a window-side choice only.
 _TM_UNC_RADIALS = {"3d": 1, "4s": 1}
 _SC_UNC_BASIS = gto.parse((_DATA / "sc_ccpvdz_unc.txt").read_text())
 _TI_UNC_BASIS = gto.parse((_DATA / "ti_ccpvdz_unc.txt").read_text())

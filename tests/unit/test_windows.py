@@ -502,8 +502,6 @@ def test_shell_realization_is_identity_until_declared():
                              {"3d": ("12d", "13d")}) == ["12d", "13d", "4s"]
 
 
-# --------------------------------------------- the compressed-shell window
-
 def _planted_reference(mol, layer, shells, seed: int = 7):
     """Synthetic occupied columns for the compression pins: one
     m-complete MO per shell, a planted radial on the shell's declared
@@ -524,84 +522,6 @@ def _planted_reference(mol, layer, shells, seed: int = 7):
     foil = np.zeros((n, 1))
     foil[select_shell_ao(mol, "3d")[0], 0] = 1.0
     return np.hstack(cols + [foil])
-
-
-def test_compressed_ncas_counts_the_declared_radials():
-    """The counting rule without building: each shell contributes
-    k x (2l+1); an undeclared window shell refuses (a mixed
-    compressed/raw window is not a construct the module offers)."""
-    from atomterm.windows import compressed_ncas
-
-    assert compressed_ncas(["3d", "4s"], {"3d": 1, "4s": 1}) == 6
-    assert compressed_ncas(["3d"], {"3d": 1, "4s": 1}) == 5
-    assert compressed_ncas(["3d"], {"3d": 2}) == 10
-    with pytest.raises(ValueError, match="undeclared"):
-        compressed_ncas(["3d", "4s"], {"3d": 1})
-
-
-def test_window_compressed_recovers_the_planted_radial():
-    """The construction's exact anchor: an m-complete planted MO over
-    a multi-band family is recovered exactly -- the top radial IS the
-    planted one on every member, the columns are S-orthonormal, the
-    capture reads 1, and the span is rotation-CLOSED (member-complete
-    at every k by construction -- the certificates are machine-zero
-    whatever the capture)."""
-    from atomterm.operators import window_closure
-    from atomterm.windows import window_compressed
-
-    mol = uncontracted_carbon_mole()
-    layer = {"2s": ("1s", "2s"), "2p": ("2p", "3p")}
-    s = mol.intor_symmetric("int1e_ovlp")
-    c_ref = _planted_reference(mol, layer, ["2p"])
-    cols, rep = window_compressed(mol, c_ref, s, ["2p"], layer,
-                                  {"2p": 1})
-    assert cols.shape == (mol.nao_nr(), 3)
-    assert rep["2p"]["dominated"] == [0]
-    assert abs(rep["2p"]["capture"][0] - 1.0) < 1e-10
-    assert np.abs(cols.T @ s @ cols - np.eye(3)).max() < 1e-10
-    lz, lperp = window_closure(mol, cols).values()
-    assert lz < 1e-12 and lperp < 1e-12
-
-
-def test_window_compressed_refusals():
-    """The fail-fast branches: k beyond the radial signal (the kept
-    spectrum is tail), a shell with no dominated column (the forced
-    dominance), and radials=None (the uncompressed window is the row
-    selectors' business)."""
-    from atomterm.windows import window_compressed
-
-    mol = uncontracted_carbon_mole()
-    layer = {"2p": ("2p", "3p")}
-    s = mol.intor_symmetric("int1e_ovlp")
-    c_ref = _planted_reference(mol, layer, ["2p"])
-    with pytest.raises(ValueError, match="exceeds the radial signal"):
-        window_compressed(mol, c_ref, s, ["2p"], layer, {"2p": 2})
-    with pytest.raises(ValueError, match="no reference column"):
-        # w is bounded by 1: dominance past the bound leaves no
-        # qualified column (the forced form of a family no occupied
-        # MO calls home)
-        window_compressed(mol, c_ref, s, ["2p"], layer, {"2p": 1},
-                          dominance=1.1)
-    with pytest.raises(ValueError, match="select_valence_ao"):
-        window_compressed(mol, c_ref, s, ["2p"], layer, None)
-
-
-def test_window_compressed_on_a_1_1_realization_is_the_label_span(carbon):
-    """The degenerate anchor: on a one-band-per-shell realization
-    (the contracted bases) k=1 reproduces the label-selected m-set's
-    span exactly -- the compression is the identity there, and every
-    contracted record's construction is unchanged by the seam."""
-    from atomterm.windows import span_overlap, window_compressed
-
-    _cfg, mol, mf, _act = carbon
-    s = mol.intor_symmetric("int1e_ovlp")
-    c_occ = np.asarray(mf.mo_coeff)[:, np.asarray(mf.mo_occ) > 0]
-    cols, rep = window_compressed(mol, c_occ, s, ["2p"], None,
-                                  {"2p": 1})
-    raw = lowdin(np.eye(mol.nao_nr())[:, select_valence_ao(mol, ["2p"])],
-                 s)
-    assert span_overlap(cols, raw, s) > 1 - 1e-12
-    assert rep["2p"]["dominated"] == [2, 3]      # the two open 2p MOs
 
 
 # --------------------------------------------- the distilled window
@@ -670,7 +590,7 @@ def test_window_distilled_admits_the_hybrid_signal():
 def test_window_distilled_refusals():
     """The fail-fast branches: k beyond the radial signal (the kept
     spectrum is tail), a shell with no significant column (the forced
-    cut), and radials=None (the uncompressed window is the row
+    cut), and radials=None (the undistilled window is the row
     selectors' business)."""
     from atomterm.windows import window_distilled
 

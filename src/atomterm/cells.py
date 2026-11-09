@@ -600,29 +600,29 @@ def _key_core(key: CellKey, mol, mf,
 
 def _window_columns(key, mol, mf, shell_bands, shell_radials):
     """The window object ``build_full_mo`` consumes: the raw AO rows,
-    or the compressed-shell columns when the case declares radials --
+    or the distilled-shell columns when the case declares radials --
     ONE resolution shared by the free run, the pinned lane, and the
     NO-start source window (start-independent by the same rule as the
-    frozen masks: the compression is the case's WINDOW DEFINITION, the
-    mo/moc starts express their own gauge within its width).  Prints
-    the compression report (the composition log's entry).
+    frozen masks: the distillation is the case's WINDOW DEFINITION,
+    the mo/moc starts express their own gauge within its width).
+    Prints the distillation report (the composition log's entry).
 
     Returns ``(act, ncas)``: row indices, or S-orthonormal columns
-    (:func:`atomterm.windows.window_compressed` -- the dominated-MO
-    signal is the OCCUPIED reference block).
+    (:func:`atomterm.windows.window_distilled` -- the radial signal is
+    the OCCUPIED reference block).
     """
     from atomterm.windows import (realized_patterns, select_valence_ao,
-                                  window_compressed)
+                                  window_distilled)
 
     act = select_valence_ao(
         mol, realized_patterns(key.shell_patterns, shell_bands))
     if shell_radials is None:
         return act, len(act)
     c_occ = mf.mo_coeff[:, np.asarray(mf.mo_occ) > 0]
-    act, report = window_compressed(
+    act, report = window_distilled(
         mol, c_occ, mf.get_ovlp(), key.shell_patterns,
         shell_bands, shell_radials)
-    print("  [window] compressed " + "; ".join(
+    print("  [window] distilled " + "; ".join(
         f"{sh}: k={r['k']} of {len(r['bands'])} bands, "
         f"capture {min(r['capture']):.4f}-{max(r['capture']):.4f}"
         for sh, r in report.items()), flush=True)
@@ -630,13 +630,13 @@ def _window_columns(key, mol, mf, shell_bands, shell_radials):
 
 
 def _window_ncas(key, mol, shell_bands, shell_radials) -> int:
-    """The stored-absent ``ncas`` fallback: the compressed width when
+    """The stored-absent ``ncas`` fallback: the distilled width when
     the case declares radials, else the raw band-row count."""
-    from atomterm.windows import (compressed_ncas, realized_patterns,
+    from atomterm.windows import (distilled_ncas, realized_patterns,
                                   select_valence_ao)
 
     if shell_radials is not None:
-        return compressed_ncas(key.shell_patterns, shell_radials)
+        return distilled_ncas(key.shell_patterns, shell_radials)
     return len(select_valence_ao(
         mol, realized_patterns(key.shell_patterns, shell_bands)))
 
@@ -684,12 +684,12 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         (:attr:`atomterm.cases.CaseSpec.shell_bands`) -- chemical
         shells resolve to their declared AO bands through it (None =
         the 1:1 identity, the contracted-basis behavior).
-    shell_radials : the case's declared WINDOW compression
+    shell_radials : the case's declared WINDOW distillation depth
         (:attr:`atomterm.cases.CaseSpec.shell_radials`; None = the
         raw band rows).  Start-independent: the ao/no starts carry
-        the compressed columns, the mo/moc starts their own canonical
-        gauge at the compressed width.  Undeclared combinations fail
-        fast: the frac fold and the radial mask have no compressed
+        the distilled columns, the mo/moc starts their own canonical
+        gauge at the distilled width.  Undeclared combinations fail
+        fast: the frac fold and the radial mask have no distilled
         meaning (the fractional reference's open shell and the
         member-labeled radial substrate are row-space constructs).
     workdir : the store root (``<workdir>/<Atom>/rungs/``).
@@ -741,7 +741,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     if shell_radials is not None and (key.fold == "frac"
                                       or key.mask == "radial"):
         raise ValueError(
-            f"{key.address}: the compressed window is undeclared for "
+            f"{key.address}: the distilled window is undeclared for "
             f"fold={key.fold}, mask={key.mask} -- the fractional "
             "reference's open shell and the member-labeled radial "
             "substrate are row-space constructs")
@@ -1123,7 +1123,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     fresh : ignore a stored payload and re-run.
     shell_bands : the case's declared shell layer (chemical shell ->
         its AO bands; None = the 1:1 identity).
-    shell_radials : the case's declared WINDOW compression
+    shell_radials : the case's declared WINDOW distillation depth
         (:attr:`atomterm.cases.CaseSpec.shell_radials`; None = the raw
         band rows) -- the pinned term readout at the chemically-sized
         window; the FOLD stays at full family width either way.

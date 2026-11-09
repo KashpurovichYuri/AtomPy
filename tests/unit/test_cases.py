@@ -115,7 +115,7 @@ def test_casespec_validates_lane_windows():
 def test_shell_radials_must_cover_every_declared_window():
     """The compression grammar: every window shell the case names
     (primary, lattice, lane spans, planned) carries its k -- a mixed
-    compressed/raw window is refused at the declaration, not at the
+    distilled/raw window is refused at the declaration, not at the
     first run."""
     ti = dict(symbol="Ti", basis="ccpvdz", nelec_act=4, ncore=9,
               shell_patterns=["3d", "4s"], spin=2, term=(3, "g"))

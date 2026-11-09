@@ -66,14 +66,14 @@ def cas_label(key, spec=None) -> str:
     """The CAS(nelec, ncas) label: electrons from the key's sector,
     columns from the window's width -- THROUGH THE SHELL LAYER when
     the case declares one, and through the WINDOW COMPRESSION when
-    the case declares that (a compressed shell contributes its k
+    the case declares that (a distilled shell contributes its k
     radials' m-sets -- the CAS label reads the delivered records'
     shapes; the raw band count would read CAS(3,43) for a CAS(3,6))."""
     shells = re.findall(r"\d+[spdfgh]", key.span_label)
     if spec is not None:
         if getattr(spec, "shell_radials", None) is not None:
-            from atomterm.windows import compressed_ncas
-            cols = compressed_ncas(shells, spec.shell_radials)
+            from atomterm.windows import distilled_ncas
+            cols = distilled_ncas(shells, spec.shell_radials)
         else:
             from atomterm.windows import realized_patterns
             bands = realized_patterns(shells, spec.shell_bands)
