@@ -1,0 +1,10 @@
+== Ti: anchor (neutral ROHF) E = -848.40648875
+   confined core E = -845.03262770  SCF-core E = -845.04952181  dE = +16.894 mEh
+   confined vs SCF core singular values: [1.0, 1.0, 1.0, 1.0, 1.0, 0.999975, 0.99993, 0.99993, 0.99993]
+   folded E = -848.07210949  conv=True  valence electrons = 4
+   offset vs the anchor = +334.379 mEh
+== Sc: anchor (neutral ROHF) E = -759.73625510
+   confined core E = -758.16477634  SCF-core E = -758.17506306  dE = +10.287 mEh
+   confined vs SCF core singular values: [1.0, 1.0, 1.0, 1.0, 1.0, 0.999951, 0.999951, 0.999945, 0.999942]
+   folded E = -759.59934271  conv=True  valence electrons = 3
+   offset vs the anchor = +136.912 mEh

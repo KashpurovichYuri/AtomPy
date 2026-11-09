@@ -71,18 +71,26 @@ user decision; the partial verdict 91/91-isolation-green).
   (a folded-field chk beside the ROHF chk); (b) a folded-basin
   census; (c) the claims stay draw-documented.  The carbon
   nested-basis keeper is DELIVERED (05af7b9).  AMENDED (2026-11-09,
-  the user's review): the +400 mEh is NOT physics and NOT basis
-  convergence -- it is the bare-confined-core construction's cost
-  (the core solved without the valence over-relaxes on a rich span:
-  ≈ −139.4 + ≈ +539 mEh); the physical frozen-core scale is +1.5 mEh,
-  basis-stable; E_folded ≥ E_neutral always, and freezing the SCF's
-  own core collapses every gap to mEh.  The PROGRAM amended: span
-  repair over field repair -- m-complete MO-subspace windows on the
-  neutral field for the first round (C/Si/Sc/Ti/U14e); the compression
-  DELETED once the replacement is certified; the folded field stays a
-  draw-documented study; the basis pipeline (the per-shell
-  radial-vector contract, the exporter, the on-basis road) and NOs
-  are specced future stages.
+  the user's review; second revision after the contracted control
+  experiment -- elements/Ti/logs/folded_review.log): the +400 mEh is
+  BASIS-STABLE construction physics, not span bloat and not
+  confined-core mismatch -- the contracted control measures
+  +334.4/+136.9 mEh with cores identical to 1e-4; it is the folded
+  construction's frozen-core SCF penalty (the missing core-valence
+  self-consistency), the textbook scale for an [Ar]-core TM atom.
+  E_folded ≥ E_neutral always; the folded zero is structurally ~0.3
+  Eh above the true minimum.  The PROGRAM stands: span repair over
+  field repair -- m-complete MO-subspace windows on the neutral field
+  (STEP 1 CERTIFIED: the Ti probe, 3F exact, +0.0033 mEh vs the
+  certified default, the oracle decisive -- the d radial is a
+  three-band mixture no label-picked space approaches);
+  window_compressed DELETED, window_distilled is the one window-side
+  construction (step 2); the folded field stays a draw-documented
+  study; the lane legs on the unc twins run on the neutral field with
+  the disclosed structural offset (~+124 mEh -- the confined core on
+  the full-family span); NOs and the basis pipeline (the per-shell
+  radial-vector contract, the exporter, the on-basis road) are
+  specced future stages.
 - The projected-Gram alternative, DECLINED (2026-11-08, the design
   round): forming the compression Gram from S-PROJECTED member
   vectors (bounded spectra, self-interpretable shares) instead of

@@ -154,6 +154,39 @@ T-D docs /code-review (anti-inflation); T-E the term-ID round (NIST
 as the acceptance test).  Stop after T-E's review -- no physics waves
 before it.
 
+## The folded review (2026-11-09, step 3): the corrected interpretation,
+## second revision -- the offset is basis-STABLE construction physics
+
+The contracted control experiment (elements/Ti/logs/folded_review.log)
+REFUTES the narrow-span prediction and revises the +400 story AGAIN:
+
+- Contracted Ti: folded offset +334.4 mEh; contracted Sc: +136.9 mEh
+  -- vs the unc twins' +399.7/+150.9.  The offset is BASIS-STABLE
+  (the drift ≈ +65/+14 mEh is the wide-span confined core's
+  over-relaxation, a minor term).
+- The confined-vs-SCF cores on CONTRACTED bases are IDENTICAL
+  (singular values 0.9999+, core dE +16.9/+10.3 mEh) -- the confined-
+  core mismatch is NOT the cause.  The solve replays cleanly on both
+  (conv, correct fillings) -- the machinery certificate delivered.
+- The offset is therefore the folded CONSTRUCTION's own frozen-core
+  SCF penalty: E_folded = E_confined + min{valence in the complement,
+  frozen field} misses the core-valence self-consistency, and that
+  cost is ~0.15-0.4 Eh for an [Ar]-core TM atom at the SCF level --
+  the textbook frozen-core scale, partition-dependent, not
+  basis-dependent.  The user's convergence intuition is CONFIRMED by
+  measurement: richer basis, same offset.
+
+**Consequences:**
+- The folded zero is structurally ~0.3 Eh above the true minimum --
+  the demotion (draw-documented study; tables on the TRUE anchors)
+  stands, now with the measured reason.
+- The first-round IMPLICATION for the lane: the unc lane's
+  neutral-field offset (~+124 mEh) is ALSO structural (the lane's
+  fold stays full-family, so its confined core ≠ the SCF core on the
+  wide span regardless of window distillation).  The lane legs run on
+  the neutral field with the offset DISCLOSED -- the lane's value is
+  the independent machine-exact term certification, not the totals.
+
 ## The folded-field draw-chaos finding (2026-11-09)
 
 The tail's window legs exposed it (the probe diverged where the
