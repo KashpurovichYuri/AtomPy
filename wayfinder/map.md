@@ -62,7 +62,7 @@ user decision; the partial verdict 91/91-isolation-green).
   per-radial spectrum delivers the interpretability without touching
   the construction), and the unmeasured ranking difference.  REVISIT
   CONDITION: the per-radial spectrum showing truncated-ranking
-  distortions (ticket 34's riding-along installs the spectrum).
+  distortions (the riding-along tail installs the spectrum).
 - The D2h substrate layer, UNDERSTOOD (2026-11-07, the user-directed
   probe -- elements/Scunc/logs/d2h_probe.log is the record):
   (1) the D2h ROHF landscape is the SAME multi-basin zoo as C1 --

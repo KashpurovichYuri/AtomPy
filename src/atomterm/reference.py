@@ -48,7 +48,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
-from pyscf import scf
+from pyscf import gto, scf
 
 from atomterm.windows import select_span, span_projector
 
@@ -672,10 +672,11 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     cycle's columns (from the seed on) within dominance gates --
     the closed pairs among the closed-span-dominated columns
     (``w > 0.5``), the opens among the d-premium columns.  Neither
-    character alone nor energy alone can pick here: the complement's
-    tight core-shell radials carry near-perfect s/p character at
-    +1e1 Eh, and the ion field's aufbau order is d-BELOW-s (the
-    inversion that makes the ion configs d^n).  Plain DIIS.
+    character alone nor energy alone can pick here: the complement
+    carries the span's unused tight radials, whose span character
+    rivals the valence pair's at energies orders of magnitude
+    higher, and a field whose aufbau order may invert relative to
+    the neutral atom's.  Plain DIIS.
 
     The bookkeeping (the total, computed explicitly each cycle):
 
@@ -719,12 +720,11 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     RuntimeError
         If the valence SCF does not converge under plain DIIS.
     """
-    from pyscf import gto, scf
-
+    # the core family is this runner's only consumer (a fresh local
+    # import, no module-level coupling)
     from atomterm.core import (closed_shell_core_energy,
                                confined_core_orbitals)
-    from atomterm.windows import (complete_orthonormal, select_span,
-                                  span_projector)
+    from atomterm.windows import complete_orthonormal
 
     mol = mf.mol
     n_open = mol.spin
@@ -811,26 +811,15 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     fm.get_init_guess = _init_guess
 
     def _occ(mo_energy, mo_coeff):
-        # the filling is CHARACTER-FORCED (the _forced_rohf_occ rule,
-        # restricted to the complement): the closed pairs by
-        # closed-span weight, then the opens by the premium.
+        # MOM-primary picks within the dominance gates -- the rule is
+        # the docstring's; the seed declared the basin this anchor
+        # keeps.
         occ = np.zeros(len(mo_energy))
         c_ao = compl @ mo_coeff
         w_open = np.einsum("ai,ab,bi->i", c_ao.conj(), p_open,
                            c_ao).real
         w_closed = np.einsum("ai,ab,bi->i", c_ao.conj(), p_closed,
                              c_ao).real
-        # the picks are MOM-PRIMARY within dominance gates: the seed
-        # (the projected substrate valence) declares the basin, the
-        # previous cycle's columns anchor it, and the gates keep the
-        # character honest.  Neither character alone nor energy alone
-        # can pick here: the complement's tight core-shell radials
-        # carry near-perfect s/p character at +1e1 Eh (they beat the
-        # valence pair's 0.9993 weight in a class tie), and the ion
-        # field's aufbau order is d-BELOW-s (the inversion that makes
-        # the ion configs d^n -- energy ordering would declare a d
-        # pair).  The MOM anchor is the run_frac_occ cure, applied
-        # from the seed onward.
         mom_c = np.zeros(len(occ))
         mom_o = np.zeros(len(occ))
         if prev_open[0] is not None:
@@ -838,11 +827,21 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
         if prev_closed[0] is not None:
             mom_c = np.abs(prev_closed[0].conj().T @ mo_coeff).sum(axis=0)
         qualified_c = [i for i in range(len(occ)) if w_closed[i] > 0.5]
+        if len(qualified_c) < n_closed_val:
+            raise ValueError(
+                f"only {len(qualified_c)} complement columns are "
+                f"closed-span-dominated; the filling wants "
+                f"{n_closed_val} closed pairs -- the basin is lost")
         closed = sorted(qualified_c, key=lambda i: -mom_c[i])[:n_closed_val]
         occ[closed] = 2.0
         rest = [i for i in range(len(occ)) if occ[i] == 0.0]
         qualified_o = [i for i in rest
                        if 2 * w_open[i] + w_closed[i] > 1.0]
+        if len(qualified_o) < n_open:
+            raise ValueError(
+                f"only {len(qualified_o)} columns pass the d-premium "
+                f"gate; the filling wants {n_open} opens -- the basin "
+                "is lost")
         opens = sorted(qualified_o, key=lambda i: -mom_o[i])[:n_open]
         occ[opens] = 1.0
         prev_open[0] = mo_coeff[:, opens].copy()
@@ -853,13 +852,12 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
 
     def _energy_elec(dm=None, h1e=None, vhf=None):
         d_v = compl @ _spin_summed(dm) @ compl.conj().T
-        e_val = (float(np.einsum("ij,ji->", h_eff, d_v).real)
-                 + 0.5 * float(
-                     np.einsum("ij,ji->", _closed_field(mf, d_v),
-                               d_v).real))
-        fm.scf_summary["e1"] = e_val
-        fm.scf_summary["e2"] = 0.5 * e_val
-        return e_conf + e_val, e_val
+        v_dv = _closed_field(mf, d_v)
+        e_one = float(np.einsum("ij,ji->", h_eff, d_v).real)
+        e_coul = 0.5 * float(np.einsum("ij,ji->", v_dv, d_v).real)
+        fm.scf_summary["e1"] = e_one
+        fm.scf_summary["e2"] = e_coul
+        return e_conf + e_one + e_coul, e_coul
 
     fm.energy_elec = _energy_elec
 
