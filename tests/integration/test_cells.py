@@ -29,6 +29,7 @@ from atomterm.cells import (
     route_keys,
     spine_keys,
     void_reason,
+    window_grid,
 )
 from atomterm.cases import CAMPAIGN, scenarios_for
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
@@ -1331,6 +1332,59 @@ def test_ladder_ci_only_store_renders_planned_pointers():
     assert "| CASCI | free | 3d4s / D |" in text
     assert "regen_cells.py Ti --window 3d4d" in text
     assert "| CASSCF" not in text and "| SA-CASSCF" not in text
+
+
+@fast
+def test_ladder_prior_rows_join_the_span_family_in_comparison_order():
+    """The same-CAS comparison: a prior window's CI rows render BESIDE
+    the incumbent's at its span, one family (no rule row inside),
+    ordered incumbent -> r -> s1 -> s2 -- in the lattice family of a
+    lattice span and in the primary's fold groups of the primary
+    span."""
+    mod = ladder_module()
+    cs = CAMPAIGN["Sc"]
+    keys = [k for k in [*lattice_keys(cs), *grid_keys(cs),
+                        *(k for w in cs.planned_windows
+                          for k in window_grid(cs, w))]
+            if k.method == "casci"]
+    text = "\n".join(mod.ladder_section(
+        cs, {k.address: _ladder_payload(-759.5) for k in keys}, -759.7363))
+    lines = text.splitlines()
+
+    def idx(window, fold="Ar"):
+        return next(i for i, l in enumerate(lines)
+                    if l.startswith(f"| CASCI | free | {window} / D |")
+                    and l.split("|")[5].strip() == fold)
+
+    for span in ("3d", "3d4s"):
+        a, b, c, d = (idx(span), idx(f"{span} (r1)"),
+                      idx(f"{span} (s1)"), idx(f"{span} (s2)"))
+        assert a < b < c < d
+        assert not any(l.startswith("| --- ") for l in lines[a:d + 1])
+
+
+@fast
+def test_ladder_prior_span_without_incumbent_renders_its_own_family():
+    """A prior span with no incumbent family (no lattice, not the
+    primary) renders as its own comparison family -- beside the
+    primary's, separated by the rule row."""
+    mod = ladder_module()
+    cs = CAMPAIGN["Ti"]
+    keys = [k for k in (k for w in cs.planned_windows
+                        for k in window_grid(cs, w))
+            if k.method == "casci" and k.source_tag is not None]
+    text = "\n".join(mod.ladder_section(
+        cs, {k.address: _ladder_payload(-848.2) for k in keys}, -848.4065))
+    lines = text.splitlines()
+
+    def idx(window):
+        return next(i for i, l in enumerate(lines)
+                    if l.startswith(f"| CASCI | free | {window} / D |")
+                    and "·" not in l.split("|")[5])
+
+    a, d = idx("3d (r1)"), idx("3d (s2)")
+    assert a < d
+    assert not any(l.startswith("| --- ") for l in lines[a:d + 1])
 
 
 @fast

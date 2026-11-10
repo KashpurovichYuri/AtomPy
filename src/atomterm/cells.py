@@ -722,11 +722,16 @@ def _window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
     the mo/moc starts express their own gauge within its width).
     Prints the distillation report (the composition log's entry).
 
-    Returns ``(act, ncas)``: row indices, or S-orthonormal columns
-    (:func:`atomterm.windows.window_distilled` -- the radial signal is
+    Returns ``(act, ncas, report)``: row indices, the width, and the
+    construction's disclosure (``None`` for raw-band windows -- a
+    reporting construction is a compressed one:
+    :func:`atomterm.windows.window_distilled` -- the radial signal is
     the OCCUPIED reference block; a source tag routes to
     :func:`atomterm.basis.series_window` -- the density-block family,
-    ``@r`` the head configuration, ``@s`` the ladder average).
+    ``@r`` the head configuration, ``@s`` the ladder average).  The
+    report rides the payload (``window_report``) -- the k evidence
+    (bands, spectrum, discarded fraction, captures) is store data,
+    not console text.
     """
     from atomterm.windows import (realized_patterns, select_valence_ao,
                                   window_distilled)
@@ -759,11 +764,11 @@ def _window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
             f"capture {min(min(c) for c in r['capture']):.4f}"
             f"-{max(max(c) for c in r['capture']):.4f}"
             for sh, r in report.items()), flush=True)
-        return act, act.shape[1]
+        return act, act.shape[1], report
     act = select_valence_ao(
         mol, realized_patterns(key.shell_patterns, shell_bands))
     if shell_radials is None:
-        return act, len(act)
+        return act, len(act), None
     c_occ = mf.mo_coeff[:, np.asarray(mf.mo_occ) > 0]
     act, report = window_distilled(
         mol, c_occ, mf.get_ovlp(), key.shell_patterns,
@@ -772,7 +777,7 @@ def _window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
         f"{sh}: k={r['k']} of {len(r['bands'])} bands, "
         f"capture {min(r['capture']):.4f}-{max(r['capture']):.4f}"
         for sh, r in report.items()), flush=True)
-    return act, act.shape[1]
+    return act, act.shape[1], report
 
 
 def _window_ncas(key, mol, shell_bands, shell_radials) -> int:
@@ -908,9 +913,9 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
             "reference's open shell and the member-labeled radial "
             "substrate are row-space constructs")
     ncore, c_core, c_pur = _key_core(key, mol, mf, shell_bands)
-    act, ncas = _window_columns(key, mol, mf, shell_bands, shell_radials,
-                                ncol=ncore, prior_bands=prior_bands,
-                                ladder_mfs=ladder_mfs)
+    act, ncas, win_report = _window_columns(
+        key, mol, mf, shell_bands, shell_radials,
+        ncol=ncore, prior_bands=prior_bands, ladder_mfs=ladder_mfs)
 
     # start x mask -> the substrate MO matrix + the optimizer mask.
     # frozen/virtmix are START-INDEPENDENT (they pin the window columns
@@ -1045,7 +1050,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     # None is the caller's signal (:func:`kernel_cell_payload`)
     if sector_dimension(ncas, na, nb) > _COMM_CAP:
         return None
-    return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_core=c_core)
+    return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_core=c_core,
+                  window_report=win_report)
 
 
 # analysis + persistence ---------------------------------------------
@@ -1212,10 +1218,12 @@ def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
 
 
 def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
-           na: int, nb: int, c_core=None):
+           na: int, nb: int, c_core=None, window_report=None):
     """The cell layer's one facts call: the fold's spherical convention
     and the CASCI anisotropy report are the only cell-specific
-    choices; everything else is :func:`atomterm.stages.stage_facts`."""
+    choices; everything else is :func:`atomterm.stages.stage_facts`
+    (``window_report`` carries the construction's disclosure through
+    to the payload)."""
     from atomterm.stages import stage_facts
 
     c_act = cas.mo_coeff[:, ncore:ncore + ncas]
@@ -1226,6 +1234,7 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
         # raw fold's is the detector; the pur fold's is the ~0
         # certificate; row parity across the fold block)
         anisotropy_ref=(mf, c_core) if key.method == "casci" else None,
+        window_report=window_report,
     )
 
 
@@ -1359,7 +1368,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     L, parity = term
     na, nb = key.sector
     fold, nf, c_core, core_report = _fold_core(key, mol, mf, shell_bands)
-    act, ncas = _window_columns(key, mol, mf, shell_bands, shell_radials)
+    act, ncas, _ = _window_columns(key, mol, mf, shell_bands, shell_radials)
     mo = build_full_mo(mf, list(range(nf)), act, c_core=c_core)
     c = mo[:, nf:nf + ncas]
 

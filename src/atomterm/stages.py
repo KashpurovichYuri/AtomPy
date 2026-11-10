@@ -104,6 +104,13 @@ class StageFacts:
         The final macro-cycle |delta e_tot| (``CASResult.conv_dE``)
         -- the convergence precision beside the count; ``None``
         where ``cycles`` is.
+    window_report : dict or None
+        The window construction's own disclosure -- the distillation/
+        prior-axis report (per shell: the bands, k, the radial
+        spectrum, the discarded fraction, the per-configuration
+        captures).  Present only when the window was built by a
+        reporting construction (a compressed or prior-tagged window);
+        raw-band windows carry none.
     """
 
     tag: str
@@ -124,6 +131,7 @@ class StageFacts:
     cycles: int | None = None  # optimizer macro-cycles (CI/cache: None)
     max_cycle: int | None = None  # the declared cap (identity flag)
     conv_dE: float | None = None  # final |delta e_tot| (beside cycles)
+    window_report: dict | None = None  # the construction's disclosure
 
     # --- shared readouts (thin pass-throughs: renderers never reach
     # --- into the analysis object)
@@ -199,6 +207,8 @@ class StageFacts:
             "n_dev": self.n_dev,
             "configurations": self.configurations,
         }
+        if self.window_report is not None:
+            out["window_report"] = self.window_report
         if self.core_anisotropy is not None:
             out["core_anisotropy"] = self.core_anisotropy
         return out
@@ -208,7 +218,7 @@ class StageFacts:
 
 def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
                 *, tag: str, spherical_core: bool = True,
-                anisotropy_ref=None) -> StageFacts:
+                anisotropy_ref=None, window_report=None) -> StageFacts:
     """Fold and analyze one finished stage.
 
     Parameters
@@ -229,6 +239,10 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         the core-density anisotropy of that reference's core and report
         it (the raw-fold detector column); ``None`` leaves the
         field absent.
+    window_report : dict, optional -- the window construction's own
+        disclosure, carried through to the payload verbatim (the
+        caller owns the report: :func:`atomterm.cells._window_columns`
+        returns it); ``None`` leaves the field absent.
 
     Returns
     -------
@@ -302,6 +316,7 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         configurations=configuration_summary(
             mol, mf.get_ovlp(), cas.ci[: len(e_mine)], c_act, na, nb),
         core_anisotropy=aniso,
+        window_report=window_report,
         # the optimizer's own report, read off the live mc object (the
         # mutation discipline); CASCI stages and cache hits carry no mc
         converged=bool(getattr(getattr(cas, "mc", None), "converged", True)),

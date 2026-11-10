@@ -1,0 +1,486 @@
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+  no declared cell matches the filter -- skipped
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d@r1_2-1_casci_ao_-_pol_raw
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998
+  [cell] sc_3d@r1_2-1_casci_ao_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998
+  [cell] sc_3d@r1_2-1_casci_ao_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998
+  [cell] sc_3d@r1_2-1_casci_mo_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998
+  [cell] sc_3d@r1_2-1_casci_moc_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998
+  [cell] sc_3d@r1_2-1_casci_mo_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998
+  [cell] sc_3d@r1_2-1_casci_moc_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998
+  [void] sc_3d@r1_2-1_casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_ao_virtmix_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1_2-1_sa-casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d@s1_2-1_casci_ao_-_pol_raw
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938
+  [cell] sc_3d@s1_2-1_casci_ao_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938
+  [cell] sc_3d@s1_2-1_casci_ao_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938
+  [cell] sc_3d@s1_2-1_casci_mo_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938
+  [cell] sc_3d@s1_2-1_casci_moc_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938
+  [cell] sc_3d@s1_2-1_casci_mo_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938
+  [cell] sc_3d@s1_2-1_casci_moc_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938
+  [void] sc_3d@s1_2-1_casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_ao_virtmix_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1_2-1_sa-casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d@s2_2-1_casci_ao_-_pol_raw
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999
+  [cell] sc_3d@s2_2-1_casci_ao_-_pol_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999
+  [cell] sc_3d@s2_2-1_casci_ao_-_pur_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999
+  [cell] sc_3d@s2_2-1_casci_mo_-_pol_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999
+  [cell] sc_3d@s2_2-1_casci_moc_-_pol_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999
+  [cell] sc_3d@s2_2-1_casci_mo_-_pur_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999
+  [cell] sc_3d@s2_2-1_casci_moc_-_pur_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999
+  [void] sc_3d@s2_2-1_casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_ao_virtmix_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2_2-1_sa-casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d4s@r1_2-1_casci_ao_-_pol_raw
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998; 4s: k=1 of 2 bands, discarded 0.0000, capture 0.0003-0.9985
+  [cell] sc_3d4s@r1_2-1_casci_ao_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998; 4s: k=1 of 2 bands, discarded 0.0000, capture 0.0003-0.9985
+  [cell] sc_3d4s@r1_2-1_casci_ao_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998; 4s: k=1 of 2 bands, discarded 0.0000, capture 0.0003-0.9985
+  [cell] sc_3d4s@r1_2-1_casci_mo_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998; 4s: k=1 of 2 bands, discarded 0.0000, capture 0.0003-0.9985
+  [cell] sc_3d4s@r1_2-1_casci_moc_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998; 4s: k=1 of 2 bands, discarded 0.0000, capture 0.0003-0.9985
+  [cell] sc_3d4s@r1_2-1_casci_mo_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998; 4s: k=1 of 2 bands, discarded 0.0000, capture 0.0003-0.9985
+  [cell] sc_3d4s@r1_2-1_casci_moc_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998; 4s: k=1 of 2 bands, discarded 0.0000, capture 0.0003-0.9985
+  [void] sc_3d4s@r1_2-1_casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_ao_virtmix_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1_2-1_sa-casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d4s@s1_2-1_casci_ao_-_pol_raw
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938; 4s: k=1 of 2 bands, discarded 0.0004, capture 0.0001-0.9988
+  [cell] sc_3d4s@s1_2-1_casci_ao_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938; 4s: k=1 of 2 bands, discarded 0.0004, capture 0.0001-0.9988
+  [cell] sc_3d4s@s1_2-1_casci_ao_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938; 4s: k=1 of 2 bands, discarded 0.0004, capture 0.0001-0.9988
+  [cell] sc_3d4s@s1_2-1_casci_mo_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938; 4s: k=1 of 2 bands, discarded 0.0004, capture 0.0001-0.9988
+  [cell] sc_3d4s@s1_2-1_casci_moc_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938; 4s: k=1 of 2 bands, discarded 0.0004, capture 0.0001-0.9988
+  [cell] sc_3d4s@s1_2-1_casci_mo_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938; 4s: k=1 of 2 bands, discarded 0.0004, capture 0.0001-0.9988
+  [cell] sc_3d4s@s1_2-1_casci_moc_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938; 4s: k=1 of 2 bands, discarded 0.0004, capture 0.0001-0.9988
+  [void] sc_3d4s@s1_2-1_casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_ao_virtmix_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1_2-1_sa-casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d4s@s2_2-1_casci_ao_-_pol_raw
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999; 4s: k=2 of 2 bands, discarded 0.0000, capture 0.3297-0.9988
+  [cell] sc_3d4s@s2_2-1_casci_ao_-_pol_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999; 4s: k=2 of 2 bands, discarded 0.0000, capture 0.3297-0.9988
+  [cell] sc_3d4s@s2_2-1_casci_ao_-_pur_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999; 4s: k=2 of 2 bands, discarded 0.0000, capture 0.3297-0.9988
+  [cell] sc_3d4s@s2_2-1_casci_mo_-_pol_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999; 4s: k=2 of 2 bands, discarded 0.0000, capture 0.3297-0.9988
+  [cell] sc_3d4s@s2_2-1_casci_moc_-_pol_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999; 4s: k=2 of 2 bands, discarded 0.0000, capture 0.3297-0.9988
+  [cell] sc_3d4s@s2_2-1_casci_mo_-_pur_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999; 4s: k=2 of 2 bands, discarded 0.0000, capture 0.3297-0.9988
+  [cell] sc_3d4s@s2_2-1_casci_moc_-_pur_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999; 4s: k=2 of 2 bands, discarded 0.0000, capture 0.3297-0.9988
+  [void] sc_3d4s@s2_2-1_casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_ao_virtmix_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_ao_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_mo_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_moc_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_ao_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_mo_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_moc_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_ao_radial_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_ao_radial_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_ao_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_mo_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_moc_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_ao_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_mo_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2_2-1_sa-casscf_moc_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d@r1no1_2-1_casci_no_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998
+[no-arm] source ground block: 7 roots
+[no-arm] occupation groups: [5]
+  [cell] sc_3d@r1no1_2-1_casci_no_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998
+[no-arm] source ground block: 7 roots
+[no-arm] occupation groups: [5]
+  [void] sc_3d@r1no1_2-1_casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1no1_2-1_casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1no1_2-1_casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1no1_2-1_casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1no1_2-1_sa-casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1no1_2-1_sa-casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1no1_2-1_sa-casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@r1no1_2-1_sa-casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d@s1no1_2-1_casci_no_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938
+[no-arm] source ground block: 7 roots
+[no-arm] occupation groups: [5]
+  [cell] sc_3d@s1no1_2-1_casci_no_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938
+[no-arm] source ground block: 7 roots
+[no-arm] occupation groups: [5]
+  [void] sc_3d@s1no1_2-1_casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1no1_2-1_casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1no1_2-1_casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1no1_2-1_casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1no1_2-1_sa-casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1no1_2-1_sa-casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1no1_2-1_sa-casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s1no1_2-1_sa-casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d@s2no1_2-1_casci_no_-_pol_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999
+[no-arm] source ground block: 7 roots
+[no-arm] occupation groups: [5, 5]
+  [cell] sc_3d@s2no1_2-1_casci_no_-_pur_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999
+[no-arm] source ground block: 7 roots
+[no-arm] occupation groups: [5, 5]
+  [void] sc_3d@s2no1_2-1_casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2no1_2-1_casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2no1_2-1_casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2no1_2-1_casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2no1_2-1_sa-casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2no1_2-1_sa-casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2no1_2-1_sa-casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d@s2no1_2-1_sa-casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d4s@r1no2_2-1_casci_no_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998; 4s: k=1 of 2 bands, discarded 0.0000, capture 0.0003-0.9985
+[no-arm] source ground block: 5 roots
+[no-arm] occupation groups: [1, 5]
+  [cell] sc_3d4s@r1no2_2-1_casci_no_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0005, capture 0.9998-0.9998; 4s: k=1 of 2 bands, discarded 0.0000, capture 0.0003-0.9985
+[no-arm] source ground block: 5 roots
+[no-arm] occupation groups: [1, 5]
+  [void] sc_3d4s@r1no2_2-1_casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1no2_2-1_casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1no2_2-1_casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1no2_2-1_casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1no2_2-1_sa-casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1no2_2-1_sa-casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1no2_2-1_sa-casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@r1no2_2-1_sa-casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d4s@s1no2_2-1_casci_no_-_pol_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938; 4s: k=1 of 2 bands, discarded 0.0004, capture 0.0001-0.9988
+[no-arm] source ground block: 5 roots
+[no-arm] occupation groups: [1, 5]
+  [cell] sc_3d4s@s1no2_2-1_casci_no_-_pur_avg
+  [window] prior 3d: k=1 of 2 bands, discarded 0.0157, capture 0.5596-0.9938; 4s: k=1 of 2 bands, discarded 0.0004, capture 0.0001-0.9988
+[no-arm] source ground block: 5 roots
+[no-arm] occupation groups: [1, 5]
+  [void] sc_3d4s@s1no2_2-1_casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1no2_2-1_casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1no2_2-1_casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1no2_2-1_casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1no2_2-1_sa-casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1no2_2-1_sa-casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1no2_2-1_sa-casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s1no2_2-1_sa-casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+  [cell] sc_3d4s@s2no2_2-1_casci_no_-_pol_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999; 4s: k=2 of 2 bands, discarded 0.0000, capture 0.3297-0.9988
+[no-arm] source ground block: 5 roots
+[no-arm] occupation groups: [1, 5, 1, 5]
+  [cell] sc_3d4s@s2no2_2-1_casci_no_-_pur_avg
+  [window] prior 3d: k=2 of 2 bands, discarded 0.0000, capture 0.5677-0.9999; 4s: k=2 of 2 bands, discarded 0.0000, capture 0.3297-0.9988
+[no-arm] source ground block: 5 roots
+[no-arm] occupation groups: [1, 5, 1, 5]
+  [void] sc_3d4s@s2no2_2-1_casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2no2_2-1_casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2no2_2-1_casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2no2_2-1_casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2no2_2-1_sa-casscf_no_-_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2no2_2-1_sa-casscf_no_-_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2no2_2-1_sa-casscf_no_frozen_pol_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  [void] sc_3d4s@s2no2_2-1_sa-casscf_no_frozen_pur_avg -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+  wrote elements/Sc/cells.json + cells.md
+
+done

@@ -48,6 +48,23 @@ def test_stage_facts_payload_and_invariants(carbon, tmp_path):
     json.dumps(payload)
 
 
+def test_stage_facts_carries_the_window_report(carbon, tmp_path):
+    """The window construction's disclosure rides the payload verbatim
+    when the caller owns one; absent otherwise."""
+    _, mol, mf, act_idx = carbon
+    ncore = (mol.nelectron - 2) // 2
+    mo = build_full_mo(mf, list(range(ncore)), act_idx)
+    cas = run_casci(mf, 3, (1, 1), mo, str(tmp_path / "wr.chk"), nroots=9)
+    c_act = np.eye(mol.nao_nr())[:, act_idx]
+    rep = {"2p": {"bands": ["2p"], "k": 1, "spectrum": [1.0, 0.01],
+                  "discarded": 0.01, "capture": [[0.99]]}}
+    with_rep = stage_facts(mol, mf, cas, c_act, ncore, 1, 1,
+                           tag="rep", window_report=rep)
+    assert with_rep.payload("casci")["window_report"] == rep
+    plain = stage_facts(mol, mf, cas, c_act, ncore, 1, 1, tag="plain")
+    assert "window_report" not in plain.payload("casci")
+
+
 def test_divergence_guard_fires_on_broken_orthonormality(carbon, tmp_path):
     """Negative control for the ortho_err guard (ticket 14): a deliberately
     non-S-orthonormal MO matrix (pre-fix-style) must be flagged DIVERGED --

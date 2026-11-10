@@ -51,7 +51,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.cells import (grid_keys, lattice_keys,  # noqa: E402
-                            route_keys, window_grid)
+                            prior_tag_of, route_keys, window_grid)
 from _tables_common import (DASH, EV, cas_label,  # noqa: E402
                             comm_cell, conv_cell, fold_col,
                             l2_text, minus, payload_of, replace_block)
@@ -231,13 +231,34 @@ def _uhf_anchor_row(anchor: float, uhf: dict) -> str:
     return "| " + " | ".join(cells) + " |"
 
 
+def _comparison_key(k):
+    """The family's row order -- THE COMPARISON READING: every CI row
+    before the optimizer rows; within CI, the distilled block by
+    (k, source) -- the incumbent, the head prior ``r``, the series
+    prior ``s`` at k=1, the double-budget ``s2`` -- then the NO
+    density leg, the MO/MOC controls last; optimizer variants keep
+    their declared order after the CI block."""
+    t = k.source_tag
+    k_rank, src = (t[1], t[0]) if t is not None else (1, "")
+    if k.method != "casci":
+        return (1, 0, k_rank, src, k.start)
+    block = {"ao": 0, "no": 1}.get(k.start, 2)
+    return (0, block, k_rank, src, k.start)
+
+
 def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     """THE LADDER: one table for the whole atom.  Families in
     declaration order, separated by the rule row -- the lattice
     spans (CI only), the primary window when ``render_primary``
-    (each fold group's CASCI beside its optimizer variants), the
-    planned windows whose CASCI anchors are read, then every lane
-    window whose route twins ran.  The ROHF anchor row leads, the
+    (each fold group's CI block beside its optimizer variants), then
+    every lane window whose route twins ran.  The PRIOR windows join
+    their span's family (the same-CAS comparison: at a given CAS,
+    every approach adjacent -- the incumbent's CI row, the ``r``/``s``
+    priors beside it, the double-budget block, then the optimizer
+    rows over the chosen basis), in :func:`_comparison_key` order; a
+    prior span with no incumbent family renders as its own family.
+    A lattice span equal to the primary's renders once -- the
+    primary's fold groups own it.  The ROHF anchor row leads, the
     UHF anchor row follows when the store carries the record;
     a NO-start CASCI cell IS a ladder row (the kind block's density
     leg); NO-start OPTIMIZER cells are not (a start, not a family);
@@ -246,25 +267,45 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     seen: set[str] = set()
 
     def _fam(keys) -> None:
-        rows = _rows([k for k in keys
-                      if k.address not in seen and _ladder_row(k)],
+        rows = _rows(sorted([k for k in keys
+                             if k.address not in seen and _ladder_row(k)],
+                            key=_comparison_key),
                      cells, anchor, spec)
         seen.update(k.address for k in keys)
         if rows:
             body.extend([RULE] if body else [])
             body.extend(rows)
 
+    # the prior windows, gathered by span (the sector match guards
+    # the join: a prior at another sector has no incumbent twin
+    # there and renders as its own family)
+    priors: dict[str, list] = {}
+    for w in spec.planned_windows:
+        if prior_tag_of(w) is None:
+            continue
+        priors.setdefault(w.partition("@")[0], []).extend(window_grid(spec, w))
+    primary_span = "".join(spec.shell_patterns) if spec.render_primary \
+        else None
+
     for span in dict.fromkeys(k.window for k in lattice_keys(spec)):
-        _fam([k for k in lattice_keys(spec) if k.window == span])
+        if span == primary_span:
+            continue    # the primary's fold groups own this span
+        _fam([k for k in lattice_keys(spec) if k.window == span]
+             + [k for k in priors.get(span, [])
+                if k.sector == spec.lattice_sector])
 
     # the primary family: fold groups in declaration order, each
-    # group's CASCI beside its optimizer variants; suppressed by the
-    # declaration (render_primary=False -- the promoted windows carry
-    # the results; the primary rows stay in the store)
+    # group's CI block (the incumbent's row beside the prior windows'
+    # -- the comparison) followed by its optimizer variants;
+    # suppressed by the declaration (render_primary=False -- the
+    # promoted windows carry the results; the primary rows stay in
+    # the store)
     if spec.render_primary:
         grid = [k for k in grid_keys(spec) if _ladder_row(k)]
+        join = [k for k in priors.get(primary_span, [])
+                if k.sector == grid[0].sector]
         groups: dict[str, list] = {}
-        for k in grid:
+        for k in [*grid, *join]:
             groups.setdefault(fold_col(k, spec), []).append(k)
         for keys in groups.values():
             _fam(keys)
@@ -279,12 +320,18 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         if any(_ladder_row(k) and payload_of(cells, k) for k in twins):
             _fam([k for k in twins if _ladder_row(k)])
 
-    # the planned windows whose CASCI anchors are read: the tier
-    # families (the whole window's non-NO cells at once -- the optimizer
-    # cells are void at the key under the anchor-first gate and join
-    # the family when --full materializes them)
+    # the planned windows that did not join a family above: the
+    # untagged tiers (their own families, as declared) and any prior
+    # span without an incumbent twin (its own comparison family) --
+    # the same row order throughout
     for w in spec.planned_windows:
-        _fam([k for k in window_grid(spec, w) if _ladder_row(k)])
+        if prior_tag_of(w) is not None:
+            keys = priors.pop(w.partition("@")[0], [])
+            if not keys:
+                continue
+        else:
+            keys = [k for k in window_grid(spec, w) if _ladder_row(k)]
+        _fam(keys)
 
     out = [BEGIN, HEAD, SEP, _anchor_row(anchor, spec)]
     if uhf is not None:
