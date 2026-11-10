@@ -1,0 +1,21 @@
+# Sc ccpvdz -- the series-source probe (reference E = -759.73625510)
+  config d1s2: E = -759.73625510
+  config d2s1: E = -759.52176011
+  config d3: E = -759.41547824
+  shell 3d ('3d', '4d'): averaged spectrum [1.      0.02117]
+  shell 4s ('4s', '6s'): averaged spectrum [1.      0.00535]
+
+  == sc_3d_2-1_casci_ao_-_pol_avg (stored 1:1 total -759.435292297, term <L^2> 12.0)
+         1:1: total -759.435292297  dE vs 1:1   +0.000 mEh  L2 11.9999  ortho 8.9e-16  closure 1.8e-03/2.1e-02
+     neutral: total -759.519076699  dE vs 1:1  -83.784 mEh  L2 11.9999  ortho 1.3e-15  closure 1.6e-03/1.9e-02
+     series1: total -759.421667505  dE vs 1:1  +13.625 mEh  L2 12.0000  ortho 2.4e-15  closure 1.1e-03/1.3e-02
+     series2: total -759.554794859  dE vs 1:1 -119.503 mEh  L2 11.9999  ortho 2.7e-15  closure 2.1e-03/2.5e-02
+    series2 3d capture over the reference's significant columns: 0.9999-0.9999
+
+  == sc_3d4s_2-1_casci_ao_-_pol_avg (stored 1:1 total -759.728239375, term <L^2> 6.0)
+         1:1: total -759.728239375  dE vs 1:1   +0.000 mEh  L2  5.9998  ortho 1.1e-15  closure 1.8e-03/2.1e-02
+     neutral: total -759.600935375  dE vs 1:1 +127.304 mEh  L2  5.9999  ortho 1.3e-15  closure 1.7e-03/2.1e-02
+     series1: total -759.527946827  dE vs 1:1 +200.293 mEh  L2  6.0004  ortho 1.3e-15  closure 1.4e-03/1.7e-02
+     series2: total -759.744634867  dE vs 1:1  -16.395 mEh  L2  5.9998  ortho 2.2e-15  closure 2.1e-03/2.5e-02
+    series2 3d capture over the reference's significant columns: 0.9999-0.9999
+    series2 4s capture over the reference's significant columns: 0.3372-0.9985

@@ -1,0 +1,19 @@
+# Sc plain ROHF E = -759.73625510 Eh (measurement substrate; the closed MOs are basin-independent)
+
+# the display table (Mulliken populations -- wild on near-dependent bands; the certificate is the projector capture below; floor 0.5%)
+   1s occ=2 MOs=[0]  1s:0.94 2s:0.06
+   2s occ=2 MOs=[1]  2s:0.94 1s:0.06
+   3s occ=2 MOs=[5]  3s:1.00
+   4s occ=2 MOs=[9]  4s:0.73 6s:0.25 5s:0.01
+   2p occ=2 MOs=[2, 3, 4]  2p:1.00
+   3p occ=2 MOs=[6, 7, 8]  3p:1.00
+   3d occ=1 MOs=[10]  3d:0.97 4d:0.03
+
+# the certificate: the greedy realization (worst-MO projector capture >= 99.5%; the DECLARATION takes these lists)
+   1s -> (1s, 2s)  capture 1.0000
+   2s -> (2s, 1s)  capture 1.0000
+   3s -> (3s)  capture 0.9999
+   4s -> (4s, 6s)  capture 0.9985
+   2p -> (2p)  capture 1.0000
+   3p -> (3p)  capture 0.9999
+   3d -> (3d, 4d)  capture 0.9999

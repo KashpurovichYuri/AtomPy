@@ -1,0 +1,43 @@
+
+== the occupation-averaged prior (the user's proposal): the fractional-
+   occupation reference's density-distilled radial, occupation-weighted
+   Gram, vs the two existing priors
+frac reference E = -758.01496696, open-shell occ: [0.5 0.5 0.5 0.5 0.5 0.5]
+ neutral-ref: 3d radial {'3d': 0.9469388724475604, '4d': 0.009687504175375618}  4s radial {'4s': 0.5659196180300289, '6s': 0.08295491684671313}
+    frac-avg: 3d radial {'3d': 1.0038917067897084, '4d': 0.19801548682508888}  4s radial {'4s': 2.5535152554485796, '6s': 0.8913148286651583}
+
+window                   authors 1:1   neutral-ref      frac-avg
+
+window                   authors 1:1   neutral-ref      frac-avg
+d3-lattice            -759.435292297  -0.857625830  -0.915953489
+primary 3d4s          -759.728239375  -2.163747460  -8.717496412
+
+== the density-block prior: the member-summed shell block of the
+   occupation-weighted density (ownership-free averaging) ==
+ neutral-ref: 3d {'3d': 1.0, '4d': 0.0} spec [1.e+00 7.e-04]  |  4s {'4s': 0.566, '6s': 0.083} spec [1. 0.]
+    frac-avg: 3d {'3d': 1.0, '4d': 0.0} spec [1. 0.]  |  4s {'4s': 2.554, '6s': 0.891} spec [1. 0.]
+d3-lattice       active E: neutral -0.857647102  frac-avg -0.915953489  d(frac-neutral) -58.306 mEh
+primary 3d4s     active E: neutral -2.163758898  frac-avg -8.717846252  d(frac-neutral) -6554.087 mEh
+
+== the valence-density prior: the member-summed shell block of
+   the VALENCE density only (columns past the fold boundary) ==
+window             authors 1:1   neutral-ref      frac-avg
+d3-lattice        -0.872739618  -0.857653830  -0.915953489   vs authors: +15.09 / -43.21 mEh
+primary 3d4s      -2.530602729  -2.163738644  -8.716621162   vs authors: +366.86 / -6186.02 mEh
+
+== the config-series Gram average: does the spread supply k=2? ==
+d1s2: FAILED (AttributeError: 'Mole' object has no attribute 'symbol')
+d1s2: FAILED TypeError: expected str, bytes or os.PathLike object, not NoneType
+d2s1: FAILED TypeError: expected str, bytes or os.PathLike object, not NoneType
+d3: FAILED TypeError: expected str, bytes or os.PathLike object, not NoneType
+d1s2: FAILED AttributeError: 'tuple' object has no attribute 'e_tot'
+d2s1: FAILED AttributeError: 'tuple' object has no attribute 'e_tot'
+d3: FAILED AttributeError: 'tuple' object has no attribute 'e_tot'
+d1s2: E = -759.73625510
+d2s1: E = -759.68774723
+d3: E = -759.49653766
+d1s2: E = -759.73625510
+d2s1: E = -759.58563851
+d3: E = -759.40584505
+3d ('3d', '4d'): averaged spectrum [1.      0.02424]  top radial {'3d': 1.043, '4d': 0.017}
+4s ('4s', '6s'): averaged spectrum [1.      0.25064]  top radial {'4s': 0.711, '6s': 0.035}

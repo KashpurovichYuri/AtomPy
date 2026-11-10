@@ -1,0 +1,14 @@
+# Sc contracted ccpvdz -- ROHF E = -759.73625510
+# the radial-Gram spectrum (normalized to lam0) + the top radial's band composition
+ 3d 3d         sig-cols 1  spectrum[:5] 1.00e+00 2.04e-17 4.35e-19 -1.61e-20 -4.24e-17
+     top radial: 3d:1.000
+     window_distilled k=1: capture 0.9919-0.9919  spectrum [0.94122, 0.0, 0.0, -0.0, -0.0]
+ 3d 3d,4d      sig-cols 1  spectrum[:5] 1.00e+00 1.22e-14 1.93e-16 9.81e-17 1.30e-18
+     top radial: 3d:0.946 4d:0.010
+     window_distilled k=1: capture 0.9998-0.9998  spectrum [0.994445, 0.0, 0.0, 0.0, 0.0]
+ 4s 4s         sig-cols 1  spectrum[:5] 1.00e+00
+     top radial: 4s:1.000
+     window_distilled k=1: capture 0.9705-0.9705  spectrum [0.548919]
+ 4s 4s,6s      sig-cols 2  spectrum[:5] 1.00e+00 4.07e-06
+     top radial: 4s:0.566 6s:0.083
+     window_distilled k=1: capture 0.0003-0.9985  spectrum [0.96999, 4e-06]

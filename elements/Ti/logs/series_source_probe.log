@@ -1,0 +1,21 @@
+# Ti ccpvdz -- the series-source probe (reference E = -848.40648875)
+  config d2s2: E = -848.39528808
+  config d3s1: E = -848.38179380
+  config d4: E = -848.15487195
+  shell 3d ('3d', '4d'): averaged spectrum [1.      0.01225]
+  shell 4s ('4s', '6s'): averaged spectrum [1.      0.01948]
+
+  == ti_3d_2-0_casci_ao_-_pol_avg (stored 1:1 total -848.397266927, term <L^2> 12.0)
+         1:1: total -848.397266927  dE vs 1:1   +0.000 mEh  L2 12.0000  ortho 1.6e-15  closure 5.8e-09/7.0e-09
+     neutral: total -848.288029870  dE vs 1:1 +109.237 mEh  L2 12.0000  ortho 7.8e-16  closure 5.4e-09/6.4e-09
+     series1: total -848.134449047  dE vs 1:1 +262.818 mEh  L2 12.0000  ortho 8.9e-16  closure 5.0e-09/5.8e-09
+     series2: total -848.421047258  dE vs 1:1  -23.780 mEh  L2 12.0000  ortho 1.1e-15  closure 6.4e-09/7.9e-09
+    series2 3d capture over the reference's significant columns: 0.9999-0.9999
+
+  == ti_3d4s_3-1_casci_ao_-_pol_avg (stored 1:1 total -848.393165657, term <L^2> 12.0)
+         1:1: total -848.393165657  dE vs 1:1   +0.000 mEh  L2 12.0000  ortho 1.3e-15  closure 5.8e-09/7.0e-09
+     neutral: total -848.274794116  dE vs 1:1 +118.372 mEh  L2 12.0000  ortho 1.1e-15  closure 5.6e-09/6.7e-09
+     series1: total -848.180056130  dE vs 1:1 +213.110 mEh  L2 12.0000  ortho 8.9e-16  closure 5.3e-09/6.3e-09
+     series2: total -848.414614567  dE vs 1:1  -21.449 mEh  L2 12.0000  ortho 1.8e-15  closure 6.4e-09/7.9e-09
+    series2 3d capture over the reference's significant columns: 0.9999-0.9999
+    series2 4s capture over the reference's significant columns: 0.3034-0.9996
