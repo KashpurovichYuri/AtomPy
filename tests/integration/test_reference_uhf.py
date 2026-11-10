@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 
 from atomterm.cases import CAMPAIGN
-from atomterm.reference import ReferenceSpec, run_rohf, run_uhf, \
-    uhf_basin_census, uhf_contamination
+from atomterm.reference import ReferenceSpec, rohf_basin_census, \
+    run_rohf, run_uhf, uhf_basin_census, uhf_contamination
 
 
 @pytest.fixture(scope="module")
@@ -45,6 +45,25 @@ def test_uhf_basin_census_single_basin(tmp_path_factory):
     assert len({round(r["e_tot"], 9) for r in rows}) == 1
     assert all(r["s2"] >= 2.0 - 1e-9 for r in rows)
     assert all(0.0 < r["sigma_min"] <= 1.0 for r in rows)
+
+
+def test_rohf_basin_census_single_basin_occupation_safe(tmp_path_factory):
+    """The ROHF census (the ladder gate's measurement) on C: every arm
+    converges to the one basin, and every arm's occupations pass the
+    hook re-assignment (occ_ok) -- on a single-basin atom the safety
+    certificate is trivially green; the wrong-configuration class it
+    refuses (the Newton frozen-assignment disease) lives on the
+    degenerate transition-metal quartets, measured in the census
+    logs."""
+    cfg = CAMPAIGN["C"].atom_config()
+    ref = ReferenceSpec(occ_closed=("1s", "2s"), occ_open=("2p",))
+    rows = rohf_basin_census(cfg, ref)
+    assert [r["label"] for r in rows] == ["default", "atom", "huckel"]
+    assert all(r["converged"] for r in rows)
+    assert all(r["occ_ok"] for r in rows)
+    assert len({round(r["e_tot"], 9) for r in rows}) == 1
+    with pytest.raises(ValueError, match="occupation forcing"):
+        rohf_basin_census(cfg, None)
 
 
 def test_uhf_reference_meter_reads(carbon_references):

@@ -406,7 +406,7 @@ def rohf_basin_census(cfg, ref: ReferenceSpec | None = None,
     out = []
     for label, guess in guesses:
         m = scf.ROHF(mol)
-        if ref.occ_closed is None:
+        if ref is None or ref.occ_closed is None:
             raise ValueError(
                 "the census needs the occupation forcing (ref= with "
                 "occ_closed/occ_open) -- without it the arms measure "

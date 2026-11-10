@@ -1,0 +1,19 @@
+
+===== cells Ti =====
+ROHF E = -848.40648875 Eh
+  [cell] ti_3d4d_3-1_casci_ao_-_pol_raw
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 404, in <module>
+    main()
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 372, in main
+    facts = run_cell(key, mf, frac_mf=mf_f,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 894, in run_cell
+    act, ncas = _window_columns(key, mol, mf, shell_bands, shell_radials,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 751, in _window_columns
+    act, report = window_distilled(
+                  ^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/windows.py", line 810, in window_distilled
+    raise ValueError(
+ValueError: the assembled distilled window is not S-orthonormal (max deviation 2.20e-01) -- same-l shell blocks overlap; the member-preserving cross-shell orthogonalization is a future seam
