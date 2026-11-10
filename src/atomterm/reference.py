@@ -52,8 +52,8 @@ from pyscf import gto, scf
 
 from atomterm.windows import select_span, span_projector
 
-__all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "rohf_basin_census",
-           "uhf_basin_census",
+__all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "occupation_postcheck",
+           "rohf_basin_census", "uhf_basin_census",
            "run_frac_occ", "uhf_contamination", "run_folded"]
 
 
@@ -357,7 +357,45 @@ ROHF_CENSUS_GUESSES = (("default", None), ("atom", "atom"),
                        ("huckel", "huckel"))
 
 
-def rohf_basin_census(cfg, ref: ReferenceSpec | None = None,
+def occupation_postcheck(mol, mf, occ_closed, occ_open) -> bool:
+    """The occupation post-check: the character-forcing hook
+    re-applied to the CONVERGED orbitals must reproduce the run's own
+    occupations.
+
+    The second-order (Newton) accelerator rotates orbitals with
+    occupations FROZEN from its early cycles, so a converged solution
+    can violate the hook -- energy agreement alone cannot certify the
+    configuration.  Mandatory wherever the accelerator runs under a
+    forcing hook (the census's ``occ_ok`` column;
+    :func:`atomterm.basis.run_ladder`'s per-run gate).
+
+    Parameters
+    ----------
+    mol : Mole
+        The atom (the hook labels MOs against it).
+    mf : the converged SCF object.
+    occ_closed, occ_open : the hook's shell lists.
+
+    Returns
+    -------
+    bool
+        True = the converged occupations ARE the forced ones.
+
+    Notes
+    -----
+    Measured instance: a d-forced quartet converging onto the
+    d²s¹ solution with the (n+1)s MO occupied at hook-rank 0 -- the
+    census logs carry the record
+    (``elements/<Atom>/logs/ladder_census.log``).
+    """
+    hook = _forced_rohf_occ(mol, list(occ_closed), list(occ_open))
+    mo_energy = (mf.mo_energy if np.ndim(mf.mo_energy) == 1
+                 else np.asarray(mf.mo_energy)[0])
+    reassigned = hook(np.asarray(mo_energy), mf.mo_coeff)
+    return bool(np.array_equal(reassigned, np.asarray(mf.mo_occ)))
+
+
+def rohf_basin_census(cfg, ref: ReferenceSpec,
                       guesses=ROHF_CENSUS_GUESSES) -> list[dict]:
     """The ROHF basin census: one character-forced SCF per starting
     guess, the basin table side by side -- the measurement behind the
@@ -376,22 +414,18 @@ def rohf_basin_census(cfg, ref: ReferenceSpec | None = None,
 
     OCCUPATION SAFETY (``occ_ok``): the Newton/second-order path
     rotates orbitals with occupations FROZEN from its early cycles --
-    a converged arm can therefore VIOLATE the hook (measured on Sc:
-    a 3d-forced quartet converging onto the d2s1 solution with the
-    4s MO occupied at hook-rank 0).  Each arm is post-checked: the
-    hook re-applied to the CONVERGED MOs must reproduce the run's own
-    occupations.  A converged-but-``occ_ok=False`` arm is a WRONG
-    CONFIGURATION, not a basin of the intended one -- the gate never
-    anchors there.
+    a converged arm can therefore VIOLATE the hook.  Each arm carries
+    the occupation post-check (:func:`occupation_postcheck`): a
+    converged-but-``occ_ok=False`` arm is a WRONG CONFIGURATION, not
+    a basin of the intended one -- the gate never anchors there.
 
     Parameters
     ----------
     cfg : AtomConfig
         The atom (the ladder configuration's own spin).
     ref : ReferenceSpec
-        The configuration's occupation forcing (mandatory here -- a
-        census without forcing measures the aufbau runaway, not the
-        configuration's basins).
+        The configuration's occupation forcing (without it the arms
+        measure the aufbau runaway, not the configuration's basins).
     guesses : (label, init_guess) pairs
         The arms; the default = the gate's own cycle.
 
@@ -402,30 +436,26 @@ def rohf_basin_census(cfg, ref: ReferenceSpec | None = None,
     """
     from atomterm.system import build_mol
 
+    if ref is None or ref.occ_closed is None:
+        raise ValueError(
+            "the census needs the occupation forcing (ref= with "
+            "occ_closed/occ_open) -- without it the arms measure "
+            "the aufbau runaway, not the configuration's basins")
     mol = build_mol(cfg)
     out = []
     for label, guess in guesses:
         m = scf.ROHF(mol)
-        if ref is None or ref.occ_closed is None:
-            raise ValueError(
-                "the census needs the occupation forcing (ref= with "
-                "occ_closed/occ_open) -- without it the arms measure "
-                "the aufbau runaway, not the configuration's basins")
-        hook = _forced_rohf_occ(mol, list(ref.occ_closed),
-                                list(ref.occ_open))
-        m.get_occ = hook
+        m.get_occ = _forced_rohf_occ(mol, list(ref.occ_closed),
+                                     list(ref.occ_open))
         m.conv_tol = 1e-12
         m.verbose = cfg.verbose
         if guess is not None:
             m.init_guess = guess
         mf = _accelerated(m, ref)
-        mo_energy = (mf.mo_energy if np.ndim(mf.mo_energy) == 1
-                     else np.asarray(mf.mo_energy)[0])
-        reassigned = hook(np.asarray(mo_energy), mf.mo_coeff)
         out.append({"label": label, "e_tot": float(mf.e_tot),
                     "converged": bool(mf.converged),
-                    "occ_ok": bool(np.array_equal(
-                        reassigned, np.asarray(mf.mo_occ)))})
+                    "occ_ok": occupation_postcheck(
+                        mol, mf, ref.occ_closed, ref.occ_open)})
     return out
 
 

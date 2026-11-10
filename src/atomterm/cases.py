@@ -37,6 +37,7 @@ from pyscf import gto
 from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
 from atomterm.basis import LadderSpec
+from atomterm.cells import no_label, prior_tag_of
 from atomterm.reference import ReferenceSpec, run_rohf
 from atomterm.scans import ScanSpec
 from atomterm.windows import (build_full_mo, closed_electrons, fold_shells,
@@ -331,14 +332,14 @@ class CaseSpec:
         tagged = [w for w in (*self.planned_windows,
                               "".join(self.shell_patterns))
                   if "@" in w]
-        stray = [w for w in tagged
-                 if re.fullmatch(r".+@[rs][1-9]\d*", w) is None]
+        stray = [w for w in tagged if prior_tag_of(w) is None]
         if stray:
             raise ValueError(
                 f"the prior windows {stray} must carry a source tag "
                 "<shells>@<r|s><k> (e.g. '3d4s@s2'); fold tags belong "
                 "to lane windows")
-        series = [w for w in tagged if re.search(r"@s[1-9]", w)]
+        series = [w for w in tagged
+                  if (t := prior_tag_of(w)) is not None and t[0] == "s"]
         if series and self.ladder is None:
             raise ValueError(
                 f"the series windows {series} need the case's declared "
@@ -422,8 +423,7 @@ def _prior_anchor_first(atom: str, sectors) -> Scenario:
     re-home there)."""
     cells = []
     for w in _PRIOR_WINDOWS:
-        no = f"{w}no{len(re.findall(r'\d+[spdfgh]', w.partition('@')[0]))}"
-        for lbl in (w, no):
+        for lbl in (w, no_label(w)):
             cells += [f"{atom.lower()}_{lbl}_{na}-{nb}_{m}_"
                       for na, nb in sectors
                       for m in ("casscf", "sa-casscf")]

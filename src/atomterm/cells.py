@@ -125,6 +125,8 @@ __all__ = [
     "cell_payload",
     "kernel_cell_payload",
     "load_cell",
+    "no_label",
+    "prior_tag_of",
     "run_cell",
     "analyze_cell",
     "spine_keys",
@@ -159,6 +161,26 @@ _WINDOW_RE = re.compile(r"[0-9][0-9a-z]*(?:@[0-9a-z]+)?\Z")
 # from the fold vocabulary (noble names, "semi", digit-first shell
 # lists) by construction
 _SOURCE_TAG_RE = re.compile(r"([rs])([1-9]\d*)\Z")
+
+
+def _source_label_of(window: str) -> str:
+    """The window label with any NO tail removed (``"3d4s@s2no2"`` ->
+    ``"3d4s@s2"``) -- the part a fold/source tag lives in."""
+    m = re.fullmatch(r"(.+?)no([1-9]\d*)", window)
+    return m.group(1) if m else window
+
+
+def prior_tag_of(window: str) -> tuple[str, int] | None:
+    """The label's ``@``-source tag ``(source, k)``, None when
+    untagged -- the prior-axis grammar's ONE home: the key property,
+    the case validation, and the renderer's tag display parse
+    identically through here.  A NO tail is not part of the tag
+    (``"3d4s@s2no2"`` -> ``("s", 2)``)."""
+    span, sep, tag = _source_label_of(window).partition("@")
+    if not sep:
+        return None
+    m = _SOURCE_TAG_RE.fullmatch(tag)
+    return (m.group(1), int(m.group(2))) if m is not None else None
 
 # the campaign key: a plain alphanumeric token (an element symbol or a
 # declared label) or ONE hyphenated variant suffix (the uncontracted
@@ -358,8 +380,7 @@ class CellKey:
         """The label of the window's SOURCE construction: the bare
         label with any NO tail removed (``"3d4s@s2no2"`` ->
         ``"3d4s@s2"``) -- the part a fold/source tag lives in."""
-        m = re.fullmatch(r"(.+?)no([1-9]\d*)", self.window)
-        return m.group(1) if m else self.window
+        return _source_label_of(self.window)
 
     @property
     def fold_tag(self) -> str | None:
@@ -387,11 +408,7 @@ class CellKey:
         axis of a comparison is thereby always declared, never
         implicit.
         """
-        span, sep, tag = self._source_label.partition("@")
-        if not sep:
-            return None
-        m = _SOURCE_TAG_RE.fullmatch(tag)
-        return (m.group(1), int(m.group(2))) if m else None
+        return prior_tag_of(self.window)
 
     def fold_shells(self) -> tuple[str, ...]:
         """The key's fold tag resolved to shells
@@ -1643,7 +1660,7 @@ def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]
     ]
 
 
-def _no_label(window: str) -> str:
+def no_label(window: str) -> str:
     """The full-span occupation-group prefix label of a window: k = its
     shell count ({3d,4s} -> the [s,d] groups -> ``3d4sno2``; each shell's
     m-set is one occupation group of the term-averaged density)."""
@@ -1669,7 +1686,7 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     diseases in one row) -- then the optimizer product method x mask x
     substrate x start with the virtual-mix diagnostic after the CASSCF
     free/polarized starts, and the NO start addressing the full-span
-    group prefix (:func:`_no_label`). mo x pur and moc x pur ARE part
+    group prefix (:func:`no_label`). mo x pur and moc x pur ARE part
     of the grid (the canonical/character-selected columns are
     re-orthogonalized against the pur span); radial stays ao-only
     (validated at the key).  A SOURCE-TAGGED window drops the frac
@@ -1700,12 +1717,12 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     keys += [
         CellKey(atom, w, sec, method="casci", start="mo", fold="avg"),
         CellKey(atom, w, sec, method="casci", start="moc", fold="avg"),
-        CellKey(atom, _no_label(w), sec, method="casci", start="no",
+        CellKey(atom, no_label(w), sec, method="casci", start="no",
                 fold="avg"),
         CellKey(atom, w, sec, method="casci", start="mo", substrate="pur"),
         CellKey(atom, w, sec, method="casci", start="moc",
                 substrate="pur"),
-        CellKey(atom, _no_label(w), sec, method="casci", start="no",
+        CellKey(atom, no_label(w), sec, method="casci", start="no",
                 substrate="pur"),
     ]
     for m in ("casscf", "sa-casscf"):
@@ -1714,7 +1731,7 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
                 starts = (("ao", "mo", "moc", "no") if mask != "radial"
                           else ("ao",))
                 for st in starts:
-                    keys.append(CellKey(atom, _no_label(w) if st == "no"
+                    keys.append(CellKey(atom, no_label(w) if st == "no"
                                         else w, sec, method=m, start=st,
                                         mask=mask, substrate=sub))
                 if m == "casscf" and mask is None and sub == "pol":

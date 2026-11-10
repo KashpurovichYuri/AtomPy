@@ -58,7 +58,8 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 
-from atomterm.reference import ReferenceSpec, run_rohf
+from atomterm.reference import (ReferenceSpec, occupation_postcheck,
+                                run_rohf)
 from atomterm.windows import member_chains
 
 if TYPE_CHECKING:  # the mol/mf annotations (no cycle; system is leaf)
@@ -182,17 +183,11 @@ def run_ladder(cfg: "AtomConfig", workdir: str | Path, key: str, ladder,
                             occ_e_ref=spec.e_ref,
                             conv_accelerator=spec.accel)
         _m, mf_x = run_rohf(cfg_x, str(chk_dir / f"{spec.tag}.chk"), ref=ref)
-        # the occupation post-check: the Newton path's frozen early
-        # assignments can converge VIOLATING the hook (measured: a
-        # 3d-forced quartet landing the d2s1 solution) -- a gated run
-        # whose occupations disagree with its own hook is a wrong
-        # configuration, refused whatever the energy
-        from atomterm.reference import _forced_rohf_occ
-        hook = _forced_rohf_occ(_m, list(spec.closed), list(spec.open))
-        mo_energy = (mf_x.mo_energy if np.ndim(mf_x.mo_energy) == 1
-                     else np.asarray(mf_x.mo_energy)[0])
-        if not np.array_equal(hook(np.asarray(mo_energy), mf_x.mo_coeff),
-                              np.asarray(mf_x.mo_occ)):
+        # the occupation post-check: a gated run whose converged
+        # occupations disagree with its own hook is a wrong
+        # configuration, refused whatever the energy (the Newton
+        # frozen-assignment disease -- reference.occupation_postcheck)
+        if not occupation_postcheck(_m, mf_x, spec.closed, spec.open):
             raise RuntimeError(
                 f"ladder config {spec.tag!r} converged at "
                 f"E = {mf_x.e_tot:.8f} with occupations its own hook "

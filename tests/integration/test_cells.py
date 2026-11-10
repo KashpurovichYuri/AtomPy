@@ -294,7 +294,6 @@ def test_void_reason_gates_scenariod_cells():
         else:
             assert (void_reason(k, sc) is not None) == \
                 (k.method != "casci"), k.address
-            k.address
     assert all(void_reason(k, sc) is None for k in grid_keys(spec))
     reason = void_reason("ti_3d4d_3-1_casscf_ao_-_pol_avg", sc)
     assert reason.startswith("anchor-first") and "2026-11-02" in reason
