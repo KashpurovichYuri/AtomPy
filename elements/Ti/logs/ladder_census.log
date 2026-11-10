@@ -1,0 +1,11 @@
+# the ladder census (2026-11-10): per arm E/converged/occ_ok
+# (C = converged, +/- = occ_ok; the declared gates anchor the
+#  occupation-safe rows)
+Sc-d2s1 [newton] default:-759.69899090/C+ atom:-759.69899090/C+ huckel:-759.69119947/C+
+Sc-d2s1 [diis+newton] default:-759.69899090/C+ atom:-759.69899090/C+ huckel:-759.69899090/C+
+Sc-d3 [newton] default:-759.69899090/C- atom:-759.69899090/C- huckel:-759.57064777/C+
+Sc-d3 [diis+newton] default:-759.69899090/C- atom:-759.69899090/C- huckel:-759.70189268/C-
+Ti-d3s1 [newton] default:-848.38650790/C+ atom:-848.38650790/C+ huckel:-848.37759735/C+
+Ti-d3s1 [diis+newton] default:-848.38650790/C+ atom:-848.38650790/C+ huckel:-848.37759735/C+
+Ti-d4 [newton] default:-848.24887522/C+ atom:-848.24887292/C+ huckel:-848.24887522/C+
+Ti-d4 [diis+newton] default:-848.24887292/C+ atom:-848.24887522/C+ huckel:-848.38650790/C-

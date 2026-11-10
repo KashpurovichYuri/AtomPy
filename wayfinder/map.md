@@ -42,21 +42,24 @@ user decision; the partial verdict 91/91-isolation-green).
   wave's next): the prior-cells run (the first CASCI cells of the
   tagged windows -- ALSO the probe's re-verification under the FIXED
   metric, see below), then the radial-CASSCF legs, SA-over-ladder.
-- THE HONEST PRIOR TABLE (Sc, first run under the FIXED metric +
-  the CENSUS-corrected ladder, 2026-11-10; the store: sc_{3d,3d4s}
-  @{r1,s1,s2} casci ao pol/avg): the k=1 HIERARCHY THE PROBE REPORTED
-  IS INVERTED -- honest: @r1 (the head block) +102.9 on the d-row /
-  -7.0 on the primary; @s1 (the ladder mean) -64.7 on the d-row /
-  +5.5 on the primary; @s2 -119.5/-16.4.  The probe's flipped
-  numbers said neutral -83.8/+127.3 and series1 +13.6/+200.3 -- the
-  ladder mean is a STRONG k=1 prior (the probe had it the worst),
-  and no universal k=1 winner remains (the head block wins the
-  primary, the mean wins the d-row).  THE INTERNAL CONSISTENCY
-  CERTIFICATE: @s2 matches the probe's numbers EXACTLY -- k=2 on a
-  2-band chain spans the full radial space, the radial convention is
-  a rotation within it, and the CASCI total is span-invariant.  Ti's
-  table lands with its run; the SA-over-ladder optimization (the
-  dominant-k=1 road) is the wave's next step after it.
+- THE HONEST PRIOR TABLE (Sc+Ti complete, 2026-11-10; the store:
+  {sc,ti}_{3d,3d4s}@{r1,s1,s2} casci ao pol/avg, term-certified,
+  Ti's 3d rows at the lattice d2 sector): dE vs the incumbent
+  (authors' 1:1), mEh --
+    Sc: @r1 +102.9/-7.0  @s1 -64.7/+5.5  @s2 -119.5/-16.4  (3d/3d4s)
+    Ti: @r1  -6.2/-10.6  @s1 +11.0/+6.9  @s2   -9.6/-21.4
+  THE k=1 ORDERING IS ATOM-DEPENDENT (Sc's ladder mean wins its d-row,
+  Ti's head block wins both rows; both within ~11 mEh of the
+  incumbent on Ti, spread ~100 on Sc) -- no universal k=1 prior
+  exists, the strongest evidence for the SA-over-ladder optimized
+  contraction (the wave's next step).  THE INTERNAL CONSISTENCY
+  CERTIFICATE: @s2 matches the probe's flipped-metric numbers EXACTLY
+  (k=2 on a 2-band chain spans the full radial space -- the CASCI
+  total is span-invariant under the radial convention).  Closure: Ti
+  machine-precision (1e-14-class rows); Sc carries the known
+  anisotropic-core floor (2e-3-class) consistent with the incumbents.
+  The k=1 hierarchy the probe reported is INVERTED (its transport was
+  flipped); the committed probe logs stay as the historical record.
 - THE LADDER CENSUS + THE NEWTON OCCUPATION DISEASE (2026-11-10,
   reference.rohf_basin_census -- the ROHF twin of the UHF instrument,
   committed with the occ_ok certificate): the probe's ladder draws
