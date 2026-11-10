@@ -28,6 +28,37 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- THE BASIS-PREPARATION LAYER landed (2026-11-10, this session):
+  `src/atomterm/basis.py` (the ladder runner, the density-block
+  source, `metric_radials`, `series_window`) + the SOURCE-TAG grammar
+  (`@r<k>`/`@s<k>` on window labels, one @-slot partitioned
+  fold|source; NO-of-tagged parses through `_source_label`) + the
+  Sc/Ti declarations (ladders gated -- Ti's head at the TRUSTED
+  reference energy, not the probe's shallow draw; prior_bands = the
+  widened 2-band chains, Ti's 3d widening DECLARED) + the
+  anchor-first gates on the prior windows' optimizer class.  The
+  member-chains extraction to `windows.member_chains` (one home) is
+  bit-exact -- the existing distilled pins certify it.  OPEN (the
+  wave's next): the prior-cells run (the first CASCI cells of the
+  tagged windows -- ALSO the probe's re-verification under the FIXED
+  metric, see below), then the radial-CASSCF legs, SA-over-ladder.
+- THE PROBE'S RADIAL TRANSPORT WAS FLIPPED (2026-11-10, caught by the
+  unit pin -- the three-layer chain's exact-anchor layer): the probe's
+  `metric_radials` solved the generalized problem (block, s_r) --
+  the s_r^{-1/2} conjugation `eigh(L^-1 B L^-T)`, which mixes the
+  EUCLIDEAN coefficient pairing into the numerator and returns
+  s_r^{-1}-DISTORTED radials; the capture-maximizing problem is
+  (block, s_r^-1) = `eigh(L^T B L)` with vectors through `L^-T` (the
+  form that recovers a planted radial exactly, and agrees with
+  window_distilled's column-space Gram on a single-configuration
+  source).  WHAT SURVIVES of the probe's committed verdicts: the k=2
+  DOMINANCE is variational basis-supermacy (any k=2 window over the
+  same chain space dominates, distorted radials included) --
+  unaffected; the k=1 NUMBERS (neutral's +109..+127 losses, Sc's
+  -83.8 d-row win, series1 always-worst) were measured on distorted
+  radials and RE-VERIFY at the prior-cells run.  The committed probe
+  logs stay as the historical record (provenance); the module's
+  numbers are the honest successors.
 - THE SERIES-SOURCE PROBE's review (2026-11-10, two axes over
   44e0ed4..d9e4afe): CORRECTED RECORD -- (1) "neutral loses
   everywhere" (handoff xxi) was FALSE: Sc's d-only row has neutral

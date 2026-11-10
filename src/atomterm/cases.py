@@ -36,6 +36,7 @@ from pyscf import gto
 
 from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
+from atomterm.basis import LadderSpec
 from atomterm.reference import ReferenceSpec, run_rohf
 from atomterm.scans import ScanSpec
 from atomterm.windows import (build_full_mo, closed_electrons, fold_shells,
@@ -155,6 +156,21 @@ class CaseSpec:
         (:func:`atomterm.windows.window_distilled`) -- the CAS label
         reads the delivered records' shapes (CAS(3,6), not CAS(3,43)).
         Window-side only: the FOLD stays at full family width.
+    ladder : the declared CONFIGURATION LADDER
+        (:class:`atomterm.basis.LadderSpec` tuple) -- the prior axis's
+        radial-signal sources: the atom's valence configurations as
+        forced-occupation, basin-gated references, the HEAD (first
+        entry) being the case's own reference configuration.  Required
+        by any ``@s``-tagged window (the series source); the mfs
+        resolve once per atom through :func:`atomterm.basis.run_ladder`
+        (the caller's job -- reference construction never enters a
+        cell run).
+    prior_bands : the PRIOR axis's realization (chemical shell -> its
+        widened band tuple) -- what ``@r``/``@s`` windows distill
+        from, beside the case's incumbent ``shell_bands`` (None =
+        the incumbent realization).  The k>1 tags need the width;
+        a widening beyond the measured certificate is a DECLARED
+        widening (the declaration cites it).
     planned_windows : further window labels of the campaign, declared
         but not yet run (Ti: the (4,10)/(4,14) partitions) -- the cell
         grid derives their full factor grids (:func:`atomterm.cells.planned`).
@@ -218,6 +234,11 @@ class CaseSpec:
     # choice only); every shell of every window the case declares must
     # carry one (a mixed distilled/raw window is not offered).
     shell_radials: dict[str, int] | None = None
+    # the prior axis's declarations: the configuration ladder (the
+    # @s windows' radial-signal sources) and the widened realization
+    # the @r/@s windows distill from
+    ladder: tuple | None = None
+    prior_bands: dict[str, tuple[str, ...]] | None = None
     ecp: str | None = None
     spin: int = 0
     tag: str | None = None
@@ -290,9 +311,12 @@ class CaseSpec:
                     f"lane window {label!r}: {overlap} sit in both the "
                     "window and its fold")
         if self.shell_radials is not None:
+            # the tagged planned windows carry their k in the source
+            # tag -- only the untagged ones read shell_radials here
             windows = ["".join(self.shell_patterns), *self.lattice_windows,
                        *(w.partition("@")[0]
-                         for w in self.lane_windows), *self.planned_windows]
+                         for w in self.lane_windows),
+                       *(w for w in self.planned_windows if "@" not in w)]
             shells = {s for w in windows
                       for s in re.findall(r"\d+[spdfgh]", w)}
             bare = sorted(shells - set(self.shell_radials))
@@ -301,6 +325,30 @@ class CaseSpec:
                     f"shell_radials is undeclared for {bare} -- every "
                     "window shell the case names carries its k (a mixed "
                     "distilled/raw window is not offered)")
+        # the prior axis: every @-tagged declared window is a source
+        # tag (fold tags live on lane windows, which never enter this
+        # validation), and the series source needs the ladder
+        tagged = [w for w in (*self.planned_windows,
+                              "".join(self.shell_patterns))
+                  if "@" in w]
+        stray = [w for w in tagged
+                 if re.fullmatch(r".+@[rs][1-9]\d*", w) is None]
+        if stray:
+            raise ValueError(
+                f"the prior windows {stray} must carry a source tag "
+                "<shells>@<r|s><k> (e.g. '3d4s@s2'); fold tags belong "
+                "to lane windows")
+        series = [w for w in tagged if re.search(r"@s[1-9]", w)]
+        if series and self.ladder is None:
+            raise ValueError(
+                f"the series windows {series} need the case's declared "
+                "ladder (LadderSpec tuple -- basis.run_ladder's "
+                "sources)")
+        if self.ladder is not None and self.ladder[0].spin != self.spin:
+            raise ValueError(
+                f"the ladder head {self.ladder[0].tag!r} must be the "
+                f"case's reference configuration (spin {self.spin}, "
+                f"not {self.ladder[0].spin})")
 
     def atom_config(self) -> AtomConfig:
         """The spec as an :class:`AtomConfig` (``tag`` defaults to the
@@ -343,6 +391,30 @@ _ANCHOR_FIRST = Scenario(
            "ti_3d4s4p4d_3-1_sa-casscf_", "ti_3d4s4p4dno4_3-1_sa-casscf_"),
     reason="planned windows anchor first: no optimizer cell of a window "
            "whose CASCI anchors are unread (2026-11-02)")
+
+# the prior-axis windows (the @r/@s tags), shared by the contracted
+# transition metals -- the probe's prior set as declared cells
+_PRIOR_WINDOWS = ("3d@r1", "3d@s1", "3d@s2",
+                  "3d4s@r1", "3d4s@s1", "3d4s@s2")
+
+
+def _prior_anchor_first(atom: str, sector) -> Scenario:
+    """The prior windows' anchor-first gate: their OPTIMIZER cells
+    stay void until the CASCI anchors run -- the prior comparison is
+    CASCI; the treatment rows over a chosen basis come after the
+    adoption decision (the radial-CASSCF legs re-home there)."""
+    na, nb = sector
+    cells = []
+    for w in _PRIOR_WINDOWS:
+        no = f"{w}no{len(re.findall(r'\d+[spdfgh]', w.partition('@')[0]))}"
+        for lbl in (w, no):
+            cells += [f"{atom.lower()}_{lbl}_{na}-{nb}_casscf_",
+                      f"{atom.lower()}_{lbl}_{na}-{nb}_sa-casscf_"]
+    return Scenario(
+        name="prior-anchor-first", cells=tuple(cells),
+        reason="the prior-axis comparison is CASCI: optimizer cells of "
+               "a @r/@s window stay void until the basis decision "
+               "(2026-11-10)")
 
 # U14e's gate (Ti's pattern, widened to the whole optimizer class):
 # the f-shell optimizer class is the declared multi-solution class
@@ -525,6 +597,27 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  # 4s fixed: the 4s->5s direction is
                                  # harmful and would mask the d structure
                                  extra_fixed="4s"),
+                   # the prior axis: the ladder (gates = the probe's
+                   # term-certified draws, head = the trusted reference)
+                   # and the widened realization (Sc's certificate:
+                   # 3d -> (3d, 4d), 4s -> (4s, 6s))
+                   ladder=(LadderSpec("d1s2", ("1s", "2s", "2p", "3s",
+                                               "3p", "4s"), ("3d",),
+                                      1, -759.73625510),
+                           LadderSpec("d2s1", ("1s", "2s", "2p", "3s",
+                                               "3p"), ("3d", "4s"),
+                                      3, -759.52176011),
+                           LadderSpec("d3", ("1s", "2s", "2p", "3s",
+                                             "3p"), ("3d",),
+                                      3, -759.41547824)),
+                   prior_bands={"3d": ("3d", "4d"), "4s": ("4s", "6s")},
+                   # the prior windows: @r1 (the head's own block -- the
+                   # probe's "neutral"), @s1/@s2 (the ladder mean, the
+                   # mean+spread); @r2 does not exist on these atoms (a
+                   # single-configuration block is rank-1 -- series_window
+                   # refuses the noise second radial)
+                   planned_windows=_PRIOR_WINDOWS,
+                   scenarios=(_prior_anchor_first("Sc", (2, 1)),),
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "2p", "3s", "3p", "4s"),
                        occ_open=("3d",), occ_e_ref=-759.73625510,
@@ -539,12 +632,30 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  "3d3p@semi", "3d3p4d@semi",
                                  "3s3p3d@1s2s2p4s",
                                  "3d3p4s@1s2s2p3s"),
-                   scenarios=(_ANCHOR_FIRST,),
+                   scenarios=(_ANCHOR_FIRST,
+                              _prior_anchor_first("Ti", (3, 1))),
+                   # the prior axis: the ladder (the HEAD gate = the
+                   # TRUSTED reference energy -- the probe's fresh
+                   # d2s2 draw was 11 mEh shallow; the further gates =
+                   # the probe's draws); the realization WIDENS 3d
+                   # beyond Ti's certificate (3d -> (3d), capture
+                   # 0.9991 -- a DECLARED widening: k=2 needs the
+                   # 2-wide radial space)
+                   ladder=(LadderSpec("d2s2", ("1s", "2s", "2p", "3s",
+                                               "3p", "4s"), ("3d",),
+                                      2, -848.40648875),
+                           LadderSpec("d3s1", ("1s", "2s", "2p", "3s",
+                                               "3p"), ("3d", "4s"),
+                                      4, -848.38179380),
+                           LadderSpec("d4", ("1s", "2s", "2p", "3s",
+                                             "3p"), ("3d",),
+                                      4, -848.15487195)),
+                   prior_bands={"3d": ("3d", "4d"), "4s": ("4s", "6s")},
+                   planned_windows=("3d4d", "3d4s4p4d", *_PRIOR_WINDOWS),
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
                        occ_open=("3d",), occ_e_ref=-848.40648875,
                        occ_e_ref_uhf=-848.40991227),
-                   planned_windows=("3d4d", "3d4s4p4d"),
                    lattice_windows=("3d", "3d4p", "3d4p4d"),
                    lattice_sector=(2, 0)),
     # The uncontracted twins: the multi-column fold's validation atoms

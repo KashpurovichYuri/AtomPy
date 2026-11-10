@@ -343,6 +343,15 @@ def main() -> None:
                          "class first")
 
         lane_sub = None
+        # the prior axis's source ladder: resolved once per atom, only
+        # when a running cell needs it (the @s windows; the head = the
+        # trusted reference itself, the rest gated + chk-cached)
+        ladder_mfs = None
+        if (spec.ladder is not None and any(
+                k.source_tag is not None and k.source_tag[0] == "s"
+                for k in queue)):
+            from atomterm.basis import run_ladder
+            ladder_mfs = run_ladder(cfg, "elements", name, spec.ladder, mf)
         for key in queue:
             reason = void_reason(key, scens)
             if reason and not args.full:
@@ -364,6 +373,8 @@ def main() -> None:
                                      fresh=args.fresh, workdir="elements",
                                      shell_bands=spec.shell_bands,
                                      shell_radials=spec.shell_radials,
+                                     ladder_mfs=ladder_mfs,
+                                     prior_bands=spec.prior_bands,
                                      budgets={"sa_weights":
                                               spec.sa_weights})
                     cells[key.address] = (

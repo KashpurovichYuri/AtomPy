@@ -58,7 +58,12 @@ the label (``3d3p@semi``, ``3s3p3d@1s2s2p4s`` --
 :func:`atomterm.windows.fold_shells` the tag grammar): the tag
 declares the cell's core partition AND marks the pinned-lane cell
 (:func:`lane_keys`, :func:`run_lane_cell`) -- a tagged window never
-collides with a free-route label.
+collides with a free-route label.  A PRIOR-AXIS window carries its
+distillation source as the tag instead (``3d4s@s2`` --
+:attr:`CellKey.source_tag` the grammar): ``@r<k>`` the head
+configuration's density block, ``@s<k>`` the configuration-ladder
+average (:func:`atomterm.basis.series_window`) -- the one ``@``-slot
+holds a fold or a source tag, never both.
 
 The REFERENCE FIELD sits outside the eight slots: a cell runs on the
 neutral-atom SCF (``field="neutral"`` -- the default, and every store
@@ -144,8 +149,16 @@ FIELDS = ("neutral", "folded")  # the reference field (an optional 9th slot)
 
 # the nominal window label: shell tokens like "2p", "3d4s" -- lowercase
 # alphanumerics, no separators (the address splits on "_"); a lane
-# window appends its fold tag: "3d3p@semi", "3s3p3d@1s2s2p4s"
+# window appends its fold tag: "3d3p@semi", "3s3p3d@1s2s2p4s"; a
+# prior-axis window appends its source tag: "3d4s@s2" (the @-slot
+# holds ONE tag -- a fold or a source, never both)
 _WINDOW_RE = re.compile(r"[0-9][0-9a-z]*(?:@[0-9a-z]+)?\Z")
+
+# the prior-axis source tag: @r<k> (the head configuration's density
+# block) | @s<k> (the ladder average) -- letter-first, k >= 1; disjoint
+# from the fold vocabulary (noble names, "semi", digit-first shell
+# lists) by construction
+_SOURCE_TAG_RE = re.compile(r"([rs])([1-9]\d*)\Z")
 
 # the campaign key: a plain alphanumeric token (an element symbol or a
 # declared label) or ONE hyphenated variant suffix (the uncontracted
@@ -341,11 +354,44 @@ class CellKey:
         return self.window.partition("@")[0]
 
     @property
+    def _source_label(self) -> str:
+        """The label of the window's SOURCE construction: the bare
+        label with any NO tail removed (``"3d4s@s2no2"`` ->
+        ``"3d4s@s2"``) -- the part a fold/source tag lives in."""
+        m = re.fullmatch(r"(.+?)no([1-9]\d*)", self.window)
+        return m.group(1) if m else self.window
+
+    @property
     def fold_tag(self) -> str | None:
         """The window's ``@fold`` tag (None = the case's core prefix;
-        :meth:`fold_shells` resolves a tag to shells)."""
-        span, sep, tag = self.window.partition("@")
-        return tag if sep else None
+        :meth:`fold_shells` resolves a tag to shells).  A source tag
+        (:attr:`source_tag`) is not a fold."""
+        span, sep, tag = self._source_label.partition("@")
+        return tag if sep and self.source_tag is None else None
+
+    @property
+    def source_tag(self) -> tuple[str, int] | None:
+        """The window's ``@source`` tag: ``(source, k)`` -- the PRIOR
+        AXIS, the basis-preparation window family
+        (:func:`atomterm.basis.series_window`): ``@r2`` = the head
+        configuration's density block at k=2 (the reference source),
+        ``@s1``/``@s2`` = the configuration-ladder average at k=1/k=2
+        (the series source), k uniform over the window's shells.  The
+        realization is the case's declared ``prior_bands`` (the
+        widened, certificate-measured band lists k>1 needs).  None =
+        the incumbent construction (the case's ``shell_radials`` on
+        the reference source -- the stored cells' identity, frozen).
+
+        The tag is part of the window identity: differently-sourced
+        windows of one span get different addresses, and the basis
+        axis of a comparison is thereby always declared, never
+        implicit.
+        """
+        span, sep, tag = self._source_label.partition("@")
+        if not sep:
+            return None
+        m = _SOURCE_TAG_RE.fullmatch(tag)
+        return (m.group(1), int(m.group(2))) if m else None
 
     def fold_shells(self) -> tuple[str, ...]:
         """The key's fold tag resolved to shells
@@ -378,8 +424,10 @@ class CellKey:
         density) -- shell letters cannot contain "no", so the tail is
         unambiguous. The prefix IS part of the window identity: two NO
         cells of one source differ in k and get different addresses.
+        The source label may itself carry a source tag
+        (``"3d4s@s2no2"`` = the NO kind of the series window).
         """
-        m = re.fullmatch(r"(.+?)no([1-9]\d*)", self.span_label)
+        m = re.fullmatch(r"(.+?)no([1-9]\d*)", self.window)
         return (m.group(1), int(m.group(2))) if m else None
 
 
@@ -646,10 +694,12 @@ def _key_core(key: CellKey, mol, mf,
     return ncore, (c_run if c_run is not None else c_pur), c_pur
 
 
-def _window_columns(key, mol, mf, shell_bands, shell_radials):
+def _window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
+                    prior_bands=None, ladder_mfs=None):
     """The window object ``build_full_mo`` consumes: the raw AO rows,
-    or the distilled-shell columns when the case declares radials --
-    ONE resolution shared by the free run, the pinned lane, and the
+    the distilled-shell columns when the case declares radials, or the
+    PRIOR-AXIS columns when the window carries a source tag -- ONE
+    resolution shared by the free run, the pinned lane, and the
     NO-start source window (start-independent by the same rule as the
     frozen masks: the distillation is the case's WINDOW DEFINITION,
     the mo/moc starts express their own gauge within its width).
@@ -657,11 +707,42 @@ def _window_columns(key, mol, mf, shell_bands, shell_radials):
 
     Returns ``(act, ncas)``: row indices, or S-orthonormal columns
     (:func:`atomterm.windows.window_distilled` -- the radial signal is
-    the OCCUPIED reference block).
+    the OCCUPIED reference block; a source tag routes to
+    :func:`atomterm.basis.series_window` -- the density-block family,
+    ``@r`` the head configuration, ``@s`` the ladder average).
     """
     from atomterm.windows import (realized_patterns, select_valence_ao,
                                   window_distilled)
 
+    if key.source_tag is not None:
+        src, k = key.source_tag
+        if src == "s":
+            if ladder_mfs is None:
+                raise ValueError(
+                    f"window {key.window!r} needs the configuration "
+                    "ladder (the case's declared LadderSpec tuple, "
+                    "resolved through atomterm.basis.run_ladder) -- "
+                    "pass ladder_mfs")
+            mfs = list(ladder_mfs.values())
+        else:
+            mfs = [mf]
+        if ncol is None:
+            raise ValueError(
+                f"window {key.window!r} needs the fold boundary ncol "
+                "(the case's core pair count -- the ladder blocks cut "
+                "the valence there)")
+        from atomterm.basis import series_window
+        act, report = series_window(
+            mol, mfs, mf.get_ovlp(), key.shell_patterns,
+            prior_bands if prior_bands is not None else shell_bands,
+            {sh: k for sh in key.shell_patterns}, ncol)
+        print("  [window] prior " + "; ".join(
+            f"{sh}: k={r['k']} of {len(r['bands'])} bands, "
+            f"discarded {r['discarded']:.4f}, "
+            f"capture {min(min(c) for c in r['capture']):.4f}"
+            f"-{max(max(c) for c in r['capture']):.4f}"
+            for sh, r in report.items()), flush=True)
+        return act, act.shape[1]
     act = select_valence_ao(
         mol, realized_patterns(key.shell_patterns, shell_bands))
     if shell_radials is None:
@@ -679,10 +760,15 @@ def _window_columns(key, mol, mf, shell_bands, shell_radials):
 
 def _window_ncas(key, mol, shell_bands, shell_radials) -> int:
     """The stored-absent ``ncas`` fallback: the distilled width when
-    the case declares radials, else the raw band-row count."""
+    the case declares radials, the prior tag's width when the window
+    carries one, else the raw band-row count."""
     from atomterm.windows import (distilled_ncas, realized_patterns,
                                   select_valence_ao)
 
+    if key.source_tag is not None:
+        _src, k = key.source_tag
+        return distilled_ncas(key.shell_patterns,
+                              {sh: k for sh in key.shell_patterns})
     if shell_radials is not None:
         return distilled_ncas(key.shell_patterns, shell_radials)
     return len(select_valence_ao(
@@ -692,6 +778,8 @@ def _window_ncas(key, mol, shell_bands, shell_radials) -> int:
 def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
              fresh: bool = False, shell_bands: dict | None = None,
              shell_radials: dict | None = None,
+             ladder_mfs: dict | None = None,
+             prior_bands: dict | None = None,
              workdir: str | Path = "elements") -> "StageFacts | None":
     """Execute one cell: resolve every axis through its OWNER, run,
     store, analyze. The unit of the run queue.
@@ -740,6 +828,15 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         fast: the frac fold and the radial mask have no distilled
         meaning (the fractional reference's open shell and the
         member-labeled radial substrate are row-space constructs).
+    ladder_mfs : the configuration ladder's converged mfs
+        (:func:`atomterm.basis.run_ladder`'s product; the HEAD is the
+        case reference itself).  REQUIRED by ``@s``-tagged windows
+        (the series source); reference construction belongs to the
+        caller, never to cells.
+    prior_bands : the prior axis's realization
+        (:attr:`atomterm.cases.CaseSpec.prior_bands`) -- the widened,
+        certificate-declared band lists the ``@r``/``@s`` windows
+        distill from (None = the case's ``shell_bands``).
     workdir : the store root (``<workdir>/<Atom>/rungs/``).
 
     Returns
@@ -786,15 +883,17 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                                   select_valence_mo)
 
     na, nb = key.sector
-    if shell_radials is not None and (key.fold == "frac"
-                                      or key.mask == "radial"):
+    if (shell_radials is not None or key.source_tag is not None) and (
+            key.fold == "frac" or key.mask == "radial"):
         raise ValueError(
-            f"{key.address}: the distilled window is undeclared for "
-            f"fold={key.fold}, mask={key.mask} -- the fractional "
+            f"{key.address}: the distilled/prior window is undeclared "
+            f"for fold={key.fold}, mask={key.mask} -- the fractional "
             "reference's open shell and the member-labeled radial "
             "substrate are row-space constructs")
     ncore, c_core, c_pur = _key_core(key, mol, mf, shell_bands)
-    act, ncas = _window_columns(key, mol, mf, shell_bands, shell_radials)
+    act, ncas = _window_columns(key, mol, mf, shell_bands, shell_radials,
+                                ncol=ncore, prior_bands=prior_bands,
+                                ladder_mfs=ladder_mfs)
 
     # start x mask -> the substrate MO matrix + the optimizer mask.
     # frozen/virtmix are START-INDEPENDENT (they pin the window columns

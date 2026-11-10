@@ -136,6 +136,59 @@ def test_no_window_grammar():
 
 
 @fast
+def test_source_tag_grammar():
+    """A prior-axis window carries its distillation source as the tag:
+    '@r<k>' (the head configuration's block) / '@s<k>' (the ladder
+    average), k uniform over the span; the tag is part of the address
+    (differently-sourced windows never collide), stays out of the span
+    selectors, and is NOT a fold -- the one @-slot holds one or the
+    other.  The NO kind of a tagged source names it through the
+    '<source>no<k>' grammar unchanged."""
+    k = CellKey("Sc", "3d4s@s2", (2, 1), method="casci")
+    assert CellKey.from_address(k.address) == k
+    assert k.address == "sc_3d4s@s2_2-1_casci_ao_-_pol_avg"
+    assert k.source_tag == ("s", 2)
+    assert k.fold_tag is None
+    assert k.shell_patterns == ["3d", "4s"]
+    assert CellKey("Sc", "3d4s@r1", (2, 1)).source_tag == ("r", 1)
+    # the tag is not a fold: fold resolution refuses it (the tag
+    # routes as a source, so the key carries no fold at all)
+    with pytest.raises(ValueError, match="no fold tag"):
+        CellKey("Sc", "3d4s@s2", (2, 1)).fold_shells()
+    # a lane fold tag is not a source
+    assert CellKey("Ti", "3d3p4d@semi", (5, 3), substrate="pur"
+                   ).source_tag is None
+    # the NO kind of the series window: the source label carries the
+    # tag, the group prefix rides after it
+    kn = CellKey("Sc", "3d4s@s2no2", (2, 1), start="no")
+    assert kn.no_source == ("3d4s@s2", 2)
+    assert kn.source_tag == ("s", 2)
+    assert kn.fold_tag is None
+    assert CellKey.from_address(kn.address) == kn
+
+
+@fast
+def test_prior_windows_declared_on_the_campaign():
+    """The prior axis derives from the ONE declaration: Sc/Ti declare
+    their ladders + prior realizations, and the planned prior windows
+    parse into source tags the cells can resolve (the @s windows'
+    ladder requirement validated at the case)."""
+    for name in ("Sc", "Ti"):
+        spec = CAMPAIGN[name]
+        assert spec.ladder is not None
+        tagged = [w for w in spec.planned_windows if "@" in w]
+        assert tagged, f"{name} declares no prior windows"
+        for w in tagged:
+            k = CellKey(name, w, (1, 0), method="casci")
+            assert k.source_tag is not None
+            assert k.source_tag[1] <= 2
+        # the untagged planned windows (the real spans) stay untagged
+        for w in ("3d4d",):
+            if w in spec.planned_windows:
+                assert CellKey(name, w, (1, 0)).source_tag is None
+
+
+@fast
 def test_lane_window_grammar():
     """A lane window carries its fold as a tag: the tag is part of the
     address (never collides with a free-route label), stays out of the
@@ -147,7 +200,10 @@ def test_lane_window_grammar():
     assert k.shell_patterns == ["3d", "3p", "4d"]
     assert k.fold_tag == "semi"
     assert k.fold_shells() == ("1s", "2s", "2p", "3s", "4s")
-    with pytest.raises(ValueError, match="fold tag"):
+    # a NO window with a fold tag is structurally unparseable (the NO
+    # tail is terminal -- the '<source>no<k>' grammar admits no tag
+    # after it), so the label never agrees with start='no'
+    with pytest.raises(ValueError, match="agree"):
         CellKey("Ti", "3d4sno2@semi", (3, 1), start="no")
     with pytest.raises(ValueError, match="fold tag"):
         CellKey("Ti", "3d4s", (3, 1)).fold_shells()
@@ -341,11 +397,16 @@ def test_window_grid_is_the_one_declaration():
     spine = {k.address for k in spine_keys("Ti", "3d4s", (3, 1))}
     assert spine <= set(addrs)
     assert [k.mask for k in diagnostics(spec)] == ["virtmix"]
-    # planned: the declared windows' full grids, same shape as the primary
+    # planned: the declared windows' full grids, same shape as the
+    # primary -- the real spans AND the prior-axis source tags (each
+    # with its NO sibling label)
     pl = planned(spec)
-    assert len(pl) == 2 * len(grid)
+    assert len(pl) == 8 * len(grid)
     assert {k.window for k in pl} == {
-        "3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4"}
+        "3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4",
+        "3d@r1", "3d@r1no1", "3d@s1", "3d@s1no1", "3d@s2", "3d@s2no1",
+        "3d4s@r1", "3d4s@r1no2", "3d4s@s1", "3d4s@s1no2",
+        "3d4s@s2", "3d4s@s2no2"}
     assert all(k.address not in addrs for k in pl)   # disjoint windows
 
 

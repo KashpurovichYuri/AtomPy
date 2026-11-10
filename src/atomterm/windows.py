@@ -72,6 +72,7 @@ __all__ = [
     "select_span",
     "shell_realization",
     "realized_patterns",
+    "member_chains",
     "distilled_ncas",
     "window_distilled",
     "primitive_chain",
@@ -210,8 +211,8 @@ def shell_slots(mol):
     contraction slot of every shell, ``rows`` = the slot's 2l+1
     member rows. The fused-shell addressing (contraction-outer,
     m-inner) lives here and only here; consumers: lm_sectors,
-    primitive_chain, select_span's l-vocabulary, and angular's
-    analytic construction."""
+    primitive_chain, select_span's l-vocabulary, member_chains, and
+    angular's analytic construction."""
     loc = mol.ao_loc_nr()
     for ib in range(mol.nbas):
         l = abs(mol.bas_angular(ib))
@@ -219,6 +220,69 @@ def shell_slots(mol):
         for c in range(mol.bas_nctr(ib)):
             base = loc[ib] + c * width
             yield ib, l, c, [base + m for m in range(width)]
+
+
+def member_chains(mol, shell: str, bands, s: np.ndarray
+                  ) -> tuple[list[list[int]], np.ndarray]:
+    """One chemical shell's member chains and their shared radial
+    overlap block -- the m-replication substrate every distillation
+    walks (the incumbent distilled window, the prior axis).
+
+    Parameters
+    ----------
+    mol : the built Mole (the shell walker's substrate).
+    shell : the chemical shell name (its letter fixes l).
+    bands : the shell's realized bands, in declared order
+        (:func:`shell_realization`).
+    s : the ``(nao, nao)`` overlap metric.
+
+    Returns
+    -------
+    ``(chain, s_r)`` : per member m, the row list in DECLARED band
+    order (one fixed radial-basis order every member shares); and the
+    shared member overlap block (all members' blocks agree to 1e-10
+    -- the member replication premise of a spherical one-center
+    basis).
+
+    Raises
+    ------
+    ValueError
+        a declared band absent from the basis, or member chains whose
+        overlap blocks differ (the replication premise broken).
+
+    Notes
+    -----
+    The chains walk :func:`shell_slots` -- never label lists (fused
+    shells are contraction-outer/member-inner).
+    """
+    labels = [line.split()[-1] for line in mol.ao_labels()]
+    ell = "spdfgh".index(shell[-1])
+    n_members = 2 * ell + 1
+    band_member: dict[str, dict[int, list[int]]] = {b: {} for b in bands}
+    for _ib, sl, _c, rows in shell_slots(mol):
+        if sl != ell:
+            continue
+        name = labels[rows[0]]
+        name = name[: name.index(shell[-1]) + 1]
+        if name in band_member:
+            for m, r in enumerate(rows):
+                band_member[name].setdefault(m, []).append(r)
+    absent = [b for b in bands if not band_member[b]]
+    if absent:
+        raise ValueError(
+            f"the basis has no band(s) {absent} -- the declared "
+            f"realization of shell {shell!r}")
+    chain = [[r for b in bands for r in band_member[b][m]]
+             for m in range(n_members)]
+    s_r = s[np.ix_(chain[0], chain[0])]
+    for m in range(1, n_members):
+        if not np.allclose(s[np.ix_(chain[m], chain[m])], s_r,
+                           atol=1e-10):
+            raise ValueError(
+                f"shell {shell!r}: the member chains' overlap "
+                "blocks differ -- the member replication premise "
+                "(a spherical one-center basis) is broken")
+    return chain, s_r
 
 
 def lm_sectors(mol) -> dict[tuple[int, int], list[int]]:
@@ -664,7 +728,6 @@ def window_distilled(mol, c_ref, s, patterns, layer=None, radials=None,
         raise ValueError(
             f"the distillation is undeclared for {undeclared} -- every "
             "window shell carries its k")
-    labels = [line.split()[-1] for line in mol.ao_labels()]
     n = mol.nao_nr()
     blocks: list[np.ndarray] = []
     report: dict[str, dict] = {}
@@ -673,36 +736,10 @@ def window_distilled(mol, c_ref, s, patterns, layer=None, radials=None,
         if k < 1:
             raise ValueError(f"shell {shell!r}: k must be >= 1")
         bands = shell_realization(shell, layer)
-        l = "spdfgh".index(shell[-1])
-        M = 2 * l + 1
-        # the member chains: per member m, the shell's band rows in
-        # DECLARED band order (one fixed radial-basis order; every
-        # member must share it) -- through the shell walker, never
-        # label lists (fused shells)
-        band_member: dict[str, dict[int, list[int]]] = {b: {} for b in bands}
-        for _ib, sl, _c, rows in shell_slots(mol):
-            if sl != l:
-                continue
-            name = labels[rows[0]]
-            name = name[: name.index(shell[-1]) + 1]
-            if name in band_member:
-                for m, r in enumerate(rows):
-                    band_member[name].setdefault(m, []).append(r)
-        absent = [b for b in bands if not band_member[b]]
-        if absent:
-            raise ValueError(
-                f"the basis has no band(s) {absent} -- the declared "
-                f"realization of shell {shell!r}")
-        chain = [[r for b in bands for r in band_member[b][m]]
-                 for m in range(M)]
-        s_r = s[np.ix_(chain[0], chain[0])]
-        for m in range(1, M):
-            if not np.allclose(s[np.ix_(chain[m], chain[m])], s_r,
-                               atol=1e-10):
-                raise ValueError(
-                    f"shell {shell!r}: the member chains' overlap "
-                    "blocks differ -- the member replication premise "
-                    "(a spherical one-center basis) is broken")
+        M = 2 * "spdfgh".index(shell[-1]) + 1
+        # the member chains + the shared radial overlap block (the
+        # m-replication substrate's one home, member_chains)
+        chain, s_r = member_chains(mol, shell, bands, s)
         # the significant reference columns: the S-orthogonal
         # projection weight on the shell's family SPAN (bounded [0,1]
         # -- a raw row-block weight is not: same-l families share the
