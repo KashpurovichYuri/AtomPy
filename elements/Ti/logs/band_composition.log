@@ -1,0 +1,22 @@
+# WARNING: 1 closed d-MOs do not chunk into whole m-sets -- the dominant-l reading misfired somewhere
+# Ti plain ROHF E = -848.28341842 Eh (measurement substrate; the closed MOs are basin-independent)
+
+# the display table (Mulliken populations -- wild on near-dependent bands; the certificate is the projector capture below; floor 0.5%)
+   1s occ=2 MOs=[0]  1s:0.95 2s:0.05
+   2s occ=2 MOs=[1]  2s:0.95 1s:0.05
+   3s occ=2 MOs=[5]  3s:1.00
+   4s occ=1 MOs=[10]  4s:0.79 6s:0.13 3d:0.04 5d:0.02 5s:0.02
+   2p occ=2 MOs=[2, 3, 4]  2p:1.00
+   3p occ=2 MOs=[6, 7, 8]  3p:1.00
+   4p occ=1 MOs=[11]  4p:0.71 6p:0.39
+   3d occ=2 MOs=[9]  3d:0.99 4d:0.01 5d:0.01
+
+# the certificate: the greedy realization (worst-MO projector capture >= 99.5%; the DECLARATION takes these lists)
+   1s -> (1s, 2s)  capture 1.0000
+   2s -> (2s, 1s)  capture 1.0000
+   3s -> (3s)  capture 0.9998
+   4s -> (4s, 6s, 3s, 5s, 2s, 1s)  capture 0.9431  !! supply exhausted at 0.943
+   2p -> (2p)  capture 1.0000
+   3p -> (3p)  capture 0.9996
+   4p -> (4p, 6p)  capture 0.9994
+   3d -> (3d)  capture 0.9991

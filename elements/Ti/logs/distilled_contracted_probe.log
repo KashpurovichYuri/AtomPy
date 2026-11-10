@@ -1,0 +1,14 @@
+== Sc contracted: candidate realization ('3d', '4d'), ('4s', '6s')
+  [window] distilled 3d: k=1 of 2 bands, capture 0.9998-0.9998
+  sc_3d_2-1_casci_ao_-_pol_avg: 1:1 -759.435292297  candidate -759.331436233  dE +103.8561 mEh
+  [window] distilled 3d: k=1 of 2 bands, capture 0.9998-0.9998; 4s: k=1 of 2 bands, capture 0.0003-0.9985
+  sc_3d4s_2-1_casci_ao_-_pol_avg: 1:1 -759.728239375  candidate -759.735184780  dE -6.9454 mEh
+  [window] distilled 3d: k=1 of 2 bands, capture 0.9998-0.9998; 4s: k=1 of 2 bands, capture 0.0003-0.9985
+  sc_3d4s_2-1_casci_ao_-_pur_avg: 1:1 -759.728890878  candidate -759.735833203  dE -6.9423 mEh
+== Ti contracted: candidate realization ('3d', '4d'), ('4s', '6s')
+  [window] distilled 3d: k=1 of 2 bands, capture 0.9998-0.9998
+  ti_3d_2-0_casci_ao_-_pol_avg: 1:1 -848.397266927  candidate -848.403497555  dE -6.2306 mEh
+  [window] distilled 3d: k=1 of 2 bands, capture 0.9998-0.9998; 4s: k=1 of 2 bands, capture 0.0003-0.9996
+  ti_3d4s_3-1_casci_ao_-_pol_avg: 1:1 -848.393165657  candidate -848.403756666  dE -10.5910 mEh
+  [window] distilled 3d: k=1 of 2 bands, capture 0.9998-0.9998; 4s: k=1 of 2 bands, capture 0.0003-0.9996
+  ti_3d4s_3-1_casci_ao_-_pur_avg: 1:1 -848.394584550  candidate -848.405163695  dE -10.5791 mEh
