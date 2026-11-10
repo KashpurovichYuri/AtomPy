@@ -238,6 +238,36 @@ carries a number only when the number IS the fact.
     Windows/fold partitions are CHEMICAL; the shells' band lists may
     overlap where a partition is declared non-disjoint, and the
     window projection against the confined core owns the shared rows.
+27. **The second-order (Newton) SCF path freezes occupations from its
+    early cycles** — a converged solution can therefore VIOLATE a
+    character-forced occupation hook (a 3d-forced configuration
+    converging onto a different configuration's solution): energy
+    agreement alone cannot certify the configuration — the
+    occupation post-check (the hook re-applied to the CONVERGED MOs
+    must reproduce the run's own occupations) is mandatory wherever
+    the accelerator runs under a forcing hook. The census instrument
+    (`reference.rohf_basin_census`) carries it as the `occ_ok`
+    column; `basis.run_ladder` post-checks every gated ladder run.
+    Corollaries: the plain-DIIS arms can diverge on exactly the
+    configurations that need forcing (the accelerator is declared
+    per LadderSpec), and a ladder's forced configurations are
+    multi-basin at draw-chaos scale — the gate anchors a CENSUSED
+    basin (the occupation-safe rows), never a fresh draw's energy.
+28. **The two distillation families and the radial-prior metric**:
+    the incumbent `window_distilled` (the reference's span-signal
+    Gram) and the prior axis's `basis.series_window` (the
+    occupation-weighted density blocks, averaged over the
+    configuration ladder) are DIFFERENT signal definitions sharing
+    the member chains (`windows.member_chains`) — never mixed in one
+    comparison row; the density-block radial eigenproblem must
+    maximize the CAPTURE (the generalized problem `(block, s_r⁻¹)`,
+    `eigh(LᵀBL)` with vectors through `L⁻ᵀ`): the `(block, s_r)`
+    conjugation mixes the Euclidean coefficient pairing into the
+    numerator and returns s_r⁻¹-distorted radials (the
+    planted-radial anchor is the pin; both families agree on a
+    single-configuration source — the consistency certificate). At
+    k equal to the chain width the two conventions coincide (the
+    span is the whole space — the CASCI total is convention-blind).
 
 ## Conventions
 
@@ -267,7 +297,7 @@ carries a number only when the number IS the fact.
 
 ## Tests
 
-`pytest` runs 253 tests. The fast tier: `pytest -m fast` = 164
+`pytest` runs 303 tests. The fast tier: `pytest -m fast` = 209
 tests in seconds (machine-light selection). The heavy tail is
 HOURS-class now (the `test_symm_tm` fixture carries the (8,13)
 SA-leg optimizer pairs, 1–2 h each — the old "~15 min" record

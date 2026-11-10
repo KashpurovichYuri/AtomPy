@@ -68,11 +68,18 @@ def cas_label(key, spec=None) -> str:
     the case declares one, and through the WINDOW COMPRESSION when
     the case declares that (a distilled shell contributes its k
     radials' m-sets -- the CAS label reads the delivered records'
-    shapes; the raw band count would read CAS(3,43) for a CAS(3,6))."""
+    shapes; the raw band count would read CAS(3,43) for a CAS(3,6)).
+    A source-tagged window's k rides the TAG (the budget column must
+    state the doubled width -- a k=2 row mislabeled at the k=1 shape
+    would hide the double-budget reading)."""
+    from atomterm.windows import distilled_ncas
+
     shells = re.findall(r"\d+[spdfgh]", key.span_label)
-    if spec is not None:
+    if key.source_tag is not None:
+        k = key.source_tag[1]
+        cols = distilled_ncas(shells, {sh: k for sh in shells})
+    elif spec is not None:
         if getattr(spec, "shell_radials", None) is not None:
-            from atomterm.windows import distilled_ncas
             cols = distilled_ncas(shells, spec.shell_radials)
         else:
             from atomterm.windows import realized_patterns

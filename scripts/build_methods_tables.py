@@ -73,7 +73,8 @@ BEGIN, END = "<!-- ladder:begin -->", "<!-- ladder:end -->"
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
                 "sa-casscf": "SA-CASSCF"}
-START_NAMES = {"ao": "AO", "mo": "MO", "moc": "MOC", "no": "NO"}
+# the distilled kind renders D (its construction: the distilled windows)
+START_NAMES = {"ao": "D", "mo": "MO", "moc": "MOC", "no": "NO"}
 MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
               "virtmix": "virtual-mix"}
 
@@ -160,6 +161,12 @@ def _row(k, p, anchor, spec) -> str:
     elif route == "pinned":
         note += "SCF core; offset = bookkeeping form"
     wname = (spec.window_names or {}).get(k.span_label, k.span_label)
+    src = k.source_tag
+    if src is not None:
+        # the prior axis rides the display (the tag is the window's
+        # identity; without it the rows would be indistinguishable
+        # from the incumbent's at the same span)
+        wname += f" ({src[0]}{src[1]})"
     cells = [
         _method(k), route, f"{wname} / {START_NAMES[k.start]}",
         cas_label(k, spec), fold, f"{p['n_det']:,}",

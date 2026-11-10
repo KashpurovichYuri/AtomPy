@@ -185,7 +185,7 @@ fold's raw-shell Löwdin span, the window placed through
 `build_full_mo`) — the label under which the pinned route runs.
 
 **The treatment grid.** One declared grid, priced and classified at
-fixed window: fold (raw/avg/frac) × start (AO/MO/NO) × mask
+fixed window: fold (raw/avg/frac) × start (D/MO/NO) × mask
 (free/radial/frozen) × objective (single root / M_L average) ×
 substrate (polarized/purified — the core span). Every cell is priced
 against the ROHF anchor; the grid localizes each failure by which axis
@@ -232,8 +232,9 @@ slices are interesting; the runners execute the declared set:
 | sector (M_S) | `(na, nb)`, from spin + electron parity | `run.py` |
 | method | casci / casscf / sa-casscf | `regen_cells.py` |
 | mask | free / frozen / radial / virtmix | `regen_cells.py` |
-| start (the window kind) | **ao** — the distilled windows: MO-informed (the radial Gram of the reference's occupied columns), AO-expressed, m-complete — the production kind; **mo** / **moc** (rendered `MO` / `MOC`) — the SCF's own canonical slice / character-selected columns, the *controls* (m-incomplete by construction: the SCF's hybrid-open gauge, certified scrambled-term fingerprints); **no** — the term-averaged density's occupation groups (`<source>no<k>` label), m-complete by sphericity — the density leg, expected degenerate with `ao` at k=1 | `regen_cells.py` |
-| radials (k) | the distillation depth, per shell — **k = 1 is the usual case** (it already spans the full shell, k·(2l+1) columns, the contraction analog); k ≥ 2 only when a correlated source supplies real second radials (the SCF's Gram is rank-1) *and* the CAS budget allows — the tail certificate refuses barren k | the case declaration (`shell_radials`) |
+| start (the window kind) | **ao** — the distilled windows: MO-informed (the radial Gram of the reference's occupied columns), AO-expressed, m-complete — the production kind, **rendered `D`**; **mo** / **moc** (rendered `MO` / `MOC`) — the SCF's own canonical slice / character-selected columns, the *controls* (m-incomplete by construction: the SCF's hybrid-open gauge, certified scrambled-term fingerprints); **no** — the term-averaged density's occupation groups (`<source>no<k>` label), m-complete by sphericity — the density leg, expected degenerate with `D` at k=1 | `regen_cells.py` |
+| source (the radial prior) | the **prior axis**, a `@`-tag on the window label: *untagged* = the incumbent (the reference's span-signal distillation — the stored cells' identity, frozen); **`@r<k>`** = the head configuration's density block at k; **`@s<k>`** = the configuration-ladder average (the basin-gated forced-occupation series, `basis.run_ladder`) at k — the density-block family beside the incumbent's span-signal family; the tag is part of the window identity, so differently-sourced windows never collide and every comparison names its basis | the case declaration (`ladder` + `prior_bands`) |
+| radials (k) | the distillation depth, per shell — **k = 1 is the usual case** (one radial per shell, the contraction analog); a single-configuration source is rank-1 — the second radial exists only as the ladder's configuration *spread* (`@s2`), and the kept-signal certificate refuses barren k; **k=2 doubles the window budget** (the CAS column states it) — the k-frozen windows stand alone (symmetry-exact, suboptimal) | the case declaration (`shell_radials`); the tag's k on prior windows |
 | substrate | pol (canonical core) / pur (closed span) | `regen_cells.py` |
 | fold | raw / avg / frac | `regen_cells.py` |
 | field | neutral (default) / folded — the reference the cell's substrate lives on; ninth address slot, written only when `folded` | `run_cell` / `run_lane_cell` (the substrate on the key's field) |
@@ -302,13 +303,31 @@ placed through `build_full_mo` — the label under which the pinned
 route runs; the lane family's *free* twin (same window, same fold,
 free driver) demonstrates route agreement at the same partition.
 
+**Core-field taxonomy** — what the fold/substrate vocabulary names
+(one line each; the axes compose, e.g. `avg·pur` = the certified
+class):
+
+| tag | the core field it names |
+|---|---|
+| `raw` | the SCF's canonical core density as converged — the anisotropy *detector* |
+| `avg` | that density's spherical average — the *ruler* |
+| `frac` | a different reference SCF entirely (fractional occupations) — the average-of-configuration *control* |
+| `pur` | the substrate axis: the closed, rotation-closed core *span* (vs `pol` = the SCF's polarized canonical span) |
+| `lane` | the pinned route's uniform construction: the fold span's own core, the window placed through `build_full_mo` |
+
 Columns of the CI window survey (one row per declared CI cell):
 
-- **window / CAS / dets** — the span and its active size; **fold** —
+- **window / CAS / dets** — the span and its active size (the CAS
+  shape is the **budget**: a `@s2` window doubles the per-shell
+  columns — read the k=2 rows as double-budget, their dominance as
+  variational headroom, never same-budget superiority); a prior tag
+  rides the window name (`(r1)` the head configuration's own block,
+  `(s1)`/`(s2)` the configuration-ladder average at k=1/k=2 — the
+  untagged rows are the incumbent); **fold** —
   the partition: the pinned rows carry their own tags (`semi`,
   explicit lists), free rows the prefix name, with `·raw`/`·frac`/
   `·pur` marking the free variants' deviation; **start** — the
-  window kind (`AO` distilled / `MO` canonical slice / `MOC`
+  window kind (`D` distilled / `MO` canonical slice / `MOC`
   character-selected / `NO` density groups — the kind block compares
   them at the ruler folds; the controls carry the m-incomplete
   fingerprint note); **route** — free
@@ -334,7 +353,7 @@ render what ran):
 
 - **method | route | window | CAS | fold | dets | E | ΔE | eV | conv
   | ⟨L²⟩ | ptp | the closure and meter columns | note** — the
-  window cell carries the start (`3d4s / AO`); the method names the
+  window cell carries the start (`3d4s / D`); the method names the
   objective and its restriction only (`CASSCF, radial`); the
   substrate is the fold column's (Fold notation's markers); the ROHF
   anchor row leads, ΔE's zero.
@@ -468,9 +487,9 @@ every other atom: `elements/<Atom>/TABLE.md`; frozen, this draw):
 | method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | conv | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −848.4065 | 0 | — | — | — | — | forced filling |
-| CASCI | free | 3d4s / AO | (4,6) | Ar | 120 | −848.3959 | +10.5 | — | 12.0000 | 4.2e-09 | 2.3e-08 |  |
-| CASSCF | free | 3d4s / AO | (4,6) | Ar | 120 | −848.4377 | −31.3 | 1e-8/38 | 0.0503 | 4.3e-01 | 1.1e+00 |  |
-| SA-CASSCF | free | 3d4s / AO | (4,6) | Ar | 120 | −848.4166 | −10.1 | 1e-9/33 | 12.0029 | 1.1e+00 | 6.0e+00 |  |
+| CASCI | free | 3d4s / D | (4,6) | Ar | 120 | −848.3959 | +10.5 | — | 12.0000 | 4.2e-09 | 2.3e-08 |  |
+| CASSCF | free | 3d4s / D | (4,6) | Ar | 120 | −848.4377 | −31.3 | 1e-8/38 | 0.0503 | 4.3e-01 | 1.1e+00 |  |
+| SA-CASSCF | free | 3d4s / D | (4,6) | Ar | 120 | −848.4166 | −10.1 | 1e-9/33 | 12.0029 | 1.1e+00 | 6.0e+00 |  |
 
 (ΔE against the ROHF anchor; the ellided columns — eV twins, ptp, the
 span certificates — are in the element file. The reading: the free
