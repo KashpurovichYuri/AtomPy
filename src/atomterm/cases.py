@@ -413,18 +413,20 @@ _SAME_L_VOID = Scenario(
            "2026-11-10)")
 
 
-def _prior_anchor_first(atom: str, sector) -> Scenario:
-    """The prior windows' anchor-first gate: their OPTIMIZER cells
-    stay void until the CASCI anchors run -- the prior comparison is
-    CASCI; the treatment rows over a chosen basis come after the
-    adoption decision (the radial-CASSCF legs re-home there)."""
-    na, nb = sector
+def _prior_anchor_first(atom: str, sectors) -> Scenario:
+    """The prior windows' anchor-first gate (every declared sector --
+    the case default and any planned_sectors overrides): their
+    OPTIMIZER cells stay void until the CASCI anchors run -- the
+    prior comparison is CASCI; the treatment rows over a chosen
+    basis come after the adoption decision (the radial-CASSCF legs
+    re-home there)."""
     cells = []
     for w in _PRIOR_WINDOWS:
         no = f"{w}no{len(re.findall(r'\d+[spdfgh]', w.partition('@')[0]))}"
         for lbl in (w, no):
-            cells += [f"{atom.lower()}_{lbl}_{na}-{nb}_casscf_",
-                      f"{atom.lower()}_{lbl}_{na}-{nb}_sa-casscf_"]
+            cells += [f"{atom.lower()}_{lbl}_{na}-{nb}_{m}_"
+                      for na, nb in sectors
+                      for m in ("casscf", "sa-casscf")]
     return Scenario(
         name="prior-anchor-first", cells=tuple(cells),
         reason="the prior-axis comparison is CASCI: optimizer cells of "
@@ -633,7 +635,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    # single-configuration block is rank-1 -- series_window
                    # refuses the noise second radial)
                    planned_windows=_PRIOR_WINDOWS,
-                   scenarios=(_prior_anchor_first("Sc", (2, 1)),),
+                   scenarios=(_prior_anchor_first("Sc", [(2, 1)]),),
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "2p", "3s", "3p", "4s"),
                        occ_open=("3d",), occ_e_ref=-759.73625510,
@@ -649,7 +651,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  "3s3p3d@1s2s2p4s",
                                  "3d3p4s@1s2s2p3s"),
                    scenarios=(_ANCHOR_FIRST, _SAME_L_VOID,
-                              _prior_anchor_first("Ti", (3, 1))),
+                              _prior_anchor_first("Ti", [(3, 1), (2, 0)])),
                    # the prior axis: the ladder (the HEAD gate = the
                    # TRUSTED reference energy; the further gates = the
                    # CENSUS occupation-safe basins 2026-11-10 -- the
@@ -668,6 +670,12 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                       4, -848.24887522)),
                    prior_bands={"3d": ("3d", "4d"), "4s": ("4s", "6s")},
                    planned_windows=("3d4d", "3d4s4p4d", *_PRIOR_WINDOWS),
+                   # the 3d-only prior windows compare against the
+                   # LATTICE's d2 sector (ti_3d_2-0), not the case
+                   # default (3,1 -- a different term class with no
+                   # incumbent twin)
+                   planned_sectors={f"3d@{t}": (2, 0)
+                                    for t in ("r1", "s1", "s2")},
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "3s", "4s", "2p", "3p"),
                        occ_open=("3d",), occ_e_ref=-848.40648875,

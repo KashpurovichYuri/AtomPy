@@ -287,12 +287,19 @@ def test_void_reason_gates_scenariod_cells():
     (the key constructs; only the run is gated)."""
     spec = CAMPAIGN["Ti"]
     sc = scenarios_for(spec)
+    same_l = ("3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4")
     for k in planned(spec):
-        assert (void_reason(k, sc) is not None) == (k.method != "casci"), \
+        if k.window in same_l:
+            assert void_reason(k, sc) is not None, k.address
+        else:
+            assert (void_reason(k, sc) is not None) == \
+                (k.method != "casci"), k.address
             k.address
     assert all(void_reason(k, sc) is None for k in grid_keys(spec))
     reason = void_reason("ti_3d4d_3-1_casscf_ao_-_pol_avg", sc)
     assert reason.startswith("anchor-first") and "2026-11-02" in reason
+    reason = void_reason("ti_3d4d_3-1_casci_ao_-_pol_avg", sc)
+    assert reason.startswith("same-l-window") and "2026-11-10" in reason
 
 
 @fast
