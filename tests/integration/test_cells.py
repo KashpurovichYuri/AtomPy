@@ -1249,13 +1249,13 @@ def test_ladder_every_run_cell_a_row_no_starts_scoped_to_optimizers():
     agree = {k.address: _ladder_payload(-848.4) for k in keys}
     text = "\n".join(mod.ladder_section(cs, agree, -848.4065))
     rows = [r for r in text.splitlines() if r.startswith("|")]
-    ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / AO |")]
+    ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / D |")]
     assert len(ci) == 4            # the four fold variants' CI rows
     no_ci = [r for r in rows if "/ NO |" in r]
     assert len(no_ci) == 2         # the density leg, both ruler folds
     assert all(r.startswith("| CASCI |") for r in no_ci)
     opt = [r for r in rows
-           if r.startswith("| CASSCF | free | 3d4s / AO |")]
+           if r.startswith("| CASSCF | free | 3d4s / D |")]
     assert len(opt) == 2 and not any("·lane" in r for r in opt)  # Ar + Ar·pur substrates
 
 
@@ -1275,7 +1275,7 @@ def test_ladder_meter_and_ptp_columns_render():
     text = body(agree)
     rows = [r for r in text.splitlines() if r.startswith("|")]
     opt = [r for r in rows
-           if r.startswith("| CASSCF | free | 3d4s / AO |")]
+           if r.startswith("| CASSCF | free | 3d4s / D |")]
     assert opt[0].split("|")[14].strip() == "1e-15"
     assert opt[0].split("|")[15].strip() == "2e-15"
     assert opt[0].split("|")[13].strip() == "—"  # the single root: no set
@@ -1286,7 +1286,7 @@ def test_ladder_meter_and_ptp_columns_render():
     traced[sa.address] = {**_ladder_payload(-848.4, roots=5),
                           "conv_dE": 2.3e-9, "cycles": 5}
     row = [r for r in body(traced).splitlines()
-           if r.startswith("| SA-CASSCF | free | 3d4s / AO |")][0]
+           if r.startswith("| SA-CASSCF | free | 3d4s / D |")][0]
     assert "| 1e-9/5 |" in row and "| 0e+00 |" in row
 
 
@@ -1310,7 +1310,7 @@ def test_ladder_cycle_cap_note():
                              "conv_dE": 2.3e-9, **extra}
         row = [r for r in "\n".join(
                    mod.ladder_section(cs, cells, -848.4065)).splitlines()
-               if r.startswith("| SA-CASSCF | free | 3d4s / AO |")][0]
+               if r.startswith("| SA-CASSCF | free | 3d4s / D |")][0]
         return "cycle cap" in row
 
     assert row_of({"cycles": 5, "max_cycle": 5})       # identity fires
@@ -1329,7 +1329,7 @@ def test_ladder_ci_only_store_renders_planned_pointers():
     text = "\n".join(mod.ladder_section(
         cs, {k.address: _ladder_payload(-848.4) for k in keys
              if k.method == "casci"}, -848.4065))
-    assert "| CASCI | free | 3d4s / AO |" in text
+    assert "| CASCI | free | 3d4s / D |" in text
     assert "regen_cells.py Ti --window 3d4d" in text
     assert "| CASSCF" not in text and "| SA-CASSCF" not in text
 
@@ -1370,11 +1370,11 @@ def test_method_ladder_lane_families():
              if set(l.replace("|", "").replace(" ", "")) == {"-"}]
     assert len(rules) == 2    # the column SEP + the anchor block's
     #                          rule; the lone family leads without one
-    assert sum(l.startswith("| CASCI | pinned | 3d3p4d / AO |")
+    assert sum(l.startswith("| CASCI | pinned | 3d3p4d / D |")
                for l in lines) == 1
-    assert sum(l.startswith("| CASCI | free | 3d3p4d / AO |")
+    assert sum(l.startswith("| CASCI | free | 3d3p4d / D |")
                for l in lines) == 1
-    assert sum(l.startswith("| CASSCF | free | 3d3p4d / AO |")
+    assert sum(l.startswith("| CASSCF | free | 3d3p4d / D |")
                for l in lines) == 1
     assert sum(l.startswith("| SA-CASSCF | pinned | 3d3p4d")
                for l in lines) == 1
