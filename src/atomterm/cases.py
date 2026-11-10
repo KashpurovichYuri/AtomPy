@@ -597,19 +597,20 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  # 4s fixed: the 4s->5s direction is
                                  # harmful and would mask the d structure
                                  extra_fixed="4s"),
-                   # the prior axis: the ladder (gates = the probe's
-                   # term-certified draws, head = the trusted reference)
-                   # and the widened realization (Sc's certificate:
-                   # 3d -> (3d, 4d), 4s -> (4s, 6s))
+                   # the prior axis: the ladder (gates = the CENSUS
+                   # occupation-safe basins, 2026-11-10 -- the probe's
+                   # draws were 155-177 mEh SHALLOW garbage) and the
+                   # widened realization (Sc's certificate: 3d ->
+                   # (3d, 4d), 4s -> (4s, 6s))
                    ladder=(LadderSpec("d1s2", ("1s", "2s", "2p", "3s",
                                                "3p", "4s"), ("3d",),
                                       1, -759.73625510),
                            LadderSpec("d2s1", ("1s", "2s", "2p", "3s",
                                                "3p"), ("3d", "4s"),
-                                      3, -759.52176011),
+                                      3, -759.69899090),
                            LadderSpec("d3", ("1s", "2s", "2p", "3s",
                                              "3p"), ("3d",),
-                                      3, -759.41547824)),
+                                      3, -759.57064777)),
                    prior_bands={"3d": ("3d", "4d"), "4s": ("4s", "6s")},
                    # the prior windows: @r1 (the head's own block -- the
                    # probe's "neutral"), @s1/@s2 (the ladder mean, the
@@ -635,21 +636,21 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    scenarios=(_ANCHOR_FIRST,
                               _prior_anchor_first("Ti", (3, 1))),
                    # the prior axis: the ladder (the HEAD gate = the
-                   # TRUSTED reference energy -- the probe's fresh
-                   # d2s2 draw was 11 mEh shallow; the further gates =
-                   # the probe's draws); the realization WIDENS 3d
-                   # beyond Ti's certificate (3d -> (3d), capture
-                   # 0.9991 -- a DECLARED widening: k=2 needs the
-                   # 2-wide radial space)
+                   # TRUSTED reference energy; the further gates = the
+                   # CENSUS occupation-safe basins 2026-11-10 -- the
+                   # probe's d4 draw was 94 mEh shallow, d3s1 4.7 mEh);
+                   # the realization WIDENS 3d beyond Ti's certificate
+                   # (3d -> (3d), capture 0.9991 -- a DECLARED widening:
+                   # k=2 needs the 2-wide radial space)
                    ladder=(LadderSpec("d2s2", ("1s", "2s", "2p", "3s",
                                                "3p", "4s"), ("3d",),
                                       2, -848.40648875),
                            LadderSpec("d3s1", ("1s", "2s", "2p", "3s",
                                                "3p"), ("3d", "4s"),
-                                      4, -848.38179380),
+                                      4, -848.38650790),
                            LadderSpec("d4", ("1s", "2s", "2p", "3s",
                                              "3p"), ("3d",),
-                                      4, -848.15487195)),
+                                      4, -848.24887522)),
                    prior_bands={"3d": ("3d", "4d"), "4s": ("4s", "6s")},
                    planned_windows=("3d4d", "3d4s4p4d", *_PRIOR_WINDOWS),
                    ref=ReferenceSpec(

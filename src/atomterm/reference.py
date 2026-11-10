@@ -52,7 +52,8 @@ from pyscf import gto, scf
 
 from atomterm.windows import select_span, span_projector
 
-__all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "uhf_basin_census",
+__all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "rohf_basin_census",
+           "uhf_basin_census",
            "run_frac_occ", "uhf_contamination", "run_folded"]
 
 
@@ -348,6 +349,84 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
 
     gate = ref.occ_e_ref if ref is not None else None
     return _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg)
+
+
+# the census arms: the gate's own guess cycle (default, then the two
+# named starts) -- the census must see exactly what the gate can reach
+ROHF_CENSUS_GUESSES = (("default", None), ("atom", "atom"),
+                       ("huckel", "huckel"))
+
+
+def rohf_basin_census(cfg, ref: ReferenceSpec | None = None,
+                      guesses=ROHF_CENSUS_GUESSES) -> list[dict]:
+    """The ROHF basin census: one character-forced SCF per starting
+    guess, the basin table side by side -- the measurement behind the
+    configuration-ladder gate (:class:`atomterm.basis.LadderSpec`'s
+    ``e_ref``).
+
+    A degenerate open shell is multi-basin at fixed occupations (the
+    metastable draws differ by tens of mEh); the census MEASURES the
+    basins the gate's own guess cycle can reach, the declaration
+    ANCHORS the gate on one row -- the deepest converged row is the
+    physical configuration state (the variational pick; an
+    unconverged arm is a divergence to widen the accelerator policy
+    on, never a basin). Occupations stay character-forced throughout
+    (``ref``); no checkpoint is written; the arms run under ``ref``'s
+    declared acceleration policy (the production path's own).
+
+    OCCUPATION SAFETY (``occ_ok``): the Newton/second-order path
+    rotates orbitals with occupations FROZEN from its early cycles --
+    a converged arm can therefore VIOLATE the hook (measured on Sc:
+    a 3d-forced quartet converging onto the d2s1 solution with the
+    4s MO occupied at hook-rank 0).  Each arm is post-checked: the
+    hook re-applied to the CONVERGED MOs must reproduce the run's own
+    occupations.  A converged-but-``occ_ok=False`` arm is a WRONG
+    CONFIGURATION, not a basin of the intended one -- the gate never
+    anchors there.
+
+    Parameters
+    ----------
+    cfg : AtomConfig
+        The atom (the ladder configuration's own spin).
+    ref : ReferenceSpec
+        The configuration's occupation forcing (mandatory here -- a
+        census without forcing measures the aufbau runaway, not the
+        configuration's basins).
+    guesses : (label, init_guess) pairs
+        The arms; the default = the gate's own cycle.
+
+    Returns
+    -------
+    list[dict]
+        Per arm: ``label``, ``e_tot``, ``converged``, ``occ_ok``.
+    """
+    from atomterm.system import build_mol
+
+    mol = build_mol(cfg)
+    out = []
+    for label, guess in guesses:
+        m = scf.ROHF(mol)
+        if ref.occ_closed is None:
+            raise ValueError(
+                "the census needs the occupation forcing (ref= with "
+                "occ_closed/occ_open) -- without it the arms measure "
+                "the aufbau runaway, not the configuration's basins")
+        hook = _forced_rohf_occ(mol, list(ref.occ_closed),
+                                list(ref.occ_open))
+        m.get_occ = hook
+        m.conv_tol = 1e-12
+        m.verbose = cfg.verbose
+        if guess is not None:
+            m.init_guess = guess
+        mf = _accelerated(m, ref)
+        mo_energy = (mf.mo_energy if np.ndim(mf.mo_energy) == 1
+                     else np.asarray(mf.mo_energy)[0])
+        reassigned = hook(np.asarray(mo_energy), mf.mo_coeff)
+        out.append({"label": label, "e_tot": float(mf.e_tot),
+                    "converged": bool(mf.converged),
+                    "occ_ok": bool(np.array_equal(
+                        reassigned, np.asarray(mf.mo_occ)))})
+    return out
 
 
 def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):

@@ -1,0 +1,18 @@
+
+===== cells Sc =====
+ROHF E = -759.73625510 Eh
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 404, in <module>
+    main()
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 354, in main
+    ladder_mfs = run_ladder(cfg, "elements", name, spec.ladder, mf)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/basis.py", line 164, in run_ladder
+    _m, mf_x = run_rohf(cfg_x, str(chk_dir / f"{spec.tag}.chk"), ref=ref)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/reference.py", line 350, in run_rohf
+    return _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/reference.py", line 290, in _converged_cached
+    raise RuntimeError(
+RuntimeError: character-forced SCF did not reach the reference basin E = -759.52176011 (got -759.60089066, converged=False); the basin census or the guess list needs revisiting

@@ -93,13 +93,24 @@ class LadderSpec(NamedTuple):
         e.g. ``"d1s2"``).
     closed / open : the doubly-/singly-occupied AO span patterns
         (:class:`atomterm.reference.ReferenceSpec` semantics -- by
-        character, never energy order).
+        character, never energy order).  A MIXED configuration
+        (``d2s1``) is pinned only to its spin and its open spans --
+        the flat open ranking cannot express "2 open in 3d + 1 in
+        4s"; the deeper quartet wins unless the spans say otherwise
+        (a 3d-only open list pins d3 exactly).  The declared e_ref is
+        the measured anchor of the INTENDED basin.
     spin : the configuration's 2S (the :class:`atomterm.system.AtomConfig`
         spin of its sector).
     e_ref : the basin gate energy (Eh).  MANDATORY: the gate matches a
         fresh draw to the declared basin within 1e-4 (guess cycling),
         refusing the wrong-basin draws the degenerate open shell
-        admits.  Measured by the census, then trusted.
+        admits.  Measured by the census
+        (:func:`atomterm.reference.rohf_basin_census` -- the
+        occupation-safe rows), then trusted.
+    accel : the SCF acceleration policy (``conv_accelerator`` -- the
+        ladder configurations DIVERGE under plain DIIS, measured;
+        Newton converges them, at the cost that its frozen early
+        occupations can VIOLATE the hook -- run_ladder post-checks).
 
     Notes
     -----
@@ -115,6 +126,7 @@ class LadderSpec(NamedTuple):
     open: tuple[str, ...]
     spin: int
     e_ref: float
+    accel: str = "newton"
 
 
 # the ladder -----------------------------------------------------------
@@ -160,8 +172,26 @@ def run_ladder(cfg: "AtomConfig", workdir: str | Path, key: str, ladder,
     for spec in ladder[1:]:
         cfg_x = type(cfg)(cfg.symbol, cfg.basis, spin=spec.spin)
         ref = ReferenceSpec(occ_closed=spec.closed, occ_open=spec.open,
-                            occ_e_ref=spec.e_ref)
+                            occ_e_ref=spec.e_ref,
+                            conv_accelerator=spec.accel)
         _m, mf_x = run_rohf(cfg_x, str(chk_dir / f"{spec.tag}.chk"), ref=ref)
+        # the occupation post-check: the Newton path's frozen early
+        # assignments can converge VIOLATING the hook (measured: a
+        # 3d-forced quartet landing the d2s1 solution) -- a gated run
+        # whose occupations disagree with its own hook is a wrong
+        # configuration, refused whatever the energy
+        from atomterm.reference import _forced_rohf_occ
+        hook = _forced_rohf_occ(_m, list(spec.closed), list(spec.open))
+        mo_energy = (mf_x.mo_energy if np.ndim(mf_x.mo_energy) == 1
+                     else np.asarray(mf_x.mo_energy)[0])
+        if not np.array_equal(hook(np.asarray(mo_energy), mf_x.mo_coeff),
+                              np.asarray(mf_x.mo_occ)):
+            raise RuntimeError(
+                f"ladder config {spec.tag!r} converged at "
+                f"E = {mf_x.e_tot:.8f} with occupations its own hook "
+                "reassigns differently (the Newton frozen-assignment "
+                "disease) -- the wrong configuration; the census "
+                "(rohf_basin_census, the occ_ok rows) owns the gate")
         out[spec.tag] = mf_x
     return out
 
