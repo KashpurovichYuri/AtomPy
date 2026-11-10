@@ -42,6 +42,39 @@ user decision; the partial verdict 91/91-isolation-green).
   wave's next): the prior-cells run (the first CASCI cells of the
   tagged windows -- ALSO the probe's re-verification under the FIXED
   metric, see below), then the radial-CASSCF legs, SA-over-ladder.
+- THE HONEST PRIOR TABLE (Sc, first run under the FIXED metric +
+  the CENSUS-corrected ladder, 2026-11-10; the store: sc_{3d,3d4s}
+  @{r1,s1,s2} casci ao pol/avg): the k=1 HIERARCHY THE PROBE REPORTED
+  IS INVERTED -- honest: @r1 (the head block) +102.9 on the d-row /
+  -7.0 on the primary; @s1 (the ladder mean) -64.7 on the d-row /
+  +5.5 on the primary; @s2 -119.5/-16.4.  The probe's flipped
+  numbers said neutral -83.8/+127.3 and series1 +13.6/+200.3 -- the
+  ladder mean is a STRONG k=1 prior (the probe had it the worst),
+  and no universal k=1 winner remains (the head block wins the
+  primary, the mean wins the d-row).  THE INTERNAL CONSISTENCY
+  CERTIFICATE: @s2 matches the probe's numbers EXACTLY -- k=2 on a
+  2-band chain spans the full radial space, the radial convention is
+  a rotation within it, and the CASCI total is span-invariant.  Ti's
+  table lands with its run; the SA-over-ladder optimization (the
+  dominant-k=1 road) is the wave's next step after it.
+- THE LADDER CENSUS + THE NEWTON OCCUPATION DISEASE (2026-11-10,
+  reference.rohf_basin_census -- the ROHF twin of the UHF instrument,
+  committed with the occ_ok certificate): the probe's ladder draws
+  were 155-177 mEh SHALLOW garbage; the true quartet basins are Sc
+  d2s1 = -759.69899090 (robust), Sc d3 = -759.57064777 (huckel+
+  newton only), Ti d3s1 = -848.38650790, Ti d4 = -848.24887522 --
+  the declarations carry them.  THE DISEASE: the Newton/second-order
+  path freezes occupations from its early cycles -- converged arms
+  can VIOLATE the hook (measured: a 3d-forced quartet converging
+  onto the d2s1 solution, the 4s MO occupied at hook-rank 0); the
+  census's occ_ok column refuses them and run_ladder post-checks
+  every gated run.  The plain-DIIS arms DIVERGE on these configs
+  (LadderSpec.accel, default newton).  ALSO VOIDED: Ti's same-l
+  planned windows (3d4d, 3d4s4p4d) -- latent-unrunnable since the
+  distillation wave (window_distilled's declared future seam), now a
+  dated scenario; the incumbent distilled FRAC cells are the same
+  latent class (their pre-distillation caches mask the refusal -- a
+  --fresh regen of them would be refused; watch item).
 - THE PROBE'S RADIAL TRANSPORT WAS FLIPPED (2026-11-10, caught by the
   unit pin -- the three-layer chain's exact-anchor layer): the probe's
   `metric_radials` solved the generalized problem (block, s_r) --
@@ -54,19 +87,21 @@ user decision; the partial verdict 91/91-isolation-green).
   source).  WHAT SURVIVES of the probe's committed verdicts: the k=2
   DOMINANCE is variational basis-supermacy (any k=2 window over the
   same chain space dominates, distorted radials included) --
-  unaffected; the k=1 NUMBERS (neutral's +109..+127 losses, Sc's
-  -83.8 d-row win, series1 always-worst) were measured on distorted
-  radials and RE-VERIFY at the prior-cells run.  The committed probe
-  logs stay as the historical record (provenance); the module's
-  numbers are the honest successors.
+  unaffected (and now CONFIRMED exactly: the @s2 totals reproduce the
+  probe's to the digit); the k=1 NUMBERS were inverted by the flip
+  (the honest table above).  The committed probe logs stay as the
+  historical record (provenance); the module's numbers are the honest
+  successors.
 - THE SERIES-SOURCE PROBE's review (2026-11-10, two axes over
   44e0ed4..d9e4afe): CORRECTED RECORD -- (1) "neutral loses
   everywhere" (handoff xxi) was FALSE: Sc's d-only row has neutral
   WINNING (-83.8 mEh, term-certified); the truth is NO universal k=1
-  winner (authors' wins the primaries, neutral Sc's d-row, series1
-  none) -- which STRENGTHENS the SA-over-ladder optimization as the
+  winner -- which STRENGTHENS the SA-over-ladder optimization as the
   only road to a dominant k=1; the neutral-as-small-CAS-default
-  survives (uncontracted bases have no authors' contraction).  (2)
+  survives (uncontracted bases have no authors' contraction).  [The
+  per-row ordering THIS entry reported was the flipped metric's --
+  the honest table (later entry below) inverts the k=1 hierarchy;
+  the no-winner conclusion stands either way.]  (2)
   series2's dominance is VARIATIONAL AT DOUBLE BUDGET: every k=1
   window is a subspace of the k=2 chain space, so the -16/-21/-24/-120
   mEh numbers are the headroom the second radial BUYS, not equal-budget

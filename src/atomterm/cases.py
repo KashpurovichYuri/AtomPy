@@ -397,6 +397,21 @@ _ANCHOR_FIRST = Scenario(
 _PRIOR_WINDOWS = ("3d@r1", "3d@s1", "3d@s2",
                   "3d4s@r1", "3d4s@s1", "3d4s@s2")
 
+# Ti's same-l planned windows (the 3d+4d partitions) wait on
+# window_distilled's declared future seam (the member-preserving
+# cross-shell orthogonalization): two same-l shells' distilled blocks
+# overlap and the assembly refuses -- void until the seam lands
+_SAME_L_WINDOWS = ("3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4")
+_SAME_L_VOID = Scenario(
+    name="same-l-window",
+    cells=tuple(f"ti_{w}_3-1_{m}_"
+                for w in _SAME_L_WINDOWS
+                for m in ("casci", "casscf", "sa-casscf")),
+    reason="same-l distilled windows wait on the member-preserving "
+           "cross-shell orthogonalization (window_distilled's "
+           "declared future seam; void since the distillation wave, "
+           "2026-11-10)")
+
 
 def _prior_anchor_first(atom: str, sector) -> Scenario:
     """The prior windows' anchor-first gate: their OPTIMIZER cells
@@ -633,7 +648,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  "3d3p@semi", "3d3p4d@semi",
                                  "3s3p3d@1s2s2p4s",
                                  "3d3p4s@1s2s2p3s"),
-                   scenarios=(_ANCHOR_FIRST,
+                   scenarios=(_ANCHOR_FIRST, _SAME_L_VOID,
                               _prior_anchor_first("Ti", (3, 1))),
                    # the prior axis: the ladder (the HEAD gate = the
                    # TRUSTED reference energy; the further gates = the
