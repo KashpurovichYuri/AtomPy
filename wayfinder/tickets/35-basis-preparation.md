@@ -58,16 +58,19 @@ Opened 2026-11-10 from the handoff (xxii) skeleton + the review round
 
 ## Open (in order)
 
-1. Ti's (2,0) prior cells land; the honest table completes.
-2. The verdict rendering: the prior rows' presentation (the tables'
-   prior section + the D legend + the window_names display), budget
-   labeled (CAS shape per row), term-selected.
-3. The radial-CASSCF legs (k=1 and k=2 windows, per-state <=).
-4. SA-over-ladder (the transferable k=1 contraction); then the twins +
+1. THE TABLE FEEDBACK ROUND (user, 2026-11-10): (a) same-CAS
+   adjacency in the renderer -- the prior CASCI rows BESIDE the
+   incumbent's at the same CAS (a prior sub-block joining the primary
+   family, ordered by CAS shape), not one-family-per-prior-window;
+   (b) the prior preamble in TABLE.md (r1/s1/s2 + k=2 = double
+   budget); (c) the baseline protocol stated (contracted: the
+   incumbent = the authors' 1:1; uncontracted: the reference-source
+   k=1 is the baseline, no authors' contraction exists; ROHF the
+   absolute zero in both); (d) the README deep review (the user's
+   notes + the pre-basis-layer vocabulary + the reading-key
+   tightening).
+2. The radial-CASSCF legs (k=1 and k=2 windows, per-state <=) --
+   their rows join the same-CAS blocks.
+3. SA-over-ladder (the transferable k=1 contraction); the twins +
    C/Si ports; the adoption gate (user); the exporter + convergence.
-5. The queued clarity items folded in: mo x raw cells; the README
-   fold-taxonomy table; the k sentence (the honest content: the
-   config-ladder mean is the strong k=1; single-config blocks rank-1;
-   k=2 = the variational headroom at double budget).
-6. The census provenance log (the committed census table for the
-   record; the declarations cite it).
+4. Still queued: mo x raw cells; the k sentence's README placement.
