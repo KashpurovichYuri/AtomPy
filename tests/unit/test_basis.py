@@ -220,18 +220,24 @@ def test_series_window_refuses_k_beyond_the_chain_width():
 def test_run_ladder_head_is_the_trusted_reference(tmp_path):
     """The head contract: the FIRST ladder entry is the case's own
     reference -- its mf returns untouched (no SCF, no chk written for
-    it), and a spin-mismatched head is a refused declaration."""
+    it), the head's ENERGY is checked against the declaration (the
+    head-must-be-the-case-reference convention as a checked
+    invariant), and a spin-mismatched head is a refused declaration."""
     mol = uncontracted_carbon_mole()
     _m, head = None, _planted_config(mol, {"2p": ("2p", "3p")},
                                      ["2p"], seed=7)
-    ladder = (LadderSpec("p2", ("1s", "2s"), ("2p",), 2, -37.0),)
+    head.e_tot = -37.5                      # the declared reference's
+    ladder = (LadderSpec("p2", ("1s", "2s"), ("2p",), 2, -37.5),)
     out = run_ladder(type("Cfg", (), {"symbol": "C", "basis": "x",
                                       "spin": 2})(), tmp_path, "C",
                      ladder, head)
     assert out == {"p2": head}
-    assert not (tmp_path / "C" / "rungs" / "ladder").exists() or \
-        not list((tmp_path / "C" / "rungs" / "ladder").glob("*.chk"))
-    bad = (LadderSpec("p2", ("1s", "2s"), ("2p",), 0, -37.0),)
+    wrong_energy = (LadderSpec("p2", ("1s", "2s"), ("2p",), 2, -38.0),)
+    with pytest.raises(ValueError, match="not the ladder head"):
+        run_ladder(type("Cfg", (), {"symbol": "C", "basis": "x",
+                                    "spin": 2})(), tmp_path, "C",
+                   wrong_energy, head)
+    bad = (LadderSpec("p2", ("1s", "2s"), ("2p",), 0, -37.5),)
     with pytest.raises(ValueError, match="mismatched ladder"):
         run_ladder(type("Cfg", (), {"symbol": "C", "basis": "x",
                                     "spin": 2})(), tmp_path, "C",

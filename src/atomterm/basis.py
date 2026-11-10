@@ -166,6 +166,13 @@ def run_ladder(cfg: "AtomConfig", workdir: str | Path, key: str, ladder,
             f"{ladder[0].spin} but the case's reference (which the head "
             f"must be) carries spin {cfg.spin} -- a mismatched ladder "
             "declaration")
+    if abs(head_mf.e_tot - ladder[0].e_ref) > 1e-4:
+        raise ValueError(
+            f"the head mf (E = {head_mf.e_tot:.8f}) is not the ladder "
+            f"head {ladder[0].tag!r}'s declared reference (E = "
+            f"{ladder[0].e_ref:.8f}) -- the head must be the case's own "
+            "trusted reference, passed in as head_mf (a foreign mf is "
+            "a wrong ladder, whatever its convergence)")
     out = {ladder[0].tag: head_mf}
     chk_dir = Path(workdir) / key / "rungs" / "ladder"
     chk_dir.mkdir(parents=True, exist_ok=True)

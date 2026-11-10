@@ -42,6 +42,22 @@ user decision; the partial verdict 91/91-isolation-green).
   wave's next): the prior-cells run (the first CASCI cells of the
   tagged windows -- ALSO the probe's re-verification under the FIXED
   metric, see below), then the radial-CASSCF legs, SA-over-ladder.
+- THE DESIGN SURVEY (2026-11-10, the codebase-design vocabulary over
+  the basis seam): VERDICT -- basis.py is DEEP (the three-part public
+  face stands: metric_radials/valence_block public is the
+  verification seam, the independent-construction pins reach them by
+  design); the two-family seam placement RIGHT (merging the frozen
+  incumbent with the tagged family declined -- the store contract +
+  the differing certificates); the head contract right but
+  UNDER-CHECKED (FIXED: the head-energy invariant now checked in
+  run_ladder + pinned).  RECORD-FOR-LATER: the m-replication/assembly
+  duplication (windows vs basis, verbatim -- extract at the
+  incumbent's next legitimate change, bitwise A/B); the per-atom
+  prepared-basis bundle collapsing shell_bands/shell_radials/
+  prior_bands/ladder_mfs (trigger: a second consumer or a fifth
+  field); the prior_bands-defaults-to-shell_bands rule lives in
+  cells (a small locality leak -- hoist when touched).  NO
+  PASS-THROUGHS (the deletion pass: everything reappears in callers).
 - THE HONEST PRIOR TABLE (Sc+Ti complete, 2026-11-10; the store:
   {sc,ti}_{3d,3d4s}@{r1,s1,s2} casci ao pol/avg, term-certified,
   Ti's 3d rows at the lattice d2 sector): dE vs the incumbent
