@@ -157,42 +157,15 @@ analysis split then differs from the run's partition — such a number
 is an energy of no partition and reads below the kernel's own total
 (the fold shift catches it; compare kernel totals only).
 
-**Fold notation.** A fold is named by a **noble-gas element** when it
-is exactly that element's closed-shell prefix — He {1s}, Ne
-{1s,2s,2p}, Ar {1s..3p}. `semi` marks the **semi-core fold**: for an
-open-(n)d atom, the noble-gas prefix with the (n−1)p shell promoted to
-the active window and the valence ns pair folded in — on the 3d
-metals, Ar − 3p + 4s = {1s,2s,2p,3s,4s}. Every other fold is written
-as an explicit shell list, e.g. {1s,2s,2p,4s}. The machine form
-(addresses, declarations) is the concatenated list — `1s2s2p4s` —
-resolved by `windows.fold_shells`; a lane window carries its fold as
-a tag on the label (`3d3p@semi`). Folds count **electrons
-chemically** — a fold of N pairs freezes N pairs whatever its AO
-realization: on contracted bases the named shells are usually one AO
-block each, while on multi-band realizations (multi-zeta or
-uncontracted bases) each shell names its **declared band list** (the
-shell layer) and the frozen core is the span's own closed-shell
-solution over those bands.
-
-The fold column's **variant markers**: `·raw` — the raw AO shell
-columns as the fold span (no SCF averaging; the anisotropy control);
-`·frac` — the fractional-occupation reference (a *different*
-reference SCF, not the ε→0 limit of averaging); `·pur` — the
-**purified** core substrate (the rotation-closed span of `core.py`:
-raw ROHF cores never rotation-close, the purified span does, at
-machine precision); `·lane` — the ladder's uniform construction (the
-fold's raw-shell Löwdin span, the window placed through
-`build_full_mo`) — the label under which the pinned route runs.
-
 **The treatment grid.** One declared grid, priced and classified at
-fixed window: fold (raw/avg/frac) × start (D/MO/NO) × mask
+fixed window: core field (raw/avg/frac) × start (D/MO/NO) × mask
 (free/radial/frozen) × objective (single root / M_L average) ×
-substrate (polarized/purified — the core span). Every cell is priced
+substrate (pol/pur). Every cell is priced
 against the ROHF anchor; the grid localizes each failure by which axis
-flips it. The spine (default subset): the three folds; frozen ×
+flips it. The spine (default subset): the three core fields; frozen ×
 purified under both objectives — the certified class; one free row
 per substrate — the basin detectors. The ungated variants (stock MO
-picks, free optimization, the raw fold) run through the same analysis
+picks, free optimization, the raw field) run through the same analysis
 — classified, not discarded.
 
 **Gates.** Character-forced reference + energy gate; checkpoint trust;
@@ -222,23 +195,46 @@ declaration; scans (scans.py) are the optimizer-free anatomy layer.
 ### The variety axes
 
 Every point of the campaign's variety is **data** — an axis value in a
-`CellKey` address, never a new script. The declaration says which
-slices are interesting; the runners execute the declared set:
+`CellKey` address, never a new script. Each axis is defined once,
+here, in the same shape (values as `name` — plain phrases); the
+declaration says which slices are interesting, the runners execute
+the declared set, and Results *reads* the axes — it never re-teaches
+them:
 
 | Axis | Values | Run by |
 |---|---|---|
-| atom × basis × ECP | any `AtomConfig` (all-electron or `ecp=`) | both runners |
-| window | any shell set the basis carries; `planned_windows` = declared, not yet run | both runners |
-| sector (M_S) | `(na, nb)`, from spin + electron parity | `run.py` |
-| method | casci / casscf / sa-casscf | `regen_cells.py` |
-| mask | free / frozen / radial / virtmix | `regen_cells.py` |
-| start (the window kind) | **ao** — the distilled windows: MO-informed (the radial Gram of the reference's occupied columns), AO-expressed, m-complete — the production kind, **rendered `D`**; **mo** / **moc** (rendered `MO` / `MOC`) — the SCF's own canonical slice / character-selected columns, the *controls* (m-incomplete by construction: the SCF's hybrid-open gauge, certified scrambled-term fingerprints); **no** — the term-averaged density's occupation groups (`<source>no<k>` label), m-complete by sphericity — the density leg, expected degenerate with `D` at k=1 | `regen_cells.py` |
-| source (the radial prior) | the **prior axis**, a `@`-tag on the window label: *untagged* = the incumbent (the reference's span-signal distillation — the stored cells' identity, frozen); **`@r<k>`** = the head configuration's density block at k; **`@s<k>`** = the configuration-ladder average (the basin-gated forced-occupation series, `basis.run_ladder`) at k — the density-block family beside the incumbent's span-signal family; the tag is part of the window identity, so differently-sourced windows never collide and every comparison names its basis | the case declaration (`ladder` + `prior_bands`) |
-| radials (k) | the distillation depth, per shell — **k = 1 is the usual case** (one radial per shell, the contraction analog); a single-configuration source is rank-1 — the second radial exists only as the ladder's configuration *spread* (`@s2`), and the kept-signal certificate refuses barren k; **k=2 doubles the window budget** (the CAS column states it) — the k-frozen windows stand alone (symmetry-exact, suboptimal) | the case declaration (`shell_radials`); the tag's k on prior windows |
-| substrate | pol (canonical core) / pur (closed span) | `regen_cells.py` |
-| fold | raw / avg / frac | `regen_cells.py` |
-| field | neutral (default) / folded — the reference the cell's substrate lives on; ninth address slot, written only when `folded` | `run_cell` / `run_lane_cell` (the substrate on the key's field) |
+| atom × basis × ECP | any `AtomConfig` — all-electron or ECP-pseudopotentialized | both runners |
+| window | any shell set the basis carries — `planned_windows` = declared, not yet run | both runners |
+| sector (M_S) | `(na, nb)` — derived from spin and electron parity | `run.py` |
+| method | casci — exact diagonalization of the sector; casscf — one root, orbitals free to move; sa-casscf — the term average over the ground term's M_L set | `regen_cells.py` |
+| mask | free — all rotations; radial — same-(l, member) pairs only; frozen — the window pinned; virtmix — the core-mixing probe | `regen_cells.py` |
+| start (the window kind) | `ao` → **D** — the distilled window: the reference's radial content expressed in AO form, m-complete (the production kind); `mo` → **MO** — the SCF's canonical slice (a control: m-incomplete by construction, the hybrid-open gauge); `moc` → **MOC** — the SCF's character-selected columns (a control, the same disease); `no` → **NO** — the term-averaged density's occupation groups (the density leg) | `regen_cells.py` |
+| source (the radial prior) | untagged — the incumbent: radials distilled from the reference's own occupied orbitals (on contracted bases ≈ the basis authors' 1:1 contraction); `@r<k>` — the head's density block, k radials per shell; `@s<k>` — the configuration-series average's density block, k radials per shell (the **configuration series** = one occupation-forced SCF per valence configuration; its first rung, the **head**, is the campaign's anchor reference) — the two distillation families (incumbent vs density-block) never share a comparison row | the case declaration (`ladder` + `prior_bands`) |
+| radials (k) | k = 1 — the usual case, one radial per shell (the contraction analog); k = 2 — only the series source (the second radial *is* the configuration spread): double budget, the CAS column states it; the tail certificate refuses barren k | the case declaration (`shell_radials`) |
+| fold (the frozen shells) | a noble-gas prefix — exactly that closed shell (Ar = {1s..3p}); `semi` — the prefix with (n−1)p promoted to the window and the valence ns pair folded in; an explicit shell list — everything else ({1s,2s,2p,4s}) | both runners |
+| core field (the fold's frozen density) | `raw` — the SCF's core density as converged (the anisotropy control); `avg` — its spherical average (the default); `frac` — a separately converged fractional-occupation reference (a *different* SCF, not an averaging limit); `lane` — the pinned route's fold (pinned-only): the reference's own occupied orbitals projected onto the fold span, so free and pinned compare at one construction | `regen_cells.py` |
+| substrate (the core span) | `pol` — the SCF's canonical core span (polarized by the open shell); `pur` — the rebuilt rotation-closed span (a raw SCF span never rotation-closes; this one does, at machine precision) | `regen_cells.py` |
+| field | neutral (the default) / folded — the reference the cell's substrate lives on; a ninth address slot, written only when folded | `run_cell` / `run_lane_cell` |
 | reference | default / gated / UHF / fractional-occupation | both runners |
+
+**Window labels** — the address language, one grammar: shells, then at
+most one `@`-suffix, then at most one kind suffix. `3d4s` — the
+shells; `@ar` / `@semi` / `@1s2s2p4s` — the fold declaration (lane
+windows); `@r1` / `@s2` — the source axis: prior family + k; `no2` —
+the natural-orbital kind at k = 2. So `3d4s@s2no2` reads: shells 3d4s,
+series-average prior at k = 2, natural-orbital kind — rendered
+`3d4s (s2) / NO`. Folds count **electrons chemically**: a fold of N
+pairs freezes N pairs whatever its AO realization — on multi-band
+realizations (multi-zeta, uncontracted) each shell names its declared
+band list, and the frozen core is the span's own closed-shell
+solution over those bands.
+
+**The prior comparison's baseline.** On contracted bases the untagged
+incumbent is the authors' 1:1 contraction — the equal-budget baseline
+the priors must beat; on uncontracted bases no authors' contraction
+exists — the head class is the baseline, and `@s1`/`@s2` measure what
+the series averaging adds; the ROHF anchor row is ΔE's absolute zero
+in both.
 
 **Address guarantees** — the address IS the store identity (chk name,
 payload key, table row) and never renames: a new axis serializes as
@@ -271,20 +267,17 @@ machinery.
 ## Results
 
 All tables live in `elements/<Atom>/TABLE.md` (committed,
-regenerable). This section is
-the reading key and one excerpt.
+regenerable). This section is the reading key and one excerpt; every
+axis it names is defined once, in Methods.
 
 **Tables grammar** — the element file is `TABLE.md`: the ONE ladder
-table (below), generated between `ladder` markers, its CSV mirror
-`TABLE.csv` beside it (same rows, ASCII headers).
-The ladder pins certify what the tables report.
-
-Every energy table states its **route** (free — our symmetry-blind
-native driver, symmetry measured and restored by averaging; pinned —
-symmetry by D2h construction, one `wfnsym` solver per term
-component), its **partition** (the fold — Fold notation; a column
-when it varies, stated once when uniform), and its **source**, as a
-one-line tag under the heading. Per-section legends live nowhere.
+table, generated between `ladder` markers, its CSV mirror `TABLE.csv`
+beside it (same rows, ASCII headers). Every run cell is a row;
+families (the lattice spans, the primary window's core-field groups,
+the lane families, the prior comparison blocks) are separated by rule
+rows; the ROHF anchor row leads — ΔE's zero — and the UHF anchor
+follows where the store carries it. The tables render what ran;
+per-section legends live nowhere.
 
 **Route (free vs pinned).** The *free* route is the native
 symmetry-blind driver: one Davidson CI over the whole sector;
@@ -292,78 +285,44 @@ symmetry is *measured* afterwards (⟨L²⟩, the commutators, ptp). The
 *pinned* route builds symmetry by construction: the declared term's
 2L+1 components are distributed over D2h irreps (`branch_d2h`), one
 PySCF `wfnsym` solver per component, each component's identity
-guaranteed by its irrep. The E column's semantics follow the route:
-**free rows carry the run's own total; pinned rows carry the TERM
-energy** — the branch components' mean at CI plus the
+guaranteed by its irrep — it runs on `lane` core fields, and its
+*free* twin (same window, same fold, free driver) demonstrates route
+agreement at the same partition. The E column's semantics follow the
+route: **free rows carry the run's own total; pinned rows carry the
+TERM energy** — the branch components' mean at CI plus the
 fold-independent bookkeeping constant (their ΔE residual vs the
 anchor is that constant's projected-density form, mEh-class,
-disclosed in the note). `·lane` in the fold column names the ladder
-family's uniform construction — the fold span's core with the window
-placed through `build_full_mo` — the label under which the pinned
-route runs; the lane family's *free* twin (same window, same fold,
-free driver) demonstrates route agreement at the same partition.
+disclosed in the note).
 
-**Core-field taxonomy** — what the fold/substrate vocabulary names
-(one line each; the axes compose, e.g. `avg·pur` = the certified
-class):
+Columns of the ladder table (the axis columns — window, CAS, fold,
+method, route — read their values off Methods' axes; these are the
+reading rules):
 
-| tag | the core field it names |
-|---|---|
-| `raw` | the SCF's canonical core density as converged — the anisotropy *detector* |
-| `avg` | that density's spherical average — the *ruler* |
-| `frac` | a different reference SCF entirely (fractional occupations) — the average-of-configuration *control* |
-| `pur` | the substrate axis: the closed, rotation-closed core *span* (vs `pol` = the SCF's polarized canonical span) |
-| `lane` | the pinned route's uniform construction: the fold span's own core, the window placed through `build_full_mo` |
-
-Columns of the CI window survey (one row per declared CI cell):
-
-- **window / CAS / dets** — the span and its active size (the CAS
-  shape is the **budget**: a `@s2` window doubles the per-shell
-  columns — read the k=2 rows as double-budget, their dominance as
-  variational headroom, never same-budget superiority); a prior tag
-  rides the window name (`(r1)` the head configuration's own block,
-  `(s1)`/`(s2)` the configuration-ladder average at k=1/k=2 — the
-  untagged rows are the incumbent); **fold** —
-  the partition: the pinned rows carry their own tags (`semi`,
-  explicit lists), free rows the prefix name, with `·raw`/`·frac`/
-  `·pur` marking the free variants' deviation; **start** — the
-  window kind (`D` distilled / `MO` canonical slice / `MOC`
-  character-selected / `NO` density groups — the kind block compares
-  them at the ruler folds; the controls carry the m-incomplete
-  fingerprint note); **route** — free
-  (the native driver) or pinned (D2h construction).
-- **E** — **rows compare across folds only.** Free rows: the run's
-  own total. Pinned rows: the TERM energy — the branch components'
-  mean at CI plus the fold-independent bookkeeping constant.
+- **window / CAS / dets** — the span and its active size; the CAS
+  shape is the **budget** (a k = 2 prior window doubles the per-shell
+  columns — its dominance is variational headroom, never same-budget
+  superiority).
+- **E** — **rows compare within a family** (same span, same sector):
+  free rows the run's own total, pinned rows the TERM energy.
 - **ΔE** — against the anchor row that leads the table (the TRUE
-  reference — ROHF, or UHF where the campaign anchors there); the
-  pinned rows' residual is the projected-density bookkeeping form,
-  disclosed in their note.
+  reference — ROHF, or UHF where the campaign anchors there).
+- **conv** — the optimizer rows' final macro-cycle |ΔE| (order of
+  magnitude) per cycle count, `1e-9/7`; CI rows carry the em-dash.
 - **⟨L²⟩** — the free rows' ground root; the pinned rows' components
-  (one value when they agree, a range when they scramble). The
-  commutator columns are the assembled meters, em-dash past the
-  dense-meter cap.
-
-Columns of a methods table (ONE ladder per atom between the
-`ladder` markers — every run cell a row: the lattice spans (CI), the
-primary window's fold groups (each CASCI beside its optimizer
-variants), the lane families (pinned and free CI, the free and
-pinned optimizers); families separated by a rule row; the tables
-render what ran):
-
-- **method | route | window | CAS | fold | dets | E | ΔE | eV | conv
-  | ⟨L²⟩ | ptp | the closure and meter columns | note** — the
-  window cell carries the start (`3d4s / D`); the method names the
-  objective and its restriction only (`CASSCF, radial`); the
-  substrate is the fold column's (Fold notation's markers); the ROHF
-  anchor row leads, ΔE's zero.
-- **ptp** — intrinsic where a component/root set exists (the pinned
-  rows store it; the free SA rows' root spread computes at render);
-  the dash means "no set" (single-root runs).
+  (one value when they agree, a range when they scramble), with
+  **ptp** carrying the energy side of the scramble — the component or
+  root spread, the degeneracy certificate (the dash = no set).
 - **‖[P,Lz]‖, ‖[P,L⊥]‖** — the one-particle closure certificate of
   the window span (gauge-invariant: rotations within the span cannot
   move it) — zero certifies the span itself is m-closed; cheap at any
   size.
+- **‖[H,Lz]‖, ‖[H,L²]‖** — **zero certifies symmetry; the value
+  localizes the breaking.** Plain values are the exact operator norms
+  (whole matrices — sectors under the dense-meter cap, ~6k dets);
+  values marked **ψ** are the STATE RESIDUAL ‖[H,Lz]ψ‖ / ‖[H,L²]ψ‖ —
+  the commutator applied to that row's converged solution (exact zero
+  iff the state is a symmetry eigenstate) — the only form past the
+  cap; the em-dash where neither exists.
 - **note** — terse, data-derived flags only (`cycle cap` at the
   optimizer's 200-cycle limit; the standing stamps: `control:
   m-incomplete by construction` on the MO/MOC rows — an explained
@@ -372,70 +331,18 @@ render what ran):
   never fresh verdicts.
 
 **Further variants** — the tables render what ran; other combinations
-of the treatment axes are possible, one regen away, and are the
-first levers when a run misbehaves (bad convergence, a suspected
-basin escape):
-
-- **start — MO / MOC / NO**: the control and density legs of the kind
-  block (the canonical slice, the character-selected columns, the
-  occupation groups) — the m-complete kinds should land the term and
-  degenerate; the controls' scrambled readings are the certified
-  m-incompleteness fingerprints; on uncontracted bases MO names the
-  **character-selected** canonical columns (the SCF's own
-  valence + the virtual complement ranked by the named bands'
-  S-projection weight), and **window names are chemical shells** —
-  the uncontracted basis counts radial primitives, so one shell
-  spans several bands (U14e: 5f³ reads on 9f–11f, 6d¹ on 12d–14d,
-  7s² on 18s–19s, 6p⁶ on 13p–15p; the certificate lives in the
-  element's `logs/probe_bands.log`), and the fold column names the
-  fold's shells when the noble guess would lie (`fold_chemistry`:
-  U14e folds 6s6p7s / 6s6p, not Ne).  A band-named shell in a window
-  is its DOMINANT radial, not the whole shell -- the AO 5f6d7s
-  window's s radial is the compact band-7s function, not the
-  physical 7s orbital (the MO rows carry the true 7s column);
-- **mask — radial / frozen**: same-(l,member)-only rotations / a
-  frozen window — to separate correlation hunger from window-identity
-  drift when free optimization escapes;
-- **fold — raw / frac**: core-field controls (raw shell columns; the
-  fractional-occupation reference);
-- **substrate — pur**: the purified rotation-closed core, when the
-  canonical core's anisotropy contaminates;
-- **route — pinned**: the guaranteed D2h component set, to check a
-  free route's averaging (the term identification always comes from
-  the symmetric run);
-- **window / CAS**: the planned windows and the lattice spans —
-  completeness and saturation questions.
-
-Columns of a ladder table (window families × routes):
-
-- **route / method** — the treatment identity: pinned (D2h
-  construction, one `wfnsym` solver per term component) or free (the
-  symmetry-blind native driver); CI today, CASSCF/SA with the route
-  axis.
-- **CAS / dets** — the row's active size and sector determinant
-  count; **fold** — the row's partition (the column that varies).
-- **conv** — the optimizer rows' convergence: the final macro-cycle
-  |ΔE| (its order of magnitude) per cycle count, `1e-9/7`; CI rows
-  carry no optimizer — the em-dash.
-- **E** — **rows compare across folds, never sector grounds.** The
-  TERM energy: the mean over the 2L+1 branch components at CI, the
-  uniform-weight ensemble at SA (its exact degenerate limit — the
-  readout absolutes move under same-irrep partition rotations), plus
-  the fold-independent bookkeeping constant.
-- **ΔE** — gap to the row spanning the case's primary window (the
-  anchor; zero there), in mEh and eV.
-- **⟨L²⟩** — across the branch components: one value when they agree
-  (the term reading), a min–max range when they do not (the scramble;
-  **ptp** carries its energy side — the component spread, the
-  degeneracy certificate).
-- **‖[H,Lz]‖, ‖[H,L²]‖** — **zero certifies symmetry; the value
-  localizes the breaking.** Plain values are the exact operator norms
-  (whole matrices — sectors under the dense-meter cap, ~6k dets);
-  values marked **ψ** are the STATE RESIDUAL ‖[H,Lz]ψ‖ / ‖[H,L²]ψ‖ —
-  the same commutator applied to that row's converged solution
-  (exact zero iff the state is a symmetry eigenstate) — the only form
-  past the cap, where a payload carries one; the em-dash where
-  neither exists (structural zeros for the certified fold class).
+of the treatment axes are one regen away, the first levers when a run
+misbehaves (bad convergence, a suspected basin escape). One reading
+rule on uncontracted bases, where the axis values shift meaning:
+**window names are chemical shells**, but the basis counts radial
+primitives — one shell spans several bands (U14e: 5f³ reads on
+9f–11f, 6d¹ on 12d–14d, 7s² on 18s–19s, 6p⁶ on 13p–15p; the
+certificate lives in the element's `logs/probe_bands.log`), and the
+fold column names the fold's shells when the noble guess would lie
+(`fold_chemistry`: U14e folds 6s6p7s / 6s6p, not Ne). A band-named
+shell in a window is its DOMINANT radial, not the whole shell — the
+AO 5f6d7s window's s radial is the compact band-7s function, not the
+physical 7s orbital (the MO rows carry the true 7s column).
 
 **Matrix-free meters.** Meters evaluate through *application*, not
 matrices: ⟨ψ|Ô|ψ⟩ and ‖[Ĥ,L̂z]ψ‖ need only Ôψ. The algebra fixes the
@@ -462,14 +369,14 @@ core anisotropy — `core_anisotropy()`, no CI involved):
 | ‖[Ĥ, L̂z]‖, ‖[Ĥ, L̂²]‖ | the assembled treatment | single-irrep sectors (L̂²); ±pair structure (L̂z) |
 | ‖[P, L̂z]‖, ‖[P, L̂⊥]‖ | the window span alone | — (as a pair) |
 | ⟨L̂²⟩, ⟨Ŝ²⟩ per root | term identity | small defects (order ε²) |
-| multiplet splitting | fold anisotropy (order ε) | — |
+| multiplet splitting | core-field anisotropy (order ε) | — |
 
 Class key (row-level discriminators, never assigned by hand):
 
 - **exact** — commutators and span certificates at the 1e-13 class.
 - **baseline** — a named non-closure mechanism at its signature scale
-  (the raw fold's percent-class commutators at unchanged energy make
-  it the polarized-core detector).
+  (the raw core field's percent-class commutators at unchanged energy
+  make it the polarized-core detector).
 - **escape** — ⟨L̂²⟩ ≈ 0 with the Span column showing massive
   borrowing.
 - **swap** — SA rows whose Span reads s → 0 with p ≈ 1/6 and
@@ -498,12 +405,12 @@ the SA restores the term; the classes and their row-level
 discriminators are the reading key above.)
 
 The **window lattice** is the grid's complement — method fixed
-(CASCI, symmetric folds), window grown: the symmetric solution
+(CASCI, the averaged core field), window grown: the symmetric solution
 reaches the broken ones' energies by growing the span (both
 transition metals cross below their escaped CASSCF basins at exact
 ⟨L̂²⟩); the raw-MO spans never close (the certificate disqualifies
-them without running any CI); NO spans match the AO value at equal
-determinant count and exceed it at the top. Per-series tables: the
+them without running any CI); NO spans match the distilled value at
+equal determinant count and exceed it at the top. Per-series tables: the
 element files. Two construction facts, measured: CASCI over the ROHF
 MO window equals ROHF exactly (singles Brillouin-dead, doubles dead
 unless same-l — the only live channel is the same-l double shell);
