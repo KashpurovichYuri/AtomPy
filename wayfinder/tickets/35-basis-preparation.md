@@ -58,19 +58,39 @@ Opened 2026-11-10 from the handoff (xxii) skeleton + the review round
 
 ## Open (in order)
 
-1. THE TABLE FEEDBACK ROUND (user, 2026-11-10): (a) same-CAS
-   adjacency in the renderer -- the prior CASCI rows BESIDE the
-   incumbent's at the same CAS (a prior sub-block joining the primary
-   family, ordered by CAS shape), not one-family-per-prior-window;
-   (b) the prior preamble in TABLE.md (r1/s1/s2 + k=2 = double
-   budget); (c) the baseline protocol stated (contracted: the
-   incumbent = the authors' 1:1; uncontracted: the reference-source
-   k=1 is the baseline, no authors' contraction exists; ROHF the
-   absolute zero in both); (d) the README deep review (the user's
-   notes + the pre-basis-layer vocabulary + the reading-key
-   tightening).
-2. The radial-CASSCF legs (k=1 and k=2 windows, per-state <=) --
-   their rows join the same-CAS blocks.
-3. SA-over-ladder (the transferable k=1 contraction); the twins +
+1. THE RADIAL-CASSCF LEGS (the per-state <= on the fixed basis):
+   k=1 AND k=2 prior windows alike (the k=1 legs serve the capped
+   sectors -- the relaxation where k=2 cannot go; the k=2 legs the
+   maximal relaxation at the normal tier).  The optimizer cells of
+   prior windows are void under the anchor-first gate -- materialize
+   with --full (the gate's declared path).  Their rows join the
+   same-CAS blocks (delivered, b0e8c53).  Per-state <= check against
+   the incumbent's optimizer rows.
+2. SA-over-ladder (the transferable k=1 contraction); the twins +
    C/Si ports; the adoption gate (user); the exporter + convergence.
-4. Still queued: mo x raw cells; the k sentence's README placement.
+3. Still queued: mo x raw cells.
+
+## Executed 2026-11-10 (the table feedback round + the docs)
+
+- (a4e61a8..1a2446d) the basis layer + the honest prior tables (the
+  wave record above).
+- (c82fa6d) the two-axis review's fixes: occupation_postcheck ONE
+  home (public in reference; run_ladder and the census both call
+  it), the census ref required, the measured instance -> Notes, the
+  prior-tag grammar through cells.prior_tag_of, _no_label public as
+  no_label, the reference layout row current.
+- (b0e8c53) the same-CAS comparison: _comparison_key (incumbent ->
+  r -> s1 -> double-budget s2 -> NO -> controls -> optimizers), the
+  prior windows JOIN their span's family (a lattice span equal to
+  the primary's renders once; a prior span without an incumbent
+  twin renders as its own family -- Ti's 3d at the d2 sector);
+  StageFacts.window_report (the construction's disclosure rides the
+  payloads -- 108 prior cells regenerated fresh, energies
+  bit-stable); the prior preambles in Sc/Ti TABLE.md; pins: the
+  comparison order, the fallback family, the report carriage.
+- (70c8517) the README restructure: every axis defined ONCE in the
+  variety-axes table in one fragment shape (fold/core-field/
+  substrate rows; the source row defines the configuration series
+  and the head; the baseline protocol's one home; the label grammar
+  as one syntax block); the three column legends merged; --93 lines
+  of duplication.
