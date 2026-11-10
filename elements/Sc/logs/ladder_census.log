@@ -1,0 +1,4 @@
+  File "<string>", line 16
+    fmt = " ".join(f"{r[chr(39)+chr(39)] if False else r[label]}:{r[e_tot]:.8f}/{C if r[converged] else x}{+ if r[occ_ok] else -}" for r in rows)
+                                                                                                           ^
+SyntaxError: f-string: expecting a valid expression after '{'

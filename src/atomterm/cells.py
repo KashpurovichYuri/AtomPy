@@ -1672,7 +1672,10 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     group prefix (:func:`_no_label`). mo x pur and moc x pur ARE part
     of the grid (the canonical/character-selected columns are
     re-orthogonalized against the pur span); radial stays ao-only
-    (validated at the key).
+    (validated at the key).  A SOURCE-TAGGED window drops the frac
+    fold (structurally: the prior family has no fractional-reference
+    class -- it reads the ladder's own occupations, and a fractional
+    reference is a different density altogether).
     """
     from atomterm.system import sector_na_nb
 
@@ -1680,16 +1683,21 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     atom = spec.key
     sec = (spec.planned_sectors.get(w)
            or sector_na_nb(spec.nelec_act, spec.spin))
+    tagged = _SOURCE_TAG_RE.fullmatch(w.partition("@")[2]) is not None \
+        if "@" in w else False
     keys = [
         CellKey(atom, w, sec, fold="raw"),
         CellKey(atom, w, sec, fold="avg"),
         CellKey(atom, w, sec, substrate="pur"),   # the CASCI pur fold
-        CellKey(atom, w, sec, fold="frac"),
-        # the COMPLETE KIND BLOCK at each ruler fold: the window-source
-        # comparison (mo/moc/no beside ao) at fixed window and fold --
-        # raw/frac are core-field controls and stay ao-only (an
-        # m-incomplete start there would confound two diseases in one
-        # row)
+    ]
+    if not tagged:
+        keys.append(CellKey(atom, w, sec, fold="frac"))
+    # the COMPLETE KIND BLOCK at each ruler fold: the window-source
+    # comparison (mo/moc/no beside ao) at fixed window and fold --
+    # raw/frac are core-field controls and stay ao-only (an
+    # m-incomplete start there would confound two diseases in one
+    # row)
+    keys += [
         CellKey(atom, w, sec, method="casci", start="mo", fold="avg"),
         CellKey(atom, w, sec, method="casci", start="moc", fold="avg"),
         CellKey(atom, _no_label(w), sec, method="casci", start="no",

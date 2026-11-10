@@ -397,11 +397,11 @@ def test_window_grid_is_the_one_declaration():
     spine = {k.address for k in spine_keys("Ti", "3d4s", (3, 1))}
     assert spine <= set(addrs)
     assert [k.mask for k in diagnostics(spec)] == ["virtmix"]
-    # planned: the declared windows' full grids, same shape as the
-    # primary -- the real spans AND the prior-axis source tags (each
-    # with its NO sibling label)
+    # planned: the declared windows' full grids -- the real spans at
+    # the primary's shape, the prior-axis tagged windows one SHORT
+    # (they carry no frac fold), each with its NO sibling label
     pl = planned(spec)
-    assert len(pl) == 8 * len(grid)
+    assert len(pl) == 2 * len(grid) + 6 * (len(grid) - 1)
     assert {k.window for k in pl} == {
         "3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4",
         "3d@r1", "3d@r1no1", "3d@s1", "3d@s1no1", "3d@s2", "3d@s2no1",
