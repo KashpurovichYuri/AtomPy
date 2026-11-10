@@ -28,6 +28,35 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- THE SERIES-SOURCE PROBE's review (2026-11-10, two axes over
+  44e0ed4..d9e4afe): CORRECTED RECORD -- (1) "neutral loses
+  everywhere" (handoff xxi) was FALSE: Sc's d-only row has neutral
+  WINNING (-83.8 mEh, term-certified); the truth is NO universal k=1
+  winner (authors' wins the primaries, neutral Sc's d-row, series1
+  none) -- which STRENGTHENS the SA-over-ladder optimization as the
+  only road to a dominant k=1; the neutral-as-small-CAS-default
+  survives (uncontracted bases have no authors' contraction).  (2)
+  series2's dominance is VARIATIONAL AT DOUBLE BUDGET: every k=1
+  window is a subspace of the k=2 chain space, so the -16/-21/-24/-120
+  mEh numbers are the headroom the second radial BUYS, not equal-budget
+  superiority -- every rendered comparison must carry the CAS shape
+  (the budget) per row.  (3) Ti's 3d chain (3d, 4d) is a DECLARED
+  WIDENING beyond its certificate (3d -> (3d), capture 0.9991) --
+  noted in the script; basis.py reads realizations from the per-atom
+  certificate and declares any widening.  FIXED in the probe: the dead
+  declarations gone ("ar" now the fold-boundary derivation via
+  core_pairs, cfg/lam/occ1 deleted), the err0 raw-window ortho printed
+  beside the treated one, the anchor circularity documented in place.
+  BASIS.PY'S DESIGN INPUTS (not probe fixes): the basin gate (the
+  probe ran un-gated, occ_e_ref=None -- the k=2 numbers re-verify at
+  the birth certificate through the gated module); the term selection
+  joins <S^2> beside <L^2>; the anchor uses the stored payload's core
+  fields so the 1:1 row becomes a genuine cross-check; the budget cap
+  stays (vacuous at 2-band shells, live on wider realizations).
+  DECLINED: the "bm" rename and the metric_radials/s_metric_roots
+  duplication (both absorbed when basis.py becomes the one home);
+  re-running the probe (the birth certificate regenerates the
+  authoritative numbers).
 - THE EACH-BY-EACH ROUND's review dispositions (2026-11-09, ticket
   34's round section carries the record; the fixes = 44e0ed4):
   DECLINED -- (a) the `_fold_core` report's `"core": "scf"` era tag

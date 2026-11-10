@@ -16,14 +16,13 @@ constant):
 - ``1:1``    the authors' bare contractions (the incumbent records);
 - ``neutral`` the reference configuration's own block top (rank-1);
 - ``series1`` the ladder average's mean radial (k=1);
-- ``series2`` mean + config-spread (k=2, where the spectrum certifies);
-- ``occ1``   the 4s occupied-only variant (the empty-s configs dropped
-  from the s average -- the one-probe question).
+- ``series2`` mean + config-spread (k=2, where the spectrum certifies).
 
 Usage:
     python scripts/probe_series_source.py Sc > elements/Sc/logs/series_source_probe.log
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -59,12 +58,24 @@ PLAN = {
         "ladder": (("d2s2", ("1s", "2s", "2p", "3s", "3p", "4s"), ("3d",), 2),
                    ("d3s1", ("1s", "2s", "2p", "3s", "3p"), ("3d", "4s"), 4),
                    ("d4",   ("1s", "2s", "2p", "3s", "3p"), ("3d",), 4)),
+        # NOTE (review 2026-11-10): Ti's certified greedy realization is
+        # 3d -> (3d) alone (band_composition.log, capture 0.9991); the
+        # (3d, 4d) chain here is a DECLARED WIDENING beyond the
+        # certificate -- the 2-wide radial space k=2 needs.  basis.py
+        # takes realizations from the per-atom certificate and declares
+        # any widening.
         "bands": {"3d": ("3d", "4d"), "4s": ("4s", "6s")},
         "cells": (("ti_3d_2-0_casci_ao_-_pol_avg", ("3d",), (2, 0)),
                   ("ti_3d4s_3-1_casci_ao_-_pol_avg", ("3d", "4s"), (3, 1))),
     },
 }
-NCOL = 9                                   # the fold boundary (valence)
+
+
+def core_pairs(core_shells):
+    """The fold boundary in orbital pairs from the declared core shells
+    (the noble prefix -- never re-derived per ladder config, whose
+    closed lists differ on the valence)."""
+    return sum(2 * (2 * "spdfgh".index(c[-1]) + 1) for c in core_shells) // 2
 
 
 def shell_geometry(mol, labels, shell, bands):
@@ -90,11 +101,11 @@ def shell_geometry(mol, labels, shell, bands):
     return chain, widths
 
 
-def valence_block(mf, chain):
+def valence_block(mf, chain, ncol):
     """The member-summed shell block of the VALENCE density (the core
     columns never enter -- the measured core-dominance rejection)."""
-    cv = mf.mo_coeff[:, NCOL:]
-    wv = np.asarray(mf.mo_occ)[NCOL:]
+    cv = mf.mo_coeff[:, ncol:]
+    wv = np.asarray(mf.mo_occ)[ncol:]
     d = (cv * wv) @ cv.conj().T
     b = sum(d[np.ix_(chain[m], chain[m])] for m in range(len(chain)))
     return 0.5 * (b + b.T).real
@@ -157,7 +168,7 @@ def capture(c_win, mf, s, chain, thresh=0.05):
 
 def main(atom):
     plan = PLAN[atom]
-    cfg = AtomConfig(atom, plan["basis"])
+    ncol = core_pairs(plan["ar"])
     mol, rec = scf.chkfile.load_scf(f"elements/{atom}/rungs/rohf.chk")
     mf = scf.RHF(mol)
     mf.__dict__.update(rec)
@@ -190,9 +201,9 @@ def main(atom):
     for shell, bands in plan["bands"].items():
         chain, widths = geo[shell]
         s_r = s[np.ix_(chain[0], chain[0])]
-        blocks = {t: valence_block(m, chain) for t, m in series}
+        blocks = {t: valence_block(m, chain, ncol) for t, m in series}
         b_avg = sum(blocks.values()) / len(blocks)
-        v1, lam = metric_radials(b_avg, s_r, 1)
+        v1, _ = metric_radials(b_avg, s_r, 1)
         v2, lam2 = metric_radials(b_avg, s_r, 2)
         spectra[shell] = lam2 / lam2[0]
         priors[(shell, "1:1")] = authors_vector(s_r, widths, bands,
@@ -201,15 +212,14 @@ def main(atom):
             blocks[neutral_tag], s_r, 1)[0], 1
         priors[(shell, "series1")] = v1, 1
         priors[(shell, "series2")] = v2, 2
-        if shell.endswith("s") and len(series) > 2:
-            b_occ = (blocks[series[0][0]] + blocks[series[1][0]]) / 2
-            priors[(shell, "occ1")] = metric_radials(b_occ, s_r, 1)[0], 1
         print(f"  shell {shell} {bands}: averaged spectrum "
               f"{np.round(spectra[shell], 5)[:3]}")
 
     # the CASCI legs: each prior combination per cell, anchored to the
-    # stored 1:1 total through the prior-independent core constant
-    import json
+    # stored 1:1 total through the prior-independent core constant (the
+    # 1:1 row is thereby identically zero -- the ACROSS-ROW dE's are
+    # the sound readings; a non-circular anchor needs the stored
+    # payload's core fields, basis.py's job)
     store = json.loads(Path(f"elements/{atom}/cells.json").read_text())
     for addr, shells, (na, nb) in plan["cells"]:
         stored = store["cells"][addr]
@@ -217,8 +227,6 @@ def main(atom):
         print(f"\n  == {addr} (stored 1:1 total {stored_e:.9f}, "
               f"term <L^2> {l2_target:.1f})")
         names = ["1:1", "neutral", "series1", "series2"]
-        if all((sh, "occ1") in priors for sh in shells):
-            names.append("occ1")
         for name in names:
             blocks = [assemble(nao, priors[(sh, name)][0], geo[sh][0])
                       for sh in shells]
@@ -228,12 +236,12 @@ def main(atom):
             # the PRODUCTION treatment: project against the core span
             # and renormalize (a raw window's core overlap contaminates
             # the active-space H at Eh scale -- measured)
-            mo_full = build_full_mo(mf, occupied_core_idx(mf, NCOL),
+            mo_full = build_full_mo(mf, occupied_core_idx(mf, ncol),
                                     c_win)
-            c_act = mo_full[:, NCOL:NCOL + c_win.shape[1]]
+            c_act = mo_full[:, ncol:ncol + c_win.shape[1]]
             err = np.abs(c_act.T @ s @ c_act
                          - np.eye(c_act.shape[1])).max()
-            ops = build_operators(mol, mf, c_act, NCOL, na, nb)
+            ops = build_operators(mol, mf, c_act, ncol, na, nb)
             ev, vec = np.linalg.eigh(ops["H"].real)
             l2m = ops["L2"].real
             # the TARGETED TERM's root: the lowest eigenstate of the
@@ -250,7 +258,7 @@ def main(atom):
             cert = window_closure(mol, c_act)
             print(f"    {name:>8}: total {total:.9f}  "
                   f"dE vs 1:1 {(total - stored_e) * 1e3:+8.3f} mEh  "
-                  f"L2 {l2_0:7.4f}  ortho {err:.1e}  "
+                  f"L2 {l2_0:7.4f}  raw {err0:.1e}  ortho {err:.1e}  "
                   f"closure {cert['lz']:.1e}/{cert['lperp']:.1e}")
         # the capture certificates on the k=2 span
         for sh in shells:
