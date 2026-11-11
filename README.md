@@ -209,7 +209,7 @@ them:
 | method | casci — exact diagonalization of the sector; casscf — one root, orbitals free to move; sa-casscf — the term average over the ground term's M_L set | `regen_cells.py` |
 | mask | free — all rotations; radial — same-(l, member) pairs only; frozen — the window pinned; virtmix — the core-mixing probe | `regen_cells.py` |
 | start (the window kind) | `ao` → **D** — the distilled window: the reference's radial content expressed in AO form, m-complete (the production kind); `mo` → **MO** — the SCF's canonical slice (a control: m-incomplete by construction, the hybrid-open gauge); `moc` → **MOC** — the SCF's character-selected columns (a control, the same disease); `no` → **NO** — the term-averaged density's occupation groups (the density leg) | `regen_cells.py` |
-| source (the radial prior) | untagged — the incumbent: radials distilled from the reference's own occupied orbitals (on contracted bases ≈ the basis authors' 1:1 contraction); `@r<k>` — the head's density block, k radials per shell; `@s<k>` — the configuration-series average's density block, k radials per shell (the **configuration series** = one occupation-forced SCF per valence configuration; its first rung, the **head**, is the campaign's anchor reference) — the two distillation families (incumbent vs density-block) never share a comparison row | the case declaration (`series` + `prior_bands`) |
+| source (the radial prior) | untagged — the incumbent: radials distilled from the reference's own occupied orbitals by their span Gram — *which radials the occupied span uses* (on contracted bases ≈ the basis authors' 1:1 contraction); `@r<k>` — the head's *density block*, occupation-weighted — *where the valence density sits* — k radials per shell; `@s<k>` — the same density block averaged over the **configuration series** (one occupation-forced SCF per valence configuration; its first rung, the **head**, is the campaign's anchor reference) — every source is MO-informed (the signal always comes from solved SCF orbitals) and every product is AO-form (explicit basis columns, transferable without the SCF they came from); the two distillation families (span-signal vs density-block) never share a comparison row | the case declaration (`series` + `prior_bands`) |
 | radials (k) | k = 1 — the usual case, one radial per shell (the contraction analog); k = 2 — only the series source (the second radial *is* the configuration spread): double budget, the CAS column states it; the tail certificate refuses barren k | the case declaration (`shell_radials`) |
 | core (the frozen shells) | a noble-gas prefix — exactly that closed shell (Ar = {1s..3p}); `semi` — the prefix with (n−1)p promoted to the window and the valence ns pair folded in; an explicit shell list — everything else ({1s,2s,2p,4s}) | both runners |
 | core field (the frozen density) | `raw` — the SCF's core density as converged (the anisotropy control); `avg` — its spherical average (the default); `frac` — a separately converged fractional-occupation reference (a *different* SCF, not an averaging limit); `lane` — the pinned route's core (pinned-only): the reference's own occupied orbitals projected onto the core span, so free and pinned compare at one construction | `regen_cells.py` |
@@ -222,12 +222,26 @@ most one `@`-suffix, then at most one kind suffix. `3d4s` — the
 shells; `@ar` / `@semi` / `@1s2s2p4s` — the core declaration (lane
 windows); `@r1` / `@s2` — the source axis: prior family + k; `no2` —
 the natural-orbital kind at k = 2. So `3d4s@s2no2` reads: shells 3d4s,
-series-average prior at k = 2, natural-orbital kind — rendered
-`3d4s (s2) / NO`. Folds count **electrons chemically**: a core of N
+series-average prior at k = 2, natural-orbital kind. Cores count
+**electrons chemically**: a core of N
 pairs freezes N pairs whatever its AO realization — on multi-band
 realizations (multi-zeta, uncontracted) each shell names its declared
 band list, and the frozen core is the span's own closed-shell
 solution over those bands.
+
+**Reading the source axis — two controlled pairs.** Every source asks
+solved SCF orbitals a question and hands the answer back as basis
+columns ("the radial directions are data, never a basis rewrite").
+The incumbent asks the *span* — the occupied MOs' unweighted Gram;
+`@r` asks the *density* of the head configuration — and the head IS
+the incumbent's own source SCF, so **D vs @r1** isolates the question
+(span vs density) at fixed source. **@r1 vs @s1** asks the same
+question of different sources — one configuration vs the series
+average — and `@s2`'s second radial *is* the configuration spread the
+averaging carries. The `MO`/`MOC` controls take the canonical MOs
+themselves as the window — no distillation, m-incomplete by
+construction; the `NO` kind (store-only) asks the *correlated*
+density — the term-averaged CI's natural orbitals.
 
 **The prior comparison's baseline.** On contracted bases the untagged
 incumbent is the authors' 1:1 contraction — the equal-budget baseline
