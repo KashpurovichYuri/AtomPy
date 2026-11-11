@@ -51,7 +51,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.cells import (CellKey, grid_keys, lattice_keys,  # noqa: E402
-                            prior_tag_of, route_keys, window_grid)
+                            prior_tag_of, radial_refused, route_keys,
+                            window_grid)
 from _tables_common import (DASH, EV, cas_label,  # noqa: E402
                             comm_cell, conv_cell, core_col,
                             l2_text, minus, payload_of, replace_block)
@@ -314,14 +315,10 @@ def _pending_row(k, spec) -> str:
 
 
 def _pendingable(k, spec) -> bool:
-    """The skeleton excludes the CONSTRUCTION-REFUSED class: the
-    radial mask on a prior window or a distilled substrate (the
-    twins' shell_radials) -- the pair predicate needs member-labeled
-    basis rows, a distilled column has no row identity; those rows
-    can never run, so they hold no place."""
-    return not (k.mask == "radial"
-                and (k.source_tag is not None
-                     or spec.shell_radials is not None))
+    """The skeleton excludes the CONSTRUCTION-REFUSED class
+    (:func:`atomterm.cells.radial_refused` -- the one home): those
+    rows can never run, so they hold no place."""
+    return not radial_refused(k, spec)
 
 
 def _comparison_key(k):

@@ -60,7 +60,8 @@ from _tables_common import atomic_write_text  # noqa: E402
 from atomterm.cases import CAMPAIGN, campaign_spec, scenarios_for  # noqa: E402
 from atomterm.cells import (CellKey, cell_payload, diagnostics,  # noqa: E402
                             grid_keys, lane_keys, lattice_keys, planned,
-                            kernel_cell_payload, route_keys, run_cell,
+                            kernel_cell_payload, radial_refused,
+                            route_keys, run_cell,
                            run_lane_cell, spine_keys,
                             void_reason)
 from atomterm.reference import run_frac_occ, run_rohf  # noqa: E402
@@ -359,6 +360,14 @@ def main() -> None:
             from atomterm.basis import run_series
             series_mfs = run_series(cfg, "elements", name, spec.series, mf)
         for key in queue:
+            if radial_refused(key, spec):
+                # a construction refusal is permanent (no basis rows)
+                # -- not a scenario claim, so --full cannot test it;
+                # nothing stored, no place held
+                print(f"  [refused] {key.address} -- the radial mask "
+                      "has no member-labeled rows on this case",
+                      flush=True)
+                continue
             reason = void_reason(key, scens)
             if reason and not args.full:
                 print(f"  [void] {key.address} -- {reason}", flush=True)

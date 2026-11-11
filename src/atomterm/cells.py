@@ -139,6 +139,7 @@ __all__ = [
     "route_keys",
     "run_lane_cell",
     "load_lane_cell",
+    "radial_refused",
     "void_reason",
 ]
 
@@ -1867,6 +1868,20 @@ def route_keys(spec) -> list[CellKey]:
             out.append(replace(leg, method=method, substrate="pol"))
         out.append(replace(leg, method="sa-casscf"))
     return out
+
+
+def radial_refused(key, spec) -> bool:
+    """The construction refusal at the key: the radial mask's pair
+    predicate needs member-labeled basis rows, and a prior window
+    (``@r``/``@s``) or a distilled substrate (the case's declared
+    ``shell_radials``) has no row identity -- the cell can never run
+    on this case, whatever its scenario standing.  One home for the
+    predicate: regen's queue skips on it (nothing stored, no place
+    held), the renderer's skeleton consults it, and :func:`run_cell`
+    keeps the runtime fail-fast as the deep guard."""
+    return (key.mask == "radial"
+            and (key.source_tag is not None
+                 or spec.shell_radials is not None))
 
 
 def void_reason(address, scenarios) -> str | None:

@@ -31,6 +31,7 @@ from atomterm.cells import (
     run_lane_cell,
     route_keys,
     spine_keys,
+    radial_refused,
     void_reason,
     window_grid,
 )
@@ -305,6 +306,23 @@ def test_void_reason_gates_scenariod_cells():
     assert reason.startswith("anchor-first") and "2026-11-02" in reason
     reason = void_reason("ti_3d4d_3-1_casci_ao_-_pol_avg", sc)
     assert reason.startswith("same-l-window") and "2026-11-10" in reason
+
+
+def test_radial_refused_covers_the_distilled_cases():
+    """The construction refusal is KEY x SPEC: every radial cell of a
+    distilled case (declared shell_radials -- the TM campaign) or a
+    prior window (@r/@s tag) refuses; a raw-row case runs radial.
+    regen's queue skips on it and the skeleton holds no place -- one
+    predicate, one home."""
+    for atom in ("Sc", "Sc-unc", "Ti", "Ti-unc"):
+        spec = CAMPAIGN[atom]
+        for k in grid_keys(spec) + planned(spec) + lattice_keys(spec):
+            if k.mask == "radial":
+                assert radial_refused(k, spec), k.address
+    spec = CAMPAIGN["C"]
+    k = CellKey("C", "2p", (2, 0), method="casscf", mask="radial",
+                start="ao")
+    assert not radial_refused(k, spec)
 
 
 def test_void_reason_voids_every_twins_s_window_cell():
