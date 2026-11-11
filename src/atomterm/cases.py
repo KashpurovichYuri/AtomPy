@@ -418,6 +418,24 @@ _PRIOR_WINDOWS = ("3d@r1", "3d@s1", "3d@s2",
 # window_distilled's declared future seam (the member-preserving
 # cross-shell orthogonalization): two same-l shells' distilled blocks
 # overlap and the assembly refuses -- void until the seam lands
+# the twins' @s windows: the series' non-head configurations need
+# fresh forced-occupation SCFs, and every fresh run diverges on the
+# uncontracted basis (measured 2026-11-11, map Issues) -- the cells
+# hold their STRUCTURAL place (pending rows) but never run until
+# that repair lands
+_SC_UNC_S_BLOCK = Scenario(
+    name="series-source-diverges",
+    cells=tuple(f"sc-unc_{lbl}_{na}-{nb}_{m}_"
+                for lbl in ("3d@s1", "3d@s1no1", "3d@s2", "3d@s2no1",
+                            "3d4s@s1", "3d4s@s1no2",
+                            "3d4s@s2", "3d4s@s2no2")
+                for na, nb in ((2, 1),)
+                for m in ("casci", "casscf", "sa-casscf")),
+    reason="the series source (the non-head configurations' fresh "
+           "forced-occupation SCFs) diverges on this basis -- the "
+           "fresh-SCF disease, measured 2026-11-11 (map Issues); the "
+           "@s windows wait on that repair")
+
 _SAME_L_WINDOWS = ("3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4")
 _SAME_L_VOID = Scenario(
     name="same-l-window",
@@ -651,10 +669,10 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    # single-configuration block is rank-1 -- series_window
                    # refuses the noise second radial)
                    planned_windows=_PRIOR_WINDOWS,
-                   # the review stage: the 3d4s window's table only
-                   # (CAS(3,6) + the @s2 CAS(3,12)); the other spans
-                   # rejoin as review proceeds
-                   render_spans=("3d4s",),
+                   # the review stage: the 3d4s window (CAS(3,6) +
+                   # the @s2 CAS(3,12)) and the 3d section (CAS(3,5))
+                   # -- opened with the === section rule
+                   render_spans=("3d4s", "3d",),
                    scenarios=(_prior_anchor_first("Sc", [(2, 1)]),),
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "2p", "3s", "3p", "4s"),
@@ -724,11 +742,15 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                            1, -759.7373848622801),),
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},
-                        planned_windows=("3d@r1", "3d4s@r1"),
+                        planned_windows=("3d@r1", "3d@s1", "3d@s2",
+                                         "3d4s@r1", "3d4s@s1",
+                                         "3d4s@s2"),
                         sa_weights=[1 / 5] * 5,
                         run_casscf=False, key="Sc-unc",
+                        render_spans=("3d4s", "3d"),
                         scenarios=_unc_gates("sc-unc", (2, 1))
-                        + (_prior_anchor_first("sc-unc", [(2, 1)]),),
+                        + (_prior_anchor_first("sc-unc", [(2, 1)]),
+                           _SC_UNC_S_BLOCK),
                         term=(2, "g"), lane_windows=("3d4s@ar",),
                         lattice_windows=("3d",), lattice_sector=(2, 1)),
     "Ti-unc": CaseSpec("Ti", _TI_UNC_BASIS, nelec_act=4, ncore=9,

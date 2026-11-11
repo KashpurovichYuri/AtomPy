@@ -56,10 +56,6 @@ from _tables_common import (DASH, EV, cas_label,  # noqa: E402
                             comm_cell, conv_cell, core_col,
                             l2_text, minus, payload_of, replace_block)
 BOUNDARY = "## Studies (frozen history; ticket 28)"
-POINTER = ("Declared, not yet run -- the optimizer cells are void "
-           "until their CASCI anchors are read (the anchor-first "
-           "scenario). One regen away: `regen_cells.py {atom} "
-           "--window {window}`.")
 
 # the methods-table grammar (one shape with the CAS table); the
 # family separator row renders as a horizontal rule mid-table
@@ -68,6 +64,9 @@ HEAD = ("| method | route | window | CAS | core | dets | E, Eh | "
         "‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |")
 SEP = "|" + "---|" * 18
 RULE = "|" + " --- |" * 18
+# the section rule: a family OUTSIDE the primary span opens a new
+# SECTION (the added spans), set apart from the primary's families
+HEAVY = "|" + " === |" * 18
 BEGIN, END = "<!-- methods:begin -->", "<!-- methods:end -->"
 
 # identity -> display (the ONLY branching the renderer does)
@@ -233,13 +232,24 @@ def _sa_floor(cells: dict) -> dict[tuple, float]:
 
 
 def _rows(keys, cells, anchor, spec, floor) -> list[str]:
-    """Every RUN cell of the key set (the :func:`_method_row` policy),
-    in the given order; ``floor`` = the table's :func:`_sa_floor`
-    (computed once in :func:`methods_section`)."""
-    return [_row(k, p, anchor, spec, floor)
-            for k in keys
-            if _method_row(k)
-            and (p := payload_of(cells, k)) is not None]
+    """Every declared cell of the key set (the :func:`_method_row`
+    policy), in the given order: a payload renders its run, a
+    payload-less runnable cell renders its PENDING placeholder (the
+    structure), and the construction-refused class holds no place
+    (:func:`_pendingable`)."""
+    out = []
+    for k in keys:
+        if not _method_row(k):
+            continue
+        p = payload_of(cells, k)
+        if p is not None and ("e_ground" in p or "energies_pyscf" in p):
+            out.append(_row(k, p, anchor, spec, floor))
+        elif _pendingable(k, spec):
+            # DATA always renders (the store is the record -- legacy
+            # rows included); the construction-refused class gates
+            # only the PLACEHOLDER
+            out.append(_pending_row(k, spec))
+    return out
 
 
 def _anchor_row(anchor: float, spec) -> str:
@@ -269,6 +279,45 @@ def _uhf_anchor_row(anchor: float, uhf: dict) -> str:
     for i in (6, 7, 8, 9):
         cells[i] = minus(cells[i])
     return "| " + " | ".join(cells) + " |"
+
+
+def _uhf_pending_row() -> str:
+    """The UHF anchor row's place when the store carries no record:
+    dashed, noted pending (on the twins the class diverges -- map
+    Issues -- the row states the missing measurement, never hides
+    it)."""
+    return "| " + " | ".join(
+        ["UHF (anchor)", *[DASH] * 16, "pending"]) + " |"
+
+
+def _pending_row(k, spec) -> str:
+    """A declared, runnable cell that has no run yet: the row holds
+    its place in the structure (label, CAS, core) with every value
+    dashed and the note 'pending' -- the table doubles as the run
+    plan; the runs land on approval."""
+    wname = (k.window if k.source_tag is not None
+             else (spec.window_names or {}).get(k.span_label, k.span_label))
+    core = core_col(k, spec)
+    if k.core_tag is not None and k.substrate == "pur":
+        core += "·lane"     # the raw-shell Loewin core, not the prefix
+    cells = [_method(k),
+             "pinned" if (k.core_tag is not None
+                          and k.substrate == "pur") else "free",
+             f"{wname} / {START_NAMES[k.start]}",
+             cas_label(k, spec), core,
+             *[DASH] * 12, "pending"]
+    return "| " + " | ".join(cells) + " |"
+
+
+def _pendingable(k, spec) -> bool:
+    """The skeleton excludes the CONSTRUCTION-REFUSED class: the
+    radial mask on a prior window or a distilled substrate (the
+    twins' shell_radials) -- the pair predicate needs member-labeled
+    basis rows, a distilled column has no row identity; those rows
+    can never run, so they hold no place."""
+    return not (k.mask == "radial"
+                and (k.source_tag is not None
+                     or spec.shell_radials is not None))
 
 
 def _comparison_key(k):
@@ -320,6 +369,7 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     seen: set[str] = set()
 
     floor = _sa_floor(cells)
+    main_span = "".join(spec.shell_patterns)
 
     def _fam(keys) -> None:
         rows = _rows(sorted([k for k in keys
@@ -328,7 +378,11 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
                      cells, anchor, spec, floor)
         seen.update(k.address for k in keys)
         if rows:
-            body.extend([RULE] if body else [])
+            if body:
+                # a family outside the primary span opens a new
+                # SECTION (===); within it, the standard rule (---)
+                span = rows and keys[0].span_label
+                body.append(HEAVY if span != main_span else RULE)
             body.extend(rows)
 
     # the prior windows, gathered by span (the sector match guards
@@ -352,6 +406,25 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     keep = (lambda sp: True) if spec.render_spans is None \
         else (lambda sp: sp in spec.render_spans)
 
+    # the primary family FIRST (the main section): core groups in
+    # declaration order, each group's CI block (the incumbent's row
+    # beside the prior windows' -- the comparison) followed by its
+    # optimizer variants; the frac reference class does not render
+    # (the diet); suppressed by the declaration (render_primary=
+    # False -- the promoted windows carry the results; the primary
+    # rows stay in the store)
+    if spec.render_primary and keep(primary_span):
+        grid = [k for k in grid_keys(spec)
+                if _method_row(k) and k.core != "frac"]
+        join = [k for k in priors.get(primary_span, [])
+                if k.sector == grid[0].sector]
+        groups: dict[str, list] = {}
+        for k in [*grid, *join]:
+            groups.setdefault(core_col(k, spec), []).append(k)
+        for keys in groups.values():
+            _fam(keys)
+
+    # the other spans' sections follow (opened with the === rule)
     for span in dict.fromkeys(k.window for k in lattice_keys(spec)):
         if span == primary_span:
             continue    # the primary's core groups own this span
@@ -364,29 +437,13 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
              + [k for k in priors.get(span, [])
                 if k.sector == spec.lattice_sector])
 
-    # the primary family: core groups in declaration order, each
-    # group's CI block (the incumbent's row beside the prior windows'
-    # -- the comparison) followed by its optimizer variants; the frac
-    # reference class does not render (the diet); suppressed by the
-    # declaration (render_primary=False -- the promoted windows carry
-    # the results; the primary rows stay in the store)
-    if spec.render_primary and keep(primary_span):
-        grid = [k for k in grid_keys(spec)
-                if _method_row(k) and k.core != "frac"]
-        join = [k for k in priors.get(primary_span, [])
-                if k.sector == grid[0].sector]
-        groups: dict[str, list] = {}
-        for k in [*grid, *join]:
-            groups.setdefault(core_col(k, spec), []).append(k)
-        for keys in groups.values():
-            _fam(keys)
-
     routes = route_keys(spec)
     for leg in [k for k in routes
                 if k.substrate == "pur" and k.method == "sa-casscf"]:
         if not keep(leg.window.partition("@")[0]):
             continue
-        twins = [k for k in routes if k.window == leg.window]
+        twins = [k for k in routes
+                 if k.window == leg.window and k.core != "frac"]
         # the family renders when ANY twin ran (the validation atoms'
         # pinned leg alone is their story; the campaign atoms' route
         # studies render the fuller family)
@@ -405,18 +462,16 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
             if not keys:
                 continue
         else:
-            keys = [k for k in window_grid(spec, w) if _method_row(k)]
+            keys = [k for k in window_grid(spec, w)
+                    if _method_row(k) and k.core != "frac"]
         _fam(keys)
 
     out = [BEGIN, HEAD, SEP, _anchor_row(anchor, spec)]
-    if uhf is not None:
-        out.append(_uhf_anchor_row(anchor, uhf))
+    out.append(_uhf_anchor_row(anchor, uhf) if uhf is not None
+               else _uhf_pending_row())
     out.append(RULE)      # the anchor block set apart from the CAS rows
     out.extend([*body, END])
 
-    for w in spec.planned_windows:
-        if not any(payload_of(cells, k) for k in window_grid(spec, w)):
-            out[-1:-1] = ["", POINTER.format(atom=spec.key, window=w)]
     return out
 
 
@@ -435,9 +490,10 @@ def main(atom: str) -> None:
     body = "\n".join(methods_section(spec, cells, anchor,
                                     uhf=data.get("uhf")))
 
-    # structural assertions (the table protocol): no pending rows,
-    # no starred gauge numbers, every table row well-formed
-    assert "pending" not in body
+    # structural assertions (the table protocol): every pending row
+    # is well-formed (the pending placeholders are VALID rows -- the
+    # table doubles as the run plan), no starred gauge numbers,
+    # every table row well-formed
     assert not re.search(r"\d\*", body)      # no starred gauge numbers
     for line in body.splitlines():
         if line.startswith("|"):

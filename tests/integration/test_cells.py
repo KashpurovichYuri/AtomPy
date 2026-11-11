@@ -10,9 +10,12 @@ independently built Slater-Condon H: generic integrals admit no
 permutation automorphism, so a wrong mapping cannot satisfy it.
 """
 
+import json
+
 import numpy as np
 import pytest
 import re
+from pathlib import Path
 
 from atomterm.cells import (
     CellData,
@@ -31,7 +34,7 @@ from atomterm.cells import (
     void_reason,
     window_grid,
 )
-from atomterm.cases import CAMPAIGN, scenarios_for
+from atomterm.cases import CAMPAIGN, campaign_spec, scenarios_for
 from dataclasses import replace
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
 from atomterm.operators import ci_in_detbasis_order, pyscf_ci_permutation
@@ -1300,6 +1303,33 @@ def test_methods_local_minimum_note_derived_from_the_sa_floor():
 
 
 @fast
+def test_methods_sc_and_sc_unc_line_by_line_parity():
+    """Sc's and Sc-unc's tables carry the SAME row structure (the
+    method+window sequence, rules included) -- the line-by-line
+    review identity, a maintained invariant; Sc's legacy radial rows
+    (a construction class since refused) are the ONE exception."""
+    mod = methods_module()
+    skel = []
+    for atom in ("Sc", "Sc-unc"):
+        spec = campaign_spec(atom)
+        data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
+        text = "\n".join(mod.methods_section(
+            spec, data["cells"], data["rohf_energy"],
+            uhf=data.get("uhf")))
+        rows = []
+        for l in text.splitlines():
+            m = re.match(r"^\| (\S[^|]*?) \| \S[^|]*? \| ([^|]+?) \|", l)
+            if m and m.group(1) not in ("method", "ROHF (anchor)",
+                                        "UHF (anchor)"):
+                if set(l.replace("|", "").replace(" ", "")) <= {"-", "="}:
+                    rows.append("RULE")
+                else:
+                    rows.append(f"{m.group(1).strip()}|{m.group(2).strip()}")
+        skel.append(rows)
+    assert [r for r in skel[0] if "radial" not in r] == skel[1]
+
+
+@fast
 def test_methods_meter_and_ptp_columns_render():
     """The closure columns carry the span certificate; ptp computes
     where a root set exists and stays dash on single roots; the conv
@@ -1360,9 +1390,10 @@ def test_methods_cycle_cap_note():
 
 
 @fast
-def test_methods_ci_only_store_renders_planned_pointers():
-    """No optimizer run cells anywhere: the CI rows still render, the
-    gated planned windows follow as pointers."""
+def test_methods_ci_only_store_renders_pending_placeholders():
+    """No optimizer run cells anywhere: the CI rows render and every
+    unrun declared cell holds its PLACE as a pending row (the table
+    doubles as the run plan)."""
     mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
@@ -1370,8 +1401,9 @@ def test_methods_ci_only_store_renders_planned_pointers():
         cs, {k.address: _methods_payload(-848.4) for k in keys
              if k.method == "casci"}, -848.4065))
     assert "| CASCI | free | 3d4s / D |" in text
-    assert "regen_cells.py Ti --window 3d4d" in text
-    assert "| CASSCF" not in text and "| SA-CASSCF" not in text
+    opt = [l for l in text.splitlines()
+           if l.startswith(("| CASSCF", "| SA"))]
+    assert opt and all(l.endswith("| pending |") for l in opt)
 
 
 @fast
@@ -1495,8 +1527,10 @@ def test_methods_lane_families():
     assert lines[3].startswith("| ROHF (anchor) |")
     rules = [l for l in lines
              if set(l.replace("|", "").replace(" ", "")) == {"-"}]
-    assert len(rules) == 2    # the column SEP + the anchor block's
-    #                          rule; the lone family leads without one
+    assert len(rules) >= 2    # the column SEP + the anchor rule
+    # the FIRST family leads without a rule of its own
+    after = lines[lines.index(rules[1]) + 1]
+    assert after.startswith("| CASCI")
     assert sum(l.startswith("| CASCI | pinned | 3d3p4d / D |")
                for l in lines) == 1
     # the review-stage span filter matches the SPAN, never the raw
