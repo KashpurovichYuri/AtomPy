@@ -63,12 +63,33 @@ Opened 2026-11-10 from the handoff (xxii) skeleton + the review round
    sectors -- the relaxation where k=2 cannot go; the k=2 legs the
    maximal relaxation at the normal tier).  The optimizer cells of
    prior windows are void under the anchor-first gate -- materialize
-   with --full (the gate's declared path).  Their rows join the
-   same-CAS blocks (delivered, b0e8c53).  Per-state <= check against
-   the incumbent's optimizer rows.
-2. SA-over-ladder (the transferable k=1 contraction); the twins +
+   with `--group planned --window <label> --full` (the no-forms are
+   their own labels).  Their rows join the dieted same-CAS blocks.
+   Per-state <= check against the incumbent's optimizer rows.
+2. SA-over-series (the transferable k=1 contraction); the twins +
    C/Si ports; the adoption gate (user); the exporter + convergence.
-3. Still queued: mo x raw cells.
+3. Still queued: mo x raw cells; the twins' UHF class repair (the
+   class diverges on the uncontracted bases, measured 2026-11-11 --
+   map Issues).
+
+## Executed 2026-11-11 (the user's table review round)
+
+- (82d6611) THE RENDERING DIET: the methods table renders the
+  comparison, the store keeps everything -- NO-start cells never
+  render (energy-identical to D), the prior windows contribute
+  their distilled CI row at the ruler core only, the lattice one
+  row per span, the frac class does not render, the prior labels
+  verbatim (3d4s@r1 / D); Sc 122->65 run rows, Ti 123->70, C/Si
+  32->29, the twins 14->10.
+- (010688a) THE LOCKSTEP RENAME: fold -> core (CellKey.core,
+  core_tag/core_shells/core_col/core_label/core_chemistry,
+  _lane_core; the storage schema strings frozen by design), ladder
+  retired (methods_section, the methods:begin/end markers,
+  SeriesSpec/run_series/CaseSpec.series, rungs/series); the L+-
+  physics and run_folded/folded keep their names by design.
+- (9dd43fb) THE UHF ANCHORS: Sc/Ti/U14e warmed bit-exact to their
+  declared gates, the anchor rows render; the twins BLOCKED (the
+  UHF class diverges on the uncontracted bases -- map Issues).
 
 ## Executed 2026-11-10 (the table feedback round + the docs)
 

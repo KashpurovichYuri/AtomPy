@@ -272,10 +272,14 @@ axis it names is defined once, in Methods.
 
 **Tables grammar** — the element file is `TABLE.md`: the ONE methods
 table, generated between `methods` markers, its CSV mirror `TABLE.csv`
-beside it (same rows, ASCII headers). Every run cell is a row;
-families (the lattice spans, the primary window's core-field groups,
-the lane families, the prior comparison blocks) are separated by rule
-rows; the ROHF anchor row leads — ΔE's zero — and the UHF anchor
+beside it (same rows, ASCII headers). The table renders the
+COMPARISON classes -- the distilled rows, the controls, the
+treatments; repeats stay store-only (NO-start cells are
+energy-identical to their D row, the prior windows' control rows
+repeat the incumbent's, the frac reference class belongs to the
+reference study). Families (the lattice spans, the primary window's
+core groups, the lane families, the prior comparison blocks) are
+separated by rule rows; the ROHF anchor row leads — ΔE's zero — and the UHF anchor
 follows where the store carries it. The tables render what ran;
 per-section legends live nowhere.
 
