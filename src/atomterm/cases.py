@@ -355,6 +355,17 @@ class CaseSpec:
                 f"the series head {self.series[0].tag!r} must be the "
                 f"case's reference configuration (spin {self.spin}, "
                 f"not {self.series[0].spin})")
+        if self.render_spans is not None:
+            declared = {"".join(self.shell_patterns)}
+            declared |= {w.partition("@")[0] for w in self.planned_windows}
+            declared |= set(self.lattice_windows or ())
+            declared |= {w.partition("@")[0]
+                         for w in (self.lane_windows or ())}
+            stray = [s for s in self.render_spans if s not in declared]
+            if stray:
+                raise ValueError(
+                    f"render_spans names undeclared spans {stray} -- a "
+                    "typo would silently render a partial table")
 
     def atom_config(self) -> AtomConfig:
         """The spec as an :class:`AtomConfig` (``tag`` defaults to the
@@ -709,7 +720,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         # 2026-11-11, the twins' fresh-SCF disease; the
                         # port's @s half waits on that repair)
                         series=(SeriesSpec("d1s2", ("1s", "2s", "2p", "3s",
-                                                    "3p"), ("3d", "4s"),
+                                                    "3p", "4s"), ("3d",),
                                            1, -759.7373848622801),),
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},

@@ -142,6 +142,7 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d4s_2-1_casscf_moc_-_pol_avg | -759.76590055 | -3.766e-02 | 0.05257 | 3.49e-01 | 7.20e-01 | 2.5e+00 | 2.5e+00 | 0.499 | nan | 1.9e-03 | 1.5e-12 |  |
 | sc_3d4s_2-1_sa-casscf_moc_-_pol_avg | -759.73778662 | -9.547e-03 | 5.00136 | 1.08e+00 | 6.43e+00 | 1.9e+00 | 4.5e+00 | 0.833 | nan | 4.9e-04 | 1.4e-12 | NOT-CONVERGED |
 | sc_3d4sno2_2-1_casci_no_-_pur_avg | -759.72889088 | -6.515e-04 | 6.00000 | 3.26e-14 | 1.67e-13 | 6.7e-15 | 8.7e-15 | 0.833 | 0.0e+00 | 0.0e+00 | 3.4e-12 |  |
+| sc_3d4s_2-1_casci_mo_-_pur_avg | -759.74621598 | -1.798e-02 | 0.00621 | 1.53e-01 | 7.23e-01 | 2.8e+00 | 3.7e+00 | 0.500 | 0.0e+00 | 0.0e+00 | 3.2e-13 |  |
 
 configurations per root (top-2 determinants):
 
@@ -1031,6 +1032,15 @@ configurations per root (top-2 determinants):
 - `sc_3d4sno2_2-1_casci_no_-_pur_avg` root 6: s^1.00d^2.00 (|c|=0.35); s^1.00d^2.00 (|c|=0.35)
 - `sc_3d4sno2_2-1_casci_no_-_pur_avg` root 7: s^1.00d^2.00 (|c|=0.28); s^1.00d^2.00 (|c|=0.28)
 - `sc_3d4sno2_2-1_casci_no_-_pur_avg` root 8: s^1.00d^2.00 (|c|=0.27); s^1.00d^2.00 (|c|=0.27)
+- `sc_3d4s_2-1_casci_mo_-_pur_avg` root 0: s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.12)
+- `sc_3d4s_2-1_casci_mo_-_pur_avg` root 1: s^1.00p^1.00d^1.00 (|c|=0.57); s^1.00p^1.00d^1.00 (|c|=0.57)
+- `sc_3d4s_2-1_casci_mo_-_pur_avg` root 2: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d4s_2-1_casci_mo_-_pur_avg` root 3: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d4s_2-1_casci_mo_-_pur_avg` root 4: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.48)
+- `sc_3d4s_2-1_casci_mo_-_pur_avg` root 5: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)
+- `sc_3d4s_2-1_casci_mo_-_pur_avg` root 6: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)
+- `sc_3d4s_2-1_casci_mo_-_pur_avg` root 7: s^1.19d^1.81 (|c|=0.58); s^1.19d^1.81 (|c|=0.58)
+- `sc_3d4s_2-1_casci_mo_-_pur_avg` root 8: s^1.00p^1.00d^1.00 (|c|=0.73); s^1.00p^1.00d^1.00 (|c|=0.63)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 

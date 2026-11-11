@@ -1262,6 +1262,12 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     assert d_opt[:7] == ["CASSCF", "CASSCF, radial", "CASSCF, frozen",
                          "CASSCF, virtual-mix", "SA-CASSCF",
                          "SA-CASSCF, radial", "SA-CASSCF, frozen"]
+    mo_opt = [r.split("|")[1].strip() for r in rows
+              if "3d4s / MO |" in r and (r.startswith("| CASSCF")
+                                         or r.startswith("| SA"))]
+    seq = ["CASSCF", "CASSCF, frozen", "SA-CASSCF", "SA-CASSCF, frozen"]
+    assert mo_opt[:4] == seq                    # the pol group's order
+    assert mo_opt[4:] == seq                    # pur repeats it identically
     opt = [r for r in rows
            if r.startswith("| CASSCF | free | 3d4s / D |")]
     assert len(opt) == 2 and not any("·lane" in r for r in opt)  # Ar + Ar·pur substrates
@@ -1269,10 +1275,8 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
 
 @fast
 def test_methods_local_minimum_note_derived_from_the_sa_floor():
-    """A FREE single-root CASSCF above its span's SA ground root is a
-    converged LOCAL minimum (the variational argument) and the note
-    says so; a row below the floor and every CONSTRAINED row (frozen,
-    radial -- legitimately above the SA ground) never carry it."""
+    """A free single-root CASSCF above its span's SA ground carries
+    the derived note; below-floor and constrained rows never do."""
     mod = methods_module()
     cs = replace(CAMPAIGN["Sc"], render_spans=None)
 

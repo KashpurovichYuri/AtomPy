@@ -305,10 +305,12 @@ def main() -> None:
                 sys.exit(f"no {store} to merge into -- a filtered first "
                          "run would create a subset-only store; run "
                          "unfiltered first")
+            # the WHOLE store dict, not just cells: the write below
+            # merges into it, so the store's other top-level records
+            # (the UHF anchor) survive a regen -- {} on the unfiltered
+            # path, whose runs rebuild every cell anyway
+            store_data = {}
             try:
-                # the WHOLE store dict, not just cells: the write
-                # below merges into it, so the store's other
-                # top-level records (the UHF anchor) survive a regen
                 store_data = json.loads(store.read_text())
                 cells = store_data["cells"]
             except (json.JSONDecodeError, KeyError) as e:

@@ -288,7 +288,7 @@ axis it names is defined once, in Methods.
 table, generated between `methods` markers, its CSV mirror `TABLE.csv`
 beside it (same rows, ASCII headers). The table renders the
 COMPARISON classes -- the distilled block (the incumbent and the
-prior windows), the NO density leg, the controls, the treatments;
+prior windows), the controls, the treatments;
 repeats stay store-only (the prior windows' control rows repeat
 the incumbent's at equal width, the frac reference class belongs
 to the reference study). Families (the lattice spans, the primary

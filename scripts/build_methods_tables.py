@@ -128,7 +128,7 @@ def _num(v, fmt) -> str:
     return format(v, fmt) if isinstance(v, float) and v == v else DASH
 
 
-def _row(k, p, anchor, spec, sa_floor=None) -> str:
+def _row(k, p, anchor, spec, sa_floor) -> str:
     """One run cell in the methods table's columns -- every run cell a row,
     fully identified (method, route, window/start, CAS, core)."""
     route = ("pinned" if k.core_tag is not None and k.substrate == "pur"
@@ -232,10 +232,10 @@ def _sa_floor(cells: dict) -> dict[tuple, float]:
     return out
 
 
-def _rows(keys, cells, anchor, spec) -> list[str]:
+def _rows(keys, cells, anchor, spec, floor) -> list[str]:
     """Every RUN cell of the key set (the :func:`_method_row` policy),
-    in the given order."""
-    floor = _sa_floor(cells)
+    in the given order; ``floor`` = the table's :func:`_sa_floor`
+    (computed once in :func:`methods_section`)."""
     return [_row(k, p, anchor, spec, floor)
             for k in keys
             if _method_row(k)
@@ -319,11 +319,13 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     body: list[str] = []
     seen: set[str] = set()
 
+    floor = _sa_floor(cells)
+
     def _fam(keys) -> None:
         rows = _rows(sorted([k for k in keys
                              if k.address not in seen and _method_row(k)],
                             key=_comparison_key),
-                     cells, anchor, spec)
+                     cells, anchor, spec, floor)
         seen.update(k.address for k in keys)
         if rows:
             body.extend([RULE] if body else [])
