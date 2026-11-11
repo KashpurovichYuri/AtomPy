@@ -48,7 +48,7 @@ atom's ROHF anchor and classified by its diagnostics (Results).
 ## Motivation
 
 The exact Hamiltonian of an atom is SO(3) × SU(2) invariant, so every
-term (2S+1)L is exactly (2L+1)(2S+1)-core degenerate. A CAS run breaks
+term (2S+1)L is exactly (2L+1)(2S+1)-fold degenerate. A CAS run breaks
 this in exactly two places.
 
 **The restriction.** CAS takes its core from a prior SCF reference,
@@ -109,7 +109,7 @@ algebra): the Symbols section of `atomterm.operators`' docstring.
 
 ## Methods
 
-**ROHF — the reference.** Everything downstream cores it. Where
+**ROHF — the reference.** Everything downstream builds on it. Where
 energy-ordered filling fails (runaway configurations; metastable
 polarized basins) it is kept honest by character-forced occupations
 (orbital type measured by S-projector weight, never energy order), an
@@ -128,7 +128,7 @@ census (`uhf_basin_census`: the production start, the named PySCF
 starts, one strong spin break — one call, any atom; the census
 measures, the declaration picks). The UHF object is a
 reference-class product — the methods grid does not run on it (the
-cores assume one closed-shell core density; the broken-core core is
+cores assume one closed-shell core density; the broken-core partition is
 the declared next step); the anchor row renders from the store's
 `uhf` record beside the ROHF anchor.
 

@@ -171,7 +171,7 @@ def test_source_tag_grammar():
 @fast
 def test_prior_windows_declared_on_the_campaign():
     """The prior axis derives from the ONE declaration: Sc/Ti declare
-    their ladders + prior realizations, and the planned prior windows
+    their series + prior realizations, and the planned prior windows
     parse into source tags the cells can resolve (the @s windows'
     series requirement validated at the case)."""
     for name in ("Sc", "Ti"):
@@ -1171,7 +1171,7 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
     assert sa_q["conv_dE"] == sa["conv_dE"] >= 0.0
 
 
-def ladder_module():
+def methods_module():
     """The methods-table builder, loaded once per call site (a script,
     not a package import)."""
     import importlib.util
@@ -1195,10 +1195,10 @@ def _methods_payload(e, roots=1):
 
 
 @fast
-def test_ladder_table_is_byte_deterministic():
+def test_methods_table_is_byte_deterministic():
     """THE LADDER (one table per atom, between the markers): the
     section builds byte-identically from the same store, once."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
     agree = {k.address: _methods_payload(-848.4) for k in keys}
@@ -1208,11 +1208,11 @@ def test_ladder_table_is_byte_deterministic():
 
 
 @fast
-def test_ladder_anchors_lead_and_families_follow():
+def test_methods_anchors_lead_and_families_follow():
     """The ROHF anchor leads; the UHF anchor row follows when the
     store carries the record (DeltaE against the same zero, the meter
     in the note); the first family follows directly."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
     agree = {k.address: _methods_payload(-848.4) for k in keys}
@@ -1236,13 +1236,13 @@ def test_ladder_anchors_lead_and_families_follow():
 
 
 @fast
-def test_ladder_every_run_cell_a_row_no_starts_scoped_to_optimizers():
+def test_methods_primary_renders_core_groups_beside_optimizers():
     """EVERY comparison row a row -- the three rendered core variants'
     CI rows beside their optimizer variants, the method bare +
     restriction only, the window cell in slash form; the frac
     reference class and NO-start cells stay store-only (the diet);
     free optimizer rows carry no lane marker."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
     agree = {k.address: _methods_payload(-848.4) for k in keys}
@@ -1258,11 +1258,11 @@ def test_ladder_every_run_cell_a_row_no_starts_scoped_to_optimizers():
 
 
 @fast
-def test_ladder_meter_and_ptp_columns_render():
+def test_methods_meter_and_ptp_columns_render():
     """The closure columns carry the span certificate; ptp computes
     where a root set exists and stays dash on single roots; the conv
     column carries precision/count."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
     agree = {k.address: _methods_payload(-848.4) for k in keys}
@@ -1289,12 +1289,12 @@ def test_ladder_meter_and_ptp_columns_render():
 
 
 @fast
-def test_ladder_cycle_cap_note():
+def test_methods_cycle_cap_note():
     """The cap note fires by IDENTITY on payloads carrying the cap
     (the store's ``max_cycle`` field -- the run's actual mc cap) and
     keeps the legacy ``== 200`` key for payloads predating the field;
     a mid-cap count never flags."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
     agree = {k.address: _methods_payload(-848.4) for k in keys}
@@ -1318,10 +1318,10 @@ def test_ladder_cycle_cap_note():
 
 
 @fast
-def test_ladder_ci_only_store_renders_planned_pointers():
+def test_methods_ci_only_store_renders_planned_pointers():
     """No optimizer run cells anywhere: the CI rows still render, the
     gated planned windows follow as pointers."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
     text = "\n".join(mod.methods_section(
@@ -1333,13 +1333,13 @@ def test_ladder_ci_only_store_renders_planned_pointers():
 
 
 @fast
-def test_ladder_prior_rows_join_the_span_family_in_comparison_order():
+def test_methods_prior_rows_join_the_span_family_in_comparison_order():
     """The same-CAS comparison: a prior window's CI rows render BESIDE
     the incumbent's at its span, one family (no rule row inside),
     ordered incumbent -> r -> s1 -> s2 -- in the lattice family of a
     lattice span and in the primary's core groups of the primary
     span."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Sc"]
     keys = [k for k in [*lattice_keys(cs), *grid_keys(cs),
                         *(k for w in cs.planned_windows
@@ -1367,7 +1367,7 @@ def test_methods_table_diet_repeats_do_not_render():
     row), the prior windows' control and non-ruler-core rows, the
     lattice's per-span control, and the frac reference class never
     render -- the store keeps them, the table does not repeat them."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Sc"]
     keys = [k for k in [*lattice_keys(cs), *grid_keys(cs),
                         *(k for w in cs.planned_windows
@@ -1389,11 +1389,11 @@ def test_methods_table_diet_repeats_do_not_render():
 
 
 @fast
-def test_ladder_prior_span_without_incumbent_renders_its_own_family():
+def test_methods_prior_span_without_incumbent_renders_its_own_family():
     """A prior span with no incumbent family (no lattice, not the
     primary) renders as its own comparison family -- beside the
     primary's, separated by the rule row."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = [k for k in (k for w in cs.planned_windows
                         for k in window_grid(cs, w))
@@ -1413,12 +1413,12 @@ def test_ladder_prior_span_without_incumbent_renders_its_own_family():
 
 
 @fast
-def test_method_ladder_lane_families():
+def test_methods_lane_families():
     """The one table carries the lane families: pinned CI, free CI,
     the free CASSCF/SA, and the pinned SA in one family block; the
     tagged cores carry the lane marker; un-run lane families are
     absent; families are separated by the rule row."""
-    mod = ladder_module()
+    mod = methods_module()
     cs = CAMPAIGN["Sc"]
 
     def p(e, pinned=False, ci=False):

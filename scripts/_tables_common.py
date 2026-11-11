@@ -30,7 +30,7 @@ def core_col(k, spec) -> str:
     """The core column (every table's one grammar): a tagged window's
     own core; an untagged cell's prefix -- the declared chemical shell
     set of the key's EFFECTIVE core (``core_chemistry``: the count
-    follows the key's sector -- a promoted-pair window cores fewer
+    follows the key's sector -- a promoted-pair window freezes fewer
     pairs), else the noble whose closed count fills ``spec.ncore``
     orbitals; the variants naming their deviation."""
     if k.core_tag is not None:

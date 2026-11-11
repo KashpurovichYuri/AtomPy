@@ -28,6 +28,26 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- THE 2026-11-11 REVIEW ROUND (two-axis over c82fa6d..bfd9b08 + the
+  design survey): fixes landed (the module-docstring header, ~20
+  verb-damage sites from the mechanical rename sweep -- the worst
+  the PHYSICS word "k-fold degenerate" mangled to "k-core"; the
+  keep-list lesson: the degeneracy "fold" is physics vocabulary,
+  same class as the L+- ladder -- plus the stale `_fold_span` ref,
+  `fold_rows` locals, the capitalized-FOLD leftovers, the
+  address-grammar prose, the 10 test renames, the AGENTS cells row
+  naming `prior_tag_of`/`no_label`).  DECLINED, with reasons:
+  `scripts/probe_series_source.py` keeps its ladder vocabulary
+  (frozen historical probe -- predates basis.py, imports nothing
+  renamed); `_comparison_key`'s bare rank ints (the documented
+  reading order -- primitive-by-design, named in the docstring);
+  the lane-family extraction from cells.py (locality-only gain --
+  the interface would not simplify; REVISIT if the radial legs grow
+  it); the renderer's script-home (convention-owned, one production
+  consumer).  Survey verdicts: basis.py is DEEP (the deletion test:
+  the contraction recipe re-scatters across cases/reference/scripts);
+  the member_chains seam is real (two declared distillation
+  families walk it); the radial legs need ZERO new src surface.
 - THE TWINS' UHF ANCHORS BLOCKED (2026-11-11, measured): the UHF
   class does NOT converge on the uncontracted twins -- the census
   arms (default/minao/atom/huckel/broken) all diverge or land

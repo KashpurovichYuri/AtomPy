@@ -232,7 +232,7 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         stages.
     ncore, na, nb : core size and spin sector of the stage.
     tag : stage label used throughout reports and chkfile stores.
-    spherical_core : core with the spherically averaged core density
+    spherical_core : build with the spherically averaged core density
         (the physical reference) or the raw one (the raw-core
         detector).
     anisotropy_ref : ``(mf_ref, c_core_or_None)``, optional -- measure

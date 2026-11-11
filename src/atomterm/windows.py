@@ -655,7 +655,7 @@ def window_distilled(mol, c_ref, s, patterns, layer=None, radials=None,
     s : ``(nao, nao)`` the overlap metric.
     patterns : the window's chemical shell names, in slot order.
     layer : the declared realization mapping (shell -> band tuple),
-        :func:`shell_realization`; the FOLD keeps reading the same
+        :func:`shell_realization`; the CORE keeps reading the same
         layer at full family width -- the distillation is a
         window-side choice only.
     radials : the declared depth, shell -> k.  Every pattern shell
@@ -933,7 +933,7 @@ def occupied_core_idx(mf, ncore: int) -> list[int]:
     Warns when the closed block is NOT ``range(ncore)``: canonical MO
     ORDER is meaningless on near-degenerate uncontracted bases (the
     first canonical MOs can be virtual junk while the closed block
-    sits elsewhere; ``range(ncore)`` would silently core garbage
+    sits elsewhere; ``range(ncore)`` would silently freeze garbage
     columns). On contracted bases
     the two coincide -- this makes the coincidence a checked
     invariant instead of an assumption.
@@ -961,7 +961,7 @@ def canonical_order(mf, ncore: int) -> list[int]:
     m-block listing, not the occupation/energy order -- on uncontracted
     bases the first columns are diffuse virtual junk while the closed
     block sits elsewhere (the warning :func:`occupied_core_idx` fires),
-    and ``columns[:ncore]`` would silently core garbage. On contracted
+    and ``columns[:ncore]`` would silently freeze garbage. On contracted
     bases the permutation is the identity: the coincidence stays a
     checked invariant, not an assumption.
 

@@ -4,7 +4,7 @@ contract: the table and its source cannot diverge).
 
 Usage: python scripts/build_methods_tables.py [atom]
 
-THE ONE LADDER TABLE (the element file IS the table): every run cell
+THE ONE METHODS TABLE (the element file IS the table): every run cell
 of the atom a row, ROHF anchor first, the UHF anchor beside it when
 the store carries the record; families in declaration order,
 separated by the rule row -- the lattice spans (CI only), the
@@ -87,7 +87,7 @@ CSV_HEADER = ["method", "route", "window", "CAS", "core", "dets", "E_Eh",
 def csv_of(body: str) -> str:
     """The CSV mirror of the methods table: the same data rows (the
     rule rows and the markdown furniture dropped), ASCII header
-    names, csv-quoted (the braced cores carry commas)."""
+    names, csv-quoted (the braced core names carry commas)."""
     import csv
     import io
     out = io.StringIO()

@@ -144,7 +144,7 @@ class CaseSpec:
         behavior).  The realization is BASIS-SPECIFIC and certified by
         the measured composition (``scripts/band_composition.py``):
         a chemical shell over multi-zeta contractions or uncontracted
-        primitive bands is multi-column, and its FOLD freezes
+        primitive bands is multi-column, and its CORE freezes
         ``closed_electrons`` pairs over that span
         (:func:`atomterm.core.confined_core_orbitals`) -- never one
         pair per column.
@@ -156,7 +156,7 @@ class CaseSpec:
         replicated on every m-member
         (:func:`atomterm.windows.window_distilled`) -- the CAS label
         reads the delivered records' shapes (CAS(3,6), not CAS(3,43)).
-        Window-side only: the FOLD stays at full family width.
+        Window-side only: the CORE stays at full family width.
     series : the declared CONFIGURATION SERIES
         (:class:`atomterm.basis.SeriesSpec` tuple) -- the prior axis's
         radial-signal sources: the atom's valence configurations as
@@ -178,7 +178,7 @@ class CaseSpec:
     planned_sectors : per-window sector overrides for planned windows
         (window label -> (na, nb)) -- a promoted-pair window's core
         count follows its sector (:func:`atomterm.system.ncore_of`:
-        the (5,1) key cores 4 of the 5 core pairs).  Absent = the
+        the (5,1) key freezes 4 of the 5 core pairs).  Absent = the
         case's default sector.
     lattice_windows : the lattice spans (empty = none) -- CASCI cells
         over growing m-complete shell spans at ``lattice_sector``
@@ -230,7 +230,7 @@ class CaseSpec:
     shell_bands: dict[str, tuple[str, ...]] | None = None
     # the WINDOW-side compression depth (chemical shell -> k reference
     # radials x the m-set): a multi-band realization's chemically
-    # sized window -- CAS(3,6)-shaped, not CAS(3,43)-shaped.  The FOLD
+    # sized window -- CAS(3,6)-shaped, not CAS(3,43)-shaped.  The CORE
     # ignores it (full family spans; the compression is a window-side
     # choice only); every shell of every window the case declares must
     # carry one (a mixed distilled/raw window is not offered).
@@ -552,7 +552,7 @@ _TM_UNC_BANDS = {
 # the twins' WINDOW distillation depth (k=1: the single reference
 # radial per shell, replicated on the m-set): the CAS labels mirror
 # the certified contracted records' shapes (CAS(3,6)/CAS(4,6)) at
-# minutes per cell.  The FOLD families stay full -- the cusp is the
+# minutes per cell.  The CORE families stay full -- the cusp is the
 # core's business; the distillation is a window-side choice only.
 _TM_UNC_RADIALS = {"3d": 1, "4s": 1}
 _SC_UNC_BASIS = gto.parse((_DATA / "sc_ccpvdz_unc.txt").read_text())
@@ -899,7 +899,7 @@ def run_atom(
         results dict (one closure per run -- it captures the run's
         mol/mf/reports)."""
         ncore = ncore_of(mol.nelectron, na + nb)
-        # core with the stage's OWN core (inside stage_facts: it uses
+        # build with the stage's OWN core (inside stage_facts: it uses
         # cas.mo_coeff[:, :ncore]): orbital optimization may legally
         # reorganize the inactive span, and a different core than the one
         # PySCF's energies used breaks E_tot = E_core + e_cas. For CASCI

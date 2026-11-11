@@ -492,7 +492,7 @@ def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
       ``occ_e_ref`` would gate the UNBROKEN basin only and a broken
       solution trips it BY DESIGN.
     - The returned object is a REFERENCE-CLASS product, not a cells
-      axis: downstream cores consume one closed-shell core density
+      axis: downstream core partitions consume one closed-shell core density
       and one MO set (the module docstring's declined-seam note).
     """
     from atomterm.system import build_mol

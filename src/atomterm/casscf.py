@@ -369,7 +369,7 @@ def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
     conv_tol : the pinned solvers' CI convergence tolerance.
     c_core : explicit core columns (the lane windows' non-prefix cores --
         ``ncore`` is then the core's column count; the default None
-        cores the ncore prefix).
+        freezes the ncore prefix).
 
     Returns
     -------

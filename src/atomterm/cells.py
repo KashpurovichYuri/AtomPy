@@ -355,7 +355,7 @@ class CellKey:
             raise ValueError(
                 f"address {address!r} does not have 8 slots (9 with "
                 "the field tag): atom_window_na-nb_method_start_mask_"
-                "substrate_fold[_field]")
+                "substrate_core[_field]")
         atom, window, sector, method, start, mask, substrate, core, \
             field_name = parts
         na, nb = sector.split("-")
@@ -655,21 +655,21 @@ def _lane_core(key: CellKey, mol, mf,
         raise ValueError(
             f"{key.address}: the sector holds {na + nb} active electrons; "
             f"the core {list(core)} leaves {nelec}")
-    fold_rows: list[int] = []
+    core_rows: list[int] = []
     for sh in core:
         for band in shell_realization(sh, shell_bands):
             rows = select_shell_ao(mol, band)
             if not rows:
                 raise ValueError(
-                    f"{key.address}: the basis has no {band} band to core"
+                    f"{key.address}: the basis has no {band} band to freeze"
                     + (f" (the declared realization of shell {sh!r})"
                        if band != sh else ""))
-            fold_rows.extend(rows)
+            core_rows.extend(rows)
     # the shells' realizations may SHARE bands (physical, see above) --
     # the span is the UNION of rows: a duplicate row would make the
     # Gram exactly singular
-    fold_rows = sorted(set(fold_rows))
-    c_span = lowdin(np.eye(mol.nao_nr())[:, fold_rows], mf.get_ovlp())
+    core_rows = sorted(set(core_rows))
+    c_span = lowdin(np.eye(mol.nao_nr())[:, core_rows], mf.get_ovlp())
     n_pairs = closed_electrons(core) // 2
     # the reference's own core: the occupied columns, S-projected onto
     # the core span and orthonormalized within it -- the span hosts
@@ -694,7 +694,7 @@ def _key_core(key: CellKey, mol, mf,
     ``(ncore, c_core, c_pur)`` -- a tagged core's SCF core IS
     the core (``ncore`` follows the core's PAIR count, not its span
     width), else the pur substrate's purified span when declared,
-    else ``None`` cores the occupied prefix.  ``c_pur`` is separate
+    else ``None`` freezes the occupied prefix.  ``c_pur`` is separate
     because the NO-start branch and the anisotropy reference need the
     pur substrate even when a core supplied ``c_core``."""
     from atomterm.core import purified_core_orbitals
@@ -989,7 +989,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     else:  # start == "mo": the canonical window in the run convention
         # (:func:`atomterm.windows.canonical_order`: closed | open |
         # virtual -- the raw PySCF order is the m-block listing and
-        # would core virtual junk on uncontracted bases). On pol the
+        # would freeze virtual junk on uncontracted bases). On pol the
         # reordered canonical matrix IS the substrate; on pur the
         # canonical columns are re-orthogonalized against the pur core
         # span (they are S-orthonormal against the core they were
@@ -1063,7 +1063,7 @@ def analyze_cell(key: CellKey, mol, mf, shell_bands: dict | None = None,
     optimizer re-run, no re-solving. The two-function lean: loading is
     pure data (:func:`load_cell`), analysis needs the live reference.
 
-    Fold-tagged windows analyze against their tag's SCF core
+    Core-tagged windows analyze against their tag's SCF core
     (the core size is the core's PAIR count -- the span width on a
     multi-column realization); sectors past the dense-meter budget
     return None -- the kernel-only class
@@ -1312,7 +1312,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     shell_radials : the case's declared WINDOW distillation depth
         (:attr:`atomterm.cases.CaseSpec.shell_radials`; None = the raw
         band rows) -- the pinned term readout at the chemically-sized
-        window; the FOLD stays at full family width either way.
+        window; the CORE stays at full family width either way.
     verbose : print each block as it solves.
     workdir : the store root.
 
@@ -1822,7 +1822,7 @@ def lane_keys(spec) -> list[CellKey]:
     Examples
     --------
     Ti (nelec_act=4, Ar prefix): ``3d4s@ar`` keeps sector (3, 1);
-    ``3d3p@semi`` grows to (5, 3); the M-shell cores to (6, 4).
+    ``3d3p@semi`` grows to (5, 3); the M-shell core lands at (6, 4).
     """
     from dataclasses import replace
 
