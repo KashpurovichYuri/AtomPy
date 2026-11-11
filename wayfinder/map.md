@@ -26,7 +26,19 @@ Resolved: ticket 32 (the symmetry lane) — the campaign complete
 wave closed 2026-11-05 on the gates (the full-suite run retired by
 user decision; the partial verdict 91/91-isolation-green).
 
-## Issues (open dispositions + watchlist)
+## Issues
+
+- **The pinned lane payload seam** (found 2026-11-11, the runs round):
+  the pinned lane legs (substrate=pur) store the LANE certificate
+  schema (anchor_dev/fold/conv, no e_ground/energies_pyscf), which the
+  renderer's data-row condition does not recognize -- the pinned rows
+  render pending UNIFORMLY on every atom while their runs sit in the
+  stores.  Pre-existing through the structure round.  The resolution
+  is a declared class: either the lane payload gains the renderable
+  fields, or the pinned legs join the NO certificate class
+  (store-only, no row).  Decision pending; the uniform render is
+  honest in the meantime (the tables never claim data that isn't
+  shown). (open dispositions + watchlist)
 
 - THE 2026-11-11 REVIEW ROUND (two-axis over c82fa6d..bfd9b08 + the
   design survey): fixes landed (the module-docstring header, ~20

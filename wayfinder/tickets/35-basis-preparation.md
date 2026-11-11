@@ -75,6 +75,24 @@ Opened 2026-11-10 from the handoff (xxii) skeleton + the review round
 ## Executed 2026-11-11, the review-stage rounds (the user's
 ## structure, delivered iteratively)
 
+- (9274b04..f8e8a58) THE APPROVED RUNS, fully executed: every render
+  span on every atom reads ZERO runnable-pending (Sc/Sc-unc/Ti/Ti-unc/
+  C/Si; U14e deferred).  Sc-unc: the 3d lattice (30), the 3d@ar lane,
+  the @r1 NO certificates.  Ti-unc: the @r1 priors at both sectors
+  (18), the 3d lattice (32), the lane, the UHF anchor.  Sc: the 3d
+  lattice (32) + the lane.  Ti: the kind blocks (12), the 3d lattice
+  (30), the lane.  C/Si: the mo/moc legs (12 each).  THREE code facts
+  the runs forced: (a) the @s guard went LABEL-level (the sector-
+  bearing prefix leaked 18 Ti-unc cells past the planned_sectors
+  mirror); (b) the radial construction refusal got ONE home
+  (cells.radial_refused -- regen's queue died at the twins' lattice
+  radial cells); (c) the same-l guard DERIVES from the declared
+  windows (Sc's lattice ladder carried five unguarded same-l spans;
+  the derivation also caught Ti's 3d4p4d).  VERDICT REVERSAL: both
+  twins' UHF anchors CONVERGE spin-pure (the 'lands diverged'
+  expectation was wrong); the diverged-note machinery stays for
+  whoever needs it.
+
 - (f2e5d04..328ee86) THE STRUCTURE ROUND: pending placeholders, the
   sectioned skeleton (=== anchors/span transitions, --- families,
   lane closes its section), the UHF place row, the NO class retired

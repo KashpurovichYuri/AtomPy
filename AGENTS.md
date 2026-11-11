@@ -297,7 +297,7 @@ carries a number only when the number IS the fact.
 
 ## Tests
 
-`pytest` runs 309 tests. The fast tier: `pytest -m fast` = 215
+`pytest` runs 312 tests. The fast tier: `pytest -m fast` = 218
 tests in seconds (machine-light selection). The heavy tail is
 HOURS-class now (the `test_symm_tm` fixture carries the (8,13)
 SA-leg optimizer pairs, 1–2 h each — the old "~15 min" record

@@ -312,6 +312,7 @@ def test_void_reason_gates_scenariod_cells():
     assert reason.startswith("same-l-window") and "2026-11-10" in reason
 
 
+@fast
 def test_same_l_guard_derives_from_the_declared_windows():
     """The same-l guard is DERIVED (scenarios_for), never hand-listed
     per atom: Sc's five same-l lattice spans and Ti's three planned
@@ -331,6 +332,7 @@ def test_same_l_guard_derives_from_the_declared_windows():
                 assert void_reason(k, sc) is None, k.address
 
 
+@fast
 def test_radial_refused_covers_the_distilled_cases():
     """The construction refusal is KEY x SPEC: every radial cell of a
     distilled case (declared shell_radials -- the TM campaign) or a
@@ -348,6 +350,7 @@ def test_radial_refused_covers_the_distilled_cases():
     assert not radial_refused(k, spec)
 
 
+@fast
 def test_void_reason_voids_every_twins_s_window_cell():
     """The twins' @s guard is LABEL-level: every cell of an @s window
     voids (whatever its sector -- the planned_sectors mirror moved the
