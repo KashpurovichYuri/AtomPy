@@ -369,7 +369,7 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     seen: set[str] = set()
 
     floor = _sa_floor(cells)
-    main_span = "".join(spec.shell_patterns)
+    last_span: list[str | None] = [None]
 
     def _fam(keys) -> None:
         rows = _rows(sorted([k for k in keys
@@ -379,10 +379,11 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         seen.update(k.address for k in keys)
         if rows:
             if body:
-                # a family outside the primary span opens a new
-                # SECTION (===); within it, the standard rule (---)
-                span = rows and keys[0].span_label
-                body.append(HEAVY if span != main_span else RULE)
+                # a SPAN TRANSITION opens a new section (===); within
+                # the section, families separate by the standard rule
+                span = keys[0].span_label
+                body.append(HEAVY if span != last_span[0] else RULE)
+            last_span[0] = keys[0].span_label
             body.extend(rows)
 
     # the prior windows, gathered by span (the sector match guards
@@ -424,19 +425,7 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         for keys in groups.values():
             _fam(keys)
 
-    # the other spans' sections follow (opened with the === rule)
-    for span in dict.fromkeys(k.window for k in lattice_keys(spec)):
-        if span == primary_span:
-            continue    # the primary's core groups own this span
-        if not keep(span):
-            continue
-        # the diet: one row per span (the distilled CI); the
-        # m-incomplete control story renders once, at the primary
-        _fam([k for k in lattice_keys(spec)
-              if k.window == span and k.start == "ao"]
-             + [k for k in priors.get(span, [])
-                if k.sector == spec.lattice_sector])
-
+    # the route/lane families of the primary span close its section
     routes = route_keys(spec)
     for leg in [k for k in routes
                 if k.substrate == "pur" and k.method == "sa-casscf"]:
@@ -449,6 +438,26 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         # studies render the fuller family)
         if any(_method_row(k) and payload_of(cells, k) for k in twins):
             _fam([k for k in twins if _method_row(k)])
+
+    # the other spans' sections follow (opened with the === rule)
+    for span in dict.fromkeys(k.window for k in lattice_keys(spec)):
+        if span == primary_span:
+            continue    # the primary's core groups own this span
+        if not keep(span):
+            continue
+        # the SAME core-group structure as the primary section: each
+        # group's block (the incumbent's rows beside the prior
+        # windows' at the lattice sector), pending placeholders
+        # holding the unrun places
+        keys = [k for k in lattice_keys(spec)
+                if k.window == span and k.core != "frac"]
+        keys += [k for k in priors.get(span, [])
+                 if k.sector == spec.lattice_sector]
+        groups: dict[str, list] = {}
+        for k in keys:
+            groups.setdefault(core_col(k, spec), []).append(k)
+        for g in groups.values():
+            _fam(g)
 
     # the planned windows that did not join a family above: the
     # untagged tiers (their own families, as declared) and any prior
@@ -469,7 +478,7 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     out = [BEGIN, HEAD, SEP, _anchor_row(anchor, spec)]
     out.append(_uhf_anchor_row(anchor, uhf) if uhf is not None
                else _uhf_pending_row())
-    out.append(RULE)      # the anchor block set apart from the CAS rows
+    out.append(HEAVY)     # the anchor block is its own SECTION
     out.extend([*body, END])
 
     return out

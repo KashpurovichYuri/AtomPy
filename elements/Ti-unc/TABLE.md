@@ -23,7 +23,7 @@ projected-density bookkeeping form. Sector M_S = 1. Sibling:
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −848.4074 | 0 | −23086.3543 | +0.0000 | — | — | — | — | — | — | — | forced filling |
 | UHF (anchor) | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === |
 | CASCI | free | 3d4s / D | (4,6) | Ar·raw | 120 | −848.4037 | +3.8 | −23086.2515 | +0.1028 | — | 12.0000 | 6e-02 | 4e-09 | 4e-09 | 6.5e-02 | 3.4e-01 |  |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CASCI | free | 3d4s / D | (4,6) | Ar | 120 | −848.4037 | +3.8 | −23086.2515 | +0.1028 | — | 12.0000 | 6e-02 | 4e-09 | 4e-09 | 2.6e-09 | 1.3e-08 |  |
@@ -58,12 +58,45 @@ projected-density bookkeeping form. Sector M_S = 1. Sibling:
 | CASSCF, frozen | free | 3d4s / MOC | (4,6) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | free | 3d4s / MOC | (4,6) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen | free | 3d4s / MOC | (4,6) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === |
-| CASCI | free | 3d / D | (2,5) | Ar | 10 | −848.4074 | −0.0 | −23086.3543 | −0.0000 | — | 12.0000 | 6e-02 | 1e-08 | 9e-09 | 4.5e-15 | 3.7e-14 |  |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CASCI | pinned | 3d4s / D | (4,6) | Ar·lane | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASCI | free | 3d4s / D | (4,6) | Ar·lane | 120 | −848.4014 | +6.1 | −23086.1894 | +0.1650 | — | 12.0000 | 6e-02 | 1e-14 | 2e-14 | 2.2e-14 | 2.7e-13 |  |
 | CASSCF | free | 3d4s / D | (4,6) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | free | 3d4s / D | (4,6) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | pinned | 3d4s / D | (4,6) | Ar·lane | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === |
+| CASCI | free | 3d / D | (2,5) | Ar·raw | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CASCI | free | 3d / D | (2,5) | Ar | 10 | −848.4074 | −0.0 | −23086.3543 | −0.0000 | — | 12.0000 | 6e-02 | 1e-08 | 9e-09 | 4.5e-15 | 3.7e-14 |  |
+| CASCI | free | 3d / MO | (2,5) | Ar | 10 | −848.4074 | −0.0 | −23086.3543 | −0.0000 | — | 0.0000 | 9e-01 | 3e+00 | 4e+00 | 5.7e-03 | 1.0e-09 | m-incomplete |
+| CASCI | free | 3d / MOC | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 3d / D | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 3d / D | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, virtual-mix | free | 3d / D | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 3d / D | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 3d / D | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 3d / MO | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 3d / MO | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 3d / MO | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 3d / MO | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 3d / MOC | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 3d / MOC | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 3d / MOC | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 3d / MOC | (2,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CASCI | free | 3d / D | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 3d / MO | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 3d / MOC | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 3d / D | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 3d / D | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 3d / D | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 3d / D | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 3d / MO | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 3d / MO | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 3d / MO | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 3d / MO | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 3d / MOC | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 3d / MOC | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 3d / MOC | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 3d / MOC | (2,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 <!-- methods:end -->

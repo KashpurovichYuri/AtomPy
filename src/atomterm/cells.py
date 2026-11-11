@@ -1799,13 +1799,17 @@ def lattice_keys(spec) -> list[CellKey]:
     CAS(2,8), 3d4p4d -> CAS(2,13).  Sc (valence series, sector
     (2,1)): 3d4s -> CAS(3,6).
     """
-    sec = spec.lattice_sector
+    from dataclasses import replace
     keys = []
     for w in spec.lattice_windows:
-        keys.append(CellKey(spec.key, w, sec, method="casci",
-                            core="avg"))
-        keys.append(CellKey(spec.key, w, sec, method="casci",
-                            start="mo", core="avg"))
+        # ONE grammar home: the full factor grid (:func:`window_grid`)
+        # over a sector view -- the lattice spans carry the same
+        # structure as the primary (core groups, kinds, treatments),
+        # their pending placeholders holding the unrun places
+        view = replace(spec, planned_sectors={w: spec.lattice_sector})
+        # frac stays out (a different reference SCF -- never a
+        # lattice arm)
+        keys.extend(k for k in window_grid(view, w) if k.core != "frac")
     return keys
 
 

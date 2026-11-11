@@ -448,26 +448,35 @@ def test_planned_sector_override_shrinks_the_fold():
 @fast
 def test_lattice_keys_derive_from_the_declaration():
     """The lattice derives from CaseSpec.lattice_windows at the
-    declared lattice_sector: two constructions per span (AO -- exactly
-    closed; MO -- the m-delocalized control); undeclared atoms derive
-    nothing; the sector is a declaration, not a constant (Sc's valence
-    series differs from Ti's free-ion series)."""
-    from atomterm.cases import CAMPAIGN
+    declared lattice_sector, carrying the SAME factor grid as the
+    primary window (one grammar home: core groups, kinds,
+    treatments -- the pending placeholders hold the unrun places);
+    undeclared atoms derive nothing; the sector is a declaration,
+    not a constant (Sc's valence series differs from Ti's
+    free-ion series)."""
+    from atomterm.cases import CAMPAIGN, campaign_spec
+    from atomterm.cells import window_grid
 
     assert lattice_keys(CAMPAIGN["C"]) == []
-    assert lattice_keys(CAMPAIGN["Si"]) == []
-    assert [k.address for k in lattice_keys(CAMPAIGN["Ti"])] == [
-        "ti_3d_2-0_casci_ao_-_pol_avg",
-        "ti_3d_2-0_casci_mo_-_pol_avg",
-        "ti_3d4p_2-0_casci_ao_-_pol_avg",
-        "ti_3d4p_2-0_casci_mo_-_pol_avg",
-        "ti_3d4p4d_2-0_casci_ao_-_pol_avg",
-        "ti_3d4p4d_2-0_casci_mo_-_pol_avg",
-    ]
+    ti = lattice_keys(CAMPAIGN["Ti"])
+    # the full grammar per span: the core-field controls, both
+    # substrates, every kind, treatments
+    assert {k.core for k in ti} == {"raw", "avg"}
+    assert {k.substrate for k in ti} == {"pol", "pur"}
+    assert {k.start for k in ti} == {"ao", "mo", "moc", "no"}
+    assert {"casci", "casscf", "sa-casscf"} <= {k.method for k in ti}
     # the valence series at its own sector: CAS(3,·), Ms = 1/2
-    first = lattice_keys(CAMPAIGN["Sc"])[0]
-    assert first.address == "sc_3d_2-1_casci_ao_-_pol_avg"
-    assert [k.sector for k in lattice_keys(CAMPAIGN["Sc"])] == [(2, 1)] * 16
+    sc = lattice_keys(CAMPAIGN["Sc"])
+    assert sc[0].address == "sc_3d_2-1_casci_ao_-_pol_raw"
+    assert {k.sector for k in sc} == {(2, 1)}
+    # the grammar IS the primary's (window_grid over a sector view,
+    # frac excluded at the source)
+    from dataclasses import replace as _re
+    view = _re(campaign_spec("Sc"), planned_sectors={"3d": (2, 1)})
+    per_span = {k.address for k in sc if k.window in ("3d", "3dno1")}
+    grid = {k.address for k in window_grid(view, "3d")
+            if k.core != "frac"}
+    assert per_span == grid
 
 
 # ------------------------------------------------------------- the bridge
@@ -1234,8 +1243,9 @@ def test_methods_anchors_lead_and_families_follow():
     assert cells_uhf[0] == "UHF (anchor)"
     assert cells_uhf[7] == "−3.5"
     assert "⟨S²⟩=4.0200" in cells_uhf[17]
-    # the anchor block set apart by a rule row, the first family follows
-    assert all(c.strip() == "---" for c in rows_uhf[4].split("|")[1:-1])
+    # the anchor block set apart by the SECTION rule, the first
+    # family follows
+    assert all(c.strip() == "===" for c in rows_uhf[4].split("|")[1:-1])
     assert rows_uhf[5].startswith("| CASCI |")
 
 
@@ -1461,10 +1471,12 @@ def test_methods_table_diet_repeats_do_not_render():
     assert prior_rows
     assert {l.split("|")[5].strip() for l in prior_rows} >= {"Ar", "Ar·raw"}
     assert all("/ D |" in l for l in prior_rows)
-    # the controls render only at the primary's span (no per-span
-    # lattice control)
-    assert all(l.split("|")[3].strip() == "3d4s / MO"
-               for l in rows if "/ MO |" in l)
+    # the controls render at EVERY span now (the lattice sections
+    # carry the same structure as the primary -- the lattice diet
+    # clause retired with the structural round)
+    mo_spans = {l.split("|")[3].strip().split(" /")[0]
+                for l in rows if "/ MO |" in l}
+    assert {"3d4s", "3d"} <= mo_spans
 
 
 @fast
