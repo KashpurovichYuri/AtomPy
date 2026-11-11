@@ -1241,9 +1241,9 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     """EVERY comparison row a row -- the three rendered core variants'
     CI rows beside their optimizer variants, the method bare +
     restriction only, the window cell in slash form; the frac
-    reference class and the NO CI row stay store-only while the NO
-    start's OPTIMIZER legs render with the controls; free optimizer
-    rows carry no lane marker."""
+    reference class and the NO start (its span IS its source's,
+    re-gauged) stay store-only; free optimizer rows carry no lane
+    marker."""
     mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
@@ -1252,9 +1252,7 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     rows = [r for r in text.splitlines() if r.startswith("|")]
     ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / D |")]
     assert len(ci) == 3            # raw/avg/pur (the frac class: store-only)
-    no_rows = [r for r in rows if "/ NO |" in r]
-    assert no_rows                 # the NO start's optimizer legs
-    assert all(not r.startswith("| CASCI |") for r in no_rows)  # no CI
+    assert not any("/ NO |" in r for r in rows)  # the NO class: store-only
     assert not any("frac" in r for r in rows)
     # the IDENTICAL per-start order: the D start's CASSCF rows (free,
     # then the masks in declaration order) before its SA rows
@@ -1404,12 +1402,11 @@ def test_methods_prior_rows_join_the_span_family_in_comparison_order():
 
 @fast
 def test_methods_table_diet_repeats_do_not_render():
-    """The rendering diet: the prior windows' control and
-    non-ruler-core rows, the lattice's per-span control, the frac
-    reference class, and the NO CI row (energy-degenerate with D)
-    never render -- the store keeps them, the table does not repeat
-    them; the NO start's OPTIMIZER legs DO render (a legitimate
-    start kind).  Pinned with the spec's render_spans review filter
+    """The rendering diet: the prior windows' control rows, the
+    lattice's per-span control, the frac reference class, and the
+    whole NO start (its span IS its source's, re-gauged -- a
+    certificate, not a row) never render; the store keeps
+    everything.  Pinned with the spec's render_spans review filter
     unset."""
     mod = methods_module()
     cs = replace(CAMPAIGN["Sc"], render_spans=None)
@@ -1420,7 +1417,7 @@ def test_methods_table_diet_repeats_do_not_render():
     text = "\n".join(mod.methods_section(
         cs, {k.address: _methods_payload(-759.5) for k in keys}, -759.7363))
     rows = [l for l in text.splitlines() if l.startswith("| CASCI")]
-    assert not any("/ NO" in l for l in rows)   # the CI row: store-only
+    assert not any("/ NO" in l for l in rows)   # the NO class: store-only
     assert not any("frac" in l for l in rows)
     # prior windows: their D rows in EVERY core group where they ran
     # (here: the raw and avg groups), never their control clones

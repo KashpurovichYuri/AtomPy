@@ -1,41 +1,18 @@
 # Sc-unc (3d¹ 4s², the uncontracted cc-pVDZ split)
 
-Primitive split of Sc/cc-pVDZ (data/sc_ccpvdz_unc.txt). Windows:
-DISTILLED, k=1 per shell (`window_distilled` — the reference's own
-radial × the m-set; CAS(3,5)/CAS(3,6), construction-uniform with
-`elements/Sc/`, whose verification legs reproduced the certified
-records at 0.00e+00 mEh). The kind block compares the four window
-sources at both ruler cores: `MO`/`MOC` are CONTROLS (m-incomplete
-by construction — the SCF's hybrid-open gauge), the `NO` density
-leg is store-only, degenerate with D at the closed substrate
-(+3.2 µEh at Ar·pur -- the rendering diet drops the repeat row).
-The prior axis lands `@r1`-ONLY here (the head configuration's own
-density block — the same trusted ROHF the incumbent distills): on
-this atom `D` and `@r1` are the SAME WINDOW (both +6.0 mEh at Ar;
-+4.7-class at Ar·pur) — the DEGENERACY CERTIFICATE: no authors'
-contraction exists on the primitive split, the incumbent IS the
-span-Gram distillation of the head, and for the d¹ head the span and
-density signals carry the same radial information (two independent
-signal definitions, one window — the same-source controlled pair at
-its degenerate point). The `@s` windows (the series average) are
-BLOCKED on this basis: the series' non-head configurations need
-fresh forced-occupation SCFs, and every fresh run diverges here (the
-twins' fresh-SCF disease, measured 2026-11-11 — map Issues); the
-port's @s half waits on that repair. The `3d`-span priors are
-internal-only (the incumbent's own 3d window misses the 4s
-correlation by ~0.4 Eh; `@r1` follows it to 1.5 mEh).
-This atom's canonical core is the ANISOTROPIC class: the Ar (pol)
-rows carry the assembly defect (closures ~3e-2, ⟨L²⟩ 5.9989 —
-identical across kinds) and their ground-root energies are
-gauge-sensitive at the split scale (the ²D block splits 0.7 mEh
-under ‖[H,L²]‖ 8e-2); the CLOSED comparisons are the Ar·pur rows and
-the lanes. The optimizer class and the frac core (no measured
-fractional-occupation basin on this basis) are out of scope this
-wave (void at the key, one `--full` away). Reference: the trusted ROHF
-(−759.73738486, rungs/rohf.chk). The pinned row and its free twin
-freeze the reference's OWN core; their residual vs the anchor
-(+5.1 mEh) is the projected-density bookkeeping form. Sector
-M_S = ½. Sibling: `elements/Sc/` (contracted).
+Primitive split of Sc/cc-pVDZ (data/sc_ccpvdz_unc.txt); the
+construction is uniform with `elements/Sc/` (the verification legs
+reproduced the certified records at 0.00e+00 mEh). `D` ≡ `@r1` here
+(the d¹ head: the span and density signals agree -- the same-source
+controlled pair at its degenerate point). The `@s` windows are
+BLOCKED on this basis (the series' fresh forced-occupation SCFs
+diverge -- the twins' fresh-SCF disease, map Issues); the optimizer
+class and the frac core stay void at the key. The canonical core is
+the ANISOTROPIC class: the Ar (pol) rows carry the assembly defect
+(closures ~3e-2) and the ²D block splits 0.7 mEh -- the closed
+comparisons are the Ar·pur rows and the lanes. Reference: the
+trusted ROHF (−759.73738486, rungs/rohf.chk). Sector M_S = ½.
+Sibling: `elements/Sc/` (contracted).
 
 <!-- methods:begin -->
 | method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |

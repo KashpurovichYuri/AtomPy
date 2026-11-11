@@ -199,13 +199,14 @@ def _row(k, p, anchor, spec, sa_floor=None) -> str:
 def _method_row(k) -> bool:
     """The methods-row policy, ONE home: the table renders the
     COMPARISON classes -- the distilled block (the incumbent and the
-    prior windows), the SCF controls, the treatments, and the NO
-    start's OPTIMIZER legs (a legitimate start kind).  A NO-start
-    CASCI cell never renders (energy-degenerate with its D row at
-    k=1 -- the density leg's certificate lives in the store and the
-    pins); every filter in the table's assembly routes through
-    here."""
-    return k.start != "no" or k.method != "casci"
+    prior windows), the SCF controls, the treatments.  A NO-start
+    cell never renders: its window is its SOURCE's span re-gauged
+    into the term-averaged density's natural orbitals -- the CI is
+    degenerate with the source's D row and the optimizer reaches the
+    same basins (measured, Sc 2026-11-11: free to 5 decimals), a
+    CERTIFICATE, not a comparison row; every filter in the table's
+    assembly routes through here."""
+    return k.start != "no"
 
 
 def _sa_floor(cells: dict) -> dict[tuple, float]:
@@ -280,8 +281,7 @@ def _comparison_key(k):
     t = k.source_tag
     k_rank, src = (t[1], t[0]) if t is not None else (1, "")
     # both tiers, ONE block structure: the D-family by (k, source),
-    # then the controls (MO, MOC, and -- optimizer tiers -- the NO
-    # start) last; within a start the OPTIMIZER block reads
+    # then the MO/MOC controls last; within a start the OPTIMIZER block reads
     # CASSCF-then-SA, masks in the declaration order (free first)
     block = 0 if k.start == "ao" else 2
     tier = 0 if k.method == "casci" else 1
@@ -309,9 +309,9 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     controls repeat the incumbent's at equal width and stay out),
     the lattice renders one row per
     span (the m-incomplete control story renders once, at the
-    primary's controls), NO-start OPTIMIZER cells never render (the
-    natural-orbital start is not a family -- its CI row IS the
-    density leg), and the frac reference class does not render (a
+    primary's controls), the NO start never renders (its window is
+    its source's span re-gauged -- a certificate, not a row), and
+    the frac reference class does not render (a
     different reference SCF -- its home is the reference study,
     not the methods grid).  The ROHF anchor row
     leads, the UHF anchor row follows when the store carries the

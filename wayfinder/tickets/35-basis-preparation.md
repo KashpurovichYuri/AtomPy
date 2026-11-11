@@ -72,6 +72,35 @@ Opened 2026-11-10 from the handoff (xxii) skeleton + the review round
    class diverges on the uncontracted bases, measured 2026-11-11 --
    map Issues).
 
+## Executed 2026-11-11, the review-stage rounds (the user's
+## structure, delivered iteratively)
+
+- (3646175) README: the source axis explained accurately (the signal
+  definitions, the two controlled pairs, the MO-informed/AO-form
+  contracts).
+- (d6375e6) THE SC LEGS: free + SA over all six prior windows at the
+  ruler cell (free start-blind EXACTLY; SA @r1 = the incumbent basin
+  in 34 vs 129 cycles; the SA stack anomaly surfaced) + the conv
+  flag.  The radial subcase: undeclared on priors BY CONSTRUCTION.
+- (cff3e96) THE SC-UNC @r1 PORT (the degeneracy certificate: D ≡ @r1
+  on the twin) + the @s block recorded (the fresh-SCF disease).
+- (c159c07) the 19-row comparison block (MOC's optimizer legs run;
+  the SA-MOC stall found; THE STORE-MERGE BUG fixed -- regen had
+  been deleting the UHF records).
+- (4bfba78) the review-stage table: CaseSpec.render_spans; the NO
+  optimizer legs rendered (later retired); the preamble compacted.
+- (09922ca) the symmetric core groups (priors in every group; 12
+  pur optimizer legs), the explicit per-start order, THE ROUTES
+  FILTER BUG (the lane/pinned family was wrongly suppressed).
+- (466b6de) the brevity round (notes 1-3 words; Sc's preamble
+  emptied), the LOCAL-MINIMUM derived note (the SA-floor variational
+  rule; fires on Sc/Ti lane rows + U14e's MOC rows), the NO pol
+  cache repaired (old-wave 2-det solves -> fresh 90-det windows).
+- (this commit) the NO start fully store-only (its window IS its
+  source's span re-gauged -- the CI degeneracy + the optimizer
+  equality are the certificate, not a row); Sc-unc's preamble
+  dieted to the atom-specific minimum.
+
 ## Executed 2026-11-11 (the user's table review round)
 
 - (82d6611) THE RENDERING DIET: the methods table renders the
