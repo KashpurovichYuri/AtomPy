@@ -16,6 +16,67 @@ ROHF reference energy: -848.40744343 Eh
 | ti-unc_3d_2-0_casci_ao_-_pol_avg | -848.40377783 | nan | 12.00000 | 4.54e-15 | 3.69e-14 | 1.3e-08 | 9.5e-09 | 1.000 | 7.2e-03 | 3.7e-03 | 2.2e-13 |  |
 | ti-unc_3d_2-0_casci_mo_-_pol_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | 7.2e-03 | 3.7e-03 | 1.4e-13 |  |
 | ti-unc_3d4s@ar_3-1_casci_ao_-_pol_avg | -848.40138159 | -1.376e-03 | 12.00000 | 2.21e-14 | 2.67e-13 | 1.4e-14 | 1.7e-14 | 0.833 | 6.2e-10 | 2.0e-11 | 2.5e-13 |  |
+| ti-unc_3d@r1_2-0_casci_ao_-_pol_raw | -848.40744343 | nan | 12.00000 | 1.50e-02 | 2.99e-02 | 1.3e-08 | 9.5e-09 | 1.000 | 7.2e-03 | 0.0e+00 | 2.2e-13 |  |
+| ti-unc_3d@r1_2-0_casci_ao_-_pol_avg | -848.40377783 | nan | 12.00000 | 2.81e-15 | 2.60e-14 | 1.3e-08 | 9.5e-09 | 1.000 | 7.2e-03 | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d@r1_2-0_casci_ao_-_pur_avg | -848.40561265 | nan | 12.00000 | 2.18e-15 | 2.96e-14 | 1.3e-14 | 1.7e-14 | 1.000 | 0.0e+00 | 0.0e+00 | 2.2e-13 |  |
+| ti-unc_3d@r1_2-0_casci_mo_-_pol_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | 7.2e-03 | 3.7e-03 | 1.5e-13 |  |
+| ti-unc_3d@r1_2-0_casci_moc_-_pol_avg | -848.40377783 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | 7.2e-03 | 3.7e-03 | 1.3e-13 |  |
+| ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg | -848.40377783 | nan | 12.00000 | 6.09e-15 | 4.69e-14 | 1.3e-08 | 9.5e-09 | 1.000 | 7.2e-03 | 3.7e-03 | 2.1e-13 |  |
+| ti-unc_3d@r1_2-0_casci_mo_-_pur_avg | -848.40561265 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | 0.0e+00 | 0.0e+00 | 4.4e-14 |  |
+| ti-unc_3d@r1_2-0_casci_moc_-_pur_avg | -848.40561265 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | 0.0e+00 | 0.0e+00 | 2.2e-13 |  |
+| ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg | -848.40561265 | nan | 12.00000 | 5.41e-15 | 3.18e-14 | 1.4e-14 | 1.7e-14 | 1.000 | 0.0e+00 | 0.0e+00 | 2.2e-13 |  |
+| ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw | -848.40366694 | -3.661e-03 | 12.00000 | 6.47e-02 | 3.44e-01 | 3.7e-09 | 3.7e-09 | 0.833 | 8.1e-03 | 0.0e+00 | 2.2e-13 |  |
+| ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg | -848.40000556 | 0.000e+00 | 12.00000 | 2.64e-09 | 1.32e-08 | 3.7e-09 | 3.7e-09 | 0.833 | 8.1e-03 | 3.7e-03 | 2.3e-13 |  |
+| ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg | -848.40183803 | -1.832e-03 | 12.00000 | 1.80e-14 | 2.37e-13 | 1.4e-14 | 1.7e-14 | 0.833 | 0.0e+00 | 0.0e+00 | 2.2e-13 |  |
+| ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg | -848.41357932 | -1.357e-02 | 0.00480 | 1.52e-01 | 3.77e-01 | 2.8e+00 | 4.0e+00 | 0.500 | 8.1e-03 | 3.7e-03 | 1.4e-13 |  |
+| ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg | -848.40669578 | -6.690e-03 | 4.90415 | 3.70e+00 | 1.38e+01 | 3.1e+00 | 4.4e+00 | 0.833 | 8.1e-03 | 3.7e-03 | 1.6e-13 |  |
+| ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg | -848.40000556 | 6.025e-12 | 12.00000 | 2.76e-09 | 1.37e-08 | 3.6e-09 | 3.7e-09 | 0.833 | 8.1e-03 | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg | -848.41541461 | -1.541e-02 | 0.00480 | 1.52e-01 | 3.77e-01 | 2.8e+00 | 4.0e+00 | 0.500 | 0.0e+00 | 1.1e-13 | 3.1e-14 |  |
+| ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg | -848.40853049 | -8.525e-03 | 4.90415 | 3.70e+00 | 1.38e+01 | 3.1e+00 | 4.4e+00 | 0.833 | 0.0e+00 | 0.0e+00 | 2.2e-13 |  |
+| ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg | -848.40183803 | -1.832e-03 | 12.00000 | 2.13e-14 | 1.88e-13 | 1.4e-14 | 1.7e-14 | 0.833 | 0.0e+00 | 0.0e+00 | 2.2e-13 |  |
+| ti-unc_3d_2-0_casci_ao_-_pol_raw | -848.40744343 | nan | 12.00000 | 1.50e-02 | 2.99e-02 | 1.3e-08 | 9.5e-09 | 1.000 | 7.2e-03 | 1.1e-13 | 2.3e-13 |  |
+| ti-unc_3d_2-0_casci_ao_-_pur_avg | -848.40561265 | nan | 12.00000 | 8.89e-16 | 3.11e-14 | 1.4e-14 | 1.7e-14 | 1.000 | 0.0e+00 | 0.0e+00 | 2.1e-13 |  |
+| ti-unc_3d_2-0_casci_moc_-_pol_avg | -848.40377783 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | 7.2e-03 | 3.7e-03 | 1.4e-13 |  |
+| ti-unc_3dno1_2-0_casci_no_-_pol_avg | -848.40377783 | nan | 12.00000 | 3.27e-15 | 3.96e-14 | 1.3e-08 | 9.5e-09 | 1.000 | 7.2e-03 | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d_2-0_casci_mo_-_pur_avg | -848.40561265 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | 0.0e+00 | 1.1e-13 | 7.0e-14 |  |
+| ti-unc_3d_2-0_casci_moc_-_pur_avg | -848.40561265 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | 0.0e+00 | 0.0e+00 | 2.1e-13 |  |
+| ti-unc_3dno1_2-0_casci_no_-_pur_avg | -848.40561265 | nan | 12.00000 | 1.19e-14 | 3.70e-14 | 1.3e-14 | 1.7e-14 | 1.000 | 0.0e+00 | 1.1e-13 | 2.1e-13 |  |
+| ti-unc_3d_2-0_casscf_ao_-_pol_avg | -848.40377783 | nan | 12.00000 | 4.58e-15 | 3.59e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.3e-13 |  |
+| ti-unc_3d_2-0_casscf_mo_-_pol_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.7e-03 | 1.4e-13 |  |
+| ti-unc_3d_2-0_casscf_moc_-_pol_avg | -848.40377783 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 3.7e-03 | 1.4e-13 |  |
+| ti-unc_3dno1_2-0_casscf_no_-_pol_avg | -848.40377783 | nan | 12.00000 | 3.51e-15 | 3.07e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.3e-13 |  |
+| ti-unc_3d_2-0_casscf_ao_virtmix_pol_avg | -848.40377783 | nan | 12.00000 | 4.36e-15 | 3.48e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d_2-0_casscf_ao_-_pur_avg | -848.40795241 | nan | 0.22854 | 4.95e+00 | 7.23e-01 | 4.6e+00 | 7.0e+00 | 0.814 | nan | 3.6e-03 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_casscf_mo_-_pur_avg | -848.40377786 | nan | 0.00000 | 5.10e-03 | 4.19e-04 | 2.9e+00 | 4.1e+00 | 0.597 | nan | 3.7e-03 | 4.0e-13 |  |
+| ti-unc_3d_2-0_casscf_moc_-_pur_avg | -848.40377926 | nan | 4.32841 | 7.59e+03 | 1.39e+04 | 3.4e+00 | 4.7e+00 | 0.959 | nan | 3.7e-03 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3dno1_2-0_casscf_no_-_pur_avg | -848.40377770 | nan | 12.00000 | 4.08e-05 | 1.53e-04 | 8.8e-04 | 1.1e-03 | 1.000 | nan | 3.7e-03 | 1.8e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_casscf_ao_frozen_pol_avg | -848.40377783 | nan | 12.00000 | 2.11e-15 | 3.43e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.3e-13 |  |
+| ti-unc_3d_2-0_casscf_mo_frozen_pol_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.7e-03 | 1.3e-13 |  |
+| ti-unc_3d_2-0_casscf_moc_frozen_pol_avg | -848.40377783 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 3.7e-03 | 1.4e-13 |  |
+| ti-unc_3dno1_2-0_casscf_no_frozen_pol_avg | -848.40377783 | nan | 12.00000 | 4.40e-15 | 2.67e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d_2-0_casscf_ao_frozen_pur_avg | -848.40377783 | nan | 12.00000 | 8.12e-15 | 4.01e-14 | 1.4e-14 | 1.7e-14 | 1.000 | nan | 3.7e-03 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_casscf_mo_frozen_pur_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.7e-03 | 2.3e-14 |  |
+| ti-unc_3d_2-0_casscf_moc_frozen_pur_avg | -848.40377784 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 3.7e-03 | 1.9e-13 | NOT-CONVERGED |
+| ti-unc_3dno1_2-0_casscf_no_frozen_pur_avg | -848.40377775 | nan | 12.00000 | 4.74e-15 | 4.03e-14 | 1.3e-14 | 1.7e-14 | 1.000 | nan | 3.7e-03 | 1.8e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_ao_-_pol_avg | -848.40561336 | nan | 12.00000 | 6.46e-06 | 2.71e-05 | 8.0e-04 | 1.4e-03 | 1.000 | nan | 4.2e-06 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_mo_-_pol_avg | -848.36054831 | nan | 0.00000 | 1.09e-02 | 1.00e-04 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 2.2e-03 | 1.4e-13 |  |
+| ti-unc_3d_2-0_sa-casscf_moc_-_pol_avg | -848.40561364 | nan | 12.00000 | 9.61e-09 | 3.78e-08 | 2.4e-06 | 3.4e-06 | 1.000 | nan | 1.2e-08 | 1.5e-13 |  |
+| ti-unc_3dno1_2-0_sa-casscf_no_-_pol_avg | -848.40561339 | nan | 12.00000 | 6.17e-06 | 3.04e-05 | 6.9e-04 | 1.2e-03 | 1.000 | nan | 4.5e-06 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_ao_-_pur_avg | -848.40561337 | nan | 12.00000 | 7.48e-06 | 2.60e-05 | 1.0e-03 | 1.2e-03 | 1.000 | nan | 4.4e-07 | 2.2e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_mo_-_pur_avg | -848.36055152 | nan | 0.00000 | 1.09e-02 | 1.72e-05 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 2.2e-03 | 3.9e-14 |  |
+| ti-unc_3d_2-0_sa-casscf_moc_-_pur_avg | -848.40131343 | nan | 11.97954 | 2.37e-03 | 9.56e-03 | 1.8e-01 | 2.5e-01 | 0.999 | nan | 5.0e-05 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3dno1_2-0_sa-casscf_no_-_pur_avg | -848.40561335 | nan | 12.00000 | 6.29e-06 | 2.45e-05 | 6.9e-04 | 1.2e-03 | 1.000 | nan | 3.5e-07 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_ao_frozen_pol_avg | -848.40561255 | nan | 12.00000 | 2.83e-15 | 3.70e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 2.9e-06 | 1.9e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_mo_frozen_pol_avg | -848.36320232 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 2.0e-03 | 1.5e-13 |  |
+| ti-unc_3d_2-0_sa-casscf_moc_frozen_pol_avg | -848.37838928 | nan | 4.90205 | 1.01e+00 | 2.30e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 1.8e-03 | 1.3e-13 |  |
+| ti-unc_3dno1_2-0_sa-casscf_no_frozen_pol_avg | -848.40561258 | nan | 12.00000 | 3.05e-15 | 9.26e-15 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.3e-06 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_ao_frozen_pur_avg | -848.40561265 | nan | 12.00000 | 4.31e-15 | 1.80e-14 | 1.4e-14 | 1.7e-14 | 1.000 | nan | 3.0e-10 | 2.2e-13 |  |
+| ti-unc_3d_2-0_sa-casscf_mo_frozen_pur_avg | -848.36320111 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 2.0e-03 | 7.1e-14 |  |
+| ti-unc_3d_2-0_sa-casscf_moc_frozen_pur_avg | -848.38368931 | nan | 4.90205 | 1.04e+00 | 2.36e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 1.7e-03 | 1.8e-13 | NOT-CONVERGED |
+| ti-unc_3dno1_2-0_sa-casscf_no_frozen_pur_avg | -848.40561265 | nan | 12.00000 | 4.45e-15 | 1.47e-14 | 1.3e-14 | 1.7e-14 | 1.000 | nan | 6.4e-11 | 2.1e-13 |  |
+| ti-unc_3d@ar_3-1_casci_ao_-_pol_avg | -847.94347389 | 4.565e-01 | 6.00000 | 1.71e-14 | 1.38e-13 | 1.4e-14 | 1.7e-14 | 1.000 | 6.2e-10 | 1.7e-11 | 4.7e-13 |  |
+| ti-unc_3d@ar_3-1_casscf_ao_-_pol_avg | -848.27095383 | 1.291e-01 | 5.05028 | 3.09e+00 | 1.74e+01 | 2.6e+00 | 3.3e+00 | 0.761 | nan | 3.5e-03 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d@ar_3-1_sa-casscf_ao_-_pol_avg | -848.24893424 | 1.511e-01 | 5.97137 | 1.60e-02 | 9.51e-02 | 2.1e-01 | 3.4e-01 | 0.999 | nan | 1.3e-04 | 1.7e-13 | NOT-CONVERGED |
 
 configurations per root (top-2 determinants):
 
@@ -127,6 +188,377 @@ configurations per root (top-2 determinants):
 - `ti-unc_3d4s@ar_3-1_casci_ao_-_pol_avg` root 6: s^2.00d^2.00 (|c|=0.84); s^2.00d^2.00 (|c|=0.53)
 - `ti-unc_3d4s@ar_3-1_casci_ao_-_pol_avg` root 7: s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.44)
 - `ti-unc_3d4s@ar_3-1_casci_ao_-_pol_avg` root 8: s^2.00d^2.00 (|c|=0.89); s^2.00d^2.00 (|c|=0.44)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_raw` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_raw` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_raw` root 2: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_raw` root 3: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_raw` root 4: d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_raw` root 5: d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_raw` root 6: d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_raw` root 7: d^2.00 (|c|=0.77); d^2.00 (|c|=0.47)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_raw` root 8: d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_avg` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_avg` root 2: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_avg` root 3: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_avg` root 4: d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_avg` root 5: d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_avg` root 6: d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_avg` root 7: d^2.00 (|c|=0.77); d^2.00 (|c|=0.47)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pol_avg` root 8: d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pur_avg` root 0: d^2.00 (|c|=0.89); d^2.00 (|c|=0.44)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pur_avg` root 1: d^2.00 (|c|=0.77); d^2.00 (|c|=0.45)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pur_avg` root 2: d^2.00 (|c|=0.78); d^2.00 (|c|=0.42)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pur_avg` root 3: d^2.00 (|c|=0.89); d^2.00 (|c|=0.39)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pur_avg` root 4: d^2.00 (|c|=0.88); d^2.00 (|c|=0.41)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pur_avg` root 5: d^2.00 (|c|=0.97); d^2.00 (|c|=0.17)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pur_avg` root 6: d^2.00 (|c|=1.00); d^2.00 (|c|=0.04)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pur_avg` root 7: d^2.00 (|c|=0.77); d^2.00 (|c|=0.45)
+- `ti-unc_3d@r1_2-0_casci_ao_-_pur_avg` root 8: d^2.00 (|c|=0.77); d^2.00 (|c|=0.45)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pol_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pol_avg` root 1: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pol_avg` root 2: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pol_avg` root 3: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pol_avg` root 4: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pol_avg` root 5: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pol_avg` root 6: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pol_avg` root 7: p^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pol_avg` root 8: p^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pol_avg` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pol_avg` root 2: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pol_avg` root 3: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pol_avg` root 4: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pol_avg` root 5: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pol_avg` root 6: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pol_avg` root 7: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pol_avg` root 8: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg` root 0: d^2.00 (|c|=0.82); d^2.00 (|c|=0.56)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg` root 1: d^2.00 (|c|=0.71); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg` root 2: d^2.00 (|c|=0.82); d^2.00 (|c|=0.56)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg` root 3: d^2.00 (|c|=0.71); d^2.00 (|c|=0.49)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg` root 4: d^2.00 (|c|=0.69); d^2.00 (|c|=0.49)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg` root 5: d^2.00 (|c|=0.88); d^2.00 (|c|=0.46)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg` root 6: d^2.00 (|c|=0.74); d^2.00 (|c|=0.52)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg` root 7: d^2.00 (|c|=0.80); d^2.00 (|c|=0.37)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pol_avg` root 8: d^2.00 (|c|=0.88); d^2.00 (|c|=0.46)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pur_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pur_avg` root 1: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pur_avg` root 2: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pur_avg` root 3: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pur_avg` root 4: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pur_avg` root 5: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pur_avg` root 6: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pur_avg` root 7: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_mo_-_pur_avg` root 8: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pur_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pur_avg` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pur_avg` root 2: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pur_avg` root 3: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pur_avg` root 4: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pur_avg` root 5: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pur_avg` root 6: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pur_avg` root 7: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d@r1_2-0_casci_moc_-_pur_avg` root 8: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg` root 0: d^2.00 (|c|=0.88); d^2.00 (|c|=0.44)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg` root 1: d^2.00 (|c|=0.73); d^2.00 (|c|=0.39)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg` root 2: d^2.00 (|c|=0.66); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg` root 3: d^2.00 (|c|=0.78); d^2.00 (|c|=0.42)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg` root 4: d^2.00 (|c|=0.51); d^2.00 (|c|=0.45)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg` root 5: d^2.00 (|c|=0.82); d^2.00 (|c|=0.34)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg` root 6: d^2.00 (|c|=0.88); d^2.00 (|c|=0.42)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg` root 7: d^2.00 (|c|=0.61); d^2.00 (|c|=0.48)
+- `ti-unc_3d@r1no1_2-0_casci_no_-_pur_avg` root 8: d^2.00 (|c|=0.53); d^2.00 (|c|=0.52)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw` root 0: s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.01)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw` root 1: s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw` root 2: s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw` root 3: s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw` root 4: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw` root 5: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.47)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw` root 6: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw` root 7: s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_raw` root 8: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.01)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg` root 1: s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg` root 2: s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg` root 3: s^2.00d^2.00 (|c|=0.87); s^2.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg` root 4: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg` root 5: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.47)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg` root 6: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.40)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg` root 7: s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pol_avg` root 8: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg` root 0: s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.38)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg` root 1: s^2.00d^2.00 (|c|=0.75); s^2.00d^2.00 (|c|=0.41)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg` root 2: s^2.00d^2.00 (|c|=0.86); s^2.00d^2.00 (|c|=0.51)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg` root 3: s^2.00d^2.00 (|c|=0.89); s^2.00d^2.00 (|c|=0.37)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg` root 4: s^2.00d^2.00 (|c|=0.83); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg` root 5: s^2.00d^2.00 (|c|=0.74); s^2.00d^2.00 (|c|=0.34)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg` root 6: s^2.00d^2.00 (|c|=0.83); s^2.00d^2.00 (|c|=0.32)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg` root 7: s^2.00d^2.00 (|c|=0.60); s^2.00d^2.00 (|c|=0.56)
+- `ti-unc_3d4s@r1_3-1_casci_ao_-_pur_avg` root 8: s^2.00d^2.00 (|c|=0.69); s^2.00d^2.00 (|c|=0.49)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg` root 0: s^2.00d^2.00 (|c|=0.98); p^2.00d^2.00 (|c|=0.10)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg` root 1: s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg` root 2: s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg` root 3: s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg` root 4: s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.51)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg` root 5: s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.51)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg` root 6: s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.53)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg` root 7: s^1.00p^1.00d^2.00 (|c|=0.58); s^1.00p^1.00d^2.00 (|c|=0.56)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pol_avg` root 8: s^1.00p^1.00d^2.00 (|c|=0.58); s^1.00p^1.00d^2.00 (|c|=0.43)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg` root 0: s^2.00d^2.00 (|c|=1.00); d^4.00 (|c|=0.05)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg` root 1: s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg` root 2: s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg` root 3: s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg` root 4: s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg` root 5: s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.54)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg` root 6: s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg` root 7: s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pol_avg` root 8: s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg` root 0: s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg` root 1: s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.45)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg` root 2: s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg` root 3: s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.45)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg` root 4: s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.41)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg` root 5: s^2.00d^2.00 (|c|=0.69); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg` root 6: s^2.00d^2.00 (|c|=0.79); s^2.00d^2.00 (|c|=0.40)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg` root 7: s^2.00d^2.00 (|c|=0.71); s^2.00d^2.00 (|c|=0.38)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pol_avg` root 8: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.36)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg` root 0: s^2.00d^2.00 (|c|=0.98); p^2.00d^2.00 (|c|=0.10)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg` root 1: s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg` root 2: s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg` root 3: s^1.00p^1.00d^2.00 (|c|=0.50); s^1.00p^1.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg` root 4: s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.51)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg` root 5: s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.51)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg` root 6: s^1.00p^1.00d^2.00 (|c|=0.61); s^1.00p^1.00d^2.00 (|c|=0.53)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg` root 7: s^1.00p^1.00d^2.00 (|c|=0.58); s^1.00p^1.00d^2.00 (|c|=0.56)
+- `ti-unc_3d4s@r1_3-1_casci_mo_-_pur_avg` root 8: s^1.00p^1.00d^2.00 (|c|=0.58); s^1.00p^1.00d^2.00 (|c|=0.43)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg` root 0: s^2.00d^2.00 (|c|=1.00); d^4.00 (|c|=0.05)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg` root 1: s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg` root 2: s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg` root 3: s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg` root 4: s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg` root 5: s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.54)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg` root 6: s^1.00d^3.00 (|c|=0.59); s^1.00d^3.00 (|c|=0.52)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg` root 7: s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)
+- `ti-unc_3d4s@r1_3-1_casci_moc_-_pur_avg` root 8: s^1.00d^3.00 (|c|=0.76); s^1.00d^3.00 (|c|=0.62)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg` root 0: s^2.00d^2.00 (|c|=0.49); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg` root 1: s^2.00d^2.00 (|c|=0.62); s^2.00d^2.00 (|c|=0.48)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg` root 2: s^2.00d^2.00 (|c|=0.74); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg` root 3: s^2.00d^2.00 (|c|=0.77); s^2.00d^2.00 (|c|=0.32)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg` root 4: s^2.00d^2.00 (|c|=0.56); s^2.00d^2.00 (|c|=0.49)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg` root 5: s^2.00d^2.00 (|c|=0.66); s^2.00d^2.00 (|c|=0.41)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg` root 6: s^2.00d^2.00 (|c|=0.61); s^2.00d^2.00 (|c|=0.52)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg` root 7: s^2.00d^2.00 (|c|=0.60); s^2.00d^2.00 (|c|=0.55)
+- `ti-unc_3d4s@r1no2_3-1_casci_no_-_pur_avg` root 8: s^2.00d^2.00 (|c|=0.64); s^2.00d^2.00 (|c|=0.42)
+- `ti-unc_3d_2-0_casci_ao_-_pol_raw` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_ao_-_pol_raw` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_ao_-_pol_raw` root 2: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_ao_-_pol_raw` root 3: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_ao_-_pol_raw` root 4: d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)
+- `ti-unc_3d_2-0_casci_ao_-_pol_raw` root 5: d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)
+- `ti-unc_3d_2-0_casci_ao_-_pol_raw` root 6: d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)
+- `ti-unc_3d_2-0_casci_ao_-_pol_raw` root 7: d^2.00 (|c|=0.77); d^2.00 (|c|=0.47)
+- `ti-unc_3d_2-0_casci_ao_-_pol_raw` root 8: d^2.00 (|c|=0.88); d^2.00 (|c|=0.47)
+- `ti-unc_3d_2-0_casci_ao_-_pur_avg` root 0: d^2.00 (|c|=0.88); d^2.00 (|c|=0.44)
+- `ti-unc_3d_2-0_casci_ao_-_pur_avg` root 1: d^2.00 (|c|=0.85); d^2.00 (|c|=0.51)
+- `ti-unc_3d_2-0_casci_ao_-_pur_avg` root 2: d^2.00 (|c|=0.63); d^2.00 (|c|=0.59)
+- `ti-unc_3d_2-0_casci_ao_-_pur_avg` root 3: d^2.00 (|c|=0.73); d^2.00 (|c|=0.67)
+- `ti-unc_3d_2-0_casci_ao_-_pur_avg` root 4: d^2.00 (|c|=0.88); d^2.00 (|c|=0.36)
+- `ti-unc_3d_2-0_casci_ao_-_pur_avg` root 5: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d_2-0_casci_ao_-_pur_avg` root 6: d^2.00 (|c|=1.00); d^2.00 (|c|=0.07)
+- `ti-unc_3d_2-0_casci_ao_-_pur_avg` root 7: d^2.00 (|c|=0.77); d^2.00 (|c|=0.45)
+- `ti-unc_3d_2-0_casci_ao_-_pur_avg` root 8: d^2.00 (|c|=0.77); d^2.00 (|c|=0.45)
+- `ti-unc_3d_2-0_casci_moc_-_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_moc_-_pol_avg` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_moc_-_pol_avg` root 2: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_moc_-_pol_avg` root 3: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_moc_-_pol_avg` root 4: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_moc_-_pol_avg` root 5: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d_2-0_casci_moc_-_pol_avg` root 6: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_moc_-_pol_avg` root 7: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d_2-0_casci_moc_-_pol_avg` root 8: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3dno1_2-0_casci_no_-_pol_avg` root 0: d^2.00 (|c|=0.83); d^2.00 (|c|=0.52)
+- `ti-unc_3dno1_2-0_casci_no_-_pol_avg` root 1: d^2.00 (|c|=0.85); d^2.00 (|c|=0.49)
+- `ti-unc_3dno1_2-0_casci_no_-_pol_avg` root 2: d^2.00 (|c|=0.84); d^2.00 (|c|=0.52)
+- `ti-unc_3dno1_2-0_casci_no_-_pol_avg` root 3: d^2.00 (|c|=0.70); d^2.00 (|c|=0.47)
+- `ti-unc_3dno1_2-0_casci_no_-_pol_avg` root 4: d^2.00 (|c|=0.69); d^2.00 (|c|=0.47)
+- `ti-unc_3dno1_2-0_casci_no_-_pol_avg` root 5: d^2.00 (|c|=0.75); d^2.00 (|c|=0.46)
+- `ti-unc_3dno1_2-0_casci_no_-_pol_avg` root 6: d^2.00 (|c|=0.88); d^2.00 (|c|=0.26)
+- `ti-unc_3dno1_2-0_casci_no_-_pol_avg` root 7: d^2.00 (|c|=0.70); d^2.00 (|c|=0.41)
+- `ti-unc_3dno1_2-0_casci_no_-_pol_avg` root 8: d^2.00 (|c|=0.88); d^2.00 (|c|=0.40)
+- `ti-unc_3d_2-0_casci_mo_-_pur_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_mo_-_pur_avg` root 1: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_mo_-_pur_avg` root 2: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_mo_-_pur_avg` root 3: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_mo_-_pur_avg` root 4: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_mo_-_pur_avg` root 5: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_mo_-_pur_avg` root 6: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_mo_-_pur_avg` root 7: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_mo_-_pur_avg` root 8: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_moc_-_pur_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_moc_-_pur_avg` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_moc_-_pur_avg` root 2: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casci_moc_-_pur_avg` root 3: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_moc_-_pur_avg` root 4: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_moc_-_pur_avg` root 5: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d_2-0_casci_moc_-_pur_avg` root 6: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_casci_moc_-_pur_avg` root 7: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d_2-0_casci_moc_-_pur_avg` root 8: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3dno1_2-0_casci_no_-_pur_avg` root 0: d^2.00 (|c|=0.60); d^2.00 (|c|=0.52)
+- `ti-unc_3dno1_2-0_casci_no_-_pur_avg` root 1: d^2.00 (|c|=0.76); d^2.00 (|c|=0.55)
+- `ti-unc_3dno1_2-0_casci_no_-_pur_avg` root 2: d^2.00 (|c|=0.62); d^2.00 (|c|=0.59)
+- `ti-unc_3dno1_2-0_casci_no_-_pur_avg` root 3: d^2.00 (|c|=0.76); d^2.00 (|c|=0.42)
+- `ti-unc_3dno1_2-0_casci_no_-_pur_avg` root 4: d^2.00 (|c|=0.65); d^2.00 (|c|=0.41)
+- `ti-unc_3dno1_2-0_casci_no_-_pur_avg` root 5: d^2.00 (|c|=0.74); d^2.00 (|c|=0.52)
+- `ti-unc_3dno1_2-0_casci_no_-_pur_avg` root 6: d^2.00 (|c|=0.81); d^2.00 (|c|=0.56)
+- `ti-unc_3dno1_2-0_casci_no_-_pur_avg` root 7: d^2.00 (|c|=0.64); d^2.00 (|c|=0.38)
+- `ti-unc_3dno1_2-0_casci_no_-_pur_avg` root 8: d^2.00 (|c|=0.63); d^2.00 (|c|=0.40)
+- `ti-unc_3d_2-0_casscf_ao_-_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_mo_-_pol_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_moc_-_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3dno1_2-0_casscf_no_-_pol_avg` root 0: d^2.00 (|c|=0.83); d^2.00 (|c|=0.52)
+- `ti-unc_3d_2-0_casscf_ao_virtmix_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_ao_-_pur_avg` root 0: d^2.00 (|c|=1.00); d^1.58f^0.41 (|c|=0.03)
+- `ti-unc_3d_2-0_casscf_mo_-_pur_avg` root 0: d^2.00 (|c|=1.00); p^1.99f^0.01 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_moc_-_pur_avg` root 0: d^2.00 (|c|=1.00); s^0.01p^0.02d^1.84f^0.13 (|c|=0.00)
+- `ti-unc_3dno1_2-0_casscf_no_-_pur_avg` root 0: d^2.00 (|c|=0.97); d^2.00 (|c|=0.20)
+- `ti-unc_3d_2-0_casscf_ao_frozen_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_mo_frozen_pol_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_moc_frozen_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3dno1_2-0_casscf_no_frozen_pol_avg` root 0: d^2.00 (|c|=0.83); d^2.00 (|c|=0.52)
+- `ti-unc_3d_2-0_casscf_ao_frozen_pur_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_mo_frozen_pur_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_moc_frozen_pur_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3dno1_2-0_casscf_no_frozen_pur_avg` root 0: d^2.00 (|c|=0.97); d^2.00 (|c|=0.19)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pol_avg` root 0: d^2.00 (|c|=0.77); d^2.00 (|c|=0.44)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pol_avg` root 1: d^2.00 (|c|=0.66); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pol_avg` root 2: d^2.00 (|c|=0.78); d^2.00 (|c|=0.44)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pol_avg` root 3: d^2.00 (|c|=0.75); d^2.00 (|c|=0.37)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pol_avg` root 4: d^2.00 (|c|=0.64); d^2.00 (|c|=0.63)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pol_avg` root 5: d^2.00 (|c|=0.56); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pol_avg` root 6: d^2.00 (|c|=0.65); d^2.00 (|c|=0.43)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pol_avg` root 0: d^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pol_avg` root 1: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pol_avg` root 2: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pol_avg` root 3: p^1.00d^1.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pol_avg` root 4: p^1.00d^1.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pol_avg` root 5: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pol_avg` root 6: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pol_avg` root 1: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pol_avg` root 2: d^2.00 (|c|=0.86); d^2.00 (|c|=0.51)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pol_avg` root 3: d^2.00 (|c|=0.86); d^2.00 (|c|=0.51)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pol_avg` root 4: d^2.00 (|c|=0.89); d^2.00 (|c|=0.38)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pol_avg` root 5: d^2.00 (|c|=0.89); d^2.00 (|c|=0.38)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pol_avg` root 6: d^2.00 (|c|=0.89); d^2.00 (|c|=0.45)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pol_avg` root 0: d^2.00 (|c|=0.71); d^2.00 (|c|=0.41)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pol_avg` root 1: d^2.00 (|c|=0.71); d^2.00 (|c|=0.37)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pol_avg` root 2: d^2.00 (|c|=0.52); d^2.00 (|c|=0.48)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pol_avg` root 3: d^2.00 (|c|=0.61); d^2.00 (|c|=0.46)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pol_avg` root 4: d^2.00 (|c|=0.57); d^2.00 (|c|=0.48)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pol_avg` root 5: d^2.00 (|c|=0.48); d^2.00 (|c|=0.45)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pol_avg` root 6: d^2.00 (|c|=0.47); d^2.00 (|c|=0.44)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pur_avg` root 0: d^2.00 (|c|=0.82); d^2.00 (|c|=0.39)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pur_avg` root 1: d^2.00 (|c|=0.70); d^2.00 (|c|=0.53)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pur_avg` root 2: d^2.00 (|c|=0.79); d^2.00 (|c|=0.41)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pur_avg` root 3: d^2.00 (|c|=0.98); d^2.00 (|c|=0.13)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pur_avg` root 4: d^2.00 (|c|=0.77); d^2.00 (|c|=0.56)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pur_avg` root 5: d^2.00 (|c|=0.66); d^2.00 (|c|=0.61)
+- `ti-unc_3d_2-0_sa-casscf_ao_-_pur_avg` root 6: d^2.00 (|c|=0.75); d^2.00 (|c|=0.52)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pur_avg` root 0: d^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pur_avg` root 1: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pur_avg` root 2: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.01)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pur_avg` root 3: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pur_avg` root 4: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pur_avg` root 5: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_-_pur_avg` root 6: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pur_avg` root 0: d^2.00 (|c|=0.99); d^2.00 (|c|=0.09)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pur_avg` root 1: d^2.00 (|c|=0.65); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pur_avg` root 2: d^2.00 (|c|=0.86); d^2.00 (|c|=0.42)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pur_avg` root 3: d^2.00 (|c|=0.61); d^2.00 (|c|=0.47)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pur_avg` root 4: d^2.00 (|c|=0.56); d^2.00 (|c|=0.54)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pur_avg` root 5: d^2.00 (|c|=0.68); d^2.00 (|c|=0.56)
+- `ti-unc_3d_2-0_sa-casscf_moc_-_pur_avg` root 6: d^2.00 (|c|=0.63); d^2.00 (|c|=0.53)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pur_avg` root 0: d^2.00 (|c|=0.73); d^2.00 (|c|=0.44)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pur_avg` root 1: d^2.00 (|c|=0.61); d^2.00 (|c|=0.44)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pur_avg` root 2: d^2.00 (|c|=0.48); d^2.00 (|c|=0.42)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pur_avg` root 3: d^2.00 (|c|=0.58); d^2.00 (|c|=0.52)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pur_avg` root 4: d^2.00 (|c|=0.64); d^2.00 (|c|=0.47)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pur_avg` root 5: d^2.00 (|c|=0.63); d^2.00 (|c|=0.50)
+- `ti-unc_3dno1_2-0_sa-casscf_no_-_pur_avg` root 6: d^2.00 (|c|=0.66); d^2.00 (|c|=0.60)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pol_avg` root 0: d^2.00 (|c|=0.84); d^2.00 (|c|=0.39)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pol_avg` root 1: d^2.00 (|c|=0.74); d^2.00 (|c|=0.48)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pol_avg` root 2: d^2.00 (|c|=0.96); d^2.00 (|c|=0.21)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pol_avg` root 3: d^2.00 (|c|=0.66); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pol_avg` root 4: d^2.00 (|c|=0.54); d^2.00 (|c|=0.54)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pol_avg` root 5: d^2.00 (|c|=0.64); d^2.00 (|c|=0.47)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pol_avg` root 6: d^2.00 (|c|=0.71); d^2.00 (|c|=0.49)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pol_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pol_avg` root 1: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pol_avg` root 2: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pol_avg` root 3: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pol_avg` root 4: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pol_avg` root 5: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pol_avg` root 6: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pol_avg` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pol_avg` root 2: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pol_avg` root 3: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pol_avg` root 4: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pol_avg` root 5: d^2.00 (|c|=1.00); d^2.00 (|c|=0.01)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pol_avg` root 6: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pol_avg` root 0: d^2.00 (|c|=0.71); d^2.00 (|c|=0.65)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pol_avg` root 1: d^2.00 (|c|=0.75); d^2.00 (|c|=0.40)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pol_avg` root 2: d^2.00 (|c|=0.59); d^2.00 (|c|=0.56)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pol_avg` root 3: d^2.00 (|c|=0.62); d^2.00 (|c|=0.41)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pol_avg` root 4: d^2.00 (|c|=0.58); d^2.00 (|c|=0.52)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pol_avg` root 5: d^2.00 (|c|=0.48); d^2.00 (|c|=0.42)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pol_avg` root 6: d^2.00 (|c|=0.63); d^2.00 (|c|=0.49)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pur_avg` root 0: d^2.00 (|c|=0.62); d^2.00 (|c|=0.41)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pur_avg` root 1: d^2.00 (|c|=0.49); d^2.00 (|c|=0.46)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pur_avg` root 2: d^2.00 (|c|=0.53); d^2.00 (|c|=0.53)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pur_avg` root 3: d^2.00 (|c|=0.84); d^2.00 (|c|=0.38)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pur_avg` root 4: d^2.00 (|c|=0.80); d^2.00 (|c|=0.33)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pur_avg` root 5: d^2.00 (|c|=0.71); d^2.00 (|c|=0.57)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozen_pur_avg` root 6: d^2.00 (|c|=0.73); d^2.00 (|c|=0.54)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pur_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pur_avg` root 1: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pur_avg` root 2: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pur_avg` root 3: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pur_avg` root 4: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pur_avg` root 5: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozen_pur_avg` root 6: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pur_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pur_avg` root 1: d^2.00 (|c|=0.61); d^2.00 (|c|=0.47)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pur_avg` root 2: d^2.00 (|c|=0.62); d^2.00 (|c|=0.60)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pur_avg` root 3: d^2.00 (|c|=0.65); d^2.00 (|c|=0.64)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pur_avg` root 4: d^2.00 (|c|=0.63); d^2.00 (|c|=0.57)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pur_avg` root 5: d^2.00 (|c|=0.96); d^2.00 (|c|=0.25)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozen_pur_avg` root 6: d^2.00 (|c|=0.66); d^2.00 (|c|=0.54)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pur_avg` root 0: d^2.00 (|c|=0.68); d^2.00 (|c|=0.49)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pur_avg` root 1: d^2.00 (|c|=0.72); d^2.00 (|c|=0.48)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pur_avg` root 2: d^2.00 (|c|=0.60); d^2.00 (|c|=0.49)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pur_avg` root 3: d^2.00 (|c|=0.61); d^2.00 (|c|=0.51)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pur_avg` root 4: d^2.00 (|c|=0.50); d^2.00 (|c|=0.43)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pur_avg` root 5: d^2.00 (|c|=0.61); d^2.00 (|c|=0.52)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozen_pur_avg` root 6: d^2.00 (|c|=0.54); d^2.00 (|c|=0.42)
+- `ti-unc_3d@ar_3-1_casci_ao_-_pol_avg` root 0: d^4.00 (|c|=0.38); d^4.00 (|c|=0.38)
+- `ti-unc_3d@ar_3-1_casci_ao_-_pol_avg` root 1: d^4.00 (|c|=0.50); d^4.00 (|c|=0.50)
+- `ti-unc_3d@ar_3-1_casci_ao_-_pol_avg` root 2: d^4.00 (|c|=0.50); d^4.00 (|c|=0.50)
+- `ti-unc_3d@ar_3-1_casci_ao_-_pol_avg` root 3: d^4.00 (|c|=0.50); d^4.00 (|c|=0.50)
+- `ti-unc_3d@ar_3-1_casci_ao_-_pol_avg` root 4: d^4.00 (|c|=0.38); d^4.00 (|c|=0.38)
+- `ti-unc_3d@ar_3-1_casci_ao_-_pol_avg` root 5: d^4.00 (|c|=0.52); d^4.00 (|c|=0.42)
+- `ti-unc_3d@ar_3-1_casci_ao_-_pol_avg` root 6: d^4.00 (|c|=0.48); d^4.00 (|c|=0.46)
+- `ti-unc_3d@ar_3-1_casci_ao_-_pol_avg` root 7: d^4.00 (|c|=0.53); d^4.00 (|c|=0.40)
+- `ti-unc_3d@ar_3-1_casci_ao_-_pol_avg` root 8: d^4.00 (|c|=0.48); d^4.00 (|c|=0.42)
+- `ti-unc_3d@ar_3-1_casscf_ao_-_pol_avg` root 0: p^0.87d^3.13 (|c|=0.38); p^0.87d^3.13 (|c|=0.38)
+- `ti-unc_3d@ar_3-1_sa-casscf_ao_-_pol_avg` root 0: d^4.00 (|c|=0.37); d^4.00 (|c|=0.37)
+- `ti-unc_3d@ar_3-1_sa-casscf_ao_-_pol_avg` root 1: d^4.00 (|c|=0.33); d^4.00 (|c|=0.33)
+- `ti-unc_3d@ar_3-1_sa-casscf_ao_-_pol_avg` root 2: d^4.00 (|c|=0.32); d^4.00 (|c|=0.32)
+- `ti-unc_3d@ar_3-1_sa-casscf_ao_-_pol_avg` root 3: d^3.99 (|c|=0.27); d^3.99 (|c|=0.27)
+- `ti-unc_3d@ar_3-1_sa-casscf_ao_-_pol_avg` root 4: d^4.00 (|c|=0.28); d^4.00 (|c|=0.28)
+- `ti-unc_3d@ar_3-1_sa-casscf_ao_-_pol_avg` root 5: d^4.00 (|c|=0.31); d^3.99 (|c|=0.28)
+- `ti-unc_3d@ar_3-1_sa-casscf_ao_-_pol_avg` root 6: d^4.00 (|c|=0.30); d^4.00 (|c|=0.27)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 
@@ -169,3 +601,41 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `ti-unc_3d4s_3-1_sa-casscf_moc_frozen_pur_avg` VOID -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
 - `ti-unc_3d4sno2_3-1_sa-casscf_no_frozen_pur_avg` VOID -- anchor-first: the optimizer class is not declared on the uncontracted bases this wave: the CASCI anchors and the multi-column lane legs run first (2026-11-06; the kind block's casci cells -- mo/moc/no -- run: amended 2026-11-09)
 - `ti-unc_3d4s@ar_3-1_casci_ao_-_pur_avg` E_term -848.40138159  ptp 2.7e-15  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']  core 9p/span 0.9999
+- `ti-unc_3d@s1_2-0_casci_ao_-_pol_raw` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s1_2-0_casci_ao_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s1_2-0_casci_ao_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s1_2-0_casci_mo_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s1_2-0_casci_moc_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s1no1_2-0_casci_no_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s1_2-0_casci_mo_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s1_2-0_casci_moc_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s1no1_2-0_casci_no_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s2_2-0_casci_ao_-_pol_raw` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s2_2-0_casci_ao_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s2_2-0_casci_ao_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s2_2-0_casci_mo_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s2_2-0_casci_moc_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s2no1_2-0_casci_no_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s2_2-0_casci_mo_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s2_2-0_casci_moc_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@s2no1_2-0_casci_no_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s1_3-1_casci_ao_-_pol_raw` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s1_3-1_casci_ao_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s1_3-1_casci_ao_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s1_3-1_casci_mo_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s1_3-1_casci_moc_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s1no2_3-1_casci_no_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s1_3-1_casci_mo_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s1_3-1_casci_moc_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s1no2_3-1_casci_no_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s2_3-1_casci_ao_-_pol_raw` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s2_3-1_casci_ao_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s2_3-1_casci_ao_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s2_3-1_casci_mo_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s2_3-1_casci_moc_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s2no2_3-1_casci_no_-_pol_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s2_3-1_casci_mo_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s2_3-1_casci_moc_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d4s@s2no2_3-1_casci_no_-_pur_avg` VOID -- series-source-diverges: the series source (the non-head configurations' fresh forced-occupation SCFs) diverges on this basis -- the fresh-SCF disease, measured 2026-11-11 (map Issues); the @s windows wait on that repair
+- `ti-unc_3d@ar_3-1_casci_ao_-_pur_avg` E_term -847.91213342  ptp 7.3e-02  L2 ['6.000', '6.000', '30.000', '6.000', '30.000', '6.000', '30.000']  core 9p/span 0.9999
+- `ti-unc_3d@ar_3-1_sa-casscf_ao_-_pur_avg` E_term -848.22861977  ptp 4.8e-02  L2 ['5.981', '5.983', '29.945', '5.984', '29.945', '5.990', '29.431']  core 9p/span 0.9999
