@@ -50,7 +50,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import campaign_spec  # noqa: E402
-from atomterm.cells import (grid_keys, lattice_keys,  # noqa: E402
+from atomterm.cells import (CellKey, grid_keys, lattice_keys,  # noqa: E402
                             prior_tag_of, route_keys, window_grid)
 from _tables_common import (DASH, EV, cas_label,  # noqa: E402
                             comm_cell, conv_cell, core_col,
@@ -128,7 +128,7 @@ def _num(v, fmt) -> str:
     return format(v, fmt) if isinstance(v, float) and v == v else DASH
 
 
-def _row(k, p, anchor, spec) -> str:
+def _row(k, p, anchor, spec, sa_floor=None) -> str:
     """One run cell in the methods table's columns -- every run cell a row,
     fully identified (method, route, window/start, CAS, core)."""
     route = ("pinned" if k.core_tag is not None and k.substrate == "pur"
@@ -161,9 +161,17 @@ def _row(k, p, anchor, spec) -> str:
     # pinned rows carry the bookkeeping-form disclosure (the residual
     # vs the anchor is the projected-density ruler's form, mEh-class)
     if k.start in ("mo", "moc"):
-        note += "control: m-incomplete by construction"
+        note += "m-incomplete"
     elif route == "pinned":
-        note += "SCF core; offset = bookkeeping form"
+        note += "bookkeeping form"
+    # the single-root floor: a CASSCF row above its span's SA ground
+    # root is a converged LOCAL minimum (1 mEh guards the cross-core
+    # bookkeeping)
+    if (k.method == "casscf" and k.mask is None and sa_floor is not None
+            and (fl := sa_floor.get(
+                (k.span_label, k.sector, p.get("n_det")))) is not None
+            and e > fl + 1e-3):
+        note += ("; " if note else "") + "local minimum"
     # a prior window renders under its full label (the tag is part of
     # the window's identity -- the address grammar verbatim)
     if k.source_tag is not None:
@@ -200,10 +208,34 @@ def _method_row(k) -> bool:
     return k.start != "no" or k.method != "casci"
 
 
+def _sa_floor(cells: dict) -> dict[tuple, float]:
+    """The single-root floor: the SA ground-root energy per
+    (span, sector, determinant count).  A single-root CASSCF
+    minimizes one state unconstrained by averaging, so it can never
+    legitimately sit ABOVE its span's SA ground -- a row that does
+    is a converged LOCAL minimum (the variational argument), and
+    :func:`_row` flags it."""
+    out: dict[tuple, float] = {}
+    for addr, p in cells.items():
+        if p.get("kind") != "sa-casscf" or "n_det" not in p:
+            continue
+        try:
+            k = CellKey.from_address(addr)
+        except (ValueError, IndexError):
+            continue
+        e = p.get("energies_pyscf", [p.get("e_ground")])[0]
+        if e is None:
+            continue
+        key3 = (k.span_label, k.sector, p["n_det"])
+        out[key3] = min(out.get(key3, float("inf")), float(e))
+    return out
+
+
 def _rows(keys, cells, anchor, spec) -> list[str]:
     """Every RUN cell of the key set (the :func:`_method_row` policy),
     in the given order."""
-    return [_row(k, p, anchor, spec)
+    floor = _sa_floor(cells)
+    return [_row(k, p, anchor, spec, floor)
             for k in keys
             if _method_row(k)
             and (p := payload_of(cells, k)) is not None]

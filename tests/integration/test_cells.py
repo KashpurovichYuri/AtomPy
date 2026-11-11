@@ -1187,9 +1187,9 @@ def methods_module():
     return mod
 
 
-def _methods_payload(e, roots=1):
+def _methods_payload(e, roots=1, kind="casci", n_det=90):
     """A minimal run payload for methods-table rendering."""
-    return {"energies_pyscf": [e] * roots, "n_det": 90,
+    return {"energies_pyscf": [e] * roots, "n_det": n_det, "kind": kind,
             "ground_l2": 12.0, "comm_norm_h_lz": 1e-9,
             "comm_norm_h_l2": 1e-8, "win_lz": 1e-15,
             "win_lperp": 2e-15}
@@ -1267,6 +1267,34 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     opt = [r for r in rows
            if r.startswith("| CASSCF | free | 3d4s / D |")]
     assert len(opt) == 2 and not any("·lane" in r for r in opt)  # Ar + Ar·pur substrates
+
+
+@fast
+def test_methods_local_minimum_note_derived_from_the_sa_floor():
+    """A FREE single-root CASSCF above its span's SA ground root is a
+    converged LOCAL minimum (the variational argument) and the note
+    says so; a row below the floor and every CONSTRAINED row (frozen,
+    radial -- legitimately above the SA ground) never carry it."""
+    mod = methods_module()
+    cs = replace(CAMPAIGN["Sc"], render_spans=None)
+
+    keys = [*grid_keys(cs), *route_keys(cs)]
+    cells = {}
+    for k in keys:
+        if k.method == "sa-casscf" and k.mask is None and k.core == "avg":
+            cells[k.address] = _methods_payload(-759.7495, kind="sa-casscf")
+        elif k.method == "casscf" and k.core == "avg":
+            above = k.window == "3d4s@ar" and k.substrate == "pol"
+            cells[k.address] = _methods_payload(
+                -759.7436 if above else -759.7680,        # above: flagged
+                kind="casscf")
+    text = "\n".join(mod.methods_section(cs, cells, -759.7363))
+    rows = [l for l in text.splitlines() if l.startswith("| CASSCF")]
+    flagged = [l for l in rows if "local minimum" in l]
+    assert flagged and all("Ar·lane" in l for l in flagged)
+    assert all("frozen" not in l and "radial" not in l for l in flagged)
+    assert not any("local minimum" in l for l in rows
+                   if "frozen" in l or "radial" in l)
 
 
 @fast
