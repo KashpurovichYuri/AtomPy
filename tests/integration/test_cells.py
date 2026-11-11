@@ -277,7 +277,8 @@ def test_lane_keys_derive_from_the_declaration():
     assert ti["3s3p3d@1s2s2p4s"] == (6, 4)
     assert ti["3d3p4s@1s2s2p3s"] == (6, 4)
     assert [(k.window, k.sector) for k in lane_keys(CAMPAIGN["Sc"])] == [
-        ("3d4s@ar", (2, 1)), ("3d3p@semi", (4, 3)),
+        ("3d4s@ar", (2, 1)), ("3d@ar", (2, 1)),
+        ("3d3p@semi", (4, 3)),
         ("3d3p4d@semi", (4, 3)), ("3d3p4s@1s2s2p3s", (5, 4)),
         ("3s3p3d@1s2s2p4s", (5, 4))]
     assert [(k.window, k.sector) for k in lane_keys(CAMPAIGN["U14e"])] \
@@ -1263,7 +1264,9 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     agree = {k.address: _methods_payload(-848.4) for k in keys}
     text = "\n".join(mod.methods_section(cs, agree, -848.4065))
     rows = [r for r in text.splitlines() if r.startswith("|")]
-    ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / D |")]
+    ci = [r for r in rows
+          if r.startswith("| CASCI | free | 3d4s / D |")
+          and r.split("|")[6].strip() != "—"]   # data rows only
     assert len(ci) == 3            # raw/avg/pur (the frac class: store-only)
     assert not any("/ NO |" in r for r in rows)  # the NO class: store-only
     assert not any("frac" in r for r in rows)
@@ -1282,7 +1285,8 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     assert mo_opt[:4] == seq                    # the pol group's order
     assert mo_opt[4:] == seq                    # pur repeats it identically
     opt = [r for r in rows
-           if r.startswith("| CASSCF | free | 3d4s / D |")]
+           if r.startswith("| CASSCF | free | 3d4s / D |")
+           and r.split("|")[6].strip() != "—"]      # data rows only
     assert len(opt) == 2 and not any("·lane" in r for r in opt)  # Ar + Ar·pur substrates
 
 
@@ -1319,8 +1323,13 @@ def test_methods_sc_and_sc_unc_line_by_line_parity():
     review identity, a maintained invariant; Sc's legacy radial rows
     (a construction class since refused) are the ONE exception."""
     mod = methods_module()
+    for a, b in (("Sc", "Sc-unc"), ("Ti", "Ti-unc")):
+        _assert_pair_parity(mod, a, b)
+
+
+def _assert_pair_parity(mod, a, b):
     skel = []
-    for atom in ("Sc", "Sc-unc"):
+    for atom in (a, b):
         spec = campaign_spec(atom)
         data = json.loads(Path(f"elements/{atom}/cells.json").read_text())
         text = "\n".join(mod.methods_section(
@@ -1336,7 +1345,8 @@ def test_methods_sc_and_sc_unc_line_by_line_parity():
                 else:
                     rows.append(f"{m.group(1).strip()}|{m.group(2).strip()}")
         skel.append(rows)
-    assert [r for r in skel[0] if "radial" not in r] == skel[1]
+    assert [r for r in skel[0] if "radial" not in r] == skel[1], (
+        f"{a} vs {b} skeletons differ")
 
 
 @fast

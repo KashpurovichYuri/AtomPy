@@ -423,18 +423,24 @@ _PRIOR_WINDOWS = ("3d@r1", "3d@s1", "3d@s2",
 # uncontracted basis (measured 2026-11-11, map Issues) -- the cells
 # hold their STRUCTURAL place (pending rows) but never run until
 # that repair lands
-_SC_UNC_S_BLOCK = Scenario(
-    name="series-source-diverges",
-    cells=tuple(f"sc-unc_{lbl}_{na}-{nb}_{m}_"
-                for lbl in ("3d@s1", "3d@s1no1", "3d@s2", "3d@s2no1",
-                            "3d4s@s1", "3d4s@s1no2",
-                            "3d4s@s2", "3d4s@s2no2")
-                for na, nb in ((2, 1),)
-                for m in ("casci", "casscf", "sa-casscf")),
-    reason="the series source (the non-head configurations' fresh "
-           "forced-occupation SCFs) diverges on this basis -- the "
-           "fresh-SCF disease, measured 2026-11-11 (map Issues); the "
-           "@s windows wait on that repair")
+def _unc_s_block(key: str, sec: tuple[int, int]) -> Scenario:
+    """The twins' @s windows' guard: the series' non-head
+    configurations need fresh forced-occupation SCFs, and every fresh
+    run diverges on the uncontracted basis (measured 2026-11-11, map
+    Issues) -- the cells hold their STRUCTURAL place (pending rows)
+    but never run until that repair lands."""
+    return Scenario(
+        name="series-source-diverges",
+        cells=tuple(f"{key}_{lbl}_{na}-{nb}_{m}_"
+                    for lbl in ("3d@s1", "3d@s1no1", "3d@s2", "3d@s2no1",
+                                "3d4s@s1", "3d4s@s1no2",
+                                "3d4s@s2", "3d4s@s2no2")
+                    for na, nb in (sec,)
+                    for m in ("casci", "casscf", "sa-casscf")),
+        reason="the series source (the non-head configurations' fresh "
+               "forced-occupation SCFs) diverges on this basis -- the "
+               "fresh-SCF disease, measured 2026-11-11 (map Issues); "
+               "the @s windows wait on that repair")
 
 _SAME_L_WINDOWS = ("3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4")
 _SAME_L_VOID = Scenario(
@@ -624,11 +630,13 @@ CAMPAIGN: dict[str, CaseSpec] = {
     "C": CaseSpec("C", "ccpvdz", nelec_act=2, ncore=2,
                   shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3,
                   term=(1, "g"), lane_windows=("2p@1s2s",),
+                  render_spans=("2p",),
                   scan=ScanSpec(fam=("2p", "3p"),
                                 grid=(0.0, 0.8, 17))),
     "Si": CaseSpec("Si", "ccpvdz", nelec_act=2, ncore=6,
                    shell_patterns=["3p"], spin=2, sa_weights=[1 / 3] * 3,
                    term=(1, "g"), lane_windows=("3p@1s2s2p3s",),
+                   render_spans=("3p",),
                    scan=ScanSpec(fam=("3p", "4p"),
                                  grid=(0.0, 1.1, 23))),
     "Sc": CaseSpec("Sc", "ccpvdz", nelec_act=3, ncore=9,
@@ -685,10 +693,12 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                   "3p": 1, "3s": 1},
                    sa_weights=[1 / 7] * 7,
                    term=(3, "g"),
-                   lane_windows=("3d4s@ar", "3d4d@ar", "3d4s4p4d@ar",
+                   lane_windows=("3d4s@ar", "3d@ar", "3d4d@ar",
+                                 "3d4s4p4d@ar",
                                  "3d3p@semi", "3d3p4d@semi",
                                  "3s3p3d@1s2s2p4s",
                                  "3d3p4s@1s2s2p3s"),
+                   render_spans=("3d4s", "3d"),
                    scenarios=(_ANCHOR_FIRST, _SAME_L_VOID,
                               _prior_anchor_first("Ti", [(3, 1), (2, 0)])),
                    # the prior axis: the series (the HEAD gate = the
@@ -751,7 +761,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         render_spans=("3d4s", "3d"),
                         scenarios=_unc_gates("sc-unc", (2, 1))
                         + (_prior_anchor_first("sc-unc", [(2, 1)]),
-                           _SC_UNC_S_BLOCK),
+                           _unc_s_block("sc-unc", (2, 1))),
                         term=(2, "g"),
                         lane_windows=("3d4s@ar", "3d@ar"),
                         lattice_windows=("3d",), lattice_sector=(2, 1)),
@@ -759,10 +769,29 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         shell_patterns=["3d", "4s"], spin=2,
                         shell_bands=_TM_UNC_BANDS,
                         shell_radials=_TM_UNC_RADIALS,
+                        # the prior axis, @r1-only (the head IS the
+                        # trusted cache; the @s windows guarded -- the
+                        # fresh-SCF disease, map Issues)
+                        series=(SeriesSpec("d2s2", ("1s", "2s", "2p", "3s",
+                                                    "3p", "4s"), ("3d",),
+                                           2, -848.4074434287603),),
+                        prior_bands={"3d": _TM_UNC_BANDS["3d"],
+                                     "4s": _TM_UNC_BANDS["4s"]},
+                        planned_windows=("3d@r1", "3d@s1", "3d@s2",
+                                         "3d4s@r1", "3d4s@s1",
+                                         "3d4s@s2"),
+                        # the prior sectors mirror Ti's: the 3d-span
+                        # priors at the lattice's d2 sector
+                        planned_sectors={f"3d@{t}": (2, 0)
+                                         for t in ("r1", "s1", "s2")},
                         sa_weights=[1 / 7] * 7,
                         run_casscf=False, key="Ti-unc",
-                        scenarios=_unc_gates("ti-unc", (3, 1)),
-                        term=(3, "g"), lane_windows=("3d4s@ar",),
+                        render_spans=("3d4s", "3d"),
+                        scenarios=_unc_gates("ti-unc", (3, 1))
+                        + (_prior_anchor_first("ti-unc", [(3, 1), (2, 0)]),
+                           _unc_s_block("ti-unc", (3, 1))),
+                        term=(3, "g"),
+                        lane_windows=("3d4s@ar", "3d@ar"),
                         lattice_windows=("3d",), lattice_sector=(2, 0)),
     # CAMPAIGN key `U14e`: the ECP-atom record's element dir
     # (``elements/U14e/``); the SYMBOL stays `U` (PySCF builds the
