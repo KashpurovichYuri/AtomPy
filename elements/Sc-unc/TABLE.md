@@ -7,7 +7,7 @@ radial × the m-set; CAS(3,5)/CAS(3,6), construction-uniform with
 records at 0.00e+00 mEh). The kind block compares the four window
 sources at both ruler folds: `MO`/`MOC` are CONTROLS (m-incomplete
 by construction — the SCF's hybrid-open gauge), `NO` is the density
-leg, degenerate with AO at the closed substrate (+3.2 µEh at Ar·pur).
+leg, degenerate with D at the closed substrate (+3.2 µEh at Ar·pur).
 This atom's canonical core is the ANISOTROPIC class: the Ar (pol)
 rows carry the assembly defect (closures ~3e-2, ⟨L²⟩ 5.9989 —
 identical across kinds) and their ground-root energies are
