@@ -160,13 +160,12 @@ def _row(k, p, anchor, spec) -> str:
         note += "control: m-incomplete by construction"
     elif route == "pinned":
         note += "SCF core; offset = bookkeeping form"
-    wname = (spec.window_names or {}).get(k.span_label, k.span_label)
-    src = k.source_tag
-    if src is not None:
-        # the prior axis rides the display (the tag is the window's
-        # identity; without it the rows would be indistinguishable
-        # from the incumbent's at the same span)
-        wname += f" ({src[0]}{src[1]})"
+    # a prior window renders under its full label (the tag is part of
+    # the window's identity -- the address grammar verbatim)
+    if k.source_tag is not None:
+        wname = k.window
+    else:
+        wname = (spec.window_names or {}).get(k.span_label, k.span_label)
     cells = [
         _method(k), route, f"{wname} / {START_NAMES[k.start]}",
         cas_label(k, spec), fold, f"{p['n_det']:,}",
@@ -186,11 +185,14 @@ def _row(k, p, anchor, spec) -> str:
 
 
 def _ladder_row(k) -> bool:
-    """The ladder-row policy, ONE home: a NO-start CASCI cell IS a
-    ladder row (the kind block's density leg); a NO-start OPTIMIZER
-    cell is a start, not a family. Every filter in the ladder
-    section routes through here."""
-    return k.start != "no" or k.method == "casci"
+    """The methods-row policy, ONE home: the table renders the
+    COMPARISON classes -- the distilled start, the SCF controls, the
+    treatments.  A NO-start cell never renders (the density leg is
+    energy-identical to its D row at k=1 -- its degeneracy
+    certificate lives in the store and the pins, not in a repeated
+    row). Every filter in the table's assembly routes through
+    here."""
+    return k.start != "no"
 
 
 def _rows(keys, cells, anchor, spec) -> list[str]:
@@ -235,34 +237,41 @@ def _comparison_key(k):
     """The family's row order -- THE COMPARISON READING: every CI row
     before the optimizer rows; within CI, the distilled block by
     (k, source) -- the incumbent, the head prior ``r``, the series
-    prior ``s`` at k=1, the double-budget ``s2`` -- then the NO
-    density leg, the MO/MOC controls last; optimizer variants keep
-    their declared order after the CI block."""
+    prior ``s`` at k=1, the double-budget ``s2`` -- the MO/MOC
+    controls last; optimizer variants keep their declared order after
+    the CI block."""
     t = k.source_tag
     k_rank, src = (t[1], t[0]) if t is not None else (1, "")
     if k.method != "casci":
         return (1, 0, k_rank, src, k.start)
-    block = {"ao": 0, "no": 1}.get(k.start, 2)
+    block = 0 if k.start == "ao" else 2   # the controls after the D block
     return (0, block, k_rank, src, k.start)
 
 
 def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
-    """THE LADDER: one table for the whole atom.  Families in
+    """THE METHODS TABLE: one table for the whole atom.  Families in
     declaration order, separated by the rule row -- the lattice
-    spans (CI only), the primary window when ``render_primary``
-    (each fold group's CI block beside its optimizer variants), then
-    every lane window whose route twins ran.  The PRIOR windows join
-    their span's family (the same-CAS comparison: at a given CAS,
-    every approach adjacent -- the incumbent's CI row, the ``r``/``s``
-    priors beside it, the double-budget block, then the optimizer
-    rows over the chosen basis), in :func:`_comparison_key` order; a
-    prior span with no incumbent family renders as its own family.
+    spans (the distilled CI row per span), the primary window when
+    ``render_primary`` (each core group's CI block beside its
+    optimizer variants), then every lane window whose route twins
+    ran.  The PRIOR windows join their span's family (the same-CAS
+    comparison: at a given CAS, every approach adjacent -- the
+    incumbent's CI row, the ``r``/``s`` priors beside it, the
+    double-budget block, then the optimizer rows over the chosen
+    basis), in :func:`_comparison_key` order; a prior span with no
+    incumbent family renders as its own family.
     A lattice span equal to the primary's renders once -- the
-    primary's fold groups own it.  The ROHF anchor row leads, the
-    UHF anchor row follows when the store carries the record;
-    a NO-start CASCI cell IS a ladder row (the kind block's density
-    leg); NO-start OPTIMIZER cells are not (a start, not a family);
-    optimizer twins is not this table's story yet."""
+    primary's core groups own it.  The rendering DIET (store data
+    stays; rows do not repeat it): NO-start cells never render, the
+    prior windows contribute only their distilled CI row at the
+    ruler core (their controls repeat the incumbent's at equal
+    width; their raw/pur rows repeat their certificates), the
+    lattice renders one row per span (the m-incomplete control story
+    renders once, at the primary's controls), and the frac reference
+    class does not render (a different reference SCF -- its home is
+    the reference study, not the methods grid).  The ROHF anchor row
+    leads, the UHF anchor row follows when the store carries the
+    record; optimizer twins is not this table's story yet."""
     body: list[str] = []
     seen: set[str] = set()
 
@@ -278,30 +287,39 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
 
     # the prior windows, gathered by span (the sector match guards
     # the join: a prior at another sector has no incumbent twin
-    # there and renders as its own family)
+    # there and renders as its own family).  The DIET filter: the
+    # distilled CI row at the ruler core only -- the prior windows'
+    # controls repeat the incumbent's at equal width and their
+    # raw/pur rows repeat their certificates
     priors: dict[str, list] = {}
     for w in spec.planned_windows:
         if prior_tag_of(w) is None:
             continue
-        priors.setdefault(w.partition("@")[0], []).extend(window_grid(spec, w))
+        priors.setdefault(w.partition("@")[0], []).extend(
+            k for k in window_grid(spec, w)
+            if k.start == "ao" and k.fold == "avg" and k.substrate == "pol")
     primary_span = "".join(spec.shell_patterns) if spec.render_primary \
         else None
 
     for span in dict.fromkeys(k.window for k in lattice_keys(spec)):
         if span == primary_span:
-            continue    # the primary's fold groups own this span
-        _fam([k for k in lattice_keys(spec) if k.window == span]
+            continue    # the primary's core groups own this span
+        # the diet: one row per span (the distilled CI); the
+        # m-incomplete control story renders once, at the primary
+        _fam([k for k in lattice_keys(spec)
+              if k.window == span and k.start == "ao"]
              + [k for k in priors.get(span, [])
                 if k.sector == spec.lattice_sector])
 
-    # the primary family: fold groups in declaration order, each
+    # the primary family: core groups in declaration order, each
     # group's CI block (the incumbent's row beside the prior windows'
-    # -- the comparison) followed by its optimizer variants;
-    # suppressed by the declaration (render_primary=False -- the
-    # promoted windows carry the results; the primary rows stay in
-    # the store)
+    # -- the comparison) followed by its optimizer variants; the frac
+    # reference class does not render (the diet); suppressed by the
+    # declaration (render_primary=False -- the promoted windows carry
+    # the results; the primary rows stay in the store)
     if spec.render_primary:
-        grid = [k for k in grid_keys(spec) if _ladder_row(k)]
+        grid = [k for k in grid_keys(spec)
+                if _ladder_row(k) and k.fold != "frac"]
         join = [k for k in priors.get(primary_span, [])
                 if k.sector == grid[0].sector]
         groups: dict[str, list] = {}

@@ -1237,12 +1237,11 @@ def test_ladder_anchors_lead_and_families_follow():
 
 @fast
 def test_ladder_every_run_cell_a_row_no_starts_scoped_to_optimizers():
-    """EVERY run cell a row -- the four fold variants' CI rows beside
-    their optimizer variants, the method bare + restriction only, the
-    window cell in slash form; a NO-start CASCI cell IS a row (the
-    kind block's density leg, both ruler folds) while NO-start
-    OPTIMIZER cells stay excluded (a start, not a family); free
-    optimizer rows carry no lane marker."""
+    """EVERY comparison row a row -- the three rendered core variants'
+    CI rows beside their optimizer variants, the method bare +
+    restriction only, the window cell in slash form; the frac
+    reference class and NO-start cells stay store-only (the diet);
+    free optimizer rows carry no lane marker."""
     mod = ladder_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
@@ -1250,10 +1249,9 @@ def test_ladder_every_run_cell_a_row_no_starts_scoped_to_optimizers():
     text = "\n".join(mod.ladder_section(cs, agree, -848.4065))
     rows = [r for r in text.splitlines() if r.startswith("|")]
     ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / D |")]
-    assert len(ci) == 4            # the four fold variants' CI rows
-    no_ci = [r for r in rows if "/ NO |" in r]
-    assert len(no_ci) == 2         # the density leg, both ruler folds
-    assert all(r.startswith("| CASCI |") for r in no_ci)
+    assert len(ci) == 3            # raw/avg/pur (the frac class: store-only)
+    assert not any("/ NO |" in r for r in rows)   # the diet: no repeats
+    assert not any("frac" in r for r in rows)
     opt = [r for r in rows
            if r.startswith("| CASSCF | free | 3d4s / D |")]
     assert len(opt) == 2 and not any("·lane" in r for r in opt)  # Ar + Ar·pur substrates
@@ -1357,10 +1355,37 @@ def test_ladder_prior_rows_join_the_span_family_in_comparison_order():
                     and l.split("|")[5].strip() == fold)
 
     for span in ("3d", "3d4s"):
-        a, b, c, d = (idx(span), idx(f"{span} (r1)"),
-                      idx(f"{span} (s1)"), idx(f"{span} (s2)"))
+        a, b, c, d = (idx(span), idx(f"{span}@r1"),
+                      idx(f"{span}@s1"), idx(f"{span}@s2"))
         assert a < b < c < d
         assert not any(l.startswith("| --- ") for l in lines[a:d + 1])
+
+
+@fast
+def test_methods_table_diet_repeats_do_not_render():
+    """The rendering diet: NO-start rows (energy-identical to their D
+    row), the prior windows' control and non-ruler-core rows, the
+    lattice's per-span control, and the frac reference class never
+    render -- the store keeps them, the table does not repeat them."""
+    mod = ladder_module()
+    cs = CAMPAIGN["Sc"]
+    keys = [k for k in [*lattice_keys(cs), *grid_keys(cs),
+                        *(k for w in cs.planned_windows
+                          for k in window_grid(cs, w))]
+            if k.method == "casci"]
+    text = "\n".join(mod.ladder_section(
+        cs, {k.address: _ladder_payload(-759.5) for k in keys}, -759.7363))
+    rows = [l for l in text.splitlines() if l.startswith("| CASCI")]
+    assert not any("/ NO" in l for l in rows)
+    assert not any("frac" in l for l in rows)
+    # prior windows: the distilled row at the ruler core only
+    prior_rows = [l for l in rows if "@" in l.split("|")[3]]
+    assert prior_rows
+    assert all(l.split("|")[5].strip() == "Ar" for l in prior_rows)
+    # the controls render only at the primary's span (no per-span
+    # lattice control)
+    assert all(l.split("|")[3].strip() == "3d4s / MO"
+               for l in rows if "/ MO |" in l)
 
 
 @fast
@@ -1382,7 +1407,7 @@ def test_ladder_prior_span_without_incumbent_renders_its_own_family():
                     if l.startswith(f"| CASCI | free | {window} / D |")
                     and "·" not in l.split("|")[5])
 
-    a, d = idx("3d (r1)"), idx("3d (s2)")
+    a, d = idx("3d@r1"), idx("3d@s2")
     assert a < d
     assert not any(l.startswith("| --- ") for l in lines[a:d + 1])
 
