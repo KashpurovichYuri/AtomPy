@@ -7,8 +7,8 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d4s_2-1_casci_ao_-_pol_raw | -759.72956514 | -1.326e-03 | 6.00031 | 2.82e-02 | 1.28e-01 | 1.8e-03 | 2.1e-02 | 0.833 | 1.3e-02 | 0.0e+00 | 3.6e-12 |  |
 | sc_3d4s_2-1_casci_ao_-_pol_avg | -759.72823938 | 0.000e+00 | 5.99977 | 8.86e-04 | 4.03e-02 | 1.8e-03 | 2.1e-02 | 0.833 | 1.3e-02 | 1.3e-03 | 3.7e-12 |  |
 | sc_3d4s_2-1_casci_ao_-_pol_frac | -759.69949176 | 2.875e-02 | 6.00000 | 6.32e-14 | 3.97e-13 | 1.6e-08 | 2.3e-08 | 0.833 | 2.9e-09 | 0.0e+00 | 4.2e-12 |  |
-| sc_3d4s_2-1_casscf_ao_frozen_pur_avg | -759.72842244 | -1.831e-04 | 6.00000 | 3.39e-14 | 1.68e-13 | 6.6e-15 | 8.7e-15 | 0.833 | nan | 1.1e-03 | 3.8e-12 |  |
-| sc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg | -759.72897768 | -7.383e-04 | 6.00000 | 1.59e-13 | 5.85e-13 | 6.6e-15 | 8.7e-15 | 0.833 | nan | 2.9e-08 | 2.8e-12 |  |
+| sc_3d4s_2-1_casscf_ao_frozen_pur_avg | -759.72842244 | -1.831e-04 | 6.00000 | 6.52e-14 | 2.38e-13 | 6.6e-15 | 8.7e-15 | 0.833 | nan | 1.1e-03 | 3.8e-12 |  |
+| sc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg | -759.72897768 | -7.383e-04 | 6.00000 | 3.39e-14 | 2.63e-13 | 6.6e-15 | 8.7e-15 | 0.833 | nan | 2.9e-08 | 2.8e-12 |  |
 | sc_3d4s_2-1_casscf_ao_-_pol_avg | -759.76608434 | -3.784e-02 | 0.04689 | 5.66e-01 | 1.22e+00 | 4.1e+00 | 4.1e+00 | 0.525 | nan | 1.9e-03 | 3.7e-12 |  |
 | sc_3d4s_2-1_sa-casscf_ao_-_pur_avg | -759.73973939 | -1.150e-02 | 6.00000 | 4.58e-05 | 3.01e-04 | 1.0e-04 | 1.6e-04 | 0.833 | nan | 5.6e-09 | 4.4e-12 |  |
 | sc_3d4s_2-1_sa-casscf_ao_-_pol_avg | -760.54807923 | -8.198e-01 | 6.00198 | 7.85e-01 | 3.81e+00 | 1.3e+00 | 1.5e+00 | 0.833 | nan | 8.0e-01 | 4.9e-12 |  |
@@ -49,7 +49,7 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d4s_2-1_casscf_mo_frozen_pol_avg | -759.74543706 | -1.720e-02 | 0.00621 | 1.53e-01 | 7.23e-01 | 2.8e+00 | 3.7e+00 | 0.500 | nan | 1.6e-03 | 1.4e-12 |  |
 | sc_3d4sno2_2-1_casscf_no_frozen_pol_avg | -759.72835829 | -1.189e-04 | 5.99977 | 8.44e-04 | 3.83e-02 | 1.8e-03 | 2.1e-02 | 0.833 | nan | 1.3e-03 | 3.8e-12 |  |
 | sc_3d4s_2-1_casscf_mo_frozen_pur_avg | -759.74546896 | -1.723e-02 | 0.00622 | 1.53e-01 | 7.23e-01 | 2.8e+00 | 3.7e+00 | 0.500 | nan | 1.5e-03 | 2.3e-13 |  |
-| sc_3d4sno2_2-1_casscf_no_frozen_pur_avg | -759.72842368 | -1.843e-04 | 6.00000 | 3.31e-14 | 2.34e-13 | 6.7e-15 | 8.8e-15 | 0.833 | nan | 1.1e-03 | 3.3e-12 |  |
+| sc_3d4sno2_2-1_casscf_no_frozen_pur_avg | -759.72842368 | -1.843e-04 | 6.00000 | 3.14e-14 | 1.73e-13 | 6.7e-15 | 8.8e-15 | 0.833 | nan | 1.1e-03 | 3.3e-12 |  |
 | sc_3d4sno2_2-1_sa-casscf_no_-_pol_avg | -759.73973971 | -1.150e-02 | 6.00000 | 5.23e-05 | 2.95e-04 | 8.0e-04 | 8.7e-04 | 0.833 | nan | 3.4e-07 | 3.0e-12 |  |
 | sc_3d4s_2-1_sa-casscf_mo_-_pur_avg | -759.76108097 | -3.284e-02 | 0.03086 | 3.06e-01 | 1.20e+00 | 2.8e+00 | 4.0e+00 | 0.500 | nan | 1.7e-03 | 2.1e-13 |  |
 | sc_3d4sno2_2-1_sa-casscf_no_-_pur_avg | -759.73974810 | -1.151e-02 | 6.00000 | 2.20e-05 | 1.35e-04 | 3.5e-03 | 4.8e-03 | 0.833 | nan | 8.7e-06 | 3.7e-12 |  |
@@ -57,7 +57,7 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d4s_2-1_sa-casscf_mo_frozen_pol_avg | -759.74539971 | -1.716e-02 | 0.00625 | 1.53e-01 | 7.23e-01 | 2.8e+00 | 3.7e+00 | 0.500 | nan | 1.6e-03 | 1.4e-12 |  |
 | sc_3d4sno2_2-1_sa-casscf_no_frozen_pol_avg | -759.72891590 | -6.765e-04 | 5.99977 | 8.44e-04 | 3.83e-02 | 1.8e-03 | 2.1e-02 | 0.833 | nan | 3.1e-04 | 3.7e-12 |  |
 | sc_3d4s_2-1_sa-casscf_mo_frozen_pur_avg | -759.74543247 | -1.719e-02 | 0.00626 | 1.53e-01 | 7.23e-01 | 2.8e+00 | 3.7e+00 | 0.500 | nan | 1.5e-03 | 3.7e-13 |  |
-| sc_3d4sno2_2-1_sa-casscf_no_frozen_pur_avg | -759.72897768 | -7.383e-04 | 6.00000 | 9.60e-14 | 7.16e-13 | 6.7e-15 | 8.8e-15 | 0.833 | nan | 3.6e-08 | 2.5e-12 |  |
+| sc_3d4sno2_2-1_sa-casscf_no_frozen_pur_avg | -759.72897768 | -7.383e-04 | 6.00000 | 6.54e-14 | 4.82e-13 | 6.7e-15 | 8.8e-15 | 0.833 | nan | 3.6e-08 | 2.5e-12 |  |
 | sc_3d4s_2-1_casci_moc_-_pol_avg | -759.73696758 | -8.728e-03 | 3.35321 | 1.36e+00 | 1.58e+00 | 2.7e+00 | 3.7e+00 | 0.533 | 1.3e-02 | 3.1e-03 | 1.4e-12 |  |
 | sc_3d4s_2-1_casci_moc_-_pur_avg | -759.73774256 | -9.503e-03 | 3.35321 | 1.36e+00 | 1.58e+00 | 2.7e+00 | 3.7e+00 | 0.533 | 0.0e+00 | 0.0e+00 | 3.7e-12 |  |
 | sc_3d@r1_2-1_casci_ao_-_pol_raw | -759.33298168 | 3.953e-01 | 11.99953 | 2.29e-02 | 1.02e-01 | 1.9e-03 | 2.3e-02 | 1.000 | 1.3e-02 | 1.1e-13 | 3.7e-12 |  |
@@ -140,9 +140,58 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d4s@s2_2-1_sa-casscf_ao_-_pur_avg | -759.74818863 | -1.995e-02 | 6.00000 | 2.70e-03 | 2.39e-02 | 2.5e-03 | 4.6e-03 | 0.833 | nan | 7.1e-09 | 3.5e-12 |  |
 | sc_3d4sno2_2-1_casci_no_-_pol_avg | -759.72822326 | 1.612e-05 | 5.99977 | 8.44e-04 | 3.83e-02 | 1.8e-03 | 2.1e-02 | 0.833 | 1.3e-02 | 1.4e-03 | 3.6e-12 |  |
 | sc_3d4s_2-1_casscf_moc_-_pol_avg | -759.76590055 | -3.766e-02 | 0.05257 | 3.49e-01 | 7.20e-01 | 2.5e+00 | 2.5e+00 | 0.499 | nan | 1.9e-03 | 1.5e-12 |  |
-| sc_3d4s_2-1_sa-casscf_moc_-_pol_avg | -759.73778662 | -9.547e-03 | 5.00136 | 1.08e+00 | 6.43e+00 | 1.9e+00 | 4.5e+00 | 0.833 | nan | 4.9e-04 | 1.4e-12 | NOT-CONVERGED |
+| sc_3d4s_2-1_sa-casscf_moc_-_pol_avg | -759.73778662 | -9.547e-03 | 5.00136 | 1.08e+00 | 6.43e+00 | 1.9e+00 | 4.5e+00 | 0.833 | nan | 4.9e-04 | 1.4e-12 |  |
 | sc_3d4sno2_2-1_casci_no_-_pur_avg | -759.72889088 | -6.515e-04 | 6.00000 | 3.26e-14 | 1.67e-13 | 6.7e-15 | 8.7e-15 | 0.833 | 0.0e+00 | 0.0e+00 | 3.4e-12 |  |
 | sc_3d4s_2-1_casci_mo_-_pur_avg | -759.74621598 | -1.798e-02 | 0.00621 | 1.53e-01 | 7.23e-01 | 2.8e+00 | 3.7e+00 | 0.500 | 0.0e+00 | 0.0e+00 | 3.2e-13 |  |
+| sc_3d_2-1_casci_ao_-_pol_raw | -759.43588522 | 2.924e-01 | 11.99957 | 2.26e-02 | 9.91e-02 | 1.8e-03 | 2.1e-02 | 1.000 | 1.3e-02 | 1.1e-13 | 3.7e-12 |  |
+| sc_3d_2-1_casci_ao_-_pur_avg | -759.43584706 | 2.924e-01 | 12.00000 | 2.74e-14 | 1.46e-13 | 6.6e-15 | 8.7e-15 | 1.000 | 0.0e+00 | 0.0e+00 | 4.2e-12 |  |
+| sc_3d_2-1_casci_moc_-_pol_avg | -759.73526333 | -7.024e-03 | 3.98131 | 6.97e-01 | 1.46e+00 | 2.3e+00 | 3.9e+00 | 0.800 | 1.3e-02 | 1.9e-03 | 1.4e-12 |  |
+| sc_3dno1_2-1_casci_no_-_pol_avg | -759.43529230 | 2.929e-01 | 11.99989 | 6.97e-04 | 3.14e-02 | 1.8e-03 | 2.1e-02 | 1.000 | 1.3e-02 | 9.8e-04 | 3.7e-12 |  |
+| sc_3d_2-1_casci_mo_-_pur_avg | -759.74592304 | -1.768e-02 | 0.00648 | 1.15e-01 | 2.22e-01 | 2.8e+00 | 2.0e+00 | 0.600 | 0.0e+00 | 0.0e+00 | 2.7e-13 |  |
+| sc_3d_2-1_casci_moc_-_pur_avg | -759.73603757 | -7.798e-03 | 3.98131 | 6.97e-01 | 1.46e+00 | 2.3e+00 | 3.9e+00 | 0.800 | 0.0e+00 | 0.0e+00 | 4.0e-12 |  |
+| sc_3dno1_2-1_casci_no_-_pur_avg | -759.43584706 | 2.924e-01 | 12.00000 | 2.70e-14 | 1.68e-13 | 6.6e-15 | 8.7e-15 | 1.000 | 0.0e+00 | 0.0e+00 | 2.9e-12 |  |
+| sc_3d_2-1_casscf_ao_-_pol_avg | -759.76466753 | -3.643e-02 | 0.05082 | 2.90e-01 | 5.84e-01 | 2.5e+00 | 2.5e+00 | 0.599 | nan | 1.9e-03 | 3.6e-12 |  |
+| sc_3d_2-1_casscf_mo_-_pol_avg | -759.76477158 | -3.653e-02 | 0.05143 | 3.09e-01 | 5.77e-01 | 2.8e+00 | 2.0e+00 | 0.599 | nan | 1.5e-03 | 1.4e-12 |  |
+| sc_3d_2-1_casscf_moc_-_pol_avg | -759.76466764 | -3.643e-02 | 0.05082 | 2.88e-01 | 5.84e-01 | 2.5e+00 | 2.5e+00 | 0.599 | nan | 1.9e-03 | 1.4e-12 |  |
+| sc_3dno1_2-1_casscf_no_-_pol_avg | -759.76466784 | -3.643e-02 | 0.05082 | 2.35e-01 | 5.84e-01 | 2.0e+00 | 2.9e+00 | 0.599 | nan | 1.9e-03 | 4.0e-12 |  |
+| sc_3d_2-1_casscf_ao_virtmix_pol_avg | -759.76482217 | -3.658e-02 | 0.05039 | 2.85e-01 | 5.80e-01 | 2.5e+00 | 2.5e+00 | 0.599 | nan | 1.4e-03 | 3.5e-12 |  |
+| sc_3d_2-1_casscf_ao_-_pur_avg | -759.76466764 | -3.643e-02 | 0.05082 | 2.63e-01 | 5.84e-01 | 2.2e+00 | 2.7e+00 | 0.599 | nan | 1.9e-03 | 3.4e-12 |  |
+| sc_3d_2-1_casscf_mo_-_pur_avg | -759.76477164 | -3.653e-02 | 0.05146 | 3.09e-01 | 5.77e-01 | 2.8e+00 | 2.0e+00 | 0.599 | nan | 1.5e-03 | 3.1e-13 |  |
+| sc_3d_2-1_casscf_moc_-_pur_avg | -759.76466786 | -3.643e-02 | 0.05083 | 2.88e-01 | 5.84e-01 | 2.5e+00 | 2.5e+00 | 0.599 | nan | 1.9e-03 | 3.1e-12 |  |
+| sc_3dno1_2-1_casscf_no_-_pur_avg | -759.76466766 | -3.643e-02 | 0.05082 | 2.89e-01 | 5.84e-01 | 2.5e+00 | 2.5e+00 | 0.599 | nan | 1.9e-03 | 3.9e-12 |  |
+| sc_3d_2-1_casscf_ao_frozen_pol_avg | -759.47941271 | 2.488e-01 | 11.99989 | 6.97e-04 | 3.13e-02 | 1.8e-03 | 2.1e-02 | 1.000 | nan | 2.2e-03 | 3.9e-12 |  |
+| sc_3d_2-1_casscf_mo_frozen_pol_avg | -759.74515090 | -1.691e-02 | 0.00648 | 1.15e-01 | 2.22e-01 | 2.8e+00 | 2.0e+00 | 0.600 | nan | 1.6e-03 | 1.4e-12 |  |
+| sc_3d_2-1_casscf_moc_frozen_pol_avg | -759.73526472 | -7.025e-03 | 3.98131 | 6.97e-01 | 1.46e+00 | 2.3e+00 | 3.9e+00 | 0.800 | nan | 1.5e-03 | 1.4e-12 |  |
+| sc_3dno1_2-1_casscf_no_frozen_pol_avg | -759.47941261 | 2.488e-01 | 11.99989 | 6.97e-04 | 3.13e-02 | 1.8e-03 | 2.1e-02 | 1.000 | nan | 2.2e-03 | 2.5e-12 |  |
+| sc_3d_2-1_casscf_ao_frozen_pur_avg | -759.47945075 | 2.488e-01 | 12.00000 | 2.74e-14 | 1.37e-13 | 6.6e-15 | 8.7e-15 | 1.000 | nan | 2.3e-03 | 4.2e-12 |  |
+| sc_3d_2-1_casscf_mo_frozen_pur_avg | -759.74515657 | -1.692e-02 | 0.00649 | 1.15e-01 | 2.22e-01 | 2.8e+00 | 2.0e+00 | 0.600 | nan | 1.5e-03 | 2.4e-13 |  |
+| sc_3d_2-1_casscf_moc_frozen_pur_avg | -759.73526495 | -7.026e-03 | 3.98131 | 6.97e-01 | 1.46e+00 | 2.3e+00 | 3.9e+00 | 0.800 | nan | 1.5e-03 | 3.9e-12 |  |
+| sc_3dno1_2-1_casscf_no_frozen_pur_avg | -759.47945075 | 2.488e-01 | 12.00000 | 2.31e-14 | 1.78e-13 | 6.6e-15 | 8.7e-15 | 1.000 | nan | 2.3e-03 | 3.9e-12 |  |
+| sc_3d_2-1_sa-casscf_ao_-_pol_avg | -759.73607870 | -7.839e-03 | 4.96170 | 3.92e-01 | 2.12e+00 | 2.2e+00 | 2.8e+00 | 0.800 | nan | 4.9e-04 | 2.5e-12 |  |
+| sc_3d_2-1_sa-casscf_mo_-_pol_avg | -759.76022295 | -3.198e-02 | 0.03321 | 2.25e-01 | 4.24e-01 | 2.8e+00 | 2.0e+00 | 0.600 | nan | 1.6e-03 | 1.4e-12 |  |
+| sc_3d_2-1_sa-casscf_moc_-_pol_avg | -759.73607906 | -7.840e-03 | 4.95982 | 4.86e-01 | 2.12e+00 | 1.5e+00 | 3.2e+00 | 0.800 | nan | 4.9e-04 | 1.4e-12 |  |
+| sc_3dno1_2-1_sa-casscf_no_-_pol_avg | -759.73608039 | -7.841e-03 | 4.96077 | 4.37e-01 | 2.12e+00 | 1.9e+00 | 3.0e+00 | 0.800 | nan | 4.9e-04 | 3.3e-12 |  |
+| sc_3d_2-1_sa-casscf_ao_-_pur_avg | -759.73607906 | -7.840e-03 | 4.96193 | 4.03e-01 | 2.12e+00 | 2.1e+00 | 2.8e+00 | 0.800 | nan | 4.9e-04 | 2.4e-12 |  |
+| sc_3d_2-1_sa-casscf_mo_-_pur_avg | -759.76022283 | -3.198e-02 | 0.03321 | 2.25e-01 | 4.24e-01 | 2.8e+00 | 2.0e+00 | 0.600 | nan | 1.6e-03 | 2.1e-13 |  |
+| sc_3d_2-1_sa-casscf_moc_-_pur_avg | -759.73607941 | -7.840e-03 | 4.96185 | 4.84e-01 | 2.12e+00 | 1.5e+00 | 3.2e+00 | 0.800 | nan | 4.9e-04 | 2.4e-12 |  |
+| sc_3dno1_2-1_sa-casscf_no_-_pur_avg | -759.73607913 | -7.840e-03 | 4.95935 | 4.81e-01 | 2.12e+00 | 1.6e+00 | 3.2e+00 | 0.800 | nan | 4.9e-04 | 3.8e-12 |  |
+| sc_3d_2-1_sa-casscf_ao_frozen_pol_avg | -759.48044319 | 2.478e-01 | 11.99989 | 6.97e-04 | 3.13e-02 | 1.8e-03 | 2.1e-02 | 1.000 | nan | 3.6e-04 | 3.6e-12 |  |
+| sc_3d_2-1_sa-casscf_mo_frozen_pol_avg | -759.74508177 | -1.684e-02 | 0.00654 | 1.15e-01 | 2.22e-01 | 2.8e+00 | 2.0e+00 | 0.600 | nan | 1.6e-03 | 1.4e-12 |  |
+| sc_3d_2-1_sa-casscf_moc_frozen_pol_avg | -759.73545884 | -7.219e-03 | 3.98131 | 6.77e-01 | 1.41e+00 | 2.3e+00 | 3.9e+00 | 0.800 | nan | 4.7e-04 | 1.4e-12 |  |
+| sc_3dno1_2-1_sa-casscf_no_frozen_pol_avg | -759.48044342 | 2.478e-01 | 11.99989 | 6.97e-04 | 3.13e-02 | 1.8e-03 | 2.1e-02 | 1.000 | nan | 3.6e-04 | 3.3e-12 |  |
+| sc_3d_2-1_sa-casscf_ao_frozen_pur_avg | -759.48048176 | 2.478e-01 | 12.00000 | 2.74e-14 | 3.10e-13 | 6.6e-15 | 8.7e-15 | 1.000 | nan | 4.6e-04 | 3.9e-12 |  |
+| sc_3d_2-1_sa-casscf_mo_frozen_pur_avg | -759.74508749 | -1.685e-02 | 0.00655 | 1.15e-01 | 2.22e-01 | 2.8e+00 | 2.0e+00 | 0.600 | nan | 1.6e-03 | 3.5e-13 |  |
+| sc_3d_2-1_sa-casscf_moc_frozen_pur_avg | -759.73545917 | -7.220e-03 | 3.98131 | 6.77e-01 | 1.41e+00 | 2.3e+00 | 3.9e+00 | 0.800 | nan | 4.7e-04 | 3.6e-12 |  |
+| sc_3dno1_2-1_sa-casscf_no_frozen_pur_avg | -759.48048177 | 2.478e-01 | 12.00000 | 2.64e-14 | 2.52e-13 | 6.6e-15 | 8.7e-15 | 1.000 | nan | 4.6e-04 | 4.0e-12 |  |
+| sc_3d4s_2-1_casscf_moc_-_pur_avg | -759.76590011 | -3.766e-02 | 0.05257 | 3.51e-01 | 7.20e-01 | 2.5e+00 | 2.5e+00 | 0.499 | nan | 1.9e-03 | 3.8e-12 |  |
+| sc_3d4s_2-1_casscf_moc_frozen_pol_avg | -759.73696876 | -8.729e-03 | 3.35321 | 1.36e+00 | 1.58e+00 | 2.7e+00 | 3.7e+00 | 0.533 | nan | 1.5e-03 | 1.4e-12 |  |
+| sc_3d4s_2-1_casscf_moc_frozen_pur_avg | -759.73697616 | -8.737e-03 | 3.35321 | 1.36e+00 | 1.58e+00 | 2.7e+00 | 3.7e+00 | 0.533 | nan | 1.5e-03 | 3.5e-12 |  |
+| sc_3d4s_2-1_sa-casscf_moc_-_pur_avg | -759.75674315 | -2.850e-02 | 4.91189 | 2.81e-01 | 1.12e+00 | 1.9e+00 | 3.7e+00 | 0.501 | nan | 3.5e-04 | 3.1e-12 |  |
+| sc_3d4s_2-1_sa-casscf_moc_frozen_pol_avg | -759.73739589 | -9.157e-03 | 3.35321 | 1.35e+00 | 1.56e+00 | 2.7e+00 | 3.7e+00 | 0.533 | nan | 8.8e-04 | 1.4e-12 |  |
+| sc_3d4s_2-1_sa-casscf_moc_frozen_pur_avg | -759.73740355 | -9.164e-03 | 3.35321 | 1.35e+00 | 1.56e+00 | 2.7e+00 | 3.7e+00 | 0.533 | nan | 8.7e-04 | 3.5e-12 |  |
+| sc_3d@ar_2-1_casci_ao_-_pol_avg | -759.44716252 | 2.811e-01 | 12.00000 | 3.84e-15 | 3.27e-13 | 6.6e-15 | 8.7e-15 | 1.000 | 0.0e+00 | 0.0e+00 | 3.7e-12 |  |
+| sc_3d@ar_2-1_casscf_ao_-_pol_avg | -759.76466726 | -3.643e-02 | 0.05082 | 2.67e-01 | 5.84e-01 | 2.3e+00 | 2.6e+00 | 0.599 | nan | 1.9e-03 | 4.1e-12 |  |
+| sc_3d@ar_2-1_sa-casscf_ao_-_pol_avg | -759.73607941 | -7.840e-03 | 4.96145 | 4.86e-01 | 2.12e+00 | 1.5e+00 | 3.2e+00 | 0.800 | nan | 4.9e-04 | 3.2e-12 |  |
 
 configurations per root (top-2 determinants):
 
@@ -1041,6 +1090,199 @@ configurations per root (top-2 determinants):
 - `sc_3d4s_2-1_casci_mo_-_pur_avg` root 6: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)
 - `sc_3d4s_2-1_casci_mo_-_pur_avg` root 7: s^1.19d^1.81 (|c|=0.58); s^1.19d^1.81 (|c|=0.58)
 - `sc_3d4s_2-1_casci_mo_-_pur_avg` root 8: s^1.00p^1.00d^1.00 (|c|=0.73); s^1.00p^1.00d^1.00 (|c|=0.63)
+- `sc_3d_2-1_casci_ao_-_pol_raw` root 0: d^3.00 (|c|=0.48); d^3.00 (|c|=0.48)
+- `sc_3d_2-1_casci_ao_-_pol_raw` root 1: d^3.00 (|c|=0.46); d^3.00 (|c|=0.46)
+- `sc_3d_2-1_casci_ao_-_pol_raw` root 2: d^3.00 (|c|=0.55); d^3.00 (|c|=0.55)
+- `sc_3d_2-1_casci_ao_-_pol_raw` root 3: d^3.00 (|c|=0.50); d^3.00 (|c|=0.50)
+- `sc_3d_2-1_casci_ao_-_pol_raw` root 4: d^3.00 (|c|=0.49); d^3.00 (|c|=0.49)
+- `sc_3d_2-1_casci_ao_-_pol_raw` root 5: d^3.00 (|c|=0.49); d^3.00 (|c|=0.49)
+- `sc_3d_2-1_casci_ao_-_pol_raw` root 6: d^3.00 (|c|=0.55); d^3.00 (|c|=0.55)
+- `sc_3d_2-1_casci_ao_-_pol_raw` root 7: d^3.00 (|c|=0.56); d^3.00 (|c|=0.52)
+- `sc_3d_2-1_casci_ao_-_pol_raw` root 8: d^3.00 (|c|=0.43); d^3.00 (|c|=0.41)
+- `sc_3d_2-1_casci_ao_-_pur_avg` root 0: d^3.00 (|c|=0.57); d^3.00 (|c|=0.57)
+- `sc_3d_2-1_casci_ao_-_pur_avg` root 1: d^3.00 (|c|=0.47); d^3.00 (|c|=0.47)
+- `sc_3d_2-1_casci_ao_-_pur_avg` root 2: d^3.00 (|c|=0.41); d^3.00 (|c|=0.41)
+- `sc_3d_2-1_casci_ao_-_pur_avg` root 3: d^3.00 (|c|=0.56); d^3.00 (|c|=0.56)
+- `sc_3d_2-1_casci_ao_-_pur_avg` root 4: d^3.00 (|c|=0.51); d^3.00 (|c|=0.51)
+- `sc_3d_2-1_casci_ao_-_pur_avg` root 5: d^3.00 (|c|=0.48); d^3.00 (|c|=0.48)
+- `sc_3d_2-1_casci_ao_-_pur_avg` root 6: d^3.00 (|c|=0.51); d^3.00 (|c|=0.51)
+- `sc_3d_2-1_casci_ao_-_pur_avg` root 7: d^3.00 (|c|=0.33); d^3.00 (|c|=0.32)
+- `sc_3d_2-1_casci_ao_-_pur_avg` root 8: d^3.00 (|c|=0.41); d^3.00 (|c|=0.36)
+- `sc_3d_2-1_casci_moc_-_pol_avg` root 0: s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.02)
+- `sc_3d_2-1_casci_moc_-_pol_avg` root 1: s^2.00d^1.00 (|c|=1.00); s^1.00d^2.00 (|c|=0.03)
+- `sc_3d_2-1_casci_moc_-_pol_avg` root 2: s^2.00d^1.00 (|c|=0.98); s^1.00d^2.00 (|c|=0.12)
+- `sc_3d_2-1_casci_moc_-_pol_avg` root 3: s^2.00d^1.00 (|c|=0.98); s^1.00d^2.00 (|c|=0.12)
+- `sc_3d_2-1_casci_moc_-_pol_avg` root 4: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3d_2-1_casci_moc_-_pol_avg` root 5: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3d_2-1_casci_moc_-_pol_avg` root 6: s^1.00d^2.00 (|c|=0.57); s^1.00d^2.00 (|c|=0.57)
+- `sc_3d_2-1_casci_moc_-_pol_avg` root 7: s^1.00d^2.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.10)
+- `sc_3d_2-1_casci_moc_-_pol_avg` root 8: s^1.00d^2.00 (|c|=0.81); s^1.00d^2.00 (|c|=0.44)
+- `sc_3dno1_2-1_casci_no_-_pol_avg` root 0: d^3.00 (|c|=0.39); d^3.00 (|c|=0.39)
+- `sc_3dno1_2-1_casci_no_-_pol_avg` root 1: d^3.00 (|c|=0.38); d^3.00 (|c|=0.38)
+- `sc_3dno1_2-1_casci_no_-_pol_avg` root 2: d^3.00 (|c|=0.56); d^3.00 (|c|=0.56)
+- `sc_3dno1_2-1_casci_no_-_pol_avg` root 3: d^3.00 (|c|=0.51); d^3.00 (|c|=0.51)
+- `sc_3dno1_2-1_casci_no_-_pol_avg` root 4: d^3.00 (|c|=0.43); d^3.00 (|c|=0.43)
+- `sc_3dno1_2-1_casci_no_-_pol_avg` root 5: d^3.00 (|c|=0.42); d^3.00 (|c|=0.42)
+- `sc_3dno1_2-1_casci_no_-_pol_avg` root 6: d^3.00 (|c|=0.56); d^3.00 (|c|=0.56)
+- `sc_3dno1_2-1_casci_no_-_pol_avg` root 7: d^3.00 (|c|=0.57); d^3.00 (|c|=0.54)
+- `sc_3dno1_2-1_casci_no_-_pol_avg` root 8: d^3.00 (|c|=0.36); d^3.00 (|c|=0.33)
+- `sc_3d_2-1_casci_mo_-_pur_avg` root 0: s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.12)
+- `sc_3d_2-1_casci_mo_-_pur_avg` root 1: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_casci_mo_-_pur_avg` root 2: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_casci_mo_-_pur_avg` root 3: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_casci_mo_-_pur_avg` root 4: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)
+- `sc_3d_2-1_casci_mo_-_pur_avg` root 5: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.48)
+- `sc_3d_2-1_casci_mo_-_pur_avg` root 6: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.48)
+- `sc_3d_2-1_casci_mo_-_pur_avg` root 7: s^1.00p^1.00d^1.00 (|c|=0.74); s^1.00p^1.00d^1.00 (|c|=0.65)
+- `sc_3d_2-1_casci_mo_-_pur_avg` root 8: s^1.00p^1.00d^1.00 (|c|=0.74); s^1.00p^1.00d^1.00 (|c|=0.65)
+- `sc_3d_2-1_casci_moc_-_pur_avg` root 0: s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.02)
+- `sc_3d_2-1_casci_moc_-_pur_avg` root 1: s^2.00d^1.00 (|c|=1.00); s^1.00d^2.00 (|c|=0.03)
+- `sc_3d_2-1_casci_moc_-_pur_avg` root 2: s^2.00d^1.00 (|c|=0.98); s^1.00d^2.00 (|c|=0.12)
+- `sc_3d_2-1_casci_moc_-_pur_avg` root 3: s^2.00d^1.00 (|c|=0.98); s^1.00d^2.00 (|c|=0.12)
+- `sc_3d_2-1_casci_moc_-_pur_avg` root 4: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3d_2-1_casci_moc_-_pur_avg` root 5: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3d_2-1_casci_moc_-_pur_avg` root 6: s^1.00d^2.00 (|c|=0.57); s^1.00d^2.00 (|c|=0.57)
+- `sc_3d_2-1_casci_moc_-_pur_avg` root 7: s^1.00d^2.00 (|c|=0.81); s^1.00d^2.00 (|c|=0.44)
+- `sc_3d_2-1_casci_moc_-_pur_avg` root 8: s^1.00d^2.00 (|c|=0.81); s^1.00d^2.00 (|c|=0.44)
+- `sc_3dno1_2-1_casci_no_-_pur_avg` root 0: d^3.00 (|c|=0.57); d^3.00 (|c|=0.57)
+- `sc_3dno1_2-1_casci_no_-_pur_avg` root 1: d^3.00 (|c|=0.42); d^3.00 (|c|=0.42)
+- `sc_3dno1_2-1_casci_no_-_pur_avg` root 2: d^3.00 (|c|=0.34); d^3.00 (|c|=0.34)
+- `sc_3dno1_2-1_casci_no_-_pur_avg` root 3: d^3.00 (|c|=0.42); d^3.00 (|c|=0.42)
+- `sc_3dno1_2-1_casci_no_-_pur_avg` root 4: d^3.00 (|c|=0.41); d^3.00 (|c|=0.41)
+- `sc_3dno1_2-1_casci_no_-_pur_avg` root 5: d^3.00 (|c|=0.39); d^3.00 (|c|=0.39)
+- `sc_3dno1_2-1_casci_no_-_pur_avg` root 6: d^3.00 (|c|=0.45); d^3.00 (|c|=0.45)
+- `sc_3dno1_2-1_casci_no_-_pur_avg` root 7: d^3.00 (|c|=0.49); d^3.00 (|c|=0.42)
+- `sc_3dno1_2-1_casci_no_-_pur_avg` root 8: d^3.00 (|c|=0.38); d^3.00 (|c|=0.37)
+- `sc_3d_2-1_casscf_ao_-_pol_avg` root 0: s^1.92p^0.35d^0.73 (|c|=0.77); s^1.90p^0.83d^0.27 (|c|=0.42)
+- `sc_3d_2-1_casscf_mo_-_pol_avg` root 0: s^2.00d^1.00 (|c|=0.95); p^2.00d^1.00 (|c|=0.18)
+- `sc_3d_2-1_casscf_moc_-_pol_avg` root 0: s^2.00d^1.00 (|c|=0.95); p^2.00d^1.00 (|c|=0.17)
+- `sc_3dno1_2-1_casscf_no_-_pol_avg` root 0: s^1.63p^0.74d^0.62 (|c|=0.56); s^1.63p^0.97d^0.40 (|c|=0.41)
+- `sc_3d_2-1_casscf_ao_virtmix_pol_avg` root 0: s^1.91p^0.30d^0.78 (|c|=0.79); s^1.87p^0.87d^0.25 (|c|=0.37)
+- `sc_3d_2-1_casscf_ao_-_pur_avg` root 0: s^1.50p^1.03d^0.47 (|c|=0.42); s^1.00p^1.44d^0.56 (|c|=0.36)
+- `sc_3d_2-1_casscf_mo_-_pur_avg` root 0: s^2.00d^1.00 (|c|=0.95); p^2.00d^1.00 (|c|=0.18)
+- `sc_3d_2-1_casscf_moc_-_pur_avg` root 0: s^2.00d^1.00 (|c|=0.95); p^2.00d^1.00 (|c|=0.17)
+- `sc_3dno1_2-1_casscf_no_-_pur_avg` root 0: s^0.86p^1.24d^0.91 (|c|=0.38); s^0.86p^1.24d^0.91 (|c|=0.36)
+- `sc_3d_2-1_casscf_ao_frozen_pol_avg` root 0: d^3.00 (|c|=0.37); d^3.00 (|c|=0.37)
+- `sc_3d_2-1_casscf_mo_frozen_pol_avg` root 0: s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.12)
+- `sc_3d_2-1_casscf_moc_frozen_pol_avg` root 0: s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.02)
+- `sc_3dno1_2-1_casscf_no_frozen_pol_avg` root 0: d^3.00 (|c|=0.49); d^3.00 (|c|=0.49)
+- `sc_3d_2-1_casscf_ao_frozen_pur_avg` root 0: d^3.00 (|c|=0.58); d^3.00 (|c|=0.58)
+- `sc_3d_2-1_casscf_mo_frozen_pur_avg` root 0: s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.12)
+- `sc_3d_2-1_casscf_moc_frozen_pur_avg` root 0: s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.02)
+- `sc_3dno1_2-1_casscf_no_frozen_pur_avg` root 0: d^3.00 (|c|=0.58); d^3.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_ao_-_pol_avg` root 0: s^1.59d^1.41 (|c|=0.55); s^1.38d^1.62 (|c|=0.39)
+- `sc_3d_2-1_sa-casscf_ao_-_pol_avg` root 1: s^1.59d^1.41 (|c|=0.53); s^1.15d^1.85 (|c|=0.32)
+- `sc_3d_2-1_sa-casscf_ao_-_pol_avg` root 2: s^1.41d^1.59 (|c|=0.67); s^0.96d^2.04 (|c|=0.41)
+- `sc_3d_2-1_sa-casscf_ao_-_pol_avg` root 3: s^1.38d^1.62 (|c|=0.53); s^1.38d^1.62 (|c|=0.43)
+- `sc_3d_2-1_sa-casscf_ao_-_pol_avg` root 4: s^0.75d^2.25 (|c|=0.37); s^0.75d^2.25 (|c|=0.37)
+- `sc_3d_2-1_sa-casscf_mo_-_pol_avg` root 0: s^1.99d^1.01 (|c|=0.95); p^2.00d^1.00 (|c|=0.19)
+- `sc_3d_2-1_sa-casscf_mo_-_pol_avg` root 1: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_-_pol_avg` root 2: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_-_pol_avg` root 3: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_-_pol_avg` root 4: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.45)
+- `sc_3d_2-1_sa-casscf_moc_-_pol_avg` root 0: s^2.00d^1.00 (|c|=1.00); s^1.00d^2.00 (|c|=0.04)
+- `sc_3d_2-1_sa-casscf_moc_-_pol_avg` root 1: s^2.00d^1.00 (|c|=1.00); s^1.00d^2.00 (|c|=0.04)
+- `sc_3d_2-1_sa-casscf_moc_-_pol_avg` root 2: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.07)
+- `sc_3d_2-1_sa-casscf_moc_-_pol_avg` root 3: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.08)
+- `sc_3d_2-1_sa-casscf_moc_-_pol_avg` root 4: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3dno1_2-1_sa-casscf_no_-_pol_avg` root 0: s^0.98d^2.02 (|c|=0.32); s^0.73d^2.27 (|c|=0.24)
+- `sc_3dno1_2-1_sa-casscf_no_-_pol_avg` root 1: s^1.17d^1.83 (|c|=0.52); s^0.88d^2.12 (|c|=0.34)
+- `sc_3dno1_2-1_sa-casscf_no_-_pol_avg` root 2: s^1.13d^1.87 (|c|=0.43); s^0.88d^2.12 (|c|=0.32)
+- `sc_3dno1_2-1_sa-casscf_no_-_pol_avg` root 3: s^0.98d^2.02 (|c|=0.34); s^1.04d^1.96 (|c|=0.34)
+- `sc_3dno1_2-1_sa-casscf_no_-_pol_avg` root 4: s^0.75d^2.25 (|c|=0.30); s^0.75d^2.25 (|c|=0.30)
+- `sc_3d_2-1_sa-casscf_ao_-_pur_avg` root 0: s^1.54d^1.46 (|c|=0.61); s^1.50d^1.50 (|c|=0.42)
+- `sc_3d_2-1_sa-casscf_ao_-_pur_avg` root 1: s^1.50d^1.50 (|c|=0.56); s^1.65d^1.35 (|c|=0.40)
+- `sc_3d_2-1_sa-casscf_ao_-_pur_avg` root 2: s^1.48d^1.52 (|c|=0.62); s^1.65d^1.35 (|c|=0.45)
+- `sc_3d_2-1_sa-casscf_ao_-_pur_avg` root 3: s^1.65d^1.35 (|c|=0.50); s^1.48d^1.52 (|c|=0.36)
+- `sc_3d_2-1_sa-casscf_ao_-_pur_avg` root 4: s^0.91d^2.09 (|c|=0.44); s^0.91d^2.09 (|c|=0.44)
+- `sc_3d_2-1_sa-casscf_mo_-_pur_avg` root 0: s^1.99d^1.01 (|c|=0.95); p^2.00d^1.00 (|c|=0.19)
+- `sc_3d_2-1_sa-casscf_mo_-_pur_avg` root 1: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_-_pur_avg` root 2: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_-_pur_avg` root 3: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_-_pur_avg` root 4: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.45)
+- `sc_3d_2-1_sa-casscf_moc_-_pur_avg` root 0: s^2.00d^1.00 (|c|=0.99); s^2.00d^1.00 (|c|=0.12)
+- `sc_3d_2-1_sa-casscf_moc_-_pur_avg` root 1: s^2.00d^1.00 (|c|=0.99); s^2.00d^1.00 (|c|=0.12)
+- `sc_3d_2-1_sa-casscf_moc_-_pur_avg` root 2: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.07)
+- `sc_3d_2-1_sa-casscf_moc_-_pur_avg` root 3: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.08)
+- `sc_3d_2-1_sa-casscf_moc_-_pur_avg` root 4: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3dno1_2-1_sa-casscf_no_-_pur_avg` root 0: s^1.35d^1.65 (|c|=0.63); s^0.99d^2.01 (|c|=0.44)
+- `sc_3dno1_2-1_sa-casscf_no_-_pur_avg` root 1: s^1.28d^1.72 (|c|=0.50); s^0.92d^2.08 (|c|=0.35)
+- `sc_3dno1_2-1_sa-casscf_no_-_pur_avg` root 2: s^1.54d^1.46 (|c|=0.62); s^1.18d^1.82 (|c|=0.47)
+- `sc_3dno1_2-1_sa-casscf_no_-_pur_avg` root 3: s^1.28d^1.72 (|c|=0.52); s^1.28d^1.72 (|c|=0.37)
+- `sc_3dno1_2-1_sa-casscf_no_-_pur_avg` root 4: s^0.91d^2.09 (|c|=0.39); s^0.91d^2.09 (|c|=0.39)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pol_avg` root 0: d^3.00 (|c|=0.48); d^3.00 (|c|=0.48)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pol_avg` root 1: d^3.00 (|c|=0.49); d^3.00 (|c|=0.49)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pol_avg` root 2: d^3.00 (|c|=0.36); d^3.00 (|c|=0.36)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pol_avg` root 3: d^3.00 (|c|=0.54); d^3.00 (|c|=0.54)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pol_avg` root 4: d^3.00 (|c|=0.43); d^3.00 (|c|=0.43)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pol_avg` root 0: s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.12)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pol_avg` root 1: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pol_avg` root 2: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pol_avg` root 3: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pol_avg` root 4: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pol_avg` root 0: s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.02)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pol_avg` root 1: s^2.00d^1.00 (|c|=1.00); s^1.00d^2.00 (|c|=0.03)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pol_avg` root 2: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.11)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pol_avg` root 3: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.11)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pol_avg` root 4: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pol_avg` root 0: d^3.00 (|c|=0.41); d^3.00 (|c|=0.41)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pol_avg` root 1: d^3.00 (|c|=0.49); d^3.00 (|c|=0.49)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pol_avg` root 2: d^3.00 (|c|=0.29); d^3.00 (|c|=0.29)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pol_avg` root 3: d^3.00 (|c|=0.55); d^3.00 (|c|=0.55)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pol_avg` root 4: d^3.00 (|c|=0.39); d^3.00 (|c|=0.39)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pur_avg` root 0: d^3.00 (|c|=0.42); d^3.00 (|c|=0.42)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pur_avg` root 1: d^3.00 (|c|=0.35); d^3.00 (|c|=0.35)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pur_avg` root 2: d^3.00 (|c|=0.32); d^3.00 (|c|=0.32)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pur_avg` root 3: d^3.00 (|c|=0.42); d^3.00 (|c|=0.42)
+- `sc_3d_2-1_sa-casscf_ao_frozen_pur_avg` root 4: d^3.00 (|c|=0.37); d^3.00 (|c|=0.37)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pur_avg` root 0: s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.12)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pur_avg` root 1: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pur_avg` root 2: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pur_avg` root 3: s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)
+- `sc_3d_2-1_sa-casscf_mo_frozen_pur_avg` root 4: s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pur_avg` root 0: s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.02)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pur_avg` root 1: s^2.00d^1.00 (|c|=1.00); s^1.00d^2.00 (|c|=0.03)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pur_avg` root 2: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.11)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pur_avg` root 3: s^2.00d^1.00 (|c|=0.99); s^1.00d^2.00 (|c|=0.11)
+- `sc_3d_2-1_sa-casscf_moc_frozen_pur_avg` root 4: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pur_avg` root 0: d^3.00 (|c|=0.39); d^3.00 (|c|=0.39)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pur_avg` root 1: d^3.00 (|c|=0.38); d^3.00 (|c|=0.38)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pur_avg` root 2: d^3.00 (|c|=0.36); d^3.00 (|c|=0.36)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pur_avg` root 3: d^3.00 (|c|=0.45); d^3.00 (|c|=0.45)
+- `sc_3dno1_2-1_sa-casscf_no_frozen_pur_avg` root 4: d^3.00 (|c|=0.34); d^3.00 (|c|=0.34)
+- `sc_3d4s_2-1_casscf_moc_-_pur_avg` root 0: s^2.00d^1.00 (|c|=0.95); p^2.00d^1.00 (|c|=0.17)
+- `sc_3d4s_2-1_casscf_moc_frozen_pol_avg` root 0: s^2.00d^1.00 (|c|=1.00); s^1.62d^1.38 (|c|=0.05)
+- `sc_3d4s_2-1_casscf_moc_frozen_pur_avg` root 0: s^2.00d^1.00 (|c|=1.00); s^1.62d^1.38 (|c|=0.05)
+- `sc_3d4s_2-1_sa-casscf_moc_-_pur_avg` root 0: s^1.99d^1.01 (|c|=0.88); s^1.99d^1.01 (|c|=0.33)
+- `sc_3d4s_2-1_sa-casscf_moc_-_pur_avg` root 1: s^1.99d^1.00 (|c|=0.89); s^1.99d^1.01 (|c|=0.35)
+- `sc_3d4s_2-1_sa-casscf_moc_-_pur_avg` root 2: s^1.99d^1.01 (|c|=0.83); s^1.99d^1.01 (|c|=0.37)
+- `sc_3d4s_2-1_sa-casscf_moc_-_pur_avg` root 3: s^1.00p^1.00d^1.01 (|c|=0.48); s^1.00p^1.00d^1.01 (|c|=0.48)
+- `sc_3d4s_2-1_sa-casscf_moc_-_pur_avg` root 4: s^1.00p^1.01d^1.00 (|c|=0.48); s^1.00p^1.01d^1.00 (|c|=0.48)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pol_avg` root 0: s^2.00d^1.00 (|c|=1.00); s^1.62d^1.38 (|c|=0.05)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pol_avg` root 1: s^2.00d^1.00 (|c|=0.99); s^1.81d^1.19 (|c|=0.09)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pol_avg` root 2: s^2.00d^1.00 (|c|=0.98); s^1.81d^1.19 (|c|=0.11)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pol_avg` root 3: s^1.81d^1.19 (|c|=0.57); s^1.81d^1.19 (|c|=0.57)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pol_avg` root 4: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pur_avg` root 0: s^2.00d^1.00 (|c|=1.00); s^1.62d^1.38 (|c|=0.05)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pur_avg` root 1: s^2.00d^1.00 (|c|=0.99); s^1.81d^1.19 (|c|=0.09)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pur_avg` root 2: s^2.00d^1.00 (|c|=0.98); s^1.81d^1.19 (|c|=0.11)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pur_avg` root 3: s^1.81d^1.19 (|c|=0.57); s^1.81d^1.19 (|c|=0.57)
+- `sc_3d4s_2-1_sa-casscf_moc_frozen_pur_avg` root 4: s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)
+- `sc_3d@ar_2-1_casci_ao_-_pol_avg` root 0: d^3.00 (|c|=0.38); d^3.00 (|c|=0.38)
+- `sc_3d@ar_2-1_casci_ao_-_pol_avg` root 1: d^3.00 (|c|=0.38); d^3.00 (|c|=0.38)
+- `sc_3d@ar_2-1_casci_ao_-_pol_avg` root 2: d^3.00 (|c|=0.50); d^3.00 (|c|=0.50)
+- `sc_3d@ar_2-1_casci_ao_-_pol_avg` root 3: d^3.00 (|c|=0.50); d^3.00 (|c|=0.50)
+- `sc_3d@ar_2-1_casci_ao_-_pol_avg` root 4: d^3.00 (|c|=0.58); d^3.00 (|c|=0.58)
+- `sc_3d@ar_2-1_casci_ao_-_pol_avg` root 5: d^3.00 (|c|=0.50); d^3.00 (|c|=0.50)
+- `sc_3d@ar_2-1_casci_ao_-_pol_avg` root 6: d^3.00 (|c|=0.57); d^3.00 (|c|=0.57)
+- `sc_3d@ar_2-1_casci_ao_-_pol_avg` root 7: d^3.00 (|c|=0.34); d^3.00 (|c|=0.32)
+- `sc_3d@ar_2-1_casci_ao_-_pol_avg` root 8: d^3.00 (|c|=0.47); d^3.00 (|c|=0.40)
+- `sc_3d@ar_2-1_casscf_ao_-_pol_avg` root 0: s^1.76p^0.48d^0.76 (|c|=0.68); s^1.57p^0.99d^0.44 (|c|=0.33)
+- `sc_3d@ar_2-1_sa-casscf_ao_-_pol_avg` root 0: s^1.74d^1.26 (|c|=0.72); s^1.76d^1.24 (|c|=0.48)
+- `sc_3d@ar_2-1_sa-casscf_ao_-_pol_avg` root 1: s^1.76d^1.24 (|c|=0.71); s^1.74d^1.26 (|c|=0.44)
+- `sc_3d@ar_2-1_sa-casscf_ao_-_pol_avg` root 2: s^1.73d^1.27 (|c|=0.71); s^1.70d^1.30 (|c|=0.40)
+- `sc_3d@ar_2-1_sa-casscf_ao_-_pol_avg` root 3: s^1.70d^1.30 (|c|=0.73); s^1.73d^1.27 (|c|=0.42)
+- `sc_3d@ar_2-1_sa-casscf_ao_-_pol_avg` root 4: s^0.89d^2.11 (|c|=0.52); s^0.89d^2.11 (|c|=0.52)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 
@@ -1261,3 +1503,5 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d4s@s2_2-1_sa-casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2_2-1_sa-casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2no2_2-1_sa-casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
+- `sc_3d@ar_2-1_casci_ao_-_pur_avg` E_term -759.43811690  ptp 4.5e-02  L2 ['12.000', '20.000', '12.000', '12.000', '12.000']  core 9p/span 0.9999
+- `sc_3d@ar_2-1_sa-casscf_ao_-_pur_avg` E_term -759.71306843  ptp 1.0e-01  L2 ['5.982', '4.952', '4.987', '1.972', '4.983']  core 9p/span 0.9999

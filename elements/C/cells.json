@@ -1919,6 +1919,542 @@
       ],
       "core_anisotropy": 0.0,
       "cell": "c_2pno1_2-0_casci_no_-_pur_avg"
+    },
+    "c_2p_2-0_casci_mo_-_pol_avg": {
+      "tag": "c_2p_2-0_casci_mo_-_pol_avg",
+      "kind": "casci",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 5.230952372742995e-15,
+      "e_ground": -37.6823646207117,
+      "energies_pyscf": [
+        -37.68241788145874,
+        -37.65356461374125,
+        -37.65356461374125
+      ],
+      "max_de_vs_pyscf": 5.3260747037597866e-05,
+      "ground_term": "3P",
+      "ground_l2": 1.9176097034353576,
+      "ground_lz2": 0.024159897180189294,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.006328179686222139,
+      "comm_norm_h_l2": 3.1375349223249276e-18,
+      "win_lz": 0.06443702188700871,
+      "win_lperp": 0.5704463659879841,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.0065653785219997e-33,
+        "p": 1.9999999999999993,
+        "d": 1.0565319926186187e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.95); p^2.00 (|c|=0.30)",
+        "p^2.00 (|c|=0.95); p^2.00 (|c|=0.30)"
+      ],
+      "core_anisotropy": 0.002404749164,
+      "cell": "c_2p_2-0_casci_mo_-_pol_avg"
+    },
+    "c_2p_2-0_casci_mo_-_pur_avg": {
+      "tag": "c_2p_2-0_casci_mo_-_pur_avg",
+      "kind": "casci",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.4500237371981208e-15,
+      "e_ground": -37.682391292682624,
+      "energies_pyscf": [
+        -37.682391292682624,
+        -37.65360308013441,
+        -37.65360308013441
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3P",
+      "ground_l2": 1.917609703435362,
+      "ground_lz2": 0.024159897180189474,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.006328156909766514,
+      "comm_norm_h_l2": 5.796669678311124e-18,
+      "win_lz": 0.0644370218870089,
+      "win_lperp": 0.5704463659879834,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.1941640832833103e-32,
+        "p": 2.000000000000001,
+        "d": 6.343950792365266e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.98); p^2.00 (|c|=0.21)",
+        "p^2.00 (|c|=0.98); p^2.00 (|c|=0.21)"
+      ],
+      "core_anisotropy": 0.0,
+      "cell": "c_2p_2-0_casci_mo_-_pur_avg"
+    },
+    "c_2p_2-0_casci_moc_-_pol_avg": {
+      "tag": "c_2p_2-0_casci_moc_-_pol_avg",
+      "kind": "casci",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.7763568394002505e-15,
+      "e_ground": -37.6823646207117,
+      "energies_pyscf": [
+        -37.68241788145874,
+        -37.012433198832674,
+        -37.012433198832674
+      ],
+      "max_de_vs_pyscf": 0.0001790980010341059,
+      "ground_term": "3S",
+      "ground_l2": 0.08239029656464147,
+      "ground_lz2": 0.0010380324474166258,
+      "terms": {
+        "3S": 1,
+        "3P": 2
+      },
+      "comm_norm_h_lz": 0.030532818652770757,
+      "comm_norm_h_l2": 4.941796313478383e-17,
+      "win_lz": 0.3108690861452044,
+      "win_lperp": 2.7520536377441274,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.0065653785219997e-33,
+        "p": 1.9999999999999993,
+        "d": 1.0565319926186187e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.98); p^2.00 (|c|=0.18)",
+        "p^2.00 (|c|=0.98); p^2.00 (|c|=0.18)"
+      ],
+      "core_anisotropy": 0.002404749164,
+      "cell": "c_2p_2-0_casci_moc_-_pol_avg"
+    },
+    "c_2p_2-0_casci_moc_-_pur_avg": {
+      "tag": "c_2p_2-0_casci_moc_-_pur_avg",
+      "kind": "casci",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.1205781986815308e-15,
+      "e_ground": -37.682391292682624,
+      "energies_pyscf": [
+        -37.682391292682624,
+        -37.01228046741896,
+        -37.01228046741896
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "3S",
+      "ground_l2": 0.08239029656464147,
+      "ground_lz2": 0.0010380324474168479,
+      "terms": {
+        "3S": 1,
+        "3P": 2
+      },
+      "comm_norm_h_lz": 0.030532832567224576,
+      "comm_norm_h_l2": 6.15871838915515e-17,
+      "win_lz": 0.3108690861452044,
+      "win_lperp": 2.752053637744127,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 3.6250199987231038e-34,
+        "p": 2.000000000000001,
+        "d": 1.0565319926186191e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.99); p^2.00 (|c|=0.10)",
+        "p^2.00 (|c|=0.99); p^2.00 (|c|=0.10)"
+      ],
+      "core_anisotropy": 0.0,
+      "cell": "c_2p_2-0_casci_moc_-_pur_avg"
+    },
+    "c_2p_2-0_casscf_moc_-_pol_avg": {
+      "tag": "c_2p_2-0_casscf_moc_-_pol_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 2,
+      "max_cycle": 50,
+      "conv_dE": 0.0,
+      "ortho_err": 1.3322676295501878e-15,
+      "e_ground": -37.6823646207117,
+      "energies_pyscf": [
+        -37.68241788145874
+      ],
+      "max_de_vs_pyscf": 5.3260747037597866e-05,
+      "ground_term": "3S",
+      "ground_l2": 0.08239029656464147,
+      "ground_lz2": 0.0010380324474166258,
+      "terms": {
+        "3S": 1,
+        "3P": 2
+      },
+      "comm_norm_h_lz": 0.030532818652770757,
+      "comm_norm_h_l2": 4.941796313478383e-17,
+      "win_lz": 0.3108690861452044,
+      "win_lperp": 2.7520536377441274,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.0065653785219997e-33,
+        "p": 1.9999999999999993,
+        "d": 1.0565319926186187e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p_2-0_casscf_moc_-_pol_avg"
+    },
+    "c_2p_2-0_casscf_moc_-_pur_avg": {
+      "tag": "c_2p_2-0_casscf_moc_-_pur_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 4,
+      "max_cycle": 50,
+      "conv_dE": 0.0,
+      "ortho_err": 2.1254320863492653e-15,
+      "e_ground": -37.68236462796855,
+      "energies_pyscf": [
+        -37.68241788145426
+      ],
+      "max_de_vs_pyscf": 5.325348571005861e-05,
+      "ground_term": "3S",
+      "ground_l2": 0.08239043933335578,
+      "ground_lz2": 0.0010380435350632474,
+      "terms": {
+        "3S": 1,
+        "3P": 2
+      },
+      "comm_norm_h_lz": 0.030532982016803246,
+      "comm_norm_h_l2": 1.763722214485487e-11,
+      "win_lz": 0.3108697175269718,
+      "win_lperp": 2.7520534626695423,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.1595022296263965e-33,
+        "p": 2.0000000000000013,
+        "d": 1.0756710282264742e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p_2-0_casscf_moc_-_pur_avg"
+    },
+    "c_2p_2-0_casscf_moc_frozen_pol_avg": {
+      "tag": "c_2p_2-0_casscf_moc_frozen_pol_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 2,
+      "max_cycle": 50,
+      "conv_dE": 0.0,
+      "ortho_err": 1.4432899320127035e-15,
+      "e_ground": -37.6823646207117,
+      "energies_pyscf": [
+        -37.68241788145874
+      ],
+      "max_de_vs_pyscf": 5.3260747037597866e-05,
+      "ground_term": "3S",
+      "ground_l2": 0.08239029656464147,
+      "ground_lz2": 0.0010380324474166258,
+      "terms": {
+        "3S": 1,
+        "3P": 2
+      },
+      "comm_norm_h_lz": 0.030532818652770757,
+      "comm_norm_h_l2": 4.941796313478383e-17,
+      "win_lz": 0.3108690861452044,
+      "win_lperp": 2.7520536377441274,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.0065653785219997e-33,
+        "p": 1.9999999999999993,
+        "d": 1.0565319926186187e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p_2-0_casscf_moc_frozen_pol_avg"
+    },
+    "c_2p_2-0_casscf_moc_frozen_pur_avg": {
+      "tag": "c_2p_2-0_casscf_moc_frozen_pur_avg",
+      "kind": "casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 4,
+      "max_cycle": 50,
+      "conv_dE": 0.0,
+      "ortho_err": 2.161781396723815e-15,
+      "e_ground": -37.68236462798081,
+      "energies_pyscf": [
+        -37.682417881453986
+      ],
+      "max_de_vs_pyscf": 5.3253473176084754e-05,
+      "ground_term": "3S",
+      "ground_l2": 0.08239029656464147,
+      "ground_lz2": 0.0010380324474168479,
+      "terms": {
+        "3S": 1,
+        "3P": 2
+      },
+      "comm_norm_h_lz": 0.030532818998485794,
+      "comm_norm_h_l2": 8.920464174725741e-17,
+      "win_lz": 0.3108690861452044,
+      "win_lperp": 2.752053637744127,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 3.6250199987231038e-34,
+        "p": 2.000000000000001,
+        "d": 1.0565319926186191e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "cell": "c_2p_2-0_casscf_moc_frozen_pur_avg"
+    },
+    "c_2p_2-0_sa-casscf_moc_-_pol_avg": {
+      "tag": "c_2p_2-0_sa-casscf_moc_-_pol_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 24,
+      "max_cycle": 50,
+      "conv_dE": 0.0,
+      "ortho_err": 1.9984014443252818e-15,
+      "e_ground": -37.6823912926995,
+      "energies_pyscf": [
+        -37.68239139998282,
+        -37.68239123905619,
+        -37.68239123905619
+      ],
+      "max_de_vs_pyscf": 1.0728332000553564e-07,
+      "ground_term": "3P",
+      "ground_l2": 1.9999999999940343,
+      "ground_lz2": 0.02519792956693112,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 3.6086434217691444e-13,
+      "comm_norm_h_l2": 9.205679070276245e-29,
+      "win_lz": 5.483410409896826e-07,
+      "win_lperp": 4.854339071818028e-06,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 5.2984610651733696e-24,
+        "p": 1.9999999999999987,
+        "d": 9.394303348053985e-25
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.90); p^2.00 (|c|=0.43)",
+        "p^2.00 (|c|=0.90); p^2.00 (|c|=0.43)"
+      ],
+      "cell": "c_2p_2-0_sa-casscf_moc_-_pol_avg"
+    },
+    "c_2p_2-0_sa-casscf_moc_-_pur_avg": {
+      "tag": "c_2p_2-0_sa-casscf_moc_-_pur_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 24,
+      "max_cycle": 50,
+      "conv_dE": 0.0,
+      "ortho_err": 2.1600278046534835e-15,
+      "e_ground": -37.68239129282323,
+      "energies_pyscf": [
+        -37.68239129876432,
+        -37.68239128988708,
+        -37.682391289818256
+      ],
+      "max_de_vs_pyscf": 5.941089398220356e-09,
+      "ground_term": "3P",
+      "ground_l2": 1.9999999999997085,
+      "ground_lz2": 0.982974093116866,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 2.881203084169295e-14,
+      "comm_norm_h_l2": 4.300358283257398e-27,
+      "win_lz": 9.926101291166125e-07,
+      "win_lperp": 7.873702924454157e-07,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 9.1958264116396e-27,
+        "p": 2.000000000000002,
+        "d": 3.731205546987849e-27
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.05)",
+        "p^2.00 (|c|=0.99); p^2.00 (|c|=0.14)",
+        "p^2.00 (|c|=0.99); p^2.00 (|c|=0.14)"
+      ],
+      "cell": "c_2p_2-0_sa-casscf_moc_-_pur_avg"
+    },
+    "c_2p_2-0_sa-casscf_moc_frozen_pol_avg": {
+      "tag": "c_2p_2-0_sa-casscf_moc_frozen_pol_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 4,
+      "max_cycle": 50,
+      "conv_dE": 0.0,
+      "ortho_err": 1.5543122344752192e-15,
+      "e_ground": -37.68213390104458,
+      "energies_pyscf": [
+        -37.68227221217914,
+        -37.01272380690835,
+        -37.01272380690834
+      ],
+      "max_de_vs_pyscf": 0.0005591849145645256,
+      "ground_term": "3S",
+      "ground_l2": 0.08239029656464147,
+      "ground_lz2": 0.0010380324474166258,
+      "terms": {
+        "3S": 1,
+        "3P": 2
+      },
+      "comm_norm_h_lz": 0.030526383176086712,
+      "comm_norm_h_l2": 9.793072694144985e-17,
+      "win_lz": 0.3108690861452044,
+      "win_lperp": 2.7520536377441274,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 2.0065653785219997e-33,
+        "p": 1.9999999999999993,
+        "d": 1.0565319926186187e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.90); p^2.00 (|c|=0.44)",
+        "p^2.00 (|c|=0.90); p^2.00 (|c|=0.44)"
+      ],
+      "cell": "c_2p_2-0_sa-casscf_moc_frozen_pol_avg"
+    },
+    "c_2p_2-0_sa-casscf_moc_frozen_pur_avg": {
+      "tag": "c_2p_2-0_sa-casscf_moc_frozen_pur_avg",
+      "kind": "sa-casscf",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": 5,
+      "max_cycle": 50,
+      "conv_dE": 0.0,
+      "ortho_err": 2.147554126701044e-15,
+      "e_ground": -37.68213373103263,
+      "energies_pyscf": [
+        -37.68227208031232,
+        -37.01272388817684,
+        -37.012723857593
+      ],
+      "max_de_vs_pyscf": 0.0005593712783706906,
+      "ground_term": "3S",
+      "ground_l2": 0.08239029656464147,
+      "ground_lz2": 0.0010380324474168479,
+      "terms": {
+        "3S": 1,
+        "3P": 2
+      },
+      "comm_norm_h_lz": 0.030526380218234134,
+      "comm_norm_h_l2": 8.312887895968491e-17,
+      "win_lz": 0.3108690861452044,
+      "win_lperp": 2.752053637744127,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 3.62501976765131e-34,
+        "p": 2.000000000000001,
+        "d": 1.0565319919326872e-31
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=0.98); p^2.00 (|c|=0.21)",
+        "p^2.00 (|c|=0.98); p^2.00 (|c|=0.21)"
+      ],
+      "cell": "c_2p_2-0_sa-casscf_moc_frozen_pur_avg"
     }
   },
   "uhf": {

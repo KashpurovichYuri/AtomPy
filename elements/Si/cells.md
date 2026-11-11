@@ -42,6 +42,18 @@ ROHF reference energy: -288.84643692 Eh
 | si_3p@1s2s2p3s_2-0_sa-casscf_ao_-_pol_avg | -288.84639779 | -2.216e-01 | 2.00000 | 1.74e-16 | 1.77e-32 | 1.6e-14 | 1.3e-14 | 1.000 | nan | 0.0e+00 | 4.5e-15 |  |
 | si_3pno1_2-0_casci_no_-_pol_avg | -288.62479155 | 2.664e-05 | 1.99999 | 2.86e-05 | 1.92e-20 | 3.6e-03 | 4.3e-03 | 1.000 | 2.1e-03 | 1.2e-04 | 1.9e-15 |  |
 | si_3pno1_2-0_casci_no_-_pur_avg | -288.62480814 | 1.004e-05 | 2.00000 | 1.57e-15 | 0.00e+00 | 1.1e-15 | 1.8e-15 | 1.000 | 0.0e+00 | 0.0e+00 | 2.2e-15 |  |
+| si_3p_2-0_casci_mo_-_pol_avg | -288.84635191 | -2.215e-01 | 1.95972 | 1.24e-02 | 3.07e-18 | 2.6e-01 | 3.1e-01 | 1.000 | 2.1e-03 | 8.5e-05 | 4.7e-15 |  |
+| si_3p_2-0_casci_mo_-_pur_avg | -288.84639706 | -2.216e-01 | 1.95972 | 1.25e-02 | 2.78e-18 | 2.6e-01 | 3.1e-01 | 1.000 | 0.0e+00 | 0.0e+00 | 2.0e-15 |  |
+| si_3p_2-0_casci_moc_-_pol_avg | -288.84635191 | -2.215e-01 | 0.04028 | 8.70e-02 | 1.76e-16 | 1.8e+00 | 2.1e+00 | 1.000 | 2.1e-03 | 1.1e-04 | 5.9e-15 |  |
+| si_3p_2-0_casci_moc_-_pur_avg | -288.84639707 | -2.216e-01 | 0.04028 | 8.70e-02 | 1.85e-16 | 1.8e+00 | 2.1e+00 | 1.000 | 0.0e+00 | 0.0e+00 | 1.8e-15 |  |
+| si_3p_2-0_casscf_moc_-_pol_avg | -288.84635191 | -2.215e-01 | 0.04028 | 8.70e-02 | 4.95e-17 | 1.8e+00 | 2.1e+00 | 1.000 | nan | 8.5e-05 | 6.7e-15 |  |
+| si_3p_2-0_casscf_moc_-_pur_avg | -288.84635191 | -2.215e-01 | 0.03871 | 8.54e-02 | 2.33e-07 | 1.8e+00 | 2.1e+00 | 1.000 | nan | 8.5e-05 | 1.6e-15 |  |
+| si_3p_2-0_casscf_moc_frozen_pol_avg | -288.84635191 | -2.215e-01 | 0.04028 | 8.70e-02 | 2.08e-16 | 1.8e+00 | 2.1e+00 | 1.000 | nan | 8.5e-05 | 6.3e-15 |  |
+| si_3p_2-0_casscf_moc_frozen_pur_avg | -288.84637067 | -2.216e-01 | 0.04028 | 8.70e-02 | 1.58e-16 | 1.8e+00 | 2.1e+00 | 1.000 | nan | 5.1e-05 | 2.0e-15 |  |
+| si_3p_2-0_sa-casscf_moc_-_pol_avg | -288.84639779 | -2.216e-01 | 2.00000 | 2.91e-09 | 2.00e-24 | 2.2e-06 | 2.6e-06 | 1.000 | nan | 7.8e-10 | 6.2e-15 |  |
+| si_3p_2-0_sa-casscf_moc_-_pur_avg | -288.84639779 | -2.216e-01 | 2.00000 | 5.82e-10 | 1.52e-23 | 1.0e-06 | 1.5e-06 | 1.000 | nan | 2.4e-10 | 1.1e-14 |  |
+| si_3p_2-0_sa-casscf_moc_frozen_pol_avg | -288.84608813 | -2.213e-01 | 0.04028 | 8.70e-02 | 7.14e-17 | 1.8e+00 | 2.1e+00 | 1.000 | nan | 5.4e-04 | 5.8e-15 |  |
+| si_3p_2-0_sa-casscf_moc_frozen_pur_avg | -288.84610657 | -2.213e-01 | 0.04028 | 8.70e-02 | 3.83e-16 | 1.8e+00 | 2.1e+00 | 1.000 | nan | 5.7e-04 | 2.0e-15 |  |
 
 configurations per root (top-2 determinants):
 
@@ -123,6 +135,34 @@ configurations per root (top-2 determinants):
 - `si_3pno1_2-0_casci_no_-_pur_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
 - `si_3pno1_2-0_casci_no_-_pur_avg` root 1: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
 - `si_3pno1_2-0_casci_no_-_pur_avg` root 2: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_casci_mo_-_pol_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_casci_mo_-_pol_avg` root 1: p^2.00 (|c|=1.00); p^2.00 (|c|=0.02)
+- `si_3p_2-0_casci_mo_-_pol_avg` root 2: p^2.00 (|c|=1.00); p^2.00 (|c|=0.02)
+- `si_3p_2-0_casci_mo_-_pur_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_casci_mo_-_pur_avg` root 1: p^2.00 (|c|=1.00); p^2.00 (|c|=0.08)
+- `si_3p_2-0_casci_mo_-_pur_avg` root 2: p^2.00 (|c|=1.00); p^2.00 (|c|=0.08)
+- `si_3p_2-0_casci_moc_-_pol_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_casci_moc_-_pol_avg` root 1: p^2.00 (|c|=1.00); p^2.00 (|c|=0.08)
+- `si_3p_2-0_casci_moc_-_pol_avg` root 2: p^2.00 (|c|=1.00); p^2.00 (|c|=0.08)
+- `si_3p_2-0_casci_moc_-_pur_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_casci_moc_-_pur_avg` root 1: p^2.00 (|c|=1.00); p^2.00 (|c|=0.05)
+- `si_3p_2-0_casci_moc_-_pur_avg` root 2: p^2.00 (|c|=1.00); p^2.00 (|c|=0.05)
+- `si_3p_2-0_casscf_moc_-_pol_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_casscf_moc_-_pur_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_casscf_moc_frozen_pol_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_casscf_moc_frozen_pur_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_sa-casscf_moc_-_pol_avg` root 0: p^2.00 (|c|=0.99); p^2.00 (|c|=0.11)
+- `si_3p_2-0_sa-casscf_moc_-_pol_avg` root 1: p^2.00 (|c|=0.99); p^2.00 (|c|=0.11)
+- `si_3p_2-0_sa-casscf_moc_-_pol_avg` root 2: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_sa-casscf_moc_-_pur_avg` root 0: p^2.00 (|c|=0.99); p^2.00 (|c|=0.12)
+- `si_3p_2-0_sa-casscf_moc_-_pur_avg` root 1: p^2.00 (|c|=1.00); p^2.00 (|c|=0.06)
+- `si_3p_2-0_sa-casscf_moc_-_pur_avg` root 2: p^2.00 (|c|=0.99); p^2.00 (|c|=0.12)
+- `si_3p_2-0_sa-casscf_moc_frozen_pol_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_sa-casscf_moc_frozen_pol_avg` root 1: p^2.00 (|c|=0.86); p^2.00 (|c|=0.51)
+- `si_3p_2-0_sa-casscf_moc_frozen_pol_avg` root 2: p^2.00 (|c|=0.86); p^2.00 (|c|=0.51)
+- `si_3p_2-0_sa-casscf_moc_frozen_pur_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3p_2-0_sa-casscf_moc_frozen_pur_avg` root 1: p^2.00 (|c|=1.00); p^2.00 (|c|=0.03)
+- `si_3p_2-0_sa-casscf_moc_frozen_pur_avg` root 2: p^2.00 (|c|=1.00); p^2.00 (|c|=0.03)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 
