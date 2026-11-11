@@ -1,4 +1,4 @@
-"""Render the method-ladder section of an element's TABLE.md from its
+"""Render the methods-table section of an element's TABLE.md from its
 cells.json payloads -- the key-addressed provenance (the render
 contract: the table and its source cannot diverge).
 
@@ -8,11 +8,11 @@ THE ONE LADDER TABLE (the element file IS the table): every run cell
 of the atom a row, ROHF anchor first, the UHF anchor beside it when
 the store carries the record; families in declaration order,
 separated by the rule row -- the lattice spans (CI only), the
-primary window (each fold group's CASCI BESIDE its optimizer
+primary window (each core group's CASCI BESIDE its optimizer
 variants -- CI interleaved, the row-collapse policy is DELETED),
 then every lane window whose route twins ran (the pinned and free
 CI, the free CASSCF/SA, the pinned SA).  NO-start cells are not
-ladder rows.  The PLANNED windows follow as pointers when gated
+methods rows.  The PLANNED windows follow as pointers when gated
 (declared, not yet run -- one regen away).
 
 No verdict column: the classes and their row-level discriminators
@@ -27,7 +27,7 @@ re-state them. Two operational rules it does own:
 - the anchor line in each caption is COMPUTED from the store's
   ``rohf_energy`` (Eh + eV), never typed;
 - rows branch on key IDENTITY only (method/start/mask/substrate/
-  fold) and on the ROW POLICY; order and grouping live once in the
+  core) and on the ROW POLICY; order and grouping live once in the
   declaration builder (cells.window_grid / cells.route_keys) -- this
   renderer receives ready-made key lists and formats.
 
@@ -35,7 +35,7 @@ Applicability: any declared atom (``cases.CAMPAIGN``; windows and
 cell addresses derive from the declaration -- this file owns
 presentation only: headings, notes, value formatting).
 
-ladder edit protocol lives here: sections are rebuilt from constructed
+methods-table edit protocol lives here: sections are rebuilt from constructed
 blocks, structural assertions checked (each heading once, row counts,
 no pending rows), temp file + verified move.
 """
@@ -53,7 +53,7 @@ from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.cells import (grid_keys, lattice_keys,  # noqa: E402
                             prior_tag_of, route_keys, window_grid)
 from _tables_common import (DASH, EV, cas_label,  # noqa: E402
-                            comm_cell, conv_cell, fold_col,
+                            comm_cell, conv_cell, core_col,
                             l2_text, minus, payload_of, replace_block)
 BOUNDARY = "## Studies (frozen history; ticket 28)"
 POINTER = ("Declared, not yet run -- the optimizer cells are void "
@@ -61,14 +61,14 @@ POINTER = ("Declared, not yet run -- the optimizer cells are void "
            "scenario). One regen away: `regen_cells.py {atom} "
            "--window {window}`.")
 
-# the ladder grammar (one shape with the CAS ladder table); the
+# the methods-table grammar (one shape with the CAS table); the
 # family separator row renders as a horizontal rule mid-table
-HEAD = ("| method | route | window | CAS | fold | dets | E, Eh | "
+HEAD = ("| method | route | window | CAS | core | dets | E, Eh | "
         "ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | "
         "‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |")
 SEP = "|" + "---|" * 18
 RULE = "|" + " --- |" * 18
-BEGIN, END = "<!-- ladder:begin -->", "<!-- ladder:end -->"
+BEGIN, END = "<!-- methods:begin -->", "<!-- methods:end -->"
 
 # identity -> display (the ONLY branching the renderer does)
 METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
@@ -79,15 +79,15 @@ MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
               "virtmix": "virtual-mix"}
 
 
-CSV_HEADER = ["method", "route", "window", "CAS", "fold", "dets", "E_Eh",
+CSV_HEADER = ["method", "route", "window", "CAS", "core", "dets", "E_Eh",
               "dE_mEh", "E_eV", "dE_eV", "conv", "L2", "ptp_Eh", "PLz",
               "PLperp", "HLz", "HL2", "note"]
 
 
 def csv_of(body: str) -> str:
-    """The CSV mirror of the ladder table: the same data rows (the
+    """The CSV mirror of the methods table: the same data rows (the
     rule rows and the markdown furniture dropped), ASCII header
-    names, csv-quoted (the braced folds carry commas)."""
+    names, csv-quoted (the braced cores carry commas)."""
     import csv
     import io
     out = io.StringIO()
@@ -107,7 +107,7 @@ def csv_of(body: str) -> str:
 
 def _method(k) -> str:
     """The method column: the objective + its restriction only (the
-    start rides in the window cell, the substrate in the fold
+    start rides in the window cell, the substrate in the core
     column; an unrestricted optimizer names nothing beyond its
     method)."""
     name = METHOD_NAMES[k.method]
@@ -129,13 +129,13 @@ def _num(v, fmt) -> str:
 
 
 def _row(k, p, anchor, spec) -> str:
-    """One run cell in the ladder columns -- every run cell a row,
-    fully identified (method, route, window/start, CAS, fold)."""
-    route = ("pinned" if k.fold_tag is not None and k.substrate == "pur"
+    """One run cell in the methods table's columns -- every run cell a row,
+    fully identified (method, route, window/start, CAS, core)."""
+    route = ("pinned" if k.core_tag is not None and k.substrate == "pur"
              else "free")
-    fold = fold_col(k, spec)
-    if k.fold_tag is not None:
-        fold += "·lane"     # the raw-shell Loewdin fold, not the prefix
+    core = core_col(k, spec)
+    if k.core_tag is not None:
+        core += "·lane"     # the raw-shell Loewdin core, not the prefix
     e = _e0(p)
     de = e - anchor
     ptp = p.get("ptp")
@@ -168,7 +168,7 @@ def _row(k, p, anchor, spec) -> str:
         wname = (spec.window_names or {}).get(k.span_label, k.span_label)
     cells = [
         _method(k), route, f"{wname} / {START_NAMES[k.start]}",
-        cas_label(k, spec), fold, f"{p['n_det']:,}",
+        cas_label(k, spec), core, f"{p['n_det']:,}",
         f"{e:.4f}", f"{de * 1e3:+.1f}", f"{e * EV:.4f}",
         f"{de * EV:+.4f}", conv_cell(p), l2_text(p),
         _num(ptp, ".0e"),
@@ -184,7 +184,7 @@ def _row(k, p, anchor, spec) -> str:
     return "| " + " | ".join(cells) + " |"
 
 
-def _ladder_row(k) -> bool:
+def _method_row(k) -> bool:
     """The methods-row policy, ONE home: the table renders the
     COMPARISON classes -- the distilled start, the SCF controls, the
     treatments.  A NO-start cell never renders (the density leg is
@@ -196,11 +196,11 @@ def _ladder_row(k) -> bool:
 
 
 def _rows(keys, cells, anchor, spec) -> list[str]:
-    """Every RUN cell of the key set (the :func:`_ladder_row` policy),
+    """Every RUN cell of the key set (the :func:`_method_row` policy),
     in the given order."""
     return [_row(k, p, anchor, spec)
             for k in keys
-            if _ladder_row(k)
+            if _method_row(k)
             and (p := payload_of(cells, k)) is not None]
 
 
@@ -248,7 +248,7 @@ def _comparison_key(k):
     return (0, block, k_rank, src, k.start)
 
 
-def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
+def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     """THE METHODS TABLE: one table for the whole atom.  Families in
     declaration order, separated by the rule row -- the lattice
     spans (the distilled CI row per span), the primary window when
@@ -277,7 +277,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
 
     def _fam(keys) -> None:
         rows = _rows(sorted([k for k in keys
-                             if k.address not in seen and _ladder_row(k)],
+                             if k.address not in seen and _method_row(k)],
                             key=_comparison_key),
                      cells, anchor, spec)
         seen.update(k.address for k in keys)
@@ -297,7 +297,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
             continue
         priors.setdefault(w.partition("@")[0], []).extend(
             k for k in window_grid(spec, w)
-            if k.start == "ao" and k.fold == "avg" and k.substrate == "pol")
+            if k.start == "ao" and k.core == "avg" and k.substrate == "pol")
     primary_span = "".join(spec.shell_patterns) if spec.render_primary \
         else None
 
@@ -319,12 +319,12 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     # the results; the primary rows stay in the store)
     if spec.render_primary:
         grid = [k for k in grid_keys(spec)
-                if _ladder_row(k) and k.fold != "frac"]
+                if _method_row(k) and k.core != "frac"]
         join = [k for k in priors.get(primary_span, [])
                 if k.sector == grid[0].sector]
         groups: dict[str, list] = {}
         for k in [*grid, *join]:
-            groups.setdefault(fold_col(k, spec), []).append(k)
+            groups.setdefault(core_col(k, spec), []).append(k)
         for keys in groups.values():
             _fam(keys)
 
@@ -335,8 +335,8 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         # the family renders when ANY twin ran (the validation atoms'
         # pinned leg alone is their story; the campaign atoms' route
         # studies render the fuller family)
-        if any(_ladder_row(k) and payload_of(cells, k) for k in twins):
-            _fam([k for k in twins if _ladder_row(k)])
+        if any(_method_row(k) and payload_of(cells, k) for k in twins):
+            _fam([k for k in twins if _method_row(k)])
 
     # the planned windows that did not join a family above: the
     # untagged tiers (their own families, as declared) and any prior
@@ -348,7 +348,7 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
             if not keys:
                 continue
         else:
-            keys = [k for k in window_grid(spec, w) if _ladder_row(k)]
+            keys = [k for k in window_grid(spec, w) if _method_row(k)]
         _fam(keys)
 
     out = [BEGIN, HEAD, SEP, _anchor_row(anchor, spec)]
@@ -364,8 +364,8 @@ def ladder_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
 
 
 def main(atom: str) -> None:
-    """Rebuild ``<atom>``'s ladder block (the one table) from
-    cells.json under the ladder edit protocol (the marker pair;
+    """Rebuild ``<atom>``'s methods block (the one table) from
+    cells.json under the methods-table edit protocol (the marker pair;
     structural checks; verified move) and write the CSV mirror."""
     src = Path(f"elements/{atom}/TABLE.md")
     if not src.exists():
@@ -375,10 +375,10 @@ def main(atom: str) -> None:
     cells, anchor = data["cells"], data["rohf_energy"]
     spec = campaign_spec(atom)
 
-    body = "\n".join(ladder_section(spec, cells, anchor,
+    body = "\n".join(methods_section(spec, cells, anchor,
                                     uhf=data.get("uhf")))
 
-    # structural assertions (the ladder protocol): no pending rows,
+    # structural assertions (the table protocol): no pending rows,
     # no starred gauge numbers, every table row well-formed
     assert "pending" not in body
     assert not re.search(r"\d\*", body)      # no starred gauge numbers
@@ -390,7 +390,7 @@ def main(atom: str) -> None:
     src.with_suffix(".csv").write_text(csv_of(body))
     n = sum(1 for line in body.splitlines()
             if line.startswith(("| CASCI", "| CASSCF", "| SA-CASSCF")))
-    print(f"{src}: ladder rendered ({n} run rows) + TABLE.csv mirror")
+    print(f"{src}: methods table rendered ({n} run rows) + TABLE.csv mirror")
 
 
 if __name__ == "__main__":

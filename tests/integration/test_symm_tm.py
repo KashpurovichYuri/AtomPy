@@ -8,7 +8,7 @@ the anchor holds at machine precision as on the p shells.
 The head-to-head, though, splits by atom.  On Sc (d1) the routes
 agree as on C/Si.  On Ti (d2) the free SA escapes the declared
 {3d,4s} window by a CORE<->ACTIVE SWAP, measured on the inactive
-block (Ar s:3 p:6 -> s:4 p:5): the 4s pair rotates INTO the fold,
+block (Ar s:3 p:6 -> s:4 p:5): the 4s pair rotates INTO the core,
 one semi-core 3p orbital -- with its electron pair, 0.998 pure by
 AO content -- rotates INTO the active, buying the 3p-3d semi-core
 correlation at the price of a torn m-set (certificates O(1),
@@ -24,11 +24,11 @@ Windows, sectors, weights, and the term target (L, parity) derive
 from the CAMPAIGN declaration; the ground terms' 2S(2S+1) is test
 data, the same kind of row test_atoms carries.
 
-The CAS ladder extends the survey across the WINDOW FAMILIES
+The CAS survey extends the survey across the WINDOW FAMILIES
 (declared / valence / semi-core / the M shell): the TERM energy per
 window at frozen shells under one uniform construction -- the
 PRODUCTION lane runner (cells.run_lane_cell; the legs and their
-folds are declared data), certified here: every m-complete window
+cores are declared data), certified here: every m-complete window
 hosts its term exactly; the ordering, margins, and the cross-atom
 scaling are the recorded verdicts (elements/Ti,Sc TABLE.md).  The
 planned {3d,4d} leg is read as declared (a dead-zone window) and
@@ -118,7 +118,7 @@ def tm_lane(request):
     matrices -- everything but
     the term table derived from the CAMPAIGN declaration.  Any
     converged reference of the right charge works on either side:
-    the whole active set sits in the window, so the fold sees only
+    the whole active set sits in the window, so the core sees only
     the closed noble-gas core."""
     name = request.param
     spec = CAMPAIGN[name]
@@ -141,7 +141,7 @@ def test_tm_runner_anchor(tm_lane):
     # Ti); every root reads the term exactly by OUR meters -- the
     # runner's documented "lowest per block = the term" assumption,
     # verified, not assumed; the components are degenerate on the
-    # m-scalar fold
+    # m-scalar core
     name, spec, term, _, _, mol_d2h, mf_d2h, c_act, orbsyms, ops, na, nb = tm_lane
     l2 = term["L"] * (term["L"] + 1)
     roots = run_irrep_casci(mol_d2h, mf_d2h, c_act, spec.ncore, na, nb,
@@ -163,7 +163,7 @@ def test_tm_runner_anchor(tm_lane):
                 (name, irrep, k)
         e_all.append(e)
     e_all = np.concatenate(e_all)
-    # the components degenerate on the m-scalar fold (observed Sc
+    # the components degenerate on the m-scalar core (observed Sc
     # 1.2e-14, Ti 9.8e-15)
     assert np.ptp(e_all) < 1e-9, name
 
@@ -175,7 +175,7 @@ def test_tm_sa_head_to_head(tm_lane, tmp_path):
     # not membership alone: on the recorded Ti draw all 7 free-route
     # roots still read <L^2> = 12 while the free optimizer had
     # performed a CORE<->ACTIVE SWAP (measured below: the inactive
-    # block's Ar s:3 p:6 -> s:4 p:5) -- the 4s pair into the fold,
+    # block's Ar s:3 p:6 -> s:4 p:5) -- the 4s pair into the core,
     # one semi-core 3p orbital with its pair into the active,
     # certificates O(1), multiplet split 3.1e-3; the production
     # tables record the same basin.  The pinned route's
@@ -264,7 +264,7 @@ def test_tm_sa_head_to_head(tm_lane, tmp_path):
         assert ens_free < pinned_sa["e_tot"], name
         if swapped:
             # THE MECHANISM, pinned: the core<->active swap -- the
-            # 4s pair into the fold, one semi-core 3p orbital (with
+            # 4s pair into the core, one semi-core 3p orbital (with
             # its pair) into the active (observed 0.998 pure 3p)
             _assert_inact(4, 5, "swap")
             rows_3p = select_shell_ao(mol_c1, "3p")
@@ -278,16 +278,16 @@ def test_tm_sa_head_to_head(tm_lane, tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# The CAS ladder: the pinned route's TERM-energy survey across the
+# The CAS survey: the pinned route's TERM-energy survey across the
 # window families (declared / valence / semi-core / the M shell), CI
 # level at frozen shells, ONE uniform construction -- the PRODUCTION
 # lane runner (cells.run_lane_cell over cells.lane_keys; the legs and
-# folds are declared data: CAMPAIGN.lane_windows + .term).  The
+# cores are declared data: CAMPAIGN.lane_windows + .term).  The
 # energies are TERM energies, not sector grounds: each window's 2L+1
 # branch components are solved and averaged, the total = component
-# mean + the fold-independent bookkeeping ruler, so CROSS-FOLD legs
+# mean + the core-independent bookkeeping ruler, so CROSS-FOLD legs
 # compare.  Everything is draw-free (raw AO spans on both sides of the
-# fold), so the legs are deterministic.
+# core), so the legs are deterministic.
 
 # lane-window label -> leg tag (the reading key of the pins below)
 _LEG_TAGS = {
@@ -299,7 +299,7 @@ _LEG_TAGS = {
 
 
 class LadderLeg(NamedTuple):
-    """One ladder leg's result: the term total (the fold-independent
+    """One survey leg's result: the term total (the core-independent
     ruler), the component spread, the per-root meters, and (on the
     anchored leg) the ours-vs-solver block deviation."""
 
@@ -335,7 +335,7 @@ def cas_ladder(tmp_path_factory):
 def test_cas_ladder_terms(cas_ladder):
     # every m-complete window hosts the term EXACTLY: all 2L+1
     # branch components read L(L+1) and S(S+1) to machine precision and
-    # sit degenerate (the uniform placement + m-scalar fold; observed
+    # sit degenerate (the uniform placement + m-scalar core; observed
     # ptp <= 3.3e-13); the planned {3d,4d} leg is exempt -- its
     # reading is pinned separately
     for (name, tag), leg in cas_ladder.items():
@@ -368,7 +368,7 @@ def test_cas_ladder_ordering(cas_ladder):
 
 
 def test_cas_ladder_4s_stays_folded(cas_ladder):
-    # the 4s pair stays in the fold: giving it back the window buys
+    # the 4s pair stays in the core: giving it back the window buys
     # <= 2 mEh on top of the semi-core window (observed 0.94)
     gap = (cas_ladder[("Ti", "semicore_4s")].total
            - cas_ladder[("Ti", "semicore")].total)
@@ -376,7 +376,7 @@ def test_cas_ladder_4s_stays_folded(cas_ladder):
 
 
 def test_cas_ladder_planned_not_a_term_window(cas_ladder):
-    # the planned {3d,4d} window as declared (fold Ar, the 4s pair in
+    # the planned {3d,4d} window as declared (core Ar, the 4s pair in
     # the dead zone) does NOT host the 3F term: its lowest g-block
     # roots scramble D (L^2=6) and H (L^2=30) components, with quintet
     # admixture -- and the reading sits far above the declared window
@@ -402,5 +402,5 @@ def test_cas_ladder_semicorescaling(cas_ladder):
 def test_cas_ladder_anchor(cas_ladder):
     # the direct block pattern's conventions: our block-restricted H
     # reproduces the pinned solver's component eigenvalues (observed
-    # 4.3e-14) -- the c_core fold path certified against PySCF
+    # 4.3e-14) -- the c_core core path certified against PySCF
     assert cas_ladder[("Ti", "semicore")].anchor < 1e-10

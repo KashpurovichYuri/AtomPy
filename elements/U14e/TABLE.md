@@ -5,8 +5,8 @@ removes 78 electrons → 14: 5f³6d¹7s². Reference ROHF −50.381852 Eh
 (rechecked 2026-11-06: same basin — `logs/rohf_recheck.log`).
 Sector M_S = 2. Pre-campaign record: `elements/U/` (frozen).
 
-<!-- ladder:begin -->
-| method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
+<!-- methods:begin -->
+| method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −50.3819 | 0 | −1370.9607 | +0.0000 | — | — | — | — | — | — | — | forced filling: 6s²6p⁶7s² closed, 5f³6d¹ open |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -56,4 +56,4 @@ Sector M_S = 2. Pre-campaign record: `elements/U/` (frozen).
 | CASSCF | free | 5f6d6p / MOC | (4,15) | 6s6p7s·pur | 1,365 | −50.4114 | −29.6 | −1371.7659 | −0.8052 | 1e-4/200 | 26.3708 | — | 7e+00 | 9e+00 | 1.9e+02 | 9.2e+02 | control: m-incomplete by construction |
 | SA-CASSCF | free | 5f6d6p / MOC | (4,15) | 6s6p7s | 1,365 | −50.4279 | −46.1 | −1372.2150 | −1.2543 | 1e-6/200 | 71.0422 | 1e-02 | 4e+00 | 6e+00 | 9.5e+00 | 7.8e+01 | control: m-incomplete by construction |
 | SA-CASSCF | free | 5f6d6p / MOC | (4,15) | 6s6p7s·pur | 1,365 | −50.4138 | −32.0 | −1371.8303 | −0.8696 | 1e-4/200 | 45.2112 | 8e-02 | 5e+00 | 8e+00 | 1.1e+02 | 7.4e+02 | control: m-incomplete by construction |
-<!-- ladder:end -->
+<!-- methods:end -->

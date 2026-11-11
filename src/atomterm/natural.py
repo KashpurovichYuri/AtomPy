@@ -201,7 +201,7 @@ def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
     Parameters
     ----------
     mol, mf : the atom and its converged SCF.
-    ncore : the closed-shell count (the fold).
+    ncore : the closed-shell count (the core).
     c_act : the SOURCE window columns (shell or primitive bands).
     na, nb : the sector (prefixes too small to open it are skipped --
         the returned labels can be non-contiguous, select by label).

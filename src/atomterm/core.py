@@ -13,7 +13,7 @@ rebuilt in block form as
 members. The closure theorem (E ⊗ members is L-invariant for ANY
 radial subspace E; README · Methods) then applies to the core itself:
 every window orthogonalized against the core -- the (1 - P_core)
-projection -- inherits EXACT closure, and the core's fold field is
+projection -- inherits EXACT closure, and the core's core field is
 scalar by construction (its density is exactly m-symmetric).
 
 Why replace the canonical core at all: its MOs carry foreign-l tails
@@ -35,7 +35,7 @@ from atomterm.windows import (lm_sectors, lowdin, occupied_core_idx,
 __all__ = ["purified_core_orbitals", "confined_core_orbitals",
            "closed_shell_core_energy"]
 
-# the closed-core Roothaan's cycle budget (a fold span that cannot
+# the closed-core Roothaan's cycle budget (a core span that cannot
 # settle is a declaration error, not a patience question)
 _CORE_MAXCYCLES = 100
 
@@ -163,15 +163,15 @@ def purified_core_orbitals(mol, mf, ncore: int):
     return lowdin(c_pur, s), contamination
 
 
-# the closed core on a fold span --------------------------------------
+# the closed core on a core span --------------------------------------
 
 def confined_core_orbitals(mf, c_span: np.ndarray,
                            n_pairs: int) -> tuple[np.ndarray, dict]:
-    """The closed core ON a fold span: the span's OWN best closed-shell
+    """The closed core ON a core span: the span's OWN best closed-shell
     pairs -- a Loewdin-span-basis closed-shell Roothaan, self-consistent
     under the nuclear field and the core's own two-body field.
 
-    A shell-span fold declares its CHEMISTRY by the electron count
+    A shell-span core declares its CHEMISTRY by the electron count
     (``n_pairs``) and its AO realization by the span; on a
     multi-column realization (n_pairs pairs over M > n_pairs columns)
     the frozen core must be selected INSIDE the span, and the
@@ -182,24 +182,24 @@ def confined_core_orbitals(mf, c_span: np.ndarray,
     is: diagonalize, fill the lowest ``n_pairs`` doubly, rebuild the
     closed-shell Fock, iterate -- converging in a few cycles to the
     closed-shell (ion-like) core the span can host, monotone in the
-    span, and reading NO converged orbitals (the fold stays
+    span, and reading NO converged orbitals (the core stays
     draw-free). The span's MEMBERSHIP carries the shell grammar: the
-    lowest pairs of the fold's family span are its declared shells,
-    so a fold that skips a shell must leave that shell's bands out of
+    lowest pairs of the core's family span are its declared shells,
+    so a core that skips a shell must leave that shell's bands out of
     its realization.
 
     The degenerate shortcut ``n_pairs == M`` returns the span itself:
     every column then IS one doubly-occupied orbital (the certified
-    1:1 raw-shell fold -- this path reproduces it bit-exactly).
+    1:1 raw-shell core -- this path reproduces it bit-exactly).
 
     Parameters
     ----------
     mf : the reference (``get_hcore``; ``mol`` for the eri). No
         converged orbitals are read.
-    c_span : (nao, M) S-orthonormal span columns (the fold's raw-AO
+    c_span : (nao, M) S-orthonormal span columns (the core's raw-AO
         span, :func:`atomterm.cells._fold_span`).
-    n_pairs : the fold's doubly-occupied pair count (the CHEMISTRY:
-        :func:`atomterm.windows.closed_electrons` over the fold's
+    n_pairs : the core's doubly-occupied pair count (the CHEMISTRY:
+        :func:`atomterm.windows.closed_electrons` over the core's
         shells, halved).
 
     Returns
@@ -220,7 +220,7 @@ def confined_core_orbitals(mf, c_span: np.ndarray,
     Notes
     -----
     The converged columns are occupied eigenvectors of their own
-    Fock, so the fold's bookkeeping :func:`closed_shell_core_energy`
+    Fock, so the core's bookkeeping :func:`closed_shell_core_energy`
     over them is the span's closed-shell variational value; on the
     whole AO space the construction reproduces the (2·n_pairs)-ion
     RHF exactly (pinned in the tests).
@@ -230,7 +230,7 @@ def confined_core_orbitals(mf, c_span: np.ndarray,
     m = c_span.shape[1]
     if n_pairs > m:
         raise ValueError(
-            f"{n_pairs} closed pairs over a {m}-column span -- the fold "
+            f"{n_pairs} closed pairs over a {m}-column span -- the core "
             "declares more electrons than its realization holds columns")
     if n_pairs == m:
         return c_span, {"cycles": 0, "comm": 0.0}
@@ -257,7 +257,7 @@ def confined_core_orbitals(mf, c_span: np.ndarray,
     else:
         raise ValueError(
             f"the closed-core Roothaan did not settle in {_CORE_MAXCYCLES}"
-            f" cycles (last |[F, D]| = {comm:.2e}) -- the fold span "
+            f" cycles (last |[F, D]| = {comm:.2e}) -- the core span "
             "declaration needs revisiting")
     return c_span @ occ, {"cycles": cycles, "comm": comm}
 
@@ -267,7 +267,7 @@ def confined_core_orbitals(mf, c_span: np.ndarray,
 def closed_shell_core_energy(mf, c_core: np.ndarray) -> float:
     """Energy of a doubly-occupied core span in the raw mf field.
 
-    The pur-fold bookkeeping of the campaigns (promoted from the scan
+    The pur-core bookkeeping of the campaigns (promoted from the scan
     scripts): with ``h = C^dag h_core C`` and the chemist eri over the
     core columns,
 
@@ -283,7 +283,7 @@ def closed_shell_core_energy(mf, c_core: np.ndarray) -> float:
     -------
     float
         The closed-shell (doubly-occupied) energy of the span -- a
-        bookkeeping constant of the fold, not a variational energy.
+        bookkeeping constant of the core, not a variational energy.
     """
     from pyscf import ao2mo
 

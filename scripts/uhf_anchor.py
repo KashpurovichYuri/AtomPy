@@ -2,7 +2,7 @@
 (:attr:`ReferenceSpec.occ_e_ref_uhf` gates it where the census shows
 multiple basins -- the census measures, the declaration picks; a
 single-basin atom runs ungated, the census verdict being its guard)
-plus the contamination reading.  The ladder builder renders the
+plus the contamination reading.  The methods-table builder renders the
 ``UHF (anchor)`` row from this record; re-running is idempotent (the
 cached chk is trusted, the record is overwritten with the same
 numbers).

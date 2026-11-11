@@ -10,7 +10,7 @@ import pytest
 
 from scipy.linalg import eigh as gen_eigh
 
-from atomterm.basis import (LadderSpec, metric_radials, run_ladder,
+from atomterm.basis import (SeriesSpec, metric_radials, run_series,
                             series_window, valence_block)
 from atomterm.windows import member_chains, select_shell_ao
 from helpers import uncontracted_carbon_mole
@@ -120,7 +120,7 @@ def test_valence_block_sums_members_weights_and_cuts_the_core():
 # --------------------------------------------------------- the window
 
 def _planted_config(mol, layer, shells, seed):
-    """One synthetic ladder configuration: one CORE column (the
+    """One synthetic series configuration: one CORE column (the
     valence cut's foil -- past ncol it must never enter the block)
     then per shell a planted radial on the declared bands, replicated
     on the m-set, doubly occupied (the block family reads the
@@ -175,16 +175,16 @@ def test_series_window_ladder_average_carries_the_second_radial():
     mol = uncontracted_carbon_mole()
     s = mol.intor_symmetric("int1e_ovlp")
     layer = {"2p": ("2p", "3p")}
-    ladder = [_planted_config(mol, layer, ["2p"], seed=1),
+    series = [_planted_config(mol, layer, ["2p"], seed=1),
               _planted_config(mol, layer, ["2p"], seed=2)]
-    cols2, rep2 = series_window(mol, ladder, s, ["2p"], layer,
+    cols2, rep2 = series_window(mol, series, s, ["2p"], layer,
                                 {"2p": 2}, ncol=1)
     assert cols2.shape == (mol.nao_nr(), 6)
     assert rep2["2p"]["spectrum"][1] > 1e-2     # a real spread radial
     assert rep2["2p"]["discarded"] < 1e-10      # 2 bands, k=2: all kept
     for cfg in rep2["2p"]["capture"]:
         assert min(cfg) > 0.999
-    _cols1, rep1 = series_window(mol, ladder, s, ["2p"], layer,
+    _cols1, rep1 = series_window(mol, series, s, ["2p"], layer,
                                  {"2p": 1}, ncol=1)
     # the mean radial misses each configuration's radial direction:
     # some configuration's capture drops below the k=2 readout
@@ -209,15 +209,15 @@ def test_series_window_refuses_k_beyond_the_chain_width():
     mol = uncontracted_carbon_mole()
     s = mol.intor_symmetric("int1e_ovlp")
     layer = {"2p": ("2p", "3p")}
-    ladder = [_planted_config(mol, layer, ["2p"], seed=1),
+    series = [_planted_config(mol, layer, ["2p"], seed=1),
               _planted_config(mol, layer, ["2p"], seed=2)]
     with pytest.raises(ValueError, match="exceeds its chain width"):
-        series_window(mol, ladder, s, ["2p"], layer, {"2p": 3}, ncol=1)
+        series_window(mol, series, s, ["2p"], layer, {"2p": 3}, ncol=1)
 
 
-# ---------------------------------------------------------- the ladder
+# ---------------------------------------------------------- the series
 
-def test_run_ladder_head_is_the_trusted_reference(tmp_path):
+def test_run_series_head_is_the_trusted_reference(tmp_path):
     """The head contract: the FIRST ladder entry is the case's own
     reference -- its mf returns untouched (no SCF, no chk written for
     it), the head's ENERGY is checked against the declaration (the
@@ -227,18 +227,18 @@ def test_run_ladder_head_is_the_trusted_reference(tmp_path):
     _m, head = None, _planted_config(mol, {"2p": ("2p", "3p")},
                                      ["2p"], seed=7)
     head.e_tot = -37.5                      # the declared reference's
-    ladder = (LadderSpec("p2", ("1s", "2s"), ("2p",), 2, -37.5),)
-    out = run_ladder(type("Cfg", (), {"symbol": "C", "basis": "x",
+    series = (SeriesSpec("p2", ("1s", "2s"), ("2p",), 2, -37.5),)
+    out = run_series(type("Cfg", (), {"symbol": "C", "basis": "x",
                                       "spin": 2})(), tmp_path, "C",
-                     ladder, head)
+                     series, head)
     assert out == {"p2": head}
-    wrong_energy = (LadderSpec("p2", ("1s", "2s"), ("2p",), 2, -38.0),)
-    with pytest.raises(ValueError, match="not the ladder head"):
-        run_ladder(type("Cfg", (), {"symbol": "C", "basis": "x",
+    wrong_energy = (SeriesSpec("p2", ("1s", "2s"), ("2p",), 2, -38.0),)
+    with pytest.raises(ValueError, match="not the series head"):
+        run_series(type("Cfg", (), {"symbol": "C", "basis": "x",
                                     "spin": 2})(), tmp_path, "C",
                    wrong_energy, head)
-    bad = (LadderSpec("p2", ("1s", "2s"), ("2p",), 0, -37.5),)
-    with pytest.raises(ValueError, match="mismatched ladder"):
-        run_ladder(type("Cfg", (), {"symbol": "C", "basis": "x",
+    bad = (SeriesSpec("p2", ("1s", "2s"), ("2p",), 0, -37.5),)
+    with pytest.raises(ValueError, match="mismatched series"):
+        run_series(type("Cfg", (), {"symbol": "C", "basis": "x",
                                     "spin": 2})(), tmp_path, "C",
                    bad, head)

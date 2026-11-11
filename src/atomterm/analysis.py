@@ -109,7 +109,7 @@ class StateSummary:
     s : the snapped S -- half-integer allowed (odd-electron states).
     term : the term symbol string.
     lz : ``<L_z>`` of the root (the M_L label).
-    lz2 : ``<L_z^2>`` of the root: M_L^2 on broken folds, gauge on
+    lz2 : ``<L_z^2>`` of the root: M_L^2 on broken cores, gauge on
         isotropic ones (README, the <Lz^2> note).
     """
 

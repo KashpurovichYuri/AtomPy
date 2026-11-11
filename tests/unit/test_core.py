@@ -1,5 +1,5 @@
-"""Unit pins of atomterm.core: the closed core ON a fold span (the
-multi-column fold's mini-Roothaan construction) and the closed-shell
+"""Unit pins of atomterm.core: the closed core ON a core span (the
+multi-column core's mini-Roothaan construction) and the closed-shell
 core energy's two forms -- the columnwise bookkeeping and the
 projected-density form (independent summation orders) -- on the
 frozen carbon reference (no SCF)."""
@@ -17,7 +17,7 @@ pytestmark = pytest.mark.fast
 
 def _span(mol, mf, bands):
     """The Loewdin-orthonormal raw-AO span of the given bands (the
-    fold-span construction, ``cells._fold_span``'s)."""
+    core-span construction, ``cells._fold_span``'s)."""
     rows = sorted(r for b in bands for r in select_shell_ao(mol, b))
     return lowdin(np.eye(mol.nao_nr())[:, rows], mf.get_ovlp())
 
@@ -41,7 +41,7 @@ def _density_form_energy(mol, mf, c):
 
 def test_confined_core_is_the_span_on_a_one_to_one_realization(carbon):
     """n_pairs == span width returns the span ITSELF (the certified
-    1:1 raw-shell fold reproduced bit-exactly -- the identity, not a
+    1:1 raw-shell core reproduced bit-exactly -- the identity, not a
     re-computation; the mini-Roothaan never runs)."""
     _, mol, mf, _ = carbon
     c_span = _span(mol, mf, ("1s", "2s"))

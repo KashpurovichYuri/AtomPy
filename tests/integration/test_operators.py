@@ -24,9 +24,9 @@ def test_hamiltonian_matches_pyscf_fci(carbon):
     """Slater-Condon rules and phases, validated three independent ways.
 
     (a) my H spectrum == pyscf's FCI solver on the same integrals (pyscf's
-        4-fold input is chemist (pq|rs); ours is physicist <pq|rs>, hence the
+        4-core input is chemist (pq|rs); ours is physicist <pq|rs>, hence the
         transpose(0, 2, 1, 3));
-    (b) my integrals fold the core like mcscf: eig(H) == mcscf's own CI energy
+    (b) my integrals core the core like mcscf: eig(H) == mcscf's own CI energy
         (to ~1e-4: mcscf uses the actual core density, ours the spherical
         average -- they differ only by SCF numerical noise);
     The ground truth for both is the hand-check E(3P det) = 2 h_2p + J - K.
@@ -41,7 +41,7 @@ def test_hamiltonian_matches_pyscf_fci(carbon):
 
     for na, nb in [(2, 0), (1, 1)]:
         ops = build_operators(mol, mf, c_act, ncore, na=na, nb=nb)
-        # (a) same operator, independent solver: pyscf's 4-fold input is
+        # (a) same operator, independent solver: pyscf's 4-core input is
         # chemist (pq|rs), ours physicist <pq|rs> = chemist (pr|qs) -> transpose
         e_fci = np.atleast_1d(
             fci.direct_spin1.kernel(
@@ -62,7 +62,7 @@ def test_hamiltonian_matches_pyscf_fci(carbon):
                 np.asarray(h1eff), g_chem, 3, (na, nb), conv_tol=1e-13
             )[0]
         )
-        # 1e-4: mcscf folds the actual core density, ours the spherical
+        # 1e-4: mcscf cores the actual core density, ours the spherical
         # average -- they differ only by SCF numerical noise (~1e-5 in h1)
         assert np.allclose(e_mine, np.sort(e_mcscf), atol=1e-4), (e_mine, e_mcscf)
 
@@ -118,7 +118,7 @@ def test_lz_spectrum_ms0(shell_ops):
 
 def test_window_closure_certificate_and_blind_spots(carbon):
     """Fact 19: the one-particle closure meter ||[P, L]|| certificates a
-    window SPAN exactly (no core fold, no CI) and closes the fact-18c
+    window SPAN exactly (no core core, no CI) and closes the fact-18c
     blind spots: [P, Lz] cannot see an m=0-member tilt nor equal tilts
     of a full +-m pair, [P, Lx/Ly] SEES both."""
     _, mol, mf, act_idx = carbon

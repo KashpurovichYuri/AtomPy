@@ -5,7 +5,7 @@ Position in the architecture: the engines finish a stage (casscf
 returns a :class:`~atomterm.casscf.CASResult`); the consumers declare
 stages and render facts (cases: report text; treatments/cells: the
 flat json payload) -- none of them computes physics. :func:`stage_facts`
-is the seam between the two: the ONE composition point that folds
+is the seam between the two: the ONE composition point that cores
 (:mod:`atomterm.operators`), labels (:mod:`atomterm.analysis`), and
 measures the window (:mod:`atomterm.windows`) over a stage's own
 outputs. The guarantee: one pass, one :class:`StageFacts`, and every
@@ -13,9 +13,9 @@ stage type reports the same fields.
 
 Conventions
 -----------
-- The fold uses the stage's OWN core columns (``cas.mo_coeff[:, :ncore]``):
+- The core uses the stage's OWN core columns (``cas.mo_coeff[:, :ncore]``):
   orbital optimization may legally reorganize the inactive span, and a
-  fold different from the one PySCF's energies used breaks
+  core different from the one PySCF's energies used breaks
   ``E_tot = E_core + e_cas`` at O(Eh).
 - The reconstruction (``eigvalsh(H) + core_energy``) is the ANALYSIS
   ruler: meters, labels, and window facts are computed on it, while the
@@ -87,7 +87,7 @@ class StageFacts:
         next to the SPAN weights of ``window_rows``; partitions
         na + nb.
     core_anisotropy : float or None
-        The discarded anisotropy of the fold core -- measured only
+        The discarded anisotropy of the core core -- measured only
         when ``anisotropy_ref`` was given, else absent.
     converged : bool
         The optimizer's own kernel report; CASCI stages and trusted
@@ -232,12 +232,12 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         stages.
     ncore, na, nb : core size and spin sector of the stage.
     tag : stage label used throughout reports and chkfile stores.
-    spherical_core : fold with the spherically averaged core density
-        (the physical reference) or the raw one (the raw-fold
+    spherical_core : core with the spherically averaged core density
+        (the physical reference) or the raw one (the raw-core
         detector).
     anisotropy_ref : ``(mf_ref, c_core_or_None)``, optional -- measure
         the core-density anisotropy of that reference's core and report
-        it (the raw-fold detector column); ``None`` leaves the
+        it (the raw-core detector column); ``None`` leaves the
         field absent.
     window_report : dict, optional -- the window construction's own
         disclosure, carried through to the payload verbatim (the
@@ -255,14 +255,14 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     -----
     **The three contributions of max|dE| vs PySCF.** Up to three
     effects separate the reconstruction from the run's totals: the
-    core-field anisotropy of the fold, the window DEFINITION
-    (``c_act``), and bookkeeping -- which must be exactly 0 (the fold
+    core-field anisotropy of the core, the window DEFINITION
+    (``c_act``), and bookkeeping -- which must be exactly 0 (the core
     convention is machine-exact against PySCF's ``get_h1eff``, 1e-15;
     the pin lives in test_operators). The window-definition term is not small in
     general: where the valence shell overlaps the core, the raw-AO
     analysis window shifts the CI ground substantially against the
     run's projected columns -- on such atoms max|dE| measures the
-    window definition, not the fold.
+    window definition, not the core.
 
     **Which CI labels the stage.** ``cas.ci`` drives the configuration
     labels and the shell electrons; both consumers map it through the

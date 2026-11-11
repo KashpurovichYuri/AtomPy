@@ -20,9 +20,9 @@ same per-spin counts as ROHF, so any breaking lives in the orbital
 shapes -- closed pairs polarizing around the open shell -- and
 :func:`uhf_contamination` measures it. The UHF object is a
 REFERENCE-CLASS product here, deliberately not a cells-layer axis:
-every fold path consumes one closed-shell core density (``2 C C^dag``)
+every core path consumes one closed-shell core density (``2 C C^dag``)
 and one MO set, so consuming a UHF reference downstream is the
-declared broken-core fold step (the ``frac`` precedent does not
+declared broken-core core step (the ``frac`` precedent does not
 carry: the fractional mf is RHF-shaped and drops in unchanged).
 
 Conventions
@@ -367,7 +367,7 @@ def occupation_postcheck(mol, mf, occ_closed, occ_open) -> bool:
     can violate the hook -- energy agreement alone cannot certify the
     configuration.  Mandatory wherever the accelerator runs under a
     forcing hook (the census's ``occ_ok`` column;
-    :func:`atomterm.basis.run_ladder`'s per-run gate).
+    :func:`atomterm.basis.run_series`'s per-run gate).
 
     Parameters
     ----------
@@ -399,7 +399,7 @@ def rohf_basin_census(cfg, ref: ReferenceSpec,
                       guesses=ROHF_CENSUS_GUESSES) -> list[dict]:
     """The ROHF basin census: one character-forced SCF per starting
     guess, the basin table side by side -- the measurement behind the
-    configuration-ladder gate (:class:`atomterm.basis.LadderSpec`'s
+    configuration-series gate (:class:`atomterm.basis.SeriesSpec`'s
     ``e_ref``).
 
     A degenerate open shell is multi-basin at fixed occupations (the
@@ -422,7 +422,7 @@ def rohf_basin_census(cfg, ref: ReferenceSpec,
     Parameters
     ----------
     cfg : AtomConfig
-        The atom (the ladder configuration's own spin).
+        The atom (the series configuration's own spin).
     ref : ReferenceSpec
         The configuration's occupation forcing (without it the arms
         measure the aufbau runaway, not the configuration's basins).
@@ -492,7 +492,7 @@ def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
       ``occ_e_ref`` would gate the UNBROKEN basin only and a broken
       solution trips it BY DESIGN.
     - The returned object is a REFERENCE-CLASS product, not a cells
-      axis: downstream folds consume one closed-shell core density
+      axis: downstream cores consume one closed-shell core density
       and one MO set (the module docstring's declined-seam note).
     """
     from atomterm.system import build_mol
@@ -614,7 +614,7 @@ def uhf_contamination(mf) -> tuple[float, np.ndarray]:
         of the occupied overlap matrix (the corresponding-orbital
         pairs), descending: 1 = a paired couple, 0 = fully broken.
         The core pairs sitting at 1 is the spin-paired-core
-        certificate any future UHF fold admits on.
+        certificate any future UHF core admits on.
 
     Notes
     -----
@@ -757,7 +757,7 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     """The folded reference: the valence ROHF self-consistent in the
     frozen confined-core field.
 
-    The lane's reference class.  The fold's confined core
+    The lane's reference class.  The core's confined core
     (:func:`atomterm.core.confined_core_orbitals` -- the span's own
     closed-shell Roothaan, the ion-like field) is FROZEN, and the
     valence electrons solve ROHF in its field, in the complement of
@@ -805,9 +805,9 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     ----------
     mf : the reference substrate (``mol``, ``get_hcore``,
         ``get_ovlp``, ``get_veff``; no converged orbitals are read).
-    c_span : (nao, M) S-orthonormal fold-span columns -- the SAME
-        realization the lane's fold declares.
-    n_pairs : the confined pairs (the fold's chemistry).
+    c_span : (nao, M) S-orthonormal core-span columns -- the SAME
+        realization the lane's core declares.
+    n_pairs : the confined pairs (the core's chemistry).
     occ_closed, occ_open : AO span patterns
         (:class:`ReferenceSpec` vocabulary) -- the character spans
         of the open-shell premium.
@@ -836,7 +836,7 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
         block = the confined Fock's occupied eigenvalues).  The
         accessors are restored after the solve -- the object reads
         as a standard ROHF on the real mol.  The open pair's gauge
-        is the solve's own choice -- the fold and window
+        is the solve's own choice -- the core and window
         constructions are gauge-blind to it.
 
     Raises
@@ -881,7 +881,7 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
         raise ValueError(
             f"{n_pairs} confined pairs leave {mol.nelectron - 2 * n_pairs} "
             f"valence electrons but the sector wants {mol.spin} open -- "
-            "the fold over-freezes the atom")
+            "the core over-freezes the atom")
 
     c_conf, _ = confined_core_orbitals(mf, c_span, n_pairs)
     s = mf.get_ovlp()
@@ -913,9 +913,9 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     n_seed = n_closed_val + n_open
     if len(occ_rows) < n_pairs + n_seed:
         raise ValueError(
-            f"the substrate fills {len(occ_rows)} orbitals; the fold's "
+            f"the substrate fills {len(occ_rows)} orbitals; the core's "
             f"{n_pairs} pairs + the valence {n_seed} need more -- wrong "
-            "reference for this fold")
+            "reference for this core")
     val_cols = occ_rows[n_pairs:n_pairs + n_seed]
     c_seed = (compl.conj().T @ s @ mf.mo_coeff[:, val_cols])
     c_seed = c_seed / np.linalg.norm(c_seed, axis=0)

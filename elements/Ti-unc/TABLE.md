@@ -5,10 +5,10 @@ DISTILLED, k=1 per shell (`window_distilled` — the reference's own
 radial × the m-set; CAS(2,5)/CAS(4,6), construction-uniform with
 `elements/Ti/`, whose verification legs reproduced the certified
 records at 0.00e+00 mEh). The kind block compares the four window
-sources at both ruler folds: `MO`/`MOC` are CONTROLS (m-incomplete
+sources at both ruler cores: `MO`/`MOC` are CONTROLS (m-incomplete
 by construction — the SCF's hybrid-open gauge; MO is l-impure here,
 win_l 0.60-class), `NO` is the density leg, degenerate with D
-(+3.3 µEh, both folds). The optimizer class and the frac fold (no
+(+3.3 µEh, both cores). The optimizer class and the frac core (no
 measured fractional-occupation basin on this basis) are out of scope
 this wave (void at the key, one `--full` away). Reference: the trusted
 deep-basin ROHF (−848.40744343, logs/census.log). The pinned row and
@@ -17,8 +17,8 @@ OWN core; their residual vs the anchor (+6.1 mEh) is the
 projected-density bookkeeping form. Sector M_S = 1. Sibling:
 `elements/Ti/` (contracted).
 
-<!-- ladder:begin -->
-| method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
+<!-- methods:begin -->
+| method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −848.4074 | 0 | −23086.3543 | +0.0000 | — | — | — | — | — | — | — | forced filling |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -36,4 +36,4 @@ projected-density bookkeeping form. Sector M_S = 1. Sibling:
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CASCI | pinned | 3d4s / D | (4,6) | Ar·lane | 120 | −848.4014 | +6.1 | −23086.1894 | +0.1650 | — | 12.0000 | 3e-15 | 1e-14 | 2e-14 | 2.4e-14 | 1.5e-13 | SCF core; offset = bookkeeping form |
 | CASCI | free | 3d4s / D | (4,6) | Ar·lane | 120 | −848.4014 | +6.1 | −23086.1894 | +0.1650 | — | 12.0000 | 6e-02 | 1e-14 | 2e-14 | 2.2e-14 | 2.7e-13 |  |
-<!-- ladder:end -->
+<!-- methods:end -->

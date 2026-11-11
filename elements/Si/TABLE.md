@@ -1,7 +1,7 @@
 # Si (3s^2 3p^2)
 
-<!-- ladder:begin -->
-| method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
+<!-- methods:begin -->
+| method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −288.8464 | 0 | −7859.9159 | +0.0000 | — | — | — | — | — | — | — | forced filling |
 | UHF (anchor) | — | — | — | — | — | −288.8501 | −3.6 | −7860.0150 | −0.0990 | — | — | — | — | — | — | — | ⟨S²⟩=2.0110, σ_min=0.9945 |
@@ -38,4 +38,4 @@
 | CASSCF | free | 3p / D | (2,3) | {1s,2s,2p,3s}·lane | 3 | −288.8464 | +0.0 | −7859.9159 | +0.0000 | 0/13 | 1.6208 | — | 9e-01 | 9e-01 | 1.2e-01 | 1.4e-11 |  |
 | SA-CASSCF | free | 3p / D | (2,3) | {1s,2s,2p,3s}·lane | 3 | −288.8464 | +0.0 | −7859.9149 | +0.0011 | 1e-9/14 | 2.0000 | 0e+00 | 2e-14 | 1e-14 | 1.7e-16 | 1.8e-32 |  |
 | SA-CASSCF | pinned | 3p / D | (2,3) | {1s,2s,2p,3s}·lane | 3 | −288.8464 | +0.0 | −7859.9149 | +0.0011 | 1e-9/14 | 2.0000 | 3e-16 | 1e-14 | 1e-14 | 6.3e-16 | 7.9e-32 | SCF core; offset = bookkeeping form |
-<!-- ladder:end -->
+<!-- methods:end -->

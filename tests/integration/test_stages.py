@@ -1,4 +1,4 @@
-"""Tests of atomterm.stages: the one-pass fold-and-analyze facts module.
+"""Tests of atomterm.stages: the one-pass core-and-analyze facts module.
 
 The physics content is pinned end-to-end by test_treatments/test_atoms;
 these pin the MODULE's contract on the frozen carbon reference (no SCF,
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.fast
 
 
 def test_stage_facts_payload_and_invariants(carbon, tmp_path):
-    """stage_facts owns the fold: the Ms=0 p^2 sector reproduces the
+    """stage_facts owns the core: the Ms=0 p^2 sector reproduces the
     textbook 3P/1D/1S table with machine-precision closure, vanishing
     N-deviation, and a payload carrying every persisted rung key."""
     _, mol, mf, act_idx = carbon

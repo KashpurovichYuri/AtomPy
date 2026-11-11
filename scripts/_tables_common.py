@@ -1,6 +1,6 @@
 """The tables' shared vocabulary: the table constants, the label
 helpers, and the write protocols (the verified-move atomic write,
-the ladder edit protocol's marker form).
+the methods-table edit protocol's marker form).
 
 ONE home for what the scripts' writers share (the methods-table
 builder, the regen store writer); the per-table policy -- headings,
@@ -13,7 +13,7 @@ import re
 import sys
 from pathlib import Path
 
-from atomterm.windows import NOBLE_CORES, fold_shells
+from atomterm.windows import NOBLE_CORES, core_shells
 
 # the m-set sizes behind the CAS labels (one l, one column count)
 SHELL_COLS = {"s": 1, "p": 3, "d": 5, "f": 7, "g": 9, "h": 11}
@@ -26,40 +26,40 @@ def minus(text: str) -> str:
     return re.sub(r"(?<!e)-", "−", text)
 
 
-def fold_col(k, spec) -> str:
-    """The fold column (every table's one grammar): a tagged window's
-    own fold; an untagged cell's prefix -- the declared chemical shell
-    set of the key's EFFECTIVE fold (``fold_chemistry``: the count
-    follows the key's sector -- a promoted-pair window folds fewer
+def core_col(k, spec) -> str:
+    """The core column (every table's one grammar): a tagged window's
+    own core; an untagged cell's prefix -- the declared chemical shell
+    set of the key's EFFECTIVE core (``core_chemistry``: the count
+    follows the key's sector -- a promoted-pair window cores fewer
     pairs), else the noble whose closed count fills ``spec.ncore``
     orbitals; the variants naming their deviation."""
-    if k.fold_tag is not None:
-        return fold_label(k.fold_tag)
-    if spec.fold_chemistry:
+    if k.core_tag is not None:
+        return core_label(k.core_tag)
+    if spec.core_chemistry:
         n_eff = (2 * spec.ncore + spec.nelec_act
                  - k.sector[0] - k.sector[1]) // 2
-        base = spec.fold_chemistry.get(n_eff, f"n={n_eff}")
+        base = spec.core_chemistry.get(n_eff, f"n={n_eff}")
     else:
         base = next((n.capitalize() for n, sh in NOBLE_CORES.items()
                      if sum(SHELL_COLS[s[-1]] for s in sh) == spec.ncore),
                     f"n={spec.ncore}")
-    if k.fold == "raw":
+    if k.core == "raw":
         return f"{base}·raw"
-    if k.fold == "frac":
+    if k.core == "frac":
         return f"{base}·frac"
     if k.substrate == "pur":
         return f"{base}·pur"
     return base
 
 
-def fold_label(tag: str) -> str:
-    """The fold column's README notation: noble names capitalized,
+def core_label(tag: str) -> str:
+    """The core column's README notation: noble names capitalized,
     ``semi`` as itself, explicit lists braced."""
     if tag in NOBLE_CORES:
         return tag.capitalize()
     if tag == "semi":
         return tag
-    return "{" + ",".join(fold_shells(tag)) + "}"
+    return "{" + ",".join(core_shells(tag)) + "}"
 
 
 def cas_label(key, spec=None) -> str:
@@ -147,7 +147,7 @@ def atomic_write_text(path: Path, text: str) -> None:
 
 
 def replace_block(src: Path, begin: str, end: str, new_block: str) -> str:
-    """The ladder edit protocol's marker form: splice ``new_block``
+    """The methods-table edit protocol's marker form: splice ``new_block``
     between the section's marker pair, structural-check the splice,
     write through :func:`atomic_write_text`.  Returns the new file
     text; the caller owns the block's own structural assertions.

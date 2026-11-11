@@ -1,7 +1,7 @@
 """Ladder tests: per-treatment symmetry fingerprints, parameterized over
 atoms.
 
-Each case runs the treatment ladder -- the rungs-era subset of the
+Each case runs the treatment rungs -- the rungs-era subset of the
 cells methods grid, executed through :func:`atomterm.cells.run_cell`
 (the address map below) -- and asserts the MEASURED pattern, with
 per-atom chaotic bands -- never assumed exactness:
@@ -40,14 +40,14 @@ from atomterm.windows import select_valence_ao
 
 pytestmark = pytest.mark.slow
 
-# The treatment ladder as cell addresses: each rungs-era tag is one
+# The treatment rungs as cell addresses: each rungs-era tag is one
 # grid point of the methods axis (the cells grid replaced the rungs
 # store; the payload keys are identical -- both paths are stage_facts
 # payloads, so every pin below reads the same dict).
 LADDER_ADDRESSES = {
-    "casci_raw":      dict(method="casci", fold="raw"),
+    "casci_raw":      dict(method="casci", core="raw"),
     "casci_avg":      dict(method="casci"),                    # pol/ao/avg
-    "casci_frac":     dict(method="casci", fold="frac"),
+    "casci_frac":     dict(method="casci", core="frac"),
     "casscf_relax":   dict(method="casscf", mask="frozen"),
     "casscf_radial":  dict(method="casscf", mask="radial"),
     "casscf_virtmix": dict(method="casscf", mask="virtmix"),
@@ -69,9 +69,9 @@ LADDER_ADDRESSES = {
 }
 
 
-def run_ladder(cfg, patterns, nelec_act, workdir, *, sa_weights=None,
+def run_series(cfg, patterns, nelec_act, workdir, *, sa_weights=None,
                frac=None, pur=False, tags=None, ref=None) -> dict:
-    """One atom's treatment ladder through the cell layer: the declared
+    """One atom's treatment rungs through the cell layer: the declared
     subset of LADDER_ADDRESSES, each as one run_cell (reference
     construction here, as in every caller -- cells never builds SCFs).
     ``frac=(nelec_open, n_open)`` arms the fractional reference,
@@ -182,7 +182,7 @@ LADDER_CASES = {
 def ladders(tmp_path_factory):
     out = {}
     for name, case in LADDER_CASES.items():
-        out[name] = run_ladder(
+        out[name] = run_series(
             case["cfg"], case["patterns"], case["nelec_act"],
             tmp_path_factory.mktemp(f"ladder_{name}"),
             sa_weights=[1 / 3] * 3, frac=(2, 3), pur=True)
@@ -328,7 +328,7 @@ def test_purified_rungs_exact_closure(name, ladders):
     on p2 atoms the radial direction has a restoring force (fact 18a), so
     SA's stationary point is the symmetric window. casci_avg_pur
     additionally shows max|dE| = 0 (the purified core needs no averaging:
-    PySCF's own fold and ours coincide) and gate (d): the purification
+    PySCF's own core and ours coincide) and gate (d): the purification
     shifts the reference by the discarded core polarization only."""
     case, r = LADDER_CASES[name], ladders[name]
     b = case["bands"]
@@ -368,14 +368,14 @@ def test_purified_rungs_exact_closure(name, ladders):
 
 
 # --------------------------------------------------------------------------
-# Sc (ticket 11): the transition-metal ladder. Same machinery, different
+# Sc (ticket 11): the transition-metal rungs. Same machinery, different
 # physics -- every assertion below is the measured Sc pattern across three
 # independent cold runs (see AGENTS.md fact 15).
 # --------------------------------------------------------------------------
 
 @pytest.fixture(scope="session")
 def sc_ladder(tmp_path_factory):
-    return run_ladder(
+    return run_series(
         AtomConfig("Sc", "ccpvdz", spin=1), ["3d", "4s"], 3,
         tmp_path_factory.mktemp("ladder_Sc"),
         sa_weights=[1 / 5] * 5, frac=(3, 6), pur=True)
@@ -409,7 +409,7 @@ def test_sc_casci_exact_closure_and_term_table(sc_ladder):
     assert 6.0001 < raw["ground_l2"] < 6.001
     assert raw["ground_term"] == "2D"
     assert 1e-3 < raw["core_anisotropy"] < 1e-1
-    # PySCF's own (unaveraged) fold splits the 2D quintet at the mEh scale
+    # PySCF's own (unaveraged) core splits the 2D quintet at the mEh scale
     e = np.sort(np.asarray(raw["energies_pyscf"]))
     assert 1e-4 < e[4] - e[0] < 1e-2
 
@@ -486,8 +486,8 @@ def test_sc_purified_rungs_unbroken_lz_and_l2(sc_ladder):
         assert abs(w.get("d", 0.0) - 5 / 6) < 1e-6, tag
     # relaxation moves the energy by the core-polarization scale, but its
     # SIGN in our bookkeeping is not physics: the optimizer buys
-    # polarization energy in PySCF's RAW fold (measured relax +0.47 mEh,
-    # sa_relax -0.09 mEh vs the CASCI in our averaged fold) -- the
+    # polarization energy in PySCF's RAW core (measured relax +0.47 mEh,
+    # sa_relax -0.09 mEh vs the CASCI in our averaged core) -- the
     # max|dE| ~ 1e-3 column is precisely that detector. Bound, don't pin.
     for tag in ("casscf_relax_pur", "sa_relax_pur"):
         assert abs(r[tag]["e_ground"] - ci["e_ground"]) < 5e-3, tag
@@ -551,7 +551,7 @@ def test_sc_sa_restores_l2_not_lz(sc_ladder):
     """Shell-start SA over the five 2D M_L components restores <L^2> = 6
     always, and is BIMODAL across SCF chaos (fact 15 amended): either it
     swaps the window's 4s member for a core 3p (window p-weight exactly
-    1/6, an m-INCOMPLETE window, [H, Lz] ~ 0.3; our averaged fold of that
+    1/6, an m-INCOMPLETE window, [H, Lz] ~ 0.3; our averaged core of that
     strongly polarized core vs PySCF's raw one shows as max|dE| ~ 0.8 --
     the polarized-core detector at Eh scale), or it converges healthy
     (window {3d, 4s}, commutators at the ~1e-3 input-window baseline of
@@ -622,7 +622,7 @@ def test_sc_radial_rung_blocks_the_escape(sc_ladder):
 def sc_big_window_ladder(tmp_path_factory):
     """CAS(3,9) over the complete {3d, 4s, 4p} window (324 dets): is the
     escape just 4p correlation hunger?"""
-    return run_ladder(
+    return run_series(
         AtomConfig("Sc", "ccpvdz", spin=1), ["3d", "4s", "4p"], 3,
         tmp_path_factory.mktemp("ladder_Sc_cas311"), sa_weights=[1 / 5] * 5,
         tags={"casci_avg", "casscf_shell"})
@@ -661,7 +661,7 @@ def test_sc_complete_window_still_escapes(sc_ladder, sc_big_window_ladder):
 
 @pytest.fixture(scope="session")
 def ti_ladder(tmp_path_factory):
-    return run_ladder(
+    return run_series(
         AtomConfig("Ti", "ccpvdz", spin=2), ["3d", "4s"], 4,
         tmp_path_factory.mktemp("ladder_Ti"),
         sa_weights=[1 / 7] * 7, frac=(4, 6), pur=True, ref=TI_REF)
@@ -694,7 +694,7 @@ def test_ti_casci_exact_closure_and_term_table(ti_ladder):
     assert raw["ground_l2"] == pytest.approx(12.0, abs=1e-3)
     assert raw["ground_term"] == "3F"
     assert 1e-3 < raw["core_anisotropy"] < 1e-1
-    # PySCF's own (unaveraged) fold splits the 3F septet at the mEh scale
+    # PySCF's own (unaveraged) core splits the 3F septet at the mEh scale
     # (measured 4.1e-3)
     e = np.sort(np.asarray(raw["energies_pyscf"]))
     assert 1e-4 < e[6] - e[0] < 1e-2
@@ -743,7 +743,7 @@ def test_ti_purified_rungs_unbroken_lz_and_l2(ti_ladder):
     assert ci["max_de_vs_pyscf"] < 1e-8          # measured 1.1e-13
     assert ci["core_anisotropy"] < 1e-12         # m-scalar by construction
     # the pur reference shift: the discarded core polarization (+1.36 mEh
-    # measured in PySCF's own folds -- same scale as Sc's +0.67 mEh)
+    # measured in PySCF's own cores -- same scale as Sc's +0.67 mEh)
     d_e = ci["energies_pyscf"][0] - r["casci_avg"]["energies_pyscf"][0]
     assert 0.0 < d_e < 5e-3, d_e
 
@@ -842,7 +842,7 @@ def test_ti_sa_basins_and_radial_rung(ti_ladder):
         assert rung["window"].get("p", 0.0) < 1e-3, tag
         assert rung["ortho_err"] < 1e-10 and not rung["diverged"], tag
     # the radial gain over the frozen relax window (~11 mEh, orthogonalized
-    # substrate; the raw-window fold would show every one-parameter radial
+    # substrate; the raw-window core would show every one-parameter radial
     # rotation RISING -- fact 21)
     assert -0.02 < r["sa_radial"]["e_ground"] - r["casscf_relax"]["e_ground"] < 0.0
     sar = r["sa_radial"]

@@ -31,7 +31,7 @@ _SECTORS = ((2, 0), (1, 1))  # the triplet and the alpha-beta p^2 blocks
 @pytest.fixture(scope="module")
 def twin(carbon_d2h):
     """The twin problem over the 2p AO shell of the frozen D2h
-    reference: our folded h1 (the m-scalar core fold), the window
+    reference: our folded h1 (the m-scalar core core), the window
     eri in PySCF's own feed, and our determinant-basis matrices."""
     _, mol, mf, act_idx = carbon_d2h
     c_act = np.eye(mol.nao_nr())[:, act_idx]
@@ -42,7 +42,7 @@ def twin(carbon_d2h):
     for na, nb in _SECTORS:
         parts = build_operators(mol, mf, c_act, 2, na, nb)
         mats[(na, nb)] = {k: parts[k] for k in ("H", "L2", "S2")}
-        h1 = parts["h1"]  # sector-independent: the fold sees only the core
+        h1 = parts["h1"]  # sector-independent: the core sees only the core
     return mol, mf, c_act, h1, eri, orbsyms, mats
 
 
@@ -102,7 +102,7 @@ def test_ground_states_term_pure(twin):
 
 
 def test_component_degeneracy(twin):
-    # on the m-scalar fold the three L=1 components are degenerate
+    # on the m-scalar core the three L=1 components are degenerate
     # (observed spread 0.0 -- exact to the last bit)
     _, _, _, _, _, orbsyms, _ = twin
     ids = det_irreps(orbsyms, 2, 0)

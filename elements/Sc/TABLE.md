@@ -18,8 +18,8 @@ band list, the radial spectrum, the discarded fraction, the
 per-configuration captures) rides the cells' payloads
 (`window_report`) and the provenance logs (`logs/`).
 
-<!-- ladder:begin -->
-| method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
+<!-- methods:begin -->
+| method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −759.7363 | 0 | −20673.4871 | +0.0000 | — | — | — | — | — | — | — | forced filling |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -102,4 +102,4 @@ per-configuration captures) rides the cells' payloads
 | CASSCF | free | 3s3p3d / D | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.8509 | −114.7 | −20676.6077 | −3.1206 | 1e-11/24 | 5.0674 | — | — | — | 2.1e-01ψ | 3.2e-01ψ |  |
 | SA-CASSCF | free | 3s3p3d / D | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.8266 | −90.4 | −20675.9462 | −2.4591 | 1e-8/18 | 6.0000 | 2e-07 | — | — | 4.9e-07ψ | 2.8e-06ψ |  |
 | SA-CASSCF | pinned | 3s3p3d / D | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.8266 | −90.4 | −20675.9462 | −2.4591 | 1e-13/21 | 6.0000 | 1e-06 | 3e-05 | 5e-05 | 1.4e-06ψ | 1.1e-05ψ | SCF core; offset = bookkeeping form |
-<!-- ladder:end -->
+<!-- methods:end -->

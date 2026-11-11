@@ -5,7 +5,7 @@ DISTILLED, k=1 per shell (`window_distilled` — the reference's own
 radial × the m-set; CAS(3,5)/CAS(3,6), construction-uniform with
 `elements/Sc/`, whose verification legs reproduced the certified
 records at 0.00e+00 mEh). The kind block compares the four window
-sources at both ruler folds: `MO`/`MOC` are CONTROLS (m-incomplete
+sources at both ruler cores: `MO`/`MOC` are CONTROLS (m-incomplete
 by construction — the SCF's hybrid-open gauge), `NO` is the density
 leg, degenerate with D at the closed substrate (+3.2 µEh at Ar·pur).
 This atom's canonical core is the ANISOTROPIC class: the Ar (pol)
@@ -13,7 +13,7 @@ rows carry the assembly defect (closures ~3e-2, ⟨L²⟩ 5.9989 —
 identical across kinds) and their ground-root energies are
 gauge-sensitive at the split scale (the ²D block splits 0.7 mEh
 under ‖[H,L²]‖ 8e-2); the CLOSED comparisons are the Ar·pur rows and
-the lanes. The optimizer class and the frac fold (no measured
+the lanes. The optimizer class and the frac core (no measured
 fractional-occupation basin on this basis) are out of scope this
 wave (void at the key, one `--full` away). Reference: the trusted ROHF
 (−759.73738486, rungs/rohf.chk). The pinned row and its free twin
@@ -21,8 +21,8 @@ freeze the reference's OWN core; their residual vs the anchor
 (+5.1 mEh) is the projected-density bookkeeping form. Sector
 M_S = ½. Sibling: `elements/Sc/` (contracted).
 
-<!-- ladder:begin -->
-| method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
+<!-- methods:begin -->
+| method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −759.7374 | 0 | −20673.5179 | +0.0000 | — | — | — | — | — | — | — | forced filling |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -40,4 +40,4 @@ M_S = ½. Sibling: `elements/Sc/` (contracted).
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CASCI | pinned | 3d4s / D | (3,6) | Ar·lane | 90 | −759.7322 | +5.1 | −20673.3781 | +0.1398 | — | 6.0000 | 9e-16 | 1e-14 | 2e-14 | 5.6e-15 | 4.3e-14 | SCF core; offset = bookkeeping form |
 | CASCI | free | 3d4s / D | (3,6) | Ar·lane | 90 | −759.7323 | +5.0 | −20673.3805 | +0.1374 | — | 6.0000 | 9e-02 | 4e-11 | 5e-11 | 6.7e-15 | 4.4e-14 |  |
-<!-- ladder:end -->
+<!-- methods:end -->

@@ -36,11 +36,11 @@ from pyscf import gto
 
 from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
-from atomterm.basis import LadderSpec
+from atomterm.basis import SeriesSpec
 from atomterm.cells import no_label, prior_tag_of
 from atomterm.reference import ReferenceSpec, run_rohf
 from atomterm.scans import ScanSpec
-from atomterm.windows import (build_full_mo, closed_electrons, fold_shells,
+from atomterm.windows import (build_full_mo, closed_electrons, core_shells,
                               occupied_core_idx, select_valence_ao)
 from atomterm.casscf import (
     run_casci,
@@ -133,12 +133,12 @@ class CaseSpec:
     symbol / basis / ecp / spin : the atom (:class:`~atomterm.system.AtomConfig`
         inputs; ``basis`` is a label like ``"ccpvdz"`` or a dict).
     nelec_act / ncore : the active-electron count and the closed-shell
-        count (the fold).
+        count (the core).
     shell_patterns : the valence-shell label prefixes of the standard
         window (e.g. ``["2p"]``; ``["3d", "4s"]``).
     shell_bands : the declared SHELL LAYER -- chemical shell -> the
         AO bands realizing it on this basis (``{"3d": ("12d", "13d")}``);
-        every shell/window/fold resolution goes through it
+        every shell/window/core resolution goes through it
         (:func:`atomterm.windows.shell_realization`).  None = the 1:1
         identity (each shell IS its own band -- the contracted-basis
         behavior).  The realization is BASIS-SPECIFIC and certified by
@@ -157,13 +157,13 @@ class CaseSpec:
         (:func:`atomterm.windows.window_distilled`) -- the CAS label
         reads the delivered records' shapes (CAS(3,6), not CAS(3,43)).
         Window-side only: the FOLD stays at full family width.
-    ladder : the declared CONFIGURATION LADDER
-        (:class:`atomterm.basis.LadderSpec` tuple) -- the prior axis's
+    series : the declared CONFIGURATION SERIES
+        (:class:`atomterm.basis.SeriesSpec` tuple) -- the prior axis's
         radial-signal sources: the atom's valence configurations as
         forced-occupation, basin-gated references, the HEAD (first
         entry) being the case's own reference configuration.  Required
         by any ``@s``-tagged window (the series source); the mfs
-        resolve once per atom through :func:`atomterm.basis.run_ladder`
+        resolve once per atom through :func:`atomterm.basis.run_series`
         (the caller's job -- reference construction never enters a
         cell run).
     prior_bands : the PRIOR axis's realization (chemical shell -> its
@@ -176,9 +176,9 @@ class CaseSpec:
         but not yet run (Ti: the (4,10)/(4,14) partitions) -- the cell
         grid derives their full factor grids (:func:`atomterm.cells.planned`).
     planned_sectors : per-window sector overrides for planned windows
-        (window label -> (na, nb)) -- a promoted-pair window's fold
+        (window label -> (na, nb)) -- a promoted-pair window's core
         count follows its sector (:func:`atomterm.system.ncore_of`:
-        the (5,1) key folds 4 of the 5 core pairs).  Absent = the
+        the (5,1) key cores 4 of the 5 core pairs).  Absent = the
         case's default sector.
     lattice_windows : the lattice spans (empty = none) -- CASCI cells
         over growing m-complete shell spans at ``lattice_sector``
@@ -203,7 +203,7 @@ class CaseSpec:
         targets (parity = the configuration's total inversion parity);
         None = not certified for lane cells.
     lane_windows : the pinned-lane legs -- window labels carrying
-        their own fold (``"3d3p4d@semi"``, :func:`atomterm.windows.fold_shells`
+        their own core (``"3d3p4d@semi"``, :func:`atomterm.windows.core_shells`
         the tag grammar); each becomes one CI-level lane cell
         (:func:`atomterm.cells.lane_keys`).  The tag marks the lane
         cell: a tagged window NEVER collides with a free-route label.
@@ -213,9 +213,9 @@ class CaseSpec:
         renderers (an uncontracted basis counts radial primitives,
         not shells: the stored addresses keep the construction
         labels; the table speaks shells).
-    fold_chemistry : effective fold count -> the fold's shell set
+    core_chemistry : effective core count -> the core's shell set
         (the noble-guess fallback lies when the ECP leaves
-        non-noble closed shells: U14e's fold is 6s6p7s, not Ne).
+        non-noble closed shells: U14e's core is 6s6p7s, not Ne).
     anchor_note : the ROHF anchor row's filling note, in shells.
     render_primary : the primary window's family renders (False =
         the promoted windows carry the results; the primary rows
@@ -235,10 +235,10 @@ class CaseSpec:
     # choice only); every shell of every window the case declares must
     # carry one (a mixed distilled/raw window is not offered).
     shell_radials: dict[str, int] | None = None
-    # the prior axis's declarations: the configuration ladder (the
+    # the prior axis's declarations: the configuration series (the
     # @s windows' radial-signal sources) and the widened realization
     # the @r/@s windows distill from
-    ladder: tuple | None = None
+    series: tuple | None = None
     prior_bands: dict[str, tuple[str, ...]] | None = None
     ecp: str | None = None
     spin: int = 0
@@ -260,7 +260,7 @@ class CaseSpec:
     # stored addresses keep their construction labels):
     # window_names: window label -> chemical display name (the
     #   uncontracted bases count radial primitives, not shells).
-    # fold_chemistry: effective fold count -> its shell set (the
+    # core_chemistry: effective core count -> its shell set (the
     #   noble-guess fallback lies when the ECP leaves non-noble
     #   closed shells).
     # anchor_note: the ROHF row's filling note, in shells.
@@ -268,13 +268,13 @@ class CaseSpec:
     #   the promoted windows carry the results; the primary rows stay
     #   in the store).
     window_names: dict[str, str] | None = None
-    fold_chemistry: dict[int, str] | None = None
+    core_chemistry: dict[int, str] | None = None
     anchor_note: str | None = None
     render_primary: bool = True
 
     def __post_init__(self):
         """Validate the declaration's own grammar: the term target and
-        every lane window (its tag resolves, its fold stays out of its
+        every lane window (its tag resolves, its core stays out of its
         window).  Fail here, at the seam that owns the grammar."""
         object.__setattr__(self, "key", self.key or self.symbol)
         object.__setattr__(self, "planned_sectors",
@@ -303,14 +303,14 @@ class CaseSpec:
             shells = re.findall(r"\d+[spdfgh]", span)
             if not sep or not tag or "".join(shells) != span:
                 raise ValueError(
-                    f"lane window {label!r} must be <shells>@<fold> "
+                    f"lane window {label!r} must be <shells>@<core> "
                     "(e.g. '3d3p@semi')")
-            fold = fold_shells(tag, open_d=open_d)
-            overlap = sorted(set(shells) & set(fold))
+            core = core_shells(tag, open_d=open_d)
+            overlap = sorted(set(shells) & set(core))
             if overlap:
                 raise ValueError(
                     f"lane window {label!r}: {overlap} sit in both the "
-                    "window and its fold")
+                    "window and its core")
         if self.shell_radials is not None:
             # the tagged planned windows carry their k in the source
             # tag -- only the untagged ones read shell_radials here
@@ -327,8 +327,8 @@ class CaseSpec:
                     "window shell the case names carries its k (a mixed "
                     "distilled/raw window is not offered)")
         # the prior axis: every @-tagged declared window is a source
-        # tag (fold tags live on lane windows, which never enter this
-        # validation), and the series source needs the ladder
+        # tag (core tags live on lane windows, which never enter this
+        # validation), and the series source needs the series
         tagged = [w for w in (*self.planned_windows,
                               "".join(self.shell_patterns))
                   if "@" in w]
@@ -336,20 +336,20 @@ class CaseSpec:
         if stray:
             raise ValueError(
                 f"the prior windows {stray} must carry a source tag "
-                "<shells>@<r|s><k> (e.g. '3d4s@s2'); fold tags belong "
+                "<shells>@<r|s><k> (e.g. '3d4s@s2'); core tags belong "
                 "to lane windows")
         series = [w for w in tagged
                   if (t := prior_tag_of(w)) is not None and t[0] == "s"]
-        if series and self.ladder is None:
+        if series and self.series is None:
             raise ValueError(
                 f"the series windows {series} need the case's declared "
-                "ladder (LadderSpec tuple -- basis.run_ladder's "
+                "series (SeriesSpec tuple -- basis.run_series's "
                 "sources)")
-        if self.ladder is not None and self.ladder[0].spin != self.spin:
+        if self.series is not None and self.series[0].spin != self.spin:
             raise ValueError(
-                f"the ladder head {self.ladder[0].tag!r} must be the "
+                f"the series head {self.series[0].tag!r} must be the "
                 f"case's reference configuration (spin {self.spin}, "
-                f"not {self.ladder[0].spin})")
+                f"not {self.series[0].spin})")
 
     def atom_config(self) -> AtomConfig:
         """The spec as an :class:`AtomConfig` (``tag`` defaults to the
@@ -436,7 +436,7 @@ def _prior_anchor_first(atom: str, sectors) -> Scenario:
 # U14e's gate (Ti's pattern, widened to the whole optimizer class):
 # the f-shell optimizer class is the declared multi-solution class
 # (``run_casscf=False``'s spirit made explicit) -- the CASCI anchors
-# (the primary's four folds, the four tiers' four) run; every
+# (the primary's four cores, the four tiers' four) run; every
 # casscf/sa-casscf cell of every window stays void at the key, one
 # ``--full`` away.  The third prefix per window catches the NO-label
 # form (``<w>no<k>`` -- start='no' never occurs on a casci cell, so
@@ -448,12 +448,12 @@ def _prior_anchor_first(atom: str, sectors) -> Scenario:
 # the core 6s on 14s+15s, the 6p trio on 14p+15p, the 7s on 18s+19s):
 #   10f13d   CAS(4,12)  the record's minimal f+d window
 #   10f13d7s CAS(6,13)  the record's six13 -- the 7s pair promoted,
-#                       the fold shrinks to 4 (the full core minus the
+#                       the core shrinks to 4 (the full core minus the
 #                       7s pair); it carries its own sector
 #   10f13d14p CAS(4,15) the p-entry probe -- the physical 6p trio's
 #                       dominant band in-window, its pair folded (the
 #                       Ti 3d4s4p4d pattern); the m-complete 6p
-#                       PROMOTION would need a character-selected fold
+#                       PROMOTION would need a character-selected core
 #                       (new machinery -- the recorded future step, the
 #                       record's own open question)
 _U14E_PROMOTED = ("10f13d", "10f13d7s", "10f13d14p")
@@ -463,14 +463,14 @@ _U14E_WINDOWS = ("".join(_U_TIER["3f2d"]),) + tuple(
     "".join(_U_TIER[t]) for t in ("3f", "4f", "2f2d", "4f2d")) \
     + _U14E_PROMOTED
 
-# THE SHELL LAYER (the port of the multi-column fold, the machinery
+# THE SHELL LAYER (the port of the multi-column core, the machinery
 # proven on Sc-unc/Ti-unc): the measured realizations from the record's
 # band probe (elements/U14e/logs/probe_bands.log -- the closed 6s on
 # 13s-15s, the 6p trio on 13p-15p, the 7s on 18s-20s; the open 5f on
 # 9f-11f, the 6d on 12d-14d).  The BAND-labeled windows above stay
 # their own identities (an undeclared pattern passes through the
 # layer unchanged); the LANE window is chemical -- 5f6d@6s6p7s, the
-# fold 5 pairs over the 15-column family span, its frozen core the
+# core 5 pairs over the 15-column family span, its frozen core the
 # span's own closed-shell Roothaan.
 _U14E_BANDS = {
     "5f": ("9f", "10f", "11f"),
@@ -502,7 +502,7 @@ _U14E_ANCHOR_FIRST = Scenario(
            "(run_casscf=False's spirit made explicit): the CASCI "
            "anchors run first (2026-11-05; the kind block's casci "
            "cells -- mo/moc/no -- run: amended 2026-11-09)")
-# the frac folds' gate: the fractional-occupation reference has no
+# the frac cores' gate: the fractional-occupation reference has no
 # converged basin on the ECP atom (plain DIIS diverges E ~ +137;
 # Newton-from-minao converges to a collapsed -12.74, 37 Eh above the
 # aufbau RHF -49.04; Newton-from-ROHF does not leave the seed) -- the
@@ -526,10 +526,10 @@ _U14E_FRAC_VOID = Scenario(
 # shells; the boundaries from the measured composition,
 # elements/<Key>/logs/band_composition.log -- the greedy capture
 # tables locate each shell's MOs; the RANGES are the generous
-# declaration).  The fold spans are family-covering because the
+# declaration).  The core spans are family-covering because the
 # confined core is the span's OWN closed-shell Roothaan
 # (core.confined_core_orbitals): its pairs fill the lowest orbitals
-# of the span, so the fold's realization must cover its shells'
+# of the span, so the core's realization must cover its shells'
 # radial space DOWN TO THE CUSP (a norm-capture minimal list misses
 # the tight primitives -- measured: 99.99% capture with +13 Eh
 # core-energy error) and must EXCLUDE every skipped or active shell's
@@ -553,14 +553,14 @@ _TM_UNC_BANDS = {
 # radial per shell, replicated on the m-set): the CAS labels mirror
 # the certified contracted records' shapes (CAS(3,6)/CAS(4,6)) at
 # minutes per cell.  The FOLD families stay full -- the cusp is the
-# fold's business; the distillation is a window-side choice only.
+# core's business; the distillation is a window-side choice only.
 _TM_UNC_RADIALS = {"3d": 1, "4s": 1}
 _SC_UNC_BASIS = gto.parse((_DATA / "sc_ccpvdz_unc.txt").read_text())
 _TI_UNC_BASIS = gto.parse((_DATA / "ti_ccpvdz_unc.txt").read_text())
 
 # the validation-wave gates: the optimizer class stays void on the
 # uncontracted bases (not declared this wave -- the CASCI anchors and
-# the lane legs are the deliverable), and the frac folds wait for a
+# the lane legs are the deliverable), and the frac cores wait for a
 # measured fractional-occupation basin (the same conservatism the ECP
 # atom's record set).
 def _unc_gates(key: str, sec: tuple[int, int]) -> tuple[Scenario, ...]:
@@ -614,23 +614,23 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  # 4s fixed: the 4s->5s direction is
                                  # harmful and would mask the d structure
                                  extra_fixed="4s"),
-                   # the prior axis: the ladder (gates = the CENSUS
+                   # the prior axis: the series (gates = the CENSUS
                    # occupation-safe basins, 2026-11-10 -- the probe's
                    # draws were 155-177 mEh SHALLOW garbage) and the
                    # widened realization (Sc's certificate: 3d ->
                    # (3d, 4d), 4s -> (4s, 6s))
-                   ladder=(LadderSpec("d1s2", ("1s", "2s", "2p", "3s",
+                   series=(SeriesSpec("d1s2", ("1s", "2s", "2p", "3s",
                                                "3p", "4s"), ("3d",),
                                       1, -759.73625510),
-                           LadderSpec("d2s1", ("1s", "2s", "2p", "3s",
+                           SeriesSpec("d2s1", ("1s", "2s", "2p", "3s",
                                                "3p"), ("3d", "4s"),
                                       3, -759.69899090),
-                           LadderSpec("d3", ("1s", "2s", "2p", "3s",
+                           SeriesSpec("d3", ("1s", "2s", "2p", "3s",
                                              "3p"), ("3d",),
                                       3, -759.57064777)),
                    prior_bands={"3d": ("3d", "4d"), "4s": ("4s", "6s")},
                    # the prior windows: @r1 (the head's own block -- the
-                   # probe's "neutral"), @s1/@s2 (the ladder mean, the
+                   # probe's "neutral"), @s1/@s2 (the series mean, the
                    # mean+spread); @r2 does not exist on these atoms (a
                    # single-configuration block is rank-1 -- series_window
                    # refuses the noise second radial)
@@ -652,20 +652,20 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  "3d3p4s@1s2s2p3s"),
                    scenarios=(_ANCHOR_FIRST, _SAME_L_VOID,
                               _prior_anchor_first("Ti", [(3, 1), (2, 0)])),
-                   # the prior axis: the ladder (the HEAD gate = the
+                   # the prior axis: the series (the HEAD gate = the
                    # TRUSTED reference energy; the further gates = the
                    # CENSUS occupation-safe basins 2026-11-10 -- the
                    # probe's d4 draw was 94 mEh shallow, d3s1 4.7 mEh);
                    # the realization WIDENS 3d beyond Ti's certificate
                    # (3d -> (3d), capture 0.9991 -- a DECLARED widening:
                    # k=2 needs the 2-wide radial space)
-                   ladder=(LadderSpec("d2s2", ("1s", "2s", "2p", "3s",
+                   series=(SeriesSpec("d2s2", ("1s", "2s", "2p", "3s",
                                                "3p", "4s"), ("3d",),
                                       2, -848.40648875),
-                           LadderSpec("d3s1", ("1s", "2s", "2p", "3s",
+                           SeriesSpec("d3s1", ("1s", "2s", "2p", "3s",
                                                "3p"), ("3d", "4s"),
                                       4, -848.38650790),
-                           LadderSpec("d4", ("1s", "2s", "2p", "3s",
+                           SeriesSpec("d4", ("1s", "2s", "2p", "3s",
                                              "3p"), ("3d",),
                                       4, -848.24887522)),
                    prior_bands={"3d": ("3d", "4d"), "4s": ("4s", "6s")},
@@ -682,8 +682,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                        occ_e_ref_uhf=-848.40991227),
                    lattice_windows=("3d", "3d4p", "3d4p4d"),
                    lattice_sector=(2, 0)),
-    # The uncontracted twins: the multi-column fold's validation atoms
-    # (the ar fold = 9 pairs over a 27-column declared span; the 3d4s
+    # The uncontracted twins: the multi-column core's validation atoms
+    # (the ar core = 9 pairs over a 27-column declared span; the 3d4s
     # window COMPRESSED to its reference radials -- CAS(3,6)/CAS(4,6),
     # the certified records' shapes).  CASCI-class only this wave
     # (run_casscf=False: the optimizer class is not declared on the
@@ -718,8 +718,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    run_casscf=False,          # the multi-solution class
                    # THE LANE PORT (the shell-layer wave's destination):
                    # the chemical window 5f6d over its measured bands,
-                   # the fold 6s6p7s = 5 pairs over the 15-column
-                   # family span (the multi-column fold; the frozen
+                   # the core 6s6p7s = 5 pairs over the 15-column
+                   # family span (the multi-column core; the frozen
                    # core the span's own closed-shell Roothaan).
                    lane_windows=("5f6d@6s6p7s",),
                    nroots_primary=48,
@@ -738,7 +738,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  "10f13d": "5f6d",
                                  "10f13d7s": "5f6d7s",
                                  "10f13d14p": "5f6d6p"},
-                   fold_chemistry={5: "6s6p7s", 4: "6s6p"},
+                   core_chemistry={5: "6s6p7s", 4: "6s6p"},
                    anchor_note="forced filling: 6s²6p⁶7s² closed, "
                                "5f³6d¹ open",
                    render_primary=False,
@@ -894,14 +894,14 @@ def run_atom(
     reports: list[str] = []
 
     def stage_analysis(tag: str, cas, c_act, na: int, nb: int):
-        """The shared per-stage render: fold + analyze through
+        """The shared per-stage render: core + analyze through
         :func:`stage_facts`, print the report block, accumulate the
         results dict (one closure per run -- it captures the run's
         mol/mf/reports)."""
         ncore = ncore_of(mol.nelectron, na + nb)
-        # fold with the stage's OWN core (inside stage_facts: it uses
+        # core with the stage's OWN core (inside stage_facts: it uses
         # cas.mo_coeff[:, :ncore]): orbital optimization may legally
-        # reorganize the inactive span, and a different fold than the one
+        # reorganize the inactive span, and a different core than the one
         # PySCF's energies used breaks E_tot = E_core + e_cas. For CASCI
         # stages the passed core IS the mf core (built by build_full_mo).
         ms = (na - nb) / 2  # the true M_S (chkfile tags label M_S too)

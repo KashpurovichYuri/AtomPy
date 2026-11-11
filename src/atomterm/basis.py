@@ -18,7 +18,7 @@ come from the s_r-metric eigenproblem on the averaged block, top-k,
 replicated on the full m-set (m-complete, rotation-closed whatever the
 capture).  k is the zeta dial: k=1 is a single contraction per shell,
 k=2 adds the configuration-spread radial (single-configuration blocks
-are rank-1; the ladder average carries the spread -- the spectrum
+are rank-1; the series average carries the spread -- the spectrum
 certifies whether k=2 is reachable).
 
 Two distillation families, stated honestly:
@@ -28,7 +28,7 @@ Two distillation families, stated honestly:
   untagged windows, frozen (their identity is the store's);
 * the PRIOR axis here -- the density-block family: the
   occupation-weighted member-summed block of ONE configuration
-  (``@r<k>``, the head) or the ladder average (``@s<k>``), one
+  (``@r<k>``, the head) or the series average (``@s<k>``), one
   eigenproblem on the block, k per shell from the tag.
 
 The families share the member chains and the m-replication
@@ -38,12 +38,12 @@ comparison row.
 
 Conventions
 -----------
-- The ladder's HEAD configuration is the case's own reference (the
+- The series's HEAD configuration is the case's own reference (the
   trusted cache): the head flows in as a converged mf, never a fresh
   draw.  Every further configuration runs character-forced ROHF with a
   MANDATORY basin gate (the degenerate-open chaos is measured; an
   ungated draw is a wrong-basin risk the gate refuses).
-- Ladder chks live under ``<workdir>/<Key>/rungs/ladder/`` and are
+- Ladder chks live under ``<workdir>/<Key>/rungs/series/`` and are
   TRUSTED once present (the reproducibility unit, as every chk in
   this project).
 - The report DISCLOSES the budget: per shell the spectrum, the kept
@@ -68,8 +68,8 @@ if TYPE_CHECKING:  # the mol/mf annotations (no cycle; system is leaf)
     from atomterm.system import AtomConfig
 
 __all__ = [
-    "LadderSpec",
-    "run_ladder",
+    "SeriesSpec",
+    "run_series",
     "valence_block",
     "metric_radials",
     "series_window",
@@ -84,8 +84,8 @@ _TAIL = 1e-4
 
 # the declaration ------------------------------------------------------
 
-class LadderSpec(NamedTuple):
-    """One configuration of the ladder: the forced-occupation recipe
+class SeriesSpec(NamedTuple):
+    """One configuration of the series: the forced-occupation recipe
     and its basin gate.
 
     Attributes
@@ -109,14 +109,14 @@ class LadderSpec(NamedTuple):
         (:func:`atomterm.reference.rohf_basin_census` -- the
         occupation-safe rows), then trusted.
     accel : the SCF acceleration policy (``conv_accelerator`` -- the
-        ladder configurations DIVERGE under plain DIIS, measured;
+        series configurations DIVERGE under plain DIIS, measured;
         Newton converges them, at the cost that its frozen early
-        occupations can VIOLATE the hook -- run_ladder post-checks).
+        occupations can VIOLATE the hook -- run_series post-checks).
 
     Notes
     -----
-    The ladder's FIRST entry is the case's own reference configuration
-    (the head): its converged mf enters :func:`run_ladder` directly
+    The series's FIRST entry is the case's own reference configuration
+    (the head): its converged mf enters :func:`run_series` directly
     from the trusted cache, so the head's ``e_ref`` is the case's
     declared ``occ_e_ref`` -- recorded for completeness, never
     re-gated.
@@ -130,20 +130,20 @@ class LadderSpec(NamedTuple):
     accel: str = "newton"
 
 
-# the ladder -----------------------------------------------------------
+# the series -----------------------------------------------------------
 
-def run_ladder(cfg: "AtomConfig", workdir: str | Path, key: str, ladder,
+def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
                head_mf) -> dict[str, "_scf.RHF"]:
-    """Run (or load, trusted) the configuration ladder.
+    """Run (or load, trusted) the configuration series.
 
     Parameters
     ----------
     cfg : the atom (:class:`atomterm.system.AtomConfig`) -- the case's
-        own (the ladder varies only the occupations and spin).
+        own (the series varies only the occupations and spin).
     workdir : the elements root.
     key : the campaign key (the store dir name; chks land under
-        ``<workdir>/<key>/rungs/ladder/<tag>.chk``).
-    ladder : the declared :class:`LadderSpec` tuple; its HEAD (first
+        ``<workdir>/<key>/rungs/series/<tag>.chk``).
+    series : the declared :class:`SeriesSpec` tuple; its HEAD (first
         entry) must be the case's reference configuration.
     head_mf : the case's trusted converged reference mf (the head's
         converged state -- never re-run, never re-gated).
@@ -156,28 +156,28 @@ def run_ladder(cfg: "AtomConfig", workdir: str | Path, key: str, ladder,
     ------
     ValueError
         the head's spin mismatches the case's (the head IS the case
-        reference; a mismatched declaration is a wrong ladder).
+        reference; a mismatched declaration is a wrong series).
     RuntimeError
         a fresh configuration did not reach its declared basin (the
         gate's own error, propagated).
     """
-    if ladder[0].spin != cfg.spin:
+    if series[0].spin != cfg.spin:
         raise ValueError(
-            f"the ladder head {ladder[0].tag!r} declares spin "
-            f"{ladder[0].spin} but the case's reference (which the head "
-            f"must be) carries spin {cfg.spin} -- a mismatched ladder "
+            f"the series head {series[0].tag!r} declares spin "
+            f"{series[0].spin} but the case's reference (which the head "
+            f"must be) carries spin {cfg.spin} -- a mismatched series "
             "declaration")
-    if abs(head_mf.e_tot - ladder[0].e_ref) > 1e-4:
+    if abs(head_mf.e_tot - series[0].e_ref) > 1e-4:
         raise ValueError(
-            f"the head mf (E = {head_mf.e_tot:.8f}) is not the ladder "
-            f"head {ladder[0].tag!r}'s declared reference (E = "
-            f"{ladder[0].e_ref:.8f}) -- the head must be the case's own "
+            f"the head mf (E = {head_mf.e_tot:.8f}) is not the series "
+            f"head {series[0].tag!r}'s declared reference (E = "
+            f"{series[0].e_ref:.8f}) -- the head must be the case's own "
             "trusted reference, passed in as head_mf (a foreign mf is "
-            "a wrong ladder, whatever its convergence)")
-    out = {ladder[0].tag: head_mf}
-    chk_dir = Path(workdir) / key / "rungs" / "ladder"
+            "a wrong series, whatever its convergence)")
+    out = {series[0].tag: head_mf}
+    chk_dir = Path(workdir) / key / "rungs" / "series"
     chk_dir.mkdir(parents=True, exist_ok=True)
-    for spec in ladder[1:]:
+    for spec in series[1:]:
         cfg_x = type(cfg)(cfg.symbol, cfg.basis, spin=spec.spin)
         ref = ReferenceSpec(occ_closed=spec.closed, occ_open=spec.open,
                             occ_e_ref=spec.e_ref,
@@ -189,7 +189,7 @@ def run_ladder(cfg: "AtomConfig", workdir: str | Path, key: str, ladder,
         # frozen-assignment disease -- reference.occupation_postcheck)
         if not occupation_postcheck(_m, mf_x, spec.closed, spec.open):
             raise RuntimeError(
-                f"ladder config {spec.tag!r} converged at "
+                f"series config {spec.tag!r} converged at "
                 f"E = {mf_x.e_tot:.8f} with occupations its own hook "
                 "reassigns differently (the Newton frozen-assignment "
                 "disease) -- the wrong configuration; the census "
@@ -215,7 +215,7 @@ def valence_block(mf, chain, ncol: int) -> np.ndarray:
     mf : the configuration's converged SCF object.
     chain : the shell's member chains
         (:func:`atomterm.windows.member_chains`).
-    ncol : the fold boundary (core orbital pairs; the valence columns
+    ncol : the core boundary (core orbital pairs; the valence columns
         start there).
 
     Returns
@@ -255,7 +255,7 @@ def metric_radials(block: np.ndarray, s_r: np.ndarray, k: int
     ``(v, lam)`` : the ``(width, k)`` s_r-orthonormal radial columns
     (descending eigenvalue order) and the full descending spectrum
     (the k certificate: single-configuration blocks are rank-1, the
-    ladder average carries the spread).
+    series average carries the spread).
 
     Raises
     ------
@@ -282,7 +282,7 @@ def series_window(mol, mfs: list, s: np.ndarray, patterns: list[str],
                   ) -> tuple[np.ndarray, dict]:
     """The prior-axis distilled window: each chemical shell as its
     declared k radial directions from the DENSITY-BLOCK family -- the
-    head configuration's block (``@r``) or the ladder average
+    head configuration's block (``@r``) or the series average
     (``@s``; the caller passes the mf list) -- replicated on the full
     m-set.
 
@@ -290,7 +290,7 @@ def series_window(mol, mfs: list, s: np.ndarray, patterns: list[str],
     ----------
     mol : the built Mole (the shell walker's substrate).
     mfs : the source configurations' converged mf objects (ONE = the
-        ``@r`` head form; several = the ladder average, the ``@s``
+        ``@r`` head form; several = the series average, the ``@s``
         form -- equal weight, the per-configuration block average).
     s : the ``(nao, nao)`` overlap metric.
     patterns : the window's chemical shell names, in slot order.
@@ -300,7 +300,7 @@ def series_window(mol, mfs: list, s: np.ndarray, patterns: list[str],
         the case's incumbent ``shell_bands``.
     radials : the declared depth, shell -> k (the tag's k, uniform
         over the window's shells by the tag grammar).
-    ncol : the fold boundary (core orbital pairs).
+    ncol : the core boundary (core orbital pairs).
 
     Returns
     -------
@@ -350,8 +350,8 @@ def series_window(mol, mfs: list, s: np.ndarray, patterns: list[str],
                 f"shell {shell!r}: the declared k={k} exceeds the radial "
                 f"signal -- the k-th eigenvalue reads {lam[k - 1]:.2e} "
                 f"against the leading {lam[0]:.6f} (a single-configuration "
-                "block is rank-1; only the LADDER average carries the "
-                "second radial -- lower k or average over the ladder)")
+                "block is rank-1; only the series average carries the "
+                "second radial -- lower k or average over the series)")
         discarded = (float(lam[k:].sum() / lam.sum())
                      if len(lam) > k else 0.0)
         block = np.zeros((n, k * len(chain)))
@@ -383,7 +383,7 @@ def _capture(block: np.ndarray, mfs: list, s: np.ndarray, chain
              ) -> list[list[float]]:
     """Each source configuration's significant columns, captured on
     the distilled span (the honest quality readout, per
-    configuration -- the ladder's own columns, not a foreign
+    configuration -- the series's own columns, not a foreign
     reference's)."""
     from atomterm.windows import span_projector
 

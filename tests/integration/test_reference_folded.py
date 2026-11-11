@@ -1,6 +1,6 @@
 """The folded reference (:func:`atomterm.reference.run_folded`): the
 confined core frozen, the valence ROHF self-consistent in its field --
-the lane's reference class.  Two fold partitions on the carbon fixture
+the lane's reference class.  Two core partitions on the carbon fixture
 (1s-only: a closed valence pair + the p opens -- the Ti shape;
 1s2s: a pure-open valence); one real valence SCF per partition
 (seconds)."""

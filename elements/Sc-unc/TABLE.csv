@@ -1,4 +1,4 @@
-method,route,window,CAS,fold,dets,E_Eh,dE_mEh,E_eV,dE_eV,conv,L2,ptp_Eh,PLz,PLperp,HLz,HL2,note
+method,route,window,CAS,core,dets,E_Eh,dE_mEh,E_eV,dE_eV,conv,L2,ptp_Eh,PLz,PLperp,HLz,HL2,note
 ROHF (anchor),—,—,—,—,—,−759.7374,0,−20673.5179,+0.0000,—,—,—,—,—,—,—,forced filling
 CASCI,free,3d / D,"(3,5)",Ar,50,−759.3360,+401.3,−20662.5968,+10.9210,—,11.9994,5e-02,3e-02,4e-02,1.2e-02,7.2e-02,
 CASCI,free,3d4s / D,"(3,6)",Ar·raw,90,−759.7342,+3.2,−20673.4319,+0.0860,—,5.9990,9e-02,3e-02,4e-02,4.6e-02,2.5e-01,

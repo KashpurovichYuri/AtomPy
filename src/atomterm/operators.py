@@ -647,7 +647,7 @@ def window_closure(mol, c_win: np.ndarray) -> dict[str, float]:
     Notes
     -----
     ``lz = lperp = 0`` (to roundoff) is the COMPLETE closure
-    certificate: no blind spots, no core fold, no CI -- symmetry
+    certificate: no blind spots, no core core, no CI -- symmetry
     breaking is attributed to the span itself. The many-body
     commutator norms respond to these defects at O(defect), the
     energy at O(defect^2) at stationary points.

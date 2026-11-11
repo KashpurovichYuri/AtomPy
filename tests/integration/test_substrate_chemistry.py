@@ -334,7 +334,7 @@ def test_purified_core_orbitals_exact_closed_span(build_full_mo_refs, sc_rohf):
                     assert np.abs(cross).max() < 1e-12, (sym, l, mi, mj)
         assert core_anisotropy(mol, mf, ncore, c_core=c_pur) < 1e-12, sym
 
-        # the reference moved only at the tail^2 level of the fold's own
+        # the reference moved only at the tail^2 level of the core's own
         # scalar core (spherically averaged densities compared)
         from atomterm.operators import _spherical_average_density
         d_can = _spherical_average_density(

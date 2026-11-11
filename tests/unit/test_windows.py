@@ -13,7 +13,7 @@ from pyscf import gto
 from atomterm.windows import (NOBLE_CORES, Window, build_full_mo,
                               canonical_order, closed_electrons,
                               complete_orthonormal,
-                              fold_shells, lm_sectors, lowdin,
+                              core_shells, lm_sectors, lowdin,
                               occupied_core_idx, primitive_chain,
                               select_primitives, select_span,
                               select_valence_ao, select_shell_ao,
@@ -249,7 +249,7 @@ def test_shell_weights_pure_l_for_raw_shell_aos(carbon):
 # ---------------------- closed-block and primitive-chain pins (synthetic)
 
 def test_occupied_core_idx_selects_the_closed_block_not_canonical_order():
-    """The core fold takes the DOUBLY-OCCUPIED block, not canonical
+    """The core core takes the DOUBLY-OCCUPIED block, not canonical
     order; the contracted-basis coincidence is checked, not assumed."""
     import warnings
 
@@ -259,7 +259,7 @@ def test_occupied_core_idx_selects_the_closed_block_not_canonical_order():
 
     # U-style: canonical [0:5] are virtual junk (eps ~ 0.02) while the
     # closed block sits at 22/61/88/120/143 -- folding range(ncore)
-    # corrupted the fold at max|dE| = 14.5 Eh
+    # corrupted the core at max|dE| = 14.5 Eh
     occ = [0.0] * 10
     for k in (2, 5, 6, 8, 9):
         occ[k] = 2.0
@@ -286,7 +286,7 @@ def test_canonical_order_reorders_into_closed_open_virtual():
     """The start='mo' substrate takes the canonical matrix in the RUN
     convention -- closed block | open shell | virtuals, energy-ordered
     within the classes: the raw PySCF order is the m-block listing and
-    would fold virtual junk on uncontracted bases. Identity (silent)
+    would core virtual junk on uncontracted bases. Identity (silent)
     when the canonical order already coincides."""
     import warnings
 
@@ -439,26 +439,26 @@ def test_primitive_chain_and_select_primitives():
         primitive_chain(ccd, 1)
 
 
-# -------------------------------------------------------- the fold vocabulary
+# -------------------------------------------------------- the core vocabulary
 
 
-def test_fold_shells_rules():
+def test_core_shells_rules():
     """The three rule classes resolve: the universal noble-gas table,
     the semi class rule (the noble core ending at np, minus np, plus
     (n+1)s -- the open-d period's), and the explicit list (concatenated
     or comma-separated -- it must consume entirely)."""
-    assert fold_shells("he") == ("1s",)
-    assert fold_shells("AR") == NOBLE_CORES["ar"]
-    assert fold_shells("kr") == ("1s", "2s", "2p", "3s", "3p",
+    assert core_shells("he") == ("1s",)
+    assert core_shells("AR") == NOBLE_CORES["ar"]
+    assert core_shells("kr") == ("1s", "2s", "2p", "3s", "3p",
                                  "4s", "3d", "4p")
-    assert fold_shells("semi", open_d="3d") == ("1s", "2s", "2p", "3s", "4s")
-    assert fold_shells("semi", open_d="4d") == ("1s", "2s", "2p", "3s",
+    assert core_shells("semi", open_d="3d") == ("1s", "2s", "2p", "3s", "4s")
+    assert core_shells("semi", open_d="4d") == ("1s", "2s", "2p", "3s",
                                                 "3p", "4s", "3d", "5s")
-    assert fold_shells("1s2s2p4s") == ("1s", "2s", "2p", "4s")
-    assert fold_shells("1s, 2s") == ("1s", "2s")
+    assert core_shells("1s2s2p4s") == ("1s", "2s", "2p", "4s")
+    assert core_shells("1s, 2s") == ("1s", "2s")
 
 
-def test_fold_shells_refusals():
+def test_core_shells_refusals():
     """Unknown names, junk lists, and semi without a usable open-d
     shell all refuse at the resolver (the seam that owns the
     vocabulary)."""
@@ -466,18 +466,18 @@ def test_fold_shells_refusals():
                          ("s", None), ("", None),
                          ("semi", None), ("semi", "3p"), ("semi", "7d")):
         with pytest.raises(ValueError):
-            fold_shells(name, open_d=open_d)
+            core_shells(name, open_d=open_d)
 
 
 def test_closed_electrons():
     """Two electrons per m-slot: the noble cores' shell closures and
-    the ladder's Ti folds (semi leaves 8 of 22 active; the M-shell
-    folds leave 10)."""
+    the lane windows' Ti cores (semi leaves 8 of 22 active; the M-shell
+    cores leave 10)."""
     assert closed_electrons(NOBLE_CORES["he"]) == 2
     assert closed_electrons(NOBLE_CORES["ne"]) == 10
     assert closed_electrons(NOBLE_CORES["ar"]) == 18
     assert closed_electrons(NOBLE_CORES["rn"]) == 86
-    assert closed_electrons(fold_shells("semi", open_d="3d")) == 14
+    assert closed_electrons(core_shells("semi", open_d="3d")) == 14
     assert 22 - closed_electrons(("1s", "2s", "2p", "4s")) == 10
     assert 22 - closed_electrons(("1s", "2s", "2p", "3s")) == 10
 

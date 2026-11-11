@@ -367,9 +367,9 @@ def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
     L, parity : the target TERM -- ``parity`` is the configuration's
         total inversion parity (p^2 -> g, s p -> u), not the shell's.
     conv_tol : the pinned solvers' CI convergence tolerance.
-    c_core : explicit fold columns (the ladder's non-prefix folds --
-        ``ncore`` is then the fold's column count; the default None
-        folds the ncore prefix).
+    c_core : explicit core columns (the lane windows' non-prefix cores --
+        ``ncore`` is then the core's column count; the default None
+        cores the ncore prefix).
 
     Returns
     -------
@@ -410,7 +410,7 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     ----------
     As :func:`run_irrep_casci` (the optimizer convergence is PySCF's
     default; the readout solvers take ``conv_tol``), including the
-    ``c_core`` fold passthrough.
+    ``c_core`` core passthrough.
 
     Returns
     -------

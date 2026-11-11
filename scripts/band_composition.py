@@ -3,7 +3,7 @@ certificate behind a declared shell layer (``CaseSpec.shell_bands``).
 
 On an uncontracted basis the AO labels are radial counters; which
 bands realize a chemical shell is a MEASURED fact (this script) that
-the declaration then states (the layer) and the folds/windows consume
+the declaration then states (the layer) and the cores/windows consume
 (:func:`atomterm.windows.shell_realization`).
 
 TWO METERS, one per role:

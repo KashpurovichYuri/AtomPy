@@ -21,8 +21,8 @@ the radial spectrum, the discarded fraction, the per-configuration
 captures) rides the cells' payloads (`window_report`) and the
 provenance logs (`logs/`).
 
-<!-- ladder:begin -->
-| method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
+<!-- methods:begin -->
+| method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −848.4065 | 0 | −23086.3283 | +0.0000 | — | — | — | — | — | — | — | forced filling |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -112,4 +112,4 @@ provenance logs (`logs/`).
 Declared, not yet run -- the optimizer cells are void until their CASCI anchors are read (the anchor-first scenario). One regen away: `regen_cells.py Ti --window 3d4d`.
 
 Declared, not yet run -- the optimizer cells are void until their CASCI anchors are read (the anchor-first scenario). One regen away: `regen_cells.py Ti --window 3d4s4p4d`.
-<!-- ladder:end -->
+<!-- methods:end -->

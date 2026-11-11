@@ -26,16 +26,16 @@ Two axes describe the CORE and are easily conflated:
 * ``substrate`` -- the core SPAN (which core columns exist): ``pol`` =
   the SCF's canonical core MOs; ``pur`` = the exactly L-closed
   reconstruction (:func:`atomterm.core.purified_core_orbitals`).
-* ``fold`` -- the core FIELD convention of the analysis: ``raw`` = the
+* ``core`` -- the core FIELD convention of the analysis: ``raw`` = the
   SCF density as converged (the anisotropy detector), ``avg`` = its
   spherical average (the ruler), ``frac`` = a different reference SCF
   entirely (fractional occupations).
 
   Composition: (raw, pol) detector; (avg, pol) ruler; (avg, pur) the
-  certified fold; (frac, pol) own reference. On ``pur`` the density is
+  certified core; (frac, pol) own reference. On ``pur`` the density is
   exactly m-scalar, so ``raw`` degenerates with ``avg`` --
-  the key CANONICALIZES ``fold="raw"`` to ``"avg"`` there, and
-  ``frac`` on ``pur`` is rejected. ``substrate`` is the span, ``fold``
+  the key CANONICALIZES ``core="raw"`` to ``"avg"`` there, and
+  ``frac`` on ``pur`` is rejected. ``substrate`` is the span, ``core``
   is the field.
 
 Address grammar
@@ -43,7 +43,7 @@ Address grammar
 Manifest reading order: where / the physics box /
 the objective / the optimizer freedom / the core::
 
-    <atom>_<window>_<na>-<nb>_<method>_<start>_<mask|->_<substrate>_<fold>
+    <atom>_<window>_<na>-<nb>_<method>_<start>_<mask|->_<substrate>_<core>
 
 with SINGULAR axis values throughout (``ao``/``mo``/``moc``/``no``), the
 sector as ``na-nb`` (fixes Ms AND nelec), and ``-`` for no mask
@@ -53,17 +53,17 @@ sector as ``na-nb`` (fixes Ms AND nelec), and ``-`` for no mask
 ``<source>no<k>`` (e.g. ``3d4sno2``) = the k-th occupation-group
 prefix of the source's term-averaged density -- the prefix is part of
 the window identity, so differently-sized NO cells of one source get
-different addresses.  A LANE window carries its own fold as a tag on
+different addresses.  A LANE window carries its own core as a tag on
 the label (``3d3p@semi``, ``3s3p3d@1s2s2p4s`` --
-:func:`atomterm.windows.fold_shells` the tag grammar): the tag
+:func:`atomterm.windows.core_shells` the tag grammar): the tag
 declares the cell's core partition AND marks the pinned-lane cell
 (:func:`lane_keys`, :func:`run_lane_cell`) -- a tagged window never
 collides with a free-route label.  A PRIOR-AXIS window carries its
 distillation source as the tag instead (``3d4s@s2`` --
 :attr:`CellKey.source_tag` the grammar): ``@r<k>`` the head
-configuration's density block, ``@s<k>`` the configuration-ladder
+configuration's density block, ``@s<k>`` the configuration-series
 average (:func:`atomterm.basis.series_window`) -- the one ``@``-slot
-holds a fold or a source tag, never both.
+holds a core or a source tag, never both.
 
 The REFERENCE FIELD sits outside the eight slots: a cell runs on the
 neutral-atom SCF (``field="neutral"`` -- the default, and every store
@@ -71,16 +71,16 @@ predating the axis) or on the folded reference
 (:func:`atomterm.reference.run_folded` -- the confined-core field
 with the valence re-relaxed, the lane's reference class).  The field
 serializes as an OPTIONAL ninth slot, appended ONLY when non-default
-(``..._<substrate>_<fold>_folded``): an eight-slot address parses as
+(``..._<substrate>_<core>_folded``): an eight-slot address parses as
 ``neutral`` and re-serializes unchanged -- the store identities minted
 before the axis keep their exact names.  A folded key requires a
-fold-tagged window: the folded field is defined BY its confined span,
+core-tagged window: the folded field is defined BY its confined span,
 and the tag is that span's name.
 
 One real address, decoded slot by slot::
 
     ti_3d4sno2_3-1_sa-casscf_no_-_pol_avg
-    │  │        │   │         │  │ │   └ fold=avg   (the averaged core field)
+    │  │        │   │         │  │ │   └ core=avg   (the averaged core field)
     │  │        │   │         │  │ └─── substrate=pol (the SCF core span)
     │  │        │   │         │  └───── mask=-      (free optimization)
     │  │        │   │         └──────── start=no    (natural-orbital columns)
@@ -146,26 +146,26 @@ METHODS = ("casci", "casscf", "sa-casscf")
 STARTS = ("ao", "mo", "moc", "no")  # window constructions (the span is the window)
 MASKS = ("radial", "frozen", "virtmix")   # None = free optimization
 SUBSTRATES = ("pol", "pur")
-FOLDS = ("raw", "avg", "frac")
+CORES = ("raw", "avg", "frac")
 FIELDS = ("neutral", "folded")  # the reference field (an optional 9th slot)
 
 # the nominal window label: shell tokens like "2p", "3d4s" -- lowercase
 # alphanumerics, no separators (the address splits on "_"); a lane
-# window appends its fold tag: "3d3p@semi", "3s3p3d@1s2s2p4s"; a
+# window appends its core tag: "3d3p@semi", "3s3p3d@1s2s2p4s"; a
 # prior-axis window appends its source tag: "3d4s@s2" (the @-slot
-# holds ONE tag -- a fold or a source, never both)
+# holds ONE tag -- a core or a source, never both)
 _WINDOW_RE = re.compile(r"[0-9][0-9a-z]*(?:@[0-9a-z]+)?\Z")
 
 # the prior-axis source tag: @r<k> (the head configuration's density
-# block) | @s<k> (the ladder average) -- letter-first, k >= 1; disjoint
-# from the fold vocabulary (noble names, "semi", digit-first shell
+# block) | @s<k> (the series average) -- letter-first, k >= 1; disjoint
+# from the core vocabulary (noble names, "semi", digit-first shell
 # lists) by construction
 _SOURCE_TAG_RE = re.compile(r"([rs])([1-9]\d*)\Z")
 
 
 def _source_label_of(window: str) -> str:
     """The window label with any NO tail removed (``"3d4s@s2no2"`` ->
-    ``"3d4s@s2"``) -- the part a fold/source tag lives in."""
+    ``"3d4s@s2"``) -- the part a core/source tag lives in."""
     m = re.fullmatch(r"(.+?)no([1-9]\d*)", window)
     return m.group(1) if m else window
 
@@ -206,8 +206,8 @@ class CellKey:
     window : NOMINAL span label, e.g. ``"3d4s"`` -- names the table
         row; the construction is the ``start`` axis (window = the
         span, start = the columns defining it).  A LANE window
-        carries its own fold as a tag (``"3d3p@semi"`` --
-        :meth:`fold_shells` resolves it): the tag declares the cell's
+        carries its own core as a tag (``"3d3p@semi"`` --
+        :meth:`core_shells` resolves it): the tag declares the cell's
         core partition AND marks the lane (a tagged window never
         collides with a free-route label; NO windows take none).
     sector : ``(na, nb)`` -- alpha/beta active electrons; fixes Ms
@@ -236,18 +236,18 @@ class CellKey:
     mask : optimizer restriction -- ``None`` (free) | ``"radial"`` |
         ``"frozen"`` | ``"virtmix"``; only meaningful for optimizer
         methods (rejected for ``casci``).
-    substrate / fold : the core axes -- see the module docstring.
-        Lane cells carry ``(pur, avg)`` -- the certified-fold class:
-        an exactly-closed shell-span fold whose field is exactly
+    substrate / core : the core axes -- see the module docstring.
+        Lane cells carry ``(pur, avg)`` -- the certified-core class:
+        an exactly-closed shell-span core whose field is exactly
         m-scalar (the uniform construction of :func:`run_lane_cell`).
-        For fold-tagged windows the substrate axis NAMES THE ROUTE:
+        For core-tagged windows the substrate axis NAMES THE ROUTE:
         ``pur`` = the pinned lane class (run_lane_cell), ``pol`` = the
-        free driver (:func:`run_cell`'s fold branch -- the twins).
+        free driver (:func:`run_cell`'s core branch -- the twins).
     field : ``"neutral"`` | ``"folded"`` -- the REFERENCE field the
         cell's substrate lives on (the module docstring).  Default
         ``neutral``, serialized only when ``folded``: an address
         without the tag IS a neutral cell (stores predating the axis
-        need no migration).  A folded key requires a fold-tagged
+        need no migration).  A folded key requires a core-tagged
         window.
     """
 
@@ -258,12 +258,12 @@ class CellKey:
     start: str = "ao"
     mask: str | None = None
     substrate: str = "pol"
-    fold: str = "avg"
+    core: str = "avg"
     field: str = "neutral"
 
     def __post_init__(self):
         """Validate and canonicalize: axis vocabularies, void
-        combinations, and the pur fold rule (raw -> avg)."""
+        combinations, and the pur core rule (raw -> avg)."""
         if not (isinstance(self.atom, str)
                 and 1 <= len(self.atom) <= 8
                 and _ATOM_RE.match(self.atom)):
@@ -275,7 +275,7 @@ class CellKey:
             raise ValueError(
                 f"window {self.window!r} must be a nominal shell label "
                 "(lowercase alphanumerics, e.g. '3d4s', optionally with "
-                "a fold tag '3d3p@semi'; no separators)")
+                "a core tag '3d3p@semi'; no separators)")
         na, nb = self.sector
         if not (isinstance(na, int) and isinstance(nb, int)
                 and na >= nb >= 0 and na + nb > 0):
@@ -285,14 +285,14 @@ class CellKey:
                 ("method", self.method, METHODS),
                 ("start", self.start, STARTS),
                 ("substrate", self.substrate, SUBSTRATES),
-                ("fold", self.fold, FOLDS),
+                ("core", self.core, CORES),
                 ("field", self.field, FIELDS)):
             if value not in vocab:
                 raise ValueError(
                     f"{axis} {value!r} not in {vocab}")
-        if self.field == "folded" and self.fold_tag is None:
+        if self.field == "folded" and self.core_tag is None:
             raise ValueError(
-                f"field='folded' needs a fold-tagged window (the tag "
+                f"field='folded' needs a core-tagged window (the tag "
                 f"names the confined span that defines the field); "
                 f"{self.window!r} carries none")
         if (self.start == "no") != (self.no_source is not None):
@@ -300,10 +300,10 @@ class CellKey:
                 f"start='no' and the window label must agree: NO windows "
                 "are '<source>no<k>' (e.g. '3d4sno2'), other starts take "
                 "a plain shell label")
-        if self.no_source is not None and self.fold_tag is not None:
+        if self.no_source is not None and self.core_tag is not None:
             raise ValueError(
-                f"window {self.window!r}: NO windows carry no fold tag "
-                "(their fold is the source window's own)")
+                f"window {self.window!r}: NO windows carry no core tag "
+                "(their core is the source window's own)")
         if self.mask is not None:
             if self.mask not in MASKS:
                 raise ValueError(f"mask {self.mask!r} not in {MASKS} (None = free)")
@@ -318,16 +318,16 @@ class CellKey:
         # (mo, pur) is valid: the canonical columns are
         # re-orthogonalized against the pur core span (run_cell's mo
         # branch).
-        # the pur-fold degeneracy rule: on the purified substrate the
+        # the pur-core degeneracy rule: on the purified substrate the
         # core density is exactly m-scalar, so raw == avg --
         # canonicalize instead of storing two addresses for one cell;
         # frac is a different REFERENCE, meaningless on pur
         if self.substrate == "pur":
-            if self.fold == "frac":
-                raise ValueError("fold='frac' is a different reference SCF; "
+            if self.core == "frac":
+                raise ValueError("core='frac' is a different reference SCF; "
                                  "it cannot live on the purified substrate")
-            if self.fold == "raw":
-                object.__setattr__(self, "fold", "avg")
+            if self.core == "raw":
+                object.__setattr__(self, "core", "avg")
 
     @property
     def address(self) -> str:
@@ -338,7 +338,7 @@ class CellKey:
         na, nb = self.sector
         parts = [self.atom.lower(), self.window, f"{na}-{nb}",
                  self.method, self.start, self.mask or "-",
-                 self.substrate, self.fold]
+                 self.substrate, self.core]
         if self.field != "neutral":
             parts.append(self.field)
         return "_".join(parts)
@@ -356,37 +356,37 @@ class CellKey:
                 f"address {address!r} does not have 8 slots (9 with "
                 "the field tag): atom_window_na-nb_method_start_mask_"
                 "substrate_fold[_field]")
-        atom, window, sector, method, start, mask, substrate, fold, \
+        atom, window, sector, method, start, mask, substrate, core, \
             field_name = parts
         na, nb = sector.split("-")
         return cls(atom, window, (int(na), int(nb)), method, start,
-                   None if mask == "-" else mask, substrate, fold,
+                   None if mask == "-" else mask, substrate, core,
                    field=field_name)
 
     @property
     def shell_patterns(self) -> list[str]:
         """The window's span as shell selectors: ``"3d4s"`` ->
-        ``["3d", "4s"]``; a lane window's fold tag is not part of the
+        ``["3d", "4s"]``; a lane window's core tag is not part of the
         span."""
         return re.findall(r"\d+[spdfgh]", self.span_label)
 
     @property
     def span_label(self) -> str:
-        """The window label without its fold tag (the bare span)."""
+        """The window label without its core tag (the bare span)."""
         return self.window.partition("@")[0]
 
     @property
     def _source_label(self) -> str:
         """The label of the window's SOURCE construction: the bare
         label with any NO tail removed (``"3d4s@s2no2"`` ->
-        ``"3d4s@s2"``) -- the part a fold/source tag lives in."""
+        ``"3d4s@s2"``) -- the part a core/source tag lives in."""
         return _source_label_of(self.window)
 
     @property
-    def fold_tag(self) -> str | None:
-        """The window's ``@fold`` tag (None = the case's core prefix;
-        :meth:`fold_shells` resolves a tag to shells).  A source tag
-        (:attr:`source_tag`) is not a fold."""
+    def core_tag(self) -> str | None:
+        """The window's ``@core`` tag (None = the case's core prefix;
+        :meth:`core_shells` resolves a tag to shells).  A source tag
+        (:attr:`source_tag`) is not a core."""
         span, sep, tag = self._source_label.partition("@")
         return tag if sep and self.source_tag is None else None
 
@@ -396,7 +396,7 @@ class CellKey:
         AXIS, the basis-preparation window family
         (:func:`atomterm.basis.series_window`): ``@r2`` = the head
         configuration's density block at k=2 (the reference source),
-        ``@s1``/``@s2`` = the configuration-ladder average at k=1/k=2
+        ``@s1``/``@s2`` = the configuration-series average at k=1/k=2
         (the series source), k uniform over the window's shells.  The
         realization is the case's declared ``prior_bands`` (the
         widened, certificate-measured band lists k>1 needs).  None =
@@ -410,28 +410,28 @@ class CellKey:
         """
         return prior_tag_of(self.window)
 
-    def fold_shells(self) -> tuple[str, ...]:
-        """The key's fold tag resolved to shells
-        (:func:`atomterm.windows.fold_shells`; the class rule's open d
+    def core_shells(self) -> tuple[str, ...]:
+        """The key's core tag resolved to shells
+        (:func:`atomterm.windows.core_shells`; the class rule's open d
         = the LOWEST-n d shell of the window span -- every lane window
         contains the valence d).
 
         Raises
         ------
         ValueError
-            the window carries no tag (its fold is the case's prefix,
-            not the key's to resolve), or the tag is not a fold name.
+            the window carries no tag (its core is the case's prefix,
+            not the key's to resolve), or the tag is not a core name.
         """
-        from atomterm.windows import fold_shells
+        from atomterm.windows import core_shells
 
-        tag = self.fold_tag
+        tag = self.core_tag
         if tag is None:
             raise ValueError(
-                f"window {self.window!r} carries no fold tag; its fold "
+                f"window {self.window!r} carries no core tag; its core "
                 "is the case's core prefix")
         ds = [p for p in self.shell_patterns if p.endswith("d")]
         open_d = min(ds, key=lambda p: int(p[:-1])) if ds else None
-        return fold_shells(tag, open_d=open_d)
+        return core_shells(tag, open_d=open_d)
 
     @property
     def no_source(self) -> tuple[str, int] | None:
@@ -464,7 +464,7 @@ class CellData:
     mo_coeff : the run's full MO matrix (nao, nao).
     energies : total energies per root.
     ci : per-root CI arrays, PySCF ordering.
-    core_energy : ``E_tot`` minus the active part (the fold constant).
+    core_energy : ``E_tot`` minus the active part (the core constant).
     ncas : window width -- needed exactly when it is not derivable
         from the label (NO windows); 0 = derive from the shell label.
     cycles : the optimizer's macro-cycle count (cost pricing +
@@ -565,7 +565,7 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
 # ------------------------------------------------------------- the execution
 
 # the dense-meter budget: sectors past this determinant count skip the
-# exact [H, L] commutators (O(ndet^2) memory) -- the ladder's em-dash
+# exact [H, L] commutators (O(ndet^2) memory) -- the methods table's em-dash
 _COMM_CAP = 6000
 
 # the dense-adjudication budget: CI lane blocks up to this determinant
@@ -596,25 +596,25 @@ def _pick_no_window(wins, k: int):
         "open the sector)")
 
 
-def _fold_core(key: CellKey, mol, mf,
+def _lane_core(key: CellKey, mol, mf,
                shell_bands: dict | None = None
                ) -> tuple[tuple[str, ...], int, np.ndarray, dict]:
-    """One home for the fold resolution shared by the free fold branch
+    """One home for the core resolution shared by the free core branch
     (:func:`run_cell`), the cache path (:func:`analyze_cell`), and the
     pinned lane (:func:`run_lane_cell`): resolve the tag's shells
     THROUGH THE SHELL LAYER (a chemical shell's AO realization is
     declared, not read off labels --
     :func:`atomterm.windows.shell_realization`), refuse the malformed
-    keys, and return the fold's shell tuple, its DOUBLY-OCCUPIED PAIR
+    keys, and return the core's shell tuple, its DOUBLY-OCCUPIED PAIR
     count (the chemistry: ``closed_electrons`` halved -- never the
     span's column count), the frozen core columns, and the core's
     certificate report.
 
     The frozen core is the reference's OWN core -- the occupied core
-    columns (by occupation), S-projected onto the fold span and
+    columns (by occupation), S-projected onto the core span and
     orthonormalized within it.  The field and the bookkeeping then
     join the neutral anchor BY CONSTRUCTION on any basis.  The
-    m-scalar anisotropy rule applies downstream (the averaged fold,
+    m-scalar anisotropy rule applies downstream (the averaged core,
     ``active_space_integrals``'s default).  The retired alternative
     -- the span's own closed-shell Roothaan
     (:func:`atomterm.core.confined_core_orbitals`) -- over-relaxes on
@@ -632,36 +632,36 @@ def _fold_core(key: CellKey, mol, mf,
     Raises
     ------
     ValueError
-        a CHEMICAL shell sitting in both the window and its fold (the
+        a CHEMICAL shell sitting in both the window and its core (the
         partition is chemical: a pair is frozen or active, never both;
         the shells' BAND realizations may OVERLAP -- shared radial
         primitives are physical, and the window columns are projected
         against the frozen core span, which owns the shared rows);
-        the sector disagreeing with the fold-derived electron count;
-        the basis lacking one of the fold's bands.
+        the sector disagreeing with the core-derived electron count;
+        the basis lacking one of the core's bands.
     """
     from atomterm.windows import (closed_electrons, lowdin,
                                   occupied_core_idx, select_shell_ao,
                                   shell_realization)
 
-    fold = key.fold_shells()
-    overlap = sorted(set(key.shell_patterns) & set(fold))
+    core = key.core_shells()
+    overlap = sorted(set(key.shell_patterns) & set(core))
     if overlap:
         raise ValueError(
-            f"{key.address}: {overlap} sit in both the window and its fold")
+            f"{key.address}: {overlap} sit in both the window and its core")
     na, nb = key.sector
-    nelec = mol.nelectron - closed_electrons(fold)
+    nelec = mol.nelectron - closed_electrons(core)
     if na + nb != nelec:
         raise ValueError(
             f"{key.address}: the sector holds {na + nb} active electrons; "
-            f"the fold {list(fold)} leaves {nelec}")
+            f"the core {list(core)} leaves {nelec}")
     fold_rows: list[int] = []
-    for sh in fold:
+    for sh in core:
         for band in shell_realization(sh, shell_bands):
             rows = select_shell_ao(mol, band)
             if not rows:
                 raise ValueError(
-                    f"{key.address}: the basis has no {band} band to fold"
+                    f"{key.address}: the basis has no {band} band to core"
                     + (f" (the declared realization of shell {sh!r})"
                        if band != sh else ""))
             fold_rows.extend(rows)
@@ -670,9 +670,9 @@ def _fold_core(key: CellKey, mol, mf,
     # Gram exactly singular
     fold_rows = sorted(set(fold_rows))
     c_span = lowdin(np.eye(mol.nao_nr())[:, fold_rows], mf.get_ovlp())
-    n_pairs = closed_electrons(fold) // 2
+    n_pairs = closed_electrons(core) // 2
     # the reference's own core: the occupied columns, S-projected onto
-    # the fold span and orthonormalized within it -- the span hosts
+    # the core span and orthonormalized within it -- the span hosts
     # the core shells' full family, so the projection is near-identity
     # (the in-span weights are the certificate)
     s = mf.get_ovlp()
@@ -682,7 +682,7 @@ def _fold_core(key: CellKey, mol, mf,
                         proj).real.clip(0, 1)
     c_core = lowdin(proj, s)
     report = {"core": "scf", "in_span": in_span.round(6).tolist()}
-    return fold, n_pairs, c_core, report
+    return core, n_pairs, c_core, report
 
 
 def _key_core(key: CellKey, mol, mf,
@@ -691,20 +691,20 @@ def _key_core(key: CellKey, mol, mf,
     """One home for the key->core resolution shared by the run
     (:func:`run_cell`), the cache path (:func:`analyze_cell`), and the
     kernel payload (:func:`kernel_cell_payload`): returns
-    ``(ncore, c_core, c_pur)`` -- a tagged fold's SCF core IS
-    the core (``ncore`` follows the fold's PAIR count, not its span
+    ``(ncore, c_core, c_pur)`` -- a tagged core's SCF core IS
+    the core (``ncore`` follows the core's PAIR count, not its span
     width), else the pur substrate's purified span when declared,
-    else ``None`` folds the occupied prefix.  ``c_pur`` is separate
+    else ``None`` cores the occupied prefix.  ``c_pur`` is separate
     because the NO-start branch and the anisotropy reference need the
-    pur substrate even when a fold supplied ``c_core``."""
+    pur substrate even when a core supplied ``c_core``."""
     from atomterm.core import purified_core_orbitals
     from atomterm.system import ncore_of
 
     na, nb = key.sector
     ncore = ncore_of(mol.nelectron, na + nb)
     c_run = None
-    if key.fold_tag is not None:
-        _, ncore, c_run, _w = _fold_core(key, mol, mf, shell_bands)
+    if key.core_tag is not None:
+        _, ncore, c_run, _w = _lane_core(key, mol, mf, shell_bands)
     c_pur = (None if c_run is not None
              else purified_core_orbitals(mol, mf, ncore)[0]
              if key.substrate == "pur" else None)
@@ -712,7 +712,7 @@ def _key_core(key: CellKey, mol, mf,
 
 
 def _window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
-                    prior_bands=None, ladder_mfs=None):
+                    prior_bands=None, series_mfs=None):
     """The window object ``build_full_mo`` consumes: the raw AO rows,
     the distilled-shell columns when the case declares radials, or the
     PRIOR-AXIS columns when the window carries a source tag -- ONE
@@ -728,7 +728,7 @@ def _window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
     :func:`atomterm.windows.window_distilled` -- the radial signal is
     the OCCUPIED reference block; a source tag routes to
     :func:`atomterm.basis.series_window` -- the density-block family,
-    ``@r`` the head configuration, ``@s`` the ladder average).  The
+    ``@r`` the head configuration, ``@s`` the series average).  The
     report rides the payload (``window_report``) -- the k evidence
     (bands, spectrum, discarded fraction, captures) is store data,
     not console text.
@@ -739,19 +739,19 @@ def _window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
     if key.source_tag is not None:
         src, k = key.source_tag
         if src == "s":
-            if ladder_mfs is None:
+            if series_mfs is None:
                 raise ValueError(
                     f"window {key.window!r} needs the configuration "
-                    "ladder (the case's declared LadderSpec tuple, "
-                    "resolved through atomterm.basis.run_ladder) -- "
-                    "pass ladder_mfs")
-            mfs = list(ladder_mfs.values())
+                    "series (the case's declared SeriesSpec tuple, "
+                    "resolved through atomterm.basis.run_series) -- "
+                    "pass series_mfs")
+            mfs = list(series_mfs.values())
         else:
             mfs = [mf]
         if ncol is None:
             raise ValueError(
-                f"window {key.window!r} needs the fold boundary ncol "
-                "(the case's core pair count -- the ladder blocks cut "
+                f"window {key.window!r} needs the core boundary ncol "
+                "(the case's core pair count -- the series blocks cut "
                 "the valence there)")
         from atomterm.basis import series_window
         act, report = series_window(
@@ -800,7 +800,7 @@ def _window_ncas(key, mol, shell_bands, shell_radials) -> int:
 def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
              fresh: bool = False, shell_bands: dict | None = None,
              shell_radials: dict | None = None,
-             ladder_mfs: dict | None = None,
+             series_mfs: dict | None = None,
              prior_bands: dict | None = None,
              workdir: str | Path = "elements") -> "StageFacts | None":
     """Execute one cell: resolve every axis through its OWNER, run,
@@ -812,16 +812,16 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     mf : the atom's converged reference (REQUIRED -- reference
         construction, including character-forced occupations and the
         basin gate, belongs to cases/reference, not to cells). On
-        ``fold="frac"`` this is REPLACED by ``frac_mf``.  The
+        ``core="frac"`` this is REPLACED by ``frac_mf``.  The
         reference must live on the KEY's field: a folded key takes
         the folded reference (:func:`atomterm.reference.run_folded`'s
         product) in place of the neutral one.
     mol : the analysis mol; defaults to ``mf.mol``. Only a
-        ``fold="frac"`` run needs it stated separately (the run basis
+        ``core="frac"`` run needs it stated separately (the run basis
         is ``frac_mf.mol``).
     frac_mf : the fractional-occupation reference; required iff
-        ``key.fold == "frac"`` (that fold is a different reference SCF
-        -- the run AND the fold use it).
+        ``key.core == "frac"`` (that core is a different reference SCF
+        -- the run AND the core use it).
     budgets : per-run knobs that are NOT cell identity:
         ``mc_opts``/``fci_opts`` (optimizer/solver), ``sa_weights``,
         ``verbose``, ``no_cap`` (the NO-source cost stop).
@@ -847,11 +847,11 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         raw band rows).  Start-independent: the ao/no starts carry
         the distilled columns, the mo/moc starts their own canonical
         gauge at the distilled width.  Undeclared combinations fail
-        fast: the frac fold and the radial mask have no distilled
+        fast: the frac core and the radial mask have no distilled
         meaning (the fractional reference's open shell and the
         member-labeled radial substrate are row-space constructs).
-    ladder_mfs : the configuration ladder's converged mfs
-        (:func:`atomterm.basis.run_ladder`'s product; the HEAD is the
+    series_mfs : the configuration series' converged mfs
+        (:func:`atomterm.basis.run_series`'s product; the HEAD is the
         case reference itself).  REQUIRED by ``@s``-tagged windows
         (the series source); reference construction belongs to the
         caller, never to cells.
@@ -871,23 +871,23 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     """
 
     budgets = dict(budgets or {})
-    if key.fold == "frac":
+    if key.core == "frac":
         if frac_mf is None:
-            raise ValueError("fold='frac' needs the fractional-occupation "
+            raise ValueError("core='frac' needs the fractional-occupation "
                              "reference (frac_mf=...)")
         mf = frac_mf
         mol = mol if mol is not None else mf.mol
     mol = mf.mol if mol is None else mol
 
     # the route-class grammar first, before any store access: a
-    # fold-tagged window on the free route is ao/pol/avg (the pur
+    # core-tagged window on the free route is ao/pol/avg (the pur
     # class is run_lane_cell's; raw/frac of a tagged window are
-    # meaningless -- the tag is the partition, the fold exactly
+    # meaningless -- the tag is the partition, the core exactly
     # m-scalar)
-    if key.fold_tag is not None and (key.substrate, key.fold,
+    if key.core_tag is not None and (key.substrate, key.core,
                                      key.start) != ("pol", "avg", "ao"):
         raise ValueError(
-            f"{key.address}: a free-route ladder window is ao/pol/avg "
+            f"{key.address}: a free-route lane window is ao/pol/avg "
             "(the pur class is run_lane_cell's; the tag is the "
             "partition -- raw/frac do not apply)")
 
@@ -906,16 +906,16 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
 
     na, nb = key.sector
     if (shell_radials is not None or key.source_tag is not None) and (
-            key.fold == "frac" or key.mask == "radial"):
+            key.core == "frac" or key.mask == "radial"):
         raise ValueError(
             f"{key.address}: the distilled/prior window is undeclared "
-            f"for fold={key.fold}, mask={key.mask} -- the fractional "
+            f"for core={key.core}, mask={key.mask} -- the fractional "
             "reference's open shell and the member-labeled radial "
             "substrate are row-space constructs")
     ncore, c_core, c_pur = _key_core(key, mol, mf, shell_bands)
     act, ncas, win_report = _window_columns(
         key, mol, mf, shell_bands, shell_radials,
-        ncol=ncore, prior_bands=prior_bands, ladder_mfs=ladder_mfs)
+        ncol=ncore, prior_bands=prior_bands, series_mfs=series_mfs)
 
     # start x mask -> the substrate MO matrix + the optimizer mask.
     # frozen/virtmix are START-INDEPENDENT (they pin the window columns
@@ -950,9 +950,9 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         ncas = win.c_win.shape[1]
         mo_full = win.columns(mf, ncore, c_core=c_core)
     elif key.start == "ao":
-        # a tagged fold supplied the core columns (the run substrate's
-        # prefix); otherwise the occupied prefix folds
-        core_idx = (list(range(ncore)) if key.fold_tag is not None
+        # a tagged core supplied the core columns (the run substrate's
+        # prefix); otherwise the occupied prefix cores
+        core_idx = (list(range(ncore)) if key.core_tag is not None
                     else occupied_core_idx(mf, ncore))
         if key.mask == "radial":
             mo_full, labels = radial_basis(
@@ -989,7 +989,7 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
     else:  # start == "mo": the canonical window in the run convention
         # (:func:`atomterm.windows.canonical_order`: closed | open |
         # virtual -- the raw PySCF order is the m-block listing and
-        # would fold virtual junk on uncontracted bases). On pol the
+        # would core virtual junk on uncontracted bases). On pol the
         # reordered canonical matrix IS the substrate; on pur the
         # canonical columns are re-orthogonalized against the pur core
         # span (they are S-orthonormal against the core they were
@@ -1064,7 +1064,7 @@ def analyze_cell(key: CellKey, mol, mf, shell_bands: dict | None = None,
     pure data (:func:`load_cell`), analysis needs the live reference.
 
     Fold-tagged windows analyze against their tag's SCF core
-    (the core size is the fold's PAIR count -- the span width on a
+    (the core size is the core's PAIR count -- the span width on a
     multi-column realization); sectors past the dense-meter budget
     return None -- the kernel-only class
     (:func:`kernel_cell_payload`).  ``converged`` defaults True (a
@@ -1127,7 +1127,7 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
     :func:`run_lane_cell`'s size-independent certificates -- filling
     the columns the dense budget leaves NaN (the tables' em-dash
     class).  The meters read the STORED window (the run's own
-    converged MO) through the same fold resolution :func:`run_cell`
+    converged MO) through the same core resolution :func:`run_cell`
     uses (``shell_bands`` -- the case's declared shell layer); the
     kernel totals are the values that compare."""
     data = load_cell(key, workdir)
@@ -1146,7 +1146,7 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
         "win_lz": float("nan"),
         "win_lperp": float("nan"),
     }
-    if mol is None or mf is None or key.fold == "frac":
+    if mol is None or mf is None or key.core == "frac":
         # frac cells ran under the fractional reference (not this mf);
         # their meters belong to the dense path
         return out
@@ -1219,7 +1219,7 @@ def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
 
 def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
            na: int, nb: int, c_core=None, window_report=None):
-    """The cell layer's one facts call: the fold's spherical convention
+    """The cell layer's one facts call: the core's spherical convention
     and the CASCI anisotropy report are the only cell-specific
     choices; everything else is :func:`atomterm.stages.stage_facts`
     (``window_report`` carries the construction's disclosure through
@@ -1229,10 +1229,10 @@ def _facts(key: CellKey, mol, mf, cas, ncore: int, ncas: int,
     c_act = cas.mo_coeff[:, ncore:ncore + ncas]
     return stage_facts(
         mol, mf, cas, c_act, ncore, na, nb, tag=key.address,
-        spherical_core=key.fold != "raw",
+        spherical_core=key.core != "raw",
         # every CASCI cell reports its reference core's anisotropy (the
-        # raw fold's is the detector; the pur fold's is the ~0
-        # certificate; row parity across the fold block)
+        # raw core's is the detector; the pur core's is the ~0
+        # certificate; row parity across the core block)
         anisotropy_ref=(mf, c_core) if key.method == "casci" else None,
         window_report=window_report,
     )
@@ -1271,27 +1271,27 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
                   shell_bands: dict | None = None,
                   shell_radials: dict | None = None,
                   workdir: str | Path = "elements") -> dict:
-    """Run one pinned-lane cell: the CAS ladder's UNIFORM construction.
-    The fold resolves through the shell layer to its raw AO-shell span
+    """Run one pinned-lane cell: the lane family's UNIFORM construction.
+    The core resolves through the shell layer to its raw AO-shell span
     (Loewdin-orthonormalized), and the FROZEN CORE is the reference's
     OWN core -- the occupied columns S-projected onto that span
-    (:func:`_fold_core`; the field and the bookkeeping join the
+    (:func:`_lane_core`; the field and the bookkeeping join the
     neutral anchor BY CONSTRUCTION; ``ncore`` follows the pair count,
     never the span width); the
     window placed by :func:`atomterm.windows.build_full_mo` against
     it; one ``wfnsym``-pinned solver per branch component
     (:func:`atomterm.irreps.branch_d2h`); meters per irrep block
     (L2/S2/H are totally symmetric, so the block restriction is
-    exact); the fold-independent bookkeeping ruler
+    exact); the core-independent bookkeeping ruler
     (:func:`atomterm.core.closed_shell_core_energy` over the frozen
     columns -- the projected-density form).  Deterministic: raw AO
-    spans on both sides of the fold.
+    spans on both sides of the core.
 
     Parameters
     ----------
     key : the lane cell (a :func:`lane_keys` key: ``casci/ao/-/pur/avg``
         with a tagged window).  Its sector must hold exactly the
-        electrons its fold leaves active.
+        electrons its core leaves active.
     mol, mf : the PINNED substrate -- ``mol`` a converged-reference
         D2h molecule, ``mf`` its ROHF.  The substrate lives on the
         KEY's field: a folded key takes the folded reference
@@ -1329,7 +1329,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     the declared term is not the block's ground), the dense
     assembled-treatment commutators ``comm_norm_h_lz`` /
     ``comm_norm_h_l2`` (NaN above :data:`_COMM_CAP` -- sectors past
-    the dense-meter budget; the certified fold class makes them
+    the dense-meter budget; the certified core class makes them
     structural there).  SA cells add the ``ensemble``, the converged
     FULL MO ``mo_coeff`` (nested lists in the payload -- the
     JSON-store contract; :func:`load_lane_cell` returns the matrix),
@@ -1338,10 +1338,10 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     Raises
     ------
     ValueError
-        the key is not a lane cell; the fold construction refuses the
-        key (:func:`_fold_core`: window/fold overlap, a sector
-        disagreeing with the fold-derived electron count, an absent
-        fold shell).
+        the key is not a lane cell; the core construction refuses the
+        key (:func:`_lane_core`: window/core overlap, a sector
+        disagreeing with the core-derived electron count, an absent
+        core shell).
     """
     from pyscf import lib
 
@@ -1355,11 +1355,11 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     from atomterm.windows import build_full_mo
 
     if (key.method, key.start, key.mask, key.substrate,
-            key.fold) not in (("casci", "ao", None, "pur", "avg"),
+            key.core) not in (("casci", "ao", None, "pur", "avg"),
                               ("sa-casscf", "ao", None, "pur", "avg")):
         raise ValueError(
             f"a lane cell is casci/sa-casscf at ao/-/pur/avg (the "
-            f"certified fold class); {key.address} is not one")
+            f"certified core class); {key.address} is not one")
     chk = cell_chk(key, workdir)
     if chk.exists() and not fresh:
         return load_lane_cell(key, workdir)
@@ -1367,7 +1367,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
 
     L, parity = term
     na, nb = key.sector
-    fold, nf, c_core, core_report = _fold_core(key, mol, mf, shell_bands)
+    core, nf, c_core, core_report = _lane_core(key, mol, mf, shell_bands)
     act, ncas, _ = _window_columns(key, mol, mf, shell_bands, shell_radials)
     mo = build_full_mo(mf, list(range(nf)), act, c_core=c_core)
     c = mo[:, nf:nf + ncas]
@@ -1532,7 +1532,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
 
     es = np.asarray(es)
     # the assembled-treatment meters: exact dense commutators where
-    # the sector fits memory; above the cap the certified fold class
+    # the sector fits memory; above the cap the certified core class
     # makes [H, L] ~ 0 structural (the component spread ptp is the
     # energy-space certificate) and the columns read em-dash
     comm_lz = comm_l2 = float("nan")
@@ -1574,7 +1574,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         "comm_norm_h_l2": comm_l2,
         "res_h_lz": float(res_lz),
         "res_h_l2": float(res_l2),
-        "fold": list(fold),
+        "fold": list(core),
         # the frozen-core certificates: the pair count the core
         # freezes, and the SCF core's in-span weights (the span
         # hosts the core shells' full family -- the minimum weight
@@ -1648,7 +1648,7 @@ def load_lane_cell(key: CellKey, workdir: str | Path = "elements") -> dict:
 
 def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]:
     """The default cell subset per atom (README · Methods, "the spine"):
-    the three folds; frozen x purified under both objectives (the
+    the three cores; frozen x purified under both objectives (the
     certified class); one free row per substrate (the basin detectors).
     Diagnostics beyond these run as needed. A SUBSET view of the grid
     (every spine key is in :func:`window_grid`'s product); pinned here
@@ -1656,9 +1656,9 @@ def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]
     """
     sec = tuple(sector)
     return [
-        CellKey(atom, window, sec, fold="raw"),
-        CellKey(atom, window, sec, fold="avg"),
-        CellKey(atom, window, sec, fold="frac"),
+        CellKey(atom, window, sec, core="raw"),
+        CellKey(atom, window, sec, core="avg"),
+        CellKey(atom, window, sec, core="frac"),
         CellKey(atom, window, sec, method="casscf", mask="frozen",
                 substrate="pur"),
         CellKey(atom, window, sec, method="sa-casscf", mask="frozen",
@@ -1687,10 +1687,10 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
 
     The ORDER is presentation and lives HERE, once -- renderers receive
     this list ready-made and format (branching on key identity only):
-    the CASCI fold block first (identity: method=casci, start=ao; the
-    pur fold third), each ruler fold (avg, pur) carrying the COMPLETE
+    the CASCI core block first (identity: method=casci, start=ao; the
+    pur core third), each ruler core (avg, pur) carrying the COMPLETE
     KIND BLOCK -- mo, moc, no beside ao (the window-source comparison
-    at fixed window and fold; raw/frac are core-field controls and
+    at fixed window and core; raw/frac are core-field controls and
     stay ao-only -- an m-incomplete start there would confound two
     diseases in one row) -- then the optimizer product method x mask x
     substrate x start with the virtual-mix diagnostic after the CASSCF
@@ -1699,8 +1699,8 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     of the grid (the canonical/character-selected columns are
     re-orthogonalized against the pur span); radial stays ao-only
     (validated at the key).  A SOURCE-TAGGED window drops the frac
-    fold (structurally: the prior family has no fractional-reference
-    class -- it reads the ladder's own occupations, and a fractional
+    core (structurally: the prior family has no fractional-reference
+    class -- it reads the series' own occupations, and a fractional
     reference is a different density altogether).
     """
     from atomterm.system import sector_na_nb
@@ -1712,22 +1712,22 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     tagged = _SOURCE_TAG_RE.fullmatch(w.partition("@")[2]) is not None \
         if "@" in w else False
     keys = [
-        CellKey(atom, w, sec, fold="raw"),
-        CellKey(atom, w, sec, fold="avg"),
-        CellKey(atom, w, sec, substrate="pur"),   # the CASCI pur fold
+        CellKey(atom, w, sec, core="raw"),
+        CellKey(atom, w, sec, core="avg"),
+        CellKey(atom, w, sec, substrate="pur"),   # the CASCI pur core
     ]
     if not tagged:
-        keys.append(CellKey(atom, w, sec, fold="frac"))
-    # the COMPLETE KIND BLOCK at each ruler fold: the window-source
-    # comparison (mo/moc/no beside ao) at fixed window and fold --
+        keys.append(CellKey(atom, w, sec, core="frac"))
+    # the COMPLETE KIND BLOCK at each ruler core: the window-source
+    # comparison (mo/moc/no beside ao) at fixed window and core --
     # raw/frac are core-field controls and stay ao-only (an
     # m-incomplete start there would confound two diseases in one
     # row)
     keys += [
-        CellKey(atom, w, sec, method="casci", start="mo", fold="avg"),
-        CellKey(atom, w, sec, method="casci", start="moc", fold="avg"),
+        CellKey(atom, w, sec, method="casci", start="mo", core="avg"),
+        CellKey(atom, w, sec, method="casci", start="moc", core="avg"),
         CellKey(atom, no_label(w), sec, method="casci", start="no",
-                fold="avg"),
+                core="avg"),
         CellKey(atom, w, sec, method="casci", start="mo", substrate="pur"),
         CellKey(atom, w, sec, method="casci", start="moc",
                 substrate="pur"),
@@ -1751,8 +1751,8 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
 
 def grid_keys(spec) -> list[CellKey]:
     """The case's runnable set: the primary window's full grid
-    (:func:`window_grid`) -- the spine folds, the optimizer product, the
-    CASCI pur fold, and the virtual-mix diagnostic; every key distinct
+    (:func:`window_grid`) -- the spine cores, the optimizer product, the
+    CASCI pur core, and the virtual-mix diagnostic; every key distinct
     by construction (the spine is a subset view). What regen executes;
     planned windows are :func:`planned`."""
     return window_grid(spec)
@@ -1803,9 +1803,9 @@ def lattice_keys(spec) -> list[CellKey]:
     keys = []
     for w in spec.lattice_windows:
         keys.append(CellKey(spec.key, w, sec, method="casci",
-                            fold="avg"))
+                            core="avg"))
         keys.append(CellKey(spec.key, w, sec, method="casci",
-                            start="mo", fold="avg"))
+                            start="mo", core="avg"))
     return keys
 
 
@@ -1814,15 +1814,15 @@ def lane_keys(spec) -> list[CellKey]:
     CI-level lane cell per leg, run by :func:`run_lane_cell` (the legs
     need ``spec.term`` declared -- validated at the CaseSpec).
 
-    The SECTOR derives from the leg's own fold: activating a shell
-    moves its electrons into the window (the 3d-metal semi fold leaves
+    The SECTOR derives from the leg's own core: activating a shell
+    moves its electrons into the window (the 3d-metal semi core leaves
     ``nelec_act + 4`` active), so a lane key never reuses the case's
     default sector blindly.
 
     Examples
     --------
     Ti (nelec_act=4, Ar prefix): ``3d4s@ar`` keeps sector (3, 1);
-    ``3d3p@semi`` grows to (5, 3); the M-shell folds to (6, 4).
+    ``3d3p@semi`` grows to (5, 3); the M-shell cores to (6, 4).
     """
     from dataclasses import replace
 
@@ -1833,16 +1833,16 @@ def lane_keys(spec) -> list[CellKey]:
     keys = []
     for label in spec.lane_windows:
         k = CellKey(spec.key, label, base, method="casci",
-                    substrate="pur", fold="avg")
+                    substrate="pur", core="avg")
         nelec = (spec.nelec_act + 2 * spec.ncore
-                 - closed_electrons(k.fold_shells()))
+                 - closed_electrons(k.core_shells()))
         keys.append(replace(k, sector=sector_na_nb(nelec, spec.spin)))
     return keys
 
 
 def route_keys(spec) -> list[CellKey]:
-    """The ROUTE AXIS over the ladder windows: every pinned CI leg's
-    twins -- the free CI (a survey row; same window, same fold, the
+    """The ROUTE AXIS over the lane windows: every pinned CI leg's
+    twins -- the free CI (a survey row; same window, same core, the
     free driver), the free CASSCF and free SA-CASSCF, and the pinned
     SA-CASSCF (the two-pass ensemble through the lane runner).  The
     substrate axis names the route for tagged windows (pur = pinned,

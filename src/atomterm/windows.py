@@ -77,7 +77,7 @@ __all__ = [
     "window_distilled",
     "primitive_chain",
     "select_primitives",
-    "fold_shells",
+    "core_shells",
     "closed_electrons",
     "NOBLE_CORES",
     "shell_weights",
@@ -534,7 +534,7 @@ def select_primitives(mol, l: int, count: int | None = None,
     return sorted(r for rows in picked for r in rows)
 
 
-# ------------------------------------------------------- the fold vocabulary
+# ------------------------------------------------------- the core vocabulary
 
 # the noble-gas closed-core prefixes, in fill order up to and including
 # each noble gas's outermost np (universal -- Z-independent)
@@ -823,7 +823,7 @@ _NOBLE_AT_NP = {n: name for n, name in ((3, "ar"), (4, "kr"),
 
 def closed_electrons(shells: tuple[str, ...]) -> int:
     """Electron count of a closed shell set: two per m-slot
-    (``2(2l+1)`` per shell).  The count a closed fold removes from the
+    (``2(2l+1)`` per shell).  The count a closed core removes from the
     atom's active problem.
 
     Examples
@@ -834,8 +834,8 @@ def closed_electrons(shells: tuple[str, ...]) -> int:
     return sum(2 * _SHELL_M[sh[-1]] for sh in shells)
 
 
-def fold_shells(name: str, open_d: str | None = None) -> tuple[str, ...]:
-    """The shells of a named fold -- the closed-core partition an atom
+def core_shells(name: str, open_d: str | None = None) -> tuple[str, ...]:
+    """The shells of a named core -- the closed-core partition an atom
     is split by (the window is what remains).
 
     Three rule classes (README · Fold notation is the user-facing
@@ -853,13 +853,13 @@ def fold_shells(name: str, open_d: str | None = None) -> tuple[str, ...]:
 
     Parameters
     ----------
-    name : the fold spec (case-insensitive).
+    name : the core spec (case-insensitive).
     open_d : the atom's open d shell (``"3d"``); only ``"semi"``
       reads it.
 
     Returns
     -------
-    the fold's shells, in fill order.
+    the core's shells, in fill order.
 
     Raises
     ------
@@ -871,9 +871,9 @@ def fold_shells(name: str, open_d: str | None = None) -> tuple[str, ...]:
 
     Examples
     --------
-    >>> fold_shells("ar")
+    >>> core_shells("ar")
     ('1s', '2s', '2p', '3s', '3p')
-    >>> fold_shells("semi", open_d="3d")
+    >>> core_shells("semi", open_d="3d")
     ('1s', '2s', '2p', '3s', '4s')
     """
     key = name.strip().lower()
@@ -882,7 +882,7 @@ def fold_shells(name: str, open_d: str | None = None) -> tuple[str, ...]:
     if key == "semi":
         if open_d is None or not re.fullmatch(r"[3-6]d", open_d or ""):
             raise ValueError(
-                f"fold 'semi' needs the atom's open d shell ('3d'..'6d'), "
+                f"core 'semi' needs the atom's open d shell ('3d'..'6d'), "
                 f"got open_d={open_d!r}")
         core = NOBLE_CORES[_NOBLE_AT_NP[int(open_d[0])]]
         n = int(open_d[0])
@@ -891,7 +891,7 @@ def fold_shells(name: str, open_d: str | None = None) -> tuple[str, ...]:
     shells = tuple(re.findall(r"\d+[spdfgh]", stripped))
     if not shells or "".join(shells) != stripped:
         raise ValueError(
-            f"fold {name!r} is neither a noble-gas name {sorted(NOBLE_CORES)}"
+            f"core {name!r} is neither a noble-gas name {sorted(NOBLE_CORES)}"
             f" nor an explicit shell list like '1s2s2p4s'")
     return shells
 
@@ -933,7 +933,7 @@ def occupied_core_idx(mf, ncore: int) -> list[int]:
     Warns when the closed block is NOT ``range(ncore)``: canonical MO
     ORDER is meaningless on near-degenerate uncontracted bases (the
     first canonical MOs can be virtual junk while the closed block
-    sits elsewhere; ``range(ncore)`` would silently fold garbage
+    sits elsewhere; ``range(ncore)`` would silently core garbage
     columns). On contracted bases
     the two coincide -- this makes the coincidence a checked
     invariant instead of an assumption.
@@ -961,7 +961,7 @@ def canonical_order(mf, ncore: int) -> list[int]:
     m-block listing, not the occupation/energy order -- on uncontracted
     bases the first columns are diffuse virtual junk while the closed
     block sits elsewhere (the warning :func:`occupied_core_idx` fires),
-    and ``columns[:ncore]`` would silently fold garbage. On contracted
+    and ``columns[:ncore]`` would silently core garbage. On contracted
     bases the permutation is the identity: the coincidence stays a
     checked invariant, not an assumption.
 

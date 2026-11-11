@@ -1,5 +1,5 @@
 """ECP mode (tickets 18/19): ccECP pairing, valence bookkeeping, exact p^2
-multiplets, the ncore=0 full-valence fold, the louder raw-core detector,
+multiplets, the ncore=0 full-valence core, the louder raw-core detector,
 the gated TM references, TM free-ion tables, and the fact-20 closure
 certificate at ncore=4. All bands carry the measured fresh-draw values in
 comments."""
@@ -53,7 +53,7 @@ def test_ecp_c_multiplet_exact():
             float(np.real(ci.conj() @ ops["S2"] @ ci)),
             float(np.real(ci.conj() @ l2 @ ci))))
     assert terms == ["3P"] * 3 + ["1D"] * 5 + ["1S"]
-    ev = np.linalg.eigvalsh(h)  # OUR averaged fold: the exact one
+    ev = np.linalg.eigvalsh(h)  # OUR averaged core: the exact one
     assert ev[2] - ev[0] < 1e-12  # measured 0.0
     assert ev[7] - ev[3] < 1e-12  # 1D degenerate, measured 0.0
     d_1d, d_1s = ev[3] - ev[0], ev[8] - ev[0]
@@ -82,7 +82,7 @@ def test_ecp_raw_detector_louder():
 @pytest.mark.slow
 def test_ecp_si_multiplet_and_ncore0_fold():
     """Si/ccECP: same exact table; and the FULL-VALENCE CAS(4,4) at
-    ncore=0 -- the empty-core fold must be an exact no-op (veff == 0)
+    ncore=0 -- the empty-core core must be an exact no-op (veff == 0)
     with the closure certificate intact."""
     mol, mf = run_rohf(SI_ECP, "elements/ecp/Si_ccecp/rungs/rohf.chk")
     act = select_valence_ao(mol, ["3p"])
@@ -133,7 +133,7 @@ def test_ecp_tm_references_and_basins():
 @pytest.mark.slow
 def test_ecp_tm_multiplet_tables():
     """The free-ion tables under ECP, from OUR folded H (raw shell window,
-    averaged fold): Sc 2D ground (<L^2> = 6); Ti 3F x7 ground, exactly
+    averaged core): Sc 2D ground (<L^2> = 6); Ti 3F x7 ground, exactly
     degenerate, with 5F x7 next -- the 120-detector sector, all integer
     L(S+1)/S(S+1)."""
     for cfg, ref, nelec, spin, ground_l2, first_ev, last_ev, l2_next in [

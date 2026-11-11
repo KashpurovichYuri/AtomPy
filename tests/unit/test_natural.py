@@ -100,7 +100,7 @@ def p_scalar_density():
 
 def test_m_scalar_density_yields_whole_m_sets():
     c_no, occ = natural_orbitals(np.eye(6), p_scalar_density())
-    # occupations: two 3-fold degenerate levels, descending
+    # occupations: two 3-core degenerate levels, descending
     groups = occupation_groups(occ)
     assert [len(g) for g in groups] == [3, 3]
     assert np.allclose(sorted(occ, reverse=True)[::3], [0.9, 0.5])

@@ -44,7 +44,7 @@ def test_ground_block_excludes_same_l2_excited_and_keeps_exact():
     same-<L^2> excited state OUTSIDE the energy window (beyond one
     percent of the different-term gap) stays out -- the window never
     grows past the term's neighborhood."""
-    ev = [0.0, 0.0, 0.0, 1e-2, 1.0]            # 3-fold + same-L2 + far
+    ev = [0.0, 0.0, 0.0, 1e-2, 1.0]            # 3-core + same-L2 + far
     l2 = [2.0, 2.0, 2.0, 2.0, 6.0]
     _, nroots, w, _ = ground_block(_ops(ev, l2))
     assert nroots == 3

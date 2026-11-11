@@ -50,14 +50,14 @@ slow = pytest.mark.slow
 def test_address_round_trip():
     keys = [
         CellKey("C", "2p", (1, 1)),
-        CellKey("C", "2p", (1, 1), fold="raw"),
+        CellKey("C", "2p", (1, 1), core="raw"),
         CellKey("c", "2p", (2, 0), method="sa-casscf", mask=None, substrate="pur"),
         CellKey("Ti", "3d4s", (3, 1), method="sa-casscf", start="ao",
-                mask="radial", substrate="pur", fold="avg"),
+                mask="radial", substrate="pur", core="avg"),
         CellKey("Ti", "3d4s", (2, 2), method="casscf", start="ao",
                 mask="virtmix"),
         CellKey("Sc", "3d4s", (1, 1), method="casscf", mask="frozen",
-                fold="frac"),
+                core="frac"),
         CellKey("U", "3f2d", (4, 2), method="sa-casscf", start="ao"),
         CellKey("U14e", "9f10f11f12d13dno2", (4, 0), method="sa-casscf",
                 start="no"),
@@ -84,12 +84,12 @@ def test_docstring_example_address_parses():
 
 @fast
 def test_key_validation_and_canonicalization():
-    # the pur-fold degeneracy rule: raw on pur canonicalizes to avg
-    k = CellKey("C", "2p", (1, 1), substrate="pur", fold="raw")
-    assert k.fold == "avg"
+    # the pur-core degeneracy rule: raw on pur canonicalizes to avg
+    k = CellKey("C", "2p", (1, 1), substrate="pur", core="raw")
+    assert k.core == "avg"
     # frac is a different REFERENCE -- meaningless on the purified span
     with pytest.raises(ValueError, match="frac"):
-        CellKey("C", "2p", (1, 1), substrate="pur", fold="frac")
+        CellKey("C", "2p", (1, 1), substrate="pur", core="frac")
     # a mask needs an optimizer method
     with pytest.raises(ValueError, match="mask"):
         CellKey("C", "2p", (1, 1), method="casci", mask="radial")
@@ -102,13 +102,13 @@ def test_key_validation_and_canonicalization():
                 mask="radial")
     # mo x pur: VALID since the window-projection builder (T1a) -- the
     # canonical columns are re-orthogonalized on the pur core span; the
-    # pur-fold canonicalization applies to it like every pur key
+    # pur-core canonicalization applies to it like every pur key
     k = CellKey("Ti", "3d4s", (3, 1), method="casscf", start="mo",
-                substrate="pur", fold="raw")
-    assert k.fold == "avg"
+                substrate="pur", core="raw")
+    assert k.core == "avg"
     assert k.address == "ti_3d4s_3-1_casscf_mo_-_pur_avg"
     for bad in [dict(method="fci"), dict(start="aos"), dict(mask="relax"),
-                dict(substrate="polarized"), dict(fold="averaged")]:
+                dict(substrate="polarized"), dict(core="averaged")]:
         with pytest.raises(ValueError, match="not in"):
             CellKey("C", "2p", (1, 1), **bad)
     with pytest.raises(ValueError, match="sector"):
@@ -139,24 +139,24 @@ def test_no_window_grammar():
 @fast
 def test_source_tag_grammar():
     """A prior-axis window carries its distillation source as the tag:
-    '@r<k>' (the head configuration's block) / '@s<k>' (the ladder
+    '@r<k>' (the head configuration's block) / '@s<k>' (the series
     average), k uniform over the span; the tag is part of the address
     (differently-sourced windows never collide), stays out of the span
-    selectors, and is NOT a fold -- the one @-slot holds one or the
+    selectors, and is NOT a core -- the one @-slot holds one or the
     other.  The NO kind of a tagged source names it through the
     '<source>no<k>' grammar unchanged."""
     k = CellKey("Sc", "3d4s@s2", (2, 1), method="casci")
     assert CellKey.from_address(k.address) == k
     assert k.address == "sc_3d4s@s2_2-1_casci_ao_-_pol_avg"
     assert k.source_tag == ("s", 2)
-    assert k.fold_tag is None
+    assert k.core_tag is None
     assert k.shell_patterns == ["3d", "4s"]
     assert CellKey("Sc", "3d4s@r1", (2, 1)).source_tag == ("r", 1)
-    # the tag is not a fold: fold resolution refuses it (the tag
-    # routes as a source, so the key carries no fold at all)
-    with pytest.raises(ValueError, match="no fold tag"):
-        CellKey("Sc", "3d4s@s2", (2, 1)).fold_shells()
-    # a lane fold tag is not a source
+    # the tag is not a core: core resolution refuses it (the tag
+    # routes as a source, so the key carries no core at all)
+    with pytest.raises(ValueError, match="no core tag"):
+        CellKey("Sc", "3d4s@s2", (2, 1)).core_shells()
+    # a lane core tag is not a source
     assert CellKey("Ti", "3d3p4d@semi", (5, 3), substrate="pur"
                    ).source_tag is None
     # the NO kind of the series window: the source label carries the
@@ -164,7 +164,7 @@ def test_source_tag_grammar():
     kn = CellKey("Sc", "3d4s@s2no2", (2, 1), start="no")
     assert kn.no_source == ("3d4s@s2", 2)
     assert kn.source_tag == ("s", 2)
-    assert kn.fold_tag is None
+    assert kn.core_tag is None
     assert CellKey.from_address(kn.address) == kn
 
 
@@ -173,10 +173,10 @@ def test_prior_windows_declared_on_the_campaign():
     """The prior axis derives from the ONE declaration: Sc/Ti declare
     their ladders + prior realizations, and the planned prior windows
     parse into source tags the cells can resolve (the @s windows'
-    ladder requirement validated at the case)."""
+    series requirement validated at the case)."""
     for name in ("Sc", "Ti"):
         spec = CAMPAIGN[name]
-        assert spec.ladder is not None
+        assert spec.series is not None
         tagged = [w for w in spec.planned_windows if "@" in w]
         assert tagged, f"{name} declares no prior windows"
         for w in tagged:
@@ -191,25 +191,25 @@ def test_prior_windows_declared_on_the_campaign():
 
 @fast
 def test_lane_window_grammar():
-    """A lane window carries its fold as a tag: the tag is part of the
+    """A lane window carries its core as a tag: the tag is part of the
     address (never collides with a free-route label), stays out of the
-    span selectors, and resolves through the fold vocabulary; NO
-    windows take no tag (their fold is the source's)."""
+    span selectors, and resolves through the core vocabulary; NO
+    windows take no tag (their core is the source's)."""
     k = CellKey("ti", "3d3p4d@semi", (5, 3), substrate="pur")
     assert CellKey.from_address(k.address) == k
     assert k.address == "ti_3d3p4d@semi_5-3_casci_ao_-_pur_avg"
     assert k.shell_patterns == ["3d", "3p", "4d"]
-    assert k.fold_tag == "semi"
-    assert k.fold_shells() == ("1s", "2s", "2p", "3s", "4s")
-    # a NO window with a fold tag is structurally unparseable (the NO
+    assert k.core_tag == "semi"
+    assert k.core_shells() == ("1s", "2s", "2p", "3s", "4s")
+    # a NO window with a core tag is structurally unparseable (the NO
     # tail is terminal -- the '<source>no<k>' grammar admits no tag
     # after it), so the label never agrees with start='no'
     with pytest.raises(ValueError, match="agree"):
         CellKey("Ti", "3d4sno2@semi", (3, 1), start="no")
-    with pytest.raises(ValueError, match="fold tag"):
-        CellKey("Ti", "3d4s", (3, 1)).fold_shells()
+    with pytest.raises(ValueError, match="core tag"):
+        CellKey("Ti", "3d4s", (3, 1)).core_shells()
     with pytest.raises(ValueError, match="neither"):
-        CellKey("Ti", "3d3p@nope", (5, 3)).fold_shells()
+        CellKey("Ti", "3d3p@nope", (5, 3)).core_shells()
 
 
 @fast
@@ -252,7 +252,7 @@ def test_field_axis_folded_requires_tagged_window():
     defined BY its confined span -- an untagged window has no span to
     define it, so the combination is unrepresentable."""
     CellKey("Ti-unc", "3d4s@ar", (3, 1), substrate="pur", field="folded")
-    with pytest.raises(ValueError, match="fold-tagged"):
+    with pytest.raises(ValueError, match="core-tagged"):
         CellKey("Ti-unc", "3d4s", (3, 1), field="folded")
     with pytest.raises(ValueError, match="not in"):
         CellKey("Ti-unc", "3d4s@ar", (3, 1), field="frozen")
@@ -262,8 +262,8 @@ def test_field_axis_folded_requires_tagged_window():
 def test_lane_keys_derive_from_the_declaration():
     """The lane legs and their SECTORS derive from the declaration:
     activating a shell moves its electrons into the window, so the
-    sector follows the fold (Ti semi grows (3,1) -> (5,3), the
-    M-shell folds to (6,4); the Ar legs keep the case sector); Sc's
+    sector follows the core (Ti semi grows (3,1) -> (5,3), the
+    M-shell cores to (6,4); the Ar legs keep the case sector); Sc's
     five-leg family (d1: one electron fewer per M-shell leg)."""
     ti = {k.window: k.sector for k in lane_keys(CAMPAIGN["Ti"])}
     assert ti["3d4s@ar"] == (3, 1)
@@ -306,14 +306,14 @@ def test_void_reason_gates_scenariod_cells():
 def test_u14e_chemistry_declaration():
     """The U14e render chemistry lives in the declaration: the window
     display names (chemical shells -- the uncontracted basis counts
-    radial primitives), the fold shell sets (the (5,1) promoted
-    window folds 6s6p -- four pairs -- the (4,0) ones 6s6p7s), the
+    radial primitives), the core shell sets (the (5,1) promoted
+    window cores 6s6p -- four pairs -- the (4,0) ones 6s6p7s), the
     chemical filling note, and the primary-family suppression."""
     spec = CAMPAIGN["U14e"]
     assert spec.window_names["10f13d"] == "5f6d"
     assert spec.window_names["10f13d7s"] == "5f6d7s"
     assert spec.window_names["10f13d14p"] == "5f6d6p"
-    assert spec.fold_chemistry == {5: "6s6p7s", 4: "6s6p"}
+    assert spec.core_chemistry == {5: "6s6p7s", 4: "6s6p"}
     assert spec.render_primary is False
     assert spec.anchor_note.startswith("forced filling: 6s²6p⁶7s²")
 
@@ -322,10 +322,10 @@ def test_u14e_chemistry_declaration():
 def test_void_reason_voids_the_u14e_optimizer_class():
     """U14e's widened gate: the multi-solution class is void at the key
     on EVERY window (the primary included -- ``run_casscf=False``'s
-    spirit made explicit) and the frac folds are void with it (the
+    spirit made explicit) and the frac cores are void with it (the
     frac reference has no converged basin on the ECP atom); exactly
     the 36 remaining CASCI cells run (the 20 anchors + the kind
-    block's mo/no cells at both ruler folds, 4 per window -- the tier
+    block's mo/no cells at both ruler cores, 4 per window -- the tier
     families retired from the declaration 2026-11-06; the kind
     amendment 2026-11-09)."""
     spec = CAMPAIGN["U14e"]
@@ -334,14 +334,14 @@ def test_void_reason_voids_the_u14e_optimizer_class():
     assert len(keys) == 188
     for k in keys:
         void = void_reason(k, sc) is not None
-        expect = k.method != "casci" or k.fold == "frac"
+        expect = k.method != "casci" or k.core == "frac"
         assert void == expect, k.address
     assert sum(not void_reason(k, sc) for k in keys) == 36
 
 
 @fast
 def test_spine_keys_contract():
-    """The spine = README · Methods verbatim: the three folds; frozen x
+    """The spine = README · Methods verbatim: the three cores; frozen x
     purified under both objectives (the certified class); one free row
     per substrate (the basin detectors)."""
     keys = spine_keys("Ti", "3d4s", (3, 1))
@@ -370,16 +370,16 @@ def test_window_grid_is_the_one_declaration():
     addrs = [k.address for k in grid]
     # the manifest count: 29 established + the 4 mo x pur cells
     # + the moc block (2 CASCI + 8 optimizer keys)
-    # + the kind-completion block (mo/no CASCI at both ruler folds)
+    # + the kind-completion block (mo/no CASCI at both ruler cores)
     assert len(grid) == 47
     assert len(set(addrs)) == 47
-    assert addrs[:4] == [           # the CASCI fold block, pur third
+    assert addrs[:4] == [           # the CASCI core block, pur third
         "ti_3d4s_3-1_casci_ao_-_pol_raw",
         "ti_3d4s_3-1_casci_ao_-_pol_avg",
         "ti_3d4s_3-1_casci_ao_-_pur_avg",
         "ti_3d4s_3-1_casci_ao_-_pol_frac",
     ]
-    assert addrs[4:10] == [         # the kind block at each ruler fold
+    assert addrs[4:10] == [         # the kind block at each ruler core
         "ti_3d4s_3-1_casci_mo_-_pol_avg",
         "ti_3d4s_3-1_casci_moc_-_pol_avg",
         "ti_3d4sno2_3-1_casci_no_-_pol_avg",
@@ -406,7 +406,7 @@ def test_window_grid_is_the_one_declaration():
     assert [k.mask for k in diagnostics(spec)] == ["virtmix"]
     # planned: the declared windows' full grids -- the real spans at
     # the primary's shape, the prior-axis tagged windows one SHORT
-    # (they carry no frac fold), each with its NO sibling label
+    # (they carry no frac core), each with its NO sibling label
     pl = planned(spec)
     assert len(pl) == 2 * len(grid) + 6 * (len(grid) - 1)
     assert {k.window for k in pl} == {
@@ -420,7 +420,7 @@ def test_window_grid_is_the_one_declaration():
 @fast
 def test_planned_sector_override_shrinks_the_fold():
     """A planned window's declared sector overrides the case default in
-    its whole grid -- the promoted-pair windows' fold count follows the
+    its whole grid -- the promoted-pair windows' core count follows the
     sector (ncore_of(14, 6) = 4: the full core minus the 7s pair);
     windows without the override stay at the default, and the NO-form
     keys inherit their window's sector."""
@@ -491,7 +491,7 @@ def test_orders_coincide_only_in_trivial_sectors():
 
 
 def _random_eri(norb, rng):
-    """A generic chemist-notation eri with the full 8-fold symmetry
+    """A generic chemist-notation eri with the full 8-core symmetry
     (average over the orbit under the pair transpositions) -- PySCF's
     contraction assumes it."""
     a = rng.standard_normal((norb,) * 4)
@@ -692,7 +692,7 @@ def test_analyze_cell_matches_insession(carbon, tmp_path):
     from atomterm.cells import analyze_cell, run_cell
 
     _, mol, mf, _ = carbon
-    key = CellKey("C", "2p", (1, 1), fold="raw")   # the detector cell
+    key = CellKey("C", "2p", (1, 1), core="raw")   # the detector cell
     insession = run_cell(key, mf, workdir=tmp_path, fresh=True)
     reloaded = analyze_cell(key, mol, mf, workdir=tmp_path)
     _same_facts(reloaded, insession)
@@ -794,7 +794,7 @@ def test_sa_casscf_run_completes_the_roots_store(carbon, tmp_path):
 @slow
 def test_kernel_cell_payload_meters_match_the_dense_path(carbon, tmp_path):
     """The apply-based meters of a kernel-only payload read the STORED
-    window through the run's own fold resolution: the ground ⟨L²⟩
+    window through the run's own core resolution: the ground ⟨L²⟩
     agrees with the dense analysis payload's, and the state residual
     is present at the certificate floor (the free route's big-cell
     columns; here pinned at a small cell where both paths live)."""
@@ -805,7 +805,7 @@ def test_kernel_cell_payload_meters_match_the_dense_path(carbon, tmp_path):
 
     _, mol, mf, _ = carbon
     key = CellKey("C", "2p", (1, 1), method="casci",
-                  substrate="pur", fold="avg")
+                  substrate="pur", core="avg")
     facts = run_cell(key, mf, workdir=tmp_path)
     dense = cell_payload(key, facts)
     kern = kernel_cell_payload(key, mol, mf, workdir=tmp_path)
@@ -901,7 +901,7 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
     """The lane runner on the frozen D2h carbon twin: the declared leg
     hosts its term exactly (all 2L+1 components read L(L+1), S(S+1),
     degenerate), the payload round-trips the store, and the runner
-    refuses non-lane keys, wrong sectors, and absent fold shells."""
+    refuses non-lane keys, wrong sectors, and absent core shells."""
     cfg, mol, mf, _ = carbon_d2h
     key = lane_keys(CAMPAIGN["C"])[0]
     assert (key.window, key.sector) == ("2p@1s2s", (2, 0))
@@ -923,8 +923,8 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
     assert "mo_coeff" not in q and "cycles" not in q  # CI: no optimizer
     assert run_lane_cell(key, mol, mf, CAMPAIGN["C"].term,
                          workdir=tmp_path) == p
-    # refusals: a free-route key, a sector disagreeing with the fold,
-    # a fold shell the basis lacks
+    # refusals: a free-route key, a sector disagreeing with the core,
+    # a core shell the basis lacks
     with pytest.raises(ValueError, match="lane cell"):
         run_lane_cell(CellKey("C", "2p", (2, 0)), mol, mf, (1, "g"),
                       workdir=tmp_path)
@@ -938,14 +938,14 @@ def test_run_lane_cell_carbon_roundtrip(carbon_d2h, tmp_path):
 
 @slow
 def test_run_lane_cell_multicolumn_fold(carbon_d2h, carbon, tmp_path):
-    """The multi-column fold end to end: the SAME lane leg with the
+    """The multi-column core end to end: the SAME lane leg with the
     shell layer declaring the 1s2s chemistry over three s bands (two
     pairs over a three-column span) still hosts its term EXACTLY (the
     frozen core is the reference's OWN core restricted to the span --
     the term certificates are core-blind), while the core axes read
     the CHEMISTRY: the payload's pair count is 2 (never the span
     width 3) with the in-span restriction certificate.  A declared
-    band shared by window and fold refuses at the ROW level (the
+    band shared by window and core refuses at the ROW level (the
     layer's own ambiguity, not the labels')."""
     cfg, mol, mf, _ = carbon_d2h
     key = lane_keys(CAMPAIGN["C"])[0]
@@ -963,7 +963,7 @@ def test_run_lane_cell_multicolumn_fold(carbon_d2h, carbon, tmp_path):
         assert abs(v - 2.0) < 1e-8
     assert 0.0 <= p["res_h_lz"] < 1e-8
     # the 1:1 leg (no layer): same term, its own span (the energies
-    # differ -- DIFFERENT fold spans)
+    # differ -- DIFFERENT core spans)
     q = run_lane_cell(key, mol, mf, CAMPAIGN["C"].term, workdir=tmp_path,
                       fresh=True)
     assert q["core_pairs"] == 2
@@ -972,7 +972,7 @@ def test_run_lane_cell_multicolumn_fold(carbon_d2h, carbon, tmp_path):
     with pytest.raises(ValueError, match="sit in both"):
         run_lane_cell(CellKey("C", "2p2s@1s2s", (2, 0), substrate="pur"),
                       mol, mf, (1, "g"), workdir=tmp_path)
-    # ...while shared BANDS are physical (the fold's 2s realized over
+    # ...while shared BANDS are physical (the core's 2s realized over
     # the window's 3s band): the projection owns the shared rows
     # -- the leg RUNS, its own model core
     p_shared = run_lane_cell(
@@ -1020,7 +1020,7 @@ def test_no_arm_refuses_the_m_unequal_source_density():
                               spec.shell_bands, {"3d": 1, "4s": 1})
     cols = win.columns if hasattr(win, "columns") else win
     # the source on the CANONICAL core (c_core=None) -- the split
-    # substrate; the run path folds the purified span instead
+    # substrate; the run path cores the purified span instead
     mo = build_full_mo(mf, occupied_core_idx(mf, 9), cols)
     with pytest.raises(ValueError, match="not rotation-closed"):
         no_group_windows(mol, mf, 9, mo[:, 9:9 + cols.shape[1]], 2, 1)
@@ -1030,7 +1030,7 @@ def test_unc_lanes_load_exact_from_the_store():
     """The validation lanes re-verified from the COMMITTED stores (the
     heavy-pin pattern: fresh legs run in the campaign; the verdicts
     load and re-check their meters): Sc-unc hosts 2D and Ti-unc 3F
-    EXACTLY through the multi-column folds -- every component at its
+    EXACTLY through the multi-column cores -- every component at its
     L(L+1) and S(S+1), degenerate to the ptp floor, the core pair
     count chemical (9), the Roothaan converged, and the dense
     adjudication's corrections recorded (the pinned solver's
@@ -1106,7 +1106,7 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
     substrate axis naming the route); the SPAN-IDENTITY certificate --
     the free CI twin (run_cell, the C1 driver) reproduces the pinned
     leg's ground component to solver tolerance (same window, same
-    fold, different construction); run_cell's fold branch refuses the
+    core, different construction); run_cell's core branch refuses the
     pur class (run_lane_cell's), raw/frac, non-ao starts, and wrong
     sectors; the pinned SA runner delivers the two-pass payload with
     its term exact."""
@@ -1128,7 +1128,7 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
 
     # the span-identity certificate at CI level: the free driver's
     # ground TOTAL equals the pinned leg's TERM total (the components
-    # are degenerate -- same span, same fold, different construction;
+    # are degenerate -- same span, same core, different construction;
     # observed on the frozen twins: 7.1e-15)
     pinned = run_lane_cell(leg, mol_d2h, mf_d2h, cs.term, workdir=tmp_path)
     free = cell_payload(
@@ -1137,10 +1137,10 @@ def test_route_axis_twins(carbon, carbon_d2h, tmp_path):
                  workdir=str(tmp_path)))
     assert abs(free["energies_pyscf"][0] - pinned["total"]) < 1e-8
 
-    # the fold branch's refusals
+    # the core branch's refusals
     for kw, msg in (
             (dict(substrate="pur"), "run_lane_cell"),
-            (dict(substrate="pol", fold="raw"), "raw/frac"),
+            (dict(substrate="pol", core="raw"), "raw/frac"),
             (dict(substrate="pol", start="mo"), "ao/pol/avg"),
             (dict(substrate="pol"), "active electrons")):
         k = (replace(leg, window="2p@1s2s", sector=(3, 1), **kw)
@@ -1186,8 +1186,8 @@ def ladder_module():
     return mod
 
 
-def _ladder_payload(e, roots=1):
-    """A minimal run payload for ladder rendering."""
+def _methods_payload(e, roots=1):
+    """A minimal run payload for methods-table rendering."""
     return {"energies_pyscf": [e] * roots, "n_det": 90,
             "ground_l2": 12.0, "comm_norm_h_lz": 1e-9,
             "comm_norm_h_l2": 1e-8, "win_lz": 1e-15,
@@ -1201,9 +1201,9 @@ def test_ladder_table_is_byte_deterministic():
     mod = ladder_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
-    agree = {k.address: _ladder_payload(-848.4) for k in keys}
-    text = "\n".join(mod.ladder_section(cs, agree, -848.4065))
-    assert text == "\n".join(mod.ladder_section(cs, agree, -848.4065))
+    agree = {k.address: _methods_payload(-848.4) for k in keys}
+    text = "\n".join(mod.methods_section(cs, agree, -848.4065))
+    assert text == "\n".join(mod.methods_section(cs, agree, -848.4065))
     assert text.count(mod.BEGIN) == 1 and text.count(mod.END) == 1
 
 
@@ -1215,10 +1215,10 @@ def test_ladder_anchors_lead_and_families_follow():
     mod = ladder_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
-    agree = {k.address: _ladder_payload(-848.4) for k in keys}
+    agree = {k.address: _methods_payload(-848.4) for k in keys}
 
     def body(cells, uhf=None):
-        return "\n".join(mod.ladder_section(cs, cells, -848.4065, uhf=uhf))
+        return "\n".join(mod.methods_section(cs, cells, -848.4065, uhf=uhf))
 
     rows = [r for r in body(agree).splitlines() if r.startswith("|")]
     assert rows[2].startswith("| ROHF (anchor) |")
@@ -1245,8 +1245,8 @@ def test_ladder_every_run_cell_a_row_no_starts_scoped_to_optimizers():
     mod = ladder_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
-    agree = {k.address: _ladder_payload(-848.4) for k in keys}
-    text = "\n".join(mod.ladder_section(cs, agree, -848.4065))
+    agree = {k.address: _methods_payload(-848.4) for k in keys}
+    text = "\n".join(mod.methods_section(cs, agree, -848.4065))
     rows = [r for r in text.splitlines() if r.startswith("|")]
     ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / D |")]
     assert len(ci) == 3            # raw/avg/pur (the frac class: store-only)
@@ -1265,10 +1265,10 @@ def test_ladder_meter_and_ptp_columns_render():
     mod = ladder_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
-    agree = {k.address: _ladder_payload(-848.4) for k in keys}
+    agree = {k.address: _methods_payload(-848.4) for k in keys}
 
     def body(cells):
-        return "\n".join(mod.ladder_section(cs, cells, -848.4065))
+        return "\n".join(mod.methods_section(cs, cells, -848.4065))
 
     text = body(agree)
     rows = [r for r in text.splitlines() if r.startswith("|")]
@@ -1281,7 +1281,7 @@ def test_ladder_meter_and_ptp_columns_render():
               and k.mask is None and k.start == "ao"
               and k.substrate == "pol")
     traced = dict(agree)
-    traced[sa.address] = {**_ladder_payload(-848.4, roots=5),
+    traced[sa.address] = {**_methods_payload(-848.4, roots=5),
                           "conv_dE": 2.3e-9, "cycles": 5}
     row = [r for r in body(traced).splitlines()
            if r.startswith("| SA-CASSCF | free | 3d4s / D |")][0]
@@ -1297,17 +1297,17 @@ def test_ladder_cycle_cap_note():
     mod = ladder_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
-    agree = {k.address: _ladder_payload(-848.4) for k in keys}
+    agree = {k.address: _methods_payload(-848.4) for k in keys}
     sa = next(k for k in keys if k.method == "sa-casscf"
               and k.mask is None and k.start == "ao"
               and k.substrate == "pol")
 
     def row_of(extra):
         cells = dict(agree)
-        cells[sa.address] = {**_ladder_payload(-848.4, roots=5),
+        cells[sa.address] = {**_methods_payload(-848.4, roots=5),
                              "conv_dE": 2.3e-9, **extra}
         row = [r for r in "\n".join(
-                   mod.ladder_section(cs, cells, -848.4065)).splitlines()
+                   mod.methods_section(cs, cells, -848.4065)).splitlines()
                if r.startswith("| SA-CASSCF | free | 3d4s / D |")][0]
         return "cycle cap" in row
 
@@ -1324,8 +1324,8 @@ def test_ladder_ci_only_store_renders_planned_pointers():
     mod = ladder_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
-    text = "\n".join(mod.ladder_section(
-        cs, {k.address: _ladder_payload(-848.4) for k in keys
+    text = "\n".join(mod.methods_section(
+        cs, {k.address: _methods_payload(-848.4) for k in keys
              if k.method == "casci"}, -848.4065))
     assert "| CASCI | free | 3d4s / D |" in text
     assert "regen_cells.py Ti --window 3d4d" in text
@@ -1337,7 +1337,7 @@ def test_ladder_prior_rows_join_the_span_family_in_comparison_order():
     """The same-CAS comparison: a prior window's CI rows render BESIDE
     the incumbent's at its span, one family (no rule row inside),
     ordered incumbent -> r -> s1 -> s2 -- in the lattice family of a
-    lattice span and in the primary's fold groups of the primary
+    lattice span and in the primary's core groups of the primary
     span."""
     mod = ladder_module()
     cs = CAMPAIGN["Sc"]
@@ -1345,14 +1345,14 @@ def test_ladder_prior_rows_join_the_span_family_in_comparison_order():
                         *(k for w in cs.planned_windows
                           for k in window_grid(cs, w))]
             if k.method == "casci"]
-    text = "\n".join(mod.ladder_section(
-        cs, {k.address: _ladder_payload(-759.5) for k in keys}, -759.7363))
+    text = "\n".join(mod.methods_section(
+        cs, {k.address: _methods_payload(-759.5) for k in keys}, -759.7363))
     lines = text.splitlines()
 
-    def idx(window, fold="Ar"):
+    def idx(window, core="Ar"):
         return next(i for i, l in enumerate(lines)
                     if l.startswith(f"| CASCI | free | {window} / D |")
-                    and l.split("|")[5].strip() == fold)
+                    and l.split("|")[5].strip() == core)
 
     for span in ("3d", "3d4s"):
         a, b, c, d = (idx(span), idx(f"{span}@r1"),
@@ -1373,8 +1373,8 @@ def test_methods_table_diet_repeats_do_not_render():
                         *(k for w in cs.planned_windows
                           for k in window_grid(cs, w))]
             if k.method == "casci"]
-    text = "\n".join(mod.ladder_section(
-        cs, {k.address: _ladder_payload(-759.5) for k in keys}, -759.7363))
+    text = "\n".join(mod.methods_section(
+        cs, {k.address: _methods_payload(-759.5) for k in keys}, -759.7363))
     rows = [l for l in text.splitlines() if l.startswith("| CASCI")]
     assert not any("/ NO" in l for l in rows)
     assert not any("frac" in l for l in rows)
@@ -1398,8 +1398,8 @@ def test_ladder_prior_span_without_incumbent_renders_its_own_family():
     keys = [k for k in (k for w in cs.planned_windows
                         for k in window_grid(cs, w))
             if k.method == "casci" and k.source_tag is not None]
-    text = "\n".join(mod.ladder_section(
-        cs, {k.address: _ladder_payload(-848.2) for k in keys}, -848.4065))
+    text = "\n".join(mod.methods_section(
+        cs, {k.address: _methods_payload(-848.2) for k in keys}, -848.4065))
     lines = text.splitlines()
 
     def idx(window):
@@ -1416,7 +1416,7 @@ def test_ladder_prior_span_without_incumbent_renders_its_own_family():
 def test_method_ladder_lane_families():
     """The one table carries the lane families: pinned CI, free CI,
     the free CASSCF/SA, and the pinned SA in one family block; the
-    tagged folds carry the lane marker; un-run lane families are
+    tagged cores carry the lane marker; un-run lane families are
     absent; families are separated by the rule row."""
     mod = ladder_module()
     cs = CAMPAIGN["Sc"]
@@ -1440,7 +1440,7 @@ def test_method_ladder_lane_families():
                                   and k.method == "sa-casscf"),
                           ci=(k.method == "casci"))
              for k in fam}
-    text = "\n".join(mod.ladder_section(cs, cells, -759.7363))
+    text = "\n".join(mod.methods_section(cs, cells, -759.7363))
     lines = text.splitlines()
     assert sum(l.startswith("| method |") for l in lines) == 1
     assert lines[3].startswith("| ROHF (anchor) |")

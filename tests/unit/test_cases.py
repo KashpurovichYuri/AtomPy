@@ -96,13 +96,13 @@ def test_scenarios_for_merges_by_name(monkeypatch):
 
 def test_casespec_validates_lane_windows():
     # lane windows validate AT CONSTRUCTION: the label carries a
-    # resolvable fold tag that stays out of its window span, and the
+    # resolvable core tag that stays out of its window span, and the
     # legs need the term target declared
     ti = dict(symbol="Ti", basis="ccpvdz", nelec_act=4, ncore=9,
               shell_patterns=["3d", "4s"], spin=2, term=(3, "g"))
     CaseSpec(**ti, lane_windows=("3d3p@semi",))          # the semicore leg
-    CaseSpec(**ti, lane_windows=("3s3p3d@1s2s2p4s",))    # the M-shell fold
-    for lw in (("3d3p",),        # no fold tag
+    CaseSpec(**ti, lane_windows=("3s3p3d@1s2s2p4s",))    # the M-shell core
+    for lw in (("3d3p",),        # no core tag
                ("3d3p@nope",),   # unresolvable tag
                ("3p@ar",)):      # 3p folded AND active
         with pytest.raises(ValueError):

@@ -48,7 +48,7 @@ def test_uhf_basin_census_single_basin(tmp_path_factory):
 
 
 def test_rohf_basin_census_single_basin_occupation_safe(tmp_path_factory):
-    """The ROHF census (the ladder gate's measurement) on C: every arm
+    """The ROHF census (the series gate's measurement) on C: every arm
     converges to the one basin, and every arm's occupations pass the
     hook re-assignment (occ_ok) -- on a single-basin atom the safety
     certificate is trivially green; the wrong-configuration class it

@@ -48,7 +48,7 @@ atom's ROHF anchor and classified by its diagnostics (Results).
 ## Motivation
 
 The exact Hamiltonian of an atom is SO(3) × SU(2) invariant, so every
-term (2S+1)L is exactly (2L+1)(2S+1)-fold degenerate. A CAS run breaks
+term (2S+1)L is exactly (2L+1)(2S+1)-core degenerate. A CAS run breaks
 this in exactly two places.
 
 **The restriction.** CAS takes its core from a prior SCF reference,
@@ -59,13 +59,13 @@ window is orthogonal to the core (a window vector leaning into
 occupied core orbitals silently harvests Pauli-forbidden
 stabilization) — every window is therefore built core-orthogonal.
 
-**Injection point 1 — the fold.** The active–active Coulomb part is a
+**Injection point 1 — the core.** The active–active Coulomb part is a
 rotational scalar; **the folded part f carries whatever symmetry the
 core density ρ_c has**. An open-shell reference polarizes its core
 (the valence quadrupole field mixes the s core orbital with the m = 0
-d member), so a raw fold makes Ĥ_CAS merely axial: the term branches
+d member), so a raw core makes Ĥ_CAS merely axial: the term branches
 by |M_L| — the σ/π branching of a linear molecule — instead of
-staying degenerate. The labels survive (the fold is spin-free);
+staying degenerate. The labels survive (the core is spin-free);
 the degeneracy does not. The cure is a symmetric ρ_c — three core
 treatments are compared: **raw** (the SCF's density as-is — the
 detector), **averaged** (its l = 0 part — anisotropy removed at
@@ -94,7 +94,7 @@ sits upstream of both; the instrument can lie on its own):
 | the instrument | basis bookkeeping | labels mislead; shells fuse | wrong inputs | label + metric discipline |
 | the instrument | sector witnesses | ‖[Ĥ,L̂²]‖ = 0 with defects present | single-irrep sectors; ±pair blind spots | the projector pair |
 | upstream | SCF reference | wrong configuration; metastable basins | energy-ordered filling; degenerate open shells | character-forced occupations + energy gate |
-| **IP 1** | core field | splittings and commutators 1e-5…1e-1 | the polarization chain | averaged fold / SA / purification |
+| **IP 1** | core field | splittings and commutators 1e-5…1e-1 | the polarization chain | averaged core / SA / purification |
 | **IP 2** | orbital optimization | tilted windows, escape/swap | flat and descending directions; identity change | shell-complete starts + masks + substrate |
 
 Every cure removes the anisotropy at its source: state averaging over
@@ -109,7 +109,7 @@ algebra): the Symbols section of `atomterm.operators`' docstring.
 
 ## Methods
 
-**ROHF — the reference.** Everything downstream folds it. Where
+**ROHF — the reference.** Everything downstream cores it. Where
 energy-ordered filling fails (runaway configurations; metastable
 polarized basins) it is kept honest by character-forced occupations
 (orbital type measured by S-projector weight, never energy order), an
@@ -128,7 +128,7 @@ census (`uhf_basin_census`: the production start, the named PySCF
 starts, one strong spin break — one call, any atom; the census
 measures, the declaration picks). The UHF object is a
 reference-class product — the methods grid does not run on it (the
-folds assume one closed-shell core density; the broken-core fold is
+cores assume one closed-shell core density; the broken-core core is
 the declared next step); the anchor row renders from the store's
 `uhf` record beside the ROHF anchor.
 
@@ -155,7 +155,7 @@ in the frozen converged window.
 partition*; a free mask may exchange core and window orbitals, and the
 analysis split then differs from the run's partition — such a number
 is an energy of no partition and reads below the kernel's own total
-(the fold shift catches it; compare kernel totals only).
+(the core shift catches it; compare kernel totals only).
 
 **The treatment grid.** One declared grid, priced and classified at
 fixed window: core field (raw/avg/frac) × start (D/MO/NO) × mask
@@ -183,7 +183,7 @@ CaseSpec — the declaration (cases.CAMPAIGN)
 │  atom, basis/ECP, spin, nelec_act, ncore, shell_patterns, ref, scan
 └─ run_case(spec) — the staged pipeline (the term tables)
    ├─ 1. ROHF reference (gated; cached checkpoints trusted as-is)
-   ├─ 2. CASCI per sector × fold — term tables vs the combinatorial contract
+   ├─ 2. CASCI per sector × core — term tables vs the combinatorial contract
    ├─ 3. single-root CASSCF (flagged off on multi-solution atoms)
    └─ 4. SA-CASSCF over the ground term's M_L set
 
@@ -209,21 +209,21 @@ them:
 | method | casci — exact diagonalization of the sector; casscf — one root, orbitals free to move; sa-casscf — the term average over the ground term's M_L set | `regen_cells.py` |
 | mask | free — all rotations; radial — same-(l, member) pairs only; frozen — the window pinned; virtmix — the core-mixing probe | `regen_cells.py` |
 | start (the window kind) | `ao` → **D** — the distilled window: the reference's radial content expressed in AO form, m-complete (the production kind); `mo` → **MO** — the SCF's canonical slice (a control: m-incomplete by construction, the hybrid-open gauge); `moc` → **MOC** — the SCF's character-selected columns (a control, the same disease); `no` → **NO** — the term-averaged density's occupation groups (the density leg) | `regen_cells.py` |
-| source (the radial prior) | untagged — the incumbent: radials distilled from the reference's own occupied orbitals (on contracted bases ≈ the basis authors' 1:1 contraction); `@r<k>` — the head's density block, k radials per shell; `@s<k>` — the configuration-series average's density block, k radials per shell (the **configuration series** = one occupation-forced SCF per valence configuration; its first rung, the **head**, is the campaign's anchor reference) — the two distillation families (incumbent vs density-block) never share a comparison row | the case declaration (`ladder` + `prior_bands`) |
+| source (the radial prior) | untagged — the incumbent: radials distilled from the reference's own occupied orbitals (on contracted bases ≈ the basis authors' 1:1 contraction); `@r<k>` — the head's density block, k radials per shell; `@s<k>` — the configuration-series average's density block, k radials per shell (the **configuration series** = one occupation-forced SCF per valence configuration; its first rung, the **head**, is the campaign's anchor reference) — the two distillation families (incumbent vs density-block) never share a comparison row | the case declaration (`series` + `prior_bands`) |
 | radials (k) | k = 1 — the usual case, one radial per shell (the contraction analog); k = 2 — only the series source (the second radial *is* the configuration spread): double budget, the CAS column states it; the tail certificate refuses barren k | the case declaration (`shell_radials`) |
-| fold (the frozen shells) | a noble-gas prefix — exactly that closed shell (Ar = {1s..3p}); `semi` — the prefix with (n−1)p promoted to the window and the valence ns pair folded in; an explicit shell list — everything else ({1s,2s,2p,4s}) | both runners |
-| core field (the fold's frozen density) | `raw` — the SCF's core density as converged (the anisotropy control); `avg` — its spherical average (the default); `frac` — a separately converged fractional-occupation reference (a *different* SCF, not an averaging limit); `lane` — the pinned route's fold (pinned-only): the reference's own occupied orbitals projected onto the fold span, so free and pinned compare at one construction | `regen_cells.py` |
+| core (the frozen shells) | a noble-gas prefix — exactly that closed shell (Ar = {1s..3p}); `semi` — the prefix with (n−1)p promoted to the window and the valence ns pair folded in; an explicit shell list — everything else ({1s,2s,2p,4s}) | both runners |
+| core field (the frozen density) | `raw` — the SCF's core density as converged (the anisotropy control); `avg` — its spherical average (the default); `frac` — a separately converged fractional-occupation reference (a *different* SCF, not an averaging limit); `lane` — the pinned route's core (pinned-only): the reference's own occupied orbitals projected onto the core span, so free and pinned compare at one construction | `regen_cells.py` |
 | substrate (the core span) | `pol` — the SCF's canonical core span (polarized by the open shell); `pur` — the rebuilt rotation-closed span (a raw SCF span never rotation-closes; this one does, at machine precision) | `regen_cells.py` |
 | field | neutral (the default) / folded — the reference the cell's substrate lives on; a ninth address slot, written only when folded | `run_cell` / `run_lane_cell` |
 | reference | default / gated / UHF / fractional-occupation | both runners |
 
 **Window labels** — the address language, one grammar: shells, then at
 most one `@`-suffix, then at most one kind suffix. `3d4s` — the
-shells; `@ar` / `@semi` / `@1s2s2p4s` — the fold declaration (lane
+shells; `@ar` / `@semi` / `@1s2s2p4s` — the core declaration (lane
 windows); `@r1` / `@s2` — the source axis: prior family + k; `no2` —
 the natural-orbital kind at k = 2. So `3d4s@s2no2` reads: shells 3d4s,
 series-average prior at k = 2, natural-orbital kind — rendered
-`3d4s (s2) / NO`. Folds count **electrons chemically**: a fold of N
+`3d4s (s2) / NO`. Folds count **electrons chemically**: a core of N
 pairs freezes N pairs whatever its AO realization — on multi-band
 realizations (multi-zeta, uncontracted) each shell names its declared
 band list, and the frozen core is the span's own closed-shell
@@ -240,9 +240,9 @@ in both.
 payload key, table row) and never renames: a new axis serializes as
 an extra slot only when non-default (an eight-slot address is a
 neutral cell and re-serializes unchanged), lane windows carry their
-`@fold` tag and NO windows their `<source>no<k>` prefix as part of
+`@core` tag and NO windows their `<source>no<k>` prefix as part of
 the window identity, and illegal combinations are rejected at the key
-(`frac` on `pur`, `folded` without a fold tag, a mask on `casci`).
+(`frac` on `pur`, `folded` without a core tag, a mask on `casci`).
 
 Two runners, two deliverables — `run.py <atoms>` runs the fixed staged
 pipeline (the term tables); `regen_cells.py <atoms>` runs the methods
@@ -270,8 +270,8 @@ All tables live in `elements/<Atom>/TABLE.md` (committed,
 regenerable). This section is the reading key and one excerpt; every
 axis it names is defined once, in Methods.
 
-**Tables grammar** — the element file is `TABLE.md`: the ONE ladder
-table, generated between `ladder` markers, its CSV mirror `TABLE.csv`
+**Tables grammar** — the element file is `TABLE.md`: the ONE methods
+table, generated between `methods` markers, its CSV mirror `TABLE.csv`
 beside it (same rows, ASCII headers). Every run cell is a row;
 families (the lattice spans, the primary window's core-field groups,
 the lane families, the prior comparison blocks) are separated by rule
@@ -286,15 +286,15 @@ symmetry is *measured* afterwards (⟨L²⟩, the commutators, ptp). The
 2L+1 components are distributed over D2h irreps (`branch_d2h`), one
 PySCF `wfnsym` solver per component, each component's identity
 guaranteed by its irrep — it runs on `lane` core fields, and its
-*free* twin (same window, same fold, free driver) demonstrates route
+*free* twin (same window, same core, free driver) demonstrates route
 agreement at the same partition. The E column's semantics follow the
 route: **free rows carry the run's own total; pinned rows carry the
 TERM energy** — the branch components' mean at CI plus the
-fold-independent bookkeeping constant (their ΔE residual vs the
+core-independent bookkeeping constant (their ΔE residual vs the
 anchor is that constant's projected-density form, mEh-class,
 disclosed in the note).
 
-Columns of the ladder table (the axis columns — window, CAS, fold,
+Columns of the methods table (the axis columns — window, CAS, core,
 method, route — read their values off Methods' axes; these are the
 reading rules):
 
@@ -338,8 +338,8 @@ rule on uncontracted bases, where the axis values shift meaning:
 primitives — one shell spans several bands (U14e: 5f³ reads on
 9f–11f, 6d¹ on 12d–14d, 7s² on 18s–19s, 6p⁶ on 13p–15p; the
 certificate lives in the element's `logs/probe_bands.log`), and the
-fold column names the fold's shells when the noble guess would lie
-(`fold_chemistry`: U14e folds 6s6p7s / 6s6p, not Ne). A band-named
+core column names the core's shells when the noble guess would lie
+(`core_chemistry`: U14e cores 6s6p7s / 6s6p, not Ne). A band-named
 shell in a window is its DOMINANT radial, not the whole shell — the
 AO 5f6d7s window's s radial is the compact band-7s function, not the
 physical 7s orbital (the MO rows carry the true 7s column).
@@ -391,7 +391,7 @@ Class key (row-level discriminators, never assigned by hand):
 The worked example (Ti, the 3d4s window; excerpt — the full table and
 every other atom: `elements/<Atom>/TABLE.md`; frozen, this draw):
 
-| method | route | window | CAS | fold | dets | E, Eh | ΔE, mEh | conv | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
+| method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | conv | ⟨L²⟩ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −848.4065 | 0 | — | — | — | — | forced filling |
 | CASCI | free | 3d4s / D | (4,6) | Ar | 120 | −848.3959 | +10.5 | — | 12.0000 | 4.2e-09 | 2.3e-08 |  |
@@ -434,7 +434,7 @@ meaningful NO source is the term-averaged CI density.
 | `cases` / `cells` | the declaration (`CaseSpec` → `run_case`); the cell addressing layer |
 
 Everything human-readable lives in `elements/<Atom>/`: `TABLE.md` +
-`TABLE.csv` (the one ladder table and its mirror),
+`TABLE.csv` (the one methods table and its mirror),
 `report.md/json` (term tables),
 `cells.json/md` (the treatment grid),
 plus frozen one-shot artifacts. `elements/ecp/` is the ECP seam's
@@ -444,7 +444,7 @@ the ECP wave's CAMPAIGN declaration). New atom = new element file, not
 README growth. Regeneration: term tables — `scripts/run.py`
 (the per-atom calls recorded in each report header); cells —
 `scripts/regen_cells.py` (chkfiles land under `rungs/`, gitignored);
-the one ladder table — `scripts/build_methods_tables.py`; scans —
+the one methods table — `scripts/build_methods_tables.py`; scans —
 `scripts/radial_scan.py`;
 the U lattices — the `run_u*` scripts (the frozen record until the ECP
 wave). The test suite is the executable documentation.

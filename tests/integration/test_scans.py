@@ -41,7 +41,7 @@ def test_radial_scan_carbon_full_gain_at_exact_symmetry(carbon):
     the entire CASSCF correlation gain (theta* ~ 0.61 rad -> ~ -0.2508 Eh,
     vs the free/radial CASSCF gain of fact 16) with [H, Lz] = 0 at EVERY
     point of the curve -- the gain needs NO symmetry breaking. At theta=0
-    the scan reproduces the casci_avg fold to machine precision."""
+    the scan reproduces the casci_avg core to machine precision."""
     _, mol, mf, _ = carbon
     fam_a, fam_b = select_shell_ao(mol, "2p"), select_shell_ao(mol, "3p")
     ncore, na, nb = 2, 2, 0

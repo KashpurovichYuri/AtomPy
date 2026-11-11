@@ -13,7 +13,7 @@ Atoms (default: every declared atom, CAMPAIGN order):
 Group (--group): one named declared group instead of the full grid
     grid                    the full factor grid, every declared window
                             (the default; plus the declared lattice)
-    spine                   the fold spine: raw/avg/frac on the primary
+    spine                   the core spine: raw/avg/frac on the primary
                             window
     diagnostics             the virtual-mix rows only
     planned                 the planned windows' grids (declared,
@@ -33,7 +33,7 @@ Axis filters (AND-composed; each matches the CellKey field exactly):
     --mask radial           radial | frozen | virtmix | - (maskless)
     --start ao              ao | mo | no
     --substrate pur         pol (canonical core) | pur (closed span)
-    --fold avg              raw | avg | frac
+    --core avg              raw | avg | frac
     --sector 2-1            the (na, nb) active-electron sector
 
 Store semantics:
@@ -88,7 +88,7 @@ def lane_substrate(spec):
     amputates the open MO; the span-mixing one scrambles the
     occupation-column pairing -- measured in the d2h probe log).
     Benign for the lanes: their certificates are basin-blind (the
-    fold is the span's own Roothaan).  Cached lane cells never
+    core is the span's own Roothaan).  Cached lane cells never
     re-run (the certified records stand); the rule governs fresh
     legs."""
     mol = gto.M(atom=f"{spec.symbol} 0 0 0", basis=spec.basis,
@@ -157,7 +157,7 @@ def keep(key: CellKey, args) -> bool:
         return False
     if args.substrate and key.substrate != args.substrate:
         return False
-    if args.fold and key.fold != args.fold:
+    if args.core and key.core != args.core:
         return False
     if args.sector and key.sector != args.sector:
         return False
@@ -193,7 +193,7 @@ def parse_args(argv) -> argparse.Namespace:
     p.add_argument("--start", help="keep this start: ao | mo | moc | no")
     p.add_argument("--substrate",
                    help="keep this substrate: pol | pur")
-    p.add_argument("--fold", help="keep this fold: raw | avg | frac")
+    p.add_argument("--core", help="keep this core: raw | avg | frac")
     p.add_argument("--sector", metavar="NA-NB",
                    help="keep this (na, nb) sector, e.g. 2-1")
     args = p.parse_args(argv)
@@ -208,7 +208,7 @@ def render(atom, rohf_e, cells: dict, ruler: str) -> str:
     per-root configuration lines; the other payload shapes render in
     their own sections (lane cells: term energies; void cells: their
     scenario's reason).  Markdown pipe tables (the meter names are
-    the ladder's; a value column may hold ``nan`` -- no common zero
+    the methods table's; a value column may hold ``nan`` -- no common zero
     for ΔE, or the meter not carried by that payload)."""
     facts_cells = {a: r for a, r in cells.items() if "e_ground" in r}
     other = [(a, r) for a, r in cells.items() if "e_ground" not in r]
@@ -277,7 +277,7 @@ def main() -> None:
         sys.exit(f"not declared: {', '.join(unknown)}; "
                  f"declared: {', '.join(CAMPAIGN)}")
     filtered = bool(args.group or args.method or args.window or args.mask
-                    or args.start or args.substrate or args.fold
+                    or args.start or args.substrate or args.core
                     or args.sector)
     for name in CAMPAIGN:
         if args.atoms and name not in args.atoms:
@@ -323,12 +323,12 @@ def main() -> None:
         act_idx = select_valence_ao(
             mol, realized_patterns(spec.shell_patterns, spec.shell_bands))
         # the fractional-occupation reference is built only when a
-        # NON-VOID frac fold runs (a voided frac class -- e.g. the ECP
+        # NON-VOID frac core runs (a voided frac class -- e.g. the ECP
         # atom's unconverged basin -- skips the head; --full
         # materializing a frac cell brings the head back, guard
         # included)
         mf_f = None
-        if any(k.fold == "frac" and not void_reason(k, scens)
+        if any(k.core == "frac" and not void_reason(k, scens)
                for k in queue):
             _, mf_f = run_frac_occ(cfg, str(out / "rungs" / "fracocc.chk"),
                                    spec.nelec_act, len(act_idx),
@@ -339,19 +339,19 @@ def main() -> None:
                 Path(out / "rungs" / "fracocc.chk").unlink(missing_ok=True)
                 sys.exit(f"{name}: the fractional-occupation reference "
                          f"did not converge (E = {mf_f.e_tot:.8f}) -- "
-                         "the frac folds would be poisoned; fix the SCF "
+                         "the frac cores would be poisoned; fix the SCF "
                          "class first")
 
         lane_sub = None
-        # the prior axis's source ladder: resolved once per atom, only
+        # the prior axis's source series: resolved once per atom, only
         # when a running cell needs it (the @s windows; the head = the
         # trusted reference itself, the rest gated + chk-cached)
-        ladder_mfs = None
-        if (spec.ladder is not None and any(
+        series_mfs = None
+        if (spec.series is not None and any(
                 k.source_tag is not None and k.source_tag[0] == "s"
                 for k in queue)):
-            from atomterm.basis import run_ladder
-            ladder_mfs = run_ladder(cfg, "elements", name, spec.ladder, mf)
+            from atomterm.basis import run_series
+            series_mfs = run_series(cfg, "elements", name, spec.series, mf)
         for key in queue:
             reason = void_reason(key, scens)
             if reason and not args.full:
@@ -360,7 +360,7 @@ def main() -> None:
                                       "void_reason": reason}
             else:
                 print(f"  [cell] {key.address}", flush=True)
-                if key.fold_tag is not None and key.substrate == "pur":
+                if key.core_tag is not None and key.substrate == "pur":
                     if lane_sub is None:
                         lane_sub = lane_substrate(spec)
                     cells[key.address] = run_lane_cell(
@@ -373,7 +373,7 @@ def main() -> None:
                                      fresh=args.fresh, workdir="elements",
                                      shell_bands=spec.shell_bands,
                                      shell_radials=spec.shell_radials,
-                                     ladder_mfs=ladder_mfs,
+                                     series_mfs=series_mfs,
                                      prior_bands=spec.prior_bands,
                                      budgets={"sa_weights":
                                               spec.sa_weights})
@@ -394,7 +394,7 @@ def main() -> None:
         atomic_write_text(out / "cells.md",
                       render(name, mf.e_tot, cells,
                              ruler=CellKey(name, base.window, sector,
-                                           fold="avg").address))
+                                           core="avg").address))
         print(f"  wrote {out}/cells.json + cells.md", flush=True)
 
     print("\ndone")
