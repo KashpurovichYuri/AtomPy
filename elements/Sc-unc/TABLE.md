@@ -4,7 +4,7 @@
 | method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −759.7374 | 0 | −20673.5179 | +0.0000 | — | — | — | — | — | — | — | forced filling |
-| UHF (anchor) | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| UHF (anchor) | — | — | — | — | — | −759.7394 | −2.0 | −20673.5733 | −0.0554 | — | — | — | — | — | — | — | ⟨S²⟩=0.7534, σ_min=0.9989 |
 | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === |
 | CASCI | free | 3d4s / D | (3,6) | Ar·raw | 90 | −759.7342 | +3.2 | −20673.4319 | +0.0860 | — | 5.9990 | 9e-02 | 3e-02 | 4e-02 | 4.6e-02 | 2.5e-01 |  |
 | CASCI | free | 3d4s@r1 / D | (3,6) | Ar·raw | 90 | −759.7342 | +3.1 | −20673.4324 | +0.0855 | — | 5.9990 | 9e-02 | 3e-02 | 4e-02 | 4.6e-02 | 2.5e-01 |  |
@@ -83,7 +83,7 @@
 | SA-CASSCF | free | 3d4s / D | (3,6) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | pinned | 3d4s / D | (3,6) | Ar·lane | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === |
-| CASCI | free | 3d / D | (3,5) | Ar·raw | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 3d / D | (3,5) | Ar·raw | 50 | −759.3360 | +401.3 | −20662.5968 | +10.9210 | — | 11.9994 | 5e-02 | 3e-02 | 4e-02 | 3.6e-02 | 2.1e-01 |  |
 | CASCI | free | 3d@r1 / D | (3,5) | Ar·raw | 50 | −759.3375 | +399.9 | −20662.6368 | +10.8810 | — | 11.9994 | 5e-02 | 3e-02 | 4e-02 | 3.6e-02 | 2.1e-01 |  |
 | CASCI | free | 3d@s1 / D | (3,5) | Ar·raw | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASCI | free | 3d@s2 / D | (3,10) | Ar·raw | — | — | — | — | — | — | — | — | — | — | — | — | pending |
@@ -93,12 +93,12 @@
 | CASCI | free | 3d@s1 / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASCI | free | 3d@s2 / D | (3,10) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASCI | free | 3d / MO | (3,5) | Ar | 50 | −759.7466 | −9.2 | −20673.7694 | −0.2515 | — | 0.0057 | 1e-01 | 2e+00 | 3e+00 | 8.4e-02 | 2.2e-01 | m-incomplete |
-| CASCI | free | 3d / MOC | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, virtual-mix | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 3d / MOC | (3,5) | Ar | 50 | −759.7391 | −1.7 | −20673.5649 | −0.0470 | — | 0.7231 | 1e-01 | 3e+00 | 4e+00 | 9.4e-01 | 2.8e+00 | m-incomplete |
+| CASSCF | free | 3d / D | (3,5) | Ar | 50 | −759.5697 | +167.7 | −20668.9548 | +4.5631 | 1e-5/135 | 10.8315 | — | 1e+00 | 2e+00 | 7.5e-01 | 4.3e+00 | local minimum |
+| CASSCF, frozen | free | 3d / D | (3,5) | Ar | 50 | −759.4254 | +312.0 | −20665.0275 | +8.4904 | 1e-6/149 | 11.9994 | — | 3e-02 | 4e-02 | 1.2e-02 | 7.2e-02 | not converged;  |
+| CASSCF, virtual-mix | free | 3d / D | (3,5) | Ar | 50 | −759.5694 | +167.9 | −20668.9479 | +4.5700 | 1e-4/120 | 10.5891 | — | 1e+00 | 2e+00 | 5.7e-01 | 3.4e+00 |  |
+| SA-CASSCF | free | 3d / D | (3,5) | Ar | 50 | −759.5672 | +170.2 | −20668.8869 | +4.6309 | 1e-4/119 | 11.7177 | 2e-03 | 6e-01 | 8e-01 | 7.0e-02 | 4.2e-01 | not converged;  |
+| SA-CASSCF, frozen | free | 3d / D | (3,5) | Ar | 50 | −759.4243 | +313.1 | −20664.9978 | +8.5201 | 1e-7/138 | 11.9994 | 1e-03 | 3e-02 | 4e-02 | 1.2e-02 | 7.2e-02 | not converged;  |
 | CASSCF | free | 3d@r1 / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASSCF, frozen | free | 3d@r1 / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASSCF, virtual-mix | free | 3d@r1 / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
@@ -114,25 +114,25 @@
 | CASSCF, virtual-mix | free | 3d@s2 / D | (3,10) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | free | 3d@s2 / D | (3,10) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen | free | 3d@s2 / D | (3,10) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 3d / MO | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 3d / MO | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 3d / MO | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 3d / MO | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 3d / MOC | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 3d / MOC | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 3d / MOC | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 3d / MOC | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 3d / MO | (3,5) | Ar | 50 | −759.7674 | −30.1 | −20674.3359 | −0.8180 | 1e-9/14 | 0.0527 | — | 2e+00 | 3e+00 | 2.3e-01 | 5.9e-01 | m-incomplete |
+| CASSCF, frozen | free | 3d / MO | (3,5) | Ar | 50 | −759.7466 | −9.2 | −20673.7694 | −0.2515 | 0/5 | 0.0057 | — | 2e+00 | 3e+00 | 8.4e-02 | 2.2e-01 | m-incomplete |
+| SA-CASSCF | free | 3d / MO | (3,5) | Ar | 50 | −759.7628 | −25.4 | −20674.2089 | −0.6910 | 1e-8/16 | 0.0332 | 7e-02 | 2e+00 | 3e+00 | 1.6e-01 | 4.2e-01 | m-incomplete |
+| SA-CASSCF, frozen | free | 3d / MO | (3,5) | Ar | 50 | −759.7465 | −9.1 | −20673.7664 | −0.2485 | 1e-13/6 | 0.0058 | 8e-02 | 2e+00 | 3e+00 | 8.4e-02 | 2.2e-01 | m-incomplete |
+| CASSCF | free | 3d / MOC | (3,5) | Ar | 50 | −759.7674 | −30.1 | −20674.3359 | −0.8180 | 1e-8/54 | 0.0527 | — | 2e+00 | 3e+00 | 2.4e-01 | 5.9e-01 | m-incomplete |
+| CASSCF, frozen | free | 3d / MOC | (3,5) | Ar | 50 | −759.7391 | −1.7 | −20673.5649 | −0.0470 | 1e-8/2 | 0.7231 | — | 3e+00 | 4e+00 | 9.4e-01 | 2.8e+00 | m-incomplete |
+| SA-CASSCF | free | 3d / MOC | (3,5) | Ar | 50 | −759.7365 | +0.9 | −20673.4940 | +0.0239 | 1e-12/30 | 5.0033 | 5e-02 | 2e+00 | 3e+00 | 4.4e-01 | 2.2e+00 | m-incomplete |
+| SA-CASSCF, frozen | free | 3d / MOC | (3,5) | Ar | 50 | −759.7391 | −1.7 | −20673.5637 | −0.0458 | 1e-13/6 | 0.7231 | 1e-01 | 3e+00 | 4e+00 | 9.4e-01 | 2.8e+00 | m-incomplete |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | free | 3d / D | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 3d / D | (3,5) | Ar·pur | 50 | −759.3359 | +401.5 | −20662.5931 | +10.9248 | — | 12.0000 | 5e-02 | 2e-14 | 2e-14 | 7.5e-15 | 7.3e-14 |  |
 | CASCI | free | 3d@r1 / D | (3,5) | Ar·pur | 50 | −759.3374 | +400.0 | −20662.6332 | +10.8847 | — | 12.0000 | 5e-02 | 2e-14 | 2e-14 | 6.6e-15 | 6.5e-14 |  |
 | CASCI | free | 3d@s1 / D | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASCI | free | 3d@s2 / D | (3,10) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASCI | free | 3d / MO | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASCI | free | 3d / MOC | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 3d / D | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 3d / D | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 3d / D | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 3d / D | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 3d / MO | (3,5) | Ar·pur | 50 | −759.7452 | −7.8 | −20673.7294 | −0.2116 | — | 0.0058 | 1e-01 | 2e+00 | 3e+00 | 8.4e-02 | 2.2e-01 | m-incomplete |
+| CASCI | free | 3d / MOC | (3,5) | Ar·pur | 50 | −759.7377 | −0.3 | −20673.5251 | −0.0073 | — | 0.7233 | 1e-01 | 3e+00 | 4e+00 | 9.4e-01 | 2.8e+00 | m-incomplete |
+| CASSCF | free | 3d / D | (3,5) | Ar·pur | 50 | −759.5870 | +150.4 | −20669.4258 | +4.0921 | 1e-4/192 | 0.2292 | — | 4e+00 | 5e+00 | 5.9e-01 | 1.5e+00 | local minimum |
+| CASSCF, frozen | free | 3d / D | (3,5) | Ar·pur | 50 | −759.4257 | +311.7 | −20665.0365 | +8.4813 | 1e-7/173 | 12.0000 | — | 2e-14 | 2e-14 | 8.4e-15 | 5.9e-14 | not converged;  |
+| SA-CASSCF | free | 3d / D | (3,5) | Ar·pur | 50 | −759.5715 | +165.9 | −20669.0027 | +4.5152 | 1e-5/180 | 11.9328 | 7e-04 | 3e-01 | 5e-01 | 2.1e-02 | 9.7e-02 | not converged;  |
+| SA-CASSCF, frozen | free | 3d / D | (3,5) | Ar·pur | 50 | −759.4245 | +312.8 | −20665.0052 | +8.5127 | 1e-6/172 | 12.0000 | 6e-04 | 2e-14 | 2e-14 | 1.1e-14 | 6.5e-14 | not converged;  |
 | CASSCF | free | 3d@r1 / D | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASSCF, frozen | free | 3d@r1 / D | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | free | 3d@r1 / D | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
@@ -145,18 +145,18 @@
 | CASSCF, frozen | free | 3d@s2 / D | (3,10) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | free | 3d@s2 / D | (3,10) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen | free | 3d@s2 / D | (3,10) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 3d / MO | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 3d / MO | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 3d / MO | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 3d / MO | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 3d / MOC | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 3d / MOC | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 3d / MOC | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 3d / MOC | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 3d / MO | (3,5) | Ar·pur | 50 | −759.7674 | −30.1 | −20674.3359 | −0.8180 | 1e-10/14 | 0.0527 | — | 2e+00 | 3e+00 | 2.3e-01 | 5.9e-01 | m-incomplete |
+| CASSCF, frozen | free | 3d / MO | (3,5) | Ar·pur | 50 | −759.7462 | −8.8 | −20673.7579 | −0.2400 | 0/6 | 0.0058 | — | 2e+00 | 3e+00 | 8.4e-02 | 2.2e-01 | m-incomplete |
+| SA-CASSCF | free | 3d / MO | (3,5) | Ar·pur | 50 | −759.7628 | −25.4 | −20674.2089 | −0.6911 | 1e-8/33 | 0.0332 | 7e-02 | 2e+00 | 3e+00 | 1.6e-01 | 4.2e-01 | m-incomplete |
+| SA-CASSCF, frozen | free | 3d / MO | (3,5) | Ar·pur | 50 | −759.7461 | −8.7 | −20673.7549 | −0.2370 | 1e-12/6 | 0.0058 | 8e-02 | 2e+00 | 3e+00 | 8.4e-02 | 2.2e-01 | m-incomplete |
+| CASSCF | free | 3d / MOC | (3,5) | Ar·pur | 50 | −759.7500 | −12.6 | −20673.8617 | −0.3438 | 1e-4/186 | 0.0264 | — | 4e+00 | 5e+00 | 1.2e+00 | 2.4e+00 | m-incomplete; local minimum |
+| CASSCF, frozen | free | 3d / MOC | (3,5) | Ar·pur | 50 | −759.7387 | −1.3 | −20673.5536 | −0.0357 | 1e-8/111 | 0.7233 | — | 3e+00 | 4e+00 | 9.4e-01 | 2.8e+00 | not converged; m-incomplete |
+| SA-CASSCF | free | 3d / MOC | (3,5) | Ar·pur | 50 | −759.7305 | +6.8 | −20673.3317 | +0.1862 | 1e-4/163 | 3.8280 | 6e-02 | 3e+00 | 4e+00 | 1.7e+00 | 6.1e+00 | not converged; m-incomplete |
+| SA-CASSCF, frozen | free | 3d / MOC | (3,5) | Ar·pur | 50 | −759.7387 | −1.3 | −20673.5525 | −0.0346 | 1e-7/115 | 0.7233 | 1e-01 | 3e+00 | 4e+00 | 9.4e-01 | 2.8e+00 | not converged; m-incomplete |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CASCI | pinned | 3d / D | (3,5) | Ar·lane | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASCI | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 3d / D | (3,5) | Ar·lane | 50 | −759.3352 | +402.1 | −20662.5749 | +10.9430 | — | 12.0000 | 5e-02 | 2e-14 | 2e-14 | 6.3e-15 | 5.5e-14 |  |
+| CASSCF | free | 3d / D | (3,5) | Ar·lane | 50 | −759.5714 | +166.0 | −20669.0010 | +4.5169 | 1e-5/159 | 10.6975 | — | 1e+00 | 2e+00 | 4.6e+00 | 2.7e+01 | not converged; ; local minimum |
+| SA-CASSCF | free | 3d / D | (3,5) | Ar·lane | 50 | −759.5709 | +166.5 | −20668.9882 | +4.5296 | 1e-5/142 | 11.8667 | 8e-04 | 6e-01 | 6e-01 | 4.0e-02 | 2.2e-01 | not converged;  |
 | SA-CASSCF | pinned | 3d / D | (3,5) | Ar·lane | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 <!-- methods:end -->
