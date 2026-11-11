@@ -294,7 +294,11 @@ def test_void_reason_gates_scenariod_cells():
     (the key constructs; only the run is gated)."""
     spec = CAMPAIGN["Ti"]
     sc = scenarios_for(spec)
-    same_l = ("3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4")
+    # the DERIVED same-l class (scenarios_for): every window whose
+    # shell composition repeats an l -- the old hand-list missed
+    # 3d4p4d (caught when the derivation landed, 2026-11-11)
+    same_l = ("3d4d", "3d4dno2", "3d4p4d", "3d4p4dno3",
+              "3d4s4p4d", "3d4s4p4dno4")
     for k in planned(spec):
         if k.window in same_l:
             assert void_reason(k, sc) is not None, k.address
@@ -306,6 +310,25 @@ def test_void_reason_gates_scenariod_cells():
     assert reason.startswith("anchor-first") and "2026-11-02" in reason
     reason = void_reason("ti_3d4d_3-1_casci_ao_-_pol_avg", sc)
     assert reason.startswith("same-l-window") and "2026-11-10" in reason
+
+
+def test_same_l_guard_derives_from_the_declared_windows():
+    """The same-l guard is DERIVED (scenarios_for), never hand-listed
+    per atom: Sc's five same-l lattice spans and Ti's three planned
+    ones (incl. 3d4p4d, which the old hand-list missed) void at every
+    method; the distinct-l lattice spans stay runnable."""
+    for atom, windows in (("Sc", ("3d4d", "3d4s4d", "3d4s4p4d",
+                                  "3d4s4p4d5d", "3d4s4p4d4f")),
+                          ("Ti", ("3d4d", "3d4p4d", "3d4s4p4d"))):
+        spec = CAMPAIGN[atom]
+        sc = scenarios_for(spec)
+        for k in lattice_keys(spec) + planned(spec):
+            if k.window in windows or k.window.startswith(
+                    tuple(w + "no" for w in windows)):
+                assert void_reason(k, sc) is not None, k.address
+        for k in lattice_keys(spec):
+            if k.window == "3d" or k.window == "3d4s4p":
+                assert void_reason(k, sc) is None, k.address
 
 
 def test_radial_refused_covers_the_distilled_cases():

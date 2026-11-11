@@ -444,16 +444,40 @@ def _unc_s_block(key: str) -> Scenario:
                "fresh-SCF disease, measured 2026-11-11 (map Issues); "
                "the @s windows wait on that repair")
 
-_SAME_L_WINDOWS = ("3d4d", "3d4dno2", "3d4s4p4d", "3d4s4p4dno4")
-_SAME_L_VOID = Scenario(
-    name="same-l-window",
-    cells=tuple(f"ti_{w}_3-1_{m}_"
-                for w in _SAME_L_WINDOWS
-                for m in ("casci", "casscf", "sa-casscf")),
-    reason="same-l distilled windows wait on the member-preserving "
-           "cross-shell orthogonalization (window_distilled's "
-           "declared future seam; void since the distillation wave, "
-           "2026-11-10)")
+def _same_l_windows(windows) -> tuple[str, ...]:
+    """The windows whose shell composition REPEATS an l (two d shells
+    in one span, e.g. 3d+4d): their distilled member blocks overlap
+    and ``window_distilled`` refuses to assemble (the S-orthonormality
+    fail-fast).  Derived from the labels -- the class is shell
+    composition, never atom identity."""
+    import re
+    out = []
+    for w in windows:
+        shells = re.findall(r"\d+[spdf]", w.partition("@")[0])
+        ls = [sh[-1] for sh in shells]
+        if len(ls) > len(set(ls)):
+            out.append(w)
+    return tuple(out)
+
+
+def _same_l_void(key: str, windows) -> Scenario:
+    """The same-l windows' guard, sector- and method-free (the claim
+    is window-level: the distilled assembly cannot be built,
+    whatever cell asks): they wait on the member-preserving
+    cross-shell orthogonalization -- window_distilled's declared
+    future seam."""
+    return Scenario(
+        name="same-l-window",
+        cells=tuple(f"{key}_{lbl}_"
+                    for w in windows
+                    for lbl in (w, no_label(w))),
+        reason="same-l distilled windows wait on the member-preserving "
+               "cross-shell orthogonalization (window_distilled's "
+               "declared future seam; void since the distillation wave, "
+               "2026-11-10)")
+
+
+
 
 
 def _prior_anchor_first(atom: str, sectors) -> Scenario:
@@ -701,7 +725,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                  "3s3p3d@1s2s2p4s",
                                  "3d3p4s@1s2s2p3s"),
                    render_spans=("3d4s", "3d"),
-                   scenarios=(_ANCHOR_FIRST, _SAME_L_VOID,
+                   scenarios=(_ANCHOR_FIRST,
                               _prior_anchor_first("Ti", [(3, 1), (2, 0)])),
                    # the prior axis: the series (the HEAD gate = the
                    # TRUSTED reference energy; the further gates = the
@@ -848,6 +872,12 @@ def scenarios_for(spec: CaseSpec) -> tuple[Scenario, ...]:
     flag is the consumer's check).
     """
     merged = {**DEFAULT_SCENARIOS, **{s.name: s for s in spec.scenarios}}
+    # the same-l guard DERIVES from the declared windows (ladder +
+    # planned): the class is shell composition, never a per-atom
+    # bookkeeping item -- a row that declares its own by name wins
+    same_l = _same_l_windows((*spec.lattice_windows, *spec.planned_windows))
+    if same_l and "same-l-window" not in merged:
+        merged["same-l-window"] = _same_l_void(spec.key.lower(), same_l)
     return tuple(merged.values())
 
 
