@@ -249,10 +249,13 @@ def _comparison_key(k):
     k_rank, src = (t[1], t[0]) if t is not None else (1, "")
     # both tiers, ONE block structure: the D-family by (k, source),
     # then the controls (MO, MOC, and -- optimizer tiers -- the NO
-    # start) last
+    # start) last; within a start the OPTIMIZER block reads
+    # CASSCF-then-SA, masks in the declaration order (free first)
     block = 0 if k.start == "ao" else 2
     tier = 0 if k.method == "casci" else 1
-    return (tier, block, k_rank, src, k.start)
+    m_rank = 1 if k.method == "sa-casscf" else 0
+    mask_rank = {"radial": 1, "frozen": 2, "virtmix": 3}.get(k.mask, 0)
+    return (tier, block, k_rank, src, k.start, m_rank, mask_rank)
 
 
 def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
@@ -270,9 +273,9 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     A lattice span equal to the primary's renders once -- the
     primary's core groups own it.  The rendering DIET (store data
     stays; rows do not repeat it): the prior windows contribute
-    only their distilled rows at the ruler core (their controls
-    repeat the incumbent's at equal width; their raw/pur rows
-    repeat their certificates), the lattice renders one row per
+    their distilled rows in every core group where they ran (their
+    controls repeat the incumbent's at equal width and stay out),
+    the lattice renders one row per
     span (the m-incomplete control story renders once, at the
     primary's controls), NO-start OPTIMIZER cells never render (the
     natural-orbital start is not a family -- its CI row IS the
@@ -305,8 +308,7 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         if prior_tag_of(w) is None:
             continue
         priors.setdefault(w.partition("@")[0], []).extend(
-            k for k in window_grid(spec, w)
-            if k.start == "ao" and k.core == "avg" and k.substrate == "pol")
+            k for k in window_grid(spec, w) if k.start == "ao")
     primary_span = "".join(spec.shell_patterns) if spec.render_primary \
         else None
 
@@ -348,7 +350,7 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     routes = route_keys(spec)
     for leg in [k for k in routes
                 if k.substrate == "pur" and k.method == "sa-casscf"]:
-        if not keep(leg.window):
+        if not keep(leg.window.partition("@")[0]):
             continue
         twins = [k for k in routes if k.window == leg.window]
         # the family renders when ANY twin ran (the validation atoms'

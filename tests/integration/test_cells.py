@@ -1254,10 +1254,16 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     assert len(ci) == 3            # raw/avg/pur (the frac class: store-only)
     no_rows = [r for r in rows if "/ NO |" in r]
     assert no_rows                 # the NO start's optimizer legs
-    assert all(r.split("|")[2].strip() == "free"
-               for r in no_rows if "frozen" not in r)
     assert all(not r.startswith("| CASCI |") for r in no_rows)  # no CI
     assert not any("frac" in r for r in rows)
+    # the IDENTICAL per-start order: the D start's CASSCF rows (free,
+    # then the masks in declaration order) before its SA rows
+    d_opt = [r.split("|")[1].strip() for r in rows
+             if "3d4s / D |" in r and (r.startswith("| CASSCF")
+                                       or r.startswith("| SA"))]
+    assert d_opt[:7] == ["CASSCF", "CASSCF, radial", "CASSCF, frozen",
+                         "CASSCF, virtual-mix", "SA-CASSCF",
+                         "SA-CASSCF, radial", "SA-CASSCF, frozen"]
     opt = [r for r in rows
            if r.startswith("| CASSCF | free | 3d4s / D |")]
     assert len(opt) == 2 and not any("·lane" in r for r in opt)  # Ar + Ar·pur substrates
@@ -1388,10 +1394,12 @@ def test_methods_table_diet_repeats_do_not_render():
     rows = [l for l in text.splitlines() if l.startswith("| CASCI")]
     assert not any("/ NO" in l for l in rows)   # the CI row: store-only
     assert not any("frac" in l for l in rows)
-    # prior windows: the distilled row at the ruler core only
+    # prior windows: their D rows in EVERY core group where they ran
+    # (here: the raw and avg groups), never their control clones
     prior_rows = [l for l in rows if "@" in l.split("|")[3]]
     assert prior_rows
-    assert all(l.split("|")[5].strip() == "Ar" for l in prior_rows)
+    assert {l.split("|")[5].strip() for l in prior_rows} >= {"Ar", "Ar·raw"}
+    assert all("/ D |" in l for l in prior_rows)
     # the controls render only at the primary's span (no per-span
     # lattice control)
     assert all(l.split("|")[3].strip() == "3d4s / MO"
@@ -1462,6 +1470,12 @@ def test_methods_lane_families():
     #                          rule; the lone family leads without one
     assert sum(l.startswith("| CASCI | pinned | 3d3p4d / D |")
                for l in lines) == 1
+    # the review-stage span filter matches the SPAN, never the raw
+    # label -- a tagged lane window renders when its span is listed
+    cs_f = replace(cs, render_spans=("3d3p4d",))
+    text_f = "\n".join(mod.methods_section(cs_f, cells, -759.7363))
+    assert sum(l.startswith("| CASCI | pinned | 3d3p4d / D |")
+               for l in text_f.splitlines()) == 1
     assert sum(l.startswith("| CASCI | free | 3d3p4d / D |")
                for l in lines) == 1
     assert sum(l.startswith("| CASSCF | free | 3d3p4d / D |")
