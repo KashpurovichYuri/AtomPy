@@ -32,6 +32,7 @@ from atomterm.cells import (
     window_grid,
 )
 from atomterm.cases import CAMPAIGN, scenarios_for
+from dataclasses import replace
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
 from atomterm.operators import ci_in_detbasis_order, pyscf_ci_permutation
 from atomterm.windows import span_overlap
@@ -1240,10 +1241,9 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     """EVERY comparison row a row -- the three rendered core variants'
     CI rows beside their optimizer variants, the method bare +
     restriction only, the window cell in slash form; the frac
-    reference class stays store-only (the diet) while the NO
-    density leg renders beside the controls; NO-start OPTIMIZER
-    rows stay store-only; free optimizer rows carry no lane
-    marker."""
+    reference class and the NO CI row stay store-only while the NO
+    start's OPTIMIZER legs render with the controls; free optimizer
+    rows carry no lane marker."""
     mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
@@ -1252,9 +1252,11 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     rows = [r for r in text.splitlines() if r.startswith("|")]
     ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / D |")]
     assert len(ci) == 3            # raw/avg/pur (the frac class: store-only)
-    no_ci = [r for r in rows if "/ NO |" in r]
-    assert len(no_ci) == 2         # the density leg, both ruler cores
-    assert all(r.startswith("| CASCI |") for r in no_ci)  # CI-only
+    no_rows = [r for r in rows if "/ NO |" in r]
+    assert no_rows                 # the NO start's optimizer legs
+    assert all(r.split("|")[2].strip() == "free"
+               for r in no_rows if "frozen" not in r)
+    assert all(not r.startswith("| CASCI |") for r in no_rows)  # no CI
     assert not any("frac" in r for r in rows)
     opt = [r for r in rows
            if r.startswith("| CASSCF | free | 3d4s / D |")]
@@ -1342,9 +1344,10 @@ def test_methods_prior_rows_join_the_span_family_in_comparison_order():
     the incumbent's at its span, one family (no rule row inside),
     ordered incumbent -> r -> s1 -> s2 -- in the lattice family of a
     lattice span and in the primary's core groups of the primary
-    span."""
+    span (the spec's render_spans review filter unset -- the pin
+    proves the FULL ordering)."""
     mod = methods_module()
-    cs = CAMPAIGN["Sc"]
+    cs = replace(CAMPAIGN["Sc"], render_spans=None)
     keys = [k for k in [*lattice_keys(cs), *grid_keys(cs),
                         *(k for w in cs.planned_windows
                           for k in window_grid(cs, w))]
@@ -1368,13 +1371,14 @@ def test_methods_prior_rows_join_the_span_family_in_comparison_order():
 @fast
 def test_methods_table_diet_repeats_do_not_render():
     """The rendering diet: the prior windows' control and
-    non-ruler-core rows, the lattice's per-span control, and the
-    frac reference class never render -- the store keeps them, the
-    table does not repeat them.  The NO density leg DOES render (its
-    CI row, beside the controls -- the user's comparison block);
-    NO-start OPTIMIZER rows never do."""
+    non-ruler-core rows, the lattice's per-span control, the frac
+    reference class, and the NO CI row (energy-degenerate with D)
+    never render -- the store keeps them, the table does not repeat
+    them; the NO start's OPTIMIZER legs DO render (a legitimate
+    start kind).  Pinned with the spec's render_spans review filter
+    unset."""
     mod = methods_module()
-    cs = CAMPAIGN["Sc"]
+    cs = replace(CAMPAIGN["Sc"], render_spans=None)
     keys = [k for k in [*lattice_keys(cs), *grid_keys(cs),
                         *(k for w in cs.planned_windows
                           for k in window_grid(cs, w))]
@@ -1382,9 +1386,7 @@ def test_methods_table_diet_repeats_do_not_render():
     text = "\n".join(mod.methods_section(
         cs, {k.address: _methods_payload(-759.5) for k in keys}, -759.7363))
     rows = [l for l in text.splitlines() if l.startswith("| CASCI")]
-    no_rows = [l for l in rows if "/ NO" in l]
-    assert no_rows                      # the density leg renders
-    assert all(l.startswith("| CASCI |") for l in no_rows)
+    assert not any("/ NO" in l for l in rows)   # the CI row: store-only
     assert not any("frac" in l for l in rows)
     # prior windows: the distilled row at the ruler core only
     prior_rows = [l for l in rows if "@" in l.split("|")[3]]
@@ -1425,9 +1427,11 @@ def test_methods_lane_families():
     """The one table carries the lane families: pinned CI, free CI,
     the free CASSCF/SA, and the pinned SA in one family block; the
     tagged cores carry the lane marker; un-run lane families are
-    absent; families are separated by the rule row."""
+    absent; families are separated by the rule row (the spec's
+    render_spans review filter unset -- the lane spans are not in
+    Sc's review tuple)."""
     mod = methods_module()
-    cs = CAMPAIGN["Sc"]
+    cs = replace(CAMPAIGN["Sc"], render_spans=None)
 
     def p(e, pinned=False, ci=False):
         d = {"n_det": 204490, "comm_norm_h_lz": float("nan"),

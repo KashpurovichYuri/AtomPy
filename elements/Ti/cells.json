@@ -27011,5 +27011,11 @@
       "core_anisotropy": 0.0,
       "cell": "ti_3d4sno2_3-1_casci_no_-_pur_avg"
     }
+  },
+  "uhf": {
+    "e_tot": -848.4099122676188,
+    "s2": 2.007832201564497,
+    "sigma_min": 0.9972227153660832,
+    "converged": true
   }
 }

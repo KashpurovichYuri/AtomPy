@@ -220,6 +220,10 @@ class CaseSpec:
     render_primary : the primary window's family renders (False =
         the promoted windows carry the results; the primary rows
         stay in the store).
+    render_spans : the review-stage family filter (None = every
+        family renders): only the listed spans' families do -- the
+        growth path as review proceeds; the store and the runs are
+        untouched by it.
     """
 
     symbol: str
@@ -271,6 +275,7 @@ class CaseSpec:
     core_chemistry: dict[int, str] | None = None
     anchor_note: str | None = None
     render_primary: bool = True
+    render_spans: tuple[str, ...] | None = None
 
     def __post_init__(self):
         """Validate the declaration's own grammar: the term target and
@@ -635,6 +640,10 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    # single-configuration block is rank-1 -- series_window
                    # refuses the noise second radial)
                    planned_windows=_PRIOR_WINDOWS,
+                   # the review stage: the 3d4s window's table only
+                   # (CAS(3,6) + the @s2 CAS(3,12)); the other spans
+                   # rejoin as review proceeds
+                   render_spans=("3d4s",),
                    scenarios=(_prior_anchor_first("Sc", [(2, 1)]),),
                    ref=ReferenceSpec(
                        occ_closed=("1s", "2s", "2p", "3s", "3p", "4s"),

@@ -1,73 +1,43 @@
 # Sc (4s^2 3d^1)
 
-The prior windows (the `@r1`/`@s1`/`@s2` labels in the window
-column — the
-basis-preparation layer): the tag names the RADIAL PRIOR the window
-distills its columns from. `r1` = the head configuration's own density
-block, one radial per shell; `s1`/`s2` = the configuration-series
-average (one SCF per valence configuration, occupation-forced) at one
-and two radials per shell — `s2`'s second radial IS the configuration
-spread, so its window is DOUBLE BUDGET (the CAS column states it:
-CAS(3,12) beside the incumbent CAS(3,6); its dominance reads as the
-headroom the second radial buys, never same-budget superiority).
-Untagged rows are the incumbent: the reference-source distillation,
-which on this CONTRACTED basis is the basis authors' 1:1 contraction —
-the equal-budget baseline the priors compare against; the ROHF anchor
-row is ΔE's absolute zero throughout. The k evidence (per shell: the
-band list, the radial spectrum, the discarded fraction, the
-per-configuration captures) rides the cells' payloads
-(`window_report`) and the provenance logs (`logs/`).
+Review stage: the 3d4s window only -- CAS(3,6), plus the `@s2`
+prior's CAS(3,12) (the budget stated per row); the other spans
+rejoin as review proceeds. ΔE's absolute zero is the ROHF anchor
+row (the UHF anchor follows). One block order in both tiers: the
+D-family by (k, source), then the controls.
 
-The optimizer LEGS over the prior windows (2026-11-11, at the ruler
-cell): FREE is start-blind EXACTLY — `@r1` and `@s1` both land the
-incumbent's own free solution (−31.7; the same basin to six decimals,
-51–52 cycles beside the incumbent's 54), so a k=1 prior's value is
-its START (the CI energy and the path), never a new endpoint. SA:
-`@r1` reproduces the incumbent's SA basin exactly (−13.3) in 34
-cycles against 129 — the faster road to the same state — while `@s1`
-lands a cleaner-but-higher basin (−3.5; its stored stack is
-consistent, `max_de_vs_pyscf` 0.0, against the 0.8 Eh stack anomaly
-the incumbent/`@r1` basin carries — the comm columns state it);
-`s2`'s free row is NOT CONVERGED (167 cycles; the note column flags
-it — the value is a cap reading, not a certificate) and its SA
-(−11.9) sits between. The RADIAL mask is undeclared on prior windows
-BY CONSTRUCTION: its pair predicate needs member-labeled basis rows,
-and a distilled column has no row identity — the incumbent's radial
-rows exist because on this contracted basis D is the authors'
-row-space 1:1. The density leg and the MOC controls complete the
-block: `NO` is degenerate with D at k=1 (+6.7 both — the
-certificate, now visible as a row), MOC's free leg catches the free
-tier (−31.5 beside MO's −31.3) but its SA leg STALLS at its CI
-level (−1.5 against MO-SA's −26.3) — the term average cannot repair
-the character-selected start.
+The starts: `D` = the reference's radial content in AO form -- on
+this CONTRACTED basis the authors' 1:1 contraction, the equal-budget
+baseline; `@r1` = the head configuration's density block (the head
+is this table's own ROHF); `@s1` = the configuration-series mean;
+`@s2` = the mean plus the configuration spread (the second radial)
+at double CAS; `MO`/`MOC` = the SCF's canonical controls
+(m-incomplete by construction); `NO` = the natural-orbital start
+(its optimizer legs render; its CI row is energy-degenerate with D
+and stays store-only).
+
+The verdicts (2026-11-11 legs): FREE is start-blind EXACTLY -- `@r1`
+and `@s1` both land the incumbent's own solution (−31.7, the same
+basin to six decimals, 51–52 cycles beside its 54): a k=1 prior's
+value is its START, never a new endpoint. SA: `@r1` reproduces the
+incumbent's basin (−13.3) in 34 cycles against 129 -- the faster
+road to the same state; `@s1` lands a cleaner-but-higher basin
+(−3.5; its stored stack consistent, against the 0.8 Eh stack
+anomaly the incumbent/`@r1` basin carries -- the comm columns state
+it); `@s2` free is NOT CONVERGED (the note flags it; −37.8 is a cap
+reading) and its SA (−11.9) sits between. MOC's free leg catches
+the free tier (−31.5) but its SA stalls at its CI level (−1.5) --
+the term average cannot repair the character-selected start. The
+radial mask is undeclared on prior windows BY CONSTRUCTION (its
+pair predicate needs member-labeled basis rows). The raw core group
+is the anisotropy detector; the pur group the closure certificates;
+the k evidence rides the payloads (`window_report`) and `logs/`.
 
 <!-- methods:begin -->
 | method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −759.7363 | 0 | −20673.4871 | +0.0000 | — | — | — | — | — | — | — | forced filling |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | free | 3d / D | (3,5) | Ar | 50 | −759.4359 | +300.4 | −20665.3136 | +8.1735 | — | 11.9999 | 5e-02 | 2e-03 | 2e-02 | 7.0e-04 | 3.1e-02 |  |
-| CASCI | free | 3d@r1 / D | (3,5) | Ar | 50 | −759.3330 | +403.3 | −20662.5135 | +10.9736 | — | 11.9999 | 5e-02 | 2e-03 | 2e-02 | 8.4e-04 | 3.8e-02 |  |
-| CASCI | free | 3d@s1 / D | (3,5) | Ar | 50 | −759.5006 | +235.6 | −20667.0751 | +6.4121 | — | 11.9999 | 4e-02 | 2e-03 | 2e-02 | 5.7e-04 | 2.6e-02 |  |
-| CASCI | free | 3d@s2 / D | (3,10) | Ar | 450 | −759.5553 | +180.9 | −20668.5639 | +4.9233 | — | 11.9999 | 3e-02 | 2e-03 | 3e-02 | 2.2e-03 | 1.2e-01 |  |
-| CASSCF | free | 3d@r1 / D | (3,5) | Ar | 50 | −759.7665 | −30.3 | −20674.3113 | −0.8241 | 1e-8/70 | 0.0508 | — | 2e+00 | 3e+00 | 2.0e-01 | 5.8e-01 |  |
-| SA-CASSCF | free | 3d@r1 / D | (3,5) | Ar | 50 | −759.7361 | +0.2 | −20673.4818 | +0.0054 | 1e-8/55 | 4.9610 | 5e-02 | 2e+00 | 3e+00 | 4.3e-01 | 2.1e+00 |  |
-| CASSCF | free | 3d@s1 / D | (3,5) | Ar | 50 | −759.7665 | −30.3 | −20674.3113 | −0.8241 | 1e-8/63 | 0.0508 | — | 2e+00 | 3e+00 | 2.0e-01 | 5.8e-01 |  |
-| SA-CASSCF | free | 3d@s1 / D | (3,5) | Ar | 50 | −759.7361 | +0.2 | −20673.4818 | +0.0054 | 1e-8/46 | 4.9611 | 5e-02 | 3e+00 | 2e+00 | 2.5e-01 | 2.1e+00 |  |
-| CASSCF | free | 3d@s2 / D | (3,10) | Ar | 450 | −759.7727 | −36.4 | −20674.4777 | −0.9905 | 1e-8/84 | 0.0524 | — | 5e+00 | 6e+00 | 2.2e+00 | 8.5e+00 |  |
-| SA-CASSCF | free | 3d@s2 / D | (3,10) | Ar | 450 | −759.7681 | −31.9 | −20674.3549 | −0.8677 | 1e-8/126 | 2.6712 | 7e-02 | 4e+00 | 3e+00 | 1.5e+00 | 9.8e+00 |  |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | free | 3d4d / D | (3,10) | Ar | 450 | −759.5553 | +180.9 | −20668.5639 | +4.9233 | — | 11.9999 | 3e-02 | 2e-03 | 3e-02 | 2.2e-03 | 1.2e-01 |  |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | free | 3d4s4p / D | (3,9) | Ar | 324 | −759.7611 | −24.8 | −20674.1629 | −0.6757 | — | 5.9998 | 8e-02 | 2e-03 | 2e-02 | 1.4e-03 | 5.8e-02 |  |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | free | 3d4s4d / D | (3,11) | Ar | 605 | −759.7402 | −3.9 | −20673.5943 | −0.1072 | — | 5.9998 | 5e-02 | 2e-03 | 3e-02 | 2.5e-03 | 1.3e-01 |  |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | free | 3d4s4p4d / D | (3,14) | Ar | 1,274 | −759.7658 | −29.5 | −20674.2909 | −0.8038 | — | 5.9998 | 7e-02 | 2e-03 | 3e-02 | 3.3e-03 | 1.6e-01 |  |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | free | 3d4s4p4d5d / D | (3,19) | Ar | 3,249 | −759.7660 | −29.7 | −20674.2961 | −0.8089 | — | 5.9998 | 7e-02 | 2e-03 | 3e-02 | 4.2e-03 | 2.1e-01 |  |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | free | 3d4s4p4d4f / D | (3,21) | Ar | 4,410 | −759.7697 | −33.5 | −20674.3985 | −0.9113 | — | 5.9998 | 7e-02 | 6e-02 | 4e-02 | 1.4e-01 | 8.0e-01 |  |
+| UHF (anchor) | — | — | — | — | — | −759.7379 | −1.6 | −20673.5317 | −0.0445 | — | — | — | — | — | — | — | ⟨S²⟩=0.7620, σ_min=0.9945 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CASCI | free | 3d4s / D | (3,6) | Ar·raw | 90 | −759.7296 | +6.7 | −20673.3051 | +0.1820 | — | 6.0003 | 6e-02 | 2e-03 | 2e-02 | 2.8e-02 | 1.3e-01 |  |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -75,7 +45,6 @@ the character-selected start.
 | CASCI | free | 3d4s@r1 / D | (3,6) | Ar | 90 | −759.7366 | −0.4 | −20673.4978 | −0.0106 | — | 5.9997 | 9e-02 | 2e-03 | 2e-02 | 1.0e-03 | 4.7e-02 |  |
 | CASCI | free | 3d4s@s1 / D | (3,6) | Ar | 90 | −759.7240 | +12.3 | −20673.1526 | +0.3346 | — | 5.9998 | 3e-02 | 2e-03 | 2e-02 | 6.8e-04 | 3.1e-02 |  |
 | CASCI | free | 3d4s@s2 / D | (3,12) | Ar | 792 | −759.7460 | −9.8 | −20673.7527 | −0.2656 | — | 5.9998 | 5e-02 | 2e-03 | 3e-02 | 2.8e-03 | 1.4e-01 |  |
-| CASCI | free | 3d4sno2 / NO | (3,6) | Ar | 90 | −759.7296 | +6.7 | −20673.3055 | +0.1816 | — | 5.9998 | 6e-02 | 2e-03 | 2e-02 | 8.4e-04 | 3.8e-02 |  |
 | CASCI | free | 3d4s / MO | (3,6) | Ar | 90 | −759.7470 | −10.7 | −20673.7795 | −0.2924 | — | 0.0062 | 1e-01 | 3e+00 | 4e+00 | 1.5e-01 | 7.2e-01 | control: m-incomplete by construction |
 | CASCI | free | 3d4s / MOC | (3,6) | Ar | 90 | −759.7385 | −2.3 | −20673.5487 | −0.0616 | — | 3.3532 | 2e-01 | 3e+00 | 4e+00 | 1.4e+00 | 1.6e+00 | control: m-incomplete by construction |
 | CASSCF | free | 3d4s / D | (3,6) | Ar | 90 | −759.7680 | −31.7 | −20674.3496 | −0.8625 | 1e-8/54 | 0.0469 | — | 4e+00 | 4e+00 | 5.7e-01 | 1.2e+00 |  |
@@ -97,9 +66,12 @@ the character-selected start.
 | SA-CASSCF, frozen | free | 3d4s / MO | (3,6) | Ar | 90 | −759.7469 | −10.7 | −20673.7774 | −0.2903 | 1e-10/4 | 0.0062 | 8e-02 | 3e+00 | 4e+00 | 1.5e-01 | 7.2e-01 | control: m-incomplete by construction |
 | CASSCF | free | 3d4s / MOC | (3,6) | Ar | 90 | −759.7678 | −31.5 | −20674.3447 | −0.8575 | 1e-8/105 | 0.0526 | — | 2e+00 | 3e+00 | 3.5e-01 | 7.2e-01 | control: m-incomplete by construction |
 | SA-CASSCF | free | 3d4s / MOC | (3,6) | Ar | 90 | −759.7378 | −1.5 | −20673.5282 | −0.0410 | 1e-7/135 | 5.0014 | 5e-02 | 2e+00 | 5e+00 | 1.1e+00 | 6.4e+00 | not converged; control: m-incomplete by construction |
+| CASSCF | free | 3d4sno2 / NO | (3,6) | Ar | 2 | −759.7366 | −0.3 | −20673.4952 | −0.0081 | 0/152 | 0.0000 | — | 1e+00 | 4e+00 | 3.2e-06 | 3.6e-21 |  |
+| CASSCF, frozen | free | 3d4sno2 / NO | (3,6) | Ar | 2 | −759.7266 | +9.6 | −20673.2251 | +0.2620 | 0/6 | 0.0000 | — | 3e-01 | 3e+00 | 5.9e-18 | 1.1e-32 |  |
+| SA-CASSCF | free | 3d4sno2 / NO | (3,6) | Ar | 2 | −759.7366 | −0.3 | −20673.4952 | −0.0081 | 0/152 | 0.0000 | 4e+00 | 1e+00 | 4e+00 | 2.9e-06 | 9.1e-22 |  |
+| SA-CASSCF, frozen | free | 3d4sno2 / NO | (3,6) | Ar | 2 | −759.7266 | +9.6 | −20673.2251 | +0.2620 | 0/6 | 0.0000 | 1e-01 | 3e-01 | 3e+00 | 5.9e-18 | 1.1e-32 |  |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CASCI | free | 3d4s / D | (3,6) | Ar·pur | 90 | −759.7289 | +7.4 | −20673.2867 | +0.2004 | — | 6.0000 | 6e-02 | 7e-15 | 9e-15 | 3.4e-14 | 1.7e-13 |  |
-| CASCI | free | 3d4sno2 / NO | (3,6) | Ar·pur | 90 | −759.7289 | +7.4 | −20673.2867 | +0.2004 | — | 6.0000 | 6e-02 | 7e-15 | 9e-15 | 3.3e-14 | 1.7e-13 |  |
 | CASCI | free | 3d4s / MOC | (3,6) | Ar·pur | 90 | −759.7377 | −1.5 | −20673.5276 | −0.0405 | — | 3.3532 | 2e-01 | 3e+00 | 4e+00 | 1.4e+00 | 1.6e+00 | control: m-incomplete by construction |
 | CASSCF | free | 3d4s / D | (3,6) | Ar·pur | 90 | −759.7678 | −31.5 | −20674.3447 | −0.8575 | 1e-8/95 | 0.0526 | — | 2e+00 | 2e+00 | 3.5e-01 | 7.2e-01 |  |
 | CASSCF, radial | free | 3d4s / D | (3,6) | Ar·pur | 90 | −759.7425 | −6.2 | −20673.6558 | −0.1686 | 1e-10/15 | 3.5384 | — | 3e+00 | 2e+00 | 1.6e+00 | 4.0e+00 |  |
@@ -111,34 +83,8 @@ the character-selected start.
 | CASSCF, frozen | free | 3d4s / MO | (3,6) | Ar·pur | 90 | −759.7470 | −10.7 | −20673.7786 | −0.2915 | 1e-10/5 | 0.0062 | — | 3e+00 | 4e+00 | 1.5e-01 | 7.2e-01 | control: m-incomplete by construction |
 | SA-CASSCF | free | 3d4s / MO | (3,6) | Ar·pur | 90 | −759.7626 | −26.3 | −20674.2032 | −0.7161 | 1e-10/13 | 0.0309 | 7e-02 | 3e+00 | 4e+00 | 3.1e-01 | 1.2e+00 | control: m-incomplete by construction |
 | SA-CASSCF, frozen | free | 3d4s / MO | (3,6) | Ar·pur | 90 | −759.7469 | −10.6 | −20673.7765 | −0.2894 | 1e-11/6 | 0.0063 | 8e-02 | 3e+00 | 4e+00 | 1.5e-01 | 7.2e-01 | control: m-incomplete by construction |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | pinned | 3d4s / D | (3,6) | Ar·lane | 90 | −759.7274 | +8.8 | −20673.2471 | +0.2400 | — | 6.0000 | 7e-15 | 7e-15 | 9e-15 | 3.4e-14 | 3.7e-13 | SCF core; offset = bookkeeping form |
-| CASCI | free | 3d4s / D | (3,6) | Ar·lane | 90 | −759.7274 | +8.8 | −20673.2471 | +0.2400 | — | 6.0000 | 5e-02 | 7e-15 | 9e-15 | 6.5e-14 | 2.4e-13 |  |
-| CASSCF | free | 3d4s / D | (3,6) | Ar·lane | 90 | −759.7436 | −7.4 | −20673.6877 | −0.2005 | 1e-9/18 | 3.5457 | — | 3e+00 | 2e+00 | 1.5e+00 | 3.7e+00 |  |
-| SA-CASSCF | free | 3d4s / D | (3,6) | Ar·lane | 90 | −759.7495 | −13.3 | −20673.8479 | −0.3607 | 1e-9/75 | 6.0020 | 8e-03 | 4e-01 | 2e+00 | 2.3e-01 | 3.8e+00 |  |
-| SA-CASSCF | pinned | 3d4s / D | (3,6) | Ar·lane | 90 | −759.7397 | −3.5 | −20673.5819 | −0.0948 | 0/32 | 6.0000 | 2e-06 | 1e-05 | 2e-05 | 1.8e-05 | 1.0e-04 | SCF core; offset = bookkeeping form |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | pinned | 3d3p / D | (7,8) | semi·lane | 3,920 | −759.7871 | −50.9 | −20674.8712 | −1.3841 | — | 6.0000 | 1e-14 | 5e-14 | 6e-14 | 7.1e-13 | 4.9e-12 | SCF core; offset = bookkeeping form |
-| CASCI | free | 3d3p / D | (7,8) | semi·lane | 3,920 | −759.7871 | −50.9 | −20674.8712 | −1.3841 | — | 6.0000 | 1e+00 | 5e-14 | 6e-14 | 6.4e-13 | 5.2e-12 |  |
-| CASSCF | free | 3d3p / D | (7,8) | semi·lane | 3,920 | −759.8454 | −109.1 | −20676.4572 | −2.9701 | 1e-9/13 | 5.0700 | — | 8e-01 | 2e+00 | 6.2e+00 | 6.0e+01 |  |
-| SA-CASSCF | free | 3d3p / D | (7,8) | semi·lane | 3,920 | −759.8218 | −85.5 | −20675.8147 | −2.3276 | 1e-11/12 | 6.0000 | 4e-07 | 2e-05 | 5e-05 | 5.5e-05 | 1.7e-03 |  |
-| SA-CASSCF | pinned | 3d3p / D | (7,8) | semi·lane | 3,920 | −759.8218 | −85.5 | −20675.8147 | −2.3276 | 1e-9/10 | 6.0000 | 7e-07 | 6e-06 | 2e-05 | 2.2e-05 | 3.8e-04 | SCF core; offset = bookkeeping form |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | pinned | 3d3p4d / D | (7,13) | semi·lane | 204,490 | −759.8409 | −104.6 | −20676.3338 | −2.8467 | — | 6.0000 | 2e-14 | 5e-14 | 6e-14 | 3.6e-14ψ | 9.6e-14ψ | SCF core; offset = bookkeeping form |
-| CASCI | free | 3d3p4d / D | (7,13) | semi·lane | 204,490 | −759.8409 | −104.6 | −20676.3338 | −2.8467 | — | 6.0000 | 5e-01 | — | — | 1.5e-14ψ | 3.8e-14ψ |  |
-| CASSCF | free | 3d3p4d / D | (7,13) | semi·lane | 204,490 | −759.8668 | −130.6 | −20677.0398 | −3.5527 | 1e-6/200 | 4.8569 | — | — | — | 2.5e-01ψ | 1.3e+00ψ | cycle cap;  |
-| SA-CASSCF | free | 3d3p4d / D | (7,13) | semi·lane | 204,490 | −759.8523 | −116.0 | −20676.6438 | −3.1567 | 1e-9/17 | 6.0000 | 1e-08 | — | — | 3.7e-05ψ | 2.5e-04ψ |  |
-| SA-CASSCF | pinned | 3d3p4d / D | (7,13) | semi·lane | 204,490 | −759.8523 | −116.0 | −20676.6438 | −3.1567 | 1e-9/16 | 6.0000 | 5e-08 | 5e-06 | 7e-06 | 3.4e-07ψ | 2.2e-06ψ | SCF core; offset = bookkeeping form |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | pinned | 3d3p4s / D | (9,9) | {1s,2s,2p,3s}·lane | 15,876 | −759.7899 | −53.6 | −20674.9462 | −1.4591 | — | 6.0000 | 1e-13 | 5e-14 | 6e-14 | 7.8e-15ψ | 6.1e-14ψ | SCF core; offset = bookkeeping form |
-| CASCI | free | 3d3p4s / D | (9,9) | {1s,2s,2p,3s}·lane | 15,876 | −759.7899 | −53.6 | −20674.9462 | −1.4591 | — | 6.0000 | 6e-02 | — | — | 2.7e-15ψ | 3.8e-14ψ |  |
-| CASSCF | free | 3d3p4s / D | (9,9) | {1s,2s,2p,3s}·lane | 15,876 | −759.8511 | −114.8 | −20676.6116 | −3.1245 | 0/40 | 5.0601 | — | — | — | 6.3e-05ψ | 2.8e-01ψ |  |
-| SA-CASSCF | free | 3d3p4s / D | (9,9) | {1s,2s,2p,3s}·lane | 15,876 | −759.8266 | −90.4 | −20675.9462 | −2.4591 | 1e-10/59 | 6.0000 | 2e-07 | — | — | 7.2e-07ψ | 2.4e-06ψ |  |
-| SA-CASSCF | pinned | 3d3p4s / D | (9,9) | {1s,2s,2p,3s}·lane | 15,876 | −759.8266 | −90.4 | −20675.9462 | −2.4591 | 1e-13/41 | 6.0000 | 3e-06 | 2e-05 | 2e-05 | 5.5e-06ψ | 5.5e-06ψ | SCF core; offset = bookkeeping form |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CASCI | pinned | 3s3p3d / D | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.7900 | −53.7 | −20674.9492 | −1.4621 | — | 6.0000 | 1e-13 | 5e-14 | 6e-14 | 4.3e-14ψ | 1.2e-13ψ | SCF core; offset = bookkeeping form |
-| CASCI | free | 3s3p3d / D | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.7900 | −53.7 | −20674.9492 | −1.4621 | — | 6.0000 | 1e+00 | — | — | 1.7e-14ψ | 7.2e-14ψ |  |
-| CASSCF | free | 3s3p3d / D | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.8509 | −114.7 | −20676.6077 | −3.1206 | 1e-11/24 | 5.0674 | — | — | — | 2.1e-01ψ | 3.2e-01ψ |  |
-| SA-CASSCF | free | 3s3p3d / D | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.8266 | −90.4 | −20675.9462 | −2.4591 | 1e-8/18 | 6.0000 | 2e-07 | — | — | 4.9e-07ψ | 2.8e-06ψ |  |
-| SA-CASSCF | pinned | 3s3p3d / D | (9,9) | {1s,2s,2p,4s}·lane | 15,876 | −759.8266 | −90.4 | −20675.9462 | −2.4591 | 1e-13/21 | 6.0000 | 1e-06 | 3e-05 | 5e-05 | 1.4e-06ψ | 1.1e-05ψ | SCF core; offset = bookkeeping form |
+| CASSCF | free | 3d4sno2 / NO | (3,6) | Ar·pur | 90 | −759.7678 | −31.5 | −20674.3447 | −0.8575 | 1e-8/50 | 0.0526 | — | 2e+00 | 3e+00 | 3.4e-01 | 7.2e-01 |  |
+| CASSCF, frozen | free | 3d4sno2 / NO | (3,6) | Ar·pur | 90 | −759.7295 | +6.7 | −20673.3042 | +0.1830 | 1e-9/6 | 6.0000 | — | 7e-15 | 9e-15 | 3.3e-14 | 2.3e-13 |  |
+| SA-CASSCF | free | 3d4sno2 / NO | (3,6) | Ar·pur | 90 | −759.7397 | −3.5 | −20673.5819 | −0.0948 | 1e-8/34 | 6.0000 | 2e-07 | 3e-03 | 5e-03 | 2.2e-05 | 1.3e-04 |  |
+| SA-CASSCF, frozen | free | 3d4sno2 / NO | (3,6) | Ar·pur | 90 | −759.7290 | +7.3 | −20673.2891 | +0.1980 | 1e-13/6 | 6.0000 | 6e-08 | 7e-15 | 9e-15 | 9.6e-14 | 7.2e-13 |  |
 <!-- methods:end -->

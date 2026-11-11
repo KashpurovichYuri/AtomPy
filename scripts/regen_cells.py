@@ -306,7 +306,11 @@ def main() -> None:
                          "run would create a subset-only store; run "
                          "unfiltered first")
             try:
-                cells = json.loads(store.read_text())["cells"]
+                # the WHOLE store dict, not just cells: the write
+                # below merges into it, so the store's other
+                # top-level records (the UHF anchor) survive a regen
+                store_data = json.loads(store.read_text())
+                cells = store_data["cells"]
             except (json.JSONDecodeError, KeyError) as e:
                 sys.exit(f"{store} is unreadable ({e!r}) -- rerun "
                          "unfiltered to rebuild the store")
@@ -388,7 +392,8 @@ def main() -> None:
             # (the shell host caps background jobs) keeps every
             # finished cell
             atomic_write_text(out / "cells.json",
-                          json.dumps({"atom": name,
+                          json.dumps({**store_data,
+                                      "atom": name,
                                       "rohf_energy": float(mf.e_tot),
                                       "cells": cells}, indent=2))
         atomic_write_text(out / "cells.md",

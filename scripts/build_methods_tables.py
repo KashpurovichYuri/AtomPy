@@ -191,12 +191,13 @@ def _row(k, p, anchor, spec) -> str:
 def _method_row(k) -> bool:
     """The methods-row policy, ONE home: the table renders the
     COMPARISON classes -- the distilled block (the incumbent and the
-    prior windows), the NO density leg, the SCF controls, the
-    treatments.  A NO-start OPTIMIZER cell never renders (the
-    natural-orbital START is not a family -- its CI row is the
-    leg); every other filter in the table's assembly routes through
+    prior windows), the SCF controls, the treatments, and the NO
+    start's OPTIMIZER legs (a legitimate start kind).  A NO-start
+    CASCI cell never renders (energy-degenerate with its D row at
+    k=1 -- the density leg's certificate lives in the store and the
+    pins); every filter in the table's assembly routes through
     here."""
-    return k.start != "no" or k.method == "casci"
+    return k.start != "no" or k.method != "casci"
 
 
 def _rows(keys, cells, anchor, spec) -> list[str]:
@@ -247,10 +248,9 @@ def _comparison_key(k):
     t = k.source_tag
     k_rank, src = (t[1], t[0]) if t is not None else (1, "")
     # both tiers, ONE block structure: the D-family by (k, source),
-    # then (CI only) the NO density leg, then the MO/MOC controls
-    # last
-    block = {"ao": 0, "no": 1}.get(k.start, 2) if k.method == "casci" \
-        else (0 if k.start == "ao" else 2)
+    # then the controls (MO, MOC, and -- optimizer tiers -- the NO
+    # start) last
+    block = 0 if k.start == "ao" else 2
     tier = 0 if k.method == "casci" else 1
     return (tier, block, k_rank, src, k.start)
 
@@ -310,9 +310,17 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     primary_span = "".join(spec.shell_patterns) if spec.render_primary \
         else None
 
+    # the review-stage family filter (None = every family): only
+    # the listed spans' families render -- the growth path back to
+    # the full table
+    keep = (lambda sp: True) if spec.render_spans is None \
+        else (lambda sp: sp in spec.render_spans)
+
     for span in dict.fromkeys(k.window for k in lattice_keys(spec)):
         if span == primary_span:
             continue    # the primary's core groups own this span
+        if not keep(span):
+            continue
         # the diet: one row per span (the distilled CI); the
         # m-incomplete control story renders once, at the primary
         _fam([k for k in lattice_keys(spec)
@@ -326,7 +334,7 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     # reference class does not render (the diet); suppressed by the
     # declaration (render_primary=False -- the promoted windows carry
     # the results; the primary rows stay in the store)
-    if spec.render_primary:
+    if spec.render_primary and keep(primary_span):
         grid = [k for k in grid_keys(spec)
                 if _method_row(k) and k.core != "frac"]
         join = [k for k in priors.get(primary_span, [])
@@ -340,6 +348,8 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     routes = route_keys(spec)
     for leg in [k for k in routes
                 if k.substrate == "pur" and k.method == "sa-casscf"]:
+        if not keep(leg.window):
+            continue
         twins = [k for k in routes if k.window == leg.window]
         # the family renders when ANY twin ran (the validation atoms'
         # pinned leg alone is their story; the campaign atoms' route
@@ -352,6 +362,8 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     # span without an incumbent twin (its own comparison family) --
     # the same row order throughout
     for w in spec.planned_windows:
+        if not keep(w.partition("@")[0]):
+            continue
         if prior_tag_of(w) is not None:
             keys = priors.pop(w.partition("@")[0], [])
             if not keys:
