@@ -20053,5 +20053,11 @@
       "cell": "sc_3d4s@s2no2_2-1_sa-casscf_no_frozen_pur_avg",
       "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
     }
+  },
+  "uhf": {
+    "e_tot": -759.7378912284389,
+    "s2": 0.7619902904184386,
+    "sigma_min": 0.994546380150559,
+    "converged": true
   }
 }

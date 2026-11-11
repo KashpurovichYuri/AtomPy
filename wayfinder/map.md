@@ -28,6 +28,17 @@ user decision; the partial verdict 91/91-isolation-green).
 
 ## Issues (open dispositions + watchlist)
 
+- THE TWINS' UHF ANCHORS BLOCKED (2026-11-11, measured): the UHF
+  class does NOT converge on the uncontracted twins -- the census
+  arms (default/minao/atom/huckel/broken) all diverge or land
+  garbage basins, under plain-DIIS AND under Newton (E up to +1.5e7
+  Eh; the arms' table is in the session record).  The twins share
+  their ROHF's trusted-cache disease: fresh SCF paths diverge on
+  these bases.  Disposition: the UHF anchor row stays ABSENT on
+  Sc-unc/Ti-unc until the UHF class converges there (the same
+  repair class as the ROHF promotion -- a seeded/cached path).
+  The three gated atoms (Sc, Ti, U14e) warmed EXACTLY to their
+  declared `occ_e_ref_uhf` basins (the gates reproduced bit-exact).
 - THE BASIS-PREPARATION LAYER landed (2026-11-10, this session):
   `src/atomterm/basis.py` (the ladder runner, the density-block
   source, `metric_radials`, `series_window`) + the SOURCE-TAG grammar
