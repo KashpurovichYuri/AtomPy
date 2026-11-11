@@ -59,6 +59,11 @@ user decision; the partial verdict 91/91-isolation-green).
   repair class as the ROHF promotion -- a seeded/cached path).
   The three gated atoms (Sc, Ti, U14e) warmed EXACTLY to their
   declared `occ_e_ref_uhf` basins (the gates reproduced bit-exact).
+  THE SAME DISEASE BLOCKS THE PRIOR PORT'S @s HALF (2026-11-11,
+  measured): the series' non-head configurations need fresh
+  forced-occupation SCFs and the d3 census on Sc-unc diverges on
+  every arm (E ~ +1.3e7 Eh, Newton and DIIS alike); the @r1 half
+  landed (the head IS the trusted cache) -- elements/Sc-unc.
 - THE BASIS-PREPARATION LAYER landed (2026-11-10, this session):
   `src/atomterm/basis.py` (the ladder runner, the density-block
   source, `metric_radials`, `series_window`) + the SOURCE-TAG grammar

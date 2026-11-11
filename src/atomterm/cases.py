@@ -692,9 +692,23 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         shell_patterns=["3d", "4s"], spin=1,
                         shell_bands=_TM_UNC_BANDS,
                         shell_radials=_TM_UNC_RADIALS,
+                        # the prior axis, @r1 ONLY: the head's own block
+                        # (the head IS the trusted cache -- no fresh SCF;
+                        # the @s windows need the series' other
+                        # configurations, whose fresh forced-occupation
+                        # runs diverge on this basis -- measured
+                        # 2026-11-11, the twins' fresh-SCF disease; the
+                        # port's @s half waits on that repair)
+                        series=(SeriesSpec("d1s2", ("1s", "2s", "2p", "3s",
+                                                    "3p"), ("3d", "4s"),
+                                           1, -759.7373848622801),),
+                        prior_bands={"3d": _TM_UNC_BANDS["3d"],
+                                     "4s": _TM_UNC_BANDS["4s"]},
+                        planned_windows=("3d@r1", "3d4s@r1"),
                         sa_weights=[1 / 5] * 5,
                         run_casscf=False, key="Sc-unc",
-                        scenarios=_unc_gates("sc-unc", (2, 1)),
+                        scenarios=_unc_gates("sc-unc", (2, 1))
+                        + (_prior_anchor_first("sc-unc", [(2, 1)]),),
                         term=(2, "g"), lane_windows=("3d4s@ar",),
                         lattice_windows=("3d",), lattice_sector=(2, 1)),
     "Ti-unc": CaseSpec("Ti", _TI_UNC_BASIS, nelec_act=4, ncore=9,

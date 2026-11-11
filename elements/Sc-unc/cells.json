@@ -995,6 +995,1733 @@
       ],
       "core_anisotropy": 0.0030492471,
       "cell": "sc-unc_3d4s@ar_2-1_casci_ao_-_pol_avg"
+    },
+    "sc-unc_3d@r1_2-1_casci_ao_-_pol_raw": {
+      "tag": "sc-unc_3d@r1_2-1_casci_ao_-_pol_raw",
+      "kind": "casci",
+      "n_det": 50,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.8240964294591322e-13,
+      "e_ground": -759.3375140945843,
+      "energies_pyscf": [
+        -759.3375140945843,
+        -759.3375140945843,
+        -759.3366939864609,
+        -759.335653023977,
+        -759.335652956761,
+        -759.3339900115086,
+        -759.3339900114871,
+        -759.2876384521543,
+        -759.2857022445147
+      ],
+      "max_de_vs_pyscf": 1.1368683772161603e-13,
+      "ground_term": "4F",
+      "ground_l2": 11.999427027164847,
+      "ground_lz2": 4.30572180018701,
+      "terms": {
+        "4F": 7,
+        "4P": 3,
+        "2G": 12,
+        "2H": 8,
+        "2F": 10,
+        "2D": 10
+      },
+      "comm_norm_h_lz": 0.03552574342238987,
+      "comm_norm_h_l2": 0.20693742574278984,
+      "win_lz": 0.026781244292588723,
+      "win_lperp": 0.03968233411669092,
+      "window": {
+        "s": 3.8e-05,
+        "p": 0.0,
+        "d": 0.999962,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 0.00019098833244369056,
+        "p": 1.2691991786586286e-21,
+        "d": 2.999809011667556,
+        "f": 5.313266310770234e-26
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "d^3.00 (|c|=0.34); d^3.00 (|c|=0.34)",
+        "d^3.00 (|c|=0.38); d^3.00 (|c|=0.38)",
+        "d^3.00 (|c|=0.42); d^3.00 (|c|=0.42)",
+        "d^3.00 (|c|=0.36); d^3.00 (|c|=0.36)",
+        "d^3.00 (|c|=0.37); d^3.00 (|c|=0.37)",
+        "d^3.00 (|c|=0.38); d^3.00 (|c|=0.38)",
+        "d^3.00 (|c|=0.36); d^3.00 (|c|=0.36)",
+        "d^3.00 (|c|=0.32); d^3.00 (|c|=0.32)",
+        "d^3.00 (|c|=0.47); d^3.00 (|c|=0.41)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.01096328145,
+      "cell": "sc-unc_3d@r1_2-1_casci_ao_-_pol_raw"
+    },
+    "sc-unc_3d@r1_2-1_casci_ao_-_pol_avg": {
+      "tag": "sc-unc_3d@r1_2-1_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 50,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.857403120197887e-13,
+      "e_ground": -759.336154166373,
+      "energies_pyscf": [
+        -759.3375140945844,
+        -759.3375140945844,
+        -759.336693986461,
+        -759.3356530239771,
+        -759.3356529567611,
+        -759.3339900115087,
+        -759.3339900114872,
+        -759.2876384521544,
+        -759.2857022445148
+      ],
+      "max_de_vs_pyscf": 0.001619635922679663,
+      "ground_term": "4F",
+      "ground_l2": 11.999427027165385,
+      "ground_lz2": 4.305735376743461,
+      "terms": {
+        "4F": 7,
+        "2G": 9,
+        "4P": 3,
+        "2P": 1,
+        "2H": 11,
+        "2D": 12,
+        "2F": 7
+      },
+      "comm_norm_h_lz": 0.012071421706290275,
+      "comm_norm_h_l2": 0.07178369542848559,
+      "win_lz": 0.026781244292588723,
+      "win_lperp": 0.03968233411669092,
+      "window": {
+        "s": 3.8e-05,
+        "p": 0.0,
+        "d": 0.999962,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 0.00019098833244368853,
+        "p": 1.2691991801781726e-21,
+        "d": 2.999809011667558,
+        "f": 5.313266321183284e-26
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "d^3.00 (|c|=0.32); d^3.00 (|c|=0.32)",
+        "d^3.00 (|c|=0.36); d^3.00 (|c|=0.36)",
+        "d^3.00 (|c|=0.42); d^3.00 (|c|=0.42)",
+        "d^3.00 (|c|=0.36); d^3.00 (|c|=0.36)",
+        "d^3.00 (|c|=0.37); d^3.00 (|c|=0.37)",
+        "d^3.00 (|c|=0.38); d^3.00 (|c|=0.38)",
+        "d^3.00 (|c|=0.36); d^3.00 (|c|=0.36)",
+        "d^3.00 (|c|=0.32); d^3.00 (|c|=0.32)",
+        "d^3.00 (|c|=0.27); d^3.00 (|c|=0.26)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.01096328145,
+      "cell": "sc-unc_3d@r1_2-1_casci_ao_-_pol_avg"
+    },
+    "sc-unc_3d@r1_2-1_casci_ao_-_pur_avg": {
+      "tag": "sc-unc_3d@r1_2-1_casci_ao_-_pur_avg",
+      "kind": "casci",
+      "n_det": 50,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.7497114868092467e-13,
+      "e_ground": -759.3373791226261,
+      "energies_pyscf": [
+        -759.3373791226261,
+        -759.3373791226261,
+        -759.3373791226261,
+        -759.3373791226261,
+        -759.3373791226261,
+        -759.3373791226261,
+        -759.3373791226261,
+        -759.2866833720726,
+        -759.2866833720726
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "4F",
+      "ground_l2": 12.000000000000004,
+      "ground_lz2": 3.8481430574223614,
+      "terms": {
+        "4F": 7,
+        "4P": 3,
+        "2G": 15,
+        "2H": 8,
+        "2D": 10,
+        "2F": 7
+      },
+      "comm_norm_h_lz": 6.6319924461173034e-15,
+      "comm_norm_h_l2": 6.480160296163282e-14,
+      "win_lz": 1.5019182263600558e-14,
+      "win_lperp": 2.0437095930769805e-14,
+      "window": {
+        "s": 0.0,
+        "p": 0.0,
+        "d": 1.0,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 0.0,
+        "d": 3.0,
+        "f": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "d^3.00 (|c|=0.45); d^3.00 (|c|=0.45)",
+        "d^3.00 (|c|=0.31); d^3.00 (|c|=0.31)",
+        "d^3.00 (|c|=0.34); d^3.00 (|c|=0.34)",
+        "d^3.00 (|c|=0.40); d^3.00 (|c|=0.40)",
+        "d^3.00 (|c|=0.43); d^3.00 (|c|=0.43)",
+        "d^3.00 (|c|=0.43); d^3.00 (|c|=0.43)",
+        "d^3.00 (|c|=0.52); d^3.00 (|c|=0.52)",
+        "d^3.00 (|c|=0.34); d^3.00 (|c|=0.34)",
+        "d^3.00 (|c|=0.35); d^3.00 (|c|=0.35)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.0,
+      "cell": "sc-unc_3d@r1_2-1_casci_ao_-_pur_avg"
+    },
+    "sc-unc_3d@r1_2-1_casci_mo_-_pol_avg": {
+      "tag": "sc-unc_3d@r1_2-1_casci_mo_-_pol_avg",
+      "kind": "casci",
+      "n_det": 50,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.6608936448392342e-13,
+      "e_ground": -759.7437951087616,
+      "energies_pyscf": [
+        -759.746626818281,
+        -759.6776575963867,
+        -759.6776573470327,
+        -759.6719870542694,
+        -759.6642453119064,
+        -759.6642449018291,
+        -759.6537535727093,
+        -759.615590015509,
+        -759.6141384153419
+      ],
+      "max_de_vs_pyscf": 0.0030973661447433187,
+      "ground_term": "2S",
+      "ground_l2": 0.005739353842308836,
+      "ground_lz2": 0.0017960670497525891,
+      "terms": {
+        "2S": 4,
+        "4P": 9,
+        "2P": 21,
+        "2D": 15,
+        "4S": 1
+      },
+      "comm_norm_h_lz": 0.08356996647276266,
+      "comm_norm_h_l2": 0.21569593115887578,
+      "win_lz": 1.9385575045836139,
+      "win_lperp": 2.8724214298518036,
+      "window": {
+        "s": 0.199973,
+        "p": 0.599985,
+        "d": 0.200027,
+        "f": 1.5e-05
+      },
+      "electrons": {
+        "s": 1.9319681733181286,
+        "p": 0.06725667347729349,
+        "d": 1.0007734094746252,
+        "f": 1.7437299554652206e-06
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.11)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.48)",
+        "s^1.00p^1.00d^1.00 (|c|=0.74); s^1.00p^1.00d^1.00 (|c|=0.65)",
+        "s^1.00p^1.00d^1.00 (|c|=0.75); s^1.00p^1.00d^1.00 (|c|=0.65)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.01096328145,
+      "cell": "sc-unc_3d@r1_2-1_casci_mo_-_pol_avg"
+    },
+    "sc-unc_3d@r1_2-1_casci_moc_-_pol_avg": {
+      "tag": "sc-unc_3d@r1_2-1_casci_moc_-_pol_avg",
+      "kind": "casci",
+      "n_det": 50,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.8107737531636303e-13,
+      "e_ground": -759.7362870571689,
+      "energies_pyscf": [
+        -759.7391121624441,
+        -759.6299379231095,
+        -759.6299379230339,
+        -759.6142095988023,
+        -759.611497971613,
+        -759.6114626849217,
+        -759.600265521317,
+        -759.5966877501559,
+        -759.5962204529118
+      ],
+      "max_de_vs_pyscf": 0.002935956073770285,
+      "ground_term": "2S",
+      "ground_l2": 0.7231234048459689,
+      "ground_lz2": 0.29720842110881895,
+      "terms": {
+        "2S": 1,
+        "4D": 6,
+        "4P": 3,
+        "2D": 22,
+        "2P": 9,
+        "2G": 6,
+        "2F": 2,
+        "4S": 1
+      },
+      "comm_norm_h_lz": 0.9420876894516811,
+      "comm_norm_h_l2": 2.8321046278233215,
+      "win_lz": 2.656256906088542,
+      "win_lperp": 3.7576295955563963,
+      "window": {
+        "s": 0.199973,
+        "p": 0.0,
+        "d": 0.800027,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9872813985430238,
+        "p": 3.2405827940013355e-16,
+        "d": 1.0127186014569791,
+        "f": 1.2227430089193969e-20
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.05)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.79); s^1.00d^2.00 (|c|=0.56)",
+        "s^1.00d^2.00 (|c|=0.79); s^1.00d^2.00 (|c|=0.56)",
+        "s^1.00d^2.00 (|c|=0.76); s^1.00d^2.00 (|c|=0.63)",
+        "s^1.00d^2.00 (|c|=0.78); s^1.00d^2.00 (|c|=0.59)",
+        "s^1.00d^2.00 (|c|=0.78); s^1.00d^2.00 (|c|=0.59)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.01096328145,
+      "cell": "sc-unc_3d@r1_2-1_casci_moc_-_pol_avg"
+    },
+    "sc-unc_3d@r1_2-1_casci_mo_-_pur_avg": {
+      "tag": "sc-unc_3d@r1_2-1_casci_mo_-_pur_avg",
+      "kind": "casci",
+      "n_det": 50,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.850107658107885e-13,
+      "e_ground": -759.7451600538014,
+      "energies_pyscf": [
+        -759.7451600538014,
+        -759.6762093469785,
+        -759.6762090887809,
+        -759.6703227870213,
+        -759.6628313747917,
+        -759.66283095503,
+        -759.6522050810006,
+        -759.614028882635,
+        -759.6127265174945
+      ],
+      "max_de_vs_pyscf": 1.1368683772161603e-13,
+      "ground_term": "2S",
+      "ground_l2": 0.0057666891489544896,
+      "ground_lz2": 0.0018046212691042267,
+      "terms": {
+        "2S": 4,
+        "4P": 9,
+        "2P": 21,
+        "2D": 15,
+        "4S": 1
+      },
+      "comm_norm_h_lz": 0.08365043797248976,
+      "comm_norm_h_l2": 0.21610151979922454,
+      "win_lz": 1.9387404161632726,
+      "win_lperp": 2.8726924538752994,
+      "window": {
+        "s": 0.199935,
+        "p": 0.599985,
+        "d": 0.200065,
+        "f": 1.5e-05
+      },
+      "electrons": {
+        "s": 1.9314846767941154,
+        "p": 0.06725756517627299,
+        "d": 1.0012560140238647,
+        "f": 1.744005748027705e-06
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.11)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.49)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.48)",
+        "s^1.00p^1.00d^1.00 (|c|=0.74); s^1.00p^1.00d^1.00 (|c|=0.65)",
+        "s^1.00p^1.00d^1.00 (|c|=0.75); s^1.00p^1.00d^1.00 (|c|=0.65)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.0,
+      "cell": "sc-unc_3d@r1_2-1_casci_mo_-_pur_avg"
+    },
+    "sc-unc_3d@r1_2-1_casci_moc_-_pur_avg": {
+      "tag": "sc-unc_3d@r1_2-1_casci_moc_-_pur_avg",
+      "kind": "casci",
+      "n_det": 50,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.7863488466218769e-13,
+      "e_ground": -759.7376520273198,
+      "energies_pyscf": [
+        -759.7376520273198,
+        -759.6287016022895,
+        -759.6287016022175,
+        -759.6126630549397,
+        -759.6100341192998,
+        -759.609999945575,
+        -759.5988671674506,
+        -759.5954277968509,
+        -759.5949605553379
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "2S",
+      "ground_l2": 0.7232760539759403,
+      "ground_lz2": 0.29727034405208824,
+      "terms": {
+        "2S": 1,
+        "4D": 6,
+        "4P": 3,
+        "2D": 22,
+        "2P": 9,
+        "2G": 6,
+        "2F": 2,
+        "4S": 1
+      },
+      "comm_norm_h_lz": 0.9398487485896079,
+      "comm_norm_h_l2": 2.826237922498089,
+      "win_lz": 2.6563493950901873,
+      "win_lperp": 3.7577961059989793,
+      "window": {
+        "s": 0.199935,
+        "p": 0.0,
+        "d": 0.800065,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9866967449098987,
+        "p": 3.2411858066879266e-16,
+        "d": 1.013303255090101,
+        "f": 1.2223365911064652e-20
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.05)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.79); s^1.00d^2.00 (|c|=0.56)",
+        "s^1.00d^2.00 (|c|=0.79); s^1.00d^2.00 (|c|=0.56)",
+        "s^1.00d^2.00 (|c|=0.76); s^1.00d^2.00 (|c|=0.63)",
+        "s^1.00d^2.00 (|c|=0.78); s^1.00d^2.00 (|c|=0.59)",
+        "s^1.00d^2.00 (|c|=0.78); s^1.00d^2.00 (|c|=0.60)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.0,
+      "cell": "sc-unc_3d@r1_2-1_casci_moc_-_pur_avg"
+    },
+    "sc-unc_3d@r1_2-1_casscf_ao_-_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_ao_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_mo_-_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_mo_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_moc_-_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_moc_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_ao_virtmix_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_ao_virtmix_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_ao_-_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_ao_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_mo_-_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_mo_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_moc_-_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_moc_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_ao_radial_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_ao_radial_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_ao_radial_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_ao_radial_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_ao_frozen_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_ao_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_mo_frozen_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_mo_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_moc_frozen_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_moc_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_ao_frozen_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_ao_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_mo_frozen_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_mo_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_casscf_moc_frozen_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_casscf_moc_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_ao_-_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_ao_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_mo_-_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_mo_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_moc_-_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_moc_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_ao_-_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_ao_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_mo_-_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_mo_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_moc_-_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_moc_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_ao_radial_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_ao_radial_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_ao_radial_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_ao_radial_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_ao_frozen_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_ao_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_mo_frozen_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_mo_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_moc_frozen_pol_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_moc_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_ao_frozen_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_ao_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_mo_frozen_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_mo_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d@r1_2-1_sa-casscf_moc_frozen_pur_avg": {
+      "cell": "sc-unc_3d@r1_2-1_sa-casscf_moc_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casci_ao_-_pol_raw": {
+      "tag": "sc-unc_3d4s@r1_2-1_casci_ao_-_pol_raw",
+      "kind": "casci",
+      "n_det": 90,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.8784973576657649e-13,
+      "e_ground": -759.7342445093042,
+      "energies_pyscf": [
+        -759.7342445093042,
+        -759.7307308822188,
+        -759.7307308644466,
+        -759.7293437081374,
+        -759.7293437081164,
+        -759.6426167233712,
+        -759.6426167233499,
+        -759.6411923943807,
+        -759.6411923248711
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "2D",
+      "ground_l2": 5.9989556134498345,
+      "ground_lz2": 1.8773023162254683,
+      "terms": {
+        "2D": 23,
+        "4F": 14,
+        "2F": 14,
+        "4P": 6,
+        "2G": 21,
+        "2P": 3,
+        "2S": 1,
+        "2H": 8
+      },
+      "comm_norm_h_lz": 0.046371556832838966,
+      "comm_norm_h_l2": 0.2501000090645846,
+      "win_lz": 0.026991389221705218,
+      "win_lperp": 0.03999370536920255,
+      "window": {
+        "s": 0.166698,
+        "p": 0.0,
+        "d": 0.833302,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9939771123858478,
+        "p": 3.4996248354423034e-21,
+        "d": 1.006022887614152,
+        "f": 4.4337445801598365e-24
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=0.63); s^2.00d^1.00 (|c|=0.55)",
+        "s^2.00d^1.00 (|c|=0.68); s^2.00d^1.00 (|c|=0.45)",
+        "s^2.00d^1.00 (|c|=0.67); s^2.00d^1.00 (|c|=0.49)",
+        "s^2.00d^1.00 (|c|=0.66); s^2.00d^1.00 (|c|=0.55)",
+        "s^2.00d^1.00 (|c|=0.62); s^2.00d^1.00 (|c|=0.51)",
+        "s^1.00d^2.00 (|c|=0.36); s^1.00d^2.00 (|c|=0.36)",
+        "s^1.00d^2.00 (|c|=0.38); s^1.00d^2.00 (|c|=0.38)",
+        "s^1.00d^2.00 (|c|=0.37); s^1.00d^2.00 (|c|=0.37)",
+        "s^1.00d^2.00 (|c|=0.36); s^1.00d^2.00 (|c|=0.36)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        },
+        "4s": {
+          "bands": [
+            "18s",
+            "19s",
+            "20s"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            2e-05,
+            -0.0
+          ],
+          "discarded": 1.8e-05,
+          "capture": [
+            [
+              0.175683,
+              0.812091
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.01096328145,
+      "cell": "sc-unc_3d4s@r1_2-1_casci_ao_-_pol_raw"
+    },
+    "sc-unc_3d4s@r1_2-1_casci_ao_-_pol_avg": {
+      "tag": "sc-unc_3d4s@r1_2-1_casci_ao_-_pol_avg",
+      "kind": "casci",
+      "n_det": 90,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.9029222642075183e-13,
+      "e_ground": -759.7314213748847,
+      "energies_pyscf": [
+        -759.7342445093042,
+        -759.7307308822188,
+        -759.7307308644466,
+        -759.7293437081374,
+        -759.7293437081164,
+        -759.6426167233712,
+        -759.6426167233499,
+        -759.6411923943807,
+        -759.6411923248711
+      ],
+      "max_de_vs_pyscf": 0.0028231344194864505,
+      "ground_term": "2D",
+      "ground_l2": 5.998861690151462,
+      "ground_lz2": 1.8772818659135424,
+      "terms": {
+        "2D": 21,
+        "4F": 14,
+        "2F": 14,
+        "4P": 6,
+        "2G": 18,
+        "2P": 5,
+        "2S": 1,
+        "2H": 11
+      },
+      "comm_norm_h_lz": 0.014227762608328975,
+      "comm_norm_h_l2": 0.08416482027449099,
+      "win_lz": 0.026991389221705218,
+      "win_lperp": 0.03999370536920255,
+      "window": {
+        "s": 0.166698,
+        "p": 0.0,
+        "d": 0.833302,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.9939771123858485,
+        "p": 3.499624835442401e-21,
+        "d": 1.006022887614152,
+        "f": 4.433744580159839e-24
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=0.63); s^2.00d^1.00 (|c|=0.55)",
+        "s^2.00d^1.00 (|c|=0.68); s^2.00d^1.00 (|c|=0.45)",
+        "s^2.00d^1.00 (|c|=0.67); s^2.00d^1.00 (|c|=0.49)",
+        "s^2.00d^1.00 (|c|=0.66); s^2.00d^1.00 (|c|=0.55)",
+        "s^2.00d^1.00 (|c|=0.62); s^2.00d^1.00 (|c|=0.51)",
+        "s^1.00d^2.00 (|c|=0.36); s^1.00d^2.00 (|c|=0.36)",
+        "s^1.00d^2.00 (|c|=0.38); s^1.00d^2.00 (|c|=0.38)",
+        "s^1.00d^2.00 (|c|=0.37); s^1.00d^2.00 (|c|=0.37)",
+        "s^1.00d^2.00 (|c|=0.36); s^1.00d^2.00 (|c|=0.36)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        },
+        "4s": {
+          "bands": [
+            "18s",
+            "19s",
+            "20s"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            2e-05,
+            -0.0
+          ],
+          "discarded": 1.8e-05,
+          "capture": [
+            [
+              0.175683,
+              0.812091
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.01096328145,
+      "cell": "sc-unc_3d4s@r1_2-1_casci_ao_-_pol_avg"
+    },
+    "sc-unc_3d4s@r1_2-1_casci_ao_-_pur_avg": {
+      "tag": "sc-unc_3d4s@r1_2-1_casci_ao_-_pur_avg",
+      "kind": "casci",
+      "n_det": 90,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.89471630481461e-13,
+      "e_ground": -759.7327188041035,
+      "energies_pyscf": [
+        -759.7327188041035,
+        -759.7327188041035,
+        -759.7327188041035,
+        -759.7327188041035,
+        -759.7327188041035,
+        -759.642487739375,
+        -759.642487739375,
+        -759.642487739375,
+        -759.642487739375
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "2D",
+      "ground_l2": 5.999999999999998,
+      "ground_lz2": 3.8514331488952545,
+      "terms": {
+        "2D": 20,
+        "4F": 14,
+        "2F": 14,
+        "4P": 6,
+        "2G": 18,
+        "2P": 6,
+        "2S": 1,
+        "2H": 11
+      },
+      "comm_norm_h_lz": 1.0437563089296687e-14,
+      "comm_norm_h_l2": 9.216090927689952e-14,
+      "win_lz": 1.5019182265346177e-14,
+      "win_lperp": 2.044328804142245e-14,
+      "window": {
+        "s": 0.166667,
+        "p": 0.0,
+        "d": 0.833333,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.993138887120055,
+        "p": 0.0,
+        "d": 1.006861112879946,
+        "f": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=0.97); s^2.00d^1.00 (|c|=0.24)",
+        "s^2.00d^1.00 (|c|=0.84); s^2.00d^1.00 (|c|=0.51)",
+        "s^2.00d^1.00 (|c|=0.75); s^2.00d^1.00 (|c|=0.48)",
+        "s^2.00d^1.00 (|c|=1.00); s^1.00d^2.00 (|c|=0.03)",
+        "s^2.00d^1.00 (|c|=0.67); s^2.00d^1.00 (|c|=0.65)",
+        "s^1.00d^2.00 (|c|=0.50); s^1.00d^2.00 (|c|=0.50)",
+        "s^1.00d^2.00 (|c|=0.48); s^1.00d^2.00 (|c|=0.48)",
+        "s^1.00d^2.00 (|c|=0.43); s^1.00d^2.00 (|c|=0.43)",
+        "s^1.00d^2.00 (|c|=0.52); s^1.00d^2.00 (|c|=0.52)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        },
+        "4s": {
+          "bands": [
+            "18s",
+            "19s",
+            "20s"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            2e-05,
+            -0.0
+          ],
+          "discarded": 1.8e-05,
+          "capture": [
+            [
+              0.175683,
+              0.812091
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.0,
+      "cell": "sc-unc_3d4s@r1_2-1_casci_ao_-_pur_avg"
+    },
+    "sc-unc_3d4s@r1_2-1_casci_mo_-_pol_avg": {
+      "tag": "sc-unc_3d4s@r1_2-1_casci_mo_-_pol_avg",
+      "kind": "casci",
+      "n_det": 90,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.886268918838141e-13,
+      "e_ground": -759.7441635524478,
+      "energies_pyscf": [
+        -759.7469974058411,
+        -759.6784150448251,
+        -759.6784147911995,
+        -759.6728219150965,
+        -759.664767992787,
+        -759.6647675831942,
+        -759.6543052684166,
+        -759.6198689818449,
+        -759.6181045909755
+      ],
+      "max_de_vs_pyscf": 0.003088329422098468,
+      "ground_term": "2S",
+      "ground_l2": 0.0060028513956266,
+      "ground_lz2": 0.0018785250588896623,
+      "terms": {
+        "2S": 11,
+        "4P": 18,
+        "2P": 39,
+        "4S": 2,
+        "2D": 20
+      },
+      "comm_norm_h_lz": 0.1008318080378405,
+      "comm_norm_h_l2": 0.2586929959510584,
+      "win_lz": 1.938631209642093,
+      "win_lperp": 2.872530622605588,
+      "window": {
+        "s": 0.333298,
+        "p": 0.499988,
+        "d": 0.166702,
+        "f": 1.2e-05
+      },
+      "electrons": {
+        "s": 1.932008823127799,
+        "p": 0.0673101233268421,
+        "d": 1.0006793097115316,
+        "f": 1.743833830829968e-06
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.11)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.50)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.50)",
+        "s^1.00p^1.00d^1.00 (|c|=0.80); s^1.00p^1.00d^1.00 (|c|=0.49)",
+        "s^1.00p^1.00d^1.00 (|c|=0.74); s^1.00p^1.00d^1.00 (|c|=0.63)",
+        "s^1.00p^1.00d^1.00 (|c|=0.75); s^1.00p^1.00d^1.00 (|c|=0.63)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        },
+        "4s": {
+          "bands": [
+            "18s",
+            "19s",
+            "20s"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            2e-05,
+            -0.0
+          ],
+          "discarded": 1.8e-05,
+          "capture": [
+            [
+              0.175683,
+              0.812091
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.01096328145,
+      "cell": "sc-unc_3d4s@r1_2-1_casci_mo_-_pol_avg"
+    },
+    "sc-unc_3d4s@r1_2-1_casci_moc_-_pol_avg": {
+      "tag": "sc-unc_3d4s@r1_2-1_casci_moc_-_pol_avg",
+      "kind": "casci",
+      "n_det": 90,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 3.2201411323027523e-13,
+      "e_ground": -759.736667629764,
+      "energies_pyscf": [
+        -759.739493477208,
+        -759.6299379231095,
+        -759.6299379230339,
+        -759.61423085197,
+        -759.6142302666719,
+        -759.6115526993771,
+        -759.6115526993246,
+        -759.6004327409566,
+        -759.6004323526208
+      ],
+      "max_de_vs_pyscf": 0.0029357045887081767,
+      "ground_term": "2P",
+      "ground_l2": 1.4464236702126096,
+      "ground_lz2": 0.45264080302564813,
+      "terms": {
+        "2P": 8,
+        "4D": 13,
+        "2D": 30,
+        "4F": 4,
+        "2G": 10,
+        "2F": 20,
+        "4P": 3,
+        "2H": 2
+      },
+      "comm_norm_h_lz": 1.547981203400545,
+      "comm_norm_h_l2": 6.506469962752075,
+      "win_lz": 2.396316452137833,
+      "win_lperp": 3.550698447038335,
+      "window": {
+        "s": 0.166644,
+        "p": 0.0,
+        "d": 0.833356,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.985366380124332,
+        "p": 3.2405308263179627e-16,
+        "d": 1.0146336198756716,
+        "f": 1.2173754316909802e-20
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.04)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.79); s^1.00d^2.00 (|c|=0.57)",
+        "s^1.00d^2.00 (|c|=0.79); s^1.00d^2.00 (|c|=0.57)",
+        "s^1.00d^2.00 (|c|=0.75); s^1.00d^2.00 (|c|=0.64)",
+        "s^1.00d^2.00 (|c|=0.75); s^1.00d^2.00 (|c|=0.64)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        },
+        "4s": {
+          "bands": [
+            "18s",
+            "19s",
+            "20s"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            2e-05,
+            -0.0
+          ],
+          "discarded": 1.8e-05,
+          "capture": [
+            [
+              0.175683,
+              0.812091
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.01096328145,
+      "cell": "sc-unc_3d4s@r1_2-1_casci_moc_-_pol_avg"
+    },
+    "sc-unc_3d4s@r1_2-1_casci_mo_-_pur_avg": {
+      "tag": "sc-unc_3d4s@r1_2-1_casci_mo_-_pur_avg",
+      "kind": "casci",
+      "n_det": 90,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 2.3197173133380617e-13,
+      "e_ground": -759.7455285944851,
+      "energies_pyscf": [
+        -759.7455285944851,
+        -759.6769666266332,
+        -759.6769663641352,
+        -759.6711623025,
+        -759.6633496376246,
+        -759.6633492182106,
+        -759.6527715574015,
+        -759.6183148531867,
+        -759.6167016702132
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "2S",
+      "ground_l2": 0.006034318134760197,
+      "ground_lz2": 0.0018883721615633887,
+      "terms": {
+        "2S": 11,
+        "4P": 18,
+        "2P": 39,
+        "4S": 2,
+        "2D": 20
+      },
+      "comm_norm_h_lz": 0.10098168058122549,
+      "comm_norm_h_l2": 0.25925582678777376,
+      "win_lz": 1.9388141152627945,
+      "win_lperp": 2.8728016378009618,
+      "window": {
+        "s": 0.333267,
+        "p": 0.499988,
+        "d": 0.166733,
+        "f": 1.2e-05
+      },
+      "electrons": {
+        "s": 1.9315373293525142,
+        "p": 0.0673078580522623,
+        "d": 1.0011530686679322,
+        "f": 1.7439272923015713e-06
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=0.98); p^2.00d^1.00 (|c|=0.11)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.58); s^1.00p^1.00d^1.00 (|c|=0.58)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.50)",
+        "s^1.00p^1.00d^1.00 (|c|=0.81); s^1.00p^1.00d^1.00 (|c|=0.50)",
+        "s^1.00p^1.00d^1.00 (|c|=0.80); s^1.00p^1.00d^1.00 (|c|=0.49)",
+        "s^1.00p^1.00d^1.00 (|c|=0.74); s^1.00p^1.00d^1.00 (|c|=0.63)",
+        "s^1.00p^1.00d^1.00 (|c|=0.75); s^1.00p^1.00d^1.00 (|c|=0.63)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        },
+        "4s": {
+          "bands": [
+            "18s",
+            "19s",
+            "20s"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            2e-05,
+            -0.0
+          ],
+          "discarded": 1.8e-05,
+          "capture": [
+            [
+              0.175683,
+              0.812091
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.0,
+      "cell": "sc-unc_3d4s@r1_2-1_casci_mo_-_pur_avg"
+    },
+    "sc-unc_3d4s@r1_2-1_casci_moc_-_pur_avg": {
+      "tag": "sc-unc_3d4s@r1_2-1_casci_moc_-_pur_avg",
+      "kind": "casci",
+      "n_det": 90,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 8.378248123083709e-13,
+      "e_ground": -759.7380325010269,
+      "energies_pyscf": [
+        -759.7380325010269,
+        -759.6287016022895,
+        -759.6287016022175,
+        -759.6126846449887,
+        -759.6126840535932,
+        -759.6100873257359,
+        -759.6100873256869,
+        -759.5990319266974,
+        -759.5990315245833
+      ],
+      "max_de_vs_pyscf": 0.0,
+      "ground_term": "2P",
+      "ground_l2": 1.4467155295217355,
+      "ground_lz2": 0.45273212848635275,
+      "terms": {
+        "2P": 8,
+        "4D": 13,
+        "2D": 30,
+        "4F": 4,
+        "2G": 10,
+        "2F": 20,
+        "4P": 3,
+        "2H": 2
+      },
+      "comm_norm_h_lz": 1.5446607030678317,
+      "comm_norm_h_l2": 6.493114904963836,
+      "win_lz": 2.3963943548322386,
+      "win_lperp": 3.550813878610898,
+      "window": {
+        "s": 0.166613,
+        "p": 0.0,
+        "d": 0.833387,
+        "f": 0.0
+      },
+      "electrons": {
+        "s": 1.984791715646018,
+        "p": 3.2411178625100336e-16,
+        "d": 1.0152082843539814,
+        "f": 1.2169522778176149e-20
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "s^2.00d^1.00 (|c|=1.00); d^3.00 (|c|=0.05)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.58); s^1.00d^2.00 (|c|=0.58)",
+        "s^1.00d^2.00 (|c|=0.79); s^1.00d^2.00 (|c|=0.56)",
+        "s^1.00d^2.00 (|c|=0.79); s^1.00d^2.00 (|c|=0.56)",
+        "s^1.00d^2.00 (|c|=0.76); s^1.00d^2.00 (|c|=0.64)",
+        "s^1.00d^2.00 (|c|=0.76); s^1.00d^2.00 (|c|=0.64)"
+      ],
+      "window_report": {
+        "3d": {
+          "bands": [
+            "3d",
+            "4d",
+            "5d",
+            "6d",
+            "7d",
+            "8d",
+            "9d",
+            "10d"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            0.00072,
+            0.0,
+            0.0,
+            0.0,
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "discarded": 0.000722,
+          "capture": [
+            [
+              0.99867
+            ]
+          ]
+        },
+        "4s": {
+          "bands": [
+            "18s",
+            "19s",
+            "20s"
+          ],
+          "k": 1,
+          "spectrum": [
+            1.0,
+            2e-05,
+            -0.0
+          ],
+          "discarded": 1.8e-05,
+          "capture": [
+            [
+              0.175683,
+              0.812091
+            ]
+          ]
+        }
+      },
+      "core_anisotropy": 0.0,
+      "cell": "sc-unc_3d4s@r1_2-1_casci_moc_-_pur_avg"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_ao_-_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_ao_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_mo_-_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_mo_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_moc_-_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_moc_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_ao_virtmix_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_ao_virtmix_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_ao_-_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_ao_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_mo_-_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_mo_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_moc_-_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_moc_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_ao_radial_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_ao_radial_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_ao_radial_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_ao_radial_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_ao_frozen_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_ao_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_mo_frozen_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_mo_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_moc_frozen_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_moc_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_ao_frozen_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_ao_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_mo_frozen_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_mo_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_casscf_moc_frozen_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_casscf_moc_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_mo_-_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_mo_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_moc_-_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_moc_-_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_ao_-_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_ao_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_mo_-_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_mo_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_moc_-_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_moc_-_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_ao_radial_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_ao_radial_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_ao_radial_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_ao_radial_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_ao_frozen_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_ao_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_mo_frozen_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_mo_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_moc_frozen_pol_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_moc_frozen_pol_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_ao_frozen_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_ao_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_mo_frozen_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_mo_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
+    },
+    "sc-unc_3d4s@r1_2-1_sa-casscf_moc_frozen_pur_avg": {
+      "cell": "sc-unc_3d4s@r1_2-1_sa-casscf_moc_frozen_pur_avg",
+      "void_reason": "prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)"
     }
   }
 }
