@@ -1435,9 +1435,12 @@ def test_methods_prior_rows_join_the_span_family_in_comparison_order():
     lines = text.splitlines()
 
     def idx(window, core="Ar"):
+        # DATA rows only (the dets column carries a number) -- the
+        # lane families' free twins share the window/core display
         return next(i for i, l in enumerate(lines)
                     if l.startswith(f"| CASCI | free | {window} / D |")
-                    and l.split("|")[5].strip() == core)
+                    and l.split("|")[5].strip() == core
+                    and l.split("|")[6].strip() != "—")
 
     for span in ("3d", "3d4s"):
         a, b, c, d = (idx(span), idx(f"{span}@r1"),

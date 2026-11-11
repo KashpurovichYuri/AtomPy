@@ -369,7 +369,7 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     seen: set[str] = set()
 
     floor = _sa_floor(cells)
-    last_span: list[str | None] = [None]
+    sections: dict[str, list[list[str]]] = {}
 
     def _fam(keys) -> None:
         rows = _rows(sorted([k for k in keys
@@ -378,13 +378,13 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
                      cells, anchor, spec, floor)
         seen.update(k.address for k in keys)
         if rows:
-            if body:
-                # a SPAN TRANSITION opens a new section (===); within
-                # the section, families separate by the standard rule
-                span = keys[0].span_label
-                body.append(HEAVY if span != last_span[0] else RULE)
-            last_span[0] = keys[0].span_label
-            body.extend(rows)
+            # families collect under their SPAN; the emission renders
+            # each span as one section (=== between spans, --- between
+            # families within) -- whatever the assembly's visit order;
+            # the LANE families close their section (is_lane sorts last)
+            is_lane = any(k.core_tag is not None for k in keys)
+            sections.setdefault(keys[0].span_label, []).append(
+                (is_lane, rows))
 
     # the prior windows, gathered by span (the sector match guards
     # the join: a prior at another sector has no incumbent twin
@@ -433,11 +433,10 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
             continue
         twins = [k for k in routes
                  if k.window == leg.window and k.core != "frac"]
-        # the family renders when ANY twin ran (the validation atoms'
-        # pinned leg alone is their story; the campaign atoms' route
-        # studies render the fuller family)
-        if any(_method_row(k) and payload_of(cells, k) for k in twins):
-            _fam([k for k in twins if _method_row(k)])
+        # the family renders whatever ran -- unrun twins hold their
+        # pending places (the structural era; the any-twin-ran gate
+        # retired with it)
+        _fam([k for k in twins if _method_row(k)])
 
     # the other spans' sections follow (opened with the === rule)
     for span in dict.fromkeys(k.window for k in lattice_keys(spec)):
@@ -475,11 +474,20 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
                     if _method_row(k) and k.core != "frac"]
         _fam(keys)
 
+    # sections emission: === between spans, --- between families
+    emitted: list[str] = []
+    prev_span = None
+    for span, families in sections.items():
+        for _, rows in sorted(families, key=lambda f: f[0]):
+            if emitted:
+                emitted.append(RULE if span == prev_span else HEAVY)
+            emitted.extend(rows)
+            prev_span = span
     out = [BEGIN, HEAD, SEP, _anchor_row(anchor, spec)]
     out.append(_uhf_anchor_row(anchor, uhf) if uhf is not None
                else _uhf_pending_row())
     out.append(HEAVY)     # the anchor block is its own SECTION
-    out.extend([*body, END])
+    out.extend([*emitted, END])
 
     return out
 

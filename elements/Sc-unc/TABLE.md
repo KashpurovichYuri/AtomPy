@@ -153,4 +153,10 @@
 | CASSCF, frozen | free | 3d / MOC | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | free | 3d / MOC | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen | free | 3d / MOC | (3,5) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CASCI | pinned | 3d / D | (3,5) | Ar·lane | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 3d / D | (3,5) | Ar | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | pinned | 3d / D | (3,5) | Ar·lane | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 <!-- methods:end -->
