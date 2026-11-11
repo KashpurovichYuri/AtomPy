@@ -423,20 +423,22 @@ _PRIOR_WINDOWS = ("3d@r1", "3d@s1", "3d@s2",
 # uncontracted basis (measured 2026-11-11, map Issues) -- the cells
 # hold their STRUCTURAL place (pending rows) but never run until
 # that repair lands
-def _unc_s_block(key: str, sec: tuple[int, int]) -> Scenario:
+def _unc_s_block(key: str) -> Scenario:
     """The twins' @s windows' guard: the series' non-head
     configurations need fresh forced-occupation SCFs, and every fresh
     run diverges on the uncontracted basis (measured 2026-11-11, map
     Issues) -- the cells hold their STRUCTURAL place (pending rows)
-    but never run until that repair lands."""
+    but never run until that repair lands.  The guard is the LABEL
+    prefix alone (sector- and method-free): the claim is
+    window-level, and a sector-bearing prefix silently leaks every
+    cell the planned_sectors mirror moves (caught on the twin port,
+    2026-11-11)."""
     return Scenario(
         name="series-source-diverges",
-        cells=tuple(f"{key}_{lbl}_{na}-{nb}_{m}_"
+        cells=tuple(f"{key}_{lbl}_"
                     for lbl in ("3d@s1", "3d@s1no1", "3d@s2", "3d@s2no1",
                                 "3d4s@s1", "3d4s@s1no2",
-                                "3d4s@s2", "3d4s@s2no2")
-                    for na, nb in (sec,)
-                    for m in ("casci", "casscf", "sa-casscf")),
+                                "3d4s@s2", "3d4s@s2no2")),
         reason="the series source (the non-head configurations' fresh "
                "forced-occupation SCFs) diverges on this basis -- the "
                "fresh-SCF disease, measured 2026-11-11 (map Issues); "
@@ -761,7 +763,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         render_spans=("3d4s", "3d"),
                         scenarios=_unc_gates("sc-unc", (2, 1))
                         + (_prior_anchor_first("sc-unc", [(2, 1)]),
-                           _unc_s_block("sc-unc", (2, 1))),
+                           _unc_s_block("sc-unc")),
                         term=(2, "g"),
                         lane_windows=("3d4s@ar", "3d@ar"),
                         lattice_windows=("3d",), lattice_sector=(2, 1)),
@@ -789,7 +791,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         render_spans=("3d4s", "3d"),
                         scenarios=_unc_gates("ti-unc", (3, 1))
                         + (_prior_anchor_first("ti-unc", [(3, 1), (2, 0)]),
-                           _unc_s_block("ti-unc", (3, 1))),
+                           _unc_s_block("ti-unc")),
                         term=(3, "g"),
                         lane_windows=("3d4s@ar", "3d@ar"),
                         lattice_windows=("3d",), lattice_sector=(2, 0)),

@@ -270,11 +270,15 @@ def _uhf_anchor_row(anchor: float, uhf: dict) -> str:
     weakest corresponding-orbital pair) in the note."""
     e = uhf["e_tot"]
     de = (e - anchor) * 1000.0
+    # a diverged record still renders (the measurement IS the verdict)
+    # -- the note says so beside the meter reading
+    note = ("diverged, " if uhf.get("converged") is False else "")
     cells = ["UHF (anchor)", "—", "—", "—", "—", "—",
              f"{e:.4f}", f"{de:+.1f}", f"{e * EV:.4f}",
              f"{de * EV / 1000.0:+.4f}",
              DASH, DASH, DASH, DASH, DASH, DASH, DASH,
-             f"⟨S²⟩={uhf['s2']:.4f}, σ_min={uhf['sigma_min']:.4f}"]
+             f"{note}⟨S²⟩={uhf['s2']:.4f}, "
+             f"σ_min={uhf['sigma_min']:.4f}"]
     # sign minus on the ENERGY cells only (names keep their hyphens)
     for i in (6, 7, 8, 9):
         cells[i] = minus(cells[i])

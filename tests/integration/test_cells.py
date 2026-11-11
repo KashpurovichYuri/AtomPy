@@ -307,6 +307,24 @@ def test_void_reason_gates_scenariod_cells():
     assert reason.startswith("same-l-window") and "2026-11-10" in reason
 
 
+def test_void_reason_voids_every_twins_s_window_cell():
+    """The twins' @s guard is LABEL-level: every cell of an @s window
+    voids (whatever its sector -- the planned_sectors mirror moved the
+    3d-span priors once and the sector-bearing prefix leaked 18 cells,
+    caught 2026-11-11), and no @r1 cell is caught by it."""
+    for atom in ("Sc-unc", "Ti-unc"):
+        spec = CAMPAIGN[atom]
+        sc = scenarios_for(spec)
+        for k in planned(spec):
+            tag = k.window.partition("@")[2]
+            voided = void_reason(k, sc) is not None
+            if tag.startswith("s"):
+                assert voided, k.address
+            elif tag.startswith("r"):
+                assert not voided or "series-source" not in (
+                    void_reason(k, sc) or ""), k.address
+
+
 @fast
 def test_u14e_chemistry_declaration():
     """The U14e render chemistry lives in the declaration: the window
