@@ -148,6 +148,10 @@ def _row(k, p, anchor, spec) -> str:
     # cap the measurement runs declared; PySCF's default is 50)
     note = "cycle cap" if cyc and cyc == (cap if cap is not None else 200) \
         else ""
+    # an UNCONVERGED optimizer renders flagged, never clean (the row
+    # stays -- the store is the record -- but the reading must know)
+    if p.get("converged") is False:
+        note = "not converged" + ("; " if note else "") + note
     if note:
         note += "; "
     # the kind vocabulary's verdict language: the SCF-MO kinds are

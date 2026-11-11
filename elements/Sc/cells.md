@@ -69,6 +69,8 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d@r1_2-1_casci_mo_-_pur_avg | -759.74592304 | -1.768e-02 | 0.00648 | 1.15e-01 | 2.22e-01 | 2.8e+00 | 2.0e+00 | 0.600 | 0.0e+00 | 0.0e+00 | 2.5e-13 |  |
 | sc_3d@r1_2-1_casci_moc_-_pur_avg | -759.73603757 | -7.798e-03 | 3.98131 | 6.97e-01 | 1.46e+00 | 2.3e+00 | 3.9e+00 | 0.800 | 0.0e+00 | 0.0e+00 | 3.5e-12 |  |
 | sc_3d@r1no1_2-1_casci_no_-_pur_avg | -759.33290076 | 3.953e-01 | 12.00000 | 2.46e-14 | 2.17e-13 | 6.4e-15 | 8.8e-15 | 1.000 | 0.0e+00 | 0.0e+00 | 3.6e-12 |  |
+| sc_3d@r1_2-1_casscf_ao_-_pol_avg | -759.76466755 | -3.643e-02 | 0.05082 | 1.99e-01 | 5.84e-01 | 1.7e+00 | 3.0e+00 | 0.599 | nan | 1.9e-03 | 2.6e-12 |  |
+| sc_3d@r1_2-1_sa-casscf_ao_-_pol_avg | -759.73607960 | -7.840e-03 | 4.96100 | 4.34e-01 | 2.12e+00 | 1.9e+00 | 2.9e+00 | 0.800 | nan | 4.9e-04 | 2.9e-12 |  |
 | sc_3d@s1_2-1_casci_ao_-_pol_raw | -759.50061654 | 2.276e-01 | 11.99960 | 2.18e-02 | 9.53e-02 | 1.7e-03 | 2.0e-02 | 1.000 | 1.3e-02 | 0.0e+00 | 3.8e-12 |  |
 | sc_3d@s1_2-1_casci_ao_-_pol_avg | -759.50003864 | 2.282e-01 | 11.99990 | 5.66e-04 | 2.55e-02 | 1.7e-03 | 2.0e-02 | 1.000 | 1.3e-02 | 9.4e-04 | 3.8e-12 |  |
 | sc_3d@s1_2-1_casci_ao_-_pur_avg | -759.50063019 | 2.276e-01 | 12.00000 | 1.87e-14 | 1.34e-13 | 6.9e-15 | 8.6e-15 | 1.000 | 0.0e+00 | 0.0e+00 | 3.5e-12 |  |
@@ -78,6 +80,8 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d@s1_2-1_casci_mo_-_pur_avg | -759.74592304 | -1.768e-02 | 0.00648 | 1.15e-01 | 2.22e-01 | 2.8e+00 | 2.0e+00 | 0.600 | 0.0e+00 | 0.0e+00 | 4.1e-13 |  |
 | sc_3d@s1_2-1_casci_moc_-_pur_avg | -759.73603757 | -7.798e-03 | 3.98131 | 6.97e-01 | 1.46e+00 | 2.3e+00 | 3.9e+00 | 0.800 | 0.0e+00 | 0.0e+00 | 3.7e-12 |  |
 | sc_3d@s1no1_2-1_casci_no_-_pur_avg | -759.50063019 | 2.276e-01 | 12.00000 | 2.75e-14 | 1.93e-13 | 6.8e-15 | 8.8e-15 | 1.000 | 0.0e+00 | 0.0e+00 | 3.1e-12 |  |
+| sc_3d@s1_2-1_casscf_ao_-_pol_avg | -759.76466755 | -3.643e-02 | 0.05082 | 2.00e-01 | 5.84e-01 | 1.7e+00 | 3.0e+00 | 0.599 | nan | 1.9e-03 | 2.9e-12 |  |
+| sc_3d@s1_2-1_sa-casscf_ao_-_pol_avg | -759.73607950 | -7.840e-03 | 4.96114 | 2.55e-01 | 2.12e+00 | 2.7e+00 | 2.2e+00 | 0.800 | nan | 4.9e-04 | 3.0e-12 |  |
 | sc_3d@s2_2-1_casci_ao_-_pol_raw | -759.55532892 | 1.729e-01 | 11.99967 | 5.15e-02 | 2.78e-01 | 2.1e-03 | 2.5e-02 | 1.000 | 1.3e-02 | 2.0e-05 | 3.7e-12 |  |
 | sc_3d@s2_2-1_casci_ao_-_pol_avg | -759.55479486 | 1.734e-01 | 11.99992 | 2.15e-03 | 1.16e-01 | 2.1e-03 | 2.5e-02 | 1.000 | 1.3e-02 | 8.6e-04 | 3.5e-12 |  |
 | sc_3d@s2_2-1_casci_ao_-_pur_avg | -759.55544038 | 1.728e-01 | 12.00000 | 2.10e-13 | 1.66e-12 | 9.2e-15 | 1.1e-14 | 1.000 | 0.0e+00 | 3.1e-02 | 3.9e-12 |  |
@@ -87,6 +91,8 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d@s2_2-1_casci_mo_-_pur_avg | -759.74747080 | -1.923e-02 | 1.57799 | 4.73e+00 | 1.32e+01 | 3.5e+00 | 2.4e+00 | 0.500 | 0.0e+00 | 2.6e-03 | 4.4e-13 |  |
 | sc_3d@s2_2-1_casci_moc_-_pur_avg | -759.74754870 | -1.931e-02 | 4.28952 | 3.91e+00 | 1.38e+01 | 2.7e+00 | 4.9e+00 | 0.581 | 0.0e+00 | 2.8e-02 | 3.5e-12 |  |
 | sc_3d@s2no1_2-1_casci_no_-_pur_avg | -759.53693049 | 1.913e-01 | 12.00000 | 1.50e-14 | 1.56e-13 | 4.0e-14 | 7.9e-14 | 1.000 | 0.0e+00 | 0.0e+00 | 4.7e-12 |  |
+| sc_3d@s2_2-1_casscf_ao_-_pol_avg | -759.77117891 | -4.294e-02 | 0.05244 | 2.17e+00 | 8.55e+00 | 4.6e+00 | 6.1e+00 | 0.325 | nan | 1.5e-03 | 3.2e-12 |  |
+| sc_3d@s2_2-1_sa-casscf_ao_-_pol_avg | -759.76817294 | -3.993e-02 | 2.67122 | 1.48e+00 | 9.76e+00 | 3.7e+00 | 3.2e+00 | 0.499 | nan | 3.5e-04 | 2.9e-12 |  |
 | sc_3d4s@r1_2-1_casci_ao_-_pol_raw | -759.73664536 | -8.406e-03 | 6.00020 | 2.87e-02 | 1.29e-01 | 1.9e-03 | 2.3e-02 | 0.833 | 1.3e-02 | 0.0e+00 | 3.5e-12 |  |
 | sc_3d4s@r1_2-1_casci_ao_-_pol_avg | -759.73519208 | -6.953e-03 | 5.99975 | 1.03e-03 | 4.70e-02 | 1.9e-03 | 2.3e-02 | 0.833 | 1.3e-02 | 1.5e-03 | 3.8e-12 |  |
 | sc_3d4s@r1_2-1_casci_ao_-_pur_avg | -759.73584067 | -7.601e-03 | 6.00000 | 3.83e-14 | 1.62e-13 | 6.4e-15 | 8.7e-15 | 0.833 | 0.0e+00 | 0.0e+00 | 4.1e-12 |  |
@@ -96,6 +102,8 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d4s@r1_2-1_casci_mo_-_pur_avg | -759.74621598 | -1.798e-02 | 0.00621 | 1.53e-01 | 7.23e-01 | 2.8e+00 | 3.7e+00 | 0.500 | 0.0e+00 | 0.0e+00 | 3.4e-13 |  |
 | sc_3d4s@r1_2-1_casci_moc_-_pur_avg | -759.73774256 | -9.503e-03 | 3.35321 | 1.36e+00 | 1.58e+00 | 2.7e+00 | 3.7e+00 | 0.533 | 0.0e+00 | 1.1e-13 | 3.7e-12 |  |
 | sc_3d4s@r1no2_2-1_casci_no_-_pur_avg | -759.73584067 | -7.601e-03 | 6.00000 | 6.16e-14 | 2.65e-13 | 6.4e-15 | 9.0e-15 | 0.833 | 0.0e+00 | 0.0e+00 | 4.2e-12 |  |
+| sc_3d4s@r1_2-1_casscf_ao_-_pol_avg | -759.76608466 | -3.785e-02 | 0.04694 | 5.63e-01 | 1.22e+00 | 4.0e+00 | 4.1e+00 | 0.525 | nan | 1.9e-03 | 3.8e-12 |  |
+| sc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg | -760.54807988 | -8.198e-01 | 6.00198 | 8.36e-01 | 3.81e+00 | 1.4e+00 | 1.4e+00 | 0.833 | nan | 8.0e-01 | 3.9e-12 |  |
 | sc_3d4s@s1_2-1_casci_ao_-_pol_raw | -759.72396056 | 4.279e-03 | 6.00039 | 2.73e-02 | 1.19e-01 | 1.7e-03 | 2.0e-02 | 0.833 | 1.3e-02 | 0.0e+00 | 3.5e-12 |  |
 | sc_3d4s@s1_2-1_casci_ao_-_pol_avg | -759.72273062 | 5.509e-03 | 5.99980 | 6.76e-04 | 3.07e-02 | 1.7e-03 | 2.0e-02 | 0.833 | 1.3e-02 | 1.2e-03 | 3.7e-12 |  |
 | sc_3d4s@s1_2-1_casci_ao_-_pur_avg | -759.72342039 | 4.819e-03 | 6.00000 | 6.26e-14 | 2.78e-13 | 6.9e-15 | 8.6e-15 | 0.833 | 0.0e+00 | 0.0e+00 | 3.9e-12 |  |
@@ -105,6 +113,8 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d4s@s1_2-1_casci_mo_-_pur_avg | -759.74621598 | -1.798e-02 | 0.00621 | 1.53e-01 | 7.23e-01 | 2.8e+00 | 3.7e+00 | 0.500 | 0.0e+00 | 0.0e+00 | 3.2e-13 |  |
 | sc_3d4s@s1_2-1_casci_moc_-_pur_avg | -759.73774256 | -9.503e-03 | 3.35321 | 1.36e+00 | 1.58e+00 | 2.7e+00 | 3.7e+00 | 0.533 | 0.0e+00 | 1.1e-13 | 3.7e-12 |  |
 | sc_3d4s@s1no2_2-1_casci_no_-_pur_avg | -759.72342039 | 4.819e-03 | 6.00000 | 2.88e-14 | 1.92e-13 | 6.9e-15 | 8.7e-15 | 0.833 | 0.0e+00 | 0.0e+00 | 2.5e-12 |  |
+| sc_3d4s@s1_2-1_casscf_ao_-_pol_avg | -759.76608442 | -3.785e-02 | 0.04699 | 5.61e-01 | 1.22e+00 | 4.0e+00 | 4.1e+00 | 0.525 | nan | 1.9e-03 | 3.5e-12 |  |
+| sc_3d4s@s1_2-1_sa-casscf_ao_-_pol_avg | -759.73975880 | -1.152e-02 | 6.00000 | 6.59e-05 | 6.58e-04 | 3.1e-03 | 8.3e-03 | 0.833 | nan | 1.9e-05 | 3.8e-12 |  |
 | sc_3d4s@s2_2-1_casci_ao_-_pol_raw | -759.74601568 | -1.778e-02 | 6.00035 | 6.29e-02 | 3.39e-01 | 2.1e-03 | 2.5e-02 | 0.833 | 1.3e-02 | 2.6e-07 | 3.7e-12 |  |
 | sc_3d4s@s2_2-1_casci_ao_-_pol_avg | -759.74463487 | -1.640e-02 | 5.99975 | 2.80e-03 | 1.45e-01 | 2.1e-03 | 2.5e-02 | 0.833 | 1.3e-02 | 1.4e-03 | 3.4e-12 |  |
 | sc_3d4s@s2_2-1_casci_ao_-_pur_avg | -759.74529286 | -1.705e-02 | 6.00000 | 3.46e-13 | 2.25e-12 | 9.2e-15 | 1.1e-14 | 0.833 | 0.0e+00 | 2.8e-02 | 3.9e-12 |  |
@@ -114,6 +124,8 @@ ROHF reference energy: -759.73625510 Eh
 | sc_3d4s@s2_2-1_casci_mo_-_pur_avg | -759.74847438 | -2.024e-02 | 1.63115 | 6.21e+00 | 3.80e+01 | 2.9e+00 | 4.0e+00 | 0.583 | 0.0e+00 | 1.8e-08 | 3.9e-13 |  |
 | sc_3d4s@s2_2-1_casci_moc_-_pur_avg | -759.74915898 | -2.092e-02 | 3.97674 | 5.15e+00 | 2.01e+01 | 2.7e+00 | 4.1e+00 | 0.501 | 0.0e+00 | 2.2e-08 | 3.7e-12 |  |
 | sc_3d4s@s2no2_2-1_casci_no_-_pur_avg | -759.73577496 | -7.536e-03 | 6.00000 | 4.79e-14 | 3.03e-13 | 9.5e-15 | 5.7e-14 | 0.833 | 0.0e+00 | 1.1e-13 | 4.3e-12 |  |
+| sc_3d4s@s2_2-1_casscf_ao_-_pol_avg | -759.77248741 | -4.425e-02 | 2.59906 | 7.61e+00 | 3.16e+01 | 4.9e+00 | 6.0e+00 | 0.333 | nan | 1.6e-03 | 3.7e-12 | NOT-CONVERGED |
+| sc_3d4s@s2_2-1_sa-casscf_ao_-_pol_avg | -759.74818850 | -1.995e-02 | 6.00000 | 3.33e-04 | 1.03e-02 | 3.4e-03 | 2.9e-03 | 0.833 | nan | 7.2e-08 | 3.4e-12 |  |
 
 configurations per root (top-2 determinants):
 
@@ -496,6 +508,12 @@ configurations per root (top-2 determinants):
 - `sc_3d@r1no1_2-1_casci_no_-_pur_avg` root 6: d^3.00 (|c|=0.48); d^3.00 (|c|=0.48)
 - `sc_3d@r1no1_2-1_casci_no_-_pur_avg` root 7: d^3.00 (|c|=0.39); d^3.00 (|c|=0.39)
 - `sc_3d@r1no1_2-1_casci_no_-_pur_avg` root 8: d^3.00 (|c|=0.43); d^3.00 (|c|=0.43)
+- `sc_3d@r1_2-1_casscf_ao_-_pol_avg` root 0: s^0.84p^1.22d^0.95 (|c|=0.44); s^1.09p^0.96d^0.95 (|c|=0.42)
+- `sc_3d@r1_2-1_sa-casscf_ao_-_pol_avg` root 0: s^1.43d^1.57 (|c|=0.40); s^1.64d^1.36 (|c|=0.40)
+- `sc_3d@r1_2-1_sa-casscf_ao_-_pol_avg` root 1: s^1.64d^1.36 (|c|=0.59); s^1.43d^1.57 (|c|=0.32)
+- `sc_3d@r1_2-1_sa-casscf_ao_-_pol_avg` root 2: s^1.43d^1.57 (|c|=0.48); s^1.41d^1.59 (|c|=0.41)
+- `sc_3d@r1_2-1_sa-casscf_ao_-_pol_avg` root 3: s^1.42d^1.58 (|c|=0.52); s^0.96d^2.04 (|c|=0.35)
+- `sc_3d@r1_2-1_sa-casscf_ao_-_pol_avg` root 4: s^0.73d^2.27 (|c|=0.32); s^0.73d^2.27 (|c|=0.32)
 - `sc_3d@s1_2-1_casci_ao_-_pol_raw` root 0: d^3.00 (|c|=0.48); d^3.00 (|c|=0.48)
 - `sc_3d@s1_2-1_casci_ao_-_pol_raw` root 1: d^3.00 (|c|=0.46); d^3.00 (|c|=0.46)
 - `sc_3d@s1_2-1_casci_ao_-_pol_raw` root 2: d^3.00 (|c|=0.55); d^3.00 (|c|=0.55)
@@ -577,6 +595,12 @@ configurations per root (top-2 determinants):
 - `sc_3d@s1no1_2-1_casci_no_-_pur_avg` root 6: d^3.00 (|c|=0.49); d^3.00 (|c|=0.49)
 - `sc_3d@s1no1_2-1_casci_no_-_pur_avg` root 7: d^3.00 (|c|=0.37); d^3.00 (|c|=0.33)
 - `sc_3d@s1no1_2-1_casci_no_-_pur_avg` root 8: d^3.00 (|c|=0.32); d^3.00 (|c|=0.32)
+- `sc_3d@s1_2-1_casscf_ao_-_pol_avg` root 0: s^1.23p^0.97d^0.80 (|c|=0.44); s^0.79p^1.42d^0.79 (|c|=0.32)
+- `sc_3d@s1_2-1_sa-casscf_ao_-_pol_avg` root 0: s^1.81d^1.19 (|c|=0.78); s^1.85d^1.15 (|c|=0.34)
+- `sc_3d@s1_2-1_sa-casscf_ao_-_pol_avg` root 1: s^1.83d^1.17 (|c|=0.81); s^1.85d^1.15 (|c|=0.41)
+- `sc_3d@s1_2-1_sa-casscf_ao_-_pol_avg` root 2: s^1.85d^1.15 (|c|=0.74); s^1.83d^1.17 (|c|=0.37)
+- `sc_3d@s1_2-1_sa-casscf_ao_-_pol_avg` root 3: s^1.83d^1.17 (|c|=0.86); s^1.81d^1.19 (|c|=0.24)
+- `sc_3d@s1_2-1_sa-casscf_ao_-_pol_avg` root 4: s^0.98d^2.02 (|c|=0.44); s^0.98d^2.02 (|c|=0.44)
 - `sc_3d@s2_2-1_casci_ao_-_pol_raw` root 0: d^3.00 (|c|=0.46); d^3.00 (|c|=0.46)
 - `sc_3d@s2_2-1_casci_ao_-_pol_raw` root 1: d^3.00 (|c|=0.45); d^3.00 (|c|=0.45)
 - `sc_3d@s2_2-1_casci_ao_-_pol_raw` root 2: d^3.00 (|c|=0.53); d^3.00 (|c|=0.53)
@@ -658,6 +682,12 @@ configurations per root (top-2 determinants):
 - `sc_3d@s2no1_2-1_casci_no_-_pur_avg` root 6: d^3.00 (|c|=0.48); d^3.00 (|c|=0.48)
 - `sc_3d@s2no1_2-1_casci_no_-_pur_avg` root 7: d^3.00 (|c|=0.55); d^3.00 (|c|=0.47)
 - `sc_3d@s2no1_2-1_casci_no_-_pur_avg` root 8: d^3.00 (|c|=0.47); d^3.00 (|c|=0.47)
+- `sc_3d@s2_2-1_casscf_ao_-_pol_avg` root 0: s^1.61p^0.18d^0.91f^0.30 (|c|=0.51); s^1.62p^0.16d^0.82f^0.40 (|c|=0.42)
+- `sc_3d@s2_2-1_sa-casscf_ao_-_pol_avg` root 0: s^0.96p^0.04d^1.99 (|c|=0.38); s^0.71p^0.05d^2.24 (|c|=0.25)
+- `sc_3d@s2_2-1_sa-casscf_ao_-_pol_avg` root 1: s^1.03p^0.05d^1.92 (|c|=0.24); s^0.77p^0.06d^2.17 (|c|=0.23)
+- `sc_3d@s2_2-1_sa-casscf_ao_-_pol_avg` root 2: s^1.03p^0.05d^1.92 (|c|=0.24); s^0.73p^0.08d^2.19 (|c|=0.23)
+- `sc_3d@s2_2-1_sa-casscf_ao_-_pol_avg` root 3: s^1.06p^0.04d^1.89 (|c|=0.33); s^1.02p^0.06d^1.91 (|c|=0.26)
+- `sc_3d@s2_2-1_sa-casscf_ao_-_pol_avg` root 4: s^0.35p^0.75d^1.90 (|c|=0.16); s^0.35p^0.75d^1.90 (|c|=0.16)
 - `sc_3d4s@r1_2-1_casci_ao_-_pol_raw` root 0: s^2.00d^1.00 (|c|=0.98); s^2.00d^1.00 (|c|=0.16)
 - `sc_3d4s@r1_2-1_casci_ao_-_pol_raw` root 1: s^2.00d^1.00 (|c|=0.98); s^2.00d^1.00 (|c|=0.16)
 - `sc_3d4s@r1_2-1_casci_ao_-_pol_raw` root 2: s^2.00d^1.00 (|c|=0.97); s^2.00d^1.00 (|c|=0.18)
@@ -739,6 +769,12 @@ configurations per root (top-2 determinants):
 - `sc_3d4s@r1no2_2-1_casci_no_-_pur_avg` root 6: s^1.00d^2.00 (|c|=0.40); s^1.00d^2.00 (|c|=0.40)
 - `sc_3d4s@r1no2_2-1_casci_no_-_pur_avg` root 7: s^1.00d^2.00 (|c|=0.47); s^1.00d^2.00 (|c|=0.47)
 - `sc_3d4s@r1no2_2-1_casci_no_-_pur_avg` root 8: s^1.00d^2.00 (|c|=0.34); s^1.00d^2.00 (|c|=0.34)
+- `sc_3d4s@r1_2-1_casscf_ao_-_pol_avg` root 0: s^2.00p^0.01d^0.93f^0.05 (|c|=0.92); s^2.00p^0.20d^0.05f^0.75 (|c|=0.22)
+- `sc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg` root 0: p^2.00d^1.00 (|c|=0.85); p^2.00d^1.00 (|c|=0.42)
+- `sc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg` root 1: p^2.00d^1.00 (|c|=0.87); p^2.00d^1.00 (|c|=0.47)
+- `sc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg` root 2: p^2.00d^1.00 (|c|=0.83); p^2.00d^1.00 (|c|=0.46)
+- `sc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg` root 3: p^2.00d^1.00 (|c|=0.82); p^2.00d^1.00 (|c|=0.55)
+- `sc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg` root 4: p^2.00d^1.00 (|c|=0.71); p^2.00d^1.00 (|c|=0.47)
 - `sc_3d4s@s1_2-1_casci_ao_-_pol_raw` root 0: s^2.00d^1.00 (|c|=0.96); s^2.00d^1.00 (|c|=0.16)
 - `sc_3d4s@s1_2-1_casci_ao_-_pol_raw` root 1: s^2.00d^1.00 (|c|=0.96); s^2.00d^1.00 (|c|=0.16)
 - `sc_3d4s@s1_2-1_casci_ao_-_pol_raw` root 2: s^2.00d^1.00 (|c|=0.96); s^2.00d^1.00 (|c|=0.18)
@@ -820,6 +856,12 @@ configurations per root (top-2 determinants):
 - `sc_3d4s@s1no2_2-1_casci_no_-_pur_avg` root 6: s^1.00d^2.00 (|c|=0.32); s^1.00d^2.00 (|c|=0.32)
 - `sc_3d4s@s1no2_2-1_casci_no_-_pur_avg` root 7: s^1.00d^2.00 (|c|=0.40); s^1.00d^2.00 (|c|=0.40)
 - `sc_3d4s@s1no2_2-1_casci_no_-_pur_avg` root 8: s^1.00d^2.00 (|c|=0.51); s^1.00d^2.00 (|c|=0.51)
+- `sc_3d4s@s1_2-1_casscf_ao_-_pol_avg` root 0: s^2.00p^0.03d^0.86f^0.11 (|c|=0.88); s^2.00p^0.19d^0.11f^0.69 (|c|=0.32)
+- `sc_3d4s@s1_2-1_sa-casscf_ao_-_pol_avg` root 0: s^2.00d^1.00 (|c|=0.82); s^2.00d^1.00 (|c|=0.55)
+- `sc_3d4s@s1_2-1_sa-casscf_ao_-_pol_avg` root 1: s^2.00d^1.00 (|c|=0.81); s^2.00d^1.00 (|c|=0.56)
+- `sc_3d4s@s1_2-1_sa-casscf_ao_-_pol_avg` root 2: s^2.00d^1.00 (|c|=0.95); s^2.00d^1.00 (|c|=0.23)
+- `sc_3d4s@s1_2-1_sa-casscf_ao_-_pol_avg` root 3: s^2.00d^1.00 (|c|=0.85); s^2.00d^1.00 (|c|=0.49)
+- `sc_3d4s@s1_2-1_sa-casscf_ao_-_pol_avg` root 4: s^2.00d^1.00 (|c|=0.87); s^2.00d^1.00 (|c|=0.46)
 - `sc_3d4s@s2_2-1_casci_ao_-_pol_raw` root 0: s^2.00d^1.00 (|c|=0.94); s^2.00d^1.00 (|c|=0.17)
 - `sc_3d4s@s2_2-1_casci_ao_-_pol_raw` root 1: s^2.00d^1.00 (|c|=0.94); s^2.00d^1.00 (|c|=0.17)
 - `sc_3d4s@s2_2-1_casci_ao_-_pol_raw` root 2: s^2.00d^1.00 (|c|=0.94); s^2.00d^1.00 (|c|=0.17)
@@ -901,6 +943,12 @@ configurations per root (top-2 determinants):
 - `sc_3d4s@s2no2_2-1_casci_no_-_pur_avg` root 6: s^1.00d^2.00 (|c|=0.41); s^1.00d^2.00 (|c|=0.41)
 - `sc_3d4s@s2no2_2-1_casci_no_-_pur_avg` root 7: s^1.00d^2.00 (|c|=0.47); s^1.00d^2.00 (|c|=0.47)
 - `sc_3d4s@s2no2_2-1_casci_no_-_pur_avg` root 8: s^1.00d^2.00 (|c|=0.35); s^1.00d^2.00 (|c|=0.35)
+- `sc_3d4s@s2_2-1_casscf_ao_-_pol_avg` root 0: s^2.00d^0.98f^0.01 (|c|=0.89); s^2.00p^0.11d^0.47f^0.42 (|c|=0.24)
+- `sc_3d4s@s2_2-1_sa-casscf_ao_-_pol_avg` root 0: s^2.00d^1.00 (|c|=0.91); s^2.00d^1.00 (|c|=0.27)
+- `sc_3d4s@s2_2-1_sa-casscf_ao_-_pol_avg` root 1: s^2.00d^1.00 (|c|=0.78); s^2.00d^1.00 (|c|=0.37)
+- `sc_3d4s@s2_2-1_sa-casscf_ao_-_pol_avg` root 2: s^2.00d^1.00 (|c|=0.64); s^2.00d^1.00 (|c|=0.59)
+- `sc_3d4s@s2_2-1_sa-casscf_ao_-_pol_avg` root 3: s^2.00d^1.00 (|c|=0.86); s^2.00d^1.00 (|c|=0.28)
+- `sc_3d4s@s2_2-1_sa-casscf_ao_-_pol_avg` root 4: s^2.00d^1.00 (|c|=0.70); s^2.00d^1.00 (|c|=0.58)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 
@@ -923,7 +971,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3s3p3d@1s2s2p4s_5-4_casscf_ao_-_pol_avg` E -759.85093550
 - `sc_3s3p3d@1s2s2p4s_5-4_sa-casscf_ao_-_pol_avg` E -759.82662470
 - `sc_3s3p3d@1s2s2p4s_5-4_sa-casscf_ao_-_pur_avg` E_term -759.82662459  ptp 1.0e-06  L2 ['6.000', '6.000', '6.000', '6.000', '6.000']
-- `sc_3d@r1_2-1_casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1_2-1_casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1_2-1_casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1no1_2-1_casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -942,7 +989,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d@r1_2-1_casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1_2-1_casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1no1_2-1_casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d@r1_2-1_sa-casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1_2-1_sa-casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1_2-1_sa-casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1no1_2-1_sa-casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -960,7 +1006,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d@r1_2-1_sa-casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1_2-1_sa-casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@r1no1_2-1_sa-casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d@s1_2-1_casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1_2-1_casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1_2-1_casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1no1_2-1_casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -979,7 +1024,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d@s1_2-1_casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1_2-1_casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1no1_2-1_casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d@s1_2-1_sa-casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1_2-1_sa-casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1_2-1_sa-casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1no1_2-1_sa-casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -997,7 +1041,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d@s1_2-1_sa-casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1_2-1_sa-casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s1no1_2-1_sa-casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d@s2_2-1_casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2_2-1_casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2_2-1_casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2no1_2-1_casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -1016,7 +1059,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d@s2_2-1_casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2_2-1_casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2no1_2-1_casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d@s2_2-1_sa-casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2_2-1_sa-casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2_2-1_sa-casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2no1_2-1_sa-casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -1034,7 +1076,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d@s2_2-1_sa-casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2_2-1_sa-casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d@s2no1_2-1_sa-casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d4s@r1_2-1_casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1_2-1_casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1_2-1_casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1no2_2-1_casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -1053,7 +1094,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d4s@r1_2-1_casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1_2-1_casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1no2_2-1_casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d4s@r1_2-1_sa-casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1_2-1_sa-casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1_2-1_sa-casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1no2_2-1_sa-casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -1071,7 +1111,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d4s@r1_2-1_sa-casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1_2-1_sa-casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@r1no2_2-1_sa-casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d4s@s1_2-1_casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1_2-1_casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1_2-1_casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1no2_2-1_casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -1090,7 +1129,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d4s@s1_2-1_casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1_2-1_casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1no2_2-1_casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d4s@s1_2-1_sa-casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1_2-1_sa-casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1_2-1_sa-casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1no2_2-1_sa-casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -1108,7 +1146,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d4s@s1_2-1_sa-casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1_2-1_sa-casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s1no2_2-1_sa-casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d4s@s2_2-1_casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2_2-1_casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2_2-1_casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2no2_2-1_casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
@@ -1127,7 +1164,6 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `sc_3d4s@s2_2-1_casscf_mo_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2_2-1_casscf_moc_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2no2_2-1_casscf_no_frozen_pur_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
-- `sc_3d4s@s2_2-1_sa-casscf_ao_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2_2-1_sa-casscf_mo_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2_2-1_sa-casscf_moc_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
 - `sc_3d4s@s2no2_2-1_sa-casscf_no_-_pol_avg` VOID -- prior-anchor-first: the prior-axis comparison is CASCI: optimizer cells of a @r/@s window stay void until the basis decision (2026-11-10)
