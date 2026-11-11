@@ -63,7 +63,9 @@ user decision; the partial verdict 91/91-isolation-green).
   measured): the series' non-head configurations need fresh
   forced-occupation SCFs and the d3 census on Sc-unc diverges on
   every arm (E ~ +1.3e7 Eh, Newton and DIIS alike); the @r1 half
-  landed (the head IS the trusted cache) -- elements/Sc-unc.
+  landed on BOTH twins (the head IS the trusted cache) -- the @s
+  windows guarded by cases._unc_s_block (Sc-unc + Ti-unc), pending
+  placeholders until the repair.
 - THE BASIS-PREPARATION LAYER landed (2026-11-10, this session):
   `src/atomterm/basis.py` (the ladder runner, the density-block
   source, `metric_radials`, `series_window`) + the SOURCE-TAG grammar

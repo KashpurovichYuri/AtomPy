@@ -75,6 +75,16 @@ Opened 2026-11-10 from the handoff (xxii) skeleton + the review round
 ## Executed 2026-11-11, the review-stage rounds (the user's
 ## structure, delivered iteratively)
 
+- (f2e5d04..328ee86) THE STRUCTURE ROUND: pending placeholders, the
+  sectioned skeleton (=== anchors/span transitions, --- families,
+  lane closes its section), the UHF place row, the NO class retired
+  to store-only, render_spans review scopes, lattice_keys = the
+  full grammar, 3d@ar lane windows on the pairs, Sc's preamble
+  emptied.  (d9cc576) THE CAMPAIGN REPLAN: C/Si/Ti/Ti-unc on the
+  skeleton (41/41/150/146); Ti-unc = the Sc-unc mirror (head-only
+  series, guarded @s, mirrored prior sectors); the parity pins on
+  BOTH pairs; U14e deferred.  The C/Si UHF records re-warmed (lost
+  to the pre-fix merge bug).
 - (3646175) README: the source axis explained accurately (the signal
   definitions, the two controlled pairs, the MO-informed/AO-form
   contracts).
