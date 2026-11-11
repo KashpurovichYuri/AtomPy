@@ -1240,8 +1240,10 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     """EVERY comparison row a row -- the three rendered core variants'
     CI rows beside their optimizer variants, the method bare +
     restriction only, the window cell in slash form; the frac
-    reference class and NO-start cells stay store-only (the diet);
-    free optimizer rows carry no lane marker."""
+    reference class stays store-only (the diet) while the NO
+    density leg renders beside the controls; NO-start OPTIMIZER
+    rows stay store-only; free optimizer rows carry no lane
+    marker."""
     mod = methods_module()
     cs = CAMPAIGN["Ti"]
     keys = grid_keys(cs)
@@ -1250,7 +1252,9 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     rows = [r for r in text.splitlines() if r.startswith("|")]
     ci = [r for r in rows if r.startswith("| CASCI | free | 3d4s / D |")]
     assert len(ci) == 3            # raw/avg/pur (the frac class: store-only)
-    assert not any("/ NO |" in r for r in rows)   # the diet: no repeats
+    no_ci = [r for r in rows if "/ NO |" in r]
+    assert len(no_ci) == 2         # the density leg, both ruler cores
+    assert all(r.startswith("| CASCI |") for r in no_ci)  # CI-only
     assert not any("frac" in r for r in rows)
     opt = [r for r in rows
            if r.startswith("| CASSCF | free | 3d4s / D |")]
@@ -1363,10 +1367,12 @@ def test_methods_prior_rows_join_the_span_family_in_comparison_order():
 
 @fast
 def test_methods_table_diet_repeats_do_not_render():
-    """The rendering diet: NO-start rows (energy-identical to their D
-    row), the prior windows' control and non-ruler-core rows, the
-    lattice's per-span control, and the frac reference class never
-    render -- the store keeps them, the table does not repeat them."""
+    """The rendering diet: the prior windows' control and
+    non-ruler-core rows, the lattice's per-span control, and the
+    frac reference class never render -- the store keeps them, the
+    table does not repeat them.  The NO density leg DOES render (its
+    CI row, beside the controls -- the user's comparison block);
+    NO-start OPTIMIZER rows never do."""
     mod = methods_module()
     cs = CAMPAIGN["Sc"]
     keys = [k for k in [*lattice_keys(cs), *grid_keys(cs),
@@ -1376,7 +1382,9 @@ def test_methods_table_diet_repeats_do_not_render():
     text = "\n".join(mod.methods_section(
         cs, {k.address: _methods_payload(-759.5) for k in keys}, -759.7363))
     rows = [l for l in text.splitlines() if l.startswith("| CASCI")]
-    assert not any("/ NO" in l for l in rows)
+    no_rows = [l for l in rows if "/ NO" in l]
+    assert no_rows                      # the density leg renders
+    assert all(l.startswith("| CASCI |") for l in no_rows)
     assert not any("frac" in l for l in rows)
     # prior windows: the distilled row at the ruler core only
     prior_rows = [l for l in rows if "@" in l.split("|")[3]]

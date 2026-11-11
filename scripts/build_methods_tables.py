@@ -190,13 +190,13 @@ def _row(k, p, anchor, spec) -> str:
 
 def _method_row(k) -> bool:
     """The methods-row policy, ONE home: the table renders the
-    COMPARISON classes -- the distilled start, the SCF controls, the
-    treatments.  A NO-start cell never renders (the density leg is
-    energy-identical to its D row at k=1 -- its degeneracy
-    certificate lives in the store and the pins, not in a repeated
-    row). Every filter in the table's assembly routes through
+    COMPARISON classes -- the distilled block (the incumbent and the
+    prior windows), the NO density leg, the SCF controls, the
+    treatments.  A NO-start OPTIMIZER cell never renders (the
+    natural-orbital START is not a family -- its CI row is the
+    leg); every other filter in the table's assembly routes through
     here."""
-    return k.start != "no"
+    return k.start != "no" or k.method == "casci"
 
 
 def _rows(keys, cells, anchor, spec) -> list[str]:
@@ -246,10 +246,13 @@ def _comparison_key(k):
     the CI block."""
     t = k.source_tag
     k_rank, src = (t[1], t[0]) if t is not None else (1, "")
-    if k.method != "casci":
-        return (1, 0, k_rank, src, k.start)
-    block = 0 if k.start == "ao" else 2   # the controls after the D block
-    return (0, block, k_rank, src, k.start)
+    # both tiers, ONE block structure: the D-family by (k, source),
+    # then (CI only) the NO density leg, then the MO/MOC controls
+    # last
+    block = {"ao": 0, "no": 1}.get(k.start, 2) if k.method == "casci" \
+        else (0 if k.start == "ao" else 2)
+    tier = 0 if k.method == "casci" else 1
+    return (tier, block, k_rank, src, k.start)
 
 
 def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
@@ -266,14 +269,16 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     incumbent family renders as its own family.
     A lattice span equal to the primary's renders once -- the
     primary's core groups own it.  The rendering DIET (store data
-    stays; rows do not repeat it): NO-start cells never render, the
-    prior windows contribute only their distilled CI row at the
-    ruler core (their controls repeat the incumbent's at equal
-    width; their raw/pur rows repeat their certificates), the
-    lattice renders one row per span (the m-incomplete control story
-    renders once, at the primary's controls), and the frac reference
-    class does not render (a different reference SCF -- its home is
-    the reference study, not the methods grid).  The ROHF anchor row
+    stays; rows do not repeat it): the prior windows contribute
+    only their distilled rows at the ruler core (their controls
+    repeat the incumbent's at equal width; their raw/pur rows
+    repeat their certificates), the lattice renders one row per
+    span (the m-incomplete control story renders once, at the
+    primary's controls), NO-start OPTIMIZER cells never render (the
+    natural-orbital start is not a family -- its CI row IS the
+    density leg), and the frac reference class does not render (a
+    different reference SCF -- its home is the reference study,
+    not the methods grid).  The ROHF anchor row
     leads, the UHF anchor row follows when the store carries the
     record; optimizer twins is not this table's story yet."""
     body: list[str] = []

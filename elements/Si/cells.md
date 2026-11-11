@@ -40,6 +40,8 @@ ROHF reference energy: -288.84643692 Eh
 | si_3p@1s2s2p3s_2-0_casci_ao_-_pol_avg | -288.48505323 | 1.398e-01 | 2.00000 | 0.00e+00 | 0.00e+00 | 1.0e-15 | 1.8e-15 | 1.000 | 0.0e+00 | 0.0e+00 | 2.4e-15 |  |
 | si_3p@1s2s2p3s_2-0_casscf_ao_-_pol_avg | -288.84635187 | -2.215e-01 | 1.62076 | 1.16e-01 | 1.42e-11 | 8.7e-01 | 8.7e-01 | 1.000 | nan | 8.5e-05 | 7.3e-15 |  |
 | si_3p@1s2s2p3s_2-0_sa-casscf_ao_-_pol_avg | -288.84639779 | -2.216e-01 | 2.00000 | 1.74e-16 | 1.77e-32 | 1.6e-14 | 1.3e-14 | 1.000 | nan | 0.0e+00 | 4.5e-15 |  |
+| si_3pno1_2-0_casci_no_-_pol_avg | -288.62479155 | 2.664e-05 | 1.99999 | 2.86e-05 | 1.92e-20 | 3.6e-03 | 4.3e-03 | 1.000 | 2.1e-03 | 1.2e-04 | 1.9e-15 |  |
+| si_3pno1_2-0_casci_no_-_pur_avg | -288.62480814 | 1.004e-05 | 2.00000 | 1.57e-15 | 0.00e+00 | 1.1e-15 | 1.8e-15 | 1.000 | 0.0e+00 | 0.0e+00 | 2.2e-15 |  |
 
 configurations per root (top-2 determinants):
 
@@ -115,6 +117,12 @@ configurations per root (top-2 determinants):
 - `si_3p@1s2s2p3s_2-0_sa-casscf_ao_-_pol_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.06)
 - `si_3p@1s2s2p3s_2-0_sa-casscf_ao_-_pol_avg` root 1: p^2.00 (|c|=0.80); p^2.00 (|c|=0.60)
 - `si_3p@1s2s2p3s_2-0_sa-casscf_ao_-_pol_avg` root 2: p^2.00 (|c|=0.80); p^2.00 (|c|=0.59)
+- `si_3pno1_2-0_casci_no_-_pol_avg` root 0: p^2.00 (|c|=0.92); p^2.00 (|c|=0.40)
+- `si_3pno1_2-0_casci_no_-_pol_avg` root 1: p^2.00 (|c|=1.00); p^2.00 (|c|=0.01)
+- `si_3pno1_2-0_casci_no_-_pol_avg` root 2: p^2.00 (|c|=0.92); p^2.00 (|c|=0.40)
+- `si_3pno1_2-0_casci_no_-_pur_avg` root 0: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3pno1_2-0_casci_no_-_pur_avg` root 1: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `si_3pno1_2-0_casci_no_-_pur_avg` root 2: p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 

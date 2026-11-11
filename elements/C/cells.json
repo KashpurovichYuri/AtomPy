@@ -1827,12 +1827,98 @@
       ],
       "cycles": 12,
       "conv_dE": 0.0
+    },
+    "c_2pno1_2-0_casci_no_-_pol_avg": {
+      "tag": "c_2pno1_2-0_casci_no_-_pol_avg",
+      "kind": "casci",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 6.339378317033029e-15,
+      "e_ground": -37.43158152516689,
+      "energies_pyscf": [
+        -37.431610677487726,
+        -37.43156694900647,
+        -37.43156694900647
+      ],
+      "max_de_vs_pyscf": 2.91523208346689e-05,
+      "ground_term": "3P",
+      "ground_l2": 2.0000000000000044,
+      "ground_lz2": 1.0000000000000022,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 1.300350175809425e-15,
+      "comm_norm_h_l2": 8.367133432421036e-31,
+      "win_lz": 6.551606006003543e-16,
+      "win_lperp": 9.295128903606905e-16,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 5.986823152234497e-34,
+        "p": 2.000000000000002,
+        "d": 3.854403610068104e-39
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=0.99); p^2.00 (|c|=0.15)",
+        "p^2.00 (|c|=0.94); p^2.00 (|c|=0.31)",
+        "p^2.00 (|c|=0.95); p^2.00 (|c|=0.32)"
+      ],
+      "core_anisotropy": 0.002404749164,
+      "cell": "c_2pno1_2-0_casci_no_-_pol_avg"
+    },
+    "c_2pno1_2-0_casci_no_-_pur_avg": {
+      "tag": "c_2pno1_2-0_casci_no_-_pur_avg",
+      "kind": "casci",
+      "n_det": 3,
+      "diverged": false,
+      "converged": true,
+      "cycles": null,
+      "max_cycle": null,
+      "conv_dE": null,
+      "ortho_err": 1.4432899320127035e-15,
+      "e_ground": -37.43160772271942,
+      "energies_pyscf": [
+        -37.43160772271943,
+        -37.43160772271943,
+        -37.43160772271943
+      ],
+      "max_de_vs_pyscf": 7.105427357601002e-15,
+      "ground_term": "3P",
+      "ground_l2": 2.0000000000000018,
+      "ground_lz2": 1.0000000000000009,
+      "terms": {
+        "3P": 3
+      },
+      "comm_norm_h_lz": 0.0,
+      "comm_norm_h_l2": 0.0,
+      "win_lz": 6.547610293997335e-16,
+      "win_lperp": 9.25971927890472e-16,
+      "window": {
+        "s": 0.0,
+        "p": 1.0,
+        "d": 0.0
+      },
+      "electrons": {
+        "s": 0.0,
+        "p": 2.0000000000000004,
+        "d": 0.0
+      },
+      "n_dev": 0.0,
+      "configurations": [
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)",
+        "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
+      ],
+      "core_anisotropy": 0.0,
+      "cell": "c_2pno1_2-0_casci_no_-_pur_avg"
     }
-  },
-  "uhf": {
-    "e_tot": -37.686544437314076,
-    "s2": 2.0063145704449568,
-    "sigma_min": 0.9968381309590129,
-    "converged": true
   }
 }
