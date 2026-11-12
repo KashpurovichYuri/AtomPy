@@ -57,8 +57,8 @@ SA-CASSCF,free,3d4s / MOC,"(3,6)",Ar·pur,—,—,—,—,—,—,—,—,—,�
 "SA-CASSCF, frozen",free,3d4s / MOC,"(3,6)",Ar·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
 CASCI,pinned,3d4s / D,"(3,6)",Ar·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
 CASCI,free,3d4s / D,"(3,6)",Ar·lane,90,−759.7323,+5.0,−20673.3805,+0.1374,—,6.0000,9e-02,4e-11,5e-11,6.7e-15,4.4e-14,
-CASSCF,free,3d4s / D,"(3,6)",Ar,—,—,—,—,—,—,—,—,—,—,—,—,pending
-SA-CASSCF,free,3d4s / D,"(3,6)",Ar,—,—,—,—,—,—,—,—,—,—,—,—,pending
+CASSCF,free,3d4s / D,"(3,6)",Ar·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
+SA-CASSCF,free,3d4s / D,"(3,6)",Ar·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
 SA-CASSCF,pinned,3d4s / D,"(3,6)",Ar·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
 ===,===,===,===,===,===,===,===,===,===,===,===,===,===,===,===,===,===
 CASCI,free,3d4s@s2 / D,"(3,12)",Ar·raw,—,—,—,—,—,—,—,—,—,—,—,—,pending

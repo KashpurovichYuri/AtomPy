@@ -303,7 +303,7 @@ def _pending_row(k, spec) -> str:
     wname = (k.window if k.source_tag is not None
              else (spec.window_names or {}).get(k.span_label, k.span_label))
     core = core_col(k, spec)
-    if k.core_tag is not None and k.substrate == "pur":
+    if k.core_tag is not None:
         core += "·lane"     # the raw-shell Loewin core, not the prefix
     cells = [_method(k),
              "pinned" if (k.core_tag is not None
@@ -465,7 +465,8 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
     # the planned windows that did not join a family above: the
     # untagged tiers (their own families, as declared) and any prior
     # span without an incumbent twin (its own comparison family) --
-    # the same row order throughout
+    # the SAME core-group grammar as the primary/lattice sections
+    # (raw | avg | pur behind --- rules), the same row order
     for w in spec.planned_windows:
         if not keep(w.partition("@")[0]):
             continue
@@ -476,7 +477,12 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
         else:
             keys = [k for k in window_grid(spec, w)
                     if _method_row(k) and k.core != "frac"]
-        _fam(keys)
+        groups: dict[tuple, list] = {}
+        for k in keys:
+            groups.setdefault((core_col(k, spec), cas_label(k, spec)),
+                              []).append(k)
+        for g in groups.values():
+            _fam(g)
 
     # sections emission: === between spans, --- between families
     emitted: list[str] = []

@@ -281,9 +281,12 @@ def test_lane_keys_derive_from_the_declaration():
         ("3d3p@semi", (4, 3)),
         ("3d3p4d@semi", (4, 3)), ("3d3p4s@1s2s2p3s", (5, 4)),
         ("3s3p3d@1s2s2p4s", (5, 4))]
-    assert lane_keys(CAMPAIGN["U14e"]) == []   # the CAS(4,36) lane
-    # RETIRED (2026-11-12): the 36-column family span is not the
-    # calculation -- the three promoted CAS carry the record
+    # U14e's lanes: BACK at the CHEMICAL width (the case distills --
+    # the lane window rides _window_columns, CAS(4,12)/(6,13), not
+    # the retired 36-column band span); the (4,15) section carries
+    # none (its window shares the 6p rows with the 5-pair core)
+    assert [(k.window, k.sector) for k in lane_keys(CAMPAIGN["U14e"])] == [
+        ("5f6d@6s6p7s", (4, 0)), ("5f6d7s@6s6p", (5, 1))]
 
 
 @fast
@@ -380,7 +383,7 @@ def test_u14e_chemistry_declaration():
     assert spec.window_names["10f13d"] == "5f6d"
     assert spec.window_names["10f13d7s"] == "5f6d7s"
     assert spec.window_names["10f13d14p"] == "5f6d6p"
-    assert spec.core_chemistry == {5: "6s6p7s", 4: "6s6p"}
+    assert spec.core_chemistry == {5: "Rn·7s", 4: "Rn"}
     assert spec.render_primary is False
     assert spec.anchor_note.startswith("forced filling: 6s²6p⁶7s²")
 

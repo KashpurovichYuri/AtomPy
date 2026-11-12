@@ -835,16 +835,22 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    # radial delivers the chemical width, CAS(6,13)).
                    # Corollary: the case is distilled -- the radial
                    # mask is construction-refused on its windows
-                   shell_radials={"7s": 1, "9f": 1, "10f": 1,
-                                  "11f": 1, "12d": 1, "13d": 1,
-                                  "14p": 1},
+                   shell_radials={"5f": 1, "6d": 1, "7s": 1,
+                                  "9f": 1, "10f": 1, "11f": 1,
+                                  "12d": 1, "13d": 1, "14p": 1},
                    sa_weights=[1 / 17] * 17,  # the ground term's M_L set
                    run_casscf=False,          # the multi-solution class
-                   # the CAS(4,36) lane window RETIRED (user-directed
-                   # 2026-11-12: the 36-column family span is not the
-                   # calculation we want -- the three promoted CAS
-                   # carry the record; the lane stays in git history
-                   # and the store, re-declarable)
+                   # the lane class RETURNS at the CHEMICAL width
+                   # (the case now distills -- the lane window rides
+                   # _window_columns like every other, delivering the
+                   # CAS(4,12)/(6,13) shapes instead of the retired
+                   # 36-column band span): one lane per section at its
+                   # ruler core.  The (4,15) section carries NONE: its
+                   # window shares the 6p rows with the 5-pair core
+                   # and _lane_core refuses the overlap (a declared
+                   # non-disjoint partition is a grid axis, not a
+                   # lane one)
+                   lane_windows=("5f6d@6s6p7s", "5f6d7s@6s6p"),
                    nroots_primary=48,
                    # the tier CAS(4,>20) families: RETIRED for now
                    # (user-directed 2026-11-06 -- "most of CASCI
@@ -856,13 +862,13 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    #         for t in ("3f", "4f", "2f2d", "4f2d")),
                    planned_windows=_U14E_PROMOTED,
                    planned_sectors=_U14E_PROMOTED_SECTORS,
-                   render_spans=_U14E_PROMOTED,
+                   render_spans=_U14E_PROMOTED + ("5f6d", "5f6d7s"),
                    scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID),
                    window_names={"9f10f11f12d13d": "5f6d (3f2d radials)",
                                  "10f13d": "5f6d",
                                  "10f13d7s": "5f6d7s",
                                  "10f13d14p": "5f6d6p"},
-                   core_chemistry={5: "6s6p7s", 4: "6s6p"},
+                   core_chemistry={5: "Rn·7s", 4: "Rn"},
                    anchor_note="forced filling: 6s²6p⁶7s² closed, "
                                "5f³6d¹ open",
                    render_primary=False,

@@ -26,23 +26,62 @@ def minus(text: str) -> str:
     return re.sub(r"(?<!e)-", "−", text)
 
 
+def core_display(shells: tuple[str, ...], spec=None) -> str:
+    """One grammar for every core name: the declared chemistry first
+    (``core_chemistry`` by the shell count -- the ECP-aware names no
+    derivation reaches: an explicit 6s6p6p set COMPLETES Rn only
+    through the pseudopotential's implicit electrons), else the noble
+    EXACTLY filling the shells, else the longest noble PREFIX with the
+    remainder appended (He·2s, Ne·3s -- a closed shell plus one pair),
+    else the braced list."""
+    cols = [SHELL_COLS[s[-1]] for s in shells]
+    if spec is not None and spec.core_chemistry:
+        name = spec.core_chemistry.get(sum(cols))
+        if name is not None:
+            return name
+    total = sum(cols)
+    for n, nsh in NOBLE_CORES.items():
+        if sum(SHELL_COLS[s[-1]] for s in nsh) == total:
+            return n.capitalize()
+    best = None
+    for n, nsh in NOBLE_CORES.items():
+        k = sum(SHELL_COLS[s[-1]] for s in nsh)
+        if k < total and (best is None or k > best[0]):
+            best = (k, n)
+    if best is not None:
+        # the remainder = the shells BEYOND the noble's orbital count
+        # (a shell straddling the boundary has no name -- braced)
+        k, walked, rem = best[0], 0, []
+        for sh, c in zip(shells, cols):
+            if walked >= k:
+                rem.append(sh)
+            elif walked + c > k:
+                return "{" + ",".join(shells) + "}"
+            walked += c
+        if rem:
+            return f"{best[1].capitalize()}·" + "".join(rem)
+    return "{" + ",".join(shells) + "}"
+
+
 def core_col(k, spec) -> str:
     """The core column (every table's one grammar): a tagged window's
-    own core; an untagged cell's prefix -- the declared chemical shell
-    set of the key's EFFECTIVE core (``core_chemistry``: the count
-    follows the key's sector -- a promoted-pair window freezes fewer
-    pairs), else the noble whose closed count fills ``spec.ncore``
-    orbitals; the variants naming their deviation."""
+    own core (:func:`core_display`); an untagged cell's prefix -- the
+    declared chemical shell set of the key's EFFECTIVE core
+    (``core_chemistry``: the count follows the key's sector -- a
+    promoted-pair window freezes fewer pairs), else the noble
+    derivation (:func:`core_display` over the case's ``ncore``
+    orbitals); the variants naming their deviation."""
     if k.core_tag is not None:
-        return core_label(k.core_tag)
+        # the tagged path carries no variant suffix -- the lane's own
+        # decoration (the renderer's "·lane") is the whole statement
+        return core_display(k.core_shells(), spec)
     if spec.core_chemistry:
         n_eff = (2 * spec.ncore + spec.nelec_act
                  - k.sector[0] - k.sector[1]) // 2
-        base = spec.core_chemistry.get(n_eff, f"n={n_eff}")
+        base = spec.core_chemistry.get(
+            n_eff, core_display(_core_orbitals(spec, n_eff), spec))
     else:
-        base = next((n.capitalize() for n, sh in NOBLE_CORES.items()
-                     if sum(SHELL_COLS[s[-1]] for s in sh) == spec.ncore),
-                    f"n={spec.ncore}")
+        base = core_display(_core_orbitals(spec, spec.ncore), spec)
     if k.core == "raw":
         return f"{base}·raw"
     if k.core == "frac":
@@ -52,14 +91,21 @@ def core_col(k, spec) -> str:
     return base
 
 
-def core_label(tag: str) -> str:
-    """The core column's README notation: noble names capitalized,
-    ``semi`` as itself, explicit lists braced."""
-    if tag in NOBLE_CORES:
-        return tag.capitalize()
-    if tag == "semi":
-        return tag
-    return "{" + ",".join(core_shells(tag)) + "}"
+def _core_orbitals(spec, n: int) -> tuple[str, ...]:
+    """The aufbau-filling first ``n`` orbitals (the core naming's
+    substrate when no chemistry is declared -- the derivation, never
+    a guess about partitions)."""
+    out, left = [], n
+    for shell in (("1s", 1), ("2s", 1), ("2p", 3), ("3s", 1), ("3p", 3),
+                  ("4s", 1), ("3d", 5), ("4p", 3), ("5s", 1), ("4d", 5),
+                  ("5p", 3), ("6s", 1), ("4f", 7), ("5d", 5), ("6p", 3),
+                  ("7s", 1), ("5f", 7), ("6d", 5), ("7p", 3)):
+        if left <= 0:
+            break
+        out.append(shell[0])
+        left -= shell[1]
+    return tuple(out)
+
 
 
 def cas_label(key, spec=None) -> str:
