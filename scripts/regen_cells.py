@@ -142,6 +142,15 @@ def run_queue(name, spec, sector, group) -> list[CellKey]:
     return grid_keys(spec) + lattice_keys(spec)
 
 
+def _materializes(key: CellKey, scens, full: bool) -> bool:
+    """Whether the run executes the cell: a scenario'd cell runs only
+    under ``--full`` (the void branch stamps the store entry instead).
+    ONE home of the materialization rule -- the frac-head build and
+    the queue branch must never disagree (a disagreement crashes
+    mid-chain: the head absent for a cell the loop runs)."""
+    return full or not void_reason(key, scens)
+
+
 def keep(key: CellKey, args) -> bool:
     """Key-identity filter: every given axis must match (``-`` = the
     None mask, the address grammar's convention)."""
@@ -332,7 +341,7 @@ def main() -> None:
         # materializing a frac cell brings the head back, guard
         # included)
         mf_f = None
-        if any(k.core == "frac" and not void_reason(k, scens)
+        if any(k.core == "frac" and _materializes(k, scens, args.full)
                for k in queue):
             _, mf_f = run_frac_occ(cfg, str(out / "rungs" / "fracocc.chk"),
                                    spec.nelec_act, len(act_idx),
@@ -366,7 +375,7 @@ def main() -> None:
                       flush=True)
                 continue
             reason = void_reason(key, scens)
-            if reason and not args.full:
+            if not _materializes(key, scens, args.full):
                 print(f"  [void] {key.address} -- {reason}", flush=True)
                 cells[key.address] = {"cell": key.address,
                                       "void_reason": reason}
