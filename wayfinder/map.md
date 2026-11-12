@@ -12,6 +12,12 @@ dies).
 - [33 — the symmetry-breaking anatomy deliverable](tickets/33-symmetry-anatomy.md):
   design-first — the frozen-landscape tables that replace the retired
   scan pointers.
+- [37 — the basis-repair bench, the @s wave, the subspace-ROHF: the executable spec](tickets/37-basis-repair-spec.md):
+  the to-spec form + the progress tracker; the seams finalized
+  (windows.project_orbitals, reference.projected_source + the dm0 seed
+  thread, basis.conditioned_basis, reference.subspace_rohf); the
+  decision tree (P1 seeded → P2 density-direct → C conditioned); 64 OMP
+  for the bench (the user's directive 2026-11-12).
 - [34 — the folded reference + the window characterization matrix](tickets/34-folded-reference.md):
   **STEPS 1-5 COMPLETE (2026-11-08/09)**: the Ti-unc census + the
   promotion; run_folded (reference.py) + its tests; the matrix on the
