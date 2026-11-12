@@ -1,0 +1,9 @@
+=== the 6-31G overlap spectra ===
+  Sc 6-31g  nao= 27  l0:min=1.24e-01 l1:min=2.47e-01 l2:min=6.04e-01
+  Ti 6-31g  nao= 27  l0:min=1.30e-01 l1:min=2.47e-01 l2:min=5.96e-01
+  C  6-31g  nao=  9  l0:min=1.87e-01 l1:min=4.30e-01
+  Si 6-31g  nao= 13  l0:min=1.58e-01 l1:min=3.06e-01
+=== the C/Si s1p3 promotions on 6-31G (the plain weight hook) ===
+  C s1p3: E = -37.58742254  conv=True  post=True
+  Si s1p3: E = -288.73699839  conv=True  post=True
+VERDICT: no divergence anywhere -- 6-31G carries none of the disease's ingredients

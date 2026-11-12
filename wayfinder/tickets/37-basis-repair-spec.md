@@ -17,14 +17,33 @@ contractions (`@r1/@s1/@s2`) cost energy at the ROHF level — the certificate w
 adoption decision un-gates the pending optimizer classes (the prior treatments'
 re-homing, the twins' primary legs).
 
+**DECOMPOSED (Stage 1b, measured 2026-11-12): the disease is the character
+hook, not the SCF.** Three stacked defects: (1) kappa(S) ~ 2000 metric
+amplification produces virtual columns at eps ~ +5e6 carrying closed-span
+projector weights ~ 1 (harmlessly present even in the trusted stores'
+mo_energy — the occupied block stays physical); (2) the unc labels are shell
+COUNTERS, so the series' plain-pattern spans select 1-5 AO slivers (weights
+~1e-3, noise ranking); (3) any weight-ranked filler fills the garbage — even
+the trusted record's own density explodes to +1.4e7 under the hook, while
+hook-free the same seed lands the anchor exactly.
+
 ## Solution
 
-Two composed repair tracks — P (projection) and C (conditioning) — developed and
-certified in a sandbox, then integrated; the twins' `@s` legs then run on whichever
-source class won; then the subspace-ROHF exploration (`run_folded`'s mirror)
-produces the per-contraction ΔE-vs-anchor certificate, Sc first. Every stage is
-gated, tracked below, and loses nothing to compaction (this file + message.txt are
-the record).
+**v2 (the measured form)**: the repair is the SEED + THE OCCUPATION MODE —
+project the on-demand 6-31G solution into the unc basis (capture = 1.0; the
+conditioning truncation stays inside the projector as a guard but drops
+nothing here), seed the SCF with its density, and let the occupations FOLLOW
+the seed's occupied columns (MOM-anchored — immune to both the garbage tail
+and the sliver spans), with the configuration verified by the
+character-of-occupied post-check on honest spans. Track C (the basis cut) is
+RETIRED at its own checkpoint (no gap to cut on); track P survives as the
+seed carrier. Certified on both twins: Ti's head transfer hits its anchor
+EXACTLY, every member lands below its contracted anchor. The integration
+(Stage 1c) lands this in `windows`/`reference`/`cases`; the twins' `@s` legs
+then run through it (Stage 2); the subspace-ROHF exploration (`run_folded`'s
+mirror) produces the per-contraction ΔE-vs-anchor certificate, Sc first
+(Stage 3). Every stage is gated, tracked below, and loses nothing to
+compaction (this file + message.txt are the record).
 
 ## User Stories
 
@@ -96,8 +115,12 @@ the record).
   — the one owner of the policy.
 - The seed seam: `run_rohf(cfg, chkfile, ref=, dm0=)` → `_converged_cached(...,
   dm0=)` → `_accelerated` calling `m.run(dm0=dm0)` — three signatures, one
-  thread, no new path. The re-relax stays under the character-forced hook
-  (stronger than MOM — the hook IS the occupation anchor; no MOM machinery).
+  thread, no new path. **THE LOAD-BEARING PIECE (the Stage-1b verdict): the
+  MOM-anchored occupation mode** — with a seed declared, the occupations
+  FOLLOW the seed's occupied columns by S-overlap each cycle (`ReferenceSpec.seed_basis`,
+  ONE knob: seed set ⇒ MOM occupations + the honest post-check; seedless ⇒ the
+  weight hook stays, certified on contracted bases). The re-relax never
+  weight-ranks the contaminated virtual tail.
 - `run_series(..., seed_basis=None)`; `CaseSpec.series_seed="6-31g"` declared on
   the twins — the repair is a declaration, not a code path.
 - Use 2 — the density-direct quasi-mf (`mo_coeff`/`mo_occ` only) feeds
@@ -268,8 +291,11 @@ the live state — update it in the same commit as any state change.
 
 ## Progress
 
-- [ ] **STAGE 0** (ticket 36; approved): batches B→C→D→E→A — re-render + commit
-      per batch; U14e LAST.
+- [x] **STAGE 0** (ticket 36; approved): batches B (Sc) and C (Ti) **LAND**
+      (85e3f0c, 74406bb — zero runnable-pending at scope on both; the 4
+      remaining rows per atom = the parked pinned-lane schema seam).  Next:
+      D (twins grid + per-window 3d4s@r1/3d@r1 `--full`; `@s` never queued)
+      → E (C/Si) → A (U14e LAST).
 - [x] **STAGE 1a** — the spectrum measurement: per-l-block S spectra on both
       twins, committed to `elements/<twin>/logs/spectrum.log`; **VERDICT =
       NO-GO on the clean-gap premise** (no null space: every eigenvalue
