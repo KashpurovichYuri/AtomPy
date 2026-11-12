@@ -66,6 +66,26 @@ user decision; the partial verdict 91/91-isolation-green).
   the contraction recipe re-scatters across cases/reference/scripts);
   the member_chains seam is real (two declared distillation
   families walk it); the radial legs need ZERO new src surface.
+- THE SWAP-BASIN READOUT SEAM (2026-11-12, found at batch D's
+  materialization): the free optimizer legs that land the SEMI-CORE
+  SWAP BASIN (the classic 3p/3s-into-active attractor; PySCF-side
+  E ~ -759.759 Sc / -848.42..-848.43 Ti -- 28..37 mEh below the
+  distilled-window CI) are MISREAD by the CI-stack bridge:
+  e_ground reads 0.79-0.83 Eh BELOW energies_pyscf on exactly those
+  legs.  The payload's own max_de_vs_pyscf meter catches every
+  instance (coherent baseline ~3 mEh; broken ~800).  The class:
+  ao/no-start FREE legs on the ruler-sector windows (3d4s,
+  3d4s@r1(+no2), 3d4sno2); every frozen leg, every mo/moc start, the
+  (2,0)-sector 3d legs (ao-free INCLUDED) and the lanes are
+  coherent.  This IS the recorded (xxv-era) "0.8 Eh stack anomaly" --
+  now measured precisely: it tracks the SWAP BASIN, not the SA
+  method.  The physics is one consistent basin across starts (the
+  fact-15 multi-solution reality, the ticket's expected trouble);
+  the READOUT seam breaks on the swapped windows (the bridge's
+  ordering/symmetry assumptions).  Deep fix = its own investigation;
+  the meter is the reliable discriminator meanwhile.  Disposition of
+  the rows at D's render: USER-GATED (quarantine vs
+  pyscf-side-energy-with-note).
 - THE TWINS' FRAC REFERENCE (2026-11-12, found at batch D): the
   `frac-reference-unmeasured` scenario holds one casci cell void per
   twin, and a blanket `--group grid --full` (ticket 36's literal D
