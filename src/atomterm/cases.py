@@ -657,12 +657,34 @@ CAMPAIGN: dict[str, CaseSpec] = {
                   shell_patterns=["2p"], spin=2, sa_weights=[1 / 3] * 3,
                   term=(1, "g"), lane_windows=("2p@1s2s",),
                   render_spans=("2p",),
+                  # the prior axis (the p-shell port of the Sc
+                  # grammar): the head = the trusted anchor; the
+                  # promotion member 2s1 2p3 (quintet S, censused
+                  # 2026-11-12: three arms, one basin, all
+                  # occupation-safe) -- the widened chain 2p -> 3p
+                  series=(SeriesSpec("p2", ("1s", "2s"), ("2p",),
+                                     2, -37.68241788145875),
+                          SeriesSpec("s1p3", ("1s",), ("2s", "2p"),
+                                     4, -37.59068260)),
+                  prior_bands={"2p": ("2p", "3p")},
+                  planned_windows=("2p@r1", "2p@s1", "2p@s2"),
+                  scenarios=(_prior_anchor_first("C", [(2, 0)]),),
                   scan=ScanSpec(fam=("2p", "3p"),
                                 grid=(0.0, 0.8, 17))),
     "Si": CaseSpec("Si", "ccpvdz", nelec_act=2, ncore=6,
                    shell_patterns=["3p"], spin=2, sa_weights=[1 / 3] * 3,
                    term=(1, "g"), lane_windows=("3p@1s2s2p3s",),
                    render_spans=("3p",),
+                   # the prior axis, mirrored (the 3p -> 4p chain; the
+                   # promotion 3s1 3p3 censused 2026-11-12: one basin,
+                   # all arms occupation-safe)
+                   series=(SeriesSpec("p2", ("1s", "2s", "2p", "3s"),
+                                      ("3p",), 2, -288.8464369230717),
+                           SeriesSpec("s1p3", ("1s", "2s", "2p"),
+                                      ("3s", "3p"), 4, -288.75397878)),
+                   prior_bands={"3p": ("3p", "4p")},
+                   planned_windows=("3p@r1", "3p@s1", "3p@s2"),
+                   scenarios=(_prior_anchor_first("Si", [(2, 0)]),),
                    scan=ScanSpec(fam=("3p", "4p"),
                                  grid=(0.0, 1.1, 23))),
     "Sc": CaseSpec("Sc", "ccpvdz", nelec_act=3, ncore=9,

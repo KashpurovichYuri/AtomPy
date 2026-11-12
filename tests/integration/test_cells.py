@@ -316,6 +316,29 @@ def test_void_reason_gates_scenariod_cells():
 
 
 @fast
+@fast
+def test_pshell_prior_axis_is_declared_on_c_and_si():
+    """The p-shell prior axis mirrors the Sc grammar: the head = the
+    case's own anchor, one promotion member (censused, one basin,
+    occupation-safe), the widened one-higher-p chain, and the three
+    prior windows guarded by prior-anchor-first (censused
+    2026-11-12)."""
+    for atom, shell in (("C", "2p"), ("Si", "3p")):
+        spec = CAMPAIGN[atom]
+        assert [m.tag for m in spec.series] == ["p2", "s1p3"]
+        assert spec.series[0].e_ref == pytest.approx(
+            json.loads((Path("elements") / atom
+                        / "cells.json").read_text())["rohf_energy"])
+        assert spec.prior_bands == {shell: (shell, NEXT_P[shell])}
+        assert spec.planned_windows == (f"{shell}@r1", f"{shell}@s1",
+                                        f"{shell}@s2")
+        assert any(sc.name == "prior-anchor-first"
+                   for sc in scenarios_for(spec))
+
+
+NEXT_P = {"2p": "3p", "3p": "4p"}
+
+
 def test_same_l_guard_derives_from_the_declared_windows():
     """The same-l guard is DERIVED (scenarios_for), never hand-listed
     per atom: Sc's five same-l lattice spans and Ti's three planned
