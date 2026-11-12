@@ -110,9 +110,20 @@ the record).
   a standalone raw PySCF spec, the `_SC_UNC_BASIS` kind, `build_mol`-ready
   today; the conditioned shells' labels are shell counters → the existing
   `"l0".."l9"` forced-occupation vocabulary. Home: `basis.py` (the
-  contraction-recipe family). C is the FALLBACK — and the projector's internal
-  detail; a B′ solution embeds into B exactly (the cut span ⊂ B), so even the C
-  branch yields honest `@s` sources on B.
+  contraction-recipe family).
+  **AMENDED (Stage 1a, measured 2026-11-12 — the NO-GO branch): the twins'
+  spectra show NO null space and NO gap** (every eigenvalue > 5e-4; l=2
+  bottoms at 5e-2; the largest tail ratio jump ×3–4; `elements/<twin>/logs/
+  spectrum.log`) — the cut design's premise fails at its own checkpoint, so
+  **C is DEMOTED from a basis cut to the projector's internal guard**: the
+  `thresh` solve stays (the robustness detail + the synthetic stress's foil)
+  but removes nothing on these bases; a conservative default (1e-8-class) is
+  the declared policy. **P is THE repair** (the seed first, the
+  density-direct second); the divergence mechanism is the SCF dynamics on
+  the amplified multi-basin landscape, not AO nullity. C's
+  `conditioned_basis` is NOT built this wave (no input class exists for it
+  now); the battery's synthetic near-singular anchors keep the projector's
+  truncation certified.
 - `reference.subspace_rohf(mf, c_valence, occ_closed, occ_open, ...)` — the
   `run_folded` mirror INVERTED: there the core is frozen and the valence solves
   free in the complement; here the VALENCE is confined to the distilled span
@@ -207,9 +218,14 @@ the live state — update it in the same commit as any state change.
 
 - [ ] **STAGE 0** (ticket 36; approved): batches B→C→D→E→A — re-render + commit
       per batch; U14e LAST.
-- [ ] **STAGE 1a** — the spectrum measurement: per-l-block S spectra on both
-      twins, committed to `elements/<twin>/logs/`; the GO/NO-GO on the gap; the
-      threshold constant declared. (64 OMP.)
+- [x] **STAGE 1a** — the spectrum measurement: per-l-block S spectra on both
+      twins, committed to `elements/<twin>/logs/spectrum.log`; **VERDICT =
+      NO-GO on the clean-gap premise** (no null space: every eigenvalue
+      > 5e-4, l=2 ≥ 5e-2; continuous decay, max jump ×3–4) — the cut
+      refuted at its own checkpoint, C demoted to the projector's internal
+      guard, P promoted to THE repair (see the AMENDED bullet above). The
+      threshold policy: conservative (removes nothing here; the guard for
+      genuinely singular inputs).
 - [ ] **STAGE 1b** — the sandbox bench: `project_orbitals` + the battery
       (anchors 1–6) + the twins' decision runs (P1 → P2 → C).
 - [ ] **STAGE 1c** — integration: the primitive/adapter/seed thread land
