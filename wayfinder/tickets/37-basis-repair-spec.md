@@ -157,9 +157,12 @@ integration (git history keeps the bench). The filesystem rule honored — no
 scratch outside the repo.
 
 **Threading**: **64 OMP threads for the bench** (the user's directive
-2026-11-12; the box carries 128 cores). The runs wave keeps OMP 16; a concurrent
-bench + regen totals 80 threads — allowed, but the one-regen-at-a-time rule
-stays.
+2026-11-12; the box carries 128 cores). **AMENDED (2026-11-12, the
+user's call): 16–32 is the DEFAULT range for production runs and tests**
+(the cap's history is the measured 255-thread thrash; the kernels here
+saturate below 32 at these matrix sizes); the one-regen-at-a-time rule
+stays, and concurrent workloads compose within the 128 cores (a 16-regen
++ the 64-bench = 80, allowed).
 
 ## Testing Decisions
 
