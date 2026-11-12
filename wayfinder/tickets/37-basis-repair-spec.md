@@ -204,6 +204,55 @@ is never the verdict — isolation reruns are.
 
 ## Further Notes
 
+**STAGE 1b VERDICT (measured 2026-11-12, the sandbox bench): the
+fresh-SCF disease DECOMPOSED into three stacked defects, and the
+repair is certified.** The evidence chain (sandbox/{project,transfer,
+diag,mom,probe,probe2}.py, git history):
+
+1. **The virtual tail's metric-amplified garbage.** With kappa(S)
+   ~ 2000 (l=0 lambda_min 5.5e-4) and Fock entries ~2e3, the
+   canonical eigproblem produces VIRTUAL columns at eps ~ +5e6 whose
+   closed-span projector weights are ~ 1 (the small-lambda directions
+   lie INSIDE the s/p closed spans). The garbage is in the STORES'
+   mo_energy too (Sc-unc trusted record: max eps +5.5e6) -- harmless
+   there (the occupied block is perfectly physical: -165.9..-0.05,
+   dm clean, trace 21). Aufbau is immune (garbage sits high); any
+   weight-ranked filler is not.
+2. **The character spans are single-band slivers on unc bases.** The
+   unc labels are shell COUNTERS (1s..20s, 3d..10d): the twins'
+   series vocabulary ("1s","2s","2p","3s","3p","4s","3d") selects
+   1-5 AO slivers where the honest spans are l0=20, l2=40 -- the
+   hook's weights are ~1e-3 (noise ranking). A latent declaration
+   bug, never exercised (the heads are cache-trusted, the members
+   never ran). With (1)+(2) the hook fills garbage from cycle one:
+   even the trusted record's OWN density explodes to +1.4e7 under
+   the hook (diag arm A); WITHOUT the hook the same projected seed
+   lands the anchor exactly (arm C).
+3. **The repair (certified on both twins):** MOM-anchored occupations
+   -- the occupations FOLLOW the seed's occupied columns by
+   S-overlap (the seed = the projected 6-31G/contracted source
+   carries the configuration; garbage never wins the overlap
+   contest). Energies land the right physics: the head transfers
+   (Ti-unc hits its anchor EXACTLY; Sc-unc +0.30 mEh -- a nearby
+   basin, certificates judge); the members from the 6-31G source:
+   d3 -1.2 mEh, d2s1 -0.7, d4 -1.9, d3s1 -0.7 BELOW the contracted
+   anchors (the expected variational gains). Newton's wandering
+   confirmed (Sc d3 fell to the d2s1 basin at -129 mEh relative --
+   the frozen-assignment disease); MOM-DIIS keeps the configuration.
+
+**THE REVISED INTEGRATION SHAPE (Stage 1c):** `windows.project_orbitals`
+as speced (unchanged -- battery 1-4 ALL PASS: identity 1e-15, superset
+2.9e-14, H/He/C captures >= 0.995, near-singular membership-stability);
+`reference` gains (a) the dm0 seed thread, (b) the MOM-anchored
+occupation mode (the weight hook STAYS for contracted bases -- it is
+certified there), (c) the CHARACTER-OF-OCCUPIED post-check (verify the
+converged occupied columns carry the declared character -- never
+re-rank all columns, the virtual tail contaminates any ranking); the
+twins' series declarations move to the honest span vocabulary
+(l-spans or the shell-layer bands). The projector's role stands (the
+seed is the configuration carrier); the load-bearing repair is the
+occupation mode.
+
 Dependencies: **bench ⇒ the `@s` sources exist ⇒ the twins' `@s` legs run ⇒
 `_unc_s_block` retires**; the subspace-ROHF exploration is independent of the
 bench (different seams) but follows it in the declared order. The exploration's
@@ -229,8 +278,14 @@ the live state — update it in the same commit as any state change.
       guard, P promoted to THE repair (see the AMENDED bullet above). The
       threshold policy: conservative (removes nothing here; the guard for
       genuinely singular inputs).
-- [ ] **STAGE 1b** — the sandbox bench: `project_orbitals` + the battery
-      (anchors 1–6) + the twins' decision runs (P1 → P2 → C).
+- [x] **STAGE 1b** — the sandbox bench: `project_orbitals` + the battery
+      (anchors 1–4 ALL PASS: identity 1e-15, superset 2.9e-14, H/He/C
+      captures ≥ 0.995, the near-singular membership-stability anchor)
+      + the twins' decision runs — **P1 WINS IN THE MOM FORM**: the
+      disease decomposed (see Further Notes), the MOM-anchored runs
+      land the right physics on every leg, the revised integration
+      shape recorded. The first naive-seeded attempt (transfer.py)
+      exposed the hook itself — the finding that reshaped the wave.
 - [ ] **STAGE 1c** — integration: the primitive/adapter/seed thread land
       (`windows` / `reference` / `basis` as won); the battery's synthetic
       anchors port to `tests/unit`, the transfers to `tests/integration`;

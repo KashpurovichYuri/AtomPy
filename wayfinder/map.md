@@ -72,18 +72,31 @@ user decision; the partial verdict 91/91-isolation-green).
   garbage basins, under plain-DIIS AND under Newton (E up to +1.5e7
   Eh; the arms' table is in the session record).  The twins share
   their ROHF's trusted-cache disease: fresh SCF paths diverge on
-  these bases.  Disposition: the UHF anchor row stays ABSENT on
-  Sc-unc/Ti-unc until the UHF class converges there (the same
-  repair class as the ROHF promotion -- a seeded/cached path).
+  these bases.  **MECHANISM FOUND + REPAIRED (2026-11-12, ticket 37's
+  sandbox bench): the disease is the CHARACTER HOOK, not the SCF.**
+  Two stacked defects: (a) the virtual tail's metric-amplified
+  garbage (kappa(S)~2000 makes eps ~ +5e6 columns carrying closed-span
+  weights ~1 -- present in the trusted stores' mo_energy too,
+  harmless there); (b) the unc labels are shell counters, so the
+  series' plain-pattern spans select 1-5 AO slivers (weights ~1e-3,
+  noise ranking).  Even the trusted record's own density explodes
+  (+1.4e7) under the hook; hook-free the same seed lands the anchor.
+  The certified repair: MOM-anchored occupations from a projected
+  seed (6-31G on-demand source) + the character-of-occupied
+  post-check on honest spans (l-vocabulary / shell-layer bands).
+  Every member leg lands the right physics (variational gains
+  -0.7..-1.9 mEh vs the contracted anchors; Ti's head transfer
+  EXACT).  The UHF anchor class re-tests under the same repair at
+  Stage 2.  Disposition: the row stays absent until that re-test.
   The three gated atoms (Sc, Ti, U14e) warmed EXACTLY to their
   declared `occ_e_ref_uhf` basins (the gates reproduced bit-exact).
-  THE SAME DISEASE BLOCKS THE PRIOR PORT'S @s HALF (2026-11-11,
-  measured): the series' non-head configurations need fresh
+  THE PRIOR PORT'S @s HALF (2026-11-11, measured; superseded by the
+  mechanism above): the series' non-head configurations need fresh
   forced-occupation SCFs and the d3 census on Sc-unc diverges on
   every arm (E ~ +1.3e7 Eh, Newton and DIIS alike); the @r1 half
   landed on BOTH twins (the head IS the trusted cache) -- the @s
   windows guarded by cases._unc_s_block (Sc-unc + Ti-unc), pending
-  placeholders until the repair.
+  placeholders until the repair (Stage 2, ticket 37).
 - THE BASIS-PREPARATION LAYER landed (2026-11-10, this session):
   `src/atomterm/basis.py` (the ladder runner, the density-block
   source, `metric_radials`, `series_window`) + the SOURCE-TAG grammar
