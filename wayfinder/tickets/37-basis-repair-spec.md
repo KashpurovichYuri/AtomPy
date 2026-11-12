@@ -215,6 +215,37 @@ ships with a pin that would catch a sign/phase error. Per-commit gate: fast tier
 + the diff's targeted files (5–10 min); the full-suite run stays RETIRED; a red
 is never the verdict — isolation reruns are.
 
+### The Stage-1c design review (codebase-design pass, 2026-11-12)
+
+- **The MOM hook is the second adapter at the EXISTING `get_occ` seam** —
+  aufbau (PySCF default), the weight hook (`_forced_rohf_occ`), MOM-follow:
+  three filling policies, one insertion point, no new mechanism. The hook
+  keeps the bench's certified form: the contest state RESETS per call (MO
+  indices re-diagonalize every cycle — the bug the first prototype caught),
+  closed pairs assigned first in seed order.
+- **`project_orbitals` vs `build_full_mo`: two distinct seams, one module.**
+  Cross-basis transfer (`intor_cross`, the target metric's truncated solve)
+  vs intra-basis assembly (the AO-metric transport inside one basis). The
+  names don't collide; both sit in the S-metric column-set family.
+- **`occupation_postcheck` keeps ONE home; the FORM changes** to
+  character-of-occupied (the converged occupied columns carry the declared
+  span character ≥ 1/2 — majority weight). Well-posed on EVERY basis because
+  it never ranks: the ranking-consistency form silently degrades to
+  noise-comparison exactly where the hook's ranking is garbage-blind (the
+  disease). Callers unchanged.
+- **The honest-span pins (the 1c test list)** — why `l0+l1` closed / `l2`
+  open classifies all three configurations per twin: the closed rank puts
+  the valence 4s at position 10 (Sc/Ti: 9 core pairs before it), so d1s2/d2s2
+  (n_closed=10) pull it INTO the closed block and d3/d4 (n_closed=9) leave it
+  EMPTY — the open premium `2·w_open + w_closed` keeps d (2·1) above the
+  empty 4s (0·2+1); the m-degenerate d tie is the known gauge chaos
+  (SA-anchored downstream, never pinned here); the post-check sees only
+  OCCUPIED columns, so the empty 4s is never checked. Pin all three
+  configurations' picks through the sandbox bench before integration.
+- **The dependency direction holds**: `reference` already imports
+  `windows` (`span_projector`, `select_span`) — `projected_source` calling
+  `project_orbitals` adds no edge.
+
 ## Out of Scope
 
 - The runs wave itself (ticket 36 owns batches B→C→D→E→A; Stage 0 context only).
