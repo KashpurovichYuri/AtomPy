@@ -66,6 +66,24 @@ user decision; the partial verdict 91/91-isolation-green).
   the contraction recipe re-scatters across cases/reference/scripts);
   the member_chains seam is real (two declared distillation
   families walk it); the radial legs need ZERO new src surface.
+- THE TWINS' FRAC REFERENCE (2026-11-12, found at batch D): the
+  `frac-reference-unmeasured` scenario holds one casci cell void per
+  twin, and a blanket `--group grid --full` (ticket 36's literal D
+  command) would MATERIALIZE it -- through a weight-ranked open-block
+  pick on a diseased basis (the disease's own filler class).  Two
+  open questions before the class is measurable on the twins:
+  (i) the smearing semantics: the realized valence on the unc basis
+  is 43 AOs (8 d bands + 3 s bands) so the open electrons smear
+  3/43 per orbital, where the contracted Sc form smears 0.5 over
+  6 AOs -- a DIFFERENT ensemble, energy-incomparable across the
+  parity pair; (ii) the garbage columns (eps ~ +5e6) compete in the
+  weight pick.  Resolution rides Stage 2's seeded-reference
+  machinery (MOM-style block anchoring, the U14e frac issue's
+  remedy); until then batch D runs method-filtered so the frac cell
+  stays void.  ALSO FIXED en route: regen's materialization rule had
+  two disagreeing copies (the frac-head build forgot --full; the
+  crash that killed batch D's first grid leg) -- `_materializes` is
+  now the one home (2484d23).
 - THE TWINS' UHF ANCHORS BLOCKED (2026-11-11, measured): the UHF
   class does NOT converge on the uncontracted twins -- the census
   arms (default/minao/atom/huckel/broken) all diverge or land
