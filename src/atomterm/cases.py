@@ -827,14 +827,24 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    shell_patterns=list(_U_TIER["3f2d"]), spin=4,
                    ecp=_U_ECP, tag="U_stuttgart78_dyall", key="U14e",
                    shell_bands=_U14E_BANDS,
+                   # every window shell carries k=1 -- the IDENTITY
+                   # for the single-primitive band shells (a 1x1
+                   # radial Gram; the stored band-window data stays
+                   # valid) and the actual DISTILLATION for the 7s
+                   # (its realization is the 3-band split -- one
+                   # radial delivers the chemical width, CAS(6,13)).
+                   # Corollary: the case is distilled -- the radial
+                   # mask is construction-refused on its windows
+                   shell_radials={"7s": 1, "9f": 1, "10f": 1,
+                                  "11f": 1, "12d": 1, "13d": 1,
+                                  "14p": 1},
                    sa_weights=[1 / 17] * 17,  # the ground term's M_L set
                    run_casscf=False,          # the multi-solution class
-                   # THE LANE PORT (the shell-layer wave's destination):
-                   # the chemical window 5f6d over its measured bands,
-                   # the core 6s6p7s = 5 pairs over the 15-column
-                   # family span (the multi-column core; the frozen
-                   # core the span's own closed-shell Roothaan).
-                   lane_windows=("5f6d@6s6p7s",),
+                   # the CAS(4,36) lane window RETIRED (user-directed
+                   # 2026-11-12: the 36-column family span is not the
+                   # calculation we want -- the three promoted CAS
+                   # carry the record; the lane stays in git history
+                   # and the store, re-declarable)
                    nroots_primary=48,
                    # the tier CAS(4,>20) families: RETIRED for now
                    # (user-directed 2026-11-06 -- "most of CASCI
@@ -846,6 +856,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    #         for t in ("3f", "4f", "2f2d", "4f2d")),
                    planned_windows=_U14E_PROMOTED,
                    planned_sectors=_U14E_PROMOTED_SECTORS,
+                   render_spans=_U14E_PROMOTED,
                    scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID),
                    window_names={"9f10f11f12d13d": "5f6d (3f2d radials)",
                                  "10f13d": "5f6d",

@@ -1,21 +1,10 @@
 # U14e (f³d¹ outside the ECP core)
 
-Stuttgart RLC ECP78 + cut-Dyall valence (uncontracted); the ECP
-removes 78 electrons → 14: 5f³6d¹7s². Reference ROHF −50.381852 Eh
-(rechecked 2026-11-06: same basin — `logs/rohf_recheck.log`).
-Sector M_S = 2. Pre-campaign record: `elements/U/` (frozen).
-
 <!-- methods:begin -->
 | method | route | window | CAS | core | dets | E, Eh | ΔE, mEh | E, eV | ΔE, eV | conv | ⟨L²⟩ | ptp (Eh) | ‖[P,Lz]‖ | ‖[P,L⊥]‖ | ‖[H,Lz]‖ | ‖[H,L²]‖ | note |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | ROHF (anchor) | — | — | — | — | — | −50.3819 | 0 | −1370.9607 | +0.0000 | — | — | — | — | — | — | — | forced filling: 6s²6p⁶7s² closed, 5f³6d¹ open |
 | UHF (anchor) | — | — | — | — | — | −50.3888 | −7.0 | −1371.1502 | −0.1894 | — | — | — | — | — | — | — | ⟨S²⟩=6.2289, σ_min=0.8835 |
-| === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === |
-| CASCI | pinned | 5f6d / D | (4,36) | {6s,6p,7s}·lane | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASCI | free | 5f6d / D | (4,36) | {6s,6p,7s}·lane | 58,905 | −49.1129 | +1269.0 | −1336.4302 | +34.5306 | — | 40.9999 | 4e-02 | 1e-12 | 2e-12 | 6.8e-14ψ | 5.0e-13ψ |  |
-| CASSCF | free | 5f6d / D | (4,36) | {6s,6p,7s}·lane | 58,905 | −50.4392 | −57.4 | −1372.5222 | −1.5615 | 1e-5/200 | 71.5324 | — | 3e+00 | 5e+00 | 5.0e-01ψ | 8.5e-01ψ |  |
-| SA-CASSCF | free | 5f6d / D | (4,36) | {6s,6p,7s}·lane | 58,905 | −50.4306 | −48.7 | −1372.2859 | −1.3252 | 1e-6/200 | 71.9997 | 8e-02 | 5e-01 | 7e-01 | 4.8e-03ψ | 5.7e-02ψ |  |
-| SA-CASSCF | pinned | 5f6d / D | (4,36) | {6s,6p,7s}·lane | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === |
 | CASCI | free | 5f6d / D | (4,12) | 6s6p7s·raw | 495 | −49.4588 | +923.1 | −1345.8428 | +25.1179 | — | 38.9451 | 2e-03 | 7e-02 | 4e-01 | 8.1e-02 | 2.6e+00 |  |
 | CASCI | free | 5f6d / D | (4,12) | 6s6p7s | 495 | −49.4588 | +923.1 | −1345.8428 | +25.1179 | — | 41.9649 | 2e-03 | 7e-02 | 4e-01 | 3.0e-02 | 6.0e-01 |  |
@@ -26,15 +15,10 @@ Sector M_S = 2. Pre-campaign record: `elements/U/` (frozen).
 | CASCI | free | 5f6d / MOC | (4,12) | 6s6p7s·pur | 495 | −50.3783 | +3.5 | −1370.8648 | +0.0959 | — | 0.0160 | 1e+00 | 7e+00 | 9e+00 | 8.3e-01 | 1.1e+01 | m-incomplete |
 | CASSCF | free | 5f6d / D | (4,12) | 6s6p7s | 495 | −50.4297 | −47.8 | −1372.2627 | −1.3019 | 1e-5/200 | 64.5991 | — | 5e+00 | 7e+00 | 1.7e+01 | 1.2e+02 | not converged;  |
 | CASSCF | free | 5f6d / D | (4,12) | 6s6p7s·pur | 495 | −50.4295 | −47.6 | −1372.2564 | −1.2956 | 1e-5/200 | 65.7990 | — | 5e+00 | 7e+00 | 2.2e+01 | 1.4e+02 | not converged;  |
-| CASSCF, radial | free | 5f6d / D | (4,12) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, radial | free | 5f6d / D | (4,12) | 6s6p7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASSCF, frozen | free | 5f6d / D | (4,12) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASSCF, frozen | free | 5f6d / D | (4,12) | 6s6p7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, virtual-mix | free | 5f6d / D | (4,12) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | free | 5f6d / D | (4,12) | 6s6p7s | 495 | −50.4238 | −42.0 | −1372.1025 | −1.1418 | 1e-8/56 | 72.0000 | 3e-06 | 6e-04 | 7e-04 | 1.6e-04 | 1.2e-03 |  |
 | SA-CASSCF | free | 5f6d / D | (4,12) | 6s6p7s·pur | 495 | −50.4238 | −42.0 | −1372.1025 | −1.1418 | 1e-9/50 | 72.0000 | 3e-06 | 6e-04 | 1e-03 | 1.3e-04 | 1.1e-03 | cycle cap;  |
-| SA-CASSCF, radial | free | 5f6d / D | (4,12) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, radial | free | 5f6d / D | (4,12) | 6s6p7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen | free | 5f6d / D | (4,12) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen | free | 5f6d / D | (4,12) | 6s6p7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASSCF | free | 5f6d / MO | (4,12) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
@@ -54,42 +38,37 @@ Sector M_S = 2. Pre-campaign record: `elements/U/` (frozen).
 | SA-CASSCF, frozen | free | 5f6d / MOC | (4,12) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen | free | 5f6d / MOC | (4,12) | 6s6p7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === |
-| CASCI | free | 5f6d7s / D | (6,15) | 6s6p·raw | 16,731 | −49.3191 | +1062.7 | −1342.0428 | +28.9180 | — | 11.9979 | 2e-02 | 5e-02 | 1e-01 | 7.3e-04ψ | 5.9e-03ψ |  |
-| CASCI | free | 5f6d7s / D | (6,15) | 6s6p | 16,731 | −49.3191 | +1062.7 | −1342.0428 | +28.9180 | — | 11.9979 | 2e-02 | 5e-02 | 1e-01 | 7.3e-04ψ | 5.9e-03ψ |  |
-| CASCI | free | 5f6d7s / D | (6,15) | 6s6p·pur | 16,731 | −49.3164 | +1065.5 | −1341.9681 | +28.9926 | — | 12.0000 | 2e-02 | 2e-13 | 3e-13 | 4.6e-15ψ | 3.6e-14ψ |  |
-| CASCI | free | 5f6d7s / MO | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASCI | free | 5f6d7s / MO | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASCI | free | 5f6d7s / MOC | (6,15) | 6s6p | 16,731 | −50.3820 | −0.2 | −1370.9660 | −0.0052 | — | 0.0000 | 1e+00 | 5e+00 | 9e+00 | 1.4e-03ψ | 3.6e-03ψ | m-incomplete |
-| CASCI | free | 5f6d7s / MOC | (6,15) | 6s6p·pur | 16,731 | −50.3802 | +1.6 | −1370.9169 | +0.0439 | — | 0.0000 | 1e+00 | 5e+00 | 9e+00 | 1.4e-03ψ | 3.6e-03ψ | m-incomplete |
-| CASSCF | free | 5f6d7s / D | (6,15) | 6s6p | 16,731 | −50.4535 | −71.7 | −1372.9116 | −1.9509 | 1e-4/200 | 82.9982 | — | 3e+00 | 6e+00 | 4.1e+00ψ | 1.3e+01ψ |  |
-| CASSCF | free | 5f6d7s / D | (6,15) | 6s6p·pur | 16,731 | −50.4538 | −71.9 | −1372.9183 | −1.9576 | 1e-6/200 | 87.4745 | — | 2e+00 | 4e+00 | 6.6e+00ψ | 4.7e+00ψ |  |
-| CASSCF, radial | free | 5f6d7s / D | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, radial | free | 5f6d7s / D | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 5f6d7s / D | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 5f6d7s / D | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, virtual-mix | free | 5f6d7s / D | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 5f6d7s / D | (6,15) | 6s6p | 16,731 | −50.4529 | −71.0 | −1372.8927 | −1.9320 | 1e-9/190 | 89.9987 | 4e-04 | 2e-02 | 2e-02 | 3.9e-04ψ | 6.8e-03ψ |  |
-| SA-CASSCF | free | 5f6d7s / D | (6,15) | 6s6p·pur | 16,731 | −50.4529 | −71.0 | −1372.8928 | −1.9321 | 1e-8/114 | 89.9987 | 3e-04 | 2e-02 | 2e-02 | 3.8e-04ψ | 6.8e-03ψ |  |
-| SA-CASSCF, radial | free | 5f6d7s / D | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, radial | free | 5f6d7s / D | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 5f6d7s / D | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 5f6d7s / D | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 5f6d7s / MO | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 5f6d7s / MO | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 5f6d7s / MO | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 5f6d7s / MO | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 5f6d7s / MO | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 5f6d7s / MO | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 5f6d7s / MO | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 5f6d7s / MO | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 5f6d7s / MOC | (6,15) | 6s6p | 16,731 | −50.4561 | −74.3 | −1372.9814 | −2.0207 | 1e-4/200 | 50.8669 | — | 5e+00 | 6e+00 | 6.4e+00ψ | 1.3e+01ψ | m-incomplete |
-| CASSCF | free | 5f6d7s / MOC | (6,15) | 6s6p·pur | 16,731 | −50.4231 | −41.2 | −1372.0825 | −1.1218 | 1e-4/200 | 23.8576 | — | 6e+00 | 8e+00 | 1.6e+01ψ | 1.1e+02ψ | m-incomplete; local minimum |
-| CASSCF, frozen | free | 5f6d7s / MOC | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 5f6d7s / MOC | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 5f6d7s / MOC | (6,15) | 6s6p | 16,731 | −50.4089 | −27.0 | −1371.6966 | −0.7358 | 1e-4/200 | 24.8171 | 8e-02 | 4e+00 | 9e+00 | 7.1e+00ψ | 6.9e+01ψ | m-incomplete |
-| SA-CASSCF | free | 5f6d7s / MOC | (6,15) | 6s6p·pur | 16,731 | −50.3860 | −4.1 | −1371.0726 | −0.1119 | 1e-4/198 | 1.3487 | 1e-01 | 6e+00 | 8e+00 | 2.6e+01ψ | 5.6e+01ψ | m-incomplete |
-| SA-CASSCF, frozen | free | 5f6d7s / MOC | (6,15) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 5f6d7s / MOC | (6,15) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 5f6d7s / D | (6,13) | 6s6p·raw | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 5f6d7s / D | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 5f6d7s / D | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 5f6d7s / MO | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 5f6d7s / MO | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 5f6d7s / MOC | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASCI | free | 5f6d7s / MOC | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 5f6d7s / D | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 5f6d7s / D | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 5f6d7s / D | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 5f6d7s / D | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 5f6d7s / D | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 5f6d7s / D | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 5f6d7s / D | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 5f6d7s / D | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 5f6d7s / MO | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 5f6d7s / MO | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 5f6d7s / MO | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 5f6d7s / MO | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 5f6d7s / MO | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 5f6d7s / MO | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 5f6d7s / MO | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 5f6d7s / MO | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 5f6d7s / MOC | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 5f6d7s / MOC | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 5f6d7s / MOC | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF, frozen | free | 5f6d7s / MOC | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 5f6d7s / MOC | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF | free | 5f6d7s / MOC | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 5f6d7s / MOC | (6,13) | 6s6p | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 5f6d7s / MOC | (6,13) | 6s6p·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === | === |
 | CASCI | free | 5f6d6p / D | (4,15) | 6s6p7s·raw | 1,365 | −49.4588 | +923.0 | −1345.8436 | +25.1172 | — | 38.9378 | 2e-03 | 1e-01 | 4e-01 | 1.5e+00 | 3.8e+01 |  |
 | CASCI | free | 5f6d6p / D | (4,15) | 6s6p7s | 1,365 | −49.4588 | +923.0 | −1345.8436 | +25.1172 | — | 41.9649 | 2e-03 | 1e-01 | 4e-01 | 1.5e+00 | 3.6e+01 |  |
@@ -100,15 +79,10 @@ Sector M_S = 2. Pre-campaign record: `elements/U/` (frozen).
 | CASCI | free | 5f6d6p / MOC | (4,15) | 6s6p7s·pur | 1,365 | −50.3781 | +3.8 | −1370.8581 | +0.1026 | — | 0.0067 | 1e+00 | 5e+00 | 8e+00 | 3.4e+00 | 1.4e+01 | m-incomplete |
 | CASSCF | free | 5f6d6p / D | (4,15) | 6s6p7s | 1,365 | −50.4310 | −49.2 | −1372.2988 | −1.3380 | 1e-5/200 | 66.8672 | — | 6e+00 | 7e+00 | 2.8e+02 | 1.9e+03 | not converged;  |
 | CASSCF | free | 5f6d6p / D | (4,15) | 6s6p7s·pur | 1,365 | −50.4345 | −52.6 | −1372.3923 | −1.4316 | 1e-6/200 | 64.7066 | — | 3e+00 | 8e+00 | 7.3e+00 | 1.2e+02 | not converged;  |
-| CASSCF, radial | free | 5f6d6p / D | (4,15) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, radial | free | 5f6d6p / D | (4,15) | 6s6p7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASSCF, frozen | free | 5f6d6p / D | (4,15) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASSCF, frozen | free | 5f6d6p / D | (4,15) | 6s6p7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, virtual-mix | free | 5f6d6p / D | (4,15) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF | free | 5f6d6p / D | (4,15) | 6s6p7s | 1,365 | −50.4264 | −44.5 | −1372.1726 | −1.2118 | 1e-7/200 | 71.7790 | 2e-03 | 5e+00 | 7e+00 | 8.0e+00 | 6.0e+01 | not converged;  |
 | SA-CASSCF | free | 5f6d6p / D | (4,15) | 6s6p7s·pur | 1,365 | −50.4264 | −44.5 | −1372.1724 | −1.2116 | 1e-8/164 | 71.7851 | 2e-03 | 5e+00 | 7e+00 | 8.0e+00 | 6.0e+01 |  |
-| SA-CASSCF, radial | free | 5f6d6p / D | (4,15) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, radial | free | 5f6d6p / D | (4,15) | 6s6p7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen | free | 5f6d6p / D | (4,15) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen | free | 5f6d6p / D | (4,15) | 6s6p7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | CASSCF | free | 5f6d6p / MO | (4,15) | 6s6p7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |

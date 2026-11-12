@@ -379,12 +379,13 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
                      cells, anchor, spec, floor)
         seen.update(k.address for k in keys)
         if rows:
-            # families collect under their SPAN; the emission renders
-            # each span as one section (=== between spans, --- between
-            # families within) -- whatever the assembly's visit order;
-            # the LANE families close their section (is_lane sorts last)
+            # families collect under their CAS; the emission renders
+            # each CAS as one section (=== between CAS, --- between
+            # core families within) -- whatever the assembly's visit
+            # order; the LANE families close their section (is_lane
+            # sorts last)
             is_lane = any(k.core_tag is not None for k in keys)
-            sections.setdefault(keys[0].span_label, []).append(
+            sections.setdefault(cas_label(keys[0], spec), []).append(
                 (is_lane, rows))
 
     # the prior windows, gathered by span (the sector match guards
@@ -422,7 +423,8 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
                 if k.sector == grid[0].sector]
         groups: dict[str, list] = {}
         for k in [*grid, *join]:
-            groups.setdefault(core_col(k, spec), []).append(k)
+            groups.setdefault((core_col(k, spec), cas_label(k, spec)),
+                              []).append(k)
         for keys in groups.values():
             _fam(keys)
 
@@ -453,9 +455,10 @@ def methods_section(spec, cells, anchor, uhf: dict | None = None) -> list[str]:
                 if k.window == span and k.core != "frac"]
         keys += [k for k in priors.get(span, [])
                  if k.sector == spec.lattice_sector]
-        groups: dict[str, list] = {}
+        groups: dict[tuple, list] = {}
         for k in keys:
-            groups.setdefault(core_col(k, spec), []).append(k)
+            groups.setdefault((core_col(k, spec), cas_label(k, spec)),
+                              []).append(k)
         for g in groups.values():
             _fam(g)
 

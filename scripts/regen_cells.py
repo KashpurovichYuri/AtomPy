@@ -15,7 +15,6 @@ Group (--group): one named declared group instead of the full grid
                             (the default; plus the declared lattice)
     spine                   the core spine: raw/avg/frac on the primary
                             window
-    diagnostics             the virtual-mix rows only
     planned                 the planned windows' grids (declared,
                             not yet run)
     lattice                 the free-ion d2 lattice cells
@@ -58,7 +57,7 @@ from pyscf import gto, scf  # noqa: E402
 
 from _tables_common import atomic_write_text  # noqa: E402
 from atomterm.cases import CAMPAIGN, campaign_spec, scenarios_for  # noqa: E402
-from atomterm.cells import (CellKey, cell_payload, diagnostics,  # noqa: E402
+from atomterm.cells import (CellKey, cell_payload,  # noqa: E402
                             grid_keys, lane_keys, lattice_keys, planned,
                             kernel_cell_payload, radial_refused,
                             route_keys, run_cell,
@@ -132,8 +131,6 @@ def run_queue(name, spec, sector, group) -> list[CellKey]:
     plus the declared lattice."""
     if group == "spine":
         return spine_keys(name, "".join(spec.shell_patterns), sector)
-    if group == "diagnostics":
-        return diagnostics(spec)
     if group == "planned":
         return planned(spec)
     if group == "lattice":
@@ -172,11 +169,11 @@ def parse_args(argv) -> argparse.Namespace:
     p.add_argument("atoms", nargs="*",
                    help="declared atoms to run (default: every CAMPAIGN "
                         "atom, CAMPAIGN order)")
-    p.add_argument("--group", choices=["grid", "spine", "diagnostics",
+    p.add_argument("--group", choices=["grid", "spine",
                                        "planned", "lattice", "lane",
                                        "route"],
                    help="one named declared group instead of the full "
-                        "grid: grid | spine | diagnostics | planned | "
+                        "grid: grid | spine | planned | "
                         "lattice | lane | route")
     p.add_argument("--full", action="store_true",
                    help="materialize scenario-voided cells (re-testing "

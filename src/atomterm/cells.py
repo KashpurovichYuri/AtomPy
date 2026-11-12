@@ -132,7 +132,6 @@ __all__ = [
     "spine_keys",
     "window_grid",
     "grid_keys",
-    "diagnostics",
     "planned",
     "lattice_keys",
     "lane_keys",
@@ -1694,8 +1693,7 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
     at fixed window and core; raw/frac are core-field controls and
     stay ao-only -- an m-incomplete start there would confound two
     diseases in one row) -- then the optimizer product method x mask x
-    substrate x start with the virtual-mix diagnostic after the CASSCF
-    free/polarized starts, and the NO start addressing the full-span
+    substrate x start, and the NO start addressing the full-span
     group prefix (:func:`no_label`). mo x pur and moc x pur ARE part
     of the grid (the canonical/character-selected columns are
     re-orthogonalized against the pur span); radial stays ao-only
@@ -1744,9 +1742,6 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
                     keys.append(CellKey(atom, no_label(w) if st == "no"
                                         else w, sec, method=m, start=st,
                                         mask=mask, substrate=sub))
-                if m == "casscf" and mask is None and sub == "pol":
-                    keys.append(CellKey(atom, w, sec, method="casscf",
-                                        mask="virtmix", substrate=sub))
     return keys
 
 
@@ -1757,12 +1752,6 @@ def grid_keys(spec) -> list[CellKey]:
     by construction (the spine is a subset view). What regen executes;
     planned windows are :func:`planned`."""
     return window_grid(spec)
-
-
-def diagnostics(spec) -> list[CellKey]:
-    """The virtual-mix diagnostic rows (no core<->window exchange) --
-    the subset of the grid tagged mask='virtmix'."""
-    return [k for k in grid_keys(spec) if k.mask == "virtmix"]
 
 
 def planned(spec) -> list[CellKey]:

@@ -21,7 +21,6 @@ from atomterm.cells import (
     CellData,
     CellKey,
     cell_chk,
-    diagnostics,
     grid_keys,
     lane_keys,
     lattice_keys,
@@ -282,8 +281,9 @@ def test_lane_keys_derive_from_the_declaration():
         ("3d3p@semi", (4, 3)),
         ("3d3p4d@semi", (4, 3)), ("3d3p4s@1s2s2p3s", (5, 4)),
         ("3s3p3d@1s2s2p4s", (5, 4))]
-    assert [(k.window, k.sector) for k in lane_keys(CAMPAIGN["U14e"])] \
-        == [("5f6d@6s6p7s", (4, 0))]     # the shell-layer port leg
+    assert lane_keys(CAMPAIGN["U14e"]) == []   # the CAS(4,36) lane
+    # RETIRED (2026-11-12): the 36-column family span is not the
+    # calculation -- the three promoted CAS carry the record
 
 
 @fast
@@ -398,7 +398,7 @@ def test_void_reason_voids_the_u14e_optimizer_class():
     spec = CAMPAIGN["U14e"]
     sc = scenarios_for(spec)
     keys = grid_keys(spec) + planned(spec)
-    assert len(keys) == 188
+    assert len(keys) == 184   # the virtual-mix keys retired (-4)
     for k in keys:
         void = void_reason(k, sc) is not None
         expect = k.method != "casci" or k.core == "frac"
@@ -438,8 +438,9 @@ def test_window_grid_is_the_one_declaration():
     # the manifest count: 29 established + the 4 mo x pur cells
     # + the moc block (2 CASCI + 8 optimizer keys)
     # + the kind-completion block (mo/no CASCI at both ruler cores)
-    assert len(grid) == 47
-    assert len(set(addrs)) == 47
+    # -- the virtual-mix diagnostic retired (2026-11-12): 47 -> 46
+    assert len(grid) == 46
+    assert len(set(addrs)) == 46
     assert addrs[:4] == [           # the CASCI core block, pur third
         "ti_3d4s_3-1_casci_ao_-_pol_raw",
         "ti_3d4s_3-1_casci_ao_-_pol_avg",
@@ -467,10 +468,12 @@ def test_window_grid_is_the_one_declaration():
     assert not [a for a in addrs if "_radial_" in a and "_ao_" not in a]
     # the NO windows: full-span group prefixes, k = shell count
     assert "ti_3d4sno2_3-1_casscf_no_-_pol_avg" in addrs
-    # the spine is a subset view; diagnostics = the virtmix filter
+    # the spine is a subset view; the virtual-mix diagnostic is
+    # UNDECLARED (retired 2026-11-12 -- the rows omitted, the mask
+    # architecturally possible: the key constructs)
     spine = {k.address for k in spine_keys("Ti", "3d4s", (3, 1))}
     assert spine <= set(addrs)
-    assert [k.mask for k in diagnostics(spec)] == ["virtmix"]
+    assert not [k for k in grid if k.mask == "virtmix"]
     # planned: the declared windows' full grids -- the real spans at
     # the primary's shape, the prior-axis tagged windows one SHORT
     # (they carry no frac core), each with its NO sibling label
@@ -1337,8 +1340,10 @@ def test_methods_primary_renders_core_groups_beside_optimizers():
     d_opt = [r.split("|")[1].strip() for r in rows
              if "3d4s / D |" in r and (r.startswith("| CASSCF")
                                        or r.startswith("| SA"))]
-    assert d_opt[:7] == ["CASSCF", "CASSCF, radial", "CASSCF, frozen",
-                         "CASSCF, virtual-mix", "SA-CASSCF",
+    # the virtual-mix diagnostic retired from the declaration
+    # (2026-11-12): six optimizer rows at the D start
+    assert d_opt[:6] == ["CASSCF", "CASSCF, radial", "CASSCF, frozen",
+                         "SA-CASSCF",
                          "SA-CASSCF, radial", "SA-CASSCF, frozen"]
     mo_opt = [r.split("|")[1].strip() for r in rows
               if "3d4s / MO |" in r and (r.startswith("| CASSCF")
@@ -1491,11 +1496,13 @@ def test_methods_ci_only_store_renders_pending_placeholders():
 @fast
 def test_methods_prior_rows_join_the_span_family_in_comparison_order():
     """The same-CAS comparison: a prior window's CI rows render BESIDE
-    the incumbent's at its span, one family (no rule row inside),
-    ordered incumbent -> r -> s1 -> s2 -- in the lattice family of a
-    lattice span and in the primary's core groups of the primary
-    span (the spec's render_spans review filter unset -- the pin
-    proves the FULL ordering)."""
+    the incumbent's at its span, ordered incumbent -> r -> s1 -> s2.
+    The equal-CAS family (D, @r1, @s1) is contiguous -- no rule row
+    inside; the DOUBLED window (@s2, a different CAS) opens its own
+    === section (the CAS sectioning, 2026-11-12) -- in the lattice
+    family of a lattice span and in the primary's core groups of the
+    primary span (render_spans unset -- the pin proves the FULL
+    ordering)."""
     mod = methods_module()
     cs = replace(CAMPAIGN["Sc"], render_spans=None)
     keys = [k for k in [*lattice_keys(cs), *grid_keys(cs),
@@ -1518,7 +1525,10 @@ def test_methods_prior_rows_join_the_span_family_in_comparison_order():
         a, b, c, d = (idx(span), idx(f"{span}@r1"),
                       idx(f"{span}@s1"), idx(f"{span}@s2"))
         assert a < b < c < d
-        assert not any(l.startswith("| --- ") for l in lines[a:d + 1])
+        # the equal-CAS family is contiguous
+        assert not any(l.startswith("| --- ") for l in lines[a:c + 1])
+        # the doubled window opens its own CAS section (===)
+        assert any(l.startswith("| === ") for l in lines[c + 1:d + 1])
 
 
 @fast
@@ -1573,9 +1583,12 @@ def test_methods_prior_span_without_incumbent_renders_its_own_family():
                     if l.startswith(f"| CASCI | free | {window} / D |")
                     and "·" not in l.split("|")[5])
 
-    a, d = idx("3d@r1"), idx("3d@s2")
-    assert a < d
-    assert not any(l.startswith("| --- ") for l in lines[a:d + 1])
+    a, b, d = idx("3d@r1"), idx("3d@s1"), idx("3d@s2")
+    assert a < b < d
+    # the equal-CAS family contiguous; the doubled window opens its
+    # own CAS section (the CAS sectioning, 2026-11-12)
+    assert not any(l.startswith("| --- ") for l in lines[a:b + 1])
+    assert any(l.startswith("| === ") for l in lines[b + 1:d + 1])
 
 
 @fast
