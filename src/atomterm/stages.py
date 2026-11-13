@@ -104,6 +104,15 @@ class StageFacts:
         The final macro-cycle |delta e_tot| (``CASResult.conv_dE``)
         -- the convergence precision beside the count; ``None``
         where ``cycles`` is.
+    core_span_overlap : float or None
+        The S-metric span overlap of the converged core block against
+        the reference core (1 = the input core, gauge invariant).
+        Below ``_CORE_ANCHOR_TOL`` the optimizer rotated the core away
+        from the reference core -- the swap-basin signature.
+    swap_basin : False, or True when the detector fired
+        The analysis then reads the energy in the RAW core field (the
+        one the CI was actually solved in); the averaged field would
+        be meaningless on a block that is no longer a core.
     window_report : dict or None
         The window construction's own disclosure -- the distillation/
         prior-axis report (per shell: the bands, k, the radial
@@ -131,6 +140,8 @@ class StageFacts:
     cycles: int | None = None  # optimizer macro-cycles (CI/cache: None)
     max_cycle: int | None = None  # the declared cap (identity flag)
     conv_dE: float | None = None  # final |delta e_tot| (beside cycles)
+    core_span_overlap: float | None = None  # converged core vs ref core
+    swap_basin: bool = False  # the core-anchor detector fired
     window_report: dict | None = None  # the construction's disclosure
 
     # --- shared readouts (thin pass-throughs: renderers never reach
@@ -206,7 +217,10 @@ class StageFacts:
             "electrons": self.shell_electrons,
             "n_dev": self.n_dev,
             "configurations": self.configurations,
+            "core_span_overlap": self.core_span_overlap,
         }
+        if self.swap_basin:
+            out["swap_basin"] = True
         if self.window_report is not None:
             out["window_report"] = self.window_report
         if self.core_anisotropy is not None:
@@ -215,6 +229,24 @@ class StageFacts:
 
 
 # the one pass -------------------------------------------------------
+
+# the core-anchor tolerance (stage_facts's swap-basin detector): the
+# converged core block must span the reference core.  Measured on the
+# uncontracted twins' optimizer legs (2026-11-13): swap-basin landings
+# overlap 0.8889 (16 legs, one attractor); in-window landings
+# >= 0.9978.  The gap is two decades wide.
+_CORE_ANCHOR_TOL = 0.99
+
+
+def _span_overlap(s: np.ndarray, c: np.ndarray, c_ref: np.ndarray) -> float:
+    """Trace overlap of two column spans in the S metric -- 1 when the
+    spans coincide, invariant to the gauge within each span."""
+    def proj(cols):
+        return cols @ np.linalg.inv(cols.conj().T @ s @ cols) @ cols.conj().T
+
+    return float(np.trace(proj(c) @ s @ proj(c_ref) @ s).real
+                 / c.shape[1])
+
 
 def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
                 *, tag: str, spherical_core: bool = True,
@@ -264,6 +296,14 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     run's projected columns -- on such atoms max|dE| measures the
     window definition, not the core.
 
+    **The swap-basin exception.** A fourth effect exists where the
+    optimizer rotated the core block away from the reference core
+    (``swap_basin``, the detector above): the averaged field is then
+    not the field the CI was solved in, and reading it would shift
+    the ground by O(Eh) -- measured 0.8 Eh on the uncontracted twins'
+    runaway landings. There the readout switches to the raw field and
+    the agreement is exact; the row carries the disclosure.
+
     **Which CI labels the stage.** ``cas.ci`` drives the configuration
     labels and the shell electrons; both consumers map it through the
     PySCF-ordering bridge internally. On SA stages ``cas.ci`` is the
@@ -285,8 +325,25 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         (6.5e-16, 0.0)
     """
     c_core = cas.mo_coeff[:, :ncore]
+    # the core-anchor detector: PySCF's CASSCF optimizes EVERY orbital
+    # (the frozen core is this module's bookkeeping -- the readout
+    # passes the converged inactive columns back), so a runaway can
+    # rotate the core block far from the reference core.  The
+    # spherically averaged field (the multiplet protection) is then
+    # meaningless on a block that is no longer a core: measured on the
+    # twins' optimizer legs, the averaged-field ground sits O(0.8 Eh)
+    # below PySCF's own CI.  The overlap threshold sits in the measured
+    # gap -- swap-basin landings 0.8889 (16 legs, one attractor),
+    # in-window landings >= 0.9978 -- and the raw field (the one the
+    # CI was actually solved in) restores exact agreement.
+    from atomterm.windows import occupied_core_idx
+
+    core_ref = mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+    core_span_overlap = _span_overlap(mf.get_ovlp(), c_core, core_ref)
+    swap_basin = core_span_overlap < _CORE_ANCHOR_TOL
     ops = build_operators(mol, mf, c_act, ncore, na, nb,
-                          spherical_core=spherical_core, c_core=c_core)
+                          spherical_core=spherical_core and not swap_basin,
+                          c_core=c_core)
     res = analyze(ops["H"], ops["Lz"], ops["L2"], ops["S2"], tag,
                   sz=ops["Sz"], lz2=ops["Lz2"])
     e_mine = np.linalg.eigvalsh(ops["H"]) + cas.core_energy
@@ -316,6 +373,8 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         configurations=configuration_summary(
             mol, mf.get_ovlp(), cas.ci[: len(e_mine)], c_act, na, nb),
         core_anisotropy=aniso,
+        core_span_overlap=round(core_span_overlap, 6),
+        swap_basin=swap_basin,
         window_report=window_report,
         # the optimizer's own report, read off the live mc object (the
         # mutation discipline); CASCI stages and cache hits carry no mc

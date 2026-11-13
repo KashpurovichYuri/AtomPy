@@ -98,3 +98,57 @@ def test_stage_facts_anisotropy_ref_roundtrip(carbon, tmp_path):
     assert "core_anisotropy" not in plain.payload("casci")
     assert 1e-5 < aniso.core_anisotropy < 1e-2  # carbon's small raw field
     assert aniso.core_anisotropy == aniso.payload("casci")["core_anisotropy"]
+
+
+def test_swap_basin_detector_reads_the_raw_field(carbon, tmp_path):
+    """The core-anchor detector (stage_facts): a core block rotated
+    away from the reference core fires the swap-basin readout -- the
+    RAW field (the one the CI was solved in), the disclosure fields
+    set -- while an anchored block stays on the averaged field and the
+    payload stays flag-free.  Measured threshold placement: swap
+    landings 0.8889, in-window >= 0.9978; the rotated fixture core
+    sits at (cos^2 + 1)/2 = 0.95, inside the gap's fired side."""
+    from atomterm.casscf import CASResult
+    from atomterm.operators import build_operators
+
+    _, mol, mf, act_idx = carbon
+    ncore = (mol.nelectron - 2) // 2
+    mo = build_full_mo(mf, list(range(ncore)), act_idx)
+    cas = run_casci(mf, 3, (1, 1), mo, str(tmp_path / "sw.chk"), nroots=3)
+    c_act = np.eye(mol.nao_nr())[:, act_idx]
+
+    plain = stage_facts(mol, mf, cas, c_act, ncore, 1, 1, tag="plain")
+    assert not plain.swap_basin
+    assert plain.core_span_overlap >= 0.99
+    assert "swap_basin" not in plain.payload("casci")
+    assert "core_span_overlap" in plain.payload("casci")
+
+    # rotate the core column into one window column: the block's span
+    # leaves the reference core (cos^2 = 0.9), S-orthonormality holds
+    th = np.arccos(np.sqrt(0.9))
+    mo_rot = mo.copy()
+    mo_rot[:, [0, ncore]] = mo[:, [0, ncore]] @ np.array(
+        [[np.cos(th), -np.sin(th)], [np.sin(th), np.cos(th)]])
+    cas_rot = CASResult(cas.energies, cas.ci, mo_rot, None,
+                        cas.core_energy)
+    swap = stage_facts(mol, mf, cas_rot, c_act, ncore, 1, 1, tag="swap")
+    assert swap.swap_basin
+    # one of the TWO core columns rotated: (cos^2 + 1) / 2 = 0.95
+    assert abs(swap.core_span_overlap - 0.95) < 1e-6
+    payload = swap.payload("casci")
+    assert payload["swap_basin"] is True
+    assert payload["core_span_overlap"] == swap.core_span_overlap
+    json.dumps(payload)
+    # the energy read the RAW field: identical to the ground of the
+    # manually built raw-field H plus the core constant
+    ops_raw = build_operators(mol, mf, c_act, ncore, 1, 1,
+                              spherical_core=False,
+                              c_core=mo_rot[:, :ncore])
+    e_raw = np.linalg.eigvalsh(ops_raw["H"]) + cas.core_energy
+    assert swap.e_ground == pytest.approx(float(e_raw[0]), abs=1e-10)
+    # and NOT the averaged-field reading (the fallback did something)
+    ops_avg = build_operators(mol, mf, c_act, ncore, 1, 1,
+                              spherical_core=True,
+                              c_core=mo_rot[:, :ncore])
+    e_avg = np.linalg.eigvalsh(ops_avg["H"]) + cas.core_energy
+    assert abs(e_raw[0] - e_avg[0]) > 1e-6

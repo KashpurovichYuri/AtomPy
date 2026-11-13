@@ -152,6 +152,12 @@ def _row(k, p, anchor, spec, sa_floor) -> str:
     # stays -- the store is the record -- but the reading must know)
     if p.get("converged") is False:
         note = "not converged" + ("; " if note else "") + note
+    # the swap-basin disclosure: the optimizer rotated the core away
+    # from the reference core and the analysis read the raw field
+    # (stages._CORE_ANCHOR_TOL) -- the row's energy is the swap
+    # solution's own, never comparable to the declared window's
+    if p.get("swap_basin"):
+        note += ("; " if note else "") + "swap basin"
     if note:
         note += "; "
     # the kind vocabulary's verdict language: the SCF-MO kinds are
