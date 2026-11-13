@@ -330,8 +330,13 @@ def test_pshell_prior_axis_is_declared_on_c_and_si():
             json.loads((Path("elements") / atom
                         / "cells.json").read_text())["rohf_energy"])
         assert spec.prior_bands == {shell: (shell, NEXT_P[shell])}
-        assert spec.planned_windows == (f"{shell}@r1", f"{shell}@s1",
-                                        f"{shell}@s2")
+        # C's @s2 is RETIRED (2026-11-13): the p2+s1p3 series average
+        # is rank-1 -- the second radial eigenvalue 1.9e-4 against the
+        # leading 2.5, the construction refuses.  Si's 3p average
+        # carries a real second radial (5.1e-2, measured) and keeps it.
+        expected = ((f"{shell}@r1", f"{shell}@s1") if atom == "C"
+                    else (f"{shell}@r1", f"{shell}@s1", f"{shell}@s2"))
+        assert spec.planned_windows == expected
         assert any(sc.name == "prior-anchor-first"
                    for sc in scenarios_for(spec))
 
@@ -1414,7 +1419,10 @@ def test_methods_sc_and_sc_unc_line_by_line_parity():
     """Sc's and Sc-unc's tables carry the SAME row structure (the
     method+window sequence, rules included) -- the line-by-line
     review identity, a maintained invariant; Sc's legacy radial rows
-    (a construction class since refused) are the ONE exception."""
+    (a construction class since refused) are the ONE exception, the
+    twins' frozencore variety (their declared optimizer_masks --
+    the swap class lives there) the second: both sides filter to
+    the shared skeleton before comparing."""
     mod = methods_module()
     for a, b in (("Sc", "Sc-unc"), ("Ti", "Ti-unc")):
         _assert_pair_parity(mod, a, b)
@@ -1437,6 +1445,9 @@ def _assert_pair_parity(mod, a, b):
                     rows.append("RULE")
                 else:
                     rows.append(f"{m.group(1).strip()}|{m.group(2).strip()}")
+        # the twins' declared frozencore variety is theirs alone --
+        # the parity reads the shared skeleton
+        rows = [r for r in rows if "frozen core" not in r]
         skel.append(rows)
     assert [r for r in skel[0] if "radial" not in r] == skel[1], (
         f"{a} vs {b} skeletons differ")

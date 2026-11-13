@@ -240,6 +240,26 @@ def mask_no_core_window_mix(self, nmo, ncore, ncas, frozen):
     return mask
 
 
+def mask_frozen_core(self, nmo, ncore, ncas, frozen):
+    """Allowed: every rotation among (active + virtual); blocked: any
+    pair touching the core -- the core block is IMMOBILE while the
+    window and virtuals relax freely (cells axis token
+    ``frozencore``).
+
+    Reason (the swap-basin finding, ticket 37): PySCF's CASSCF
+    optimizes every orbital, and a free-window runaway can rotate the
+    core far from the reference core -- the semi-core swap.  Holding
+    the core kills that escape at the source: measured on the
+    Sc-unc probe (2026-11-13), the core span stays exact (overlap
+    1.0), the active stays in-window, no swap lands.
+
+    Signature: the ``uniq_var_indices`` hook, documented once in the
+    seam comment above."""
+    mask = np.zeros((nmo, nmo), dtype=bool)
+    mask[ncore:, ncore:] = True
+    return mask
+
+
 # ---------------------------------------------------------------- the driver
 
 def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,

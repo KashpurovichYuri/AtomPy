@@ -76,7 +76,7 @@ METHOD_NAMES = {"casci": "CASCI", "casscf": "CASSCF",
 # the distilled kind renders D (its construction: the distilled windows)
 START_NAMES = {"ao": "D", "mo": "MO", "moc": "MOC", "no": "NO"}
 MASK_NAMES = {None: "free", "radial": "radial", "frozen": "frozen",
-              "virtmix": "virtual-mix"}
+              "virtmix": "virtual-mix", "frozencore": "frozen core"}
 
 
 CSV_HEADER = ["method", "route", "window", "CAS", "core", "dets", "E_Eh",
@@ -157,7 +157,7 @@ def _row(k, p, anchor, spec, sa_floor) -> str:
     # (stages._CORE_ANCHOR_TOL) -- the row's energy is the swap
     # solution's own, never comparable to the declared window's
     if p.get("swap_basin"):
-        note += ("; " if note else "") + "swap basin"
+        note += ("; " if note else "") + "swap"
     if note:
         note += "; "
     # the kind vocabulary's verdict language: the SCF-MO kinds are
@@ -182,8 +182,14 @@ def _row(k, p, anchor, spec, sa_floor) -> str:
     # the window's identity -- the address grammar verbatim)
     if k.source_tag is not None:
         wname = k.window
+        note += ("; " if note else "") + f"bands {k.span_label}"
     else:
         wname = (spec.window_names or {}).get(k.span_label, k.span_label)
+        # a CHEMICAL display name: the basis-band counters demote to
+        # the note column (the provenance the user asked to keep)
+        if wname != k.span_label:
+            bands = "+".join(re.findall(r"\d+[spdf]", k.span_label))
+            note += ("; " if note else "") + f"bands {bands}"
     cells = [
         _method(k), route, f"{wname} / {START_NAMES[k.start]}",
         cas_label(k, spec), core, f"{p['n_det']:,}",

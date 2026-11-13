@@ -254,6 +254,14 @@ class CaseSpec:
     nroots_primary: int = 9
     planned_windows: tuple[str, ...] = ()
     planned_sectors: dict[str, tuple[int, int]] | None = None
+    optimizer_masks: tuple = ("radial", "frozen")
+    """The optimizer-restriction axis this case's grids declare --
+    the mask values :func:`atomterm.cells.window_grid` enumerates
+    BESIDES the free optimization for casscf/sa-casscf at every start
+    and substrate.  The default is the historical factor grid;
+    ``"frozencore"`` joins where the swap class lives (the
+    uncontracted twins) -- the core-immobile optimizer
+    (:func:`atomterm.casscf.mask_frozen_core`)."""
     lattice_windows: tuple[str, ...] = ()
     lattice_sector: tuple[int, int] | None = None
     scan: ScanSpec | None = None
@@ -811,6 +819,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                          "3d4s@s2"),
                         sa_weights=[1 / 5] * 5,
                         run_casscf=False, key="Sc-unc",
+                        optimizer_masks=("radial", "frozen",
+                                         "frozencore"),
                         render_spans=("3d4s", "3d"),
                         scenarios=_unc_gates("sc-unc", (2, 1))
                         + (_prior_anchor_first("sc-unc", [(2, 1)]),
@@ -838,6 +848,8 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         planned_sectors={f"3d@{t}": (2, 0)
                                          for t in ("r1", "s1", "s2")},
                         sa_weights=[1 / 7] * 7,
+                        optimizer_masks=("radial", "frozen",
+                                         "frozencore"),
                         run_casscf=False, key="Ti-unc",
                         render_spans=("3d4s", "3d"),
                         scenarios=_unc_gates("ti-unc", (3, 1))

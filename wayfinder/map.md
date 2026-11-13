@@ -144,6 +144,20 @@ user decision; the partial verdict 91/91-isolation-green).
   Stage 2.  Disposition: the row stays absent until that re-test.
   The three gated atoms (Sc, Ti, U14e) warmed EXACTLY to their
   declared `occ_e_ref_uhf` basins (the gates reproduced bit-exact).
+  **THE ROHF REACHABILITY CLAIM SUPERSEDED (2026-11-13)**: the
+  ticket-34-era census verdict "no fresh path reaches Ti-unc's
+  deepest basin" held under the pre-repair machinery (the forced
+  hooks + the standard guesses -- every arm diverges, the disease's
+  own signature).  The Stage-1b bench's MOM-seeded transfer (the
+  contracted Ti head projected into the unc basis, MOM-anchored
+  occupations) LANDED IT EXACTLY: E = -848.40744343, d_anchor
+  = 0.000 mEh, converged (sandbox/mom.py, the ticket-37 evidence).
+  The trusted .chk verified independently (2026-11-13): E exact,
+  22 e- = 10 closed pairs + 2 open, the open columns pure 3d
+  (weight 1.0), the 4s band carrying the s pair, S-orthonormal to
+  1.4e-13.  The formal fresh re-run rides Stage 1c's seeded
+  run_rohf; the UHF re-test under the seed seam (the ROHF chk as
+  the UHF dm0) is Stage 2.
   THE PRIOR PORT'S @s HALF (2026-11-11, measured; superseded by the
   mechanism above): the series' non-head configurations need fresh
   forced-occupation SCFs and the d3 census on Sc-unc diverges on

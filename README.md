@@ -345,8 +345,13 @@ reading rules):
   optimizer's 200-cycle limit; the standing stamps: `control:
   m-incomplete by construction` on the MO/MOC rows — an explained
   expectation, never a failure; `SCF core; offset = bookkeeping
-  form` on the pinned rows — their anchor residual's identity);
-  never fresh verdicts.
+  form` on the pinned rows — their anchor residual's identity;
+  `swap` where the optimizer rotated the core block away from the
+  reference core and the active orbitals re-pointed at a semi-core-
+  dominated subspace — the row's energy is that solution's own (the
+  raw core field, exact against PySCF), its ΔE is not comparable to
+  the declared window's rows, and the meters are the swap's
+  fingerprint); never fresh verdicts.
 
 **Further variants** — the tables render what ran; other combinations
 of the treatment axes are one regen away, the first levers when a run
@@ -360,7 +365,10 @@ core column names the core's shells when the noble guess would lie
 (`core_chemistry`: U14e cores 6s6p7s / 6s6p, not Ne). A band-named
 shell in a window is its DOMINANT radial, not the whole shell — the
 AO 5f6d7s window's s radial is the compact band-7s function, not the
-physical 7s orbital (the MO rows carry the true 7s column).
+physical 7s orbital (the MO rows carry the true 7s column). When a
+window's table name is chemical, its basis bands demote to the note
+column (`bands 10f+13d`) — the address grammar keeps the counters,
+the table reads chemically.
 
 **Matrix-free meters.** Meters evaluate through *application*, not
 matrices: ⟨ψ|Ô|ψ⟩ and ‖[Ĥ,L̂z]ψ‖ need only Ôψ. The algebra fixes the

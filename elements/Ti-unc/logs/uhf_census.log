@@ -1,0 +1,12 @@
+reference readings: ROHF deep basin -848.407443 (the trusted
+cache) | the cached UHF anchor -848.400969 (the +6.5 mEh gap)
+seeds: ||d(dm_rohf, dm_proj)||/||dm_rohf|| = 0.040
+
+=== the weight-hook arms (the disease's reproduction) ===
+  weight hook, default guess diis      conv=True  E=-848.400969  <S2>=2.0098  occ_ok=True
+  weight hook, atom guess newton       conv=True  E=-848.412340  <S2>=2.0079  occ_ok=True
+=== the MOM-anchored arms (the repair class) ===
+  MOM, ROHF-seed dm0, diis             conv=True  E=-848.412340  <S2>=2.0079  occ_ok=True
+  MOM, ROHF-seed dm0, newton           conv=True  E=-848.412340  <S2>=2.0079  occ_ok=True
+  MOM, projected-seed dm0, diis        conv=True  E=-848.412340  <S2>=2.0079  occ_ok=True
+  MOM, projected-seed dm0, newton      conv=True  E=-848.412340  <S2>=2.0079  occ_ok=True

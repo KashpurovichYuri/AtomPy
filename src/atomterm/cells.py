@@ -144,7 +144,7 @@ __all__ = [
 
 METHODS = ("casci", "casscf", "sa-casscf")
 STARTS = ("ao", "mo", "moc", "no")  # window constructions (the span is the window)
-MASKS = ("radial", "frozen", "virtmix")   # None = free optimization
+MASKS = ("radial", "frozen", "virtmix", "frozencore")   # None = free optimization
 SUBSTRATES = ("pol", "pur")
 CORES = ("raw", "avg", "frac")
 FIELDS = ("neutral", "folded")  # the reference field (an optional 9th slot)
@@ -234,7 +234,8 @@ class CellKey:
         density sibling of the distilled kind; the label grammar is
         ``<source>no<k>``, see :attr:`no_source`).
     mask : optimizer restriction -- ``None`` (free) | ``"radial"`` |
-        ``"frozen"`` | ``"virtmix"``; only meaningful for optimizer
+        ``"frozen"`` | ``"virtmix"`` | ``"frozencore"`` (the core
+        immobile, window+virtuals free); only meaningful for optimizer
         methods (rejected for ``casci``).
     substrate / core : the core axes -- see the module docstring.
         Lane cells carry ``(pur, avg)`` -- the certified-core class:
@@ -897,8 +898,9 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
                             workdir=workdir)
     chk.parent.mkdir(parents=True, exist_ok=True)
 
-    from atomterm.casscf import (constrained_casscf, mask_frozen_window,
-                                 mask_no_core_window_mix, run_casci)
+    from atomterm.casscf import (constrained_casscf, mask_frozen_core,
+                                 mask_frozen_window, mask_no_core_window_mix,
+                                 run_casci)
     from atomterm.windows import (build_full_mo, canonical_order,
                                   occupied_core_idx, radial_basis,
                                   mask_radial_rotations, realized_patterns,
@@ -1009,6 +1011,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
         mask = mask_frozen_window
     elif key.mask == "virtmix":
         mask = mask_no_core_window_mix
+    elif key.mask == "frozencore":
+        mask = mask_frozen_core
 
     verbose = budgets.get("verbose", 0)
     common = dict(mc_opts=budgets.get("mc_opts"),
@@ -1734,7 +1738,7 @@ def window_grid(spec, window: str | None = None) -> list[CellKey]:
                 substrate="pur"),
     ]
     for m in ("casscf", "sa-casscf"):
-        for mask in (None, "radial", "frozen"):
+        for mask in (None, *spec.optimizer_masks):
             for sub in ("pol", "pur"):
                 starts = (("ao", "mo", "moc", "no") if mask != "radial"
                           else ("ao",))
