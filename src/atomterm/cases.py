@@ -37,7 +37,7 @@ from pyscf import gto
 from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
 from atomterm.basis import SeriesSpec
-from atomterm.cells import no_label, prior_tag_of
+from atomterm.cells import band_tokens, no_label, prior_tag_of
 from atomterm.reference import ReferenceSpec, run_rohf
 from atomterm.scans import ScanSpec
 from atomterm.windows import (build_full_mo, closed_electrons, core_shells,
@@ -254,7 +254,7 @@ class CaseSpec:
     nroots_primary: int = 9
     planned_windows: tuple[str, ...] = ()
     planned_sectors: dict[str, tuple[int, int]] | None = None
-    optimizer_masks: tuple = ("radial", "frozen")
+    optimizer_masks: tuple[str | None, ...] = ("radial", "frozen")
     """The optimizer-restriction axis this case's grids declare --
     the mask values :func:`atomterm.cells.window_grid` enumerates
     BESIDES the free optimization for casscf/sa-casscf at every start
@@ -431,6 +431,10 @@ _PRIOR_WINDOWS = ("3d@r1", "3d@s1", "3d@s2",
 # uncontracted basis (measured 2026-11-11, map Issues) -- the cells
 # hold their STRUCTURAL place (pending rows) but never run until
 # that repair lands
+_TM_UNC_PRIOR = ("3d@r1", "3d@s1", "3d@s2",
+                 "3d4s@r1", "3d4s@s1", "3d4s@s2")
+
+
 def _unc_s_block(key: str) -> Scenario:
     """The twins' @s windows' guard: the series' non-head
     configurations need fresh forced-occupation SCFs, and every fresh
@@ -440,17 +444,20 @@ def _unc_s_block(key: str) -> Scenario:
     prefix alone (sector- and method-free): the claim is
     window-level, and a sector-bearing prefix silently leaks every
     cell the planned_sectors mirror moves (caught on the twin port,
-    2026-11-11)."""
+    2026-11-11).  The @s family DERIVES from the declared prior
+    windows -- a hand-list would leak every window the declaration
+    grows (the frozencore mask's cells now among them)."""
+    s_windows = [w for w in _TM_UNC_PRIOR
+                 if w.partition("@")[2].startswith("s")]
+    labels = s_windows + [no_label(w) for w in s_windows]
     return Scenario(
         name="series-source-diverges",
-        cells=tuple(f"{key}_{lbl}_"
-                    for lbl in ("3d@s1", "3d@s1no1", "3d@s2", "3d@s2no1",
-                                "3d4s@s1", "3d4s@s1no2",
-                                "3d4s@s2", "3d4s@s2no2")),
+        cells=tuple(f"{key}_{lbl}_" for lbl in labels),
         reason="the series source (the non-head configurations' fresh "
                "forced-occupation SCFs) diverges on this basis -- the "
                "fresh-SCF disease, measured 2026-11-11 (map Issues); "
                "the @s windows wait on that repair")
+
 
 def _same_l_windows(windows) -> tuple[str, ...]:
     """The windows whose shell composition REPEATS an l (two d shells
@@ -458,10 +465,9 @@ def _same_l_windows(windows) -> tuple[str, ...]:
     and ``window_distilled`` refuses to assemble (the S-orthonormality
     fail-fast).  Derived from the labels -- the class is shell
     composition, never atom identity."""
-    import re
     out = []
     for w in windows:
-        shells = re.findall(r"\d+[spdf]", w.partition("@")[0])
+        shells = band_tokens(w)
         ls = [sh[-1] for sh in shells]
         if len(ls) > len(set(ls)):
             out.append(w)
@@ -814,9 +820,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                            1, -759.7373848622801),),
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},
-                        planned_windows=("3d@r1", "3d@s1", "3d@s2",
-                                         "3d4s@r1", "3d4s@s1",
-                                         "3d4s@s2"),
+                        planned_windows=_TM_UNC_PRIOR,
                         sa_weights=[1 / 5] * 5,
                         run_casscf=False, key="Sc-unc",
                         optimizer_masks=("radial", "frozen",
@@ -840,9 +844,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                            2, -848.4074434287603),),
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},
-                        planned_windows=("3d@r1", "3d@s1", "3d@s2",
-                                         "3d4s@r1", "3d4s@s1",
-                                         "3d4s@s2"),
+                        planned_windows=_TM_UNC_PRIOR,
                         # the prior sectors mirror Ti's: the 3d-span
                         # priors at the lattice's d2 sector
                         planned_sectors={f"3d@{t}": (2, 0)

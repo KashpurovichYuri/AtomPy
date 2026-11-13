@@ -342,16 +342,15 @@ reading rules):
   iff the state is a symmetry eigenstate) — the only form past the
   cap; the em-dash where neither exists.
 - **note** — terse, data-derived flags only (`cycle cap` at the
-  optimizer's 200-cycle limit; the standing stamps: `control:
-  m-incomplete by construction` on the MO/MOC rows — an explained
-  expectation, never a failure; `SCF core; offset = bookkeeping
-  form` on the pinned rows — their anchor residual's identity;
-  `swap` where the optimizer rotated the core block away from the
-  reference core and the active orbitals re-pointed at a semi-core-
-  dominated subspace — the row's energy is that solution's own (the
-  raw core field, exact against PySCF), its ΔE is not comparable to
-  the declared window's rows, and the meters are the swap's
-  fingerprint); never fresh verdicts.
+  optimizer's cycle limit; `m-incomplete` on the MO/MOC rows — an
+  explained expectation, never a failure; `bookkeeping form` on the
+  pinned rows — their anchor residual's identity; `swap` where the
+  optimizer rotated the core block away from the reference core and
+  the active orbitals re-pointed at a semi-core-dominated subspace —
+  the row's energy is that solution's own (the raw core field, exact
+  against PySCF), its ΔE is not comparable to the declared window's
+  rows, and the meters are the swap's fingerprint); never fresh
+  verdicts.
 
 **Further variants** — the tables render what ran; other combinations
 of the treatment axes are one regen away, the first levers when a run

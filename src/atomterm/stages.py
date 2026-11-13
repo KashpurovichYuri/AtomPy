@@ -238,7 +238,8 @@ class StageFacts:
 _CORE_ANCHOR_TOL = 0.99
 
 
-def _span_overlap(s: np.ndarray, c: np.ndarray, c_ref: np.ndarray) -> float:
+def _span_trace_overlap(s: np.ndarray, c: np.ndarray,
+                        c_ref: np.ndarray) -> float:
     """Trace overlap of two column spans in the S metric -- 1 when the
     spans coincide, invariant to the gauge within each span."""
     def proj(cols):
@@ -339,7 +340,8 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
     from atomterm.windows import occupied_core_idx
 
     core_ref = mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
-    core_span_overlap = _span_overlap(mf.get_ovlp(), c_core, core_ref)
+    core_span_overlap = _span_trace_overlap(mf.get_ovlp(), c_core,
+                                            core_ref)
     swap_basin = core_span_overlap < _CORE_ANCHOR_TOL
     ops = build_operators(mol, mf, c_act, ncore, na, nb,
                           spherical_core=spherical_core and not swap_basin,

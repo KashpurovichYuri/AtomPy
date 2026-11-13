@@ -332,7 +332,7 @@ the live state — update it in the same commit as any state change.
       home fix (`_materializes`, 2484d23), and delivered the swap-basin
       readout fix (99cc4de — the 0.8 Eh misread root-caused to the
       spherical averaging on runaway-scrambled cores; 34 cached legs
-      re-analyzed honest; 'swap basin' notes render).  Next:
+      re-analyzed honest; 'swap' notes render).  Next:
       A (U14e LAST — BEFORE LAUNCH price the planned-group optimizer
       legs for the user; the frac scenario method-filtered).
 - [x] **STAGE 1a** — the spectrum measurement: per-l-block S spectra on both

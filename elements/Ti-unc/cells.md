@@ -112,34 +112,34 @@ ROHF reference energy: -848.40744343 Eh
 | ti-unc_3d@r1_2-0_casscf_ao_-_pol_avg | -848.40377783 | nan | 12.00000 | 5.22e-15 | 2.90e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.1e-13 |  |
 | ti-unc_3d@r1_2-0_casscf_mo_-_pol_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.7e-03 | 1.4e-13 |  |
 | ti-unc_3d@r1_2-0_casscf_moc_-_pol_avg | -848.40377783 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 3.7e-03 | 1.5e-13 |  |
-| ti-unc_3d@r1_2-0_casscf_ao_-_pur_avg | -848.40750884 | nan | 1.44360 | 7.71e+03 | 5.93e+03 | 4.9e+00 | 6.1e+00 | 0.871 | nan | 3.6e-03 | 3.1e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_casscf_ao_-_pur_avg | -848.40750884 | nan | 1.44360 | 7.71e+03 | 5.93e+03 | 4.9e+00 | 6.1e+00 | 0.871 | nan | 3.6e-03 | 3.1e-13 |  |
 | ti-unc_3d@r1_2-0_casscf_mo_-_pur_avg | -848.40377786 | nan | 0.00000 | 5.10e-03 | 4.19e-04 | 2.9e+00 | 4.1e+00 | 0.597 | nan | 3.7e-03 | 1.5e-13 |  |
-| ti-unc_3d@r1_2-0_casscf_moc_-_pur_avg | -848.40377926 | nan | 4.32860 | 7.59e+03 | 1.39e+04 | 3.4e+00 | 4.7e+00 | 0.959 | nan | 3.7e-03 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_casscf_moc_-_pur_avg | -848.40377926 | nan | 4.32860 | 7.59e+03 | 1.39e+04 | 3.4e+00 | 4.7e+00 | 0.959 | nan | 3.7e-03 | 2.0e-13 |  |
 | ti-unc_3d@r1_2-0_casscf_ao_frozen_pol_avg | -848.40377783 | nan | 12.00000 | 4.49e-15 | 2.71e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
 | ti-unc_3d@r1_2-0_casscf_mo_frozen_pol_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.7e-03 | 1.6e-13 |  |
 | ti-unc_3d@r1_2-0_casscf_moc_frozen_pol_avg | -848.40377783 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 3.7e-03 | 1.3e-13 |  |
-| ti-unc_3d@r1_2-0_casscf_ao_frozen_pur_avg | -848.40377783 | nan | 12.00000 | 1.31e-14 | 3.31e-14 | 1.3e-14 | 1.7e-14 | 1.000 | nan | 3.7e-03 | 1.6e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_casscf_ao_frozen_pur_avg | -848.40377783 | nan | 12.00000 | 1.31e-14 | 3.31e-14 | 1.3e-14 | 1.7e-14 | 1.000 | nan | 3.7e-03 | 1.6e-13 |  |
 | ti-unc_3d@r1_2-0_casscf_mo_frozen_pur_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.7e-03 | 4.0e-14 |  |
-| ti-unc_3d@r1_2-0_casscf_moc_frozen_pur_avg | -848.40377784 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 3.7e-03 | 1.9e-13 | NOT-CONVERGED |
-| ti-unc_3d@r1_2-0_sa-casscf_ao_-_pol_avg | -848.40561348 | nan | 12.00000 | 9.25e-06 | 3.41e-05 | 8.2e-04 | 1.0e-03 | 1.000 | nan | 3.3e-06 | 6.3e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_casscf_moc_frozen_pur_avg | -848.40377784 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 3.7e-03 | 1.9e-13 |  |
+| ti-unc_3d@r1_2-0_sa-casscf_ao_-_pol_avg | -848.40561348 | nan | 12.00000 | 9.25e-06 | 3.41e-05 | 8.2e-04 | 1.0e-03 | 1.000 | nan | 3.3e-06 | 6.3e-13 |  |
 | ti-unc_3d@r1_2-0_sa-casscf_mo_-_pol_avg | -848.36054831 | nan | 0.00000 | 1.09e-02 | 1.00e-04 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 2.2e-03 | 1.4e-13 |  |
 | ti-unc_3d@r1_2-0_sa-casscf_moc_-_pol_avg | -848.40561364 | nan | 12.00000 | 9.61e-09 | 3.78e-08 | 2.4e-06 | 3.4e-06 | 1.000 | nan | 1.2e-08 | 1.3e-13 |  |
-| ti-unc_3d@r1_2-0_sa-casscf_ao_-_pur_avg | -848.40561338 | nan | 12.00000 | 7.28e-06 | 2.68e-05 | 9.6e-04 | 1.2e-03 | 1.000 | nan | 3.5e-07 | 2.2e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_sa-casscf_ao_-_pur_avg | -848.40561338 | nan | 12.00000 | 7.28e-06 | 2.68e-05 | 9.6e-04 | 1.2e-03 | 1.000 | nan | 3.5e-07 | 2.2e-13 |  |
 | ti-unc_3d@r1_2-0_sa-casscf_mo_-_pur_avg | -848.36055261 | nan | 0.00000 | 1.09e-02 | 5.36e-05 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 2.2e-03 | 5.6e-14 |  |
-| ti-unc_3d@r1_2-0_sa-casscf_moc_-_pur_avg | -848.40158645 | nan | 11.97861 | 2.59e-03 | 9.65e-03 | 1.8e-01 | 2.6e-01 | 0.999 | nan | 3.0e-05 | 2.0e-13 | NOT-CONVERGED |
-| ti-unc_3d@r1_2-0_sa-casscf_ao_frozen_pol_avg | -848.40561259 | nan | 12.00000 | 9.34e-15 | 1.45e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 2.5e-06 | 1.7e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_sa-casscf_moc_-_pur_avg | -848.40158645 | nan | 11.97861 | 2.59e-03 | 9.65e-03 | 1.8e-01 | 2.6e-01 | 0.999 | nan | 3.0e-05 | 2.0e-13 |  |
+| ti-unc_3d@r1_2-0_sa-casscf_ao_frozen_pol_avg | -848.40561259 | nan | 12.00000 | 9.34e-15 | 1.45e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 2.5e-06 | 1.7e-13 |  |
 | ti-unc_3d@r1_2-0_sa-casscf_mo_frozen_pol_avg | -848.36320232 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 2.0e-03 | 1.3e-13 |  |
 | ti-unc_3d@r1_2-0_sa-casscf_moc_frozen_pol_avg | -848.37838928 | nan | 4.90205 | 1.01e+00 | 2.30e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 1.8e-03 | 1.4e-13 |  |
 | ti-unc_3d@r1_2-0_sa-casscf_ao_frozen_pur_avg | -848.40561265 | nan | 12.00000 | 4.44e-15 | 1.07e-14 | 1.3e-14 | 1.7e-14 | 1.000 | nan | 1.6e-10 | 1.8e-13 |  |
 | ti-unc_3d@r1_2-0_sa-casscf_mo_frozen_pur_avg | -848.36320111 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 2.0e-03 | 4.8e-14 |  |
-| ti-unc_3d@r1_2-0_sa-casscf_moc_frozen_pur_avg | -848.38167472 | nan | 4.90205 | 1.03e+00 | 2.35e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 1.7e-03 | 1.8e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_sa-casscf_moc_frozen_pur_avg | -848.38167472 | nan | 4.90205 | 1.03e+00 | 2.35e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 1.7e-03 | 1.8e-13 |  |
 | ti-unc_3d@r1no1_2-0_casscf_no_-_pol_avg | -848.40377783 | nan | 12.00000 | 6.94e-15 | 3.97e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
-| ti-unc_3d@r1no1_2-0_casscf_no_-_pur_avg | -848.40377785 | nan | 11.99917 | 6.30e-04 | 3.03e-03 | 4.3e-02 | 7.6e-02 | 1.000 | nan | 3.7e-03 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1no1_2-0_casscf_no_-_pur_avg | -848.40377785 | nan | 11.99917 | 6.30e-04 | 3.03e-03 | 4.3e-02 | 7.6e-02 | 1.000 | nan | 3.7e-03 | 2.1e-13 |  |
 | ti-unc_3d@r1no1_2-0_casscf_no_frozen_pol_avg | -848.40377783 | nan | 12.00000 | 4.71e-15 | 4.31e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
-| ti-unc_3d@r1no1_2-0_casscf_no_frozen_pur_avg | -848.40377787 | nan | 12.00000 | 7.00e-15 | 3.95e-14 | 1.4e-14 | 1.7e-14 | 1.000 | nan | 3.7e-03 | 2.2e-13 | NOT-CONVERGED |
-| ti-unc_3d@r1no1_2-0_sa-casscf_no_-_pol_avg | -848.40561334 | nan | 12.00000 | 4.16e-06 | 2.58e-05 | 6.9e-04 | 1.3e-03 | 1.000 | nan | 4.3e-06 | 2.1e-13 | NOT-CONVERGED |
-| ti-unc_3d@r1no1_2-0_sa-casscf_no_-_pur_avg | -848.40561346 | nan | 12.00000 | 3.63e-06 | 1.58e-05 | 8.2e-04 | 9.7e-04 | 1.000 | nan | 3.0e-07 | 2.1e-13 | NOT-CONVERGED |
-| ti-unc_3d@r1no1_2-0_sa-casscf_no_frozen_pol_avg | -848.40561260 | nan | 12.00000 | 9.12e-15 | 2.72e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 2.5e-06 | 1.8e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1no1_2-0_casscf_no_frozen_pur_avg | -848.40377787 | nan | 12.00000 | 7.00e-15 | 3.95e-14 | 1.4e-14 | 1.7e-14 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d@r1no1_2-0_sa-casscf_no_-_pol_avg | -848.40561334 | nan | 12.00000 | 4.16e-06 | 2.58e-05 | 6.9e-04 | 1.3e-03 | 1.000 | nan | 4.3e-06 | 2.1e-13 |  |
+| ti-unc_3d@r1no1_2-0_sa-casscf_no_-_pur_avg | -848.40561346 | nan | 12.00000 | 3.63e-06 | 1.58e-05 | 8.2e-04 | 9.7e-04 | 1.000 | nan | 3.0e-07 | 2.1e-13 |  |
+| ti-unc_3d@r1no1_2-0_sa-casscf_no_frozen_pol_avg | -848.40561260 | nan | 12.00000 | 9.12e-15 | 2.72e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 2.5e-06 | 1.8e-13 |  |
 | ti-unc_3d@r1no1_2-0_sa-casscf_no_frozen_pur_avg | -848.40561265 | nan | 12.00000 | 6.75e-15 | 2.81e-14 | 1.4e-14 | 1.7e-14 | 1.000 | nan | 6.0e-10 | 2.2e-13 |  |
 | ti-unc_3d4s@r1_3-1_casscf_ao_-_pol_avg | -848.42813952 | -2.813e-02 | 4.67576 | 1.35e+01 | 5.50e+01 | 3.7e+00 | 5.2e+00 | 0.693 | nan | 2.5e-10 | 2.0e-13 |  |
 | ti-unc_3d4s@r1_3-1_casscf_mo_-_pol_avg | -848.43522691 | -3.522e-02 | 0.05080 | 4.31e-01 | 1.07e+00 | 2.8e+00 | 4.0e+00 | 0.499 | nan | 3.6e-03 | 1.3e-13 |  |
@@ -173,6 +173,70 @@ ROHF reference energy: -848.40744343 Eh
 | ti-unc_3d4s@r1no2_3-1_sa-casscf_no_-_pur_avg | -848.41516312 | -1.516e-02 | 12.00456 | 8.91e-01 | 6.29e+00 | 1.1e+00 | 1.7e+00 | 0.833 | nan | 1.1e-13 | 4.6e-13 |  |
 | ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozen_pol_avg | -848.40187314 | -1.868e-03 | 12.00000 | 2.75e-09 | 1.37e-08 | 3.6e-09 | 3.7e-09 | 0.833 | nan | 7.2e-06 | 2.1e-13 |  |
 | ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozen_pur_avg | -848.40187396 | -1.868e-03 | 12.00000 | 2.05e-14 | 2.15e-13 | 1.3e-14 | 1.7e-14 | 0.833 | nan | 1.1e-06 | 2.0e-13 |  |
+| ti-unc_3d4s_3-1_casscf_ao_frozencore_pol_avg | -848.39985910 | 1.465e-04 | 11.98667 | 1.88e+02 | 8.17e+02 | 1.5e-01 | 2.2e-01 | 0.833 | nan | 3.7e-03 | 1.9e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_casscf_mo_frozencore_pol_avg | -848.11959488 | 2.804e-01 | 2.47313 | 1.88e+00 | 1.14e+01 | 2.8e+00 | 4.0e+00 | 0.499 | nan | 1.3e-03 | 2.9e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_casscf_moc_frozencore_pol_avg | -848.17047961 | 2.295e-01 | 4.29833 | 3.46e+00 | 1.38e+01 | 2.8e+00 | 3.8e+00 | 0.833 | nan | 2.9e-03 | 1.5e-13 | NOT-CONVERGED |
+| ti-unc_3d4sno2_3-1_casscf_no_frozencore_pol_avg | -848.40019769 | -1.921e-04 | 11.99937 | 2.05e-01 | 8.32e-01 | 4.3e-02 | 4.6e-02 | 0.833 | nan | 3.6e-03 | 1.8e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_casscf_ao_frozencore_pur_avg | -848.40199143 | -1.986e-03 | 11.99702 | 1.08e-01 | 6.61e-01 | 6.4e-02 | 9.8e-02 | 0.833 | nan | 2.2e-08 | 1.6e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_casscf_mo_frozencore_pur_avg | -848.41546726 | -1.546e-02 | 0.05285 | 6.54e+00 | 4.54e+01 | 2.8e+00 | 4.0e+00 | 0.499 | nan | 6.8e-13 | 4.8e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_casscf_moc_frozencore_pur_avg | -848.40590814 | -5.903e-03 | 4.90792 | 2.43e+03 | 9.86e+03 | 3.1e+00 | 4.4e+00 | 0.832 | nan | 3.5e-08 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d4sno2_3-1_casscf_no_frozencore_pur_avg | -848.40136808 | -1.363e-03 | 12.00000 | 1.76e-03 | 1.14e-02 | 1.9e-03 | 2.9e-03 | 0.833 | nan | 1.5e-07 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_casscf_ao_frozencore_pol_avg | -848.40377783 | nan | 12.00000 | 2.01e-15 | 3.69e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d_2-0_casscf_mo_frozencore_pol_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.7e-03 | 1.4e-13 |  |
+| ti-unc_3d_2-0_casscf_moc_frozencore_pol_avg | -848.40377783 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 3.7e-03 | 1.4e-13 |  |
+| ti-unc_3dno1_2-0_casscf_no_frozencore_pol_avg | -848.40377783 | nan | 12.00000 | 3.37e-15 | 3.50e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d_2-0_casscf_ao_frozencore_pur_avg | -848.40561295 | nan | 11.75307 | 3.38e+01 | 1.47e+02 | 4.3e-01 | 1.1e+00 | 0.999 | nan | 2.3e-13 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_casscf_mo_frozencore_pur_avg | -848.40559613 | nan | 0.00000 | 5.94e-03 | 9.28e-04 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.4e-13 | 1.9e-14 | NOT-CONVERGED |
+| ti-unc_3d_2-0_casscf_moc_frozencore_pur_avg | -848.40561290 | nan | 4.88057 | 2.65e+04 | 5.98e+04 | 3.1e+00 | 4.3e+00 | 0.994 | nan | 1.1e-13 | 2.2e-13 | NOT-CONVERGED |
+| ti-unc_3dno1_2-0_casscf_no_frozencore_pur_avg | -848.40561257 | nan | 12.00000 | 5.34e-05 | 2.80e-04 | 9.5e-04 | 1.6e-03 | 1.000 | nan | 2.2e-08 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pol_avg | -848.40035017 | -3.446e-04 | 12.00000 | 9.13e-04 | 5.29e-03 | 3.4e-03 | 5.1e-03 | 0.833 | nan | 3.7e-03 | 1.8e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pol_avg | -848.27531907 | 1.247e-01 | 2.00004 | 5.07e-01 | 1.21e+00 | 2.8e+00 | 4.0e+00 | 0.500 | nan | 3.7e-03 | 1.6e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pol_avg | -848.38760902 | 1.240e-02 | 11.74641 | 5.08e-01 | 2.49e+00 | 6.2e-01 | 8.0e-01 | 0.833 | nan | 3.4e-03 | 1.3e-13 | NOT-CONVERGED |
+| ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pol_avg | -848.40010590 | -1.003e-04 | 11.99994 | 4.98e-03 | 3.36e-02 | 8.6e-03 | 1.7e-02 | 0.833 | nan | 3.5e-03 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pur_avg | -848.40179159 | -1.786e-03 | 12.00000 | 7.81e-04 | 3.58e-03 | 4.8e-04 | 6.6e-04 | 0.833 | nan | 0.0e+00 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pur_avg | -848.42377574 | -2.377e-02 | 0.02029 | 2.62e-01 | 6.60e-01 | 2.8e+00 | 4.0e+00 | 0.500 | nan | 0.0e+00 | 2.2e-14 | NOT-CONVERGED |
+| ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pur_avg | -848.40342009 | -3.415e-03 | 5.40350 | 6.35e+01 | 2.77e+02 | 3.0e+00 | 4.2e+00 | 0.833 | nan | 0.0e+00 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pur_avg | -848.39988422 | 1.213e-04 | 12.00000 | 1.06e-03 | 1.06e-02 | 2.6e-03 | 4.0e-03 | 0.833 | nan | 0.0e+00 | 2.2e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_ao_frozencore_pol_avg | -848.40377798 | nan | 12.00000 | 8.91e-06 | 3.45e-05 | 8.9e-04 | 1.3e-03 | 1.000 | nan | 3.7e-03 | 5.5e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_mo_frozencore_pol_avg | -848.38875646 | nan | 0.00051 | 2.46e-02 | 2.10e-02 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.8e-03 | 1.4e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_moc_frozencore_pol_avg | -848.40377798 | nan | 11.93235 | 2.17e-01 | 4.15e-01 | 3.0e-01 | 4.3e-01 | 1.000 | nan | 3.7e-03 | 1.4e-13 | NOT-CONVERGED |
+| ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pol_avg | -848.40377798 | nan | 12.00000 | 8.83e-06 | 3.43e-05 | 8.9e-04 | 1.3e-03 | 1.000 | nan | 3.7e-03 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_ao_frozencore_pur_avg | -848.40561301 | nan | 12.00000 | 1.18e-06 | 4.78e-06 | 5.4e-04 | 7.8e-04 | 1.000 | nan | 1.1e-13 | 1.9e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_mo_frozencore_pur_avg | -848.39093429 | nan | 0.00148 | 2.59e-02 | 5.09e-02 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 1.1e-13 | 1.9e-13 | NOT-CONVERGED |
+| ti-unc_3d_2-0_sa-casscf_moc_frozencore_pur_avg | -848.37899485 | nan | 6.41842 | 8.89e-01 | 2.03e+00 | 2.6e+00 | 3.9e+00 | 0.999 | nan | 0.0e+00 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pur_avg | -848.40561298 | nan | 12.00000 | 5.81e-07 | 3.86e-06 | 3.6e-04 | 4.8e-04 | 1.000 | nan | 1.1e-13 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_casscf_ao_frozencore_pol_avg | -848.40377783 | nan | 12.00000 | 1.54e-15 | 3.80e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d@r1_2-0_casscf_mo_frozencore_pol_avg | -848.40377783 | nan | 0.00000 | 5.72e-03 | 9.99e-10 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.7e-03 | 1.7e-13 |  |
+| ti-unc_3d@r1_2-0_casscf_moc_frozencore_pol_avg | -848.40377783 | nan | 4.90205 | 1.20e+00 | 2.70e+00 | 3.1e+00 | 4.4e+00 | 1.000 | nan | 3.7e-03 | 1.4e-13 |  |
+| ti-unc_3d@r1_2-0_casscf_ao_frozencore_pur_avg | -848.40561297 | nan | 11.77184 | 7.78e+00 | 2.24e+01 | 4.7e-01 | 1.1e+00 | 0.998 | nan | 2.2e-12 | 2.3e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_casscf_mo_frozencore_pur_avg | -848.40559618 | nan | 0.00000 | 6.19e-03 | 1.06e-03 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 0.0e+00 | 2.7e-14 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_casscf_moc_frozencore_pur_avg | -848.40561290 | nan | 4.88032 | 2.65e+04 | 5.98e+04 | 3.1e+00 | 4.3e+00 | 0.994 | nan | 0.0e+00 | 9.3e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pol_avg | -848.40377798 | nan | 12.00000 | 9.01e-06 | 3.49e-05 | 9.1e-04 | 1.3e-03 | 1.000 | nan | 3.7e-03 | 3.5e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pol_avg | -848.38872164 | nan | 0.00053 | 2.50e-02 | 2.15e-02 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 3.8e-03 | 3.2e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pol_avg | -848.40377793 | nan | 11.93226 | 2.04e-01 | 3.90e-01 | 3.0e-01 | 4.3e-01 | 1.000 | nan | 3.7e-03 | 1.5e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pur_avg | -848.40561295 | nan | 12.00000 | 1.53e-06 | 6.00e-06 | 4.2e-04 | 5.5e-04 | 1.000 | nan | 1.1e-13 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pur_avg | -848.39047387 | nan | 0.00138 | 2.74e-02 | 4.93e-02 | 2.8e+00 | 4.0e+00 | 0.600 | nan | 0.0e+00 | 8.6e-14 | NOT-CONVERGED |
+| ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pur_avg | -848.36587353 | nan | 6.43406 | 9.29e-01 | 1.99e+00 | 2.7e+00 | 3.9e+00 | 0.998 | nan | 0.0e+00 | 1.8e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1no1_2-0_casscf_no_frozencore_pol_avg | -848.40377783 | nan | 12.00000 | 4.94e-15 | 3.39e-14 | 1.3e-08 | 9.5e-09 | 1.000 | nan | 3.7e-03 | 2.2e-13 |  |
+| ti-unc_3d@r1no1_2-0_casscf_no_frozencore_pur_avg | -848.40561122 | nan | 11.99990 | 3.56e-03 | 7.07e-03 | 1.6e-02 | 2.5e-02 | 1.000 | nan | 2.9e-09 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pol_avg | -848.40377798 | nan | 12.00000 | 8.86e-06 | 3.44e-05 | 8.8e-04 | 1.3e-03 | 1.000 | nan | 3.7e-03 | 2.5e-13 | NOT-CONVERGED |
+| ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pur_avg | -848.40560652 | nan | 11.99957 | 9.91e-04 | 3.39e-03 | 2.6e-02 | 5.5e-02 | 1.000 | nan | 0.0e+00 | 2.5e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_casscf_ao_frozencore_pol_avg | -848.39980873 | 1.968e-04 | 11.99998 | 2.10e-02 | 1.18e-01 | 7.4e-03 | 8.7e-03 | 0.833 | nan | 3.7e-03 | 1.9e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_casscf_mo_frozencore_pol_avg | -848.06269428 | 3.373e-01 | 1.98397 | 8.27e-01 | 1.98e+00 | 2.8e+00 | 4.0e+00 | 0.498 | nan | 3.6e-03 | 1.5e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_casscf_moc_frozencore_pol_avg | -848.17394063 | 2.261e-01 | 4.38631 | 3.45e+00 | 1.34e+01 | 2.8e+00 | 3.8e+00 | 0.833 | nan | 2.9e-03 | 1.5e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_casscf_ao_frozencore_pur_avg | -848.40174729 | -1.742e-03 | 11.99961 | 3.92e+00 | 2.43e+01 | 7.6e-02 | 1.1e-01 | 0.833 | nan | 1.1e-10 | 2.2e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_casscf_mo_frozencore_pur_avg | -848.41550803 | -1.550e-02 | 0.05317 | 6.55e+00 | 4.54e+01 | 2.8e+00 | 4.0e+00 | 0.499 | nan | 9.1e-13 | 4.8e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_casscf_moc_frozencore_pur_avg | -848.40740536 | -7.400e-03 | 4.91705 | 2.51e+03 | 1.08e+04 | 3.1e+00 | 4.4e+00 | 0.833 | nan | 1.2e-09 | 8.0e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pol_avg | -848.40022825 | -2.227e-04 | 11.99998 | 5.43e-03 | 2.94e-02 | 5.8e-03 | 8.5e-03 | 0.833 | nan | 3.6e-03 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pol_avg | -848.26486274 | 1.351e-01 | 2.00009 | 2.23e+00 | 1.03e+01 | 2.8e+00 | 4.0e+00 | 0.500 | nan | 3.7e-03 | 1.4e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pol_avg | -848.38749288 | 1.251e-02 | 11.74313 | 5.08e-01 | 2.52e+00 | 6.3e-01 | 8.0e-01 | 0.833 | nan | 3.4e-03 | 1.4e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pur_avg | -848.40195220 | -1.947e-03 | 12.00000 | 2.08e-04 | 1.08e-03 | 2.6e-04 | 3.9e-04 | 0.833 | nan | 0.0e+00 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pur_avg | -848.42377667 | -2.377e-02 | 0.02029 | 2.62e-01 | 6.60e-01 | 2.8e+00 | 4.0e+00 | 0.500 | nan | 0.0e+00 | 5.4e-14 | NOT-CONVERGED |
+| ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pur_avg | -848.40442043 | -4.415e-03 | 5.39328 | 3.53e+00 | 1.35e+01 | 3.0e+00 | 4.2e+00 | 0.833 | nan | 0.0e+00 | 1.7e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1no2_3-1_casscf_no_frozencore_pol_avg | -848.39965668 | 3.489e-04 | 11.97008 | 2.66e+00 | 1.77e+01 | 3.8e-02 | 6.1e-02 | 0.833 | nan | 3.4e-03 | 2.1e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1no2_3-1_casscf_no_frozencore_pur_avg | -848.40187476 | -1.869e-03 | 12.00000 | 1.16e-03 | 5.73e-03 | 5.2e-04 | 8.8e-04 | 0.833 | nan | 2.8e-07 | 2.0e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pol_avg | -848.39981976 | 1.858e-04 | 11.99914 | 7.39e-02 | 4.28e-01 | 1.1e-02 | 1.5e-02 | 0.833 | nan | 2.4e-03 | 2.2e-13 | NOT-CONVERGED |
+| ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pur_avg | -848.40187222 | -1.867e-03 | 12.00000 | 1.29e-04 | 9.96e-04 | 3.9e-04 | 5.1e-04 | 0.833 | nan | 0.0e+00 | 1.9e-13 | NOT-CONVERGED |
 
 configurations per root (top-2 determinants):
 
@@ -1039,6 +1103,262 @@ configurations per root (top-2 determinants):
 - `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozen_pur_avg` root 4: s^2.00d^2.00 (|c|=0.53); s^2.00d^2.00 (|c|=0.53)
 - `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozen_pur_avg` root 5: s^2.00d^2.00 (|c|=0.71); s^2.00d^2.00 (|c|=0.40)
 - `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozen_pur_avg` root 6: s^2.00d^2.00 (|c|=0.65); s^2.00d^2.00 (|c|=0.45)
+- `ti-unc_3d4s_3-1_casscf_ao_frozencore_pol_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^2.00d^2.00 (|c|=0.02)
+- `ti-unc_3d4s_3-1_casscf_mo_frozencore_pol_avg` root 0: s^1.00p^1.00d^2.00 (|c|=0.36); s^1.00p^1.00d^2.00 (|c|=0.36)
+- `ti-unc_3d4s_3-1_casscf_moc_frozencore_pol_avg` root 0: d^4.00 (|c|=0.41); d^4.00 (|c|=0.41)
+- `ti-unc_3d4sno2_3-1_casscf_no_frozencore_pol_avg` root 0: s^2.00d^2.00 (|c|=0.72); s^2.00d^2.00 (|c|=0.61)
+- `ti-unc_3d4s_3-1_casscf_ao_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)
+- `ti-unc_3d4s_3-1_casscf_mo_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=0.99); p^2.00d^2.00 (|c|=0.10)
+- `ti-unc_3d4s_3-1_casscf_moc_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=1.00); d^4.00 (|c|=0.03)
+- `ti-unc_3d4sno2_3-1_casscf_no_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^2.00d^2.00 (|c|=0.04)
+- `ti-unc_3d_2-0_casscf_ao_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_mo_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_moc_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3dno1_2-0_casscf_no_frozencore_pol_avg` root 0: d^2.00 (|c|=0.83); d^2.00 (|c|=0.52)
+- `ti-unc_3d_2-0_casscf_ao_frozencore_pur_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_mo_frozencore_pur_avg` root 0: d^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_casscf_moc_frozencore_pur_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3dno1_2-0_casscf_no_frozencore_pur_avg` root 0: d^2.00 (|c|=0.77); d^2.00 (|c|=0.42)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pol_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.01)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pol_avg` root 1: s^2.00d^2.00 (|c|=0.66); s^2.00d^2.00 (|c|=0.54)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pol_avg` root 2: s^2.00d^2.00 (|c|=0.98); s^2.00d^2.00 (|c|=0.12)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pol_avg` root 3: s^2.00d^2.00 (|c|=0.67); s^2.00d^2.00 (|c|=0.55)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pol_avg` root 4: s^2.00d^2.00 (|c|=0.84); s^2.00d^2.00 (|c|=0.38)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pol_avg` root 5: s^2.00d^2.00 (|c|=0.72); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pol_avg` root 6: s^2.00d^2.00 (|c|=0.71); s^2.00d^2.00 (|c|=0.50)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pol_avg` root 0: s^0.96p^1.04d^2.00 (|c|=0.35); s^0.96p^1.04d^2.00 (|c|=0.35)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pol_avg` root 1: s^0.04p^1.96d^2.00 (|c|=0.30); s^0.04p^1.96d^2.00 (|c|=0.30)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pol_avg` root 2: s^1.93p^0.07d^2.00 (|c|=0.63); p^2.00d^2.00 (|c|=0.38)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pol_avg` root 3: s^0.96p^1.04d^2.00 (|c|=0.38); s^0.96p^1.04d^2.00 (|c|=0.38)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pol_avg` root 4: s^0.04p^1.96d^2.00 (|c|=0.35); s^0.04p^1.96d^2.00 (|c|=0.33)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pol_avg` root 5: s^0.99p^1.01d^2.00 (|c|=0.41); s^0.99p^1.01d^2.00 (|c|=0.41)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pol_avg` root 6: s^0.01p^1.99d^2.00 (|c|=0.41); s^0.01p^1.99d^2.00 (|c|=0.41)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pol_avg` root 0: s^2.00d^2.00 (|c|=0.99); s^1.00d^3.00 (|c|=0.05)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pol_avg` root 1: s^1.00d^3.00 (|c|=0.46); s^1.00d^3.00 (|c|=0.46)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pol_avg` root 2: s^1.00d^3.00 (|c|=0.46); s^1.00d^3.00 (|c|=0.46)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pol_avg` root 3: s^1.00d^3.00 (|c|=0.43); s^1.00d^3.00 (|c|=0.43)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pol_avg` root 4: s^1.00d^3.00 (|c|=0.39); s^1.00d^3.00 (|c|=0.39)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pol_avg` root 5: s^1.00d^3.00 (|c|=0.49); s^1.00d^3.00 (|c|=0.49)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pol_avg` root 6: s^1.00d^3.00 (|c|=0.42); s^1.00d^3.00 (|c|=0.42)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pol_avg` root 0: s^1.99d^2.01 (|c|=0.74); s^1.99d^2.01 (|c|=0.59)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pol_avg` root 1: s^1.99d^2.01 (|c|=0.71); s^1.99d^2.01 (|c|=0.47)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pol_avg` root 2: s^1.99d^2.01 (|c|=0.60); s^1.99d^2.01 (|c|=0.46)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pol_avg` root 3: s^1.99d^2.01 (|c|=0.61); s^1.99d^2.01 (|c|=0.50)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pol_avg` root 4: s^1.99d^2.01 (|c|=0.85); s^1.99d^2.01 (|c|=0.44)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pol_avg` root 5: s^1.99d^2.01 (|c|=0.54); s^1.99d^2.01 (|c|=0.51)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pol_avg` root 6: s^1.99d^2.01 (|c|=0.61); s^1.99d^2.01 (|c|=0.37)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=0.76); s^2.00d^2.00 (|c|=0.40)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pur_avg` root 1: s^2.00d^2.00 (|c|=0.89); s^2.00d^2.00 (|c|=0.27)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pur_avg` root 2: s^2.00d^2.00 (|c|=0.75); s^2.00d^2.00 (|c|=0.44)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pur_avg` root 3: s^2.00d^2.00 (|c|=0.72); s^2.00d^2.00 (|c|=0.36)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pur_avg` root 4: s^2.00d^2.00 (|c|=0.61); s^2.00d^2.00 (|c|=0.56)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pur_avg` root 5: s^2.00d^2.00 (|c|=0.97); s^2.00d^2.00 (|c|=0.17)
+- `ti-unc_3d4s_3-1_sa-casscf_ao_frozencore_pur_avg` root 6: s^2.00d^2.00 (|c|=0.67); s^2.00d^2.00 (|c|=0.52)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=0.96); p^2.00d^2.00 (|c|=0.16)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pur_avg` root 1: s^1.00p^1.00d^2.00 (|c|=0.47); s^1.00p^1.00d^2.00 (|c|=0.47)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pur_avg` root 2: s^1.00p^1.00d^2.00 (|c|=0.49); s^1.00p^1.00d^2.00 (|c|=0.49)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pur_avg` root 3: s^1.00p^1.00d^2.00 (|c|=0.48); s^1.00p^1.00d^2.00 (|c|=0.48)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pur_avg` root 4: s^1.00p^1.00d^2.00 (|c|=0.45); s^1.00p^1.00d^2.00 (|c|=0.43)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pur_avg` root 5: s^1.00p^1.00d^2.00 (|c|=0.43); s^1.00p^1.00d^2.00 (|c|=0.41)
+- `ti-unc_3d4s_3-1_sa-casscf_mo_frozencore_pur_avg` root 6: s^1.00p^1.00d^2.00 (|c|=0.54); s^1.00p^1.00d^2.00 (|c|=0.53)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pur_avg` root 0: s^1.97d^2.03 (|c|=0.97); s^0.99d^3.01 (|c|=0.11)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pur_avg` root 1: s^0.99d^3.01 (|c|=0.42); s^0.99d^3.01 (|c|=0.42)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pur_avg` root 2: s^0.98d^3.02 (|c|=0.47); s^0.98d^3.02 (|c|=0.47)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pur_avg` root 3: s^0.99d^3.01 (|c|=0.51); s^0.99d^3.01 (|c|=0.47)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pur_avg` root 4: s^0.98d^3.02 (|c|=0.57); s^0.98d^3.02 (|c|=0.51)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pur_avg` root 5: s^0.98d^3.02 (|c|=0.69); s^0.98d^3.02 (|c|=0.57)
+- `ti-unc_3d4s_3-1_sa-casscf_moc_frozencore_pur_avg` root 6: s^0.99d^3.01 (|c|=0.61); s^0.99d^3.01 (|c|=0.50)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=0.54); s^2.00d^2.00 (|c|=0.49)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pur_avg` root 1: s^2.00d^2.00 (|c|=0.56); s^2.00d^2.00 (|c|=0.45)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pur_avg` root 2: s^2.00d^2.00 (|c|=0.67); s^2.00d^2.00 (|c|=0.43)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pur_avg` root 3: s^2.00d^2.00 (|c|=0.74); s^2.00d^2.00 (|c|=0.49)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pur_avg` root 4: s^2.00d^2.00 (|c|=0.54); s^2.00d^2.00 (|c|=0.47)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pur_avg` root 5: s^2.00d^2.00 (|c|=0.54); s^2.00d^2.00 (|c|=0.47)
+- `ti-unc_3d4sno2_3-1_sa-casscf_no_frozencore_pur_avg` root 6: s^2.00d^2.00 (|c|=0.54); s^2.00d^2.00 (|c|=0.51)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pol_avg` root 1: d^2.00 (|c|=0.83); d^2.00 (|c|=0.46)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pol_avg` root 2: d^2.00 (|c|=0.70); d^2.00 (|c|=0.41)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pol_avg` root 3: d^2.00 (|c|=0.63); d^2.00 (|c|=0.49)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pol_avg` root 4: d^2.00 (|c|=0.52); d^2.00 (|c|=0.52)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pol_avg` root 5: d^2.00 (|c|=0.71); d^2.00 (|c|=0.47)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pol_avg` root 6: d^2.00 (|c|=0.66); d^2.00 (|c|=0.57)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pol_avg` root 1: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.07)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pol_avg` root 2: p^1.00d^1.00 (|c|=0.86); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pol_avg` root 3: p^1.00d^1.00 (|c|=0.85); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pol_avg` root 4: p^1.00d^1.00 (|c|=0.85); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pol_avg` root 5: p^1.00d^1.00 (|c|=0.83); p^1.00d^1.00 (|c|=0.49)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pol_avg` root 6: p^1.00d^1.00 (|c|=0.70); p^1.00d^1.00 (|c|=0.56)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pol_avg` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pol_avg` root 2: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pol_avg` root 3: d^2.00 (|c|=0.96); d^2.00 (|c|=0.28)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pol_avg` root 4: d^2.00 (|c|=0.69); d^2.00 (|c|=0.60)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pol_avg` root 5: d^2.00 (|c|=0.69); d^2.00 (|c|=0.60)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pol_avg` root 6: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pol_avg` root 0: d^2.00 (|c|=0.83); d^2.00 (|c|=0.52)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pol_avg` root 1: d^2.00 (|c|=0.64); d^2.00 (|c|=0.40)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pol_avg` root 2: d^2.00 (|c|=0.71); d^2.00 (|c|=0.41)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pol_avg` root 3: d^2.00 (|c|=0.70); d^2.00 (|c|=0.48)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pol_avg` root 4: d^2.00 (|c|=0.49); d^2.00 (|c|=0.46)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pol_avg` root 5: d^2.00 (|c|=0.49); d^2.00 (|c|=0.44)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pol_avg` root 6: d^2.00 (|c|=0.71); d^2.00 (|c|=0.57)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pur_avg` root 0: d^2.00 (|c|=0.59); d^2.00 (|c|=0.46)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pur_avg` root 1: d^2.00 (|c|=0.64); d^2.00 (|c|=0.59)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pur_avg` root 2: d^2.00 (|c|=0.65); d^2.00 (|c|=0.36)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pur_avg` root 3: d^2.00 (|c|=0.48); d^2.00 (|c|=0.42)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pur_avg` root 4: d^2.00 (|c|=0.64); d^2.00 (|c|=0.49)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pur_avg` root 5: d^2.00 (|c|=0.63); d^2.00 (|c|=0.52)
+- `ti-unc_3d_2-0_sa-casscf_ao_frozencore_pur_avg` root 6: d^2.00 (|c|=0.52); d^2.00 (|c|=0.52)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pur_avg` root 0: d^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pur_avg` root 1: p^1.00d^1.00 (|c|=0.88); p^1.00d^1.00 (|c|=0.46)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pur_avg` root 2: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.49)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pur_avg` root 3: p^1.00d^1.00 (|c|=0.99); p^1.00d^1.00 (|c|=0.13)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pur_avg` root 4: p^1.00d^1.00 (|c|=0.99); p^1.00d^1.00 (|c|=0.11)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pur_avg` root 5: p^1.00d^1.00 (|c|=0.86); p^1.00d^1.00 (|c|=0.49)
+- `ti-unc_3d_2-0_sa-casscf_mo_frozencore_pur_avg` root 6: p^1.00d^1.00 (|c|=0.88); p^1.00d^1.00 (|c|=0.46)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pur_avg` root 0: d^2.00 (|c|=0.98); d^2.00 (|c|=0.13)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pur_avg` root 1: d^2.00 (|c|=0.97); d^2.00 (|c|=0.17)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pur_avg` root 2: d^2.00 (|c|=0.79); d^2.00 (|c|=0.47)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pur_avg` root 3: d^2.00 (|c|=0.78); d^2.00 (|c|=0.52)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pur_avg` root 4: d^2.00 (|c|=0.90); d^2.00 (|c|=0.40)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pur_avg` root 5: d^2.00 (|c|=0.71); d^2.00 (|c|=0.47)
+- `ti-unc_3d_2-0_sa-casscf_moc_frozencore_pur_avg` root 6: d^2.00 (|c|=0.66); d^2.00 (|c|=0.47)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pur_avg` root 0: d^2.00 (|c|=0.54); d^2.00 (|c|=0.47)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pur_avg` root 1: d^2.00 (|c|=0.62); d^2.00 (|c|=0.40)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pur_avg` root 2: d^2.00 (|c|=0.92); d^2.00 (|c|=0.27)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pur_avg` root 3: d^2.00 (|c|=0.85); d^2.00 (|c|=0.41)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pur_avg` root 4: d^2.00 (|c|=0.79); d^2.00 (|c|=0.33)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pur_avg` root 5: d^2.00 (|c|=0.66); d^2.00 (|c|=0.45)
+- `ti-unc_3dno1_2-0_sa-casscf_no_frozencore_pur_avg` root 6: d^2.00 (|c|=0.63); d^2.00 (|c|=0.51)
+- `ti-unc_3d@r1_2-0_casscf_ao_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casscf_mo_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); p^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casscf_moc_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casscf_ao_frozencore_pur_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casscf_mo_frozencore_pur_avg` root 0: d^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_casscf_moc_frozencore_pur_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pol_avg` root 1: d^2.00 (|c|=0.69); d^2.00 (|c|=0.51)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pol_avg` root 2: d^2.00 (|c|=0.69); d^2.00 (|c|=0.52)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pol_avg` root 3: d^2.00 (|c|=0.99); d^2.00 (|c|=0.08)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pol_avg` root 4: d^2.00 (|c|=0.82); d^2.00 (|c|=0.43)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pol_avg` root 5: d^2.00 (|c|=0.77); d^2.00 (|c|=0.35)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pol_avg` root 6: d^2.00 (|c|=0.81); d^2.00 (|c|=0.37)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pol_avg` root 1: p^1.00d^1.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.03)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pol_avg` root 2: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pol_avg` root 3: p^1.00d^1.00 (|c|=0.86); p^1.00d^1.00 (|c|=0.51)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pol_avg` root 4: p^1.00d^1.00 (|c|=0.85); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pol_avg` root 5: p^1.00d^1.00 (|c|=0.99); p^1.00d^1.00 (|c|=0.11)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pol_avg` root 6: p^1.00d^1.00 (|c|=0.87); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pol_avg` root 0: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pol_avg` root 1: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pol_avg` root 2: d^2.00 (|c|=0.87); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pol_avg` root 3: d^2.00 (|c|=0.96); d^2.00 (|c|=0.29)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pol_avg` root 4: d^2.00 (|c|=0.68); d^2.00 (|c|=0.62)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pol_avg` root 5: d^2.00 (|c|=0.68); d^2.00 (|c|=0.62)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pol_avg` root 6: d^2.00 (|c|=1.00); d^2.00 (|c|=0.00)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pur_avg` root 0: d^2.00 (|c|=0.66); d^2.00 (|c|=0.39)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pur_avg` root 1: d^2.00 (|c|=0.51); d^2.00 (|c|=0.49)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pur_avg` root 2: d^2.00 (|c|=0.76); d^2.00 (|c|=0.31)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pur_avg` root 3: d^2.00 (|c|=0.79); d^2.00 (|c|=0.49)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pur_avg` root 4: d^2.00 (|c|=0.52); d^2.00 (|c|=0.51)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pur_avg` root 5: d^2.00 (|c|=0.57); d^2.00 (|c|=0.45)
+- `ti-unc_3d@r1_2-0_sa-casscf_ao_frozencore_pur_avg` root 6: d^2.00 (|c|=0.61); d^2.00 (|c|=0.45)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pur_avg` root 0: d^2.00 (|c|=1.00); p^1.00d^1.00 (|c|=0.03)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pur_avg` root 1: p^1.00d^1.00 (|c|=0.70); p^1.00d^1.00 (|c|=0.51)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pur_avg` root 2: p^1.00d^1.00 (|c|=0.57); p^1.00d^1.00 (|c|=0.51)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pur_avg` root 3: p^1.00d^1.00 (|c|=0.75); p^1.00d^1.00 (|c|=0.50)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pur_avg` root 4: p^1.00d^1.00 (|c|=0.64); p^1.00d^1.00 (|c|=0.52)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pur_avg` root 5: p^1.00d^1.00 (|c|=0.67); p^1.00d^1.00 (|c|=0.55)
+- `ti-unc_3d@r1_2-0_sa-casscf_mo_frozencore_pur_avg` root 6: p^1.00d^1.00 (|c|=0.78); p^1.00d^1.00 (|c|=0.36)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pur_avg` root 0: d^2.00 (|c|=0.96); d^2.00 (|c|=0.16)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pur_avg` root 1: d^2.00 (|c|=0.86); d^2.00 (|c|=0.46)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pur_avg` root 2: d^2.00 (|c|=0.70); d^1.99 (|c|=0.68)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pur_avg` root 3: d^2.00 (|c|=0.85); d^2.00 (|c|=0.37)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pur_avg` root 4: d^1.99 (|c|=0.67); d^2.00 (|c|=0.66)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pur_avg` root 5: d^2.00 (|c|=0.77); d^2.00 (|c|=0.46)
+- `ti-unc_3d@r1_2-0_sa-casscf_moc_frozencore_pur_avg` root 6: d^2.00 (|c|=0.98); d^2.00 (|c|=0.14)
+- `ti-unc_3d@r1no1_2-0_casscf_no_frozencore_pol_avg` root 0: d^2.00 (|c|=0.82); d^2.00 (|c|=0.56)
+- `ti-unc_3d@r1no1_2-0_casscf_no_frozencore_pur_avg` root 0: d^2.00 (|c|=0.67); d^2.00 (|c|=0.48)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pol_avg` root 0: d^2.00 (|c|=0.82); d^2.00 (|c|=0.56)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pol_avg` root 1: d^2.00 (|c|=0.70); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pol_avg` root 2: d^2.00 (|c|=0.54); d^2.00 (|c|=0.43)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pol_avg` root 3: d^2.00 (|c|=0.58); d^2.00 (|c|=0.43)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pol_avg` root 4: d^2.00 (|c|=0.51); d^2.00 (|c|=0.44)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pol_avg` root 5: d^2.00 (|c|=0.55); d^2.00 (|c|=0.50)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pol_avg` root 6: d^2.00 (|c|=0.63); d^2.00 (|c|=0.49)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pur_avg` root 0: d^2.00 (|c|=0.63); d^2.00 (|c|=0.57)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pur_avg` root 1: d^2.00 (|c|=0.71); d^2.00 (|c|=0.35)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pur_avg` root 2: d^2.00 (|c|=0.72); d^2.00 (|c|=0.49)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pur_avg` root 3: d^2.00 (|c|=0.65); d^2.00 (|c|=0.58)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pur_avg` root 4: d^2.00 (|c|=0.68); d^2.00 (|c|=0.40)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pur_avg` root 5: d^2.00 (|c|=0.49); d^2.00 (|c|=0.47)
+- `ti-unc_3d@r1no1_2-0_sa-casscf_no_frozencore_pur_avg` root 6: d^2.00 (|c|=0.65); d^2.00 (|c|=0.49)
+- `ti-unc_3d4s@r1_3-1_casscf_ao_frozencore_pol_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.01)
+- `ti-unc_3d4s@r1_3-1_casscf_mo_frozencore_pol_avg` root 0: s^1.00p^0.99d^2.01 (|c|=0.38); s^1.00p^0.99d^2.01 (|c|=0.38)
+- `ti-unc_3d4s@r1_3-1_casscf_moc_frozencore_pol_avg` root 0: d^4.00 (|c|=0.41); d^4.00 (|c|=0.41)
+- `ti-unc_3d4s@r1_3-1_casscf_ao_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)
+- `ti-unc_3d4s@r1_3-1_casscf_mo_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=0.99); p^2.00d^2.00 (|c|=0.10)
+- `ti-unc_3d4s@r1_3-1_casscf_moc_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=1.00); d^4.00 (|c|=0.06)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pol_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^1.00d^3.00 (|c|=0.02)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pol_avg` root 1: s^2.00d^2.00 (|c|=0.99); s^2.00d^2.00 (|c|=0.08)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pol_avg` root 2: s^2.00d^2.00 (|c|=0.62); s^2.00d^2.00 (|c|=0.60)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pol_avg` root 3: s^2.00d^2.00 (|c|=0.61); s^2.00d^2.00 (|c|=0.60)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pol_avg` root 4: s^2.00d^2.00 (|c|=0.60); s^2.00d^2.00 (|c|=0.54)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pol_avg` root 5: s^2.00d^2.00 (|c|=0.67); s^2.00d^2.00 (|c|=0.48)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pol_avg` root 6: s^2.00d^2.00 (|c|=0.65); s^2.00d^2.00 (|c|=0.56)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pol_avg` root 0: s^0.97p^1.03d^2.00 (|c|=0.33); s^0.97p^1.03d^2.00 (|c|=0.33)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pol_avg` root 1: s^0.97p^1.03d^2.00 (|c|=0.35); s^0.97p^1.03d^2.00 (|c|=0.35)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pol_avg` root 2: s^0.97p^1.03d^2.00 (|c|=0.36); s^0.97p^1.03d^2.00 (|c|=0.33)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pol_avg` root 3: s^0.97p^1.03d^2.00 (|c|=0.37); s^0.97p^1.03d^2.00 (|c|=0.35)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pol_avg` root 4: s^1.93p^0.07d^2.00 (|c|=0.54); p^2.00d^2.00 (|c|=0.38)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pol_avg` root 5: p^2.00d^2.00 (|c|=0.44); p^2.00d^2.00 (|c|=0.44)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pol_avg` root 6: p^2.00d^2.00 (|c|=0.49); p^2.00d^2.00 (|c|=0.44)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pol_avg` root 0: s^2.00d^2.00 (|c|=0.99); s^1.00d^3.00 (|c|=0.05)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pol_avg` root 1: s^1.00d^3.00 (|c|=0.46); s^1.00d^3.00 (|c|=0.46)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pol_avg` root 2: s^1.00d^3.00 (|c|=0.46); s^1.00d^3.00 (|c|=0.46)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pol_avg` root 3: s^1.00d^3.00 (|c|=0.45); s^1.00d^3.00 (|c|=0.45)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pol_avg` root 4: s^1.00d^3.00 (|c|=0.50); s^1.00d^3.00 (|c|=0.50)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pol_avg` root 5: s^1.00d^3.00 (|c|=0.41); s^1.00d^3.00 (|c|=0.41)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pol_avg` root 6: s^1.00d^3.00 (|c|=0.43); s^1.00d^3.00 (|c|=0.43)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=0.59); s^2.00d^2.00 (|c|=0.54)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pur_avg` root 1: s^2.00d^2.00 (|c|=0.51); s^2.00d^2.00 (|c|=0.49)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pur_avg` root 2: s^2.00d^2.00 (|c|=0.59); s^2.00d^2.00 (|c|=0.51)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pur_avg` root 3: s^2.00d^2.00 (|c|=0.65); s^2.00d^2.00 (|c|=0.56)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pur_avg` root 4: s^2.00d^2.00 (|c|=0.65); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pur_avg` root 5: s^2.00d^2.00 (|c|=0.69); s^2.00d^2.00 (|c|=0.34)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_ao_frozencore_pur_avg` root 6: s^2.00d^2.00 (|c|=0.56); s^2.00d^2.00 (|c|=0.53)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=0.96); p^2.00d^2.00 (|c|=0.16)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pur_avg` root 1: s^1.00p^1.00d^2.00 (|c|=0.46); s^1.00p^1.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pur_avg` root 2: s^1.00p^1.00d^2.00 (|c|=0.47); s^1.00p^1.00d^2.00 (|c|=0.47)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pur_avg` root 3: s^1.00p^1.00d^2.00 (|c|=0.48); s^1.00p^1.00d^2.00 (|c|=0.48)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pur_avg` root 4: s^1.00p^1.00d^2.00 (|c|=0.45); s^1.00p^1.00d^2.00 (|c|=0.43)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pur_avg` root 5: s^1.00p^1.00d^2.00 (|c|=0.43); s^1.00p^1.00d^2.00 (|c|=0.41)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_mo_frozencore_pur_avg` root 6: s^1.00p^1.00d^2.00 (|c|=0.54); s^1.00p^1.00d^2.00 (|c|=0.53)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=0.99); d^4.00 (|c|=0.06)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pur_avg` root 1: s^1.00d^3.00 (|c|=0.40); s^1.00d^3.00 (|c|=0.40)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pur_avg` root 2: s^1.00d^3.00 (|c|=0.32); s^1.00d^3.00 (|c|=0.32)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pur_avg` root 3: s^1.00d^3.00 (|c|=0.41); s^1.00d^3.00 (|c|=0.41)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pur_avg` root 4: s^1.00d^3.00 (|c|=0.42); s^1.00d^3.00 (|c|=0.41)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pur_avg` root 5: s^1.00d^3.00 (|c|=0.38); s^1.00d^3.00 (|c|=0.35)
+- `ti-unc_3d4s@r1_3-1_sa-casscf_moc_frozencore_pur_avg` root 6: s^1.00d^3.00 (|c|=0.49); s^1.00d^3.00 (|c|=0.43)
+- `ti-unc_3d4s@r1no2_3-1_casscf_no_frozencore_pol_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^2.00d^2.00 (|c|=0.07)
+- `ti-unc_3d4s@r1no2_3-1_casscf_no_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=1.00); s^2.00d^2.00 (|c|=0.04)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pol_avg` root 0: s^2.00d^2.00 (|c|=0.88); s^2.00d^2.00 (|c|=0.35)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pol_avg` root 1: s^2.00d^2.00 (|c|=0.93); s^2.00d^2.00 (|c|=0.31)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pol_avg` root 2: s^2.00d^2.00 (|c|=0.75); s^2.00d^2.00 (|c|=0.43)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pol_avg` root 3: s^2.00d^2.00 (|c|=0.75); s^2.00d^2.00 (|c|=0.44)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pol_avg` root 4: s^2.00d^2.00 (|c|=0.75); s^2.00d^2.00 (|c|=0.42)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pol_avg` root 5: s^2.00d^2.00 (|c|=0.55); s^2.00d^2.00 (|c|=0.46)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pol_avg` root 6: s^2.00d^2.00 (|c|=0.61); s^2.00d^2.00 (|c|=0.53)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pur_avg` root 0: s^2.00d^2.00 (|c|=0.60); s^2.00d^2.00 (|c|=0.53)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pur_avg` root 1: s^2.00d^2.00 (|c|=0.52); s^2.00d^2.00 (|c|=0.52)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pur_avg` root 2: s^2.00d^2.00 (|c|=0.57); s^2.00d^2.00 (|c|=0.42)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pur_avg` root 3: s^2.00d^2.00 (|c|=0.72); s^2.00d^2.00 (|c|=0.47)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pur_avg` root 4: s^2.00d^2.00 (|c|=0.57); s^2.00d^2.00 (|c|=0.39)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pur_avg` root 5: s^2.00d^2.00 (|c|=0.59); s^2.00d^2.00 (|c|=0.48)
+- `ti-unc_3d4s@r1no2_3-1_sa-casscf_no_frozencore_pur_avg` root 6: s^2.00d^2.00 (|c|=0.66); s^2.00d^2.00 (|c|=0.47)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 

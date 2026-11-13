@@ -107,7 +107,7 @@ cell layer owns a complete, method-uniform store.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -476,6 +476,9 @@ class CellData:
         without a declared cap and for stores predating the field.
     conv_dE : the final macro-cycle |delta e_tot| (``None`` where
         ``cycles`` is 0).
+    converged : the run's own convergence verdict, persisted by
+        :func:`_store_cell` (``None`` for stores predating the field
+        -- the cache path then keeps its default).
     """
 
     key: CellKey
@@ -487,6 +490,7 @@ class CellData:
     cycles: int = 0
     max_cycle: int | None = None
     conv_dE: float | None = None
+    converged: bool | None = None
 
 
 # the store ----------------------------------------------------------
@@ -556,11 +560,14 @@ def load_cell(key: CellKey, workdir: str | Path = "elements") -> CellData:
     max_cycle = lib.chkfile.load(str(chk),
                                  f"atomterm/{key.address}/max_cycle")
     conv_dE = lib.chkfile.load(str(chk), f"atomterm/{key.address}/conv_dE")
+    converged = lib.chkfile.load(str(chk),
+                                 f"atomterm/{key.address}/converged")
     return CellData(key, np.asarray(mo), energies, ci, core_energy,
                     int(ncas) if ncas is not None else 0,
                     int(cycles) if cycles is not None else 0,
                     int(max_cycle) if max_cycle is not None else None,
-                    float(conv_dE) if conv_dE is not None else None)
+                    float(conv_dE) if conv_dE is not None else None,
+                    bool(converged) if converged is not None else None)
 
 
 # ------------------------------------------------------------- the execution
@@ -1086,7 +1093,13 @@ def analyze_cell(key: CellKey, mol, mf, shell_bands: dict | None = None,
     if sector_dimension(ncas, na, nb) > _COMM_CAP:
         return None
     ncore, c_core, _ = _key_core(key, mol, mf, shell_bands)
-    return _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_core=c_core)
+    facts = _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_core=c_core)
+    # the run's own verdict rides the store (the cache has no live mc
+    # object to read; the default would claim every stored run
+    # converged)
+    if data.converged is not None:
+        facts = replace(facts, converged=data.converged)
+    return facts
 
 
 def cell_payload(key: CellKey, facts) -> dict:
@@ -1205,6 +1218,13 @@ def _store_cell(chk: Path, key: CellKey, cas, ncas: int,
     lib.chkfile.save(str(chk), f"atomterm/{key.address}/mo_coeff",
                      np.asarray(cas.mo_coeff))
     lib.chkfile.save(str(chk), f"atomterm/{key.address}/ncas", int(ncas))
+    # the run's own convergence verdict -- the cache path re-analyzes
+    # without a live mc object (its default would claim every stored
+    # run converged); persisted here so the flag survives re-analysis
+    mc = getattr(cas, "mc", None)
+    if mc is not None:
+        lib.chkfile.save(str(chk), f"atomterm/{key.address}/converged",
+                         bool(mc.converged))
     cycles = getattr(cas, "cycles", None)
     if cycles is not None:
         lib.chkfile.save(str(chk), f"atomterm/{key.address}/cycles",
@@ -1673,11 +1693,21 @@ def spine_keys(atom: str, window: str, sector: tuple[int, int]) -> list[CellKey]
     ]
 
 
+def band_tokens(label: str) -> list[str]:
+    """The shell tokens of a window label's base name — ``'3d4s'`` ->
+    ``['3d', '4s']``, ``'10f13d'`` -> ``['10f', '13d']``; the source
+    tag (everything from ``@``) is not shell composition and is
+    excluded.  The ONE parse of the label grammar: the same-l guard,
+    the no-form count, and the renderer's band provenance all read
+    it."""
+    return re.findall(r"\d+[spdfgh]", label.partition("@")[0])
+
+
 def no_label(window: str) -> str:
     """The full-span occupation-group prefix label of a window: k = its
     shell count ({3d,4s} -> the [s,d] groups -> ``3d4sno2``; each shell's
     m-set is one occupation group of the term-averaged density)."""
-    return f"{window}no{len(re.findall(r'\d+[spdfgh]', window))}"
+    return f"{window}no{len(band_tokens(window))}"
 
 
 def window_grid(spec, window: str | None = None) -> list[CellKey]:

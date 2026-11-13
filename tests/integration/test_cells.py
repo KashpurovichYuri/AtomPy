@@ -315,7 +315,9 @@ def test_void_reason_gates_scenariod_cells():
     assert reason.startswith("same-l-window") and "2026-11-10" in reason
 
 
-@fast
+NEXT_P = {"2p": "3p", "3p": "4p"}
+
+
 @fast
 def test_pshell_prior_axis_is_declared_on_c_and_si():
     """The p-shell prior axis mirrors the Sc grammar: the head = the
@@ -341,9 +343,7 @@ def test_pshell_prior_axis_is_declared_on_c_and_si():
                    for sc in scenarios_for(spec))
 
 
-NEXT_P = {"2p": "3p", "3p": "4p"}
-
-
+@fast
 def test_same_l_guard_derives_from_the_declared_windows():
     """The same-l guard is DERIVED (scenarios_for), never hand-listed
     per atom: Sc's five same-l lattice spans and Ti's three planned
@@ -1687,3 +1687,42 @@ def test_methods_lane_families():
                        ][0]
     assert "3d3p / AO" not in text       # un-run families absent
 
+
+
+@fast
+def test_swap_note_wording_and_band_counter_demotion():
+    """The renderer's two display contracts (the review round, this
+    wave): a swap_basin payload notes 'swap' -- the user's wording,
+    never the longer form; a chemically named window (window_names)
+    renders the chemical name and demotes its basis-band counters to
+    the note column."""
+    mod = methods_module()
+
+    # the swap wording: 'swap', and the longer form nowhere
+    cs = replace(CAMPAIGN["Sc"], render_spans=None)
+    keys = [*grid_keys(cs), *route_keys(cs)]
+    cells = {}
+    for k in keys:
+        if k.method == "casci" and k.start == "ao" and k.core == "avg":
+            cells[k.address] = _methods_payload(-759.7342,
+                                                kind="casci")
+    swap_key = next(k for k in keys if k.method == "casscf"
+                    and k.mask is None and k.start == "ao")
+    p = _methods_payload(-759.7593, kind="casscf")
+    p["swap_basin"] = True
+    p["converged"] = False
+    cells[swap_key.address] = p
+    text = "\n".join(mod.methods_section(cs, cells, -759.7363))
+    assert "swap basin" not in text
+    flagged = [l for l in text.splitlines() if "; swap" in l]
+    assert flagged and all(l.rstrip("| ").endswith("swap") for l in flagged)
+
+    # the band-counter demotion: the chemical name renders, the
+    # counters land in the note column
+    cs_u = CAMPAIGN["U14e"]
+    ukey = CellKey("U14e", "10f13d", (4, 0))
+    ucells = {ukey.address: _methods_payload(-50.35, kind="casci")}
+    utext = "\n".join(mod.methods_section(cs_u, ucells, -50.35))
+    row = [l for l in utext.splitlines()
+           if "5f6d" in l and "pending" not in l][0]
+    assert "bands 10f+13d" in row

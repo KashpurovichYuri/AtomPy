@@ -50,9 +50,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from atomterm.cases import campaign_spec  # noqa: E402
-from atomterm.cells import (CellKey, grid_keys, lattice_keys,  # noqa: E402
-                            prior_tag_of, radial_refused, route_keys,
-                            window_grid)
+from atomterm.cells import (CellKey, band_tokens, grid_keys,  # noqa: E402
+                            lattice_keys, prior_tag_of, radial_refused,
+                            route_keys, window_grid)
 from _tables_common import (DASH, EV, cas_label,  # noqa: E402
                             comm_cell, conv_cell, core_col,
                             l2_text, minus, payload_of, replace_block)
@@ -128,11 +128,16 @@ def _num(v, fmt) -> str:
     return format(v, fmt) if isinstance(v, float) and v == v else DASH
 
 
+def _route_of(k):
+    """The route column: the pinned lane class vs the free route."""
+    return ("pinned" if k.core_tag is not None and k.substrate == "pur"
+            else "free")
+
+
 def _row(k, p, anchor, spec, sa_floor) -> str:
     """One run cell in the methods table's columns -- every run cell a row,
     fully identified (method, route, window/start, CAS, core)."""
-    route = ("pinned" if k.core_tag is not None and k.substrate == "pur"
-             else "free")
+    route = _route_of(k)
     core = core_col(k, spec)
     if k.core_tag is not None:
         core += "·lane"     # the raw-shell Loewdin core, not the prefix
@@ -188,8 +193,9 @@ def _row(k, p, anchor, spec, sa_floor) -> str:
         # a CHEMICAL display name: the basis-band counters demote to
         # the note column (the provenance the user asked to keep)
         if wname != k.span_label:
-            bands = "+".join(re.findall(r"\d+[spdf]", k.span_label))
+            bands = "+".join(band_tokens(k.span_label))
             note += ("; " if note else "") + f"bands {bands}"
+    note = note.rstrip("; ")    # no dangling separator on the last part
     cells = [
         _method(k), route, f"{wname} / {START_NAMES[k.start]}",
         cas_label(k, spec), core, f"{p['n_det']:,}",
@@ -318,8 +324,7 @@ def _pending_row(k, spec) -> str:
     if k.core_tag is not None:
         core += "·lane"     # the raw-shell Loewin core, not the prefix
     cells = [_method(k),
-             "pinned" if (k.core_tag is not None
-                          and k.substrate == "pur") else "free",
+             _route_of(k),
              f"{wname} / {START_NAMES[k.start]}",
              cas_label(k, spec), core,
              *[DASH] * 12, "pending"]
@@ -348,7 +353,8 @@ def _comparison_key(k):
     block = 0 if k.start == "ao" else 2
     tier = 0 if k.method == "casci" else 1
     m_rank = 1 if k.method == "sa-casscf" else 0
-    mask_rank = {"radial": 1, "frozen": 2, "virtmix": 3}.get(k.mask, 0)
+    mask_rank = {"radial": 1, "frozen": 2, "frozencore": 3,
+                 "virtmix": 4}.get(k.mask, 0)
     return (tier, block, k_rank, src, k.start, m_rank, mask_rank)
 
 

@@ -95,7 +95,7 @@ user decision; the partial verdict 91/91-isolation-green).
   0.8889/0.9978); below it the analysis reads the RAW field (the one
   the CI was solved in) -- exact agreement restored, the payload
   carries core_span_overlap + swap_basin, the renderer adds the
-  'swap basin' note.  The refine pass re-analyzed every cached
+  'swap' note.  The refine pass re-analyzed every cached
   optimizer leg on the twins (34 swap payloads, zero legs above
   10 mEh; the meter 1.8e-9 on the spot-checked cell).  The swap rows
   render honest energies with the disclosure; their meters are the
