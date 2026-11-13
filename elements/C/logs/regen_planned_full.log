@@ -1,0 +1,391 @@
+=== C planned --full ===
+
+===== cells C =====
+ROHF E = -37.68241788 Eh
+  [cell] c_2p@r1_2-0_casci_ao_-_pol_raw
+  [cell] c_2p@r1_2-0_casci_ao_-_pol_avg
+  [cell] c_2p@r1_2-0_casci_ao_-_pur_avg
+  [cell] c_2p@r1_2-0_casci_mo_-_pol_avg
+  [cell] c_2p@r1_2-0_casci_moc_-_pol_avg
+  [cell] c_2p@r1no1_2-0_casci_no_-_pol_avg
+  [cell] c_2p@r1_2-0_casci_mo_-_pur_avg
+  [cell] c_2p@r1_2-0_casci_moc_-_pur_avg
+  [cell] c_2p@r1no1_2-0_casci_no_-_pur_avg
+  [cell] c_2p@r1_2-0_casscf_ao_-_pol_avg
+  [cell] c_2p@r1_2-0_casscf_mo_-_pol_avg
+  [cell] c_2p@r1_2-0_casscf_moc_-_pol_avg
+  [cell] c_2p@r1no1_2-0_casscf_no_-_pol_avg
+  [cell] c_2p@r1_2-0_casscf_ao_-_pur_avg
+  [cell] c_2p@r1_2-0_casscf_mo_-_pur_avg
+  [cell] c_2p@r1_2-0_casscf_moc_-_pur_avg
+  [cell] c_2p@r1no1_2-0_casscf_no_-_pur_avg
+  [refused] c_2p@r1_2-0_casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] c_2p@r1_2-0_casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] c_2p@r1_2-0_casscf_ao_frozen_pol_avg
+  [cell] c_2p@r1_2-0_casscf_mo_frozen_pol_avg
+  [cell] c_2p@r1_2-0_casscf_moc_frozen_pol_avg
+  [cell] c_2p@r1no1_2-0_casscf_no_frozen_pol_avg
+  [cell] c_2p@r1_2-0_casscf_ao_frozen_pur_avg
+  [cell] c_2p@r1_2-0_casscf_mo_frozen_pur_avg
+  [cell] c_2p@r1_2-0_casscf_moc_frozen_pur_avg
+  [cell] c_2p@r1no1_2-0_casscf_no_frozen_pur_avg
+  [cell] c_2p@r1_2-0_sa-casscf_ao_-_pol_avg
+  [cell] c_2p@r1_2-0_sa-casscf_mo_-_pol_avg
+  [cell] c_2p@r1_2-0_sa-casscf_moc_-_pol_avg
+  [cell] c_2p@r1no1_2-0_sa-casscf_no_-_pol_avg
+  [cell] c_2p@r1_2-0_sa-casscf_ao_-_pur_avg
+  [cell] c_2p@r1_2-0_sa-casscf_mo_-_pur_avg
+  [cell] c_2p@r1_2-0_sa-casscf_moc_-_pur_avg
+  [cell] c_2p@r1no1_2-0_sa-casscf_no_-_pur_avg
+  [refused] c_2p@r1_2-0_sa-casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] c_2p@r1_2-0_sa-casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] c_2p@r1_2-0_sa-casscf_ao_frozen_pol_avg
+  [cell] c_2p@r1_2-0_sa-casscf_mo_frozen_pol_avg
+  [cell] c_2p@r1_2-0_sa-casscf_moc_frozen_pol_avg
+  [cell] c_2p@r1no1_2-0_sa-casscf_no_frozen_pol_avg
+  [cell] c_2p@r1_2-0_sa-casscf_ao_frozen_pur_avg
+  [cell] c_2p@r1_2-0_sa-casscf_mo_frozen_pur_avg
+  [cell] c_2p@r1_2-0_sa-casscf_moc_frozen_pur_avg
+  [cell] c_2p@r1no1_2-0_sa-casscf_no_frozen_pur_avg
+  [cell] c_2p@s1_2-0_casci_ao_-_pol_raw
+  [cell] c_2p@s1_2-0_casci_ao_-_pol_avg
+  [cell] c_2p@s1_2-0_casci_ao_-_pur_avg
+  [cell] c_2p@s1_2-0_casci_mo_-_pol_avg
+  [cell] c_2p@s1_2-0_casci_moc_-_pol_avg
+  [cell] c_2p@s1no1_2-0_casci_no_-_pol_avg
+  [cell] c_2p@s1_2-0_casci_mo_-_pur_avg
+  [cell] c_2p@s1_2-0_casci_moc_-_pur_avg
+  [cell] c_2p@s1no1_2-0_casci_no_-_pur_avg
+  [cell] c_2p@s1_2-0_casscf_ao_-_pol_avg
+  [cell] c_2p@s1_2-0_casscf_mo_-_pol_avg
+  [cell] c_2p@s1_2-0_casscf_moc_-_pol_avg
+  [cell] c_2p@s1no1_2-0_casscf_no_-_pol_avg
+  [cell] c_2p@s1_2-0_casscf_ao_-_pur_avg
+  [cell] c_2p@s1_2-0_casscf_mo_-_pur_avg
+  [cell] c_2p@s1_2-0_casscf_moc_-_pur_avg
+  [cell] c_2p@s1no1_2-0_casscf_no_-_pur_avg
+  [refused] c_2p@s1_2-0_casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] c_2p@s1_2-0_casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] c_2p@s1_2-0_casscf_ao_frozen_pol_avg
+  [cell] c_2p@s1_2-0_casscf_mo_frozen_pol_avg
+  [cell] c_2p@s1_2-0_casscf_moc_frozen_pol_avg
+  [cell] c_2p@s1no1_2-0_casscf_no_frozen_pol_avg
+  [cell] c_2p@s1_2-0_casscf_ao_frozen_pur_avg
+  [cell] c_2p@s1_2-0_casscf_mo_frozen_pur_avg
+  [cell] c_2p@s1_2-0_casscf_moc_frozen_pur_avg
+  [cell] c_2p@s1no1_2-0_casscf_no_frozen_pur_avg
+  [cell] c_2p@s1_2-0_sa-casscf_ao_-_pol_avg
+  [cell] c_2p@s1_2-0_sa-casscf_mo_-_pol_avg
+  [cell] c_2p@s1_2-0_sa-casscf_moc_-_pol_avg
+  [cell] c_2p@s1no1_2-0_sa-casscf_no_-_pol_avg
+  [cell] c_2p@s1_2-0_sa-casscf_ao_-_pur_avg
+  [cell] c_2p@s1_2-0_sa-casscf_mo_-_pur_avg
+  [cell] c_2p@s1_2-0_sa-casscf_moc_-_pur_avg
+  [cell] c_2p@s1no1_2-0_sa-casscf_no_-_pur_avg
+  [refused] c_2p@s1_2-0_sa-casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] c_2p@s1_2-0_sa-casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] c_2p@s1_2-0_sa-casscf_ao_frozen_pol_avg
+  [cell] c_2p@s1_2-0_sa-casscf_mo_frozen_pol_avg
+  [cell] c_2p@s1_2-0_sa-casscf_moc_frozen_pol_avg
+  [cell] c_2p@s1no1_2-0_sa-casscf_no_frozen_pol_avg
+  [cell] c_2p@s1_2-0_sa-casscf_ao_frozen_pur_avg
+  [cell] c_2p@s1_2-0_sa-casscf_mo_frozen_pur_avg
+  [cell] c_2p@s1_2-0_sa-casscf_moc_frozen_pur_avg
+  [cell] c_2p@s1no1_2-0_sa-casscf_no_frozen_pur_avg
+  wrote elements/C/cells.json + cells.md
+
+done
+=== Si planned --full ===
+
+===== cells Si =====
+ROHF E = -288.84643692 Eh
+  [cell] si_3p@r1_2-0_casci_ao_-_pol_raw
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casci_ao_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casci_ao_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casci_mo_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casci_moc_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_casci_no_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@r1_2-0_casci_mo_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casci_moc_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_casci_no_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@r1_2-0_casscf_ao_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casscf_mo_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casscf_moc_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_casscf_no_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@r1_2-0_casscf_ao_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casscf_mo_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casscf_moc_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_casscf_no_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [refused] si_3p@r1_2-0_casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] si_3p@r1_2-0_casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] si_3p@r1_2-0_casscf_ao_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casscf_mo_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casscf_moc_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_casscf_no_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@r1_2-0_casscf_ao_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casscf_mo_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_casscf_moc_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_casscf_no_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@r1_2-0_sa-casscf_ao_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_sa-casscf_mo_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_sa-casscf_moc_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_sa-casscf_no_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@r1_2-0_sa-casscf_ao_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_sa-casscf_mo_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_sa-casscf_moc_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_sa-casscf_no_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [refused] si_3p@r1_2-0_sa-casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] si_3p@r1_2-0_sa-casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] si_3p@r1_2-0_sa-casscf_ao_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_sa-casscf_mo_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_sa-casscf_moc_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_sa-casscf_no_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@r1_2-0_sa-casscf_ao_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_sa-casscf_mo_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1_2-0_sa-casscf_moc_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+  [cell] si_3p@r1no1_2-0_sa-casscf_no_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded -0.0000, capture 0.0000-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@s1_2-0_casci_ao_-_pol_raw
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casci_ao_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casci_ao_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casci_mo_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casci_moc_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_casci_no_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@s1_2-0_casci_mo_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casci_moc_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_casci_no_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@s1_2-0_casscf_ao_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casscf_mo_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casscf_moc_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_casscf_no_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@s1_2-0_casscf_ao_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casscf_mo_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casscf_moc_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_casscf_no_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [refused] si_3p@s1_2-0_casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] si_3p@s1_2-0_casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] si_3p@s1_2-0_casscf_ao_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casscf_mo_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casscf_moc_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_casscf_no_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@s1_2-0_casscf_ao_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casscf_mo_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_casscf_moc_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_casscf_no_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@s1_2-0_sa-casscf_ao_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_sa-casscf_mo_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_sa-casscf_moc_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_sa-casscf_no_-_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@s1_2-0_sa-casscf_ao_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_sa-casscf_mo_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_sa-casscf_moc_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_sa-casscf_no_-_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [refused] si_3p@s1_2-0_sa-casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] si_3p@s1_2-0_sa-casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] si_3p@s1_2-0_sa-casscf_ao_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_sa-casscf_mo_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_sa-casscf_moc_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_sa-casscf_no_frozen_pol_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@s1_2-0_sa-casscf_ao_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_sa-casscf_mo_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1_2-0_sa-casscf_moc_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+  [cell] si_3p@s1no1_2-0_sa-casscf_no_frozen_pur_avg
+  [window] prior 3p: k=1 of 2 bands, discarded 0.0006, capture 0.0000-0.9995
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3]
+  [cell] si_3p@s2_2-0_casci_ao_-_pol_raw
+  [cell] si_3p@s2_2-0_casci_ao_-_pol_avg
+  [cell] si_3p@s2_2-0_casci_ao_-_pur_avg
+  [cell] si_3p@s2_2-0_casci_mo_-_pol_avg
+  [cell] si_3p@s2_2-0_casci_moc_-_pol_avg
+  [cell] si_3p@s2no1_2-0_casci_no_-_pol_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  [cell] si_3p@s2_2-0_casci_mo_-_pur_avg
+  [cell] si_3p@s2_2-0_casci_moc_-_pur_avg
+  [cell] si_3p@s2no1_2-0_casci_no_-_pur_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  [cell] si_3p@s2_2-0_casscf_ao_-_pol_avg
+  [cell] si_3p@s2_2-0_casscf_mo_-_pol_avg
+  [cell] si_3p@s2_2-0_casscf_moc_-_pol_avg
+  [cell] si_3p@s2no1_2-0_casscf_no_-_pol_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  [cell] si_3p@s2_2-0_casscf_ao_-_pur_avg
+  [cell] si_3p@s2_2-0_casscf_mo_-_pur_avg
+  [cell] si_3p@s2_2-0_casscf_moc_-_pur_avg
+  [cell] si_3p@s2no1_2-0_casscf_no_-_pur_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  [refused] si_3p@s2_2-0_casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] si_3p@s2_2-0_casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] si_3p@s2_2-0_casscf_ao_frozen_pol_avg
+  [cell] si_3p@s2_2-0_casscf_mo_frozen_pol_avg
+  [cell] si_3p@s2_2-0_casscf_moc_frozen_pol_avg
+  [cell] si_3p@s2no1_2-0_casscf_no_frozen_pol_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  [cell] si_3p@s2_2-0_casscf_ao_frozen_pur_avg
+  [cell] si_3p@s2_2-0_casscf_mo_frozen_pur_avg
+  [cell] si_3p@s2_2-0_casscf_moc_frozen_pur_avg
+  [cell] si_3p@s2no1_2-0_casscf_no_frozen_pur_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  [cell] si_3p@s2_2-0_sa-casscf_ao_-_pol_avg
+  [cell] si_3p@s2_2-0_sa-casscf_mo_-_pol_avg
+  [cell] si_3p@s2_2-0_sa-casscf_moc_-_pol_avg
+  [cell] si_3p@s2no1_2-0_sa-casscf_no_-_pol_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  [cell] si_3p@s2_2-0_sa-casscf_ao_-_pur_avg
+  [cell] si_3p@s2_2-0_sa-casscf_mo_-_pur_avg
+  [cell] si_3p@s2_2-0_sa-casscf_moc_-_pur_avg
+  [cell] si_3p@s2no1_2-0_sa-casscf_no_-_pur_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  [refused] si_3p@s2_2-0_sa-casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] si_3p@s2_2-0_sa-casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] si_3p@s2_2-0_sa-casscf_ao_frozen_pol_avg
+  [cell] si_3p@s2_2-0_sa-casscf_mo_frozen_pol_avg
+  [cell] si_3p@s2_2-0_sa-casscf_moc_frozen_pol_avg
+  [cell] si_3p@s2no1_2-0_sa-casscf_no_frozen_pol_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  [cell] si_3p@s2_2-0_sa-casscf_ao_frozen_pur_avg
+  [cell] si_3p@s2_2-0_sa-casscf_mo_frozen_pur_avg
+  [cell] si_3p@s2_2-0_sa-casscf_moc_frozen_pur_avg
+  [cell] si_3p@s2no1_2-0_sa-casscf_no_frozen_pur_avg
+  [window] prior 3p: k=2 of 2 bands, discarded 0.0000, capture 0.0508-1.0000
+[no-arm] source ground block: 3 roots
+[no-arm] occupation groups: [3, 3]
+  wrote elements/Si/cells.json + cells.md
+
+done

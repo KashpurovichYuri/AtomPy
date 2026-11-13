@@ -323,18 +323,18 @@ the live state — update it in the same commit as any state change.
 ## Progress
 
 - [x] **STAGE 0** (ticket 36; approved): batches B (Sc) 85e3f0c, C (Ti)
-      74406bb, **D (twins) LANDED 2026-11-13** — zero runnable-pending at
-      scope on all three; the remaining rows = the declared classes (the
-      parked pinned-lane schema seam + the `@s` block).  D executed
+      74406bb, **D (twins) 0f52cbc, E (C/Si) LANDED 2026-11-13** — zero
+      runnable-pending at scope on all; the remaining rows = the declared
+      classes (the parked pinned-lane schema seam; the twins' `@s` block;
+      C's `@s2` RETIRED — the rank-1 series, map Issues).  D executed
       method-filtered (the anchor-first re-test; the frac class stays
       void — see map Issues) after the regen materialization bug's one-
       home fix (`_materializes`, 2484d23), and delivered the swap-basin
       readout fix (99cc4de — the 0.8 Eh misread root-caused to the
       spherical averaging on runaway-scrambled cores; 34 cached legs
       re-analyzed honest; 'swap basin' notes render).  Next:
-      E (C/Si) → A (U14e LAST, the frac scenario method-filtered;
-      the planned-group optimizer pricing needs a runtime estimate
-      before launch).
+      A (U14e LAST — BEFORE LAUNCH price the planned-group optimizer
+      legs for the user; the frac scenario method-filtered).
 - [x] **STAGE 1a** — the spectrum measurement: per-l-block S spectra on both
       twins, committed to `elements/<twin>/logs/spectrum.log`; **VERDICT =
       NO-GO on the clean-gap premise** (no null space: every eigenvalue

@@ -667,7 +667,12 @@ CAMPAIGN: dict[str, CaseSpec] = {
                           SeriesSpec("s1p3", ("1s",), ("2s", "2p"),
                                      4, -37.59068260)),
                   prior_bands={"2p": ("2p", "3p")},
-                  planned_windows=("2p@r1", "2p@s1", "2p@s2"),
+                  # NO 2p@s2: the p2+s1p3 series average is rank-1 --
+                  # the second radial eigenvalue 1.9e-04 against the
+                  # leading 2.5 (measured 2026-11-13, the construction
+                  # refusal at the E batch).  Si's mirrored @s2 is
+                  # measured constructible (5.1e-2) and stays.
+                  planned_windows=("2p@r1", "2p@s1"),
                   scenarios=(_prior_anchor_first("C", [(2, 0)]),),
                   scan=ScanSpec(fam=("2p", "3p"),
                                 grid=(0.0, 0.8, 17))),

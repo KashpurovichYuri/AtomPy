@@ -66,6 +66,16 @@ user decision; the partial verdict 91/91-isolation-green).
   the contraction recipe re-scatters across cases/reference/scripts);
   the member_chains seam is real (two declared distillation
   families walk it); the radial legs need ZERO new src surface.
+- C'S @s2 DECLARATION RETIRED (2026-11-13, the E batch): the
+  p2+s1p3 series average is RANK-1 -- the second radial eigenvalue
+  1.9e-04 against the leading 2.5 -- so the declared k=2 window
+  refuses at construction (the distillation's own floor).  The
+  declaration dies (the doctrine: delete the fake degree of freedom,
+  don't guard it); C's planned windows are @r1/@s1.  Si's mirrored
+  @s2 is MEASURED constructible (second eigenvalue 5.1e-2, 260x
+  C's; k=2 of 2 bands, cells ran) and stays.  The twins' @s2 blocks
+  stay pending (Stage 2's seeded series carries the census members
+  that would give the second radial).
 - THE SWAP-BASIN READOUT SEAM (2026-11-12, found at batch D's
   materialization; **FIXED 2026-11-13, 99cc4de**): the free optimizer
   legs that land the SEMI-CORE SWAP BASIN (the classic 3p/3s-into-
