@@ -67,25 +67,31 @@ user decision; the partial verdict 91/91-isolation-green).
   the member_chains seam is real (two declared distillation
   families walk it); the radial legs need ZERO new src surface.
 - THE SWAP-BASIN READOUT SEAM (2026-11-12, found at batch D's
-  materialization): the free optimizer legs that land the SEMI-CORE
-  SWAP BASIN (the classic 3p/3s-into-active attractor; PySCF-side
-  E ~ -759.759 Sc / -848.42..-848.43 Ti -- 28..37 mEh below the
-  distilled-window CI) are MISREAD by the CI-stack bridge:
-  e_ground reads 0.79-0.83 Eh BELOW energies_pyscf on exactly those
-  legs.  The payload's own max_de_vs_pyscf meter catches every
-  instance (coherent baseline ~3 mEh; broken ~800).  The class:
-  ao/no-start FREE legs on the ruler-sector windows (3d4s,
-  3d4s@r1(+no2), 3d4sno2); every frozen leg, every mo/moc start, the
-  (2,0)-sector 3d legs (ao-free INCLUDED) and the lanes are
-  coherent.  This IS the recorded (xxv-era) "0.8 Eh stack anomaly" --
-  now measured precisely: it tracks the SWAP BASIN, not the SA
-  method.  The physics is one consistent basin across starts (the
-  fact-15 multi-solution reality, the ticket's expected trouble);
-  the READOUT seam breaks on the swapped windows (the bridge's
-  ordering/symmetry assumptions).  Deep fix = its own investigation;
-  the meter is the reliable discriminator meanwhile.  Disposition of
-  the rows at D's render: USER-GATED (quarantine vs
-  pyscf-side-energy-with-note).
+  materialization; **FIXED 2026-11-13, 99cc4de**): the free optimizer
+  legs that land the SEMI-CORE SWAP BASIN (the classic 3p/3s-into-
+  active attractor; the same basin from every start -- Sc
+  e_pyscf -759.759, Ti -848.42..-848.43, 28..37 mEh below the
+  distilled-window CI) were MISREAD by the readout: e_ground 0.8 Eh
+  below energies_pyscf.  ROOT CAUSE, measured to the root: PySCF's
+  CASSCF optimizes EVERY orbital -- the runaway rotates the core
+  block far from the reference core (span overlap 0.8889), and the
+  readout's SPHERICALLY AVERAGED field (fact 5's multiplet
+  protection) is meaningless on a block that is no longer a core
+  (our h1 vs PySCF's get_h1eff: max elt diff 0.395 on one orbital;
+  PySCF CASCI on the stored layout reproduces energies_pyscf to 8
+  digits -- the averaging was the entire discrepancy).  THE FIX:
+  stage_facts measures the core block's span overlap against the
+  reference core (_CORE_ANCHOR_TOL = 0.99, the measured gap
+  0.8889/0.9978); below it the analysis reads the RAW field (the one
+  the CI was solved in) -- exact agreement restored, the payload
+  carries core_span_overlap + swap_basin, the renderer adds the
+  'swap basin' note.  The refine pass re-analyzed every cached
+  optimizer leg on the twins (34 swap payloads, zero legs above
+  10 mEh; the meter 1.8e-9 on the spot-checked cell).  The swap rows
+  render honest energies with the disclosure; their meters are the
+  swap fingerprints.  The class re-runs gauge-anchored at Stage 2 if
+  the campaign wants in-window solutions (the keep-the-window
+  treatment, casscf.py's masks).
 - THE TWINS' FRAC REFERENCE (2026-11-12, found at batch D): the
   `frac-reference-unmeasured` scenario holds one casci cell void per
   twin, and a blanket `--group grid --full` (ticket 36's literal D
