@@ -133,7 +133,7 @@ class SeriesSpec(NamedTuple):
 # the series -----------------------------------------------------------
 
 def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
-               head_mf) -> dict[str, "_scf.RHF"]:
+               head_mf, seed_basis: str | None = None) -> dict[str, "_scf.RHF"]:
     """Run (or load, trusted) the configuration series.
 
     Parameters
@@ -147,6 +147,14 @@ def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
         entry) must be the case's reference configuration.
     head_mf : the case's trusted converged reference mf (the head's
         converged state -- never re-run, never re-gated).
+    seed_basis : str | None
+        The SEEDED-MOM source basis for the non-head configurations
+        (``CaseSpec.series_seed``'s thread) -- the certified repair
+        on ill-conditioned bases: each member's forced SCF runs
+        through :func:`atomterm.reference.run_rohf`'s seeded mode
+        (the projected source carries the configuration, the MOM
+        hook follows it, the character post-check verifies).
+        Seedless ⇒ the weight hook (certified on contracted bases).
 
     Returns
     -------
@@ -159,7 +167,8 @@ def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
         reference; a mismatched declaration is a wrong series).
     RuntimeError
         a fresh configuration did not reach its declared basin (the
-        gate's own error, propagated).
+        gate's own error, propagated), or its converged occupations
+        do not carry the declared character.
     """
     if series[0].spin != cfg.spin:
         raise ValueError(
@@ -181,19 +190,21 @@ def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
         cfg_x = type(cfg)(cfg.symbol, cfg.basis, spin=spec.spin)
         ref = ReferenceSpec(occ_closed=spec.closed, occ_open=spec.open,
                             occ_e_ref=spec.e_ref,
+                            seed_basis=seed_basis,
                             conv_accelerator=spec.accel)
         _m, mf_x = run_rohf(cfg_x, str(chk_dir / f"{spec.tag}.chk"), ref=ref)
-        # the occupation post-check: a gated run whose converged
-        # occupations disagree with its own hook is a wrong
+        # the occupation post-check: a run whose converged occupied
+        # columns do not carry the declared character is a wrong
         # configuration, refused whatever the energy (the Newton
-        # frozen-assignment disease -- reference.occupation_postcheck)
+        # frozen-assignment disease -- reference.occupation_postcheck,
+        # the character-of-occupied form)
         if not occupation_postcheck(_m, mf_x, spec.closed, spec.open):
             raise RuntimeError(
                 f"series config {spec.tag!r} converged at "
-                f"E = {mf_x.e_tot:.8f} with occupations its own hook "
-                "reassigns differently (the Newton frozen-assignment "
-                "disease) -- the wrong configuration; the census "
-                "(rohf_basin_census, the occ_ok rows) owns the gate")
+                f"E = {mf_x.e_tot:.8f} without the declared character "
+                "(the Newton frozen-assignment disease) -- the wrong "
+                "configuration; the census (rohf_basin_census, the "
+                "occ_ok rows) owns the gate")
         out[spec.tag] = mf_x
     return out
 

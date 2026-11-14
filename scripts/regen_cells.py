@@ -365,7 +365,8 @@ def main() -> None:
                 k.source_tag is not None and k.source_tag[0] == "s"
                 for k in queue)):
             from atomterm.basis import run_series
-            series_mfs = run_series(cfg, "elements", name, spec.series, mf)
+            series_mfs = run_series(cfg, "elements", name, spec.series, mf,
+                                    seed_basis=spec.series_seed)
         for key in queue:
             if radial_refused(key, spec):
                 # a construction refusal is permanent (no basis rows)

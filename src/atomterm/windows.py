@@ -61,6 +61,7 @@ import warnings
 from typing import NamedTuple
 
 import numpy as np
+from pyscf import gto
 
 __all__ = [
     "Window",
@@ -88,6 +89,7 @@ __all__ = [
     "shell_slots",
     "complete_orthonormal",
     "build_full_mo",
+    "project_orbitals",
     "lm_sectors",
     "l_per_row",
     "radial_basis",
@@ -1381,3 +1383,84 @@ def window_avas(mf, labels: list[str], ncore: int, threshold: float = None):
     ncas, nelecas, mo = avas.avas(mf, labels, ncore=ncore, **kw)
     nelecas = np.atleast_1d(np.asarray(nelecas)).ravel()
     return mo, int(ncas), nelecas
+
+
+def project_orbitals(mol_b, mol_a, c_a,
+                     thresh: float = None) -> tuple[np.ndarray, dict]:
+    """The cross-basis projector: source columns ``c_a`` (S_A-orthonormal
+    in ``mol_a``) transferred into ``mol_b``'s AO space, Loewdin'd
+    within the projected span in B's metric -- the ONE primitive the
+    seeded-reference repair leans on (the seed is the configuration
+    carrier across bases).
+
+    Parameters
+    ----------
+    mol_b, mol_a : the target and source Mole objects (same geometry).
+    c_a : (nao_a, k) source columns.
+    thresh : the conditioning truncation of the B-metric solve.
+        ``None`` is deliberately the naive projector ``S_B^{-1} X C_A``
+        (the battery's stress-test foil: on a near-singular B it
+        assigns a duplicated pair's weight to an arbitrary member).
+        Given a threshold, the solve runs in the truncated eigenbasis
+        (the conditioning lives INSIDE the projector -- ``S_B^{-1}``
+        amplifies the null space); the declared policy for production
+        is the conservative constant owned by
+        :func:`atomterm.reference.projected_source`.
+
+    Returns
+    -------
+    (c_b, report): the S_B-orthonormal projected columns and the
+    disclosure dict -- per-column ``capture`` (the squared cosine of
+    each source column against its best approximation in B; exactly 1
+    under span containment), ``s_min`` (B's overlap spectrum floor),
+    ``n_drop`` (modes dropped at the cut), ``mu`` (the projected
+    span's pre-normalization metric eigenvalues), ``w_rows`` (the
+    per-AO participation of the pre-normalization projection -- the
+    membership meter), ``ortho_err``.
+
+    Notes
+    -----
+    The capture and the membership meter make misuse visible, not
+    silent: a capture below the source's span faithfulness or a
+    membership split across near-degenerate directions is the
+    warning.  The Loewdin step drops machine-zero metric directions
+    (the projected span may be rank-deficient when B lacks the
+    source's space) and uses the SYMMETRIC inverse square root --
+    dropping the trailing rotation leaves a gauge-chaotic basis on
+    near-degenerate spectra (the identity anchor catches it).
+    """
+    s = mol_b.intor("int1e_ovlp")
+    # (nao_b, nao_a): the cross overlap, A's AOs paired against B's
+    x = gto.intor_cross("int1e_ovlp", mol_a, mol_b).T
+    rhs = x @ c_a
+    ev, v = np.linalg.eigh(s)
+    if thresh is None:
+        w = np.linalg.solve(s, rhs)                  # the naive foil
+        n_drop = 0
+    else:
+        keep = ev > thresh
+        w = (v[:, keep] / ev[keep]) @ (v[:, keep].T @ rhs)
+        n_drop = int((~keep).sum())
+    # the capture: the squared cosine of source column vs its best
+    # approximation in B (columnwise: c_i^T X^T W_i)
+    cap = np.einsum("ij,ij->j", c_a.conj(), (x.T @ w)).real
+    # the per-AO participation of the projection (row-wise S-norms of
+    # w) -- the membership meter: on a near-degenerate pair the NAIVE
+    # solve assigns the weight to an arbitrary member (rounding
+    # decides), the truncated solve to the symmetric combination
+    w_rows = np.sqrt(np.maximum(np.einsum("ij,ij->i", w.real,
+                                          (s @ w).real), 0.0))
+    # Loewdin within the projected span, B's metric; drop machine-zero
+    m = w.T @ s @ w
+    m = 0.5 * (m + m.T)
+    mu, u = np.linalg.eigh(m)
+    good = mu > 1e-12
+    # the SYMMETRIC inverse square root m^{-1/2} = U mu^{-1/2} U^T --
+    # dropping the trailing U^T leaves a gauge-chaotic rotation on
+    # near-degenerate spectra (caught by the identity anchor)
+    m_isqrt = (u[:, good] / np.sqrt(mu[good])) @ u[:, good].T
+    c_b = w @ m_isqrt
+    ortho = float(np.abs(c_b.T @ s @ c_b - np.eye(c_b.shape[1])).max())
+    report = {"capture": cap, "s_min": float(ev[0]), "n_drop": n_drop,
+              "mu": mu, "ortho_err": ortho, "w_rows": w_rows}
+    return c_b, report

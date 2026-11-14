@@ -11,8 +11,11 @@ the wrong configuration (the aufbau runaway) and a metastable basin at
 fixed occupations. The toolbox, escalating: character-forced filling
 (S-projector weights, never energy order -- :func:`run_rohf`), the
 basin gate (cycled guesses against a reference energy --
-:class:`ReferenceSpec`), and the fractional-occupation ensemble (the
-spherical reference with smeared valence -- :func:`run_frac_occ`).
+:class:`ReferenceSpec`), the SEEDED-MOM mode on ill-conditioned bases
+(:class:`ReferenceSpec`'s ``seed_basis``: a projected source carries
+the configuration, the occupations FOLLOW it -- the certified repair
+for the fresh-SCF disease), and the fractional-occupation ensemble
+(the spherical reference with smeared valence -- :func:`run_frac_occ`).
 
 The UHF class (:func:`run_uhf`) runs the same discipline per spin:
 at the campaign's maximal-Ms sectors the forced occupations have the
@@ -36,11 +39,22 @@ Conventions
   never two fresh runs.
 - The occupation hook (``get_occ``) is part of the SCF object's
   identity: attached BEFORE the cache branch, so cache hits carry it
-  too.
+  too.  THREE filling policies share the one insertion point: PySCF's
+  aufbau (no patterns), the weight hook (:func:`_forced_rohf_occ` --
+  certified on contracted bases), and the MOM-follow hook
+  (:func:`_mom_occ` -- the seeded mode; the seed's occupied columns
+  win an S-overlap contest each cycle, so the metric-amplified
+  virtual tail never competes).
 - Occupation metrics are S-projector weights ``c^dag P c`` (bounded by
   1 on S-orthonormal columns); the bare quadratic form is unbounded on
   diffuse bases. One home:
   :func:`atomterm.windows.span_projector`.
+- The seeded mode's honesty meter is the CHARACTER-OF-OCCUPIED
+  post-check (:func:`occupation_postcheck`): the converged occupied
+  columns must carry the declared spans by majority weight -- it
+  never ranks all columns, because on the diseased bases the virtual
+  tail carries span weights ~1 too and any ranking degrades to
+  noise comparison.
 """
 
 from __future__ import annotations
@@ -50,10 +64,10 @@ from dataclasses import dataclass
 import numpy as np
 from pyscf import gto, scf
 
-from atomterm.windows import select_span, span_projector
+from atomterm.windows import project_orbitals, select_span, span_projector
 
 __all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "occupation_postcheck",
-           "rohf_basin_census", "uhf_basin_census",
+           "projected_source", "rohf_basin_census", "uhf_basin_census",
            "run_frac_occ", "uhf_contamination", "run_folded"]
 
 
@@ -183,6 +197,61 @@ def _forced_uhf_occ(mol, occ_closed: list[str], occ_open: list[str]):
     return _occ
 
 
+def _mom_occ(mol, c_seed, occ_seed):
+    """The MOM-anchored occupation hook (a ``get_occ`` replacement,
+    the seeded mode's filler -- built for :func:`run_rohf` under
+    ``ReferenceSpec.seed_basis``).
+
+    The occupations FOLLOW the seed's occupied columns by max
+    S-overlap each cycle: every current MO competes for every seeded
+    slot and the highest-overlap column takes the seed's occupation.
+    Near-null metric combinations are S-orthogonal to physical
+    columns, so the metric-amplified virtual tail never wins the
+    contest -- the seed alone carries the configuration (the weight
+    hook's ranking, by contrast, degrades to noise comparison on the
+    diseased bases).
+
+    Parameters
+    ----------
+    mol : Mole
+        The atom (the overlap metric).
+    c_seed : (nao, n_seed) the seed's occupied columns (S-orthonormal
+        in ``mol`` -- :func:`project_orbitals`'s product).
+    occ_seed : (n_seed,) the seed's occupations per column (2.0 pairs,
+        1.0 opens); assignment runs seed-order, closed pairs first.
+
+    Returns
+    -------
+    callable
+        ``occ(mo_energy, mo_coeff) -> occupations``.
+
+    Notes
+    -----
+    The contest state RESETS each call: MO indices re-diagonalize
+    every cycle, so a cross-cycle 'taken' set would assign cycle 2 to
+    whatever is left (the bug the first prototype caught).
+    """
+    s = mol.intor_symmetric("int1e_ovlp")
+    c_seed = np.asarray(c_seed)
+    occ_seed = np.asarray(occ_seed)
+    order = np.argsort(-occ_seed)          # closed pairs first
+
+    def _occ(mo_energy, mo_coeff=None):
+        if mo_coeff is None:
+            raise ValueError("MOM occupations need the MOs")
+        occ = np.zeros(len(mo_energy))
+        ov = np.abs(mo_coeff.conj().T @ s @ c_seed)
+        taken = np.zeros(len(mo_energy), dtype=bool)
+        for j in order[occ_seed > 0]:
+            free = np.flatnonzero(~taken)
+            bi = free[np.argmax(ov[free, j])]
+            occ[bi] = occ_seed[j]
+            taken[bi] = True
+        return occ
+
+    return _occ
+
+
 @dataclass(frozen=True)
 class ReferenceSpec:
     """The declared recipe for an ROHF reference that plain aufbau
@@ -210,6 +279,29 @@ class ReferenceSpec:
         :func:`run_uhf` gates on it). NOT the ROHF ``occ_e_ref`` --
         a spin-broken solution sits below it and would trip that
         gate by design.
+    seed_basis : str | None
+        The SEEDED-MOM mode's source basis (e.g. ``"6-31g"``) -- the
+        certified repair for ill-conditioned bases where the weight
+        hook's ranking degrades to noise (the fresh-SCF disease).
+        Set ⇒ :func:`run_rohf` builds the projected source
+        (:func:`projected_source`), seeds the density with it, and
+        arms the MOM-follow hook (:func:`_mom_occ`) -- the
+        occupations FOLLOW the seed's occupied columns instead of
+        ranking against the span patterns; the patterns serve only
+        the character post-check. Seedless ⇒ the weight hook stays
+        (certified on contracted bases).
+    source_closed, source_open : tuple[str, ...] | None
+        The SEEDED-MOM source's own forced-hook patterns -- the
+        configuration declared in the SOURCE basis's vocabulary.
+        Required on ill-conditioned-target cases: on a contracted
+        source the whole-l spans' closed RANK ties occupied valence
+        (4s ~1 on l0) against virtual polarization shells (4p ~1 on
+        l1) and steals virtuals into the closed block (measured: the
+        Ti/6-31G l-hook source diverged at E = -838.91 with eps
+        +0.09 virtuals paired), while the label patterns pin the
+        configuration by shell identity. ``None`` ⇒ the source uses
+        ``occ_closed``/``occ_open`` (the same vocabulary serves both
+        bases -- the contracted-campaign cases).
     conv_accelerator : str
         "diis" (default; the plain SCF), "newton" (second-order SOSCF
         from the start), or "diis+newton" (DIIS linearly first, then
@@ -223,24 +315,36 @@ class ReferenceSpec:
     ------
     ValueError
         On a pattern given without its pair, a basin gate without
-        patterns, or an unknown accelerator.
+        patterns, a seed without patterns (the post-check needs the
+        declared character), or an unknown accelerator.
     """
 
     occ_closed: tuple[str, ...] | None = None
     occ_open: tuple[str, ...] | None = None
     occ_e_ref: float | None = None
     occ_e_ref_uhf: float | None = None
+    seed_basis: str | None = None
+    source_closed: tuple[str, ...] | None = None
+    source_open: tuple[str, ...] | None = None
     conv_accelerator: str = "diis"
 
     def __post_init__(self):
         if (self.occ_closed is None) != (self.occ_open is None):
             raise ValueError("occ_closed and occ_open must be given together")
+        if (self.source_closed is None) != (self.source_open is None):
+            raise ValueError(
+                "source_closed and source_open must be given together")
         if self.occ_e_ref is not None and self.occ_closed is None:
             raise ValueError(
                 "occ_e_ref needs the occ_closed/occ_open patterns")
         if self.occ_e_ref_uhf is not None and self.occ_closed is None:
             raise ValueError(
                 "occ_e_ref_uhf needs the occ_closed/occ_open patterns")
+        if self.seed_basis is not None and self.occ_closed is None:
+            raise ValueError(
+                "seed_basis needs the occ_closed/occ_open patterns "
+                "(the character post-check verifies the converged "
+                "solution against them)")
         if self.conv_accelerator not in ("diis", "newton", "diis+newton"):
             raise ValueError(
                 f"unknown conv_accelerator: {self.conv_accelerator!r}")
@@ -248,22 +352,25 @@ class ReferenceSpec:
 
 # the runners --------------------------------------------------------
 
-def _accelerated(m, ref):
+def _accelerated(m, ref, dm0=None):
     """Run one SCF under the declared acceleration policy -- the ONE
     dispatch, shared by :func:`run_rohf` / :func:`run_uhf`:
     "diis" plain, "newton" second-order from the start,
-    "diis+newton" DIIS linearly first, then the Newton switch."""
+    "diis+newton" DIIS linearly first, then the Newton switch.
+    ``dm0`` threads the seeded mode's initial density (one signature,
+    one thread; PySCF consumes it in the first Fock build)."""
     acc = ref.conv_accelerator if ref is not None else "diis"
     if acc == "newton":
         m = m.newton()
     elif acc == "diis+newton":
-        m.run()
+        m.run(dm0=dm0)
         m = m.newton()
-    m.run()
+    m.run(dm0=dm0)
     return m
 
 
-def _converged_cached(mol, fresh_mf, chkfile, ref, e_gate, cfg):
+def _converged_cached(mol, fresh_mf, chkfile, ref, e_gate, cfg,
+                      dm0=None):
     """The cache-then-gate skeleton shared by the SCF runners: an
     existing chkfile is loaded and TRUSTED (marked converged, never
     re-gated -- the reproducibility unit); a fresh run solves under
@@ -280,12 +387,12 @@ def _converged_cached(mol, fresh_mf, chkfile, ref, e_gate, cfg):
         return mol, mf
     except (OSError, KeyError, ValueError):
         pass
-    mf = _accelerated(fresh_mf(None), ref)
+    mf = _accelerated(fresh_mf(None), ref, dm0)
     if e_gate is not None:
         for guess in ("atom", "huckel"):
             if mf.converged and abs(mf.e_tot - e_gate) <= 1e-4:
                 break
-            mf = _accelerated(fresh_mf(guess), ref)
+            mf = _accelerated(fresh_mf(guess), ref, dm0)
         else:
             if not (mf.converged and abs(mf.e_tot - e_gate) <= 1e-4):
                 raise RuntimeError(
@@ -296,7 +403,8 @@ def _converged_cached(mol, fresh_mf, chkfile, ref, e_gate, cfg):
     return mol, mf
 
 
-def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
+def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
+             dm0=None):
     """ROHF for the configured atom, chkfile-cached.
 
     Parameters
@@ -316,11 +424,31 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
         set, a fresh run retries over cycled init guesses (default,
         then "atom", then "huckel") until |E - occ_e_ref| <= 1e-4,
         else RuntimeError.
+        With ``seed_basis`` set, the SEEDED-MOM mode arms instead
+        (:class:`ReferenceSpec`) -- the projected source carries the
+        configuration, the occupations follow it, and the character
+        post-check verifies the converged solution.
+    dm0 : (nao, nao) ndarray, optional
+        The caller-supplied initial density (the explicit-seed form;
+        Stage 2's UHF re-test passes a reference chk's density).
+        The two masters refuse: ``dm0`` together with
+        ``ref.seed_basis`` is a ValueError -- the seed owns the guess
+        it builds.
 
     Returns
     -------
     (mol, mf)
         The built molecule and the converged (or cache-loaded) object.
+
+    Raises
+    ------
+    ValueError
+        ``dm0`` given together with ``ref.seed_basis``.
+    RuntimeError
+        The seeded mode's character post-check failed on the
+        converged solution (the configuration drifted from the
+        seed -- the frozen-assignment disease; the basin census or
+        the seed needs revisiting).
 
     Notes
     -----
@@ -331,13 +459,29 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     """
     from atomterm.system import build_mol
 
+    if dm0 is not None and ref is not None and ref.seed_basis is not None:
+        raise ValueError(
+            "dm0 and ref.seed_basis are two masters for one guess -- "
+            "the seed owns the guess it builds; pass dm0 only for the "
+            "caller-supplied form (seedless ref)")
+
     mol = build_mol(cfg)
+
+    seeded = ref is not None and ref.seed_basis is not None
+    if seeded:
+        src_chk = f"{chkfile}.{ref.seed_basis}.source.chk"
+        c_seed, occ_seed, _ = projected_source(
+            cfg, ref, source_basis=ref.seed_basis, chkfile=src_chk)
+        dm0 = (c_seed * occ_seed) @ c_seed.conj().T
+        dm0 = dm0.real.astype(np.float64)
 
     def fresh_mf(guess: str | None = None):
         """One unconverged ROHF object: occupation hook attached,
         chkfile/verbosity set, optional starting guess."""
         m = scf.ROHF(mol)
-        if ref is not None and ref.occ_closed is not None:
+        if seeded:
+            m.get_occ = _mom_occ(mol, c_seed, occ_seed)
+        elif ref is not None and ref.occ_closed is not None:
             m.get_occ = _forced_rohf_occ(mol, list(ref.occ_closed),
                                          list(ref.occ_open))
         m.chkfile = chkfile
@@ -348,7 +492,16 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
         return m
 
     gate = ref.occ_e_ref if ref is not None else None
-    return _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg)
+    mol, mf = _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg,
+                                dm0=dm0)
+    if seeded and not occupation_postcheck(mol, mf, ref.occ_closed,
+                                           ref.occ_open):
+        raise RuntimeError(
+            "the seeded run's converged occupations do not carry the "
+            "declared character (the frozen-assignment disease: the "
+            "solution drifted from the seed's configuration) -- the "
+            "basin census or the seed needs revisiting")
+    return mol, mf
 
 
 # the census arms: the gate's own guess cycle (default, then the two
@@ -358,41 +511,151 @@ ROHF_CENSUS_GUESSES = (("default", None), ("atom", "atom"),
 
 
 def occupation_postcheck(mol, mf, occ_closed, occ_open) -> bool:
-    """The occupation post-check: the character-forcing hook
-    re-applied to the CONVERGED orbitals must reproduce the run's own
-    occupations.
+    """The occupation post-check, CHARACTER-OF-OCCUPIED form: every
+    converged occupied column must carry its block's declared span by
+    MAJORITY weight (closed columns >= 1/2 on the closed spans' S
+    projector; open columns >= 1/2 on the open spans').
 
-    The second-order (Newton) accelerator rotates orbitals with
-    occupations FROZEN from its early cycles, so a converged solution
-    can violate the hook -- energy agreement alone cannot certify the
-    configuration.  Mandatory wherever the accelerator runs under a
-    forcing hook (the census's ``occ_ok`` column;
-    :func:`atomterm.basis.run_series`'s per-run gate).
+    The well-posed form on ill-conditioned bases: it never ranks all
+    columns.  The ranking-consistency predecessor (the hook
+    re-applied to the converged orbitals must reproduce the run's own
+    occupations) silently degrades to noise comparison exactly where
+    the hook's ranking is garbage-blind -- the metric-amplified
+    virtual tail carries span weights ~1 too (the fresh-SCF disease's
+    own finding), so any re-ranking compares noise to noise.  The
+    character form reads only the OCCUPIED columns, whose weights are
+    physical in every stored record.
+
+    Mandatory wherever an accelerator runs under a forcing or
+    following hook (the census's ``occ_ok`` column;
+    :func:`atomterm.basis.run_series`'s per-run gate;
+    :func:`run_rohf`'s seeded mode), and on every fresh seeded run:
+    energy agreement alone cannot certify the configuration -- the
+    second-order accelerator freezes occupations from its early
+    cycles, and a converged solution can sit in a WRONG
+    configuration's basin (measured: a d-forced quartet converging
+    onto the d²s¹ solution at -129 mEh relative; the census logs
+    carry the record).
 
     Parameters
     ----------
     mol : Mole
-        The atom (the hook labels MOs against it).
+        The atom (the spans resolve against it).
     mf : the converged SCF object.
-    occ_closed, occ_open : the hook's shell lists.
+    occ_closed, occ_open : the declared AO span patterns
+        (:class:`ReferenceSpec` semantics -- label prefixes or
+        ``"l0".."l9"`` whole-momentum spans).
 
     Returns
     -------
     bool
-        True = the converged occupations ARE the forced ones.
-
-    Notes
-    -----
-    Measured instance: a d-forced quartet converging onto the
-    d²s¹ solution with the (n+1)s MO occupied at hook-rank 0 -- the
-    census logs carry the record
-    (``elements/<Atom>/logs/ladder_census.log``).
+        True = the converged occupied columns carry the declared
+        character (the block sizes must also match the molecule's
+        electron counts exactly).
     """
-    hook = _forced_rohf_occ(mol, list(occ_closed), list(occ_open))
-    mo_energy = (mf.mo_energy if np.ndim(mf.mo_energy) == 1
-                 else np.asarray(mf.mo_energy)[0])
-    reassigned = hook(np.asarray(mo_energy), mf.mo_coeff)
-    return bool(np.array_equal(reassigned, np.asarray(mf.mo_occ)))
+    s_mat = mol.intor_symmetric("int1e_ovlp")
+    p_closed = span_projector(
+        s_mat, sum((select_span(mol, p) for p in occ_closed), []))
+    p_open = span_projector(
+        s_mat, sum((select_span(mol, p) for p in occ_open), []))
+    occ = np.asarray(mf.mo_occ)
+    n_closed = (mol.nelectron - mol.spin) // 2
+    n_open = mol.spin
+    closed = np.flatnonzero(occ == 2.0)
+    opens = np.flatnonzero(occ == 1.0)
+    if len(closed) != n_closed or len(opens) != n_open:
+        return False
+    for i in closed:
+        w = float(np.real(mf.mo_coeff[:, i].conj() @ p_closed
+                          @ mf.mo_coeff[:, i]))
+        if w < 0.5:
+            return False
+    for i in opens:
+        w = float(np.real(mf.mo_coeff[:, i].conj() @ p_open
+                          @ mf.mo_coeff[:, i]))
+        if w < 0.5:
+            return False
+    return True
+
+
+# the seeded mode's conditioning policy -- the ONE owner of the
+# threshold (Stage 1a's verdict: conservative, removes nothing on the
+# twins, the guard for genuinely singular inputs)
+_SOURCE_THRESH = 1e-8
+
+
+def projected_source(cfg, ref: ReferenceSpec, source_basis: str = "6-31g",
+                     chkfile: str = None,
+                     thresh: float = _SOURCE_THRESH):
+    """The on-demand seeded-mode source: the declared configuration's
+    forced-occupation ROHF on a SMALL basis, its occupied columns
+    projected into ``cfg``'s basis -- the configuration carrier the
+    MOM hook follows (:func:`run_rohf`'s seeded mode; the certified
+    repair for the fresh-SCF disease).
+
+    Parameters
+    ----------
+    cfg : AtomConfig
+        The TARGET atom (element, basis, charge, spin -- the source
+        runs the same configuration on ``source_basis``).
+    ref : ReferenceSpec
+        The declared occupation patterns (the projection's honesty
+        meter on the target) and the source's own forced hooks
+        (``source_closed``/``source_open`` when the source basis
+        needs its own vocabulary -- the contracted-source case;
+        falling back to ``occ_closed``/``occ_open``). ``seed_basis``/
+        ``occ_e_ref`` fields are ignored here -- no recursion, no
+        gate: the small basis converges tame, and
+        :func:`occupation_postcheck` is the honesty meter.
+    source_basis : str
+        The small basis (the default is the certified source).
+    chkfile : str
+        The source SCF's cache path (the caller owns layout --
+        :func:`run_rohf` derives it beside its own chk; the cache
+        convention applies: a cached source is trusted).
+    thresh : float
+        The projector's conditioning cut (:func:`windows.
+        project_orbitals`; the conservative default is this module's
+        declared policy).
+
+    Returns
+    -------
+    (c_occ_b, occ, report)
+        The projected occupied columns (S-orthonormal in the target
+        basis), their occupations, and the projection's disclosure
+        dict (per-column capture et al.).
+
+    Raises
+    ------
+    RuntimeError
+        The source's own post-check failed (the small-basis SCF did
+        not land the declared configuration -- the seed would carry
+        a wrong configuration; fix the source, never mask it).
+    """
+    from dataclasses import replace as dc_replace
+    from atomterm.system import build_mol
+
+    if chkfile is None:
+        raise ValueError("projected_source needs the source chkfile "
+                         "path (the caller owns layout)")
+    src_cfg = dc_replace(cfg, basis=source_basis)
+    src_ref = ReferenceSpec(
+        occ_closed=ref.source_closed or ref.occ_closed,
+        occ_open=ref.source_open or ref.occ_open)
+    mol_s, mf_s = run_rohf(src_cfg, chkfile, ref=src_ref)
+    if not occupation_postcheck(mol_s, mf_s, ref.occ_closed,
+                                ref.occ_open):
+        raise RuntimeError(
+            f"the {source_basis} source did not land the declared "
+            f"configuration (the post-check failed on "
+            f"{cfg.symbol}/{source_basis} spin={cfg.spin}) -- the seed "
+            "would carry a wrong configuration")
+    occ = np.asarray(mf_s.mo_occ)
+    cols = occ > 0
+    mol_b = build_mol(cfg)
+    c_b, report = project_orbitals(mol_b, mol_s,
+                                   mf_s.mo_coeff[:, cols], thresh=thresh)
+    return c_b, occ[cols], report
 
 
 def rohf_basin_census(cfg, ref: ReferenceSpec,

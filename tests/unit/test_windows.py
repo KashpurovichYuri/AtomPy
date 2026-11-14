@@ -624,3 +624,120 @@ def test_window_distilled_on_a_1_1_realization_is_the_label_span(carbon):
     raw = lowdin(np.eye(mol.nao_nr())[:, select_valence_ao(mol, ["2p"])],
                  s)
     assert span_overlap(cols, raw, s) > 1 - 1e-12
+
+
+# ------------------------------------------------- the cross-basis projector
+
+def _he_span_cols(basis, rng_seed=7):
+    """S-orthonormal random columns in a He basis (the battery's
+    source construction -- no SCF needed)."""
+    from pyscf import gto
+
+    mol = gto.M(atom="He 0 0 0", basis=basis, spin=0, verbose=0)
+    s = mol.intor("int1e_ovlp")
+    rng = np.random.default_rng(rng_seed)
+    q = rng.standard_normal((mol.nao, 3))
+    m = q.T @ s @ q
+    mu, u = np.linalg.eigh(0.5 * (m + m.T))
+    return mol, q @ u @ np.diag(mu ** -0.5)
+
+
+def test_project_orbitals_is_identity_on_the_same_basis():
+    """Battery anchor 1 (the degenerate anchor, zero parameters):
+    B = A transfers the columns EXACTLY -- any deviation is a bug,
+    not physics."""
+    from pyscf import gto, scf
+
+    from atomterm.windows import project_orbitals
+
+    mol = gto.M(atom="C 0 0 0", basis="ccpvdz", spin=2, verbose=0)
+    mf = scf.ROHF(mol).run(conv_tol=1e-12)
+    c_b, rep = project_orbitals(mol, mol, mf.mo_coeff)
+    assert np.abs(c_b - mf.mo_coeff).max() < 1e-10
+    assert np.allclose(rep["capture"], 1.0, atol=1e-10)
+
+
+def test_project_orbitals_reproduces_a_superset_exactly():
+    """Battery anchor 2 (the strongest anchor): B holds A's primitives
+    literally, so the projected columns pair against them exactly --
+    the check is ordering-independent (x @ c_a == s @ c_b)."""
+    from pyscf import gto
+
+    from atomterm.windows import project_orbitals
+
+    basis_a = [(0, (8.0, 1.0)), (0, (1.5, 1.0)), (0, (0.3, 1.0))]
+    basis_b = basis_a + [(0, (40.0, 1.0)), (0, (0.08, 1.0))]
+    mol_a, c_a = _he_span_cols({"He": basis_a})
+    mol_b, _ = _he_span_cols({"He": basis_b}, rng_seed=8)
+    c_b, rep = project_orbitals(mol_b, mol_a, c_a)
+    x = gto.intor_cross("int1e_ovlp", mol_a, mol_b).T
+    s = mol_b.intor("int1e_ovlp")
+    assert float(np.abs(x @ c_a - s @ c_b).max()) < 1e-10
+    assert np.allclose(rep["capture"], 1.0, atol=1e-10)
+
+
+def test_project_orbitals_captures_real_coarse_bases():
+    """Battery anchor 3 (the hand-checkable class): the occupied MOs
+    of sto3g H/He/C transfer into ccpvdz with high capture and an
+    orthonormal result."""
+    from pyscf import gto, scf
+
+    from atomterm.windows import project_orbitals
+
+    for atom, spin in (("H", 1), ("He", 0), ("C", 2)):
+        mol_a = gto.M(atom=f"{atom} 0 0 0", basis="sto3g", spin=spin,
+                      verbose=0)
+        mol_b = gto.M(atom=f"{atom} 0 0 0", basis="ccpvdz", spin=spin,
+                      verbose=0)
+        mf = scf.ROHF(mol_a).run(conv_tol=1e-12)
+        nocc = int(sum(np.asarray(mf.mo_occ) > 0))
+        c_b, rep = project_orbitals(mol_b, mol_a,
+                                    mf.mo_coeff[:, :nocc])
+        assert rep["capture"].min() > 0.95, (atom, rep["capture"])
+        assert rep["ortho_err"] < 1e-10, atom
+
+
+def test_project_orbitals_truncation_tames_the_near_singular_pair():
+    """Battery anchor 4 (the stress, the conditioning's contribution
+    demonstrated): B carries a near-duplicate primitive -- the NAIVE
+    solve assigns the duplicated pair's weight to an arbitrary member
+    (asymmetric, unstable under the duplicate's separation), while the
+    truncated solve shares the membership symmetrically and stably.
+    The duplicated pair is the twins' own disease class."""
+    from pyscf import gto
+
+    from atomterm.windows import project_orbitals
+
+    basis_a = [(0, (5.0, 1.0)), (0, (1.0, 1.0))]
+
+    def run(delta):
+        mol_a = gto.M(atom="He 0 0 0", basis={"He": basis_a}, spin=0,
+                      verbose=0)
+        mol_b = gto.M(atom="He 0 0 0",
+                      basis={"He": basis_a + [(0, (1.0 + delta, 1.0))]},
+                      spin=0, verbose=0)
+        rng = np.random.default_rng(11)
+        s_a = mol_a.intor("int1e_ovlp")
+        q = rng.standard_normal((mol_a.nao, 2))
+        m = q.T @ s_a @ q
+        mu, u = np.linalg.eigh(0.5 * (m + m.T))
+        c_a = q @ u @ np.diag(mu ** -0.5)
+        _, naive = project_orbitals(mol_b, mol_a, c_a)
+        _, trunc = project_orbitals(mol_b, mol_a, c_a, thresh=1e-8)
+        return naive["w_rows"], trunc["w_rows"], trunc
+
+    n1, t1, tr = run(1e-12)
+    n2, t2, _ = run(1e-8)
+    assert tr["n_drop"] == 1, tr["n_drop"]
+    assert tr["ortho_err"] < 1e-10
+    assert np.allclose(tr["capture"], 1.0, atol=1e-8), tr["capture"]
+    # truncated: the duplicated pair (rows 1,2) shares the membership
+    # symmetrically, and STABLY across delta
+    pair_t = t1[1:3]
+    assert abs(pair_t[0] - pair_t[1]) < 0.05 * pair_t.max(), t1
+    assert np.allclose(t1, t2, rtol=1e-6), (t1, t2)
+    # naive: the membership is arbitrary AND unstable (the rounding
+    # flip between deltas is the demonstration)
+    asym1 = abs(n1[1] - n1[2]) > 0.5 * max(n1[1], n1[2])
+    asym2 = abs(n2[1] - n2[2]) > 0.5 * max(n2[1], n2[2])
+    assert asym1 and asym2, (n1, n2)

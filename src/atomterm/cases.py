@@ -244,6 +244,10 @@ class CaseSpec:
     # the @r/@s windows distill from
     series: tuple | None = None
     prior_bands: dict[str, tuple[str, ...]] | None = None
+    # the seeded mode's source basis for the series' non-head
+    # configurations (the fresh-SCF repair -- a declaration, not a
+    # code path; reference.ReferenceSpec.seed_basis owns the mode)
+    series_seed: str | None = None
     ecp: str | None = None
     spin: int = 0
     tag: str | None = None
@@ -808,9 +812,15 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         # runs diverge on this basis -- measured
                         # 2026-11-11, the twins' fresh-SCF disease; the
                         # port's @s half waits on that repair)
-                        series=(SeriesSpec("d1s2", ("1s", "2s", "2p", "3s",
-                                                    "3p", "4s"), ("3d",),
+                        # the series' spans are the HONEST l-vocabulary
+                        # (the shell-counter labels would select 1-5
+                        # AO slivers -- the disease's own declaration
+                        # bug); the seed arms the non-head members'
+                        # MOM mode (the fresh-SCF repair -- a
+                        # declaration, not a code path)
+                        series=(SeriesSpec("d1s2", ("l0", "l1"), ("l2",),
                                            1, -759.7373848622801),),
+                        series_seed="6-31g",
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},
                         planned_windows=_TM_UNC_PRIOR,
@@ -824,7 +834,18 @@ CAMPAIGN: dict[str, CaseSpec] = {
                            _unc_s_block("sc-unc")),
                         term=(2, "g"),
                         lane_windows=("3d4s@ar", "3d@ar"),
-                        lattice_windows=("3d",), lattice_sector=(2, 1)),
+                        lattice_windows=("3d",), lattice_sector=(2, 1),
+                        # the honest l-vocabulary spans (as the
+                        # series'); the seed arms the seeded-MOM mode
+                        # on any FRESH head run (the cached head is
+                        # trusted, never re-gated); the gate anchors
+                        # the trusted cache's own basin
+                        ref=ReferenceSpec(
+                            occ_closed=("l0", "l1"), occ_open=("l2",),
+                            occ_e_ref=-759.7373848622801,
+                            seed_basis="6-31g",
+                            source_closed=("1s", "2s", "2p", "3s", "3p",
+                                           "4s"), source_open=("3d",))),
     "Ti-unc": CaseSpec("Ti", _TI_UNC_BASIS, nelec_act=4, ncore=9,
                         shell_patterns=["3d", "4s"], spin=2,
                         shell_bands=_TM_UNC_BANDS,
@@ -832,9 +853,12 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         # the prior axis, @r1-only (the head IS the
                         # trusted cache; the @s windows guarded -- the
                         # fresh-SCF disease, map Issues)
-                        series=(SeriesSpec("d2s2", ("1s", "2s", "2p", "3s",
-                                                    "3p", "4s"), ("3d",),
+                        # the series' spans are the HONEST l-vocabulary
+                        # (as Sc-unc's); the seed arms the non-head
+                        # members' MOM mode
+                        series=(SeriesSpec("d2s2", ("l0", "l1"), ("l2",),
                                            2, -848.4074434287603),),
+                        series_seed="6-31g",
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},
                         planned_windows=_TM_UNC_PRIOR,
@@ -865,7 +889,10 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         ref=ReferenceSpec(
                             occ_closed=("l0", "l1"), occ_open=("l2",),
                             occ_e_ref=-848.4074434287603,
-                            occ_e_ref_uhf=-848.412340)),
+                            occ_e_ref_uhf=-848.412340,
+                            seed_basis="6-31g",
+                            source_closed=("1s", "2s", "2p", "3s", "3p",
+                                           "4s"), source_open=("3d",))),
     # CAMPAIGN key `U14e`: the ECP-atom record's element dir
     # (``elements/U14e/``); the SYMBOL stays `U` (PySCF builds the
     # element; the ECP removes its 78 core electrons) and the `tag`

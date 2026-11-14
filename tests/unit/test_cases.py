@@ -7,7 +7,8 @@ import dataclasses
 
 import pytest
 
-from atomterm.cases import CaseSpec, Scenario, run_atom, scenarios_for
+from atomterm.cases import (CAMPAIGN, CaseSpec, Scenario, run_atom,
+                            scenarios_for)
 from atomterm.system import AtomConfig
 
 pytestmark = pytest.mark.fast
@@ -130,3 +131,26 @@ def test_shell_radials_must_cover_every_declared_window():
         with pytest.raises(ValueError, match="shell_radials"):
             CaseSpec(**ti, shell_radials=rad,
                      lane_windows=("3d4s@ar",), **kw)
+
+
+def test_twins_declare_the_seeded_honest_series():
+    """The 1c declarations: the twins' series speak the honest
+    l-vocabulary (the shell-counter labels would select 1-5 AO
+    slivers -- the disease's own declaration bug), the seed arms the
+    non-head members' MOM mode, and the heads declare the SOURCE
+    basis's own vocabulary -- the whole-l closed rank on a contracted
+    source ties occupied valence (4s ~1 on l0) against virtual
+    polarization (4p ~1 on l1) and steals virtuals into the closed
+    block (measured 2026-11-14: the Ti/6-31G l-hook source diverged
+    at E = -838.91 with eps +0.09 virtuals paired)."""
+    for key in ("Sc-unc", "Ti-unc"):
+        cs = CAMPAIGN[key]
+        assert cs.series_seed == "6-31g"
+        for m in cs.series:
+            assert m.closed == ("l0", "l1")
+            assert m.open == ("l2",)
+        assert cs.ref.seed_basis == "6-31g"
+        assert cs.ref.source_closed == ("1s", "2s", "2p", "3s", "3p",
+                                        "4s")
+        assert cs.ref.source_open == ("3d",)
+        assert cs.ref.occ_e_ref is not None

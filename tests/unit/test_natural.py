@@ -178,3 +178,24 @@ def test_certificate_on_real_ao_windows():
     assert c["lz"] < 1e-12 and c["lperp"] < 1e-12
     c = window_closure(mol, eye[:, p_rows[:2]])   # m-split p window
     assert c["lz"] > 1e-2 or c["lperp"] > 1e-2
+
+
+def test_no_group_windows_refuses_the_m_unequal_source_at_the_meter(
+        carbon):
+    """The closure meter refuses an m-unequal source: the frozen
+    carbon fixture's (3,1) ground block yields per-orbital occupation
+    groups (the single-root class), and the no3 prefix -- the whole
+    2p span re-picked by occupation order -- fails the rotation
+    closure at O(1).  NoCapExceeded (the declared budget's type, a
+    ValueError subclass) is the runner's per-cell skip contract; its
+    firing is pinned end-to-end by the U14e 7sno3 refusal (ticket
+    38's smoke pass, the regen [refused] lines)."""
+    from atomterm.system import sector_na_nb
+    from atomterm.natural import NoCapExceeded, no_group_windows
+
+    assert issubclass(NoCapExceeded, ValueError)
+    _cfg, mol, mf, act = carbon
+    c_act = np.asarray(mf.mo_coeff)[:, act]   # the source window's columns
+    na, nb = sector_na_nb(4, 2)
+    with pytest.raises(ValueError, match="not rotation-closed"):
+        no_group_windows(mol, mf, 1, c_act, na, nb)

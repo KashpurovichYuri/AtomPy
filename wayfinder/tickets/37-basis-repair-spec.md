@@ -357,10 +357,29 @@ the live state — update it in the same commit as any state change.
       land the right physics on every leg, the revised integration
       shape recorded. The first naive-seeded attempt (transfer.py)
       exposed the hook itself — the finding that reshaped the wave.
-- [ ] **STAGE 1c** — integration: the primitive/adapter/seed thread land
-      (`windows` / `reference` / `basis` as won); the battery's synthetic
-      anchors port to `tests/unit`, the transfers to `tests/integration`;
-      lockstep docs; the sandbox deleted.
+- [x] **STAGE 1c** — integration LANDED 2026-11-14: `windows.
+      project_orbitals` + the reference seeded-MOM mode (`seed_basis`,
+      `_mom_occ`, `projected_source`, the character-of-occupied
+      post-check, the `dm0` thread, the two-masters refusal) +
+      `run_series(seed_basis=)` + `CaseSpec.series_seed`; the twins'
+      declarations moved to the honest l-vocabulary.  MEASURED
+      FINDING (the interface's one honest deviation): the SOURCE
+      hooks need the source basis's own vocabulary — the whole-l
+      closed rank on a contracted source ties occupied valence (4s
+      ~1 on l0) against virtual polarization (4p ~1 on l1) and
+      STEALS VIRTUALS into the closed block (the Ti/6-31G l-hook
+      source diverged at E = -838.91, eps +0.09 virtuals paired;
+      `ReferenceSpec.source_closed/source_open` declared, the twins
+      carry the certified label hooks) — the l-vocabulary stays the
+      target-side post-check's honest form.  THE FORMAL VERIFICATION:
+      both twins' seeded head transfers land their declared anchors
+      EXACTLY through the product path (Ti-unc -848.40744343, Sc-unc
+      -759.73738486, d_anchor 0.0000 mEh, converged, post-check
+      True — the pins test_reference_seeded).  The battery ports to
+      tests/unit (test_windows's projector anchors 1-4); the sandbox
+      deleted (git history the bench).  Stage 2 note: the mixed
+      members' (d2s1/d3s1) open spans need l0 alongside l2 (the 4s
+      column's open character lives in l0).
 - [ ] **STAGE 2** — the `@s` wave: the twins' series declarations (seeded,
       censused e_refs) + `series_seed` + `_unc_s_block` retires; the CI anchors
       then the treatments; re-render + commit; the UHF anchor re-test.

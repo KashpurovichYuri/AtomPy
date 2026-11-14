@@ -11,7 +11,7 @@ import pytest
 
 from atomterm.reference import (ReferenceSpec, _forced_rohf_occ,
                                 _forced_uhf_occ, uhf_contamination)
-from atomterm.windows import lm_sectors
+from atomterm.windows import lm_sectors, lowdin, span_overlap
 from helpers import uncontracted_carbon_mole
 
 pytestmark = pytest.mark.fast
@@ -170,3 +170,117 @@ def test_uhf_contamination_rotated_pair():
         assert abs(s2 - exact) < 1e-12, theta
         assert abs(sigma[0] - 1.0) < 1e-12
         assert abs(sigma[1] - np.cos(theta)) < 1e-12
+
+
+# --------------------------------------------- the seeded-MOM mode
+
+
+def _mom_mol():
+    """The uncontracted carbon Mole (an S-metric to contest over)."""
+    return uncontracted_carbon_mole()
+
+
+def test_mom_occ_follows_the_seed_by_max_overlap():
+    """The MOM hook's contest: each seeded slot takes the current
+    column of max S-overlap (closed pairs first by seed order), the
+    occupations land as the seed's own -- garbage columns never win
+    (near-null combinations are S-orthogonal to physical ones)."""
+    from atomterm.reference import _mom_occ
+
+    mol = _mom_mol()
+    s = mol.intor_symmetric("int1e_ovlp")
+    # the seed: two S-orthonormal columns, a pair and an open
+    rng = np.random.default_rng(3)
+    q = rng.standard_normal((mol.nao_nr(), 2))
+    m = q.T @ s @ q
+    mu, u = np.linalg.eigh(0.5 * (m + m.T))
+    c_seed = q @ u @ np.diag(mu ** -0.5)
+    occ_seed = np.array([2.0, 1.0])
+    hook = _mom_occ(mol, c_seed, occ_seed)
+    # the current MOs: a rotation of the seed's span plus a garbage
+    # column of huge "energy" -- the contest must ignore the energy
+    # and assign by overlap
+    theta = 0.7
+    rot = np.array([[np.cos(theta), -np.sin(theta)],
+                    [np.sin(theta), np.cos(theta)]])
+    mo2 = c_seed @ rot                       # the seed's span, rotated
+    # the fillers: S-orthogonal to the seed's span (the current MOs
+    # are S-orthonormal, as production's are)
+    fill = rng.standard_normal((mol.nao_nr(), 3))
+    fill -= c_seed @ (c_seed.conj().T @ s @ fill)
+    fill = lowdin(fill, s)
+    mo = np.hstack([mo2, fill])
+    occ = hook(np.array([0.0, 0.0, 1e3, 2.0, 3.0]), mo)
+    assert sorted(occ[occ > 0].tolist()) == [1.0, 2.0]
+    # the two occupied columns are the seed's span (the rotation
+    # within it is the gauge the cycle resolves) -- the SPAN overlap,
+    # the identity meter that is independent of the within-span gauge
+    assert span_overlap(mo[:, occ > 0], c_seed, s) > 1 - 1e-8
+    # the contest RESETS per call: the same input, the same output
+    again = hook(np.array([0.0, 0.0, 1e3, 2.0, 3.0]), mo)
+    assert np.array_equal(occ, again)
+
+
+def test_occupation_postcheck_reads_character_of_occupied():
+    """The character-of-occupied form: the converged occupied columns
+    must carry their block's declared span by majority weight -- and
+    the block sizes must match the molecule's electron counts.  The
+    form never ranks: a virtual column of huge span weight cannot
+    flip the verdict."""
+    from atomterm.reference import occupation_postcheck
+    from atomterm.windows import lowdin, select_span
+
+    mol = _mom_mol()
+    s = mol.intor_symmetric("int1e_ovlp")
+    nocc_pairs, nopen = (mol.nelectron - mol.spin) // 2, mol.spin
+    # the character-constructed columns: the l0 block's S-orthonormal
+    # basis first (s-like), then the l1 block's (p-like) -- each
+    # column carries its own span's weight exactly
+    rows = select_span(mol, "l0") + select_span(mol, "l1")
+    c = lowdin(np.eye(mol.nao_nr())[:, rows], s)
+    occ = np.zeros(c.shape[1])
+    occ[:nocc_pairs] = 2.0                   # s-like pairs
+    occ[c.shape[1] - nopen:] = 1.0           # p-like opens
+    mf = SimpleNamespace(mo_coeff=c, mo_occ=occ)
+    assert occupation_postcheck(mol, mf, ("l0",), ("l1",))
+    # a swapped block size (one open demoted) fails
+    occ_bad = occ.copy()
+    occ_bad[c.shape[1] - nopen] = 0.0
+    assert not occupation_postcheck(
+        mol, SimpleNamespace(mo_coeff=c, mo_occ=occ_bad), ("l0",),
+        ("l1",))
+    # an open column with no open-span character fails (the
+    # frozen-assignment fingerprint: an s-like column wearing the
+    # open block's occupation)
+    occ_mix = occ.copy()
+    occ_mix[c.shape[1] - nopen] = 0.0
+    occ_mix[nocc_pairs] = 1.0                # an s-like "open"
+    assert not occupation_postcheck(
+        mol, SimpleNamespace(mo_coeff=c, mo_occ=occ_mix), ("l0",),
+        ("l1",))
+
+
+def test_reference_spec_refuses_seed_without_patterns():
+    """The seeded mode's honesty meter is the character post-check --
+    a seed without the declared patterns is not expressible."""
+    with pytest.raises(ValueError, match="seed_basis needs"):
+        ReferenceSpec(seed_basis="6-31g")
+    with pytest.raises(ValueError, match="source_closed and "
+                                         "source_open"):
+        ReferenceSpec(source_closed=("1s",))
+
+
+def test_run_rohf_refuses_two_seed_masters():
+    """dm0 and ref.seed_basis are two masters for one guess -- the
+    seed owns the guess it builds; the explicit-dm0 form is the
+    seedless path's (Stage 2's UHF re-test)."""
+    from atomterm.reference import run_rohf
+
+    mol = _mom_mol()
+    ref = ReferenceSpec(occ_closed=("l0",), occ_open=("l1",),
+                        seed_basis="6-31g")
+    with pytest.raises(ValueError, match="two masters"):
+        run_rohf(SimpleNamespace(symbol="C", basis="ccpvdz", spin=2,
+                                 verbose=0, ecp=None, charge=0),
+                 "elements/C/rungs/two_masters.chk", ref=ref,
+                 dm0=np.eye(mol.nao_nr()))

@@ -92,5 +92,6 @@ the optimizer batch is ≈ one day, not a week.
 - [ ] **T4** — the review round over the wave (both axes + the
       design survey).
 
-Dependencies: T5 (Stage 1c, ticket 37) runs BETWEEN T1 and T3 (the
-user's "implement and verify/validate first"); T6/T7 follow ticket 37.
+Dependencies: T5 (Stage 1c, ticket 37) LANDED 2026-11-14 — T3 is
+UNBLOCKED (the three sections run on the user's enable); T6/T7
+follow ticket 37.

@@ -198,7 +198,24 @@ user decision; the partial verdict 91/91-isolation-green).
   (weight 1.0), the 4s band carrying the s pair, S-orthonormal to
   1.4e-13.  The formal fresh re-run rides Stage 1c's seeded
   run_rohf; the UHF re-test under the seed seam (the ROHF chk as
-  the UHF dm0) is Stage 2.
+  the UHF dm0) is Stage 2.  **STAGE 1c LANDED (2026-11-14, the
+  seeded-reference integration)**: the seeded-MOM mode is the
+  product path (`reference.run_rohf`'s `seed_basis` knob -- the
+  projected 6-31G source, the `_mom_occ` follower, the
+  character-of-occupied post-check, the basin gate) and BOTH
+  twins' formal seeded head transfers land their declared anchors
+  EXACTLY (Ti-unc -848.40744343, Sc-unc -759.73738486, d_anchor
+  0.0000 mEh -- the pins `test_reference_seeded`; the sandbox
+  bench deleted, git history the archive).  MEASURED FINDING: the
+  SOURCE hooks need the source basis's own vocabulary -- the
+  whole-l closed rank on a contracted source ties occupied valence
+  (4s ~1 on l0) against virtual polarization (4p ~1 on l1) and
+  STEALS VIRTUALS into the closed block (the Ti/6-31G l-hook
+  source diverged at E = -838.91, eps +0.09 virtuals paired);
+  `ReferenceSpec.source_closed/source_open` declare them (the
+  twins carry the certified label hooks; the l-vocabulary stays
+  the target-side post-check's honest form).  Stage 2 note: the
+  mixed members' (d2s1/d3s1) open spans need l0 alongside l2.
   THE PRIOR PORT'S @s HALF (2026-11-11, measured; superseded by the
   mechanism above): the series' non-head configurations need fresh
   forced-occupation SCFs and the d3 census on Sc-unc diverges on
