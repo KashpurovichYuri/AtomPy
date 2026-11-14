@@ -859,7 +859,20 @@ CAMPAIGN: dict[str, CaseSpec] = {
                            _unc_s_block("ti-unc")),
                         term=(3, "g"),
                         lane_windows=("3d4s@ar", "3d@ar"),
-                        lattice_windows=("3d",), lattice_sector=(2, 0)),
+                        lattice_windows=("3d",), lattice_sector=(2, 0),
+                        # the UHF promotion (the 2026-11-13 census,
+                        # logs/uhf_census.log): the deeper spin-pure
+                        # basin is the intended UHF anchor; the honest
+                        # l-vocabulary spans (the shell-counter labels
+                        # would select slivers -- the disease's own
+                        # declaration bug).  The cached chks stay
+                        # trusted (cache-first, never re-gated); the
+                        # seeded fresh re-runs land with the seed seam
+                        # (Stage 1c/2), which re-lands the anchor row.
+                        ref=ReferenceSpec(
+                            occ_closed=("l0", "l1"), occ_open=("l2",),
+                            occ_e_ref=-848.4074434287603,
+                            occ_e_ref_uhf=-848.412340)),
     # CAMPAIGN key `U14e`: the ECP-atom record's element dir
     # (``elements/U14e/``); the SYMBOL stays `U` (PySCF builds the
     # element; the ECP removes its 78 core electrons) and the `tag`
