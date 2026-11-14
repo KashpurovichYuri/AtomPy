@@ -1,0 +1,11 @@
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_5f6d@6s6p7s_4-0_casci_ao_-_pur_avg
+  plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
+lane substrate D2h ROHF E = -50.38185233 Eh
+  [cell] u14e_5f6d7s@6s6p_5-1_casci_ao_-_pur_avg
+  [window] distilled 5f: k=1 of 3 bands, capture 0.9328-0.9420; 6d: k=1 of 3 bands, capture 0.9828-0.9828; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+  wrote elements/U14e/cells.json + cells.md
+
+done

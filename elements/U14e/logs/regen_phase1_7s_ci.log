@@ -1,0 +1,21 @@
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d7s_5-1_casci_ao_-_pol_raw
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:229: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  [cell] u14e_10f13d7s_5-1_casci_ao_-_pol_avg
+  [cell] u14e_10f13d7s_5-1_casci_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [void] u14e_10f13d7s_5-1_casci_ao_-_pol_frac -- frac-reference-unconverged: the fractional-occupation reference has no converged basin on the ECP atom: DIIS diverges, Newton collapses or does not move; MOM-anchored selection is the recorded fix (2026-11-05)
+  [cell] u14e_10f13d7s_5-1_casci_mo_-_pol_avg
+  [cell] u14e_10f13d7s_5-1_casci_moc_-_pol_avg
+  [cell] u14e_10f13d7s_5-1_casci_mo_-_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:1010: UserWarning: canonical order scrambled (closed at [np.int64(22), np.int64(61), np.int64(88), np.int64(120)]); reordering into closed|open|virtual
+  perm = canonical_order(mf, ncore)
+  [cell] u14e_10f13d7s_5-1_casci_moc_-_pur_avg
+  wrote elements/U14e/cells.json + cells.md
+
+done
