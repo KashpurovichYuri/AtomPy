@@ -332,9 +332,15 @@ the live state — update it in the same commit as any state change.
       home fix (`_materializes`, 2484d23), and delivered the swap-basin
       readout fix (99cc4de — the 0.8 Eh misread root-caused to the
       spherical averaging on runaway-scrambled cores; 34 cached legs
-      re-analyzed honest; 'swap' notes render).  Next:
-      A (U14e LAST — BEFORE LAUNCH price the planned-group optimizer
-      legs for the user; the frac scenario method-filtered).
+      re-analyzed honest; 'swap' notes render).  **A PHASE 1 LANDED
+      (2026-11-14, 5f1f530)**: the promoted windows' CI + the lanes;
+      the UHF anchor PROMOTED on Ti-unc (355282c — the censused deeper
+      basin declared, the honest l-vocabulary spans riding the same
+      line); the tier-window fresh-construction refusal found (map
+      Issues — the disposition pending); A's optimizer scope corrected
+      to 75 fresh legs; the pacing probe running (the 10f13d7s
+      max-cost window, OMP=128).  Next: the probe's extrapolation to
+      the user, then the optimizer commitment.
 - [x] **STAGE 1a** — the spectrum measurement: per-l-block S spectra on both
       twins, committed to `elements/<twin>/logs/spectrum.log`; **VERDICT =
       NO-GO on the clean-gap premise** (no null space: every eigenvalue

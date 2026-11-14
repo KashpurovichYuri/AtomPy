@@ -76,6 +76,39 @@ user decision; the partial verdict 91/91-isolation-green).
   C's; k=2 of 2 bands, cells ran) and stays.  The twins' @s2 blocks
   stay pending (Stage 2's seeded series carries the census members
   that would give the second radial).
+- U14E'S TIER-WINDOW FRESH CONSTRUCTION (2026-11-14, found at batch A
+  phase 1): the tier band windows (9f10f11f12d13d and kin, the
+  grid's primary family) REFUSE fresh construction under the
+  distilled declaration -- window_distilled's assembled
+  S-orthonormality certificate fires on their same-l multi-band
+  token sets (9f+10f+11f are three same-l "shells" to the walk; the
+  per-band k=1 blocks are each S-orthonormal but same-l band
+  primitives overlap ACROSS blocks, deviation 7.75e-01).  The
+  member-preserving cross-shell orthogonalization is the declared
+  future seam (windows.py's own refusal message).  The stored
+  tier cells predate the distilled declaration (raw-band
+  construction) and survive via the cache path -- phase 1's crash
+  was the FIRST fresh attempt on them.  The tier rows are
+  render-retired (2026-11-06, user-directed), so the refusal blocks
+  only the run side: the grid's 4 fresh CI cells + 32 optimizer
+  legs are phantom-runnable (materializable by --full, crashing at
+  construction).  DISPOSITION PENDING (the user's): (a) drop the
+  tier windows from the declared run set (the fake degree of
+  freedom -- the run gate matching the 2026-11-06 render diet; the
+  primary-window identity needs re-homing to a promoted window), or
+  (b) declare the refusal as a per-cell skip class beside
+  radial_refused (the one construction-refusal home), or (c) build
+  the cross-shell seam.  Phase 1 ran the honest runnable class
+  instead: the promoted windows' 17 CI cells + 2 lane legs (5f1f530).
+  Companion finding: the no3 certificate cells (10f13d7sno3,
+  10f13d14pno3) refuse at the DECLARED no_cap=12000 budget (the
+  16731-determinant prefix; the dense meters' cost guard -- the
+  guard's own message offers "raise the cap or narrow the source").
+  4 pending rows hold their places; raising no_cap for a
+  kernel-only run is the user's call.  ALSO CORRECTED: batch A's
+  optimizer scope is 75 fresh legs (the promoted windows' classes
+  only), not the 111 the void-count pricing assumed -- 36 of those
+  sit on the refused tier windows.
 - THE SWAP-BASIN READOUT SEAM (2026-11-12, found at batch D's
   materialization; **FIXED 2026-11-13, 99cc4de**): the free optimizer
   legs that land the SEMI-CORE SWAP BASIN (the classic 3p/3s-into-
