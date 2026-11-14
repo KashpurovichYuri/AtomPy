@@ -389,20 +389,10 @@ class CaseSpec:
 # New atom = new row here.
 
 # The ECP atom's raw specs live in data/ (raw basis/ECP text carries no
-# path-safe name -- hence the explicit tag). Its window tiers are the
-# record's exponent-band lattices expressed as their exact shell
-# subsets: this basis is its own exponent grid, so a band IS a set of
-# whole shells -- m-complete like any shell window.
+# path-safe name -- hence the explicit tag).
 _DATA = Path(__file__).resolve().parents[2] / "data"
 _U_BASIS = gto.parse((_DATA / "u_dyall_cut_basis.txt").read_text())
 _U_ECP = (_DATA / "u_stuttgart_rlc_ecp78.txt").read_text()
-_U_TIER = {
-    "3f": ("9f", "10f", "11f", "13d"),
-    "4f": ("8f", "9f", "10f", "11f", "13d"),
-    "2f2d": ("9f", "10f", "12d", "13d"),
-    "3f2d": ("9f", "10f", "11f", "12d", "13d"),
-    "4f2d": ("8f", "9f", "10f", "11f", "12d", "13d"),
-}
 
 # the standing protocol for planned windows, enforced: their OPTIMIZER
 # cells stay void until their CASCI anchors have been read (a full
@@ -516,17 +506,24 @@ def _prior_anchor_first(atom: str, sectors) -> Scenario:
 # U14e's gate (Ti's pattern, widened to the whole optimizer class):
 # the f-shell optimizer class is the declared multi-solution class
 # (``run_casscf=False``'s spirit made explicit) -- the CASCI anchors
-# (the primary's four cores, the four tiers' four) run; every
-# casscf/sa-casscf cell of every window stays void at the key, one
-# ``--full`` away.  The third prefix per window catches the NO-label
-# form (``<w>no<k>`` -- start='no' never occurs on a casci cell, so
-# the prefix cannot touch an anchor).
+# run; every casscf/sa-casscf cell of every window stays void at the
+# key, one ``--full`` away.  The third prefix per window catches the
+# NO-label form (``<w>no<k>`` -- start='no' never occurs on a casci
+# cell, so the prefix cannot touch an anchor).
 
-# the promoted-pair windows (the restricted optimizer batch,
-# user-directed 2026-11-05; shell identities from the band probe --
-# logs/probe_bands.log: the valence f/d character sits on 10f/13d,
-# the core 6s on 14s+15s, the 6p trio on 14p+15p, the 7s on 18s+19s):
-#   10f13d   CAS(4,12)  the record's minimal f+d window
+# the promoted windows -- the case's whole declared set (the
+# restricted optimizer batch, user-directed 2026-11-05; shell
+# identities from the band probe -- logs/probe_bands.log: the valence
+# f/d character sits on 10f/13d, the core 6s on 13s-15s, the 6p trio
+# on 13p-15p, the 7s on 18s-20s):
+#   10f13d   CAS(4,12)  the record's minimal f+d window -- THE
+#                       PRIMARY (re-declared 2026-11-14; the
+#                       band-lattice tier windows retired from the run
+#                       set the same day -- their same-l multi-band
+#                       token sets refuse the distilled construction,
+#                       and the user's direction retires the
+#                       CAS(4,20+)-class: git history and the store
+#                       keep their records)
 #   10f13d7s CAS(6,13)  the record's six13 -- the 7s pair promoted,
 #                       the core shrinks to 4 (the full core minus the
 #                       7s pair); it carries its own sector
@@ -538,10 +535,6 @@ def _prior_anchor_first(atom: str, sectors) -> Scenario:
 #                       record's own open question)
 _U14E_PROMOTED = ("10f13d", "10f13d7s", "10f13d14p")
 _U14E_PROMOTED_SECTORS = {"10f13d7s": (5, 1)}
-
-_U14E_WINDOWS = ("".join(_U_TIER["3f2d"]),) + tuple(
-    "".join(_U_TIER[t]) for t in ("3f", "4f", "2f2d", "4f2d")) \
-    + _U14E_PROMOTED
 
 # THE SHELL LAYER (the port of the multi-column core, the machinery
 # proven on Sc-unc/Ti-unc): the measured realizations from the record's
@@ -570,11 +563,11 @@ def _u14e_sector(window: str) -> tuple[int, int]:
 _U14E_ANCHOR_FIRST = Scenario(
     name="anchor-first",
     cells=tuple(f"u14e_{w}_{na}-{nb}_{m}_"
-                for w in _U14E_WINDOWS
+                for w in _U14E_PROMOTED
                 for na, nb in (_u14e_sector(w),)
                 for m in ("casscf", "sa-casscf"))
     + tuple(f"u14e_{w}no{k}_{na}-{nb}_{m}_"
-            for w in _U14E_WINDOWS
+            for w in _U14E_PROMOTED
             for na, nb in (_u14e_sector(w),)
             for k in (2, 3, 4, 5)
             for m in ("casscf", "sa-casscf")),
@@ -591,7 +584,7 @@ _U14E_ANCHOR_FIRST = Scenario(
 _U14E_FRAC_VOID = Scenario(
     name="frac-reference-unconverged",
     cells=tuple(f"u14e_{w}_{na}-{nb}_casci_ao_-_pol_frac"
-                for w in _U14E_WINDOWS
+                for w in _U14E_PROMOTED
                 for na, nb in (_u14e_sector(w),)),
     reason="the fractional-occupation reference has no converged basin "
            "on the ECP atom: DIIS diverges, Newton collapses or does "
@@ -878,7 +871,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
     # element; the ECP removes its 78 core electrons) and the `tag`
     # stays `U_stuttgart78_dyall` (the basis/psp label on chk names).
     "U14e": CaseSpec("U", _U_BASIS, nelec_act=4, ncore=5,
-                   shell_patterns=list(_U_TIER["3f2d"]), spin=4,
+                   shell_patterns=["10f", "13d"], spin=4,
                    ecp=_U_ECP, tag="U_stuttgart78_dyall", key="U14e",
                    shell_bands=_U14E_BANDS,
                    # every window shell carries k=1 -- the IDENTITY
@@ -906,26 +899,29 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    # lane one)
                    lane_windows=("5f6d@6s6p7s", "5f6d7s@6s6p"),
                    nroots_primary=48,
-                   # the tier CAS(4,>20) families: RETIRED for now
-                   # (user-directed 2026-11-06 -- "most of CASCI
-                   # results (4,>20) can be deleted for now": the
-                   # band-lattice anchor rows left the table with the
-                   # declaration; the windows stay in git history and
-                   # the store, re-declarable by re-adding the tuple)
-                   # + tuple("".join(_U_TIER[t])
-                   #         for t in ("3f", "4f", "2f2d", "4f2d")),
-                   planned_windows=_U14E_PROMOTED,
+                   # the primary is 10f13d (the promoted head of the
+                   # set); its grid owns the CI kind block + the
+                   # optimizer class.  The planned windows are the
+                   # other two promoted sections.  RUN-MECHANICS NOTE:
+                   # an unfiltered regen rebuilds the primary grid
+                   # ONLY -- the planned addresses prune under the
+                   # replace semantics; the canonical rebuild is the
+                   # grid pass + --group planned.
+                   planned_windows=_U14E_PROMOTED[1:],
                    planned_sectors=_U14E_PROMOTED_SECTORS,
                    render_spans=_U14E_PROMOTED + ("5f6d", "5f6d7s"),
                    scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID),
-                   window_names={"9f10f11f12d13d": "5f6d (3f2d radials)",
-                                 "10f13d": "5f6d",
+                   window_names={"10f13d": "5f6d",
                                  "10f13d7s": "5f6d7s",
                                  "10f13d14p": "5f6d6p"},
                    core_chemistry={5: "Rn·7s", 4: "Rn"},
                    anchor_note="forced filling: 6s²6p⁶7s² closed, "
                                "5f³6d¹ open",
-                   render_primary=False,
+                   # the primary IS the results window since the
+                   # 2026-11-14 re-declaration -- its family renders
+                   # (the suppression belonged to the retired tier
+                   # primary, whose rows stayed in the store)
+                   render_primary=True,
                    term=(8, "u"),
                    ref=ReferenceSpec(
                        occ_closed=("l0", "l1"), occ_open=("l2", "l3"),

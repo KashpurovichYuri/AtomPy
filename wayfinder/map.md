@@ -18,6 +18,12 @@ dies).
   thread, basis.conditioned_basis, reference.subspace_rohf); the
   decision tree (P1 seeded → P2 density-direct → C conditioned); 64 OMP
   for the bench (the user's directive 2026-11-12).
+- [38 — the U14e declaration close-out](tickets/38-u14e-declaration-closeout.md):
+  the tiers retire from the run set, the primary re-declared at
+  10f13d, the no3 ladder closed (NoCapExceeded per-cell), the
+  optimizer batch per CAS section on the user's enable.
+  T5 (Stage 1c) runs between its T1 and T3 (the user's
+  implement-and-validate-first call).
 - [34 — the folded reference + the window characterization matrix](tickets/34-folded-reference.md):
   **STEPS 1-5 COMPLETE (2026-11-08/09)**: the Ti-unc census + the
   promotion; run_folded (reference.py) + its tests; the matrix on the
@@ -92,23 +98,25 @@ user decision; the partial verdict 91/91-isolation-green).
   render-retired (2026-11-06, user-directed), so the refusal blocks
   only the run side: the grid's 4 fresh CI cells + 32 optimizer
   legs are phantom-runnable (materializable by --full, crashing at
-  construction).  DISPOSITION PENDING (the user's): (a) drop the
-  tier windows from the declared run set (the fake degree of
-  freedom -- the run gate matching the 2026-11-06 render diet; the
-  primary-window identity needs re-homing to a promoted window), or
-  (b) declare the refusal as a per-cell skip class beside
-  radial_refused (the one construction-refusal home), or (c) build
-  the cross-shell seam.  Phase 1 ran the honest runnable class
-  instead: the promoted windows' 17 CI cells + 2 lane legs (5f1f530).
-  Companion finding: the no3 certificate cells (10f13d7sno3,
-  10f13d14pno3) refuse at the DECLARED no_cap=12000 budget (the
-  16731-determinant prefix; the dense meters' cost guard -- the
-  guard's own message offers "raise the cap or narrow the source").
-  4 pending rows hold their places; raising no_cap for a
-  kernel-only run is the user's call.  ALSO CORRECTED: batch A's
-  optimizer scope is 75 fresh legs (the promoted windows' classes
-  only), not the 111 the void-count pricing assumed -- 36 of those
-  sit on the refused tier windows.
+  construction).  DISPOSITION (the user's call, 2026-11-14: option
+  (a) -- "we don't need CAS(4,20+)-class for now"): the tier windows
+  RETIRED from the run set -- the declaration carries the promoted
+  windows only, the primary re-declared at 10f13d (render_primary
+  flips True -- the primary is the results window now); no guard
+  predicate, the fake degree of freedom deleted (ticket 38).  The
+  cross-shell seam stays the recorded future step, revived only if
+  the multi-radial comparison returns to scope.  Phase 1 ran the
+  honest runnable class: the promoted windows' 17 CI cells + 2 lane
+  legs (5f1f530).  Companion: the no3 certificates -- the 14p pair
+  (UNDER the cap, C(15,4)=1365) RAN; the 7s pair (16731 dets, the
+  whole window re-gauged at (5,1)) refuses PER CELL
+  (`natural.NoCapExceeded`, the declared no_cap class, 2 pending
+  rows -- the cap stays, the kernel-only raise declined).  ALSO
+  CORRECTED: batch A's optimizer scope is ~73 fresh legs (the
+  promoted windows' classes only), not the 111 the void-count
+  pricing assumed -- and the MEASURED pricing (the pacing probe:
+  17:09 CASSCF / 26:53 SA at OMP=128, the max-cost (6,13) class,
+  ~24.7 GB peak) makes the batch ≈ one day, not a week.
 - THE SWAP-BASIN READOUT SEAM (2026-11-12, found at batch D's
   materialization; **FIXED 2026-11-13, 99cc4de**): the free optimizer
   legs that land the SEMI-CORE SWAP BASIN (the classic 3p/3s-into-

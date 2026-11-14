@@ -20,6 +20,7 @@ from pathlib import Path
 from atomterm.cells import (
     CellData,
     CellKey,
+    band_tokens,
     cell_chk,
     grid_keys,
     lane_keys,
@@ -364,6 +365,25 @@ def test_same_l_guard_derives_from_the_declared_windows():
 
 
 @fast
+def test_u14e_declares_no_same_l_window():
+    """U14e's declared key-set is constructible end-to-end: the
+    band-lattice tier windows (same-l multi-band token sets -- the
+    distilled assembly refuses them) left the RUN set with the
+    2026-11-14 re-declaration, so the derived same-l guard holds no
+    U14e windows and the primary + planned + lane base spans all
+    carry distinct-l tokens.  A new declaration row that repeats an
+    l fails here, not in a crashing chain."""
+    spec = CAMPAIGN["U14e"]
+    windows = {"".join(spec.shell_patterns), *spec.planned_windows}
+    windows |= {w.partition("@")[0] for w in spec.lane_windows}
+    for w in windows:
+        shells = band_tokens(w)
+        ls = [sh[-1] for sh in shells]
+        assert len(ls) == len(set(ls)), f"{w}: same-l tokens {ls}"
+    assert scenarios_for(spec)[0].name == "anchor-first"
+
+
+@fast
 def test_radial_refused_covers_the_distilled_cases():
     """The construction refusal is KEY x SPEC: every radial cell of a
     distilled case (declared shell_radials -- the TM campaign) or a
@@ -412,7 +432,9 @@ def test_u14e_chemistry_declaration():
     assert spec.window_names["10f13d7s"] == "5f6d7s"
     assert spec.window_names["10f13d14p"] == "5f6d6p"
     assert spec.core_chemistry == {5: "Rn·7s", 4: "Rn"}
-    assert spec.render_primary is False
+    # the primary IS the results window since the re-declaration (the
+    # suppression belonged to the retired tier primary)
+    assert spec.render_primary is True
     assert spec.anchor_note.startswith("forced filling: 6s²6p⁶7s²")
 
 
@@ -422,19 +444,19 @@ def test_void_reason_voids_the_u14e_optimizer_class():
     on EVERY window (the primary included -- ``run_casscf=False``'s
     spirit made explicit) and the frac cores are void with it (the
     frac reference has no converged basin on the ECP atom); exactly
-    the 36 remaining CASCI cells run (the 20 anchors + the kind
-    block's mo/no cells at both ruler cores, 4 per window -- the tier
-    families retired from the declaration 2026-11-06; the kind
-    amendment 2026-11-09)."""
+    the 27 remaining CASCI cells run -- the promoted windows' kind
+    blocks (the band-lattice tier windows retired from the RUN set
+    2026-11-14: the same-l distilled assembly refuses their fresh
+    construction; the render had retired their rows 2026-11-06)."""
     spec = CAMPAIGN["U14e"]
     sc = scenarios_for(spec)
     keys = grid_keys(spec) + planned(spec)
-    assert len(keys) == 184   # the virtual-mix keys retired (-4)
+    assert len(keys) == 138   # the tiers left the declared key-set
     for k in keys:
         void = void_reason(k, sc) is not None
         expect = k.method != "casci" or k.core == "frac"
         assert void == expect, k.address
-    assert sum(not void_reason(k, sc) for k in keys) == 36
+    assert sum(not void_reason(k, sc) for k in keys) == 27
 
 
 @fast
@@ -524,22 +546,23 @@ def test_planned_sector_override_shrinks_the_fold():
     its whole grid -- the promoted-pair windows' core count follows the
     sector (ncore_of(14, 6) = 4: the full core minus the 7s pair);
     windows without the override stay at the default, and the NO-form
-    keys inherit their window's sector."""
-    keys = planned(CAMPAIGN["U14e"])
+    keys inherit their window's sector.  The PRIMARY (10f13d) is not a
+    planned window -- its grid lives in grid_keys (the 2026-11-14
+    re-declaration)."""
+    spec = CAMPAIGN["U14e"]
+    keys = planned(spec)
     by_window = {}
     for k in keys:
         by_window.setdefault(k.window, []).append(k)
-    assert all(k.sector == (4, 0) for k in by_window["10f13d"])
+    assert sorted(by_window) == ["10f13d14p", "10f13d14pno3",
+                                 "10f13d7s", "10f13d7sno3"]
     assert all(k.sector == (4, 0) for k in by_window["10f13d14p"])
     assert all(k.sector == (5, 1) for k in by_window["10f13d7s"])
-    # the tier windows (no override) and the NO-forms keep their
-    # window's sector
-    assert all(k.sector == (4, 0)
-               for w, ks in by_window.items() if w.startswith("9f")
-               for k in ks)
-    no7 = [k for k in by_window if k.startswith("10f13d7sno")]
-    assert no7 and all(k.sector == (5, 1)
-                       for k in by_window[no7[0]])
+    # the NO-forms keep their window's sector
+    assert all(k.sector == (5, 1)
+               for k in by_window["10f13d7sno3"])
+    # the primary's grid: the case-default sector on every key
+    assert all(k.sector == (4, 0) for k in grid_keys(spec))
 
 
 @fast

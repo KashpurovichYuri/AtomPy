@@ -57,6 +57,7 @@ from pyscf import gto, scf  # noqa: E402
 
 from _tables_common import atomic_write_text  # noqa: E402
 from atomterm.cases import CAMPAIGN, campaign_spec, scenarios_for  # noqa: E402
+from atomterm.natural import NoCapExceeded  # noqa: E402
 from atomterm.cells import (CellKey, cell_payload,  # noqa: E402
                             grid_keys, lane_keys, lattice_keys, planned,
                             kernel_cell_payload, radial_refused,
@@ -390,14 +391,25 @@ def main() -> None:
                         shell_radials=spec.shell_radials,
                         workdir="elements")
                 else:
-                    facts = run_cell(key, mf, frac_mf=mf_f,
-                                     fresh=args.fresh, workdir="elements",
-                                     shell_bands=spec.shell_bands,
-                                     shell_radials=spec.shell_radials,
-                                     series_mfs=series_mfs,
-                                     prior_bands=spec.prior_bands,
-                                     budgets={"sa_weights":
-                                              spec.sa_weights})
+                    try:
+                        facts = run_cell(key, mf, frac_mf=mf_f,
+                                         fresh=args.fresh,
+                                         workdir="elements",
+                                         shell_bands=spec.shell_bands,
+                                         shell_radials=spec.shell_radials,
+                                         series_mfs=series_mfs,
+                                         prior_bands=spec.prior_bands,
+                                         budgets={"sa_weights":
+                                                  spec.sa_weights})
+                    except NoCapExceeded as e:
+                        # the declared budget refuses the construction
+                        # (the dense meters' cost guard) -- a per-cell
+                        # refusal like the radial mask's: the cell
+                        # holds its structural place (nothing stored,
+                        # the pending row renders), the chain goes on
+                        print(f"  [refused] {key.address} -- {e}",
+                              flush=True)
+                        continue
                     cells[key.address] = (
                         cell_payload(key, facts) if facts is not None
                         else kernel_cell_payload(key, mol, mf,

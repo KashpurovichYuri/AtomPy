@@ -1,0 +1,74 @@
+=== pacing probe 2026-11-14T19:50:29+00:00 ===
+--- leg 1: free CASSCF, 10f13d7s CAS(6,13), ao/pol/avg, fresh ---
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d7s_5-1_casscf_ao_-_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:965: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:229: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  wrote elements/U14e/cells.json + cells.md
+
+done
+	Command being timed: "python scripts/regen_cells.py U14e --group planned --window 10f13d7s --method casscf --mask - --start ao --substrate pol --core avg --fresh --full"
+	User time (seconds): 119616.03
+	System time (seconds): 1139.40
+	Percent of CPU this job got: 11737%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 17:08.78
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 24667992
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 304562
+	Voluntary context switches: 9728900
+	Involuntary context switches: 8897798
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 51168
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- leg 2: 17-root SA-CASSCF, 10f13d7s CAS(6,13), ao/pol/avg, fresh ---
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d7s_5-1_sa-casscf_ao_-_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:965: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:229: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  wrote elements/U14e/cells.json + cells.md
+
+done
+	Command being timed: "python scripts/regen_cells.py U14e --group planned --window 10f13d7s --method sa-casscf --mask - --start ao --substrate pol --core avg --fresh --full"
+	User time (seconds): 191740.52
+	System time (seconds): 998.03
+	Percent of CPU this job got: 11947%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 26:53.23
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 24673132
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 259724
+	Voluntary context switches: 10152865
+	Involuntary context switches: 11557013
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 525888
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+=== probe complete 2026-11-14T20:34:31+00:00 ===

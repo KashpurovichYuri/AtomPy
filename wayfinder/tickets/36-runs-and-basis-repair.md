@@ -23,14 +23,18 @@
   (Rn*7s*lane, Rn*lane) + `--full` optimizer legs across ALL THREE
   CAS sections.  The heaviest (17-root SA, pinned solvers/irrep).
   **PHASE 1 LANDED (2026-11-14, 5f1f530)**: the promoted windows' 17
-  CI cells + both lane legs; the pending classes = the optimizer
-  legs (62 rendered) + the no3 certificate cells (4, refused at the
-  declared no_cap).  **SCOPE CORRECTED (map Issues)**: the fresh
-  optimizer class is 75 legs (the promoted windows only), not the
-  111 the void-count pricing assumed -- 36 sit on the tier windows
-  whose fresh construction refuses (the same-l distilled assembly
-  seam).  The pacing probe (2 legs at OMP=128, the 10f13d7s
-  max-cost window) prices the commitment.
+  CI cells + both lane legs.  **SCOPE CORRECTED + DISPOSITIONED
+  (ticket 38, the user's call)**: the tier windows retired from the
+  run set (the same-l distilled assembly refuses their fresh
+  construction), the primary re-declared at 10f13d; the optimizer
+  scope is ~73 fresh legs (the promoted windows' classes only) at
+  the MEASURED pricing — the pacing probe (2 legs at OMP=128, the
+  10f13d7s max-cost window): 17:09 CASSCF / 26:53 SA, the batch ≈
+  one day.  The legs run PER CAS SECTION on the user's enable,
+  AFTER Stage 1c implements + verifies (the user's
+  implement-and-validate-first call); the 14pno3 certificate pair
+  ran (under the cap), the 7sno3 pair is the declared per-cell
+  no_cap refusal.
 
 Mechanics: one regen at a time, OMP 16, background chains, per-cell
 stores; re-render + commit per batch.  Expected physics: local-

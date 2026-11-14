@@ -181,7 +181,14 @@ def select_no_window(c_no: np.ndarray, occ, n_max: int,
     return c_no[:, cols], kept
 
 
-# ------------------------------------------------------------- the NO arm
+# the NO arm ---------------------------------------------------------
+
+
+class NoCapExceeded(ValueError):
+    """A group prefix's sector exceeds the declared ``no_cap`` budget
+    (the dense meters' cost guard).  A DISTINCT type so the runner
+    treats it as a per-cell construction refusal -- skip the cell,
+    keep the chain -- instead of a chain-killing crash."""
 
 
 def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
@@ -248,7 +255,7 @@ def no_group_windows(mol, mf, ncore: int, c_act, na: int, nb: int,
                 "missed the term's eigenspace")
         ndet = sector_dimension(c_win.shape[1], na, nb)
         if ndet > cap:
-            raise ValueError(
+            raise NoCapExceeded(
                 f"the no{nk} prefix opens a {ndet}-determinant sector "
                 f"(> cap={cap}): raise the cap or narrow the source")
         out.append(Window(f"no{nk}", None, c_win, True))
