@@ -112,6 +112,11 @@ class SeriesSpec(NamedTuple):
         series configurations DIVERGE under plain DIIS, measured;
         Newton converges them, at the cost that its frozen early
         occupations can VIOLATE the hook -- run_series post-checks).
+    src_closed, src_open : the seeded mode's SOURCE patterns -- the
+        configuration declared in the source basis's own vocabulary
+        (:class:`atomterm.reference.ReferenceSpec` semantics; None =
+        the ``closed``/``open`` vocabulary serves both sides -- safe
+        when both bases speak it, e.g. contracted campaigns).
 
     Notes
     -----
@@ -128,6 +133,11 @@ class SeriesSpec(NamedTuple):
     spin: int
     e_ref: float
     accel: str = "newton"
+    # the seeded mode's SOURCE patterns (the configuration declared
+    # in the source basis's own vocabulary -- ReferenceSpec semantics;
+    # None = the closed/open vocabulary serves both sides)
+    src_closed: tuple[str, ...] | None = None
+    src_open: tuple[str, ...] | None = None
 
 
 # the series -----------------------------------------------------------
@@ -191,6 +201,8 @@ def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
         ref = ReferenceSpec(occ_closed=spec.closed, occ_open=spec.open,
                             occ_e_ref=spec.e_ref,
                             seed_basis=seed_basis,
+                            source_closed=spec.src_closed,
+                            source_open=spec.src_open,
                             conv_accelerator=spec.accel)
         _m, mf_x = run_rohf(cfg_x, str(chk_dir / f"{spec.tag}.chk"), ref=ref)
         # the occupation post-check: a run whose converged occupied

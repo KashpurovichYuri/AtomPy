@@ -405,9 +405,10 @@ def main() -> None:
                     except NoCapExceeded as e:
                         # the declared budget refuses the construction
                         # (the dense meters' cost guard) -- a per-cell
-                        # refusal like the radial mask's: the cell
-                        # holds its structural place (nothing stored,
-                        # the pending row renders), the chain goes on
+                        # refusal like the radial mask's: nothing is
+                        # stored for the cell this pass (a stale merge
+                        # payload, if any, keeps its own record), the
+                        # chain goes on
                         print(f"  [refused] {key.address} -- {e}",
                               flush=True)
                         continue

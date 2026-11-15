@@ -106,8 +106,8 @@ user decision; the partial verdict 91/91-isolation-green).
   predicate, the fake degree of freedom deleted (ticket 38).  The
   cross-shell seam stays the recorded future step, revived only if
   the multi-radial comparison returns to scope.  Phase 1 ran the
-  honest runnable class: the promoted windows' 17 CI cells + 2 lane
-  legs (5f1f530).  Companion: the no3 certificates -- the 14p pair
+  honest runnable class: the promoted windows' 13 fresh CI cells (17
+  queued -- 4 were cache re-analyses) + 2 lane legs (5f1f530).  Companion: the no3 certificates -- the 14p pair
   (UNDER the cap, C(15,4)=1365) RAN; the 7s pair (16731 dets, the
   whole window re-gauged at (5,1)) refuses PER CELL
   (`natural.NoCapExceeded`, the declared no_cap class, 2 pending

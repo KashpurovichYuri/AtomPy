@@ -268,6 +268,11 @@ def test_reference_spec_refuses_seed_without_patterns():
     with pytest.raises(ValueError, match="source_closed and "
                                          "source_open"):
         ReferenceSpec(source_closed=("1s",))
+    # the source fields are the seeded mode's own -- seedless, they
+    # are dead config and refuse (illegal states unrepresentable)
+    with pytest.raises(ValueError, match="seed_basis"):
+        ReferenceSpec(occ_closed=("l0",), occ_open=("l2",),
+                      source_closed=("1s",), source_open=("3d",))
 
 
 def test_run_rohf_refuses_two_seed_masters():

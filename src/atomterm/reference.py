@@ -293,15 +293,15 @@ class ReferenceSpec:
     source_closed, source_open : tuple[str, ...] | None
         The SEEDED-MOM source's own forced-hook patterns -- the
         configuration declared in the SOURCE basis's vocabulary.
-        Required on ill-conditioned-target cases: on a contracted
-        source the whole-l spans' closed RANK ties occupied valence
-        (4s ~1 on l0) against virtual polarization shells (4p ~1 on
-        l1) and steals virtuals into the closed block (measured: the
-        Ti/6-31G l-hook source diverged at E = -838.91 with eps
-        +0.09 virtuals paired), while the label patterns pin the
-        configuration by shell identity. ``None`` ⇒ the source uses
+        Declared whenever the two bases speak different vocabularies:
+        on a contracted source the whole-l spans' closed RANK can tie
+        occupied valence against virtual polarization shells and
+        steal virtuals into the closed block (the rank is a weight
+        statement, not a shell identity), while the label patterns
+        pin the configuration. ``None`` ⇒ the source uses
         ``occ_closed``/``occ_open`` (the same vocabulary serves both
-        bases -- the contracted-campaign cases).
+        bases -- the contracted-campaign cases).  Requires
+        ``seed_basis`` (the fields are the seeded mode's own).
     conv_accelerator : str
         "diis" (default; the plain SCF), "newton" (second-order SOSCF
         from the start), or "diis+newton" (DIIS linearly first, then
@@ -345,6 +345,12 @@ class ReferenceSpec:
                 "seed_basis needs the occ_closed/occ_open patterns "
                 "(the character post-check verifies the converged "
                 "solution against them)")
+        if ((self.source_closed is not None)
+                and self.seed_basis is None):
+            raise ValueError(
+                "source_closed/source_open are the seeded mode's own "
+                "-- they need seed_basis (seedless, the weight hook "
+                "never reads them)")
         if self.conv_accelerator not in ("diis", "newton", "diis+newton"):
             raise ValueError(
                 f"unknown conv_accelerator: {self.conv_accelerator!r}")
@@ -429,8 +435,8 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
         configuration, the occupations follow it, and the character
         post-check verifies the converged solution.
     dm0 : (nao, nao) ndarray, optional
-        The caller-supplied initial density (the explicit-seed form;
-        Stage 2's UHF re-test passes a reference chk's density).
+        The caller-supplied initial density (the explicit-seed form --
+        e.g. a reference chk's density feeding a spin-broken run).
         The two masters refuse: ``dm0`` together with
         ``ref.seed_basis`` is a ValueError -- the seed owns the guess
         it builds.
@@ -533,9 +539,7 @@ def occupation_postcheck(mol, mf, occ_closed, occ_open) -> bool:
     energy agreement alone cannot certify the configuration -- the
     second-order accelerator freezes occupations from its early
     cycles, and a converged solution can sit in a WRONG
-    configuration's basin (measured: a d-forced quartet converging
-    onto the d²s¹ solution at -129 mEh relative; the census logs
-    carry the record).
+    configuration's basin.
 
     Parameters
     ----------
@@ -552,6 +556,14 @@ def occupation_postcheck(mol, mf, occ_closed, occ_open) -> bool:
         True = the converged occupied columns carry the declared
         character (the block sizes must also match the molecule's
         electron counts exactly).
+
+    Notes
+    -----
+    Measured instances: a d-forced quartet converging onto the
+    d²s¹ solution with the (n+1)s MO occupied at hook-rank 0 (the
+    census logs); a seeded target missing its anchor by ~1.5 Eh
+    when its source's closed rank stole virtuals -- the census logs
+    and the wayfinder record carry both.
     """
     s_mat = mol.intor_symmetric("int1e_ovlp")
     p_closed = span_projector(
@@ -584,8 +596,8 @@ def occupation_postcheck(mol, mf, occ_closed, occ_open) -> bool:
 _SOURCE_THRESH = 1e-8
 
 
-def projected_source(cfg, ref: ReferenceSpec, source_basis: str = "6-31g",
-                     chkfile: str = None,
+def projected_source(cfg, ref: ReferenceSpec, chkfile: str,
+                     source_basis: str = "6-31g",
                      thresh: float = _SOURCE_THRESH):
     """The on-demand seeded-mode source: the declared configuration's
     forced-occupation ROHF on a SMALL basis, its occupied columns
@@ -610,9 +622,9 @@ def projected_source(cfg, ref: ReferenceSpec, source_basis: str = "6-31g",
     source_basis : str
         The small basis (the default is the certified source).
     chkfile : str
-        The source SCF's cache path (the caller owns layout --
-        :func:`run_rohf` derives it beside its own chk; the cache
-        convention applies: a cached source is trusted).
+        The source SCF's cache path (REQUIRED -- the caller owns
+        layout; :func:`run_rohf` derives it beside its own chk; the
+        cache convention applies: a cached source is trusted).
     thresh : float
         The projector's conditioning cut (:func:`windows.
         project_orbitals`; the conservative default is this module's
@@ -635,9 +647,6 @@ def projected_source(cfg, ref: ReferenceSpec, source_basis: str = "6-31g",
     from dataclasses import replace as dc_replace
     from atomterm.system import build_mol
 
-    if chkfile is None:
-        raise ValueError("projected_source needs the source chkfile "
-                         "path (the caller owns layout)")
     src_cfg = dc_replace(cfg, basis=source_basis)
     src_ref = ReferenceSpec(
         occ_closed=ref.source_closed or ref.occ_closed,
@@ -677,10 +686,11 @@ def rohf_basin_census(cfg, ref: ReferenceSpec,
 
     OCCUPATION SAFETY (``occ_ok``): the Newton/second-order path
     rotates orbitals with occupations FROZEN from its early cycles --
-    a converged arm can therefore VIOLATE the hook.  Each arm carries
-    the occupation post-check (:func:`occupation_postcheck`): a
-    converged-but-``occ_ok=False`` arm is a WRONG CONFIGURATION, not
-    a basin of the intended one -- the gate never anchors there.
+    a converged arm can therefore carry the wrong configuration's
+    occupations.  Each arm carries the occupation post-check
+    (:func:`occupation_postcheck`, the character-of-occupied form):
+    a converged-but-``occ_ok=False`` arm is a WRONG CONFIGURATION,
+    not a basin of the intended one -- the gate never anchors there.
 
     Parameters
     ----------

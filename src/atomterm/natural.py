@@ -38,6 +38,7 @@ __all__ = [
     "occupation_groups",
     "select_no_window",
     "no_group_windows",
+    "NoCapExceeded",
 ]
 
 
