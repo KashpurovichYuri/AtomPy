@@ -1412,7 +1412,20 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
 def _ao_family(mol, shells: tuple[str, ...], layer: dict) -> np.ndarray:
     """The shells' full AO family as raw AO columns: the declared band
     realization (:func:`atomterm.windows.realized_patterns`), the
-    cusp-honest core space before orthonormalization."""
+    cusp-honest core space before orthonormalization.
+
+    Parameters
+    ----------
+    mol : the built Mole.
+    shells : the chemical shell names (the :class:`ReferenceSpec`
+        band vocabulary).
+    layer : the shell layer (the bands mapping; None = the identity).
+
+    Returns
+    -------
+    (nao, M) ndarray
+        One raw AO column per realized band row.
+    """
     from atomterm.windows import realized_patterns, select_valence_ao
     rows = select_valence_ao(mol, realized_patterns(shells, layer))
     return np.eye(mol.nao_nr())[:, rows]
@@ -1421,9 +1434,20 @@ def _ao_family(mol, shells: tuple[str, ...], layer: dict) -> np.ndarray:
 def _build_subspace(mf, c_fam_raw: np.ndarray,
                     c_win: np.ndarray) -> tuple[np.ndarray, int]:
     """The S-orthonormal subspace ``[family Loewdin'd | window
-    projected against it]``: the family orthonormalized, the window
-    columns family-orthogonalized and re-orthonormalized.  Returns
-    ``(Q, n_fam)``."""
+    projected against it]``.
+
+    Parameters
+    ----------
+    mf : the substrate (its ``get_ovlp`` is the metric).
+    c_fam_raw : (nao, M) the family's raw AO columns.
+    c_win : (nao, W) the window columns (S-orthonormal or raw).
+
+    Returns
+    -------
+    (Q, n_fam)
+        The (nao, M+W) S-orthonormal subspace basis and the family
+        block's width.
+    """
     from atomterm.windows import lowdin
     s = mf.get_ovlp()
     c_fam = lowdin(c_fam_raw, s)
@@ -1432,6 +1456,32 @@ def _build_subspace(mf, c_fam_raw: np.ndarray,
     w = c_win - c_fam @ (c_fam.conj().T @ s @ c_win)
     w = lowdin(w, s)
     return np.hstack([c_fam, w]), c_fam.shape[1]
+
+
+def _mom_assign(prev_cols, mo_coeff, allowed, n_pick, mo_energy):
+    """The per-slot MOM assignment (:func:`_mom_occ`'s certified
+    algorithm, in the caller's coordinates): each seed slot, in seed
+    order, takes its best-overlap REMAINING column; shortfalls fill
+    by aufbau.  A summed-anchor score instead lets a mixture direction
+    win the aggregate over every single physical column."""
+    picked = []
+    used = set()
+    for j in range(prev_cols.shape[1]):
+        if len(picked) >= n_pick:
+            break
+        free = [i for i in allowed if i not in used]
+        if not free:
+            break
+        ovl = np.abs(prev_cols[:, j].conj() @ mo_coeff)
+        picked.append(max(free, key=lambda i: ovl[i]))
+        used.add(picked[-1])
+    while len(picked) < n_pick:
+        free = [i for i in allowed if i not in used]
+        if not free:
+            break
+        picked.append(min(free, key=lambda i: mo_energy[i]))
+        used.add(picked[-1])
+    return picked
 
 
 def subspace_rohf(mf, c_core: np.ndarray, n_pairs: int,
@@ -1491,13 +1541,9 @@ def subspace_rohf(mf, c_core: np.ndarray, n_pairs: int,
         cross-check).
     occ_closed, occ_open : the filling gates' character patterns
         (:class:`ReferenceSpec` vocabulary).
-    conv_accelerator : the acceleration policy
-        (:func:`_accelerated`).  The certificate legs run "newton":
-        the seeds ARE converged solutions and the Newton recognizes
-        them at its initial-gradient check (their |g| sits at the free
-        runs' own conv_tol_grad; this runner declares 1e-4 -- the
-        needless first step at the tighter default interacts with the
-        mirror gauge and walks away).
+    conv_accelerator : the acceleration policy (:func:`_accelerated`;
+        default plain DIIS; "newton" additionally sets this runner's
+        gradient tolerance, 1e-4 -- see Notes).
 
     Returns
     -------
@@ -1544,9 +1590,6 @@ def subspace_rohf(mf, c_core: np.ndarray, n_pairs: int,
     the solve reproduces the free ROHF anchor (pinned on the fixture
     and on both uncontracted bases to <= 2e-6 mEh).
     """
-    from pyscf import gto, scf
-
-    from atomterm.reference import _accelerated, _closed_field
     from types import SimpleNamespace as _NS
 
     mol = mf.mol
@@ -1630,9 +1673,13 @@ def subspace_rohf(mf, c_core: np.ndarray, n_pairs: int,
     def _veff(mol_=None, dm=None, dm_last=0, vhf_last=None, hermi=1):
         d = np.asarray(dm)
         if d.ndim < 2:
-            import traceback
-            traceback.print_stack()
-            raise RuntimeError(f"VEFF GOT dm={dm!r}")
+            # the kernel's fallback guess built in the REAL mol's AO
+            # space -- wrong coordinates for the shimmed kernel (the
+            # initial density must come from _init_guess)
+            raise RuntimeError(
+                "the subspace veff shim received a density that is "
+                "neither the spin pair nor a subspace-summed dm -- "
+                "the initial-guess hook was bypassed")
         if d.ndim == 3:
             d_pair = np.stack([Q @ di @ Q.conj().T for di in d])
             v = mf.get_veff(mol, d_pair)
@@ -1669,29 +1716,6 @@ def subspace_rohf(mf, c_core: np.ndarray, n_pairs: int,
         columns -- slicing rows would project fragments)."""
         c_ao = Q @ mo_coeff
         return np.einsum("ai,ab,bi->i", c_ao.conj(), P, c_ao).real
-
-    def _mom_assign(prev_cols, mo_coeff, allowed, n_pick, mo_energy):
-        """The per-slot MOM assignment (_mom_occ's form): each seed
-        slot, in seed order, takes its best-overlap REMAINING column;
-        shortfalls fill by aufbau."""
-        picked = []
-        used = set()
-        for j in range(prev_cols.shape[1]):
-            if len(picked) >= n_pick:
-                break
-            free = [i for i in allowed if i not in used]
-            if not free:
-                break
-            ovl = np.abs(prev_cols[:, j].conj() @ mo_coeff)
-            picked.append(max(free, key=lambda i: ovl[i]))
-            used.add(picked[-1])
-        while len(picked) < n_pick:
-            free = [i for i in allowed if i not in used]
-            if not free:
-                break
-            picked.append(min(free, key=lambda i: mo_energy[i]))
-            used.add(picked[-1])
-        return picked
 
     vhf_cell = [None]
 
@@ -1757,7 +1781,13 @@ def subspace_rohf(mf, c_core: np.ndarray, n_pairs: int,
 
     fm.get_occ = _occ
 
-    # the certificate legs' gradient tolerance (see the docstring)
+    # the certificate legs' gradient tolerance: the seeds ARE
+    # converged solutions (their |g| sits at the free runs' own
+    # conv_tol_grad ~1e-6); the default sqrt(conv_tol) threshold
+    # misses them by a hair, the needless first step interacts with
+    # the mirror gauge and the walk diverges (measured: d2s1 walked
+    # from E = the exact anchor to -758.4).  1e-4 recognizes the seed
+    # at macro 0; the fresh ion solve converges well inside it.
     if "newton" in conv_accelerator:
         fm.conv_tol_grad = 1e-4
     fm = _accelerated(fm, _NS(conv_accelerator=conv_accelerator), dm0=dm0)
@@ -1778,8 +1808,14 @@ def subspace_rohf(mf, c_core: np.ndarray, n_pairs: int,
         raise RuntimeError(
             f"the converged filling holds {n_fill} electrons, want "
             f"{mol.nelectron} -- a lost configuration, not a result")
+    # reassemble on the real substrate: the MO columns back in AO
+    # coordinates, the accessors restored (the consumers see a
+    # standard ROHF, run_folded's own contract)
     fm.mo_coeff = c_ao
     fm.mol = mol
+    for name in ("get_occ", "get_init_guess", "get_hcore", "get_ovlp",
+                 "get_veff", "get_jk"):
+        del fm.__dict__[name]
     fm.subspace = {
         "n_fam": n_fam, "n_win": n_win, "n_pairs": n_pairs,
         "capture": (None if capture is None

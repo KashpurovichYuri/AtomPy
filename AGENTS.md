@@ -39,7 +39,7 @@ restrictions lift). Mechanical enforcement: the global
 ## Running things
 
 ```bash
-pytest -m fast                                  # the gate's base: 234 tests, seconds
+pytest -m fast                                  # the gate's base: 242 tests, seconds
 pytest tests/unit/test_X.py tests/integration/Y.py   # + the diff's targeted files
 python scripts/run.py <atoms>                   # term tables -> elements/<Atom>/
 python scripts/regen_cells.py <atom> \
@@ -220,7 +220,7 @@ cold-start warning surface.
 
 ## Tests
 
-`pytest` runs 328 tests. The fast tier: `pytest -m fast` = 234
+`pytest` runs 336 tests. The fast tier: `pytest -m fast` = 242
 tests in seconds (machine-light selection). The heavy tail is
 HOURS-class — the per-commit gate is the fast tier plus the diff's
 targeted files (see Running things); the full-suite run is RETIRED. A
@@ -381,10 +381,13 @@ ticket is self-contained (no conversation context needed).
 State: the atom campaign (C, Si, Sc, Ti, the unc twins, U14e) is
 COMPLETE — U14e certified end-to-end (⁵L at machine-precision closure,
 2026-11-16); the ECP wave and the module walk are complete; the docs
-round (2026-11-16) consolidated README/AGENTS/map. Next: ticket 37
-Stage 2 (the @s wave) then Stage 3 (`subspace_rohf`); the queued CASCI
-review (map Issues) precedes the next physics wave; beyond it the
-candidates: spin–orbit, transition moments, g-factors.
+round (2026-11-16) consolidated README/AGENTS/map; ticket 37 (the
+basis-repair bench, the @s wave, the subspace-ROHF) COMPLETE
+(2026-11-12..16 — the seeded-MOM repair, the twins' @s legs, the
+per-contraction ΔE certificate). Next: the queued CASCI review
+(map Issues) precedes the un-gating wave; the Stage-3 adoption
+decision (map Disposition candidates) is the user's call; beyond it
+the candidates: spin–orbit, transition moments, g-factors.
 
 Review protocol after each ticket wave, then a design survey:
 

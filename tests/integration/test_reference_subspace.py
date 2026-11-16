@@ -32,9 +32,9 @@ def carbon_references(tmp_path_factory):
 
 def test_subspace_whole_space_reproduces_the_free_reference_exactly(
         carbon_references):
-    """The degenerate limit: subspace == the whole AO space, the solve
-    reproduces the free reference EXACTLY (exact-by-construction: any
-    deviation is a bug, not physics)."""
+    """The degenerate limit: subspace == the whole space == the free
+    reference (exact-by-construction; the fresh-draw band: < 1e-8 Eh,
+    2026-11-16)."""
     mol, mf = carbon_references
     n = mol.nao_nr()
     eye = np.eye(n)
@@ -48,16 +48,14 @@ def test_subspace_whole_space_reproduces_the_free_reference_exactly(
 
 
 def test_subspace_ion_matches_confined_core_orbitals():
-    """The closed-shell cross-check: the valence-empty solve on the
-    family span vs confined_core_orbitals's own Roothaan loop -- two
-    independent constructions of one confined problem."""
-    from dataclasses import replace as dc_replace
+    """The valence-empty solve == confined_core_orbitals's own
+    Roothaan loop (two constructions, one confined problem)."""
     from pyscf import scf
     from atomterm.system import build_mol
     cfg = CAMPAIGN["C"].atom_config()
     # the C4+ ion (2e = the one confined pair): the nuclear field is
     # atom-blind to the charge; the counting follows mol.nelectron
-    mol = build_mol(dc_replace(cfg, charge=4, spin=0))
+    mol = build_mol(replace(cfg, charge=4, spin=0))
     n = mol.nao_nr()
     s = mol.intor_symmetric("int1e_ovlp")
     fam_rows = select_valence_ao(mol, ["1s"]) + select_valence_ao(mol, ["2s"])
@@ -97,9 +95,8 @@ def _twin_substrate(key, spec=None):
 
 @pytest.mark.parametrize("key", ["Sc-unc", "Ti-unc"])
 def test_twin_whole_space_legs_reproduce_their_anchors(key):
-    """Both twins, head + pure-d member: the whole-space legs land the
-    declared anchors exactly (the degenerate limit on the diseased
-    bases)."""
+    """The twins' whole-space legs == their declared anchors (the
+    fresh-draw band: < 1e-7 Eh, 2026-11-16)."""
     cs = CAMPAIGN[key]
     pure = cs.series[2]
     for spec in (None, pure):
@@ -119,11 +116,50 @@ def test_twin_whole_space_legs_reproduce_their_anchors(key):
         assert int(round(np.sum(mf_sub.mo_occ))) == mol.nelectron
 
 
+@pytest.mark.parametrize(
+    "key,d_s1,d_s2",
+    [("Sc-unc", 21.233, 1.267), ("Ti-unc", 38.031, 2.197)])
+def test_twin_head_s1_s2_monotone(key, d_s1, d_s2):
+    """Anchor 7's monotonicity: dE(s2) <= dE(s1) (the measured values
+    pinned, 2026-11-16)."""
+    cs_t, mol, mf, _ = _twin_substrate(key)
+    anchor = cs_t.ref.occ_e_ref
+    fam = _ao_family(mol, CORE_SHELLS, cs_t.shell_bands)
+    from atomterm.basis import series_window
+    s = mf.get_ovlp()
+    # the @s windows are the SERIES average (a single-configuration
+    # block is rank-1 -- the construction refuses k=2 without it)
+    series_mfs = [mf]
+    for spec in cs_t.series[1:]:
+        cfg_m = replace(cs_t.atom_config(), spin=spec.spin)
+        ref_m = ReferenceSpec(occ_closed=spec.closed, occ_open=spec.open,
+                              occ_e_ref=spec.e_ref,
+                              seed_basis=cs_t.series_seed,
+                              source_closed=spec.source_closed,
+                              source_open=spec.source_open,
+                              conv_accelerator=spec.accel)
+        _, mf_m = run_rohf(
+            cfg_m, f"elements/{key}/rungs/subspace_verify_{spec.tag}.chk",
+            ref=ref_m)
+        series_mfs.append(mf_m)
+    de = {}
+    for wtag, k in (("s1", 1), ("s2", 2)):
+        win, _ = series_window(mol, series_mfs, s, ("3d", "4s"),
+                               cs_t.prior_bands,
+                               {"3d": k, "4s": k}, cs_t.ncore)
+        _, mf_sub = subspace_rohf(mf, fam, cs_t.ncore, win,
+                                  cs_t.ref.occ_closed, cs_t.ref.occ_open,
+                                  conv_accelerator="newton")
+        de[wtag] = (mf_sub.e_tot - anchor) * 1e3
+    assert de["s2"] <= de["s1"] + 1e-6, (key, de)
+    assert abs(de["s1"] - d_s1) < 0.2 and abs(de["s2"] - d_s2) < 0.2, \
+        (key, de)
+
+
 @pytest.mark.parametrize("key,de_ref", [("Sc-unc", 1.401), ("Ti-unc", 1.923)])
 def test_twin_head_r1_certificate_value(key, de_ref):
-    """The head's @r1 3d4s confinement cost -- the measured certificate
-    (fresh-draw values: Sc +1.401 / Ti +1.923 mEh, 2026-11-16); the
-    window column capture is exact (1.0)."""
+    """The head's @r1 confinement cost (the measured certificate,
+    2026-11-16; the capture exact at 1.0)."""
     cs_t, mol, mf, _ = _twin_substrate(key)
     anchor = cs_t.ref.occ_e_ref
     fam = _ao_family(mol, CORE_SHELLS, cs_t.shell_bands)
