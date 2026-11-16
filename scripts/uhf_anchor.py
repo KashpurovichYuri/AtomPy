@@ -18,7 +18,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from atomterm.cases import campaign_spec  # noqa: E402
-from atomterm.reference import run_uhf, uhf_contamination  # noqa: E402
+from atomterm.reference import (  # noqa: E402
+    run_uhf, uhf_contamination, uhf_seed_density)
 
 
 def main(atom: str) -> None:
@@ -26,7 +27,17 @@ def main(atom: str) -> None:
     store = Path("elements") / atom / "cells.json"
     data = json.loads(store.read_text())
     chk = str(Path("elements") / atom / "rungs" / "uhf.chk")
-    _, mf = run_uhf(spec.atom_config(), chk, ref=spec.ref)
+    dm0 = None
+    if (spec.ref is not None and spec.ref.seed_basis is not None
+            and not Path(chk).exists()):
+        # the SEEDED fresh run: the projected source's spin-split
+        # density carries the configuration (the fresh-SCF disease's
+        # UHF class -- the hooks' ranking is the disease vector here);
+        # a cached chk stays trusted, never re-gated
+        dm0 = uhf_seed_density(spec.atom_config(), spec.ref, chk)
+        print(f"seeded fresh run: dm0 from the projected "
+              f"{spec.ref.seed_basis} source")
+    _, mf = run_uhf(spec.atom_config(), chk, ref=spec.ref, dm0=dm0)
     s2, sigma = uhf_contamination(mf)
     data["uhf"] = {"e_tot": float(mf.e_tot), "s2": float(s2),
                    "sigma_min": float(sigma.min()),

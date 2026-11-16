@@ -68,8 +68,9 @@ from atomterm.windows import (pattern_projector, project_orbitals,
                              span_projector)
 
 __all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "occupation_postcheck",
-           "projected_source", "rohf_basin_census", "uhf_basin_census",
-           "run_frac_occ", "uhf_contamination", "run_folded"]
+           "projected_source", "uhf_seed_density", "rohf_basin_census",
+           "uhf_basin_census", "run_frac_occ", "uhf_contamination",
+           "run_folded"]
 
 
 # the occupation contract --------------------------------------------
@@ -738,7 +739,8 @@ def rohf_basin_census(cfg, ref: ReferenceSpec,
     return out
 
 
-def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
+def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
+            dm0=None):
     """UHF for the configured atom, chkfile-cached -- the spin-broken
     sibling of :func:`run_rohf`, same discipline (the per-spin
     character-forced hook, the basin gate, the accelerator, the
@@ -750,6 +752,16 @@ def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
     cfg, chkfile, ref : as :func:`run_rohf` (the same
         :class:`ReferenceSpec`; the occupation patterns apply per
         spin).
+    dm0 : (2, nao, nao) ndarray, optional
+        The caller-supplied spin-separated initial density
+        (:func:`uhf_seed_density`'s form -- the projected source
+        split high-spin). With ``dm0`` the occupation hooks stay
+        UNATTACHED: the seed owns the configuration and plain aufbau
+        maintains it -- the weight hook's ranking is the
+        fresh-SCF disease's own vector on ill-conditioned bases (it
+        re-ranks every cycle, seed or no seed), while aufbau is
+        immune (the metric-amplified virtual tail sorts last).
+        Seedless runs keep the declared hooks.
 
     Returns
     -------
@@ -780,25 +792,48 @@ def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None):
 
     def fresh_mf(guess: str | None = None):
         """One unconverged UHF object: the per-spin occupation hook
-        attached, chkfile/verbosity set, optional starting guess."""
-        return _uhf_object(mol, chkfile, ref, guess, verbose=cfg.verbose)
+        attached (unless a seed density owns the configuration),
+        chkfile/verbosity set, optional starting guess."""
+        return _uhf_object(mol, chkfile, ref, guess, verbose=cfg.verbose,
+                           forced=dm0 is None)
 
     gate = ref.occ_e_ref_uhf if ref is not None else None
-    return _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg)
+    return _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg,
+                             dm0=dm0)
+
+
+def uhf_seed_density(cfg, ref: ReferenceSpec, chkfile: str) -> "np.ndarray":
+    """The SEEDED UHF's spin-separated initial density ``(2, nao,
+    nao)``: :func:`projected_source`'s occupied columns split
+    HIGH-SPIN (the closed pairs feed both spins, the open shell
+    alpha) -- the explicit seed for :func:`run_uhf`'s ``dm0`` on
+    ill-conditioned bases, the fresh-SCF disease's UHF class (the
+    twins' anchor rows: the pre-repair cached record sat 11.4 mEh
+    above the censused basin). The source chk caches beside
+    ``chkfile`` (the cache convention applies)."""
+    c_occ, occ, _ = projected_source(
+        cfg, ref, f"{chkfile}.{ref.seed_basis}.source.chk")
+    occ = np.asarray(occ)
+    occ_a = np.minimum(occ, 1.0)
+    occ_b = occ - occ_a
+    dm_a = (c_occ * occ_a) @ c_occ.conj().T
+    dm_b = (c_occ * occ_b) @ c_occ.conj().T
+    return np.stack([dm_a.real, dm_b.real]).astype(np.float64)
 
 
 def _uhf_object(mol, chkfile, ref, guess=None, break_=None,
-                verbose: int = 0):
+                verbose: int = 0, forced: bool = True):
     """One unconverged UHF object -- the ONE construction, shared by
     :func:`run_uhf` (the production path) and
     :func:`uhf_basin_census` (the measurement arms): the per-spin
-    occupation hook attached, chkfile/verbosity set, optional
-    starting guess and spin-break amplitude (PySCF's
-    ``init_guess_break`` -- the deliberate symmetry breaking of the
-    start). ``chkfile=None`` disables the checkpoint (the census
-    writes nothing)."""
+    occupation hook attached (``forced=False`` leaves it off -- the
+    seeded runs' aufbau form; the seed owns the configuration),
+    chkfile/verbosity set, optional starting guess and spin-break
+    amplitude (PySCF's ``init_guess_break`` -- the deliberate
+    symmetry breaking of the start). ``chkfile=None`` disables the
+    checkpoint (the census writes nothing)."""
     m = scf.UHF(mol)
-    if ref is not None and ref.occ_closed is not None:
+    if forced and ref is not None and ref.occ_closed is not None:
         m.get_occ = _forced_uhf_occ(mol, list(ref.occ_closed),
                                     list(ref.occ_open))
     m.chkfile = chkfile

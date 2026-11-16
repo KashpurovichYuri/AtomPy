@@ -16,7 +16,9 @@ import pytest
 from dataclasses import replace
 
 from atomterm.cases import CAMPAIGN
-from atomterm.reference import ReferenceSpec, occupation_postcheck, run_rohf
+from atomterm.reference import (ReferenceSpec, occupation_postcheck,
+                                run_rohf, run_uhf, uhf_contamination,
+                                uhf_seed_density)
 
 pytestmark = pytest.mark.fast
 
@@ -64,3 +66,24 @@ def test_seeded_series_members_land_their_declared_basins():
             assert abs(mf.e_tot - spec.e_ref) < 1e-4, (key, spec.tag)
             assert occupation_postcheck(mol, mf, spec.closed, spec.open), \
                 (key, spec.tag)
+
+
+def test_seeded_uhf_re_lands_the_ti_unc_anchor_basin():
+    """The UHF anchor row through the seed (the fresh-SCF disease's
+    UHF class: the weight hook's ranking is the disease vector, the
+    pre-repair cached record sat 11.4 mEh shallow of the censused
+    basin) -- the spin-split projected density seeds the fresh run,
+    the gate anchors the declared basin, the spin-pure character
+    reads in the contamination."""
+    cs = CAMPAIGN["Ti-unc"]
+    cfg = cs.atom_config()
+    dm0 = uhf_seed_density(
+        cfg, cs.ref, "elements/Ti-unc/rungs/uhf_seeded_verify.chk")
+    mol, mf = run_uhf(cfg,
+                      "elements/Ti-unc/rungs/uhf_seeded_verify.chk",
+                      ref=cs.ref, dm0=dm0)
+    assert mf.converged
+    assert abs(mf.e_tot - cs.ref.occ_e_ref_uhf) < 1e-4
+    s2, _ = uhf_contamination(mf)
+    s_pure = cs.spin / 2 * (cs.spin / 2 + 1)
+    assert s2 < s_pure + 0.05
