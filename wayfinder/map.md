@@ -10,12 +10,6 @@ dumps are not kept.
   DESIGN-FIRST, awaiting the user's shape call — the frozen-landscape
   tables (the m-symmetric θ-grid, the member-tilt ladder with the
   ±pair blind spots visible) that replace the retired scan pointers.
-- [37 — the basis-repair bench, the @s wave, the subspace-ROHF](tickets/37-basis-repair-spec.md):
-  Stage 1c (the seeded-reference integration) and Stage 2 (the @s
-  wave: the members measured, `_unc_s_block` retired, the UHF anchor
-  re-landed, the frac class measured-refused) LANDED; Stage 3
-  (`subspace_rohf`, Sc first — the per-contraction ΔE certificate
-  and the adoption decision) open.
 
 Resolved (git history the archive): 29 the Ti-first protocol; 30 the
 module walk; 31 the ECP wave; 32 the symmetry lane (C/Si/Sc/Ti one
@@ -26,7 +20,13 @@ basis-preparation layer (the design landed, the honest prior table,
 the census + the Newton-disease certificate); 36 the runs wave
 (batches B/C/D/E ran — the stores carry 66–208 prior-treatment legs
 per atom; batch A closed as ticket 38); 38 the U14e close-out (T1 +
-T3a/b/c + T4, 2026-11-14..16).
+T3a/b/c + T4, 2026-11-14..16); 37 the basis-repair bench, the @s
+wave, the subspace-ROHF (Stages 0–3, 2026-11-12..16: the seeded-MOM
+repair certified + integrated, the twins' series + @s legs 36/36 per
+twin, `_unc_s_block` retired, the UHF anchor re-landed, the frac
+class measured-refused, `subspace_rohf` integrated with the battery
+green and the per-contraction ΔE certificate measured — the record in
+the ticket's git history + elements/<twin>/logs/subspace.log).
 
 ## Issues
 
@@ -77,6 +77,16 @@ T3a/b/c + T4, 2026-11-14..16).
   analysis-ruler artifact class).
 - The (4,19)/(4,21)-class lattice rows: the ndet² analysis ceiling —
   the same class as `_COMM_CAP`.
+- **The Stage-3 adoption decision** (the user's call, the measured
+  basis in hand 2026-11-16): `subspace_rohf`'s certificate says the
+  @s2 windows are MEAN-FIELD-SOUND everywhere (the confinement costs
+  1.3–2.2 mEh at the ROHF level, every span, every filling, both
+  twins), @s1 is filling-dependent (3.3–38 mEh), @r1 is
+  head-filling-only (+1.4/+1.9 for its own head, up to +199 mEh for
+  the d-richer members).  Un-gating `run_casscf` on the @s2 windows
+  is certified mean-field ground; the execution (the twins' primary
+  legs + the prior treatments' re-homing) waits on the user's go AND
+  the queued CASCI review (which precedes the un-gating wave).
 
 ### Watchlist
 
@@ -142,6 +152,35 @@ T3a/b/c + T4, 2026-11-14..16).
   MEASURED-REFUSED on the twins (both accelerators diverge seeded —
   the 43-AO block feeds the amplified subspace); the averaged core
   is their spherical field.
+- **Stage 3 measured the mean-field certificate** (2026-11-16):
+  `subspace_rohf` confined-valence solves on both twins, 12 rows
+  each — the whole-space legs exact to ≤ 2e-6 mEh (the degenerate
+  limit reproduces the anchors), @s2's confinement cost 1.3–2.2 mEh
+  everywhere (mean-field-sound), @s1 3.3–38 (filling-dependent),
+  @r1 1.4–199 (head-only — excellent for its own head, catastrophic
+  for the d-richer members); within-@s monotone everywhere, the
+  cross-family r1/s1 nesting measured NOT nested (different
+  eigenproblems).
+- **The subspace-ROHF's five measured defects** (the bench's
+  evidence chain, 2026-11-16): the seed density must reach the
+  kernel SPIN-SEPARATED (a summed dm is split (d/2, d/2) — the
+  open-shell asymmetry lost, the filling off-basin from cycle one);
+  the veff shim returns the TRUE per-spin pair through the substrate
+  (a symmetric pair from the summed density carries the
+  closed-shell exchange formula, Eh-scale wrong on opens); fills
+  size COLUMNS not electrons; NO block-index pools (the subspace
+  Fock's eigvectors interleave across the family/window layout — the
+  4s ranks 9th globally, inside the family's index range); the MOM
+  assignment runs on the CLEAN spin-summed Fock with the anchors in
+  the clean gauge (the kernel's Roothaan effective Fock is
+  MIRROR-DEGENERATE in the low spectrum — the pairs split at 1e-7
+  and flip gauge every cycle; identical Fock, the picks flip from
+  exact to garbage).
+- **The twins' confined_core_orbitals floor**: the closed-core
+  Roothaan on the 65-column family span floors at ~5e-10 past its
+  own 100-cycle budget (the conditioning class) — the ion
+  cross-check runs on the carbon-class span (exact), the twins'
+  refusal recorded.
 - **The folded-field records are draw-documented single draws** (no
   replay; the post-kernel converged-filling certificate guards
   production now); the +400 mEh folded offset is basis-stable
