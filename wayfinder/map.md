@@ -18,12 +18,6 @@ dies).
   thread, basis.conditioned_basis, reference.subspace_rohf); the
   decision tree (P1 seeded → P2 density-direct → C conditioned); 64 OMP
   for the bench (the user's directive 2026-11-12).
-- [38 — the U14e declaration close-out](tickets/38-u14e-declaration-closeout.md):
-  the tiers retire from the run set, the primary re-declared at
-  10f13d, the no3 ladder closed (NoCapExceeded per-cell), the
-  optimizer batch per CAS section on the user's enable.
-  T5 (Stage 1c) runs between its T1 and T3 (the user's
-  implement-and-validate-first call).
 - [34 — the folded reference + the window characterization matrix](tickets/34-folded-reference.md):
   **STEPS 1-5 COMPLETE (2026-11-08/09)**: the Ti-unc census + the
   promotion; run_folded (reference.py) + its tests; the matrix on the
@@ -36,9 +30,53 @@ dies).
 Resolved: ticket 32 (the symmetry lane) — the campaign complete
 (C/Si/Sc/Ti on the one table, the route axis, the UHF anchors), the
 wave closed 2026-11-05 on the gates (the full-suite run retired by
-user decision; the partial verdict 91/91-isolation-green).
+user decision; the partial verdict 91/91-isolation-green).  Ticket 38
+(the U14e declaration close-out) — COMPLETE 2026-11-16: T1 the
+re-declaration, T3a/b/c the optimizer batch (70 legs, 4h14m, physics
+clean), T4 the review round (the record amended, the physics verdict
+recorded in Issues above, the design fixes applied); the ticket file
+deleted, git history the archive.
 
 ## Issues
+
+- **The U14e wave CLOSED (ticket 38, all items T1/T3a/b/c/T4 landed
+  2026-11-14..16; the batch's own entry in the ticket)**: the
+  physics verdict — the pipeline certifies the atomic ground term
+  END-TO-END (the free-mask SA legs on the (4,12)/no2/(4,15)
+  windows: ⁵L, ⟨L²⟩ = 72.00 exactly, closure AND commutators at
+  machine zero, bookkeeping ~1e-3 mEh; single-root legs break
+  symmetry exactly as declared — fact 8 verified on the ECP atom;
+  the input windows' CI grounds are ⁵I/⁵F, the ~1 Eh optimization
+  gain IS the relaxation into the ⁵L eigenspace).  The record's
+  honest residuals live in the ticket: 8 unconverged legs (the
+  no-free-mask crawl + near-floor stragglers; the user ACCEPTED
+  2026-11-16 — the physics line rests on the certified legs), the
+  11 merge-refresh converged-flag flips (disclosed), the frozen-SA
+  ensemble-above-anchor class (expected).  TWO DISPOSITION
+  CANDIDATES recorded for the user's future call: (a) `_COMM_CAP`
+  (cells) = 6000 skips the dense commutators on the (6,13) sector
+  (16731 dets) — this box could afford the raise + an 80-min
+  targeted re-run of the 24 cached legs if the [H,L] certification
+  there is ever wanted; (b) the off-basin `moc pur` starts (the
+  multi-solution class visible in the payloads) + the
+  `d14p sa moc_frozen pol` 27.7-mEh reconstruction outlier (the
+  frozen-moc gauge's analysis-ruler artifact class).
+- **The T4 design survey (2026-11-16)** — APPLIED:
+  `windows.pattern_projector` (the patterns→projector idiom's one
+  home — was hand-built 4× in reference) + `reference._open_premium`
+  (the open-block key, was written 4×) + the `SeriesSpec.src_*` →
+  `source_*` rename (one idea, one name, lockstep with
+  ReferenceSpec).  DECLINED with reasons: (a) unifying
+  `radial_refused` (statically decidable at the key) with
+  `NoCapExceeded` (needs the construction to run) would force a
+  dry-run constructor into the key grammar — two refusal classes,
+  two homes, both right; (b) CaseSpec at ~30 fields stays one
+  intent manifest under family comments — nesting would add
+  forwarding accessors and break `replace()` registry ergonomics;
+  the `render_*` family is the one blob that pays extraction if it
+  grows one more field; (c) the dm0-thread vs `get_init_guess`
+  seeding idioms coexist because each is dictated by its kernel's
+  call path — the two-masters refusal pins the contract.
 
 - **The pinned lane payload seam** (found 2026-11-11, the runs round):
   the pinned lane legs (substrate=pur) store the LANE certificate

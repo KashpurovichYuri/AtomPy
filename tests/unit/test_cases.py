@@ -157,5 +157,5 @@ def test_twins_declare_the_seeded_honest_series():
         # the series' members carry the same source vocabulary (the
         # run_series thread -- the members' sources declare it too)
         for m in cs.series:
-            assert m.src_closed == cs.ref.source_closed
-            assert m.src_open == cs.ref.source_open
+            assert m.source_closed == cs.ref.source_closed
+            assert m.source_open == cs.ref.source_open

@@ -64,7 +64,8 @@ from dataclasses import dataclass
 import numpy as np
 from pyscf import gto, scf
 
-from atomterm.windows import project_orbitals, select_span, span_projector
+from atomterm.windows import (pattern_projector, project_orbitals,
+                             span_projector)
 
 __all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "occupation_postcheck",
            "projected_source", "rohf_basin_census", "uhf_basin_census",
@@ -107,11 +108,8 @@ def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
         If the hook is called without MO coefficients (character
         needs them), or a pattern matches no AO labels.
     """
-    s_mat = mol.intor_symmetric("int1e_ovlp")
-    p_closed = span_projector(
-        s_mat, sum((select_span(mol, p) for p in occ_closed), []))
-    p_open = span_projector(
-        s_mat, sum((select_span(mol, p) for p in occ_open), []))
+    p_closed = pattern_projector(mol, occ_closed)
+    p_open = pattern_projector(mol, occ_open)
     n_closed = (mol.nelectron - mol.spin) // 2
     n_open = mol.spin
 
@@ -126,8 +124,8 @@ def _forced_rohf_occ(mol, occ_closed: list[str], occ_open: list[str]):
         w_open = np.einsum("ai,ab,bi->i", mo_coeff.conj(), p_open,
                            mo_coeff).real
         rest = np.flatnonzero(occ == 0.0)
-        open_mos = sorted(rest,
-                          key=lambda i: -(2 * w_open[i] + w_closed[i]))[:n_open]
+        prem = _open_premium(w_open, w_closed)
+        open_mos = sorted(rest, key=lambda i: -prem[i])[:n_open]
         occ[open_mos] = 1.0
         return occ
 
@@ -164,11 +162,8 @@ def _forced_uhf_occ(mol, occ_closed: list[str], occ_open: list[str]):
         If the hook is called without MO coefficients (character
         needs them), or a pattern matches no AO labels.
     """
-    s_mat = mol.intor_symmetric("int1e_ovlp")
-    p_closed = span_projector(
-        s_mat, sum((select_span(mol, p) for p in occ_closed), []))
-    p_open = span_projector(
-        s_mat, sum((select_span(mol, p) for p in occ_open), []))
+    p_closed = pattern_projector(mol, occ_closed)
+    p_open = pattern_projector(mol, occ_open)
     n_pair = (mol.nelectron - mol.spin) // 2
     n_open_a = mol.spin
 
@@ -188,9 +183,8 @@ def _forced_uhf_occ(mol, occ_closed: list[str], occ_open: list[str]):
         c = mo_coeff[0]
         w_open = np.einsum("ai,ab,bi->i", c.conj(), p_open, c).real
         rest = np.flatnonzero(occ[0] == 0.0)
-        open_mos = sorted(
-            rest, key=lambda i: -(2 * w_open[i] + w_closed_a[i])
-        )[:n_open_a]
+        prem = _open_premium(w_open, w_closed_a)
+        open_mos = sorted(rest, key=lambda i: -prem[i])[:n_open_a]
         occ[0, open_mos] = 1.0
         return occ
 
@@ -354,6 +348,14 @@ class ReferenceSpec:
         if self.conv_accelerator not in ("diis", "newton", "diis+newton"):
             raise ValueError(
                 f"unknown conv_accelerator: {self.conv_accelerator!r}")
+
+
+def _open_premium(w_open, w_closed):
+    """The open-block selection key: twice the open-span character plus
+    the closed-span -- one shared formula across the filling policies
+    (the ROHF/UHF hooks' sort keys) and the folded gates (the
+    qualification floor and the character class)."""
+    return 2 * w_open + w_closed
 
 
 # the runners --------------------------------------------------------
@@ -565,11 +567,8 @@ def occupation_postcheck(mol, mf, occ_closed, occ_open) -> bool:
     when its source's closed rank stole virtuals -- the census logs
     and the wayfinder record carry both.
     """
-    s_mat = mol.intor_symmetric("int1e_ovlp")
-    p_closed = span_projector(
-        s_mat, sum((select_span(mol, p) for p in occ_closed), []))
-    p_open = span_projector(
-        s_mat, sum((select_span(mol, p) for p in occ_open), []))
+    p_closed = pattern_projector(mol, occ_closed)
+    p_open = pattern_projector(mol, occ_open)
     occ = np.asarray(mf.mo_occ)
     n_closed = (mol.nelectron - mol.spin) // 2
     n_open = mol.spin
@@ -1169,10 +1168,8 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
             f"the complement of {n_pairs} confined columns holds "
             f"{compl.shape[1]} columns; the valence filling wants "
             f"{n_closed_val + n_open} occupied")
-    p_open = span_projector(
-        s, sum((select_span(mol, p) for p in occ_open), []))
-    p_closed = span_projector(
-        s, sum((select_span(mol, p) for p in occ_closed), []))
+    p_open = pattern_projector(mol, occ_open)
+    p_closed = pattern_projector(mol, occ_closed)
     eps_conf = np.einsum("ai,ab,bi->i", c_conf.conj(), h_eff,
                          c_conf).real
     prev_open = [None]   # the previous cycle's open columns (the MOM anchor)
@@ -1257,7 +1254,7 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
             occ[closed] = 2.0
             rest = [i for i in range(len(occ)) if occ[i] == 0.0]
             qualified_o = [i for i in rest
-                           if 2 * w_open[i] + w_closed[i] > 1.0]
+                           if _open_premium(w_open[i], w_closed[i]) > 1.0]
             opens = sorted(qualified_o,
                            key=lambda i: -mom_o[i])[:n_open]
         else:
@@ -1273,7 +1270,7 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
                                            -mom_c[i]))[:n_closed_val]
             occ[closed] = 2.0
             rest = [i for i in range(len(occ)) if occ[i] == 0.0]
-            cls_o = np.round(2 * w_open + w_closed, 8)
+            cls_o = np.round(_open_premium(w_open, w_closed), 8)
             opens = sorted(rest,
                            key=lambda i: (-cls_o[i],
                                           round(float(mo_energy[i]), 6),

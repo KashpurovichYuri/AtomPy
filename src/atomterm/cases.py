@@ -820,9 +820,9 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         # declaration, not a code path)
                         series=(SeriesSpec("d1s2", ("l0", "l1"), ("l2",),
                                            1, -759.7373848622801,
-                                           src_closed=("1s", "2s", "2p",
+                                           source_closed=("1s", "2s", "2p",
                                                        "3s", "3p", "4s"),
-                                           src_open=("3d",)),),
+                                           source_open=("3d",)),),
                         series_seed="6-31g",
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},
@@ -861,9 +861,9 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         # members' MOM mode
                         series=(SeriesSpec("d2s2", ("l0", "l1"), ("l2",),
                                            2, -848.4074434287603,
-                                           src_closed=("1s", "2s", "2p",
+                                           source_closed=("1s", "2s", "2p",
                                                        "3s", "3p", "4s"),
-                                           src_open=("3d",)),),
+                                           source_open=("3d",)),),
                         series_seed="6-31g",
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},

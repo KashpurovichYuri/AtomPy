@@ -71,6 +71,7 @@ __all__ = [
     "select_shell_ao",
     "select_valence_ao",
     "select_span",
+    "pattern_projector",
     "shell_realization",
     "realized_patterns",
     "member_chains",
@@ -444,6 +445,26 @@ def select_span(mol, pattern: str) -> list[int]:
             f"span pattern {pattern!r} matched no AO labels; available: "
             f"{[line.split()[-1] for line in mol.ao_labels()]}")
     return rows
+
+
+def pattern_projector(mol, patterns) -> np.ndarray:
+    """The S-metric projector onto every pattern's AO span -- the ONE
+    owner of the patterns-to-projector idiom the occupation hooks and
+    character meters share (:func:`select_span` resolves each pattern,
+    :func:`span_projector` orthogonalizes the union).
+
+    Parameters
+    ----------
+    mol : the molecule (the overlap metric and the AO labels).
+    patterns : iterable of span patterns
+        (:func:`select_span` vocabulary; one pattern works too).
+
+    Returns
+    -------
+    (nao, nao) hermitian projector -- idempotent in the S metric.
+    """
+    rows = sum((select_span(mol, p) for p in patterns), [])
+    return span_projector(mol.intor_symmetric("int1e_ovlp"), rows)
 
 
 def primitive_chain(mol, l: int) -> list[tuple[float, list[int]]]:
