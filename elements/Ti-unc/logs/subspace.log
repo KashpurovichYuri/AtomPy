@@ -1,0 +1,22 @@
+== Ti-unc: the subspace-ROHF dE certificate (2026-11-16, sandbox/table.py) ==
+anchors: head -848.407443429; d3s1 -848.387219440; d4 -848.250795980
+
+-- the whole-space exactness legs (the degenerate limit: subspace == free ROHF) --
+whole      head   E -848.407443429  dE +0.000000 mEh  fill 22  (0s)
+whole      d3s1   E -848.387219438  dE +0.000002 mEh  fill 22  (0s)
+whole      d4     E -848.250795978  dE +0.000002 mEh  fill 22  (0s)
+-- the confined legs (dE = E(subspace) - E(free anchor), the window's mean-field cost) --
+3d4s  r1  head   E -848.405520611  dE +1.923 mEh  capture 1.000  (0s)
+3d4s  s1  head   E -848.369412868  dE +38.031 mEh  capture 0.966  (0s)
+3d4s  s2  head   E -848.405246925  dE +2.197 mEh  capture 1.000  (0s)
+3d4s  r1  d3s1   E -848.343904689  dE +43.315 mEh  capture 0.977  (0s)
+3d4s  s1  d3s1   E -848.383908255  dE +3.311 mEh  capture 0.998  (0s)
+3d4s  s2  d3s1   E -848.385179506  dE +2.040 mEh  capture 1.000  (0s)
+3d    r1  d4     E -848.051756058  dE +199.040 mEh  capture 0.879  (0s)
+3d    s1  d4     E -848.216745579  dE +34.050 mEh  capture 0.971  (0s)
+3d    s2  d4     E -848.248969124  dE +1.827 mEh  capture 1.000  (0s)
+-- the nesting read --
+3d4s  head   dE(s2) - dE(s1) = -35.834 mEh  monotone: OK;  dE(r1) = +1.923 (cross-family: the head-block vs series-mean eigenproblems -- nesting not expected)
+3d4s  d3s1   dE(s2) - dE(s1) = -1.271 mEh  monotone: OK;  dE(r1) = +43.315 (cross-family: the head-block vs series-mean eigenproblems -- nesting not expected)
+3d    d4     dE(s2) - dE(s1) = -32.224 mEh  monotone: OK;  dE(r1) = +199.040 (cross-family: the head-block vs series-mean eigenproblems -- nesting not expected)
+-- the ion cross-check: confined_core_orbitals REFUSES on the twins' family span (the closed-core Roothaan floors at ~5e-10 past its own 100-cycle budget -- the recorded declared class); the cross-check runs on the carbon-class span (sandbox/battery.py carbon: d = 0.000000 mEh) --
