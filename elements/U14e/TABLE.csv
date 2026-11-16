@@ -6,33 +6,33 @@ CASCI,free,5f6d / D,"(4,12)",Rn·7s·raw,495,−49.4588,+923.1,−1345.8428,+25.
 CASCI,free,5f6d / D,"(4,12)",Rn·7s,495,−49.4588,+923.1,−1345.8428,+25.1179,—,41.9649,2e-03,7e-02,4e-01,3.0e-02,6.0e-01,bands 10f+13d
 CASCI,free,5f6d / MO,"(4,12)",Rn·7s,495,−50.3819,−0.0,−1370.9611,−0.0004,—,0.0013,2e-01,5e+00,8e+00,4.6e-01,2.9e+00,m-incomplete; bands 10f+13d
 CASCI,free,5f6d / MOC,"(4,12)",Rn·7s,495,−50.3821,−0.3,−1370.9680,−0.0073,—,0.0159,1e+00,7e+00,9e+00,8.2e-01,1.1e+01,m-incomplete; bands 10f+13d
-CASSCF,free,5f6d / D,"(4,12)",Rn·7s,495,−50.4297,−47.8,−1372.2627,−1.3019,1e-5/200,64.5991,—,5e+00,7e+00,1.7e+01,1.2e+02,not converged; ; bands 10f+13d
-"CASSCF, frozen",free,5f6d / D,"(4,12)",Rn·7s,—,—,—,—,—,—,—,—,—,—,—,—,pending
+CASSCF,free,5f6d / D,"(4,12)",Rn·7s,495,−50.4297,−47.8,−1372.2627,−1.3019,1e-5/200,64.5991,—,5e+00,7e+00,1.7e+01,1.2e+02,cycle cap; ; bands 10f+13d
+"CASSCF, frozen",free,5f6d / D,"(4,12)",Rn·7s,495,−49.5574,+824.4,−1348.5276,+22.4331,1e-9/28,39.5879,—,7e-02,4e-01,1.4e-01,2.6e+00,swap; ; bands 10f+13d
 SA-CASSCF,free,5f6d / D,"(4,12)",Rn·7s,495,−50.4238,−42.0,−1372.1025,−1.1418,1e-8/56,72.0000,3e-06,6e-04,7e-04,1.6e-04,1.2e-03,bands 10f+13d
-"SA-CASSCF, frozen",free,5f6d / D,"(4,12)",Rn·7s,—,—,—,—,—,—,—,—,—,—,—,—,pending
-CASSCF,free,5f6d / MO,"(4,12)",Rn·7s,—,—,—,—,—,—,—,—,—,—,—,—,pending
-"CASSCF, frozen",free,5f6d / MO,"(4,12)",Rn·7s,—,—,—,—,—,—,—,—,—,—,—,—,pending
-SA-CASSCF,free,5f6d / MO,"(4,12)",Rn·7s,—,—,—,—,—,—,—,—,—,—,—,—,pending
-"SA-CASSCF, frozen",free,5f6d / MO,"(4,12)",Rn·7s,—,—,—,—,—,—,—,—,—,—,—,—,pending
+"SA-CASSCF, frozen",free,5f6d / D,"(4,12)",Rn·7s,495,−49.5569,+825.0,−1348.5122,+22.4485,1e-9/28,41.9648,8e-03,7e-02,4e-01,3.1e-02,6.5e-01,bands 10f+13d
+CASSCF,free,5f6d / MO,"(4,12)",Rn·7s,495,−50.4286,−46.7,−1372.2326,−1.2718,1e-7/170,48.9010,—,7e+00,8e+00,2.6e+00,2.4e+01,not converged; m-incomplete; bands 10f+13d
+"CASSCF, frozen",free,5f6d / MO,"(4,12)",Rn·7s,495,−50.3819,−0.0,−1370.9611,−0.0004,1e-11/2,0.0013,—,5e+00,8e+00,4.6e-01,2.9e+00,m-incomplete; bands 10f+13d
+SA-CASSCF,free,5f6d / MO,"(4,12)",Rn·7s,495,−50.4238,−42.0,−1372.1026,−1.1419,1e-8/90,72.0000,1e-05,5e-04,7e-04,2.4e-04,1.9e-03,m-incomplete; bands 10f+13d
+"SA-CASSCF, frozen",free,5f6d / MO,"(4,12)",Rn·7s,495,−50.3610,+20.8,−1370.3945,+0.5662,1e-9/6,0.0019,2e-01,5e+00,8e+00,4.6e-01,2.8e+00,m-incomplete; bands 10f+13d
 CASSCF,free,5f6d / MOC,"(4,12)",Rn·7s,495,−50.4307,−48.8,−1372.2894,−1.3287,1e-8/176,64.7359,—,6e+00,6e+00,9.2e+00,5.5e+01,m-incomplete; bands 10f+13d
-"CASSCF, frozen",free,5f6d / MOC,"(4,12)",Rn·7s,—,—,—,—,—,—,—,—,—,—,—,—,pending
+"CASSCF, frozen",free,5f6d / MOC,"(4,12)",Rn·7s,495,−50.3821,−0.3,−1370.9680,−0.0073,1e-9/2,0.0159,—,7e+00,9e+00,8.2e-01,1.1e+01,m-incomplete; bands 10f+13d
 SA-CASSCF,free,5f6d / MOC,"(4,12)",Rn·7s,495,−50.4238,−42.0,−1372.1026,−1.1419,1e-8/160,72.0000,2e-05,2e-04,7e-04,1.1e-04,2.2e-03,m-incomplete; bands 10f+13d
-"SA-CASSCF, frozen",free,5f6d / MOC,"(4,12)",Rn·7s,—,—,—,—,—,—,—,—,—,—,—,—,pending
+"SA-CASSCF, frozen",free,5f6d / MOC,"(4,12)",Rn·7s,495,−50.3693,+12.6,−1370.6179,+0.3429,1e-9/8,0.0108,1e+00,7e+00,9e+00,7.9e-01,1.0e+01,m-incomplete; bands 10f+13d
 CASCI,free,5f6d / D,"(4,12)",Rn·7s·pur,495,−49.4587,+923.1,−1345.8412,+25.1195,—,42.0000,1e-03,2e-13,3e-13,9.7e-14,1.8e-12,bands 10f+13d
 CASCI,free,5f6d / MO,"(4,12)",Rn·7s·pur,495,−50.3781,+3.7,−1370.8590,+0.1017,—,0.0019,2e-01,5e+00,8e+00,4.7e-01,2.9e+00,m-incomplete; bands 10f+13d
 CASCI,free,5f6d / MOC,"(4,12)",Rn·7s·pur,495,−50.3783,+3.5,−1370.8648,+0.0959,—,0.0160,1e+00,7e+00,9e+00,8.3e-01,1.1e+01,m-incomplete; bands 10f+13d
-CASSCF,free,5f6d / D,"(4,12)",Rn·7s·pur,495,−50.4295,−47.6,−1372.2564,−1.2956,1e-5/200,65.7990,—,5e+00,7e+00,2.2e+01,1.4e+02,not converged; ; bands 10f+13d
-"CASSCF, frozen",free,5f6d / D,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
-SA-CASSCF,free,5f6d / D,"(4,12)",Rn·7s·pur,495,−50.4238,−42.0,−1372.1025,−1.1418,1e-9/50,72.0000,3e-06,6e-04,1e-03,1.3e-04,1.1e-03,cycle cap; ; bands 10f+13d
-"SA-CASSCF, frozen",free,5f6d / D,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
-CASSCF,free,5f6d / MO,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
-"CASSCF, frozen",free,5f6d / MO,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
-SA-CASSCF,free,5f6d / MO,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
-"SA-CASSCF, frozen",free,5f6d / MO,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
-CASSCF,free,5f6d / MOC,"(4,12)",Rn·7s·pur,495,−50.4276,−45.8,−1372.2060,−1.2452,1e-5/198,49.8403,—,7e+00,8e+00,8.3e+00,6.0e+01,not converged; m-incomplete; bands 10f+13d
-"CASSCF, frozen",free,5f6d / MOC,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
-SA-CASSCF,free,5f6d / MOC,"(4,12)",Rn·7s·pur,495,−50.4226,−40.8,−1372.0707,−1.1099,1e-4/200,59.6074,4e-02,5e+00,5e+00,1.6e+01,2.4e+02,not converged; m-incomplete; bands 10f+13d
-"SA-CASSCF, frozen",free,5f6d / MOC,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
+CASSCF,free,5f6d / D,"(4,12)",Rn·7s·pur,495,−50.4295,−47.6,−1372.2564,−1.2956,1e-5/200,65.7990,—,5e+00,7e+00,2.2e+01,1.4e+02,cycle cap; ; bands 10f+13d
+"CASSCF, frozen",free,5f6d / D,"(4,12)",Rn·7s·pur,495,−49.5572,+824.7,−1348.5200,+22.4408,1e-9/26,42.0000,—,2e-13,3e-13,4.2e-02,7.2e-01,swap; ; bands 10f+13d
+SA-CASSCF,free,5f6d / D,"(4,12)",Rn·7s·pur,495,−50.4238,−42.0,−1372.1025,−1.1418,1e-9/50,72.0000,3e-06,6e-04,1e-03,1.3e-04,1.1e-03,bands 10f+13d
+"SA-CASSCF, frozen",free,5f6d / D,"(4,12)",Rn·7s·pur,495,−49.5562,+825.7,−1348.4931,+22.4677,1e-9/22,42.0000,6e-03,2e-13,3e-13,2.8e-03,2.3e-02,swap; ; bands 10f+13d
+CASSCF,free,5f6d / MO,"(4,12)",Rn·7s·pur,495,−50.4306,−48.8,−1372.2883,−1.3276,1e-7/184,64.4439,—,6e+00,7e+00,7.1e+00,4.5e+01,not converged; m-incomplete; bands 10f+13d
+"CASSCF, frozen",free,5f6d / MO,"(4,12)",Rn·7s·pur,495,−50.3795,+2.4,−1370.8963,+0.0645,0/6,0.0019,—,5e+00,8e+00,4.7e-01,2.9e+00,m-incomplete; bands 10f+13d
+SA-CASSCF,free,5f6d / MO,"(4,12)",Rn·7s·pur,495,−50.4238,−42.0,−1372.1026,−1.1419,1e-8/74,72.0000,2e-05,3e-04,6e-04,1.9e-04,2.0e-03,m-incomplete; bands 10f+13d
+"SA-CASSCF, frozen",free,5f6d / MO,"(4,12)",Rn·7s·pur,495,−50.3587,+23.2,−1370.3303,+0.6304,1e-9/6,0.0028,2e-01,5e+00,8e+00,4.6e-01,2.8e+00,m-incomplete; bands 10f+13d
+CASSCF,free,5f6d / MOC,"(4,12)",Rn·7s·pur,495,−50.4276,−45.8,−1372.2060,−1.2452,1e-5/198,49.8403,—,7e+00,8e+00,8.3e+00,6.0e+01,m-incomplete; bands 10f+13d
+"CASSCF, frozen",free,5f6d / MOC,"(4,12)",Rn·7s·pur,495,−50.3796,+2.3,−1370.8987,+0.0621,1e-9/24,0.0160,—,7e+00,9e+00,8.3e-01,1.1e+01,m-incomplete; bands 10f+13d
+SA-CASSCF,free,5f6d / MOC,"(4,12)",Rn·7s·pur,495,−50.4226,−40.8,−1372.0707,−1.1099,1e-4/200,59.6074,4e-02,5e+00,5e+00,1.6e+01,2.4e+02,cycle cap; m-incomplete; bands 10f+13d
+"SA-CASSCF, frozen",free,5f6d / MOC,"(4,12)",Rn·7s·pur,495,−50.3666,+15.2,−1370.5466,+0.4141,1e-9/32,0.0108,1e+00,7e+00,9e+00,8.0e-01,1.0e+01,m-incomplete; bands 10f+13d
 CASCI,pinned,5f6d / D,"(4,12)",Rn·7s·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
 CASCI,free,5f6d / D,"(4,12)",Rn·7s·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
 CASSCF,free,5f6d / D,"(4,12)",Rn·7s·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending

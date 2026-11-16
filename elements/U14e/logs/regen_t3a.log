@@ -1,0 +1,110 @@
+T3a start: Sun Nov 15 11:03:32 PM UTC 2026
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_10f13d_4-0_casci_ao_-_pol_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/stages.py:342: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  core_ref = mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:679: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  [cell] u14e_10f13d_4-0_casci_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [cell] u14e_10f13d_4-0_casci_mo_-_pol_avg
+  [cell] u14e_10f13d_4-0_casci_moc_-_pol_avg
+  [cell] u14e_10f13dno2_4-0_casci_no_-_pol_avg
+  [cell] u14e_10f13d_4-0_casci_mo_-_pur_avg
+  [cell] u14e_10f13d_4-0_casci_moc_-_pur_avg
+  [cell] u14e_10f13dno2_4-0_casci_no_-_pur_avg
+  [cell] u14e_10f13d_4-0_casscf_ao_-_pol_avg
+  [cell] u14e_10f13d_4-0_casscf_mo_-_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:1010: UserWarning: canonical order scrambled (closed at [np.int64(22), np.int64(61), np.int64(88), np.int64(120), np.int64(143)]); reordering into closed|open|virtual
+  perm = canonical_order(mf, ncore)
+  [cell] u14e_10f13d_4-0_casscf_moc_-_pol_avg
+  [cell] u14e_10f13dno2_4-0_casscf_no_-_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:952: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_src = build_full_mo(mf, occupied_core_idx(mf, ncore), act,
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/windows.py:1348: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  closed = closed if closed is not None else occupied_core_idx(mf, ncore)
+[no-arm] source ground block: 13 roots
+[no-arm] occupation groups: [5, 7]
+  [cell] u14e_10f13d_4-0_casscf_ao_-_pur_avg
+  [cell] u14e_10f13d_4-0_casscf_mo_-_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_casscf_moc_-_pur_avg
+  [cell] u14e_10f13dno2_4-0_casscf_no_-_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+[no-arm] source ground block: 13 roots
+[no-arm] occupation groups: [5, 7]
+  [refused] u14e_10f13d_4-0_casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] u14e_10f13d_4-0_casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] u14e_10f13d_4-0_casscf_ao_frozen_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:965: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+  [cell] u14e_10f13d_4-0_casscf_mo_frozen_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_casscf_moc_frozen_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/windows.py:1039: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  core = occupied_core_idx(mf, ncore)
+  [cell] u14e_10f13dno2_4-0_casscf_no_frozen_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+[no-arm] source ground block: 13 roots
+[no-arm] occupation groups: [5, 7]
+  [cell] u14e_10f13d_4-0_casscf_ao_frozen_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_casscf_mo_frozen_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_casscf_moc_frozen_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:993: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_full = build_full_mo(mf, occupied_core_idx(mf, ncore),
+  [cell] u14e_10f13dno2_4-0_casscf_no_frozen_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+[no-arm] source ground block: 13 roots
+[no-arm] occupation groups: [5, 7]
+  [cell] u14e_10f13d_4-0_sa-casscf_ao_-_pol_avg
+  [cell] u14e_10f13d_4-0_sa-casscf_mo_-_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_sa-casscf_moc_-_pol_avg
+  [cell] u14e_10f13dno2_4-0_sa-casscf_no_-_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+[no-arm] source ground block: 13 roots
+[no-arm] occupation groups: [5, 7]
+  [cell] u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg
+  [cell] u14e_10f13d_4-0_sa-casscf_mo_-_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_sa-casscf_moc_-_pur_avg
+  [cell] u14e_10f13dno2_4-0_sa-casscf_no_-_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+[no-arm] source ground block: 13 roots
+[no-arm] occupation groups: [5, 7]
+  [refused] u14e_10f13d_4-0_sa-casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] u14e_10f13d_4-0_sa-casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] u14e_10f13d_4-0_sa-casscf_ao_frozen_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_sa-casscf_mo_frozen_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_sa-casscf_moc_frozen_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13dno2_4-0_sa-casscf_no_frozen_pol_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+[no-arm] source ground block: 13 roots
+[no-arm] occupation groups: [5, 7]
+  [cell] u14e_10f13d_4-0_sa-casscf_ao_frozen_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_sa-casscf_mo_frozen_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13d_4-0_sa-casscf_moc_frozen_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [cell] u14e_10f13dno2_4-0_sa-casscf_no_frozen_pur_avg
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+[no-arm] source ground block: 13 roots
+[no-arm] occupation groups: [5, 7]
+  wrote elements/U14e/cells.json + cells.md
+
+done
+T3a exit=0 end: Mon Nov 16 12:17:14 AM UTC 2026

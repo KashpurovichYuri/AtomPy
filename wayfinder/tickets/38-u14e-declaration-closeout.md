@@ -81,9 +81,19 @@ the optimizer batch is ≈ one day, not a week.
       grid green; the 14pno3 pair ran; the 7sno3 pair refused
       per-cell; render restored at 103 rows via the
       `render_primary` flip — the regression the smoke pass caught).
-- [ ] **T3a** — the (4,12) section's optimizer legs (the `10f13d` +
-      `10f13dno2` classes; the 2 probe legs already stored) — the
-      user's enable.
+- [x] **T3a** — the (4,12) section's optimizer legs (the `10f13d` +
+      `10f13dno2` classes) — LANDED 2026-11-16: 74 min wall at
+      OMP=128; 24 computed, 4 the DECLARED radial-mask construction
+      refusals (the case is distilled — the radial mask has no
+      member-labeled rows), nothing lost; every optimizer below its
+      own window's CI anchor, all energies finite (the audit's
+      first-pass flags were the no-form windows having no `casci_ao`
+      anchor — the correct `casci_no` anchors clear them all).
+      Count correction (the record's "~73" vindicated): 108 optimizer
+      cells declared, 18 stored pre-T3, 90 fresh = 74 computable +
+      12 radial refusals + 4 no3 cap refusals; the computed total is
+      74, matching the recorded estimate (my plan's 86 over-counted
+      the radial class).
 - [ ] **T3b** — the (6,13) section (the `10f13d7s` family minus the
       2 probe legs) — the user's enable.
 - [ ] **T3c** — the (4,15) section (the `10f13d14p` family + the
