@@ -70,7 +70,7 @@ from atomterm.windows import (pattern_projector, project_orbitals,
 __all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "occupation_postcheck",
            "projected_source", "uhf_seed_density", "rohf_basin_census",
            "uhf_basin_census", "run_frac_occ", "uhf_contamination",
-           "run_folded"]
+           "run_folded", "subspace_rohf"]
 
 
 # the occupation contract --------------------------------------------
@@ -1404,5 +1404,387 @@ def run_folded(mf, c_span: np.ndarray, n_pairs: int,
     for name in ("get_occ", "get_init_guess", "energy_elec",
                  "get_hcore", "get_ovlp", "get_veff"):
         del fm.__dict__[name]
+    return mol, fm
+
+
+# the subspace reference ----------------------------------------------
+
+def _ao_family(mol, shells: tuple[str, ...], layer: dict) -> np.ndarray:
+    """The shells' full AO family as raw AO columns: the declared band
+    realization (:func:`atomterm.windows.realized_patterns`), the
+    cusp-honest core space before orthonormalization."""
+    from atomterm.windows import realized_patterns, select_valence_ao
+    rows = select_valence_ao(mol, realized_patterns(shells, layer))
+    return np.eye(mol.nao_nr())[:, rows]
+
+
+def _build_subspace(mf, c_fam_raw: np.ndarray,
+                    c_win: np.ndarray) -> tuple[np.ndarray, int]:
+    """The S-orthonormal subspace ``[family Loewdin'd | window
+    projected against it]``: the family orthonormalized, the window
+    columns family-orthogonalized and re-orthonormalized.  Returns
+    ``(Q, n_fam)``."""
+    from atomterm.windows import lowdin
+    s = mf.get_ovlp()
+    c_fam = lowdin(c_fam_raw, s)
+    if c_win.shape[1] == 0:
+        return c_fam, c_fam.shape[1]
+    w = c_win - c_fam @ (c_fam.conj().T @ s @ c_win)
+    w = lowdin(w, s)
+    return np.hstack([c_fam, w]), c_fam.shape[1]
+
+
+def subspace_rohf(mf, c_core: np.ndarray, n_pairs: int,
+                  c_valence: np.ndarray, occ_closed, occ_open,
+                  conv_accelerator: str = "diis"):
+    """The confined-valence ROHF: the VALENCE self-consistent inside a
+    distilled window while the CORE stays exact -- free to relax in
+    its full declared AO family.  The per-contraction mean-field
+    certificate: ``E_tot`` here against the free ROHF anchor is the
+    window's cost at the mean-field level, not an inference from CI
+    totals.  The :func:`run_folded` mirror inverted: there the core
+    is frozen and the valence solves free in the complement; here the
+    core's family stays in the SCF and the window is the constraint.
+
+    Mechanics: PySCF's ROHF kernel runs UNMODIFIED on the
+    S-orthonormal subspace ``[core family Loewdin'd | window projected
+    against it]`` (``get_ovlp = I``, the projected h, the veff/jk
+    shims translating the subspace density to the AO field and the
+    fields back).  Everything -- core and valence -- sits INSIDE the
+    SCF, so the kernel's own ``e_tot`` is the honest restricted
+    variational value: no custom bookkeeping.  The shims never leave
+    the subspace contraction, so the metric-amplified garbage of the
+    diseased bases never enters the cycle's metric.
+
+    The filling follows the seed by the per-slot MOM assignment
+    (:func:`_mom_occ`'s certified algorithm, on the CLEAN
+    spin-summed Fock ``(focka+fockb)/2`` mapped back to the kernel's
+    columns by overlap).  The kernel's own Roothaan effective Fock is
+    MIRROR-DEGENERATE in its low spectrum -- the pairs split at the
+    numerical scale and flip gauge every cycle -- so the kernel's
+    columns cannot host the contest; the clean Fock's eigenbasis has
+    isolated physical gaps and the anchors' self-overlaps hold.  The
+    character patterns (the honest l-vocabulary) only QUALIFY the
+    pools; the composition lives in the anchors (a class-first rule
+    fills every open slot of a mixed shell from one character class
+    and drops the rest -- the measured failure that fixed the
+    MOM-primary form).  The seedless form (no converged columns on
+    the substrate) fills by pure aufbau within the gates --
+    :func:`atomterm.core.confined_core_orbitals`'s own discipline.
+
+    Parameters
+    ----------
+    mf : the trusted substrate -- ``mol``, ``get_hcore``, ``get_ovlp``,
+        ``get_veff`` and the SEED's occupied columns (``mo_coeff``/
+        ``mo_occ``; the seed carries the configuration, its projection
+        into the subspace is the disclosure's capture).  A substrate
+        without converged columns runs the seedless aufbau form.
+    c_core : (nao, M) the core's full AO family -- raw AO columns of
+        the declared core-shell bands (Loewdin'd inside).  The cusp
+        lesson: the core's energy is band-complete; only the valence
+        pays the distillation.
+    n_pairs : the core's chemistry (doubly-occupied pairs).
+    c_valence : (nao, W) the window columns -- S-orthonormal
+        (:func:`atomterm.basis.series_window`'s form) or raw AO
+        columns; projected against the family inside.  Zero columns =
+        the valence-empty ion form (the confined_core_orbitals
+        cross-check).
+    occ_closed, occ_open : the filling gates' character patterns
+        (:class:`ReferenceSpec` vocabulary).
+    conv_accelerator : the acceleration policy
+        (:func:`_accelerated`).  The certificate legs run "newton":
+        the seeds ARE converged solutions and the Newton recognizes
+        them at its initial-gradient check (their |g| sits at the free
+        runs' own conv_tol_grad; this runner declares 1e-4 -- the
+        needless first step at the tighter default interacts with the
+        mirror gauge and walks away).
+
+    Returns
+    -------
+    (mol, mf)
+        The molecule and the converged confined ROHF object.
+        ``mo_coeff`` is restored to AO coordinates, ``mo_occ`` the
+        filling, ``e_tot`` the restricted variational total, and
+        ``mf.subspace`` the disclosure dict: family/window widths,
+        per-seed-column capture, the occupied columns' character
+        splits.
+
+    Raises
+    ------
+    ValueError
+        The family holds fewer columns than the core's pairs, the
+        window cannot host the valence filling, or the patterns match
+        no AO labels.
+    RuntimeError
+        Non-convergence, a lost filling count, or a seed column that
+        does not land in the subspace (capture below 0.5 -- the
+        subspace cannot host the trusted configuration).
+
+    Notes
+    -----
+    - The seed density reaches the kernel SPIN-SEPARATED: a summed dm
+      is split (dm/2, dm/2) by the first-cycle handling and the open
+      shell's spin asymmetry -- the whole point of ROHF -- is lost.
+    - The veff shim returns the TRUE per-spin pair through the
+      substrate's own field: exchange follows EACH spin density (a
+      symmetric pair built from the summed density carries the
+      closed-shell exchange formula, Eh-scale wrong on opens).
+    - The fills size COLUMNS (a pair occupies one column;
+      ``[:n_closed_val]``-class counts, :func:`run_folded`'s
+      convention), and the pools run over the WHOLE subspace: the
+      subspace Fock's eigvectors interleave freely across the
+      family/window layout (a valence s direction can rank inside the
+      family's index range), so block-index pools are blind by
+      construction.
+
+    Examples
+    --------
+    The whole-AO-space limit is exact by construction: with the
+    window = every remaining AO the subspace IS the full space and
+    the solve reproduces the free ROHF anchor (pinned on the fixture
+    and on both uncontracted bases to <= 2e-6 mEh).
+    """
+    from pyscf import gto, scf
+
+    from atomterm.reference import _accelerated, _closed_field
+    from types import SimpleNamespace as _NS
+
+    mol = mf.mol
+    n_open = mol.spin
+    n_closed_val = (mol.nelectron - 2 * n_pairs - mol.spin) // 2
+    if n_closed_val < 0:
+        raise ValueError(
+            f"{n_pairs} core pairs leave {mol.nelectron - 2 * n_pairs} "
+            f"valence electrons but the sector wants {mol.spin} open -- "
+            "the core over-freezes the atom")
+    Q, n_fam = _build_subspace(mf, c_core, c_valence)
+    n_win = Q.shape[1] - n_fam
+    if n_fam < n_pairs:
+        raise ValueError(
+            f"the core family holds {n_fam} columns; the core's "
+            f"{n_pairs} pairs need more -- the family declaration is "
+            "too narrow")
+    if n_win < 2 * n_closed_val + n_open:
+        raise ValueError(
+            f"the window block holds {n_win} columns; the valence "
+            f"filling wants {2 * n_closed_val + n_open}")
+
+    s = mf.get_ovlp()
+    has_seed = (getattr(mf, "mo_coeff", None) is not None
+                and getattr(mf, "mo_occ", None) is not None)
+    if has_seed:
+        occ_seed = np.asarray(mf.mo_occ)
+        occ_rows = np.flatnonzero(occ_seed > 0)
+        occ_seed = occ_seed[occ_rows]
+        c_seed = Q.conj().T @ s @ mf.mo_coeff[:, occ_rows]
+        capture = np.linalg.norm(c_seed, axis=0) ** 2
+        c_seed = c_seed / np.linalg.norm(c_seed, axis=0)
+        if capture.min() < 0.5:
+            raise RuntimeError(
+                f"a seed column captures only {capture.min():.3f} of "
+                "itself in the subspace -- the subspace cannot host "
+                "the trusted configuration")
+        # the seed density in SPIN-SEPARATED form (see Notes)
+        occ_a = np.minimum(occ_seed, 1.0)
+        occ_b = occ_seed - occ_a
+        dm0 = np.stack([(c_seed * occ_a) @ c_seed.conj().T,
+                        (c_seed * occ_b) @ c_seed.conj().T])
+        prev_cl = [c_seed[:, occ_seed == 2.0]]
+        prev_op = [c_seed[:, occ_seed == 1.0]]
+    else:
+        capture = None
+        dm0 = None
+        prev_cl = [None]
+        prev_op = [None]
+
+    def _init_guess(mol_=None, key=None, **kw):
+        return dm0
+
+    p_closed = pattern_projector(mol, occ_closed)
+    p_open = pattern_projector(mol, occ_open)
+    n_cl_tot = n_pairs + n_closed_val
+
+    hc_sub = Q.conj().T @ mf.get_hcore() @ Q
+    eye = np.eye(Q.shape[1])
+    if not has_seed:
+        # the ion form's aufbau start on the subspace h
+        # (confined_core_orbitals's own first step)
+        _ev, U = np.linalg.eigh(hc_sub)
+        occ0 = np.zeros(Q.shape[1])
+        occ0[:n_pairs] = 2.0
+        dm = (U * occ0) @ U.conj().T
+        dm0 = np.stack([dm * 0.5, dm * 0.5])
+
+    mol_scf = mol
+    if getattr(mol, "symmetry", False):
+        mol_scf = gto.M(atom=mol.atom, basis=mol.basis, spin=mol.spin,
+                        ecp=mol.ecp, charge=mol.charge, verbose=0)
+
+    fm = scf.ROHF(mol_scf)
+    fm.conv_tol = 1e-12
+    fm.verbose = 0
+    fm.get_hcore = lambda *args, **kw: hc_sub
+    fm.get_ovlp = lambda *args, **kw: eye
+    fm.get_init_guess = _init_guess
+
+    def _veff(mol_=None, dm=None, dm_last=0, vhf_last=None, hermi=1):
+        d = np.asarray(dm)
+        if d.ndim < 2:
+            import traceback
+            traceback.print_stack()
+            raise RuntimeError(f"VEFF GOT dm={dm!r}")
+        if d.ndim == 3:
+            d_pair = np.stack([Q @ di @ Q.conj().T for di in d])
+            v = mf.get_veff(mol, d_pair)
+            vp = np.stack([Q.conj().T @ v[0] @ Q,
+                           Q.conj().T @ v[1] @ Q])
+        else:
+            d_ao = Q @ d @ Q.conj().T
+            vv = Q.conj().T @ _closed_field(mf, d_ao) @ Q
+            vp = np.array((vv, vv))
+        vhf_cell[0] = vp
+        return vp
+
+    fm.get_veff = _veff
+
+    def _jk(mol_=None, dm=None, hermi=1, with_j=True, with_k=True):
+        """The J/K translator the Newton response functions contract
+        through: subspace densities in, subspace J/K out."""
+        d = np.asarray(dm)
+        if d.ndim == 3:
+            jk = [mf.get_jk(mol, Q @ di @ Q.conj().T, hermi=hermi,
+                            with_j=with_j, with_k=with_k) for di in d]
+            vj = np.stack([Q.conj().T @ j @ Q for j, _ in jk])
+            vk = np.stack([Q.conj().T @ k @ Q for _, k in jk])
+            return vj, vk
+        d_ao = Q @ d @ Q.conj().T
+        vj, vk = mf.get_jk(mol, d_ao, hermi=hermi, with_j=with_j,
+                           with_k=with_k)
+        return Q.conj().T @ vj @ Q, Q.conj().T @ vk @ Q
+
+    fm.get_jk = _jk
+
+    def _w_mask(mo_coeff, P):
+        """Each MO column's span weight (the FULL coefficient
+        columns -- slicing rows would project fragments)."""
+        c_ao = Q @ mo_coeff
+        return np.einsum("ai,ab,bi->i", c_ao.conj(), P, c_ao).real
+
+    def _mom_assign(prev_cols, mo_coeff, allowed, n_pick, mo_energy):
+        """The per-slot MOM assignment (_mom_occ's form): each seed
+        slot, in seed order, takes its best-overlap REMAINING column;
+        shortfalls fill by aufbau."""
+        picked = []
+        used = set()
+        for j in range(prev_cols.shape[1]):
+            if len(picked) >= n_pick:
+                break
+            free = [i for i in allowed if i not in used]
+            if not free:
+                break
+            ovl = np.abs(prev_cols[:, j].conj() @ mo_coeff)
+            picked.append(max(free, key=lambda i: ovl[i]))
+            used.add(picked[-1])
+        while len(picked) < n_pick:
+            free = [i for i in allowed if i not in used]
+            if not free:
+                break
+            picked.append(min(free, key=lambda i: mo_energy[i]))
+            used.add(picked[-1])
+        return picked
+
+    vhf_cell = [None]
+
+    def _occ(mo_energy, mo_coeff):
+        # the MOM assignment on the CLEAN spin-summed Fock mapped to
+        # the kernel's columns by overlap (see the docstring: the
+        # kernel's Roothaan gauge is mirror-degenerate)
+        n_mo = mo_coeff.shape[1] if mo_coeff.ndim == 2 else len(mo_energy)
+        occ = np.zeros(n_mo)
+        w_cl = _w_mask(mo_coeff, p_closed)
+        w_op = _w_mask(mo_coeff, p_open)
+        cl_allowed = [i for i in range(n_mo) if w_cl[i] > 0.5]
+        if has_seed:
+            F_can = hc_sub + (vhf_cell[0][0] + vhf_cell[0][1]) * 0.5
+            ev_can, U_can = np.linalg.eigh(F_can)
+            cl_clean = _mom_assign(prev_cl[0], U_can, list(range(n_mo)),
+                                   n_cl_tot, ev_can)
+            op_clean = _mom_assign(prev_op[0], U_can,
+                                   [i for i in range(n_mo)
+                                    if i not in set(cl_clean)],
+                                   n_open, ev_can)
+
+            def _map(clean, taken):
+                mapped, used = [], set(taken)
+                for j in clean:
+                    ovl = np.abs(U_can[:, j].conj() @ mo_coeff)
+                    free = [i for i in range(n_mo) if i not in used]
+                    best = max(free, key=lambda i: ovl[i])
+                    mapped.append(best)
+                    used.add(best)
+                return mapped, used
+            cl, used_cl = _map(cl_clean, set())
+            occ[np.asarray(cl, dtype=int)] = 2.0
+            rest = [i for i in range(n_mo)
+                    if occ[i] == 0.0 and 2 * w_op[i] + w_cl[i] > 1.0]
+            vop, _ = _map(op_clean, used_cl)
+            vop = [i for i in vop if i in set(rest)]
+            if len(vop) < n_open:
+                free = [i for i in rest if i not in set(vop)]
+                vop += sorted(free,
+                              key=lambda i: round(float(mo_energy[i]), 6)
+                              )[:n_open - len(vop)]
+            vop = vop[:n_open]
+            occ[np.asarray(vop, dtype=int)] = 1.0
+            # the anchors STAY IN THE CLEAN GAUGE (the picked slots' own
+            # clean eigvectors): re-anchoring on the kernel's columns
+            # would hand the next cycle's contest the mirror-mixed
+            # gauge and the assignment flips (measured on carbon: the
+            # closed picks walked into positive-energy columns within
+            # two cycles)
+            prev_cl[0] = U_can[:, np.asarray(cl_clean, dtype=int)].copy()
+            prev_op[0] = U_can[:, np.asarray(op_clean, dtype=int)].copy()
+        else:
+            cl = sorted(cl_allowed,
+                        key=lambda i: round(float(mo_energy[i]), 6))[:n_cl_tot]
+            occ[np.asarray(cl, dtype=int)] = 2.0
+            rest = [i for i in range(n_mo)
+                    if occ[i] == 0.0 and 2 * w_op[i] + w_cl[i] > 1.0]
+            vop = sorted(rest,
+                         key=lambda i: round(float(mo_energy[i]), 6))[:n_open]
+            occ[np.asarray(vop, dtype=int)] = 1.0
+        return occ
+
+    fm.get_occ = _occ
+
+    # the certificate legs' gradient tolerance (see the docstring)
+    if "newton" in conv_accelerator:
+        fm.conv_tol_grad = 1e-4
+    fm = _accelerated(fm, _NS(conv_accelerator=conv_accelerator), dm0=dm0)
+
+    n_fill = int(round(float(np.sum(fm.mo_occ))))
+    c_ao = Q @ fm.mo_coeff
+    occ = np.asarray(fm.mo_occ)
+    occ_idx = np.flatnonzero(occ > 0)
+    splits = {}
+    for name, P in (("closed", p_closed), ("open", p_open)):
+        w = np.einsum("ai,ab,bi->i", c_ao[:, occ_idx].conj(), P,
+                      c_ao[:, occ_idx]).real
+        splits[name] = [round(float(x), 4) for x in w]
+    if not fm.converged:
+        raise RuntimeError(
+            f"the subspace SCF did not converge (E = {fm.e_tot:.8f})")
+    if n_fill != mol.nelectron:
+        raise RuntimeError(
+            f"the converged filling holds {n_fill} electrons, want "
+            f"{mol.nelectron} -- a lost configuration, not a result")
+    fm.mo_coeff = c_ao
+    fm.mol = mol
+    fm.subspace = {
+        "n_fam": n_fam, "n_win": n_win, "n_pairs": n_pairs,
+        "capture": (None if capture is None
+                    else [round(float(x), 4) for x in capture]),
+        "splits": splits,
+    }
     return mol, fm
 
