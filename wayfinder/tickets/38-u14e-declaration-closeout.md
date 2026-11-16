@@ -103,9 +103,21 @@ the optimizer batch is ≈ one day, not a week.
       frozen-mask no3 variants refuse too — the plan's arithmetic
       undercounted them) + the 4 declared radial ones; nothing lost.
       Store 85 → 107 data payloads; pendings 26.
-- [ ] **T3c** — the (4,15) section (the `10f13d14p` family + the
-      no3-form optimizer classes) — the user's enable; the batch-A
-      close.
+- [x] **T3c** — the (4,15) section (the `10f13d14p` family + the no3
+      optimizer classes) — LANDED 2026-11-16: 100 min wall at OMP=128;
+      24 computed (the no3 class RAN here — C(15,4)=1365 under cap),
+      4 the declared radial refusals; nothing lost; store 107 → 131
+      data payloads; pendings 10 (the declared no3-cap class + frac
+      voids).  **THE ONE FINDING (reported, not masked)**: 4 legs
+      record `converged=False` — the no3 FREE-mask class
+      (`casscf_no` pol/pur at conv_dE 1–2e-4 after 200 cycles; the
+      `sa no` pol twin at 1.1e-6) plus `sa-casscf_mo pol` (4.5e-7,
+      149 cycles — effectively converged): the NO window without the
+      frozen mask crawls a shallow landscape.  Energies variational
+      below their CI anchors throughout; the twins that converged
+      agree at the 1e-5 Eh level; the payloads carry the flag
+      honestly.  A budgeted re-run (--fresh, higher max_cycle) is
+      the user's call if the floor matters for these four.
 - [ ] **T4** — the review round over the wave (both axes + the
       design survey).
 

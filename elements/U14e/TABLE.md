@@ -91,32 +91,32 @@
 | CASCI | free | 5f6d6p / D | (4,15) | Rn·7s | 1,365 | −49.4588 | +923.0 | −1345.8436 | +25.1172 | — | 41.9649 | 2e-03 | 1e-01 | 4e-01 | 1.5e+00 | 3.6e+01 | bands 10f+13d+14p |
 | CASCI | free | 5f6d6p / MO | (4,15) | Rn·7s | 1,365 | −50.3820 | −0.1 | −1370.9644 | −0.0037 | — | 3.4172 | 2e-01 | 5e+00 | 8e+00 | 2.1e+00 | 3.6e+01 | m-incomplete; bands 10f+13d+14p |
 | CASCI | free | 5f6d6p / MOC | (4,15) | Rn·7s | 1,365 | −50.3819 | −0.0 | −1370.9613 | −0.0006 | — | 0.0065 | 1e+00 | 5e+00 | 8e+00 | 3.4e+00 | 1.4e+01 | m-incomplete; bands 10f+13d+14p |
-| CASSCF | free | 5f6d6p / D | (4,15) | Rn·7s | 1,365 | −50.4310 | −49.2 | −1372.2988 | −1.3380 | 1e-5/200 | 66.8672 | — | 6e+00 | 7e+00 | 2.8e+02 | 1.9e+03 | not converged; ; bands 10f+13d+14p |
-| CASSCF, frozen | free | 5f6d6p / D | (4,15) | Rn·7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 5f6d6p / D | (4,15) | Rn·7s | 1,365 | −50.4264 | −44.5 | −1372.1726 | −1.2118 | 1e-7/200 | 71.7790 | 2e-03 | 5e+00 | 7e+00 | 8.0e+00 | 6.0e+01 | not converged; ; bands 10f+13d+14p |
-| SA-CASSCF, frozen | free | 5f6d6p / D | (4,15) | Rn·7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 5f6d6p / MO | (4,15) | Rn·7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 5f6d6p / MO | (4,15) | Rn·7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 5f6d6p / MO | (4,15) | Rn·7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 5f6d6p / MO | (4,15) | Rn·7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 5f6d6p / MOC | (4,15) | Rn·7s | 1,365 | −50.4339 | −52.0 | −1372.3771 | −1.4163 | 1e-4/198 | 64.9738 | — | 6e+00 | 6e+00 | 1.9e+01 | 1.5e+02 | not converged; m-incomplete; bands 10f+13d+14p |
-| CASSCF, frozen | free | 5f6d6p / MOC | (4,15) | Rn·7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 5f6d6p / MOC | (4,15) | Rn·7s | 1,365 | −50.4279 | −46.1 | −1372.2150 | −1.2543 | 1e-6/200 | 71.0422 | 1e-02 | 4e+00 | 6e+00 | 9.5e+00 | 7.8e+01 | not converged; m-incomplete; bands 10f+13d+14p |
-| SA-CASSCF, frozen | free | 5f6d6p / MOC | (4,15) | Rn·7s | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 5f6d6p / D | (4,15) | Rn·7s | 1,365 | −50.4310 | −49.2 | −1372.2988 | −1.3380 | 1e-5/200 | 66.8672 | — | 6e+00 | 7e+00 | 2.8e+02 | 1.9e+03 | cycle cap; ; bands 10f+13d+14p |
+| CASSCF, frozen | free | 5f6d6p / D | (4,15) | Rn·7s | 1,365 | −49.5142 | +867.7 | −1347.3495 | +23.6112 | 1e-9/30 | 39.4167 | — | 1e-01 | 4e-01 | 1.5e+00 | 3.8e+01 | swap; ; bands 10f+13d+14p |
+| SA-CASSCF | free | 5f6d6p / D | (4,15) | Rn·7s | 1,365 | −50.4264 | −44.5 | −1372.1726 | −1.2118 | 1e-7/200 | 71.7790 | 2e-03 | 5e+00 | 7e+00 | 8.0e+00 | 6.0e+01 | cycle cap; ; bands 10f+13d+14p |
+| SA-CASSCF, frozen | free | 5f6d6p / D | (4,15) | Rn·7s | 1,365 | −49.5136 | +868.2 | −1347.3347 | +23.6261 | 1e-9/30 | 39.7482 | 8e-03 | 1e-01 | 4e-01 | 1.5e+00 | 3.8e+01 | swap; ; bands 10f+13d+14p |
+| CASSCF | free | 5f6d6p / MO | (4,15) | Rn·7s | 1,365 | −50.4345 | −52.6 | −1372.3920 | −1.4313 | 1e-8/107 | 64.1797 | — | 6e+00 | 6e+00 | 1.4e+01 | 9.6e+01 | m-incomplete; bands 10f+13d+14p |
+| CASSCF, frozen | free | 5f6d6p / MO | (4,15) | Rn·7s | 1,365 | −50.3820 | −0.1 | −1370.9644 | −0.0037 | 1e-9/2 | 3.4172 | — | 5e+00 | 8e+00 | 2.1e+00 | 3.6e+01 | m-incomplete; bands 10f+13d+14p |
+| SA-CASSCF | free | 5f6d6p / MO | (4,15) | Rn·7s | 1,365 | −50.4264 | −44.5 | −1372.1717 | −1.2110 | 1e-7/149 | 71.7784 | 2e-03 | 5e+00 | 7e+00 | 7.9e+00 | 6.0e+01 | not converged; m-incomplete; bands 10f+13d+14p |
+| SA-CASSCF, frozen | free | 5f6d6p / MO | (4,15) | Rn·7s | 1,365 | −50.3661 | +15.8 | −1370.5309 | +0.4298 | 1e-11/8 | 3.4174 | 2e-01 | 5e+00 | 8e+00 | 2.0e+00 | 3.5e+01 | m-incomplete; bands 10f+13d+14p |
+| CASSCF | free | 5f6d6p / MOC | (4,15) | Rn·7s | 1,365 | −50.4339 | −52.0 | −1372.3771 | −1.4163 | 1e-4/198 | 64.9738 | — | 6e+00 | 6e+00 | 1.9e+01 | 1.5e+02 | m-incomplete; bands 10f+13d+14p |
+| CASSCF, frozen | free | 5f6d6p / MOC | (4,15) | Rn·7s | 1,365 | −50.3819 | −0.0 | −1370.9613 | −0.0006 | 0/2 | 0.0065 | — | 5e+00 | 8e+00 | 3.4e+00 | 1.4e+01 | m-incomplete; bands 10f+13d+14p |
+| SA-CASSCF | free | 5f6d6p / MOC | (4,15) | Rn·7s | 1,365 | −50.4279 | −46.1 | −1372.2150 | −1.2543 | 1e-6/200 | 71.0422 | 1e-02 | 4e+00 | 6e+00 | 9.5e+00 | 7.8e+01 | cycle cap; m-incomplete; bands 10f+13d+14p |
+| SA-CASSCF, frozen | free | 5f6d6p / MOC | (4,15) | Rn·7s | 1,365 | −50.3582 | +23.7 | −1370.3172 | +0.6436 | 1e-10/10 | 0.0065 | 3e+00 | 5e+00 | 8e+00 | 3.1e+00 | 1.3e+01 | m-incomplete; bands 10f+13d+14p |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CASCI | free | 5f6d6p / D | (4,15) | Rn·7s·pur | 1,365 | −49.4587 | +923.1 | −1345.8416 | +25.1192 | — | 42.0000 | 1e-03 | 3e-13 | 5e-13 | 1.4e-12 | 1.8e-11 | bands 10f+13d+14p |
 | CASCI | free | 5f6d6p / MO | (4,15) | Rn·7s·pur | 1,365 | −50.3782 | +3.6 | −1370.8620 | +0.0987 | — | 3.4664 | 2e-01 | 5e+00 | 8e+00 | 2.1e+00 | 3.6e+01 | m-incomplete; bands 10f+13d+14p |
 | CASCI | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | 1,365 | −50.3781 | +3.8 | −1370.8581 | +0.1026 | — | 0.0067 | 1e+00 | 5e+00 | 8e+00 | 3.4e+00 | 1.4e+01 | m-incomplete; bands 10f+13d+14p |
-| CASSCF | free | 5f6d6p / D | (4,15) | Rn·7s·pur | 1,365 | −50.4345 | −52.6 | −1372.3923 | −1.4316 | 1e-6/200 | 64.7066 | — | 3e+00 | 8e+00 | 7.3e+00 | 1.2e+02 | not converged; ; bands 10f+13d+14p |
-| CASSCF, frozen | free | 5f6d6p / D | (4,15) | Rn·7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| CASSCF | free | 5f6d6p / D | (4,15) | Rn·7s·pur | 1,365 | −50.4345 | −52.6 | −1372.3923 | −1.4316 | 1e-6/200 | 64.7066 | — | 3e+00 | 8e+00 | 7.3e+00 | 1.2e+02 | cycle cap; ; bands 10f+13d+14p |
+| CASSCF, frozen | free | 5f6d6p / D | (4,15) | Rn·7s·pur | 1,365 | −49.5139 | +868.0 | −1347.3414 | +23.6193 | 1e-9/26 | 42.0000 | — | 3e-13 | 5e-13 | 8.7e-02 | 1.1e+00 | swap; ; bands 10f+13d+14p |
 | SA-CASSCF | free | 5f6d6p / D | (4,15) | Rn·7s·pur | 1,365 | −50.4264 | −44.5 | −1372.1724 | −1.2116 | 1e-8/164 | 71.7851 | 2e-03 | 5e+00 | 7e+00 | 8.0e+00 | 6.0e+01 | bands 10f+13d+14p |
-| SA-CASSCF, frozen | free | 5f6d6p / D | (4,15) | Rn·7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 5f6d6p / MO | (4,15) | Rn·7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF, frozen | free | 5f6d6p / MO | (4,15) | Rn·7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 5f6d6p / MO | (4,15) | Rn·7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF, frozen | free | 5f6d6p / MO | (4,15) | Rn·7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| CASSCF | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | 1,365 | −50.4114 | −29.6 | −1371.7659 | −0.8052 | 1e-4/200 | 26.3708 | — | 7e+00 | 9e+00 | 1.9e+02 | 9.2e+02 | not converged; m-incomplete; local minimum; bands 10f+13d+14p |
-| CASSCF, frozen | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
-| SA-CASSCF | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | 1,365 | −50.4138 | −32.0 | −1371.8303 | −0.8696 | 1e-4/200 | 45.2112 | 8e-02 | 5e+00 | 8e+00 | 1.1e+02 | 7.4e+02 | not converged; m-incomplete; bands 10f+13d+14p |
-| SA-CASSCF, frozen | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
+| SA-CASSCF, frozen | free | 5f6d6p / D | (4,15) | Rn·7s·pur | 1,365 | −49.5130 | +868.9 | −1347.3168 | +23.6439 | 1e-9/26 | 42.0000 | 6e-03 | 3e-13 | 5e-13 | 4.1e-03 | 3.3e-02 | swap; ; bands 10f+13d+14p |
+| CASSCF | free | 5f6d6p / MO | (4,15) | Rn·7s·pur | 1,365 | −50.4345 | −52.6 | −1372.3921 | −1.4314 | 1e-8/115 | 64.3170 | — | 6e+00 | 6e+00 | 1.6e+01 | 1.1e+02 | m-incomplete; bands 10f+13d+14p |
+| CASSCF, frozen | free | 5f6d6p / MO | (4,15) | Rn·7s·pur | 1,365 | −50.3796 | +2.3 | −1370.8988 | +0.0619 | 1e-10/6 | 3.4664 | — | 5e+00 | 8e+00 | 2.1e+00 | 3.6e+01 | m-incomplete; bands 10f+13d+14p |
+| SA-CASSCF | free | 5f6d6p / MO | (4,15) | Rn·7s·pur | 1,365 | −50.4264 | −44.5 | −1372.1725 | −1.2117 | 1e-8/126 | 71.7828 | 2e-03 | 5e+00 | 7e+00 | 8.0e+00 | 6.0e+01 | m-incomplete; bands 10f+13d+14p |
+| SA-CASSCF, frozen | free | 5f6d6p / MO | (4,15) | Rn·7s·pur | 1,365 | −50.3638 | +18.1 | −1370.4694 | +0.4913 | 1e-10/9 | 3.4672 | 2e-01 | 5e+00 | 8e+00 | 2.0e+00 | 3.5e+01 | m-incomplete; bands 10f+13d+14p |
+| CASSCF | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | 1,365 | −50.4114 | −29.6 | −1371.7659 | −0.8052 | 1e-4/200 | 26.3708 | — | 7e+00 | 9e+00 | 1.9e+02 | 9.2e+02 | cycle cap; m-incomplete; local minimum; bands 10f+13d+14p |
+| CASSCF, frozen | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | 1,365 | −50.3795 | +2.4 | −1370.8957 | +0.0650 | 1e-9/20 | 0.0067 | — | 5e+00 | 8e+00 | 3.4e+00 | 1.4e+01 | m-incomplete; bands 10f+13d+14p |
+| SA-CASSCF | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | 1,365 | −50.4138 | −32.0 | −1371.8303 | −0.8696 | 1e-4/200 | 45.2112 | 8e-02 | 5e+00 | 8e+00 | 1.1e+02 | 7.4e+02 | cycle cap; m-incomplete; bands 10f+13d+14p |
+| SA-CASSCF, frozen | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | 1,365 | −50.3557 | +26.2 | −1370.2481 | +0.7126 | 1e-9/34 | 0.0066 | 3e+00 | 5e+00 | 8e+00 | 3.2e+00 | 1.3e+01 | m-incomplete; bands 10f+13d+14p |
 <!-- methods:end -->
