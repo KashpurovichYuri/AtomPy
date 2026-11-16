@@ -134,28 +134,46 @@ def test_shell_radials_must_cover_every_declared_window():
 
 
 def test_twins_declare_the_seeded_honest_series():
-    """The 1c declarations: the twins' series speak the honest
-    l-vocabulary (the shell-counter labels would select 1-5 AO
-    slivers -- the disease's own declaration bug), the seed arms the
-    non-head members' MOM mode, and the heads declare the SOURCE
-    basis's own vocabulary -- the whole-l closed rank on a contracted
-    source ties occupied valence (4s ~1 on l0) against virtual
-    polarization (4p ~1 on l1) and steals virtuals into the closed
-    block (measured 2026-11-14: the Ti/6-31G l-hook source diverged
-    at E = -838.91 with eps +0.09 virtuals paired)."""
+    """The Stage-2 declarations: the twins' FULL series speaks the
+    honest l-vocabulary (the shell-counter labels would select 1-5 AO
+    slivers -- the disease's own declaration bug); the heads declare
+    the SOURCE basis's own vocabulary -- the whole-l closed rank on a
+    contracted source ties occupied valence (4s ~1 on l0) against
+    virtual polarization (4p ~1 on l1) and steals virtuals into the
+    closed block (measured 2026-11-14: the Ti/6-31G l-hook source
+    diverged at E = -838.91 with eps +0.09 virtuals paired); the
+    members declare their own configurations' source vocabulary (the
+    4s closed only where the configuration closes it), the mixed
+    members pin l0 in their open spans (the 4s open column's
+    character lives in l0), and every member carries the
+    diis+newton recipe (Newton alone crosses into the deeper sibling
+    basin -- the d3 fall to d2s1 at -128 mEh, reproduced 2026-11-16;
+    plain DIIS oscillates unconverged)."""
     for key in ("Sc-unc", "Ti-unc"):
         cs = CAMPAIGN[key]
         assert cs.series_seed == "6-31g"
+        # the series covers the valence configurations: the head,
+        # the mixed d(n-1)s1, and the pure dn member
+        assert len(cs.series) == 3
+        head, mixed, pure = cs.series
+        assert mixed.tag.endswith("s1")
+        assert pure.tag == f"d{cs.nelec_act}"
         for m in cs.series:
             assert m.closed == ("l0", "l1")
-            assert m.open == ("l2",)
+            assert m.e_ref is not None
+        # the mixed member: the 4s open column's character lives in l0
+        assert mixed.open == ("l0", "l2")
+        assert pure.open == ("l2",)
+        # the members' recipe (head never re-runs; its accel is dead)
+        for m in cs.series[1:]:
+            assert m.accel == "diis+newton"
         assert cs.ref.seed_basis == "6-31g"
         assert cs.ref.source_closed == ("1s", "2s", "2p", "3s", "3p",
                                         "4s")
         assert cs.ref.source_open == ("3d",)
         assert cs.ref.occ_e_ref is not None
-        # the series' members carry the same source vocabulary (the
-        # run_series thread -- the members' sources declare it too)
-        for m in cs.series:
-            assert m.source_closed == cs.ref.source_closed
-            assert m.source_open == cs.ref.source_open
+        # the members' sources close the core only (their
+        # configurations leave the 4s open or empty)
+        for m in cs.series[1:]:
+            assert m.source_closed == ("1s", "2s", "2p", "3s", "3p")
+            assert m.source_open in (("3d", "4s"), ("3d",))

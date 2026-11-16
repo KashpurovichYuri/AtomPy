@@ -402,22 +402,19 @@ def test_radial_refused_covers_the_distilled_cases():
 
 
 @fast
-def test_void_reason_voids_every_twins_s_window_cell():
-    """The twins' @s guard is LABEL-level: every cell of an @s window
-    voids (whatever its sector -- the planned_sectors mirror moved the
-    3d-span priors once and the sector-bearing prefix leaked 18 cells,
-    caught 2026-11-11), and no @r1 cell is caught by it."""
+def test_twins_s_window_cells_run_unvoided():
+    """The @s guard's retirement (Stage 2, 2026-11-16 -- the seeded
+    repair cured the fresh-SCF disease): no declared scenario voids
+    the twins' @s cells at the casci method (the label-level guard
+    the sector-bearing-prefix leak caught, 2026-11-11, is gone -- git
+    history archives it)."""
     for atom in ("Sc-unc", "Ti-unc"):
         spec = CAMPAIGN[atom]
         sc = scenarios_for(spec)
         for k in planned(spec):
             tag = k.window.partition("@")[2]
-            voided = void_reason(k, sc) is not None
-            if tag.startswith("s"):
-                assert voided, k.address
-            elif tag.startswith("r"):
-                assert not voided or "series-source" not in (
-                    void_reason(k, sc) or ""), k.address
+            if tag.startswith("s") and k.method == "casci":
+                assert void_reason(k, sc) is None, k.address
 
 
 @fast

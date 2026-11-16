@@ -416,41 +416,12 @@ _ANCHOR_FIRST = Scenario(
 _PRIOR_WINDOWS = ("3d@r1", "3d@s1", "3d@s2",
                   "3d4s@r1", "3d4s@s1", "3d4s@s2")
 
-# Ti's same-l planned windows (the 3d+4d partitions) wait on
-# window_distilled's declared future seam (the member-preserving
-# cross-shell orthogonalization): two same-l shells' distilled blocks
-# overlap and the assembly refuses -- void until the seam lands
-# the twins' @s windows: the series' non-head configurations need
-# fresh forced-occupation SCFs, and every fresh run diverges on the
-# uncontracted basis (measured 2026-11-11, map Issues) -- the cells
-# hold their STRUCTURAL place (pending rows) but never run until
-# that repair lands
+# the twins' prior-axis windows -- the same @r/@s labels the contracted
+# transition metals carry.  The members' fresh sources ride the
+# certified seeded repair (Stage 1c); the @s cells run since the wave
+# of 2026-11-16.
 _TM_UNC_PRIOR = ("3d@r1", "3d@s1", "3d@s2",
                  "3d4s@r1", "3d4s@s1", "3d4s@s2")
-
-
-def _unc_s_block(key: str) -> Scenario:
-    """The twins' @s windows' guard: the series' non-head
-    configurations need fresh forced-occupation SCFs, and every fresh
-    run diverges on the uncontracted basis (measured 2026-11-11, map
-    Issues) -- the cells hold their STRUCTURAL place (pending rows)
-    but never run until that repair lands.  The guard is the LABEL
-    prefix alone (sector- and method-free): the claim is
-    window-level, and a sector-bearing prefix silently leaks every
-    cell the planned_sectors mirror moves (caught on the twin port,
-    2026-11-11).  The @s family DERIVES from the declared prior
-    windows -- a hand-list would leak every window the declaration
-    grows (the frozencore mask's cells now among them)."""
-    s_windows = [w for w in _TM_UNC_PRIOR
-                 if w.partition("@")[2].startswith("s")]
-    labels = s_windows + [no_label(w) for w in s_windows]
-    return Scenario(
-        name="series-source-diverges",
-        cells=tuple(f"{key}_{lbl}_" for lbl in labels),
-        reason="the series source (the non-head configurations' fresh "
-               "forced-occupation SCFs) diverges on this basis -- the "
-               "fresh-SCF disease, measured 2026-11-11 (map Issues); "
-               "the @s windows wait on that repair")
 
 
 def _same_l_windows(windows) -> tuple[str, ...]:
@@ -805,24 +776,41 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         shell_patterns=["3d", "4s"], spin=1,
                         shell_bands=_TM_UNC_BANDS,
                         shell_radials=_TM_UNC_RADIALS,
-                        # the prior axis, @r1 ONLY: the head's own block
-                        # (the head IS the trusted cache -- no fresh SCF;
-                        # the @s windows need the series' other
-                        # configurations, whose fresh forced-occupation
-                        # runs diverge on this basis -- measured
-                        # 2026-11-11, the twins' fresh-SCF disease; the
-                        # port's @s half waits on that repair)
-                        # the series' spans are the HONEST l-vocabulary
+                        # the prior axis: the FULL series rides the
+                        # seeded repair (Stage 1c) -- the head IS the
+                        # trusted cache (never re-run); the members'
+                        # fresh seeded runs landed their measured
+                        # basins 2026-11-16.  The members declare
+                        # accel="diis+newton": Newton alone crosses
+                        # into the deeper sibling basin (the d3 draw
+                        # fell to d2s1 at -128 mEh -- the bench's
+                        # recorded fall, reproduced), plain DIIS
+                        # oscillates unconverged; diis holds the seed's
+                        # neighborhood, the Newton switch converges the
+                        # tail.  The mixed member d2s1 pins open=("l0",
+                        # "l2") -- the 4s open column's character lives
+                        # in l0.  The spans are the HONEST l-vocabulary
                         # (the shell-counter labels would select 1-5
                         # AO slivers -- the disease's own declaration
-                        # bug); the seed arms the non-head members'
-                        # MOM mode (the fresh-SCF repair -- a
-                        # declaration, not a code path)
+                        # bug)
                         series=(SeriesSpec("d1s2", ("l0", "l1"), ("l2",),
                                            1, -759.7373848622801,
                                            source_closed=("1s", "2s", "2p",
                                                        "3s", "3p", "4s"),
-                                           source_open=("3d",)),),
+                                           source_open=("3d",)),
+                                SeriesSpec("d2s1", ("l0", "l1"),
+                                           ("l0", "l2"),
+                                           3, -759.69966175,
+                                           accel="diis+newton",
+                                           source_closed=("1s", "2s", "2p",
+                                                       "3s", "3p"),
+                                           source_open=("3d", "4s")),
+                                SeriesSpec("d3", ("l0", "l1"), ("l2",),
+                                           3, -759.57186970,
+                                           accel="diis+newton",
+                                           source_closed=("1s", "2s", "2p",
+                                                       "3s", "3p"),
+                                           source_open=("3d",))),
                         series_seed="6-31g",
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},
@@ -833,8 +821,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                          "frozencore"),
                         render_spans=("3d4s", "3d"),
                         scenarios=_unc_gates("sc-unc", (2, 1))
-                        + (_prior_anchor_first("sc-unc", [(2, 1)]),
-                           _unc_s_block("sc-unc")),
+                        + (_prior_anchor_first("sc-unc", [(2, 1)]),),
                         term=(2, "g"),
                         lane_windows=("3d4s@ar", "3d@ar"),
                         lattice_windows=("3d",), lattice_sector=(2, 1),
@@ -853,17 +840,28 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         shell_patterns=["3d", "4s"], spin=2,
                         shell_bands=_TM_UNC_BANDS,
                         shell_radials=_TM_UNC_RADIALS,
-                        # the prior axis, @r1-only (the head IS the
-                        # trusted cache; the @s windows guarded -- the
-                        # fresh-SCF disease, map Issues)
-                        # the series' spans are the HONEST l-vocabulary
-                        # (as Sc-unc's); the seed arms the non-head
-                        # members' MOM mode
+                        # the prior axis: the FULL series rides the
+                        # seeded repair (as Sc-unc's -- the measured
+                        # members, the diis+newton recipe, the mixed
+                        # member's l0 open span)
                         series=(SeriesSpec("d2s2", ("l0", "l1"), ("l2",),
                                            2, -848.4074434287603,
                                            source_closed=("1s", "2s", "2p",
                                                        "3s", "3p", "4s"),
-                                           source_open=("3d",)),),
+                                           source_open=("3d",)),
+                                SeriesSpec("d3s1", ("l0", "l1"),
+                                           ("l0", "l2"),
+                                           4, -848.38721944,
+                                           accel="diis+newton",
+                                           source_closed=("1s", "2s", "2p",
+                                                       "3s", "3p"),
+                                           source_open=("3d", "4s")),
+                                SeriesSpec("d4", ("l0", "l1"), ("l2",),
+                                           4, -848.25079598,
+                                           accel="diis+newton",
+                                           source_closed=("1s", "2s", "2p",
+                                                       "3s", "3p"),
+                                           source_open=("3d",))),
                         series_seed="6-31g",
                         prior_bands={"3d": _TM_UNC_BANDS["3d"],
                                      "4s": _TM_UNC_BANDS["4s"]},
@@ -878,8 +876,7 @@ CAMPAIGN: dict[str, CaseSpec] = {
                         run_casscf=False, key="Ti-unc",
                         render_spans=("3d4s", "3d"),
                         scenarios=_unc_gates("ti-unc", (3, 1))
-                        + (_prior_anchor_first("ti-unc", [(3, 1), (2, 0)]),
-                           _unc_s_block("ti-unc")),
+                        + (_prior_anchor_first("ti-unc", [(3, 1), (2, 0)]),),
                         term=(3, "g"),
                         lane_windows=("3d4s@ar", "3d@ar"),
                         lattice_windows=("3d",), lattice_sector=(2, 0),

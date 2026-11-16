@@ -614,10 +614,16 @@ def projected_source(cfg, ref: ReferenceSpec, chkfile: str,
         meter on the target) and the source's own forced hooks
         (``source_closed``/``source_open`` when the source basis
         needs its own vocabulary -- the contracted-source case;
-        falling back to ``occ_closed``/``occ_open``). ``seed_basis``/
-        ``occ_e_ref`` fields are ignored here -- no recursion, no
-        gate: the small basis converges tame, and
-        :func:`occupation_postcheck` is the honesty meter.
+        falling back to ``occ_closed``/``occ_open``), plus the
+        acceleration policy the whole seeded flow runs under (the
+        source inherits ``conv_accelerator``: the higher-spin member
+        sources are the plain-DIIS oscillation class -- the same
+        measured verdict that pins ``SeriesSpec.accel``'s default --
+        while the heads' default-DIIS sources are untouched).
+        ``seed_basis``/``occ_e_ref`` fields are ignored here -- no
+        recursion, no gate: the small basis converges tame under the
+        declared policy, and :func:`occupation_postcheck` is the
+        honesty meter.
     source_basis : str
         The small basis (the default is the certified source).
     chkfile : str
@@ -649,7 +655,8 @@ def projected_source(cfg, ref: ReferenceSpec, chkfile: str,
     src_cfg = dc_replace(cfg, basis=source_basis)
     src_ref = ReferenceSpec(
         occ_closed=ref.source_closed or ref.occ_closed,
-        occ_open=ref.source_open or ref.occ_open)
+        occ_open=ref.source_open or ref.occ_open,
+        conv_accelerator=ref.conv_accelerator)
     mol_s, mf_s = run_rohf(src_cfg, chkfile, ref=src_ref)
     if not occupation_postcheck(mol_s, mf_s, ref.occ_closed,
                                 ref.occ_open):
