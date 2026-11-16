@@ -96,7 +96,10 @@ T3a/b/c + T4, 2026-11-14..16).
   next touched); the projected-Gram alternative (if the per-radial
   spectrum shows truncated-ranking distortions); the D2h determinism
   `--verify` mode (a second regen cycle); the D2h mol shared builder
-  (a third frozen reference).
+  (a third frozen reference); `run_frac_occ(dm0=)`'s disposition —
+  kept as the reference family's symmetric explicit-seed form, its
+  one consumer was the 2d measurement attempt, revisit if no
+  frac-bearing atom appears by the next reference-layer wave.
 
 ### Settled (standing facts, one line each; git history the archive)
 

@@ -761,7 +761,14 @@ def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
         fresh-SCF disease's own vector on ill-conditioned bases (it
         re-ranks every cycle, seed or no seed), while aufbau is
         immune (the metric-amplified virtual tail sorts last).
-        Seedless runs keep the declared hooks.
+        Seedless runs keep the declared hooks.  Unlike
+        :func:`run_rohf`, ``dm0`` and ``ref.seed_basis`` are not two
+        masters here: UHF has no auto-seed mode, so ``seed_basis``
+        merely tells the CALLER which source
+        :func:`uhf_seed_density` projects from.  The seeded form's
+        honesty meters are the basin gate and
+        :func:`uhf_contamination` (the character post-check is the
+        ROHF single-MO-set form and does not apply per spin).
 
     Returns
     -------
@@ -802,15 +809,43 @@ def run_uhf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
                              dm0=dm0)
 
 
-def uhf_seed_density(cfg, ref: ReferenceSpec, chkfile: str) -> "np.ndarray":
+def uhf_seed_density(cfg, ref: ReferenceSpec, chkfile: str) -> np.ndarray:
     """The SEEDED UHF's spin-separated initial density ``(2, nao,
-    nao)``: :func:`projected_source`'s occupied columns split
-    HIGH-SPIN (the closed pairs feed both spins, the open shell
-    alpha) -- the explicit seed for :func:`run_uhf`'s ``dm0`` on
+    nao)`` -- the explicit seed for :func:`run_uhf`'s ``dm0`` on
     ill-conditioned bases, the fresh-SCF disease's UHF class (the
-    twins' anchor rows: the pre-repair cached record sat 11.4 mEh
-    above the censused basin). The source chk caches beside
-    ``chkfile`` (the cache convention applies)."""
+    weight hook re-ranks every cycle and is the disease vector there;
+    the seed hands the configuration to aufbau instead).
+
+    Parameters
+    ----------
+    cfg : AtomConfig
+        The TARGET atom (the projection lands in its basis).
+    ref : ReferenceSpec
+        Declares the source basis (``seed_basis`` -- mandatory here)
+        and the source's own forced-hook patterns
+        (``source_closed``/``source_open``).
+    chkfile : str
+        The run's chk path -- the source SCF caches beside it as
+        ``<chkfile>.<seed_basis>.source.chk`` (the cache convention
+        applies: a cached source is trusted).
+
+    Returns
+    -------
+    (2, nao, nao) ndarray
+        The projected occupied columns split HIGH-SPIN: the closed
+        pairs feed both spins, the open shell alpha (the campaign
+        references' maximal-Ms pattern).
+
+    Raises
+    ------
+    ValueError
+        ``ref.seed_basis`` undeclared -- no source basis to project
+        from.
+    """
+    if ref is None or ref.seed_basis is None:
+        raise ValueError(
+            "uhf_seed_density declares no source basis "
+            "(ref.seed_basis) -- nothing to project from")
     c_occ, occ, _ = projected_source(
         cfg, ref, f"{chkfile}.{ref.seed_basis}.source.chk")
     occ = np.asarray(occ)

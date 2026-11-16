@@ -404,17 +404,22 @@ def test_radial_refused_covers_the_distilled_cases():
 @fast
 def test_twins_s_window_cells_run_unvoided():
     """The @s guard's retirement (Stage 2, 2026-11-16 -- the seeded
-    repair cured the fresh-SCF disease): no declared scenario voids
-    the twins' @s cells at the casci method (the label-level guard
-    the sector-bearing-prefix leak caught, 2026-11-11, is gone -- git
-    history archives it)."""
+    repair cured the fresh-SCF disease): every planned casci cell of
+    both twins runs unvoided EXCEPT the one frac cell, which the
+    measured refusal voids (the 43-AO fractional block feeds the
+    metric-amplified subspace -- both accelerators diverge seeded)."""
     for atom in ("Sc-unc", "Ti-unc"):
         spec = CAMPAIGN[atom]
         sc = scenarios_for(spec)
         for k in planned(spec):
-            tag = k.window.partition("@")[2]
-            if tag.startswith("s") and k.method == "casci":
-                assert void_reason(k, sc) is None, k.address
+            if k.method != "casci":
+                continue
+            reason = void_reason(k, sc)
+            if k.core == "frac":
+                assert reason is not None and "REFUSES" in reason, \
+                    k.address
+            else:
+                assert reason is None, k.address
 
 
 @fast

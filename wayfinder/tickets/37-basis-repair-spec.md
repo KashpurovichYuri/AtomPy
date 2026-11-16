@@ -397,6 +397,13 @@ the live state — update it in the same commit as any state change.
       11.4 mEh shallow); the frac class MEASURED-REFUSED (seeded,
       both accelerators diverge — the 43-AO block feeds the amplified
       subspace; the averaged core stays the twins' spherical field).
+      PROVENANCE NOTE (the review's honesty clause): the members'
+      e_refs are PRODUCT-PATH MEASUREMENTS (the seeded run's own
+      converged energy), not census tables — the census arms run the
+      weight hook, a form the diseased bases refuse, so no seeded
+      census exists; the reproducibility certificate is the fresh-run
+      pins (test_reference_seeded: a fresh draw lands the declared
+      e_ref within 1e-4) plus the 1b bench cross-check (0.1 mEh).
       THE RECIPE: the members run accel="diis+newton" — Newton alone
       crosses into the deeper sibling basin (the d3 fall to d2s1,
       −128 mEh, reproduced exactly), DIIS holds the neighborhood but
