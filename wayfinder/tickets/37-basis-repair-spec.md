@@ -380,9 +380,30 @@ the live state — update it in the same commit as any state change.
       deleted (git history the bench).  Stage 2 note: the mixed
       members' (d2s1/d3s1) open spans need l0 alongside l2 (the 4s
       column's open character lives in l0).
-- [ ] **STAGE 2** — the `@s` wave: the twins' series declarations (seeded,
-      censused e_refs) + `series_seed` + `_unc_s_block` retires; the CI anchors
-      then the treatments; re-render + commit; the UHF anchor re-test.
+- [x] **STAGE 2** — the `@s` wave LANDED 2026-11-16 (8622cb8..34beb37):
+      the twins' series carry their full three members (measured
+      through the product path: Sc d2s1 -759.69966175 / d3
+      -759.57186970; Ti d3s1 -848.38721944 / d4 -848.25079598 — each
+      0.67–1.92 mEh below its contracted anchor, matching the 1b
+      bench predictions to 0.1 mEh); `_unc_s_block` retired (the
+      guard's reason cured); the @s casci legs ran — **36/36 cells
+      with data per twin, zero refusals**; `projected_source` threads
+      the declaring ref's accelerator (the member sources are the
+      DIIS-oscillation class — the fix born of the first measurement
+      attempt, whose unconverged seeds had flowed downstream
+      unchecked); `run_uhf(dm0=)` + `uhf_seed_density`: the Ti-unc
+      anchor row re-landed the censused basin EXACTLY (-848.41234030
+      vs -848.412340, ⟨S²⟩ 2.008 — the pre-repair cached record was
+      11.4 mEh shallow); the frac class MEASURED-REFUSED (seeded,
+      both accelerators diverge — the 43-AO block feeds the amplified
+      subspace; the averaged core stays the twins' spherical field).
+      THE RECIPE: the members run accel="diis+newton" — Newton alone
+      crosses into the deeper sibling basin (the d3 fall to d2s1,
+      −128 mEh, reproduced exactly), DIIS holds the neighborhood but
+      never converges.  THE PHYSICS: the contracted prior verdict
+      holds at the basis limit — the series mean loses to the head's
+      own block on both twins' 3d4s spans, @s2 buys the double-budget
+      headroom; no universal k=1 winner, now measured on both bases.
 - [ ] **STAGE 3** — the subspace-ROHF: `subspace_rohf` (sandbox → battery →
       integrate, anchor 7); the ΔE-vs-anchor certificate table (Sc first, Ti
       mirrored); the adoption decision recorded in map.md.

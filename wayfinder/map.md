@@ -11,10 +11,11 @@ dumps are not kept.
   tables (the m-symmetric θ-grid, the member-tilt ladder with the
   ±pair blind spots visible) that replace the retired scan pointers.
 - [37 — the basis-repair bench, the @s wave, the subspace-ROHF](tickets/37-basis-repair-spec.md):
-  Stage 1c (the seeded-reference integration) LANDED; Stage 2 (the
-  @s wave: census-with-seed members, the twins' series grows,
-  `_unc_s_block` retires, the UHF re-test under `dm0=`, the frac
-  re-test) and Stage 3 (`subspace_rohf`, Sc first) open.
+  Stage 1c (the seeded-reference integration) and Stage 2 (the @s
+  wave: the members measured, `_unc_s_block` retired, the UHF anchor
+  re-landed, the frac class measured-refused) LANDED; Stage 3
+  (`subspace_rohf`, Sc first — the per-contraction ΔE certificate
+  and the adoption decision) open.
 
 Resolved (git history the archive): 29 the Ti-first protocol; 30 the
 module walk; 31 the ECP wave; 32 the symmetry lane (C/Si/Sc/Ti one
@@ -60,17 +61,12 @@ T3a/b/c + T4, 2026-11-14..16).
   character-selected fold spans with reference-occupation counts —
   a real seam extension when wanted.
 
-### Rides Stage 2 (ticket 37)
-
-- The twins' @s windows (guarded by `_unc_s_block`) and their @s2
-  second radials; the twins' frac cells (the smearing semantics on a
-  43-AO valence + the garbage-column pick — the seeded machinery is
-  the remedy); the UHF anchor re-test under `dm0=`; the swap-basin
-  optimizer class re-run gauge-anchored if the campaign wants
-  in-window solutions.
-
 ### Disposition candidates (the user's future call)
 
+- **The swap-basin optimizer class re-run gauge-anchored** (the
+  Stage-2 leftover): if the campaign wants in-window solutions on the
+  twins, the optimizer legs re-run seeded -- rides the Stage-3
+  adoption decision that un-gates `run_casscf`.
 - **`_COMM_CAP` (cells) = 6000** skips the dense [H,L] meters past
   6000 dets (the U14e (6,13) sector's em-dashes): this box could
   afford the raise + an ~80-min targeted re-run of the 24 cached
@@ -129,6 +125,20 @@ T3a/b/c + T4, 2026-11-14..16).
   character-of-occupied post-check) lands the declared anchors
   EXACTLY — the product path since Stage 1c; both twins' trusted
   records verified to machine epsilon.
+- **Stage 2 completed the twins' prior axis** (2026-11-16): the
+  members' recipe is `diis+newton` — Newton alone crosses into the
+  deeper sibling basin (the d3→d2s1 fall, −128 mEh, reproduced
+  exactly), plain DIIS holds the configuration but never converges;
+  `projected_source` must thread the declaring ref's accelerator
+  (the member sources are the DIIS-oscillation class). The @s legs
+  ran 36/36 per twin, zero refusals; the contracted prior verdict
+  holds at the basis limit (the series mean loses to the head's own
+  block, @s2 buys the double-budget headroom). The UHF anchor row
+  re-landed the censused basin through `uhf_seed_density` (the
+  pre-repair record was 11.4 mEh shallow). The frac class
+  MEASURED-REFUSED on the twins (both accelerators diverge seeded —
+  the 43-AO block feeds the amplified subspace); the averaged core
+  is their spherical field.
 - **The folded-field records are draw-documented single draws** (no
   replay; the post-kernel converged-filling certificate guards
   production now); the +400 mEh folded offset is basis-stable
