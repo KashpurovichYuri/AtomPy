@@ -626,11 +626,16 @@ def _unc_gates(key: str, sec: tuple[int, int]) -> tuple[Scenario, ...]:
             "block's casci cells -- mo/moc/no -- run: amended "
             "2026-11-09)"),
         Scenario(
-            name="frac-reference-unmeasured",
+            name="frac-reference-refused",
             cells=tuple(f"{key}_{w}_{na}-{nb}_casci_ao_-_pol_frac"
                         for na, nb in (sec,)),
-            reason="no measured fractional-occupation basin on the "
-            "uncontracted basis yet (2026-11-06)"),
+            reason="the fractional-occupation reference REFUSES on the "
+            "uncontracted basis (measured 2026-11-16, seeded: both "
+            "twins diverge under DIIS and Newton alike -- the 43-AO "
+            "fractional block puts weight in the metric-amplified "
+            "subspace, and the ensemble semantics differ from the "
+            "contracted 6-AO smear anyway); the averaged core is the "
+            "twins' spherical field"),
     )
 
 

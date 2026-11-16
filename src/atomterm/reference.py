@@ -950,7 +950,7 @@ def uhf_contamination(mf) -> tuple[float, np.ndarray]:
 
 def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
                  open_idx: list[int] | None = None,
-                 ref: "ReferenceSpec | None" = None):
+                 ref: "ReferenceSpec | None" = None, dm0=None):
     """Average-of-configuration (fractional-occupation) HF,
     chkfile-cached.
 
@@ -982,6 +982,13 @@ def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
         in the gated ROHF; U14e evidence 2026-11-05). The occ patterns
         and gates do not apply: the occupations ARE the fractional
         block.
+    dm0 : (nao, nao) ndarray, optional
+        The caller-supplied spin-summed initial density (the seeded
+        form on ill-conditioned bases -- e.g.
+        :func:`projected_source`'s density; the seed anchors the
+        neighborhood so the character pick lands physical valence
+        columns from cycle one). The hook stays armed: the
+        fractional block IS the configuration.
 
     Returns
     -------
@@ -1043,7 +1050,7 @@ def run_frac_occ(cfg, chkfile: str, nelec_open: int, n_open: int,
         pass
 
     mf.chkfile = chkfile
-    mf = _accelerated(mf, ref)
+    mf = _accelerated(mf, ref, dm0)
     return mol, mf
 
 
