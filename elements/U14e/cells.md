@@ -611,3 +611,25 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `u14e_5f6d7s@6s6p_5-1_casci_ao_-_pur_avg` E_term -48.76450438  ptp 1.8e-14  L2 ['72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000']  core 4p/span 0.9863  anchor-corrected ['Au', 'B1u', 'B2u', 'B3u']
 - `u14e_10f13d7s_5-1_casscf_ao_-_pol_avg` E -50.45355440
 - `u14e_10f13d7s_5-1_sa-casscf_ao_-_pol_avg` E -50.45285592
+- `u14e_10f13d7s_5-1_casscf_mo_-_pol_avg` E -50.45489441
+- `u14e_10f13d7s_5-1_casscf_moc_-_pol_avg` E -50.45611121
+- `u14e_10f13d7s_5-1_casscf_ao_-_pur_avg` E -50.45379277
+- `u14e_10f13d7s_5-1_casscf_mo_-_pur_avg` E -50.43979295
+- `u14e_10f13d7s_5-1_casscf_moc_-_pur_avg` E -50.42307666
+- `u14e_10f13d7s_5-1_casscf_ao_frozen_pol_avg` E -49.37237454
+- `u14e_10f13d7s_5-1_casscf_mo_frozen_pol_avg` E -50.39276008
+- `u14e_10f13d7s_5-1_casscf_moc_frozen_pol_avg` E -50.38392259
+- `u14e_10f13d7s_5-1_casscf_ao_frozen_pur_avg` E -49.37015404
+- `u14e_10f13d7s_5-1_casscf_mo_frozen_pur_avg` E -50.39201437
+- `u14e_10f13d7s_5-1_casscf_moc_frozen_pur_avg` E -50.38309725
+- `u14e_10f13d7s_5-1_sa-casscf_mo_-_pol_avg` E -50.43693871
+- `u14e_10f13d7s_5-1_sa-casscf_moc_-_pol_avg` E -50.40889417
+- `u14e_10f13d7s_5-1_sa-casscf_ao_-_pur_avg` E -50.45285558
+- `u14e_10f13d7s_5-1_sa-casscf_mo_-_pur_avg` E -50.43693938
+- `u14e_10f13d7s_5-1_sa-casscf_moc_-_pur_avg` E -50.38596418
+- `u14e_10f13d7s_5-1_sa-casscf_ao_frozen_pol_avg` E -49.37152808
+- `u14e_10f13d7s_5-1_sa-casscf_mo_frozen_pol_avg` E -50.39229920
+- `u14e_10f13d7s_5-1_sa-casscf_moc_frozen_pol_avg` E -50.38380516
+- `u14e_10f13d7s_5-1_sa-casscf_ao_frozen_pur_avg` E -49.36896039
+- `u14e_10f13d7s_5-1_sa-casscf_mo_frozen_pur_avg` E -50.39155226
+- `u14e_10f13d7s_5-1_sa-casscf_moc_frozen_pur_avg` E -50.38297761

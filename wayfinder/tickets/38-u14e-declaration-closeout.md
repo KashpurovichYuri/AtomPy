@@ -94,8 +94,15 @@ the optimizer batch is ≈ one day, not a week.
       12 radial refusals + 4 no3 cap refusals; the computed total is
       74, matching the recorded estimate (my plan's 86 over-counted
       the radial class).
-- [ ] **T3b** — the (6,13) section (the `10f13d7s` family minus the
-      2 probe legs) — the user's enable.
+- [x] **T3b** — the (6,13) section (the `10f13d7s` family) — LANDED
+      2026-11-16: 80 min wall at OMP=128 (the unloaded box — the
+      probe's 17–27 min/leg priced a loaded machine; the payloads
+      prove the work: full analysis fields, n_det 16731, all 22
+      optimizer legs converged, every one variational below its CI
+      anchor); 14 [refused] = the 10 declared no3-cap refusals (the
+      frozen-mask no3 variants refuse too — the plan's arithmetic
+      undercounted them) + the 4 declared radial ones; nothing lost.
+      Store 85 → 107 data payloads; pendings 26.
 - [ ] **T3c** — the (4,15) section (the `10f13d14p` family + the
       no3-form optimizer classes) — the user's enable; the batch-A
       close.
