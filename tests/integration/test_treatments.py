@@ -9,11 +9,11 @@ per-atom chaotic bands -- never assumed exactness:
 - raw core: the internal field is real (split + [H, Lz]) but bounded;
 - averaged / fractional-occupation cores: exact invariance;
 - free CASSCF: symmetry breaking is real but the window stays l-pure
-  (fact 8: m-incompleteness, not s/d leakage) and the optimizer stays
+  (fact 2: m-incompleteness, not s/d leakage) and the optimizer stays
   orthonormal (the ticket-09 build_full_mo regression guard);
 - SA: restoration to machine precision.
 
-CASSCF gauges are chaotic across identical reruns (fact 10): <L^2> was
+CASSCF gauges are chaotic across identical reruns (fact 3): <L^2> was
 observed 0.99..1.92 on carbon -- bands assert "real but not catastrophic",
 with the precisely measured values living in the tickets.
 
@@ -126,7 +126,7 @@ LADDER_CASES = {
             sa_radial_l2=1.99999,
             radial_free_tol=1e-5,       # radial == free minimum (measured 2e-8)
             sa_radial_dE=1e-4,          # vs the free SA (measured 2.7e-5)
-            # purified-substrate rungs (fact 20): everything closes at
+            # purified-substrate rungs (fact 14): everything closes at
             # machine precision -- free SA included (measured 0.0)
             pur_comm=1e-10,
             pur_sa_comm=1e-8,
@@ -149,7 +149,7 @@ LADDER_CASES = {
             # Si's raw 3p window and PySCF's core-orthogonalized window
             # differ physically (~0.3 overlap): the relax rung optimizes
             # the latter, so its total sits ABOVE the raw-shell casci_avg
-            # by the window-definition offset (fact 14)
+            # by the window-definition offset (the stages ruler's decomposition)
             relax_window_offset=0.2,
             exact_comm=1e-4,            # avg/frac commutators: the fact-17
                                         # input baseline on the projected
@@ -167,8 +167,8 @@ LADDER_CASES = {
             radial_free_tol=1e-3,       # radial == free (measured 3e-7; the
                                         # free rung's own basin wobbles)
             sa_radial_dE=5e-4,          # vs the free SA (measured 3.4e-5)
-            # purified-substrate rungs (fact 20): machine precision here
-            # too -- the free SA heals BELOW its canonical 4e-6 (fact 19)
+            # purified-substrate rungs (fact 14): machine precision here
+            # too -- the free SA heals BELOW its canonical 4e-6 (fact 10)
             # all the way to the certificate (measured 3.3e-16)
             pur_comm=1e-10,
             pur_sa_comm=1e-8,
@@ -233,7 +233,7 @@ def test_core_relaxation(name, ladders):
     assert relax["window"]["p"] > b["relax_purity"], name
     assert relax["configurations"][0].startswith("p^2.00"), name
     # monotone within one window definition; on Si the window-definition
-    # offset (fact 14) dominates, bounded per case
+    # offset (the stages ruler's window-definition term) dominates
     assert relax["e_ground"] <= \
         r["casci_avg"]["e_ground"] + b["relax_window_offset"], name
 
@@ -254,7 +254,7 @@ def _assert_window(rung: dict, s: float, d: float, tol: float, tag: str = ""):
 
 @pytest.mark.parametrize("name", list(LADDER_CASES))
 def test_free_casscf_and_virtmix(name, ladders):
-    """Free CASSCF breaks symmetry WITHOUT leaving the shell (fact 8:
+    """Free CASSCF breaks symmetry WITHOUT leaving the shell (fact 2:
     m-incompleteness, l-pure window) and stays orthonormal; virtmix lands
     in the same basin as free CASSCF (same-basin assertion is the
     regression guard for the ticket-09 bug class)."""
@@ -293,7 +293,7 @@ def test_sa_restoration(name, ladders):
 
 @pytest.mark.parametrize("name", list(LADDER_CASES))
 def test_radial_rung_full_gain_without_l_leakage(name, ladders):
-    """The same-(l, member) radial constraint (fact 16): the ENTIRE
+    """The same-(l, member) radial constraint (fact 8): the ENTIRE
     free-CASSCF correlation gain is radially reachable (radial rung ==
     free rung to µEh) with ZERO l-leakage (exact shell purity, the mask's
     structural guarantee). Which MEMBER gauge the single-root optimizer
@@ -325,7 +325,7 @@ def test_purified_rungs_exact_closure(name, ladders):
     """Fact 20 (C/Si): on the purified core substrate EVERY optimized rung
     that keeps the window closed does so at machine precision -- the
     fact-17 input baseline (Si 3.4e-3) is gone. The FREE SA closes too:
-    on p2 atoms the radial direction has a restoring force (fact 18a), so
+    on p2 atoms the radial direction has a restoring force (fact 9), so
     SA's stationary point is the symmetric window. casci_avg_pur
     additionally shows max|dE| = 0 (the purified core needs no averaging:
     PySCF's own core and ours coincide) and gate (d): the purification
@@ -348,13 +348,13 @@ def test_purified_rungs_exact_closure(name, ladders):
         assert rung["ground_l2"] == pytest.approx(2.0, abs=1e-6), (name, tag)
         assert rung["ortho_err"] < 1e-10 and not rung["diverged"], (name, tag)
         assert rung["window"]["p"] > 0.999, (name, tag)
-    # the SA family reaches the full correlation gain (fact 18a optimum)
+    # the SA family reaches the full correlation gain (fact 9 optimum)
     lo, hi = b["corr_gain"]
     for tag in ("sa_pur", "sa_radial_pur"):
         assert lo < r[tag]["e_ground"] - r["casci_avg"]["e_ground"] < hi, \
             (name, tag)
     # single-root radial pur twin: same flat member gauge as the canonical
-    # rung (fact 16a) -- purity and gain are structural, commutators not
+    # rung (fact 8) -- purity and gain are structural, commutators not
     rad = r["casscf_radial_pur"]
     assert rad["ground_term"] == "3P", (name, rad["ground_term"])
     assert rad["window"]["p"] > 0.999, name
@@ -370,7 +370,7 @@ def test_purified_rungs_exact_closure(name, ladders):
 # --------------------------------------------------------------------------
 # Sc (ticket 11): the transition-metal rungs. Same machinery, different
 # physics -- every assertion below is the measured Sc pattern across three
-# independent cold runs (see AGENTS.md fact 15).
+# independent cold runs (see AGENTS.md fact 7).
 # --------------------------------------------------------------------------
 
 @pytest.fixture(scope="session")
@@ -444,13 +444,13 @@ def test_sc_relax_keeps_window_exact(sc_ladder):
 def test_sc_purified_rungs_unbroken_lz_and_l2(sc_ladder):
     """Fact 20, the ticket-13 deliverable: Sc CASSCF and SA-CASSCF with
     UNBROKEN Lz and L^2. On the purified substrate the input-window
-    baseline (5.7e-3 / 2.1e-2, fact 17) vanishes, so:
+    baseline (5.7e-3 / 2.1e-2, fact 14) vanishes, so:
 
     - relax_pur / sa_relax_pur (window frozen): commutators at MACHINE
       precision (measured 1.3e-13 / 6.7e-14, 3.6e-13) with the full
       90-state free-ion term table and max|dE| ~ 0 -- the rung pair that
       answers "SA-CASSCF with exact rotational symmetry on a TM";
-    - sa_radial_pur: the flat member gauge of fact 18b has NO restoring
+    - sa_radial_pur: the flat member gauge of fact 9 has NO restoring
       force (m-symmetric radial rotation gains nothing), so the optimizer
       stops at a ~1e-6 window tilt (measured comm 5.7e-7 / 1.8e-5,
       convergence-tolerance-independent -- an optimizer floor, not a
@@ -549,13 +549,13 @@ def test_sc_free_casscf_escapes_the_shell(sc_ladder):
 
 def test_sc_sa_restores_l2_not_lz(sc_ladder):
     """Shell-start SA over the five 2D M_L components restores <L^2> = 6
-    always, and is BIMODAL across SCF chaos (fact 15 amended): either it
+    always, and is BIMODAL across SCF chaos (fact 7 amended): either it
     swaps the window's 4s member for a core 3p (window p-weight exactly
     1/6, an m-INCOMPLETE window, [H, Lz] ~ 0.3; our averaged core of that
     strongly polarized core vs PySCF's raw one shows as max|dE| ~ 0.8 --
     the polarized-core detector at Eh scale), or it converges healthy
     (window {3d, 4s}, commutators at the ~1e-3 input-window baseline of
-    fact 17, like sa_radial). The canonical-start SA collapses to the
+    fact 14, like sa_radial). The canonical-start SA collapses to the
     dominantly-L=0 basin -- the start dependence is real on a TM."""
     r = sc_ladder
     sa = r["sa"]
@@ -563,7 +563,7 @@ def test_sc_sa_restores_l2_not_lz(sc_ladder):
     assert 5.99 < sa["ground_l2"] < 6.02
     if sa["window"].get("p", 0.0) > 0.05:  # the swapped-window basin
         # partial-swap draws soften the defect (fresh draw 2026-10-29:
-        # 0.0736, milder than the ~0.3 of fact 15's full swap); the
+        # 0.0736, milder than the ~0.3 of fact 7's full swap); the
         # floor only separates from the healthy ~1e-3 baseline
         assert sa["comm_norm_h_lz"] > 0.02
         assert 0.1 < sa["window"].get("p", 0.0) < 0.25
@@ -592,8 +592,8 @@ def test_sc_radial_rung_blocks_the_escape(sc_ladder):
     like the free rung's m-breaking), so only its energy is pinned.
     sa_radial is the anchored counterpart: reproducible to µEh, <L^2> =
     5.9997, commutators at the INPUT window's core-orthogonalization
-    baseline (~1e-3, fact 17), NOT machine precision. All Sc CASSCF-family
-    energies carry the window-definition offset vs casci_avg (fact 14)."""
+    baseline (~1e-3, fact 14), NOT machine precision. All Sc CASSCF-family
+    energies carry the window-definition offset vs casci_avg (the stages ruler's window-definition term)."""
     r = sc_ladder
     rad, sar, shell = r["casscf_radial"], r["sa_radial"], r["casscf_shell"]
     for rung in (rad, sar):
@@ -608,7 +608,7 @@ def test_sc_radial_rung_blocks_the_escape(sc_ladder):
         assert -0.05 < rung["e_ground"] - r["casci_avg"]["e_ground"] < 0.005
     # the escape is BELOW the radial ceiling: observed gap ~25 mEh
     # (+24.4, +25.1 across cold runs), band widened for the escape
-    # energy's own draw wobble (fact 10)
+    # energy's own draw wobble (fact 3)
     assert 0.0 < rad["e_ground"] - shell["e_ground"] < 0.08
     # imposed-symmetry SA: L restored, commutators at the 1e-3 baseline
     assert sar["ground_term"] == "2D"
@@ -654,8 +654,8 @@ def test_sc_complete_window_still_escapes(sc_ladder, sc_big_window_ladder):
 
 # ==========================================================================
 # Ti (ticket 12, option B): CAS(4,6)/{3d, 4s}, Ms=1 sector (120 dets) --
-# does the whole settled story (fact 15 TM phenomenology, fact 18 scans,
-# fact 20 purification) transfer to a 4-valence-electron d2 TM?
+# does the whole settled story (fact 7 TM phenomenology, fact 9 scans,
+# fact 14 purification) transfer to a 4-valence-electron d2 TM?
 # ==========================================================================
 
 
@@ -732,7 +732,7 @@ def test_ti_purified_rungs_unbroken_lz_and_l2(ti_ladder):
     (relax_pur 6.2e-14, sa_relax_pur 1.4e-13/8.1e-13) with the full
     120-state term table, <L^2> = 12 and unbroken Lz -- Ti CASSCF and
     SA-CASSCF with exact rotational symmetry. sa_radial_pur sits at the
-    flat-gauge optimizer floor (fact 21: d2 tilts DESCEND, so no
+    flat-gauge optimizer floor (fact 9: d2 tilts DESCEND, so no
     restoring force tightens the member gauge; measured 1.4e-4, slightly
     above Sc's 5.7e-7). The free-sa swap attractor survives the purified
     substrate (bimodal across SCF chaos: branch on window p-weight)."""
@@ -813,7 +813,7 @@ def test_ti_sa_basins_and_radial_rung(ti_ladder):
     (~1e-3 class) and gains ~11 mEh over relax -- on Ti that gain lives on
     the ORTHOGONALIZED substrate's s slot (a diffuse 6s admixture, fact
     21), NOT in raw radial rotations (raw 3d->4d and 4s->5s/6s all RISE).
-    The single-root radial gauge is chaotic (like fact 16c on Sc)."""
+    The single-root radial gauge is chaotic (like fact 8 on Sc)."""
     r = ti_ladder
     sa = r["sa"]
     assert sa["ortho_err"] < 1e-10
@@ -843,7 +843,7 @@ def test_ti_sa_basins_and_radial_rung(ti_ladder):
         assert rung["ortho_err"] < 1e-10 and not rung["diverged"], tag
     # the radial gain over the frozen relax window (~11 mEh, orthogonalized
     # substrate; the raw-window core would show every one-parameter radial
-    # rotation RISING -- fact 21)
+    # rotation RISING -- fact 9)
     assert -0.02 < r["sa_radial"]["e_ground"] - r["casscf_relax"]["e_ground"] < 0.0
     sar = r["sa_radial"]
     assert sar["ground_term"] == "3F"

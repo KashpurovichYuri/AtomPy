@@ -20,7 +20,7 @@ TI_EXACT_TERMS = {"3D": 15, "3F": 35, "3G": 18, "3H": 22, "3P": 15,
                   "5D": 5, "5F": 7, "5P": 3}
 
 
-# Ti occupations are forced by character (fact 21 / ticket 12): the default
+# Ti occupations are forced by character (fact 11 / ticket 12): the default
 # energy-ordered ROHF is an aufbau runaway (+123.07 mEh). [Ar]+4s closed,
 # 3d open. occ_e_ref gates the SCF basin: with the same forced occupations
 # a metastable +11.2 mEh member-gauge basin exists whose polarized core

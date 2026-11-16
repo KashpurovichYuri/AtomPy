@@ -127,7 +127,7 @@ def test_sc_rohf_reference_is_3d1_4s2_with_argon_core(sc_rohf):
     s = mf.get_ovlp()
     names, w = shell_weights(mol, mf.mo_coeff[:, :ncore], s)
     # measured ~5e-5; flaked once at the 1e-4 bound in a full-suite draw
-    # (2026-10-19, 2x-headroom class per fact 10) -- 5e-4 still certifies
+    # (2026-10-19, 2x-headroom class per fact 3) -- 5e-4 still certifies
     # "no d charge in the core" with 3 orders of margin
     assert w[:, names.index("d")].max() < 5e-4
 
@@ -189,7 +189,7 @@ def test_sc_frac_occ_selects_open_shell_by_projection(sc_rohf, tmp_path):
     if mf_e.converged:  # the documented failure mode has two faces:
         # (a) it converges to the WRONG ensemble (4p intrudes into the
         # 3d/4s block), (b) the runaway surface sometimes never converges
-        # (chaotic across SCF starts -- fact 10/15c). Either way the
+        # (chaotic across SCF starts -- facts 3/7). Either way the
         # legacy path is unusable as the reference.
         frac_cols = np.where(np.isclose(np.asarray(mf_e.mo_occ), 0.5))[0]
         s = mf_e.get_ovlp()
@@ -274,7 +274,7 @@ def test_casscf_input_window_orthogonalization_defect(sc_rohf):
 
 
 # --------------------------------------------------------------------------
-# The purified core (ticket 13 / fact 20): the exactly L-closed core span.
+# The purified core (ticket 13 / fact 14): the exactly L-closed core span.
 # --------------------------------------------------------------------------
 
 

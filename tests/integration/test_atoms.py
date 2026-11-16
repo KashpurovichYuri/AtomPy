@@ -39,7 +39,7 @@ CASES = {
     ),
     # ticket 09: with the build_full_mo construction fixed, Si's CASSCF/SA
     # converge in the 3P basin (the old "escape" was a non-orthonormal MO
-    # matrix, see AGENTS.md fact 13) -- stages re-enabled and asserted.
+    # matrix, see AGENTS.md fact 6) -- stages re-enabled and asserted.
     "Si": dict(
         comm_band=1e-3,
         cfg=AtomConfig("Si", "ccpvdz", spin=2),
@@ -80,7 +80,7 @@ CASES = {
     # term (1G, in the Ms=0 sector), first basis with an f shell under a
     # d-analyzed load (4f AOs present; core f-tails ~1e-4). occ_* are the
     # MANDATORY character-forced occupations: default energy-ordered ROHF
-    # on Ti is an aufbau runaway (+123.07 mEh, fact 21).
+    # on Ti is an aufbau runaway (+123.07 mEh, fact 11).
     "Ti": dict(
         comm_band=1e-7,
         cfg=AtomConfig("Ti", "ccpvdz", spin=2),

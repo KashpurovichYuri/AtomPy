@@ -39,7 +39,7 @@ def test_scan_windows_are_s_orthonormal(carbon):
 def test_radial_scan_carbon_full_gain_at_exact_symmetry(carbon):
     """The ONE-PARAMETER m-symmetric radial rotation recovers
     the entire CASSCF correlation gain (theta* ~ 0.61 rad -> ~ -0.2508 Eh,
-    vs the free/radial CASSCF gain of fact 16) with [H, Lz] = 0 at EVERY
+    vs the free/radial CASSCF gain of fact 8) with [H, Lz] = 0 at EVERY
     point of the curve -- the gain needs NO symmetry breaking. At theta=0
     the scan reproduces the casci_avg core to machine precision."""
     _, mol, mf, _ = carbon
@@ -67,7 +67,7 @@ def test_member_tilts_exactly_flat_via_ml_dodge(carbon):
     """Tilting ONE member by any amount costs EXACTLY zero
     energy -- the 3P multiplet's M_L components each avoid one member, so
     the CI finds an untouched component (rotational degeneracy = the flat
-    direction of fact 16, here measured without an optimizer). Tilting
+    direction of fact 8, here measured without an optimizer). Tilting
     two members costs real energy. [H, Lz] is blind to the m=0 member
     (pz: Lz pz = 0) and to equal tilts of a full +-m pair."""
     _, mol, mf, _ = carbon

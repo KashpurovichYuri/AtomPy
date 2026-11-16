@@ -1,690 +1,161 @@
 # AtomTerm — the effort map
 
 The navigator: what is live, what is open, where the worked examples
-live. History is git's job — resolved tickets are deleted, survey dumps
-are not kept (open findings move to Issues below before their section
-dies).
+live. History is git's job — resolved tickets are deleted, survey
+dumps are not kept.
 
 ## Tickets
 
-- [29 — gated measurement batches](tickets/29-ti-first.md): the T2 Ti
-  cells + the M store migration; runs only on the user's enable.
 - [33 — the symmetry-breaking anatomy deliverable](tickets/33-symmetry-anatomy.md):
-  design-first — the frozen-landscape tables that replace the retired
-  scan pointers.
-- [37 — the basis-repair bench, the @s wave, the subspace-ROHF: the executable spec](tickets/37-basis-repair-spec.md):
-  the to-spec form + the progress tracker; the seams finalized
-  (windows.project_orbitals, reference.projected_source + the dm0 seed
-  thread, basis.conditioned_basis, reference.subspace_rohf); the
-  decision tree (P1 seeded → P2 density-direct → C conditioned); 64 OMP
-  for the bench (the user's directive 2026-11-12).
-- [34 — the folded reference + the window characterization matrix](tickets/34-folded-reference.md):
-  **STEPS 1-5 COMPLETE (2026-11-08/09)**: the Ti-unc census + the
-  promotion; run_folded (reference.py) + its tests; the matrix on the
-  folded field; the lane re-runs -- THE GAPS CLOSED (Ti-unc +124.3 →
-  5.5e-13 Eh; Sc-unc +38.7 → 0.085 mEh); the Sc port.  The riding-along
-  tail (the anisotropy column, the per-radial spectrum, the docstring
-  review, the table preambles) + the folded-field campaign-schema
-  decision remain; then T-B/T-C/T-D/T-E per the ticket's After.
+  DESIGN-FIRST, awaiting the user's shape call — the frozen-landscape
+  tables (the m-symmetric θ-grid, the member-tilt ladder with the
+  ±pair blind spots visible) that replace the retired scan pointers.
+- [37 — the basis-repair bench, the @s wave, the subspace-ROHF](tickets/37-basis-repair-spec.md):
+  Stage 1c (the seeded-reference integration) LANDED; Stage 2 (the
+  @s wave: census-with-seed members, the twins' series grows,
+  `_unc_s_block` retires, the UHF re-test under `dm0=`, the frac
+  re-test) and Stage 3 (`subspace_rohf`, Sc first) open.
 
-Resolved: ticket 32 (the symmetry lane) — the campaign complete
-(C/Si/Sc/Ti on the one table, the route axis, the UHF anchors), the
-wave closed 2026-11-05 on the gates (the full-suite run retired by
-user decision; the partial verdict 91/91-isolation-green).  Ticket 38
-(the U14e declaration close-out) — COMPLETE 2026-11-16: T1 the
-re-declaration, T3a/b/c the optimizer batch (70 legs, 4h14m, physics
-clean), T4 the review round (the record amended, the physics verdict
-recorded in Issues above, the design fixes applied); the ticket file
-deleted, git history the archive.
+Resolved (git history the archive): 29 the Ti-first protocol; 30 the
+module walk; 31 the ECP wave; 32 the symmetry lane (C/Si/Sc/Ti one
+table, the route axis, the UHF anchors; closed 2026-11-05); 34 the
+folded reference (steps 1–5 + the gap closures; the After's T-C done
+as 36A/38, T-D as the 2026-11-16 docs round); 35 the
+basis-preparation layer (the design landed, the honest prior table,
+the census + the Newton-disease certificate); 36 the runs wave
+(batches B/C/D/E ran — the stores carry 66–208 prior-treatment legs
+per atom; batch A closed as ticket 38); 38 the U14e close-out (T1 +
+T3a/b/c + T4, 2026-11-14..16).
 
 ## Issues
 
-- **The U14e wave CLOSED (ticket 38, all items T1/T3a/b/c/T4 landed
-  2026-11-14..16; the batch's own entry in the ticket)**: the
-  physics verdict — the pipeline certifies the atomic ground term
-  END-TO-END (the free-mask SA legs on the (4,12)/no2/(4,15)
-  windows: ⁵L, ⟨L²⟩ = 72.00 exactly, closure AND commutators at
-  machine zero, bookkeeping ~1e-3 mEh; single-root legs break
-  symmetry exactly as declared — fact 8 verified on the ECP atom;
-  the input windows' CI grounds are ⁵I/⁵F, the ~1 Eh optimization
-  gain IS the relaxation into the ⁵L eigenspace).  The record's
-  honest residuals live in the ticket: 8 unconverged legs (the
-  no-free-mask crawl + near-floor stragglers; the user ACCEPTED
-  2026-11-16 — the physics line rests on the certified legs), the
-  11 merge-refresh converged-flag flips (disclosed), the frozen-SA
-  ensemble-above-anchor class (expected).  TWO DISPOSITION
-  CANDIDATES recorded for the user's future call: (a) `_COMM_CAP`
-  (cells) = 6000 skips the dense commutators on the (6,13) sector
-  (16731 dets) — this box could afford the raise + an 80-min
-  targeted re-run of the 24 cached legs if the [H,L] certification
-  there is ever wanted; (b) the off-basin `moc pur` starts (the
-  multi-solution class visible in the payloads) + the
-  `d14p sa moc_frozen pol` 27.7-mEh reconstruction outlier (the
-  frozen-moc gauge's analysis-ruler artifact class).
-- **The T4 design survey (2026-11-16)** — APPLIED:
-  `windows.pattern_projector` (the patterns→projector idiom's one
-  home — was hand-built 4× in reference) + `reference._open_premium`
-  (the open-block key, was written 4×) + the `SeriesSpec.src_*` →
-  `source_*` rename (one idea, one name, lockstep with
-  ReferenceSpec).  DECLINED with reasons: (a) unifying
-  `radial_refused` (statically decidable at the key) with
-  `NoCapExceeded` (needs the construction to run) would force a
-  dry-run constructor into the key grammar — two refusal classes,
-  two homes, both right; (b) CaseSpec at ~30 fields stays one
-  intent manifest under family comments — nesting would add
-  forwarding accessors and break `replace()` registry ergonomics;
-  the `render_*` family is the one blob that pays extraction if it
-  grows one more field; (c) the dm0-thread vs `get_init_guess`
-  seeding idioms coexist because each is dictated by its kernel's
-  call path — the two-masters refusal pins the contract.
+### Open
 
-- **The pinned lane payload seam** (found 2026-11-11, the runs round):
-  the pinned lane legs (substrate=pur) store the LANE certificate
-  schema (anchor_dev/fold/conv, no e_ground/energies_pyscf), which the
-  renderer's data-row condition does not recognize -- the pinned rows
-  render pending UNIFORMLY on every atom while their runs sit in the
-  stores.  Pre-existing through the structure round.  The resolution
-  is a declared class: either the lane payload gains the renderable
-  fields, or the pinned legs join the NO certificate class
-  (store-only, no row).  Decision pending; the uniform render is
-  honest in the meantime (the tables never claim data that isn't
-  shown). (open dispositions + watchlist)
+- **The future-wave queue** (ticket 34's After + the standing
+  candidates): the contraction-recipe provenance review (our radials
+  vs the basis authors' coefficients); the term-ID round (splittings
+  vs NIST — the acceptance test); then spin–orbit, transition
+  moments, g-factors.
+- **The queued CASCI review** (the user, 2026-11-06): the CASCI
+  readings get their own review pass — the window-poverty class
+  (+923 mEh), the reference-echo roots, the raw-fold ⟨L²⟩ mixing —
+  before any new construction rides them; precedes the next physics
+  wave.
+- **The folded-field campaign identity** (ticket 34's open
+  decision): the substrate tag in the key grammar, the free-route
+  dominance declaration, the table re-anchoring — user-visible
+  before any table carries folded rows.
+- **The pinned lane payload seam** (2026-11-11): the lane legs store
+  the certificate schema (anchor_dev/fold/conv) the renderer's
+  data-row condition does not recognize — pinned rows render pending
+  uniformly while their runs sit in the stores. Either the payload
+  gains renderable fields or the class goes store-only.
+- **test_symm_tm's SA legs** re-scope to store-anchored verification
+  (the AGENTS Tests boundary, user-directed 2026-11-05): fresh CI
+  legs stay, the SA verdicts load the committed route-batch stores —
+  lands at the file's next touch.
+- **The char-selected fold seam** (the m-complete 6p promotion,
+  CAS(10,15)): the fold-tag grammar cannot express multi-band folds
+  and `closed_electrons` assumes one band per shell; the fix is
+  character-selected fold spans with reference-occupation counts —
+  a real seam extension when wanted.
 
-- THE 2026-11-11 REVIEW ROUND (two-axis over c82fa6d..bfd9b08 + the
-  design survey): fixes landed (the module-docstring header, ~20
-  verb-damage sites from the mechanical rename sweep -- the worst
-  the PHYSICS word "k-fold degenerate" mangled to "k-core"; the
-  keep-list lesson: the degeneracy "fold" is physics vocabulary,
-  same class as the L+- ladder -- plus the stale `_fold_span` ref,
-  `fold_rows` locals, the capitalized-FOLD leftovers, the
-  address-grammar prose, the 10 test renames, the AGENTS cells row
-  naming `prior_tag_of`/`no_label`).  DECLINED, with reasons:
-  `scripts/probe_series_source.py` keeps its ladder vocabulary
-  (frozen historical probe -- predates basis.py, imports nothing
-  renamed); `_comparison_key`'s bare rank ints (the documented
-  reading order -- primitive-by-design, named in the docstring);
-  the lane-family extraction from cells.py (locality-only gain --
-  the interface would not simplify; REVISIT if the radial legs grow
-  it); the renderer's script-home (convention-owned, one production
-  consumer).  Survey verdicts: basis.py is DEEP (the deletion test:
-  the contraction recipe re-scatters across cases/reference/scripts);
-  the member_chains seam is real (two declared distillation
-  families walk it); the radial legs need ZERO new src surface.
-- C'S @s2 DECLARATION RETIRED (2026-11-13, the E batch): the
-  p2+s1p3 series average is RANK-1 -- the second radial eigenvalue
-  1.9e-04 against the leading 2.5 -- so the declared k=2 window
-  refuses at construction (the distillation's own floor).  The
-  declaration dies (the doctrine: delete the fake degree of freedom,
-  don't guard it); C's planned windows are @r1/@s1.  Si's mirrored
-  @s2 is MEASURED constructible (second eigenvalue 5.1e-2, 260x
-  C's; k=2 of 2 bands, cells ran) and stays.  The twins' @s2 blocks
-  stay pending (Stage 2's seeded series carries the census members
-  that would give the second radial).
-- U14E'S TIER-WINDOW FRESH CONSTRUCTION (2026-11-14, found at batch A
-  phase 1): the tier band windows (9f10f11f12d13d and kin, the
-  grid's primary family) REFUSE fresh construction under the
-  distilled declaration -- window_distilled's assembled
-  S-orthonormality certificate fires on their same-l multi-band
-  token sets (9f+10f+11f are three same-l "shells" to the walk; the
-  per-band k=1 blocks are each S-orthonormal but same-l band
-  primitives overlap ACROSS blocks, deviation 7.75e-01).  The
-  member-preserving cross-shell orthogonalization is the declared
-  future seam (windows.py's own refusal message).  The stored
-  tier cells predate the distilled declaration (raw-band
-  construction) and survive via the cache path -- phase 1's crash
-  was the FIRST fresh attempt on them.  The tier rows are
-  render-retired (2026-11-06, user-directed), so the refusal blocks
-  only the run side: the grid's 4 fresh CI cells + 32 optimizer
-  legs are phantom-runnable (materializable by --full, crashing at
-  construction).  DISPOSITION (the user's call, 2026-11-14: option
-  (a) -- "we don't need CAS(4,20+)-class for now"): the tier windows
-  RETIRED from the run set -- the declaration carries the promoted
-  windows only, the primary re-declared at 10f13d (render_primary
-  flips True -- the primary is the results window now); no guard
-  predicate, the fake degree of freedom deleted (ticket 38).  The
-  cross-shell seam stays the recorded future step, revived only if
-  the multi-radial comparison returns to scope.  Phase 1 ran the
-  honest runnable class: the promoted windows' 13 fresh CI cells (17
-  queued -- 4 were cache re-analyses) + 2 lane legs (5f1f530).  Companion: the no3 certificates -- the 14p pair
-  (UNDER the cap, C(15,4)=1365) RAN; the 7s pair (16731 dets, the
-  whole window re-gauged at (5,1)) refuses PER CELL
-  (`natural.NoCapExceeded`, the declared no_cap class, 2 pending
-  rows -- the cap stays, the kernel-only raise declined).  ALSO
-  CORRECTED: batch A's optimizer scope is ~73 fresh legs (the
-  promoted windows' classes only), not the 111 the void-count
-  pricing assumed -- and the MEASURED pricing (the pacing probe:
-  17:09 CASSCF / 26:53 SA at OMP=128, the max-cost (6,13) class,
-  ~24.7 GB peak) makes the batch ≈ one day, not a week.
-- THE SWAP-BASIN READOUT SEAM (2026-11-12, found at batch D's
-  materialization; **FIXED 2026-11-13, 99cc4de**): the free optimizer
-  legs that land the SEMI-CORE SWAP BASIN (the classic 3p/3s-into-
-  active attractor; the same basin from every start -- Sc
-  e_pyscf -759.759, Ti -848.42..-848.43, 28..37 mEh below the
-  distilled-window CI) were MISREAD by the readout: e_ground 0.8 Eh
-  below energies_pyscf.  ROOT CAUSE, measured to the root: PySCF's
-  CASSCF optimizes EVERY orbital -- the runaway rotates the core
-  block far from the reference core (span overlap 0.8889), and the
-  readout's SPHERICALLY AVERAGED field (fact 5's multiplet
-  protection) is meaningless on a block that is no longer a core
-  (our h1 vs PySCF's get_h1eff: max elt diff 0.395 on one orbital;
-  PySCF CASCI on the stored layout reproduces energies_pyscf to 8
-  digits -- the averaging was the entire discrepancy).  THE FIX:
-  stage_facts measures the core block's span overlap against the
-  reference core (_CORE_ANCHOR_TOL = 0.99, the measured gap
-  0.8889/0.9978); below it the analysis reads the RAW field (the one
-  the CI was solved in) -- exact agreement restored, the payload
-  carries core_span_overlap + swap_basin, the renderer adds the
-  'swap' note.  The refine pass re-analyzed every cached
-  optimizer leg on the twins (34 swap payloads, zero legs above
-  10 mEh; the meter 1.8e-9 on the spot-checked cell).  The swap rows
-  render honest energies with the disclosure; their meters are the
-  swap fingerprints.  The class re-runs gauge-anchored at Stage 2 if
-  the campaign wants in-window solutions (the keep-the-window
-  treatment, casscf.py's masks).
-- THE TWINS' FRAC REFERENCE (2026-11-12, found at batch D): the
-  `frac-reference-unmeasured` scenario holds one casci cell void per
-  twin, and a blanket `--group grid --full` (ticket 36's literal D
-  command) would MATERIALIZE it -- through a weight-ranked open-block
-  pick on a diseased basis (the disease's own filler class).  Two
-  open questions before the class is measurable on the twins:
-  (i) the smearing semantics: the realized valence on the unc basis
-  is 43 AOs (8 d bands + 3 s bands) so the open electrons smear
-  3/43 per orbital, where the contracted Sc form smears 0.5 over
-  6 AOs -- a DIFFERENT ensemble, energy-incomparable across the
-  parity pair; (ii) the garbage columns (eps ~ +5e6) compete in the
-  weight pick.  Resolution rides Stage 2's seeded-reference
-  machinery (MOM-style block anchoring, the U14e frac issue's
-  remedy); until then batch D runs method-filtered so the frac cell
-  stays void.  ALSO FIXED en route: regen's materialization rule had
-  two disagreeing copies (the frac-head build forgot --full; the
-  crash that killed batch D's first grid leg) -- `_materializes` is
-  now the one home (2484d23).
-- THE TWINS' UHF ANCHORS BLOCKED (2026-11-11, measured): the UHF
-  class does NOT converge on the uncontracted twins -- the census
-  arms (default/minao/atom/huckel/broken) all diverge or land
-  garbage basins, under plain-DIIS AND under Newton (E up to +1.5e7
-  Eh; the arms' table is in the session record).  The twins share
-  their ROHF's trusted-cache disease: fresh SCF paths diverge on
-  these bases.  **MECHANISM FOUND + REPAIRED (2026-11-12, ticket 37's
-  sandbox bench): the disease is the CHARACTER HOOK, not the SCF.**
-  Two stacked defects: (a) the virtual tail's metric-amplified
-  garbage (kappa(S)~2000 makes eps ~ +5e6 columns carrying closed-span
-  weights ~1 -- present in the trusted stores' mo_energy too,
-  harmless there); (b) the unc labels are shell counters, so the
-  series' plain-pattern spans select 1-5 AO slivers (weights ~1e-3,
-  noise ranking).  Even the trusted record's own density explodes
-  (+1.4e7) under the hook; hook-free the same seed lands the anchor.
-  The certified repair: MOM-anchored occupations from a projected
-  seed (6-31G on-demand source) + the character-of-occupied
-  post-check on honest spans (l-vocabulary / shell-layer bands).
-  Every member leg lands the right physics (variational gains
-  -0.7..-1.9 mEh vs the contracted anchors; Ti's head transfer
-  EXACT).  The UHF anchor class re-tests under the same repair at
-  Stage 2.  Disposition: the row stays absent until that re-test.
-  The three gated atoms (Sc, Ti, U14e) warmed EXACTLY to their
-  declared `occ_e_ref_uhf` basins (the gates reproduced bit-exact).
-  **THE ROHF REACHABILITY CLAIM SUPERSEDED (2026-11-13)**: the
-  ticket-34-era census verdict "no fresh path reaches Ti-unc's
-  deepest basin" held under the pre-repair machinery (the forced
-  hooks + the standard guesses -- every arm diverges, the disease's
-  own signature).  The Stage-1b bench's MOM-seeded transfer (the
-  contracted Ti head projected into the unc basis, MOM-anchored
-  occupations) LANDED IT EXACTLY: E = -848.40744343, d_anchor
-  = 0.000 mEh, converged (sandbox/mom.py, the ticket-37 evidence).
-  The trusted .chk verified independently (2026-11-13): E exact,
-  22 e- = 10 closed pairs + 2 open, the open columns pure 3d
-  (weight 1.0), the 4s band carrying the s pair, S-orthonormal to
-  1.4e-13.  The formal fresh re-run rides Stage 1c's seeded
-  run_rohf; the UHF re-test under the seed seam (the ROHF chk as
-  the UHF dm0) is Stage 2.  **STAGE 1c LANDED (2026-11-14, the
-  seeded-reference integration)**: the seeded-MOM mode is the
-  product path (`reference.run_rohf`'s `seed_basis` knob -- the
-  projected 6-31G source, the `_mom_occ` follower, the
-  character-of-occupied post-check, the basin gate) and BOTH
-  twins' formal seeded head transfers land their declared anchors
-  EXACTLY (Ti-unc -848.40744343, Sc-unc -759.73738486, d_anchor
-  0.0000 mEh -- the pins `test_reference_seeded`; the sandbox
-  bench deleted, git history the archive).  MEASURED FINDING: the
-  SOURCE hooks need the source basis's own vocabulary -- the
-  whole-l closed rank on a contracted source ties occupied valence
-  (4s ~1 on l0) against virtual polarization (4p ~1 on l1) and
-  STEALS VIRTUALS into the closed block (the Ti/6-31G l-hook
-  source diverged at E = -838.91, eps +0.09 virtuals paired);
-  `ReferenceSpec.source_closed/source_open` declare them (the
-  twins carry the certified label hooks; the l-vocabulary stays
-  the target-side post-check's honest form).  Stage 2 note: the
-  mixed members' (d2s1/d3s1) open spans need l0 alongside l2.
-  THE PRIOR PORT'S @s HALF (2026-11-11, measured; superseded by the
-  mechanism above): the series' non-head configurations need fresh
-  forced-occupation SCFs and the d3 census on Sc-unc diverges on
-  every arm (E ~ +1.3e7 Eh, Newton and DIIS alike); the @r1 half
-  landed on BOTH twins (the head IS the trusted cache) -- the @s
-  windows guarded by cases._unc_s_block (Sc-unc + Ti-unc), pending
-  placeholders until the repair (Stage 2, ticket 37).
-- THE BASIS-PREPARATION LAYER landed (2026-11-10, this session):
-  `src/atomterm/basis.py` (the ladder runner, the density-block
-  source, `metric_radials`, `series_window`) + the SOURCE-TAG grammar
-  (`@r<k>`/`@s<k>` on window labels, one @-slot partitioned
-  fold|source; NO-of-tagged parses through `_source_label`) + the
-  Sc/Ti declarations (ladders gated -- Ti's head at the TRUSTED
-  reference energy, not the probe's shallow draw; prior_bands = the
-  widened 2-band chains, Ti's 3d widening DECLARED) + the
-  anchor-first gates on the prior windows' optimizer class.  The
-  member-chains extraction to `windows.member_chains` (one home) is
-  bit-exact -- the existing distilled pins certify it.  OPEN (the
-  wave's next): the prior-cells run (the first CASCI cells of the
-  tagged windows -- ALSO the probe's re-verification under the FIXED
-  metric, see below), then the radial-CASSCF legs, SA-over-ladder.
-- THE DESIGN SURVEY (2026-11-10, the codebase-design vocabulary over
-  the basis seam): VERDICT -- basis.py is DEEP (the three-part public
-  face stands: metric_radials/valence_block public is the
-  verification seam, the independent-construction pins reach them by
-  design); the two-family seam placement RIGHT (merging the frozen
-  incumbent with the tagged family declined -- the store contract +
-  the differing certificates); the head contract right but
-  UNDER-CHECKED (FIXED: the head-energy invariant now checked in
-  run_ladder + pinned).  RECORD-FOR-LATER: the m-replication/assembly
-  duplication (windows vs basis, verbatim -- extract at the
-  incumbent's next legitimate change, bitwise A/B); the per-atom
-  prepared-basis bundle collapsing shell_bands/shell_radials/
-  prior_bands/ladder_mfs (trigger: a second consumer or a fifth
-  field); the prior_bands-defaults-to-shell_bands rule lives in
-  cells (a small locality leak -- hoist when touched).  NO
-  PASS-THROUGHS (the deletion pass: everything reappears in callers).
-- THE HONEST PRIOR TABLE (Sc+Ti complete, 2026-11-10; the store:
-  {sc,ti}_{3d,3d4s}@{r1,s1,s2} casci ao pol/avg, term-certified,
-  Ti's 3d rows at the lattice d2 sector): dE vs the incumbent
-  (authors' 1:1), mEh --
-    Sc: @r1 +102.9/-7.0  @s1 -64.7/+5.5  @s2 -119.5/-16.4  (3d/3d4s)
-    Ti: @r1  -6.2/-10.6  @s1 +11.0/+6.9  @s2   -9.6/-21.4
-  THE k=1 ORDERING IS ATOM-DEPENDENT (Sc's ladder mean wins its d-row,
-  Ti's head block wins both rows; both within ~11 mEh of the
-  incumbent on Ti, spread ~100 on Sc) -- no universal k=1 prior
-  exists, the strongest evidence for the SA-over-ladder optimized
-  contraction (the wave's next step).  THE INTERNAL CONSISTENCY
-  CERTIFICATE: @s2 matches the probe's flipped-metric numbers EXACTLY
-  (k=2 on a 2-band chain spans the full radial space -- the CASCI
-  total is span-invariant under the radial convention).  Closure: Ti
-  machine-precision (1e-14-class rows); Sc carries the known
-  anisotropic-core floor (2e-3-class) consistent with the incumbents.
-  The k=1 hierarchy the probe reported is INVERTED (its transport was
-  flipped); the committed probe logs stay as the historical record.
-- THE LADDER CENSUS + THE NEWTON OCCUPATION DISEASE (2026-11-10,
-  reference.rohf_basin_census -- the ROHF twin of the UHF instrument,
-  committed with the occ_ok certificate): the probe's ladder draws
-  were 155-177 mEh SHALLOW garbage; the true quartet basins are Sc
-  d2s1 = -759.69899090 (robust), Sc d3 = -759.57064777 (huckel+
-  newton only), Ti d3s1 = -848.38650790, Ti d4 = -848.24887522 --
-  the declarations carry them.  THE DISEASE: the Newton/second-order
-  path freezes occupations from its early cycles -- converged arms
-  can VIOLATE the hook (measured: a 3d-forced quartet converging
-  onto the d2s1 solution, the 4s MO occupied at hook-rank 0); the
-  census's occ_ok column refuses them and run_ladder post-checks
-  every gated run.  The plain-DIIS arms DIVERGE on these configs
-  (LadderSpec.accel, default newton).  ALSO VOIDED: Ti's same-l
-  planned windows (3d4d, 3d4s4p4d) -- latent-unrunnable since the
-  distillation wave (window_distilled's declared future seam), now a
-  dated scenario; the incumbent distilled FRAC cells are the same
-  latent class (their pre-distillation caches mask the refusal -- a
-  --fresh regen of them would be refused; watch item).
-- THE PROBE'S RADIAL TRANSPORT WAS FLIPPED (2026-11-10, caught by the
-  unit pin -- the three-layer chain's exact-anchor layer): the probe's
-  `metric_radials` solved the generalized problem (block, s_r) --
-  the s_r^{-1/2} conjugation `eigh(L^-1 B L^-T)`, which mixes the
-  EUCLIDEAN coefficient pairing into the numerator and returns
-  s_r^{-1}-DISTORTED radials; the capture-maximizing problem is
-  (block, s_r^-1) = `eigh(L^T B L)` with vectors through `L^-T` (the
-  form that recovers a planted radial exactly, and agrees with
-  window_distilled's column-space Gram on a single-configuration
-  source).  WHAT SURVIVES of the probe's committed verdicts: the k=2
-  DOMINANCE is variational basis-supermacy (any k=2 window over the
-  same chain space dominates, distorted radials included) --
-  unaffected (and now CONFIRMED exactly: the @s2 totals reproduce the
-  probe's to the digit); the k=1 NUMBERS were inverted by the flip
-  (the honest table above).  The committed probe logs stay as the
-  historical record (provenance); the module's numbers are the honest
-  successors.
-- THE SERIES-SOURCE PROBE's review (2026-11-10, two axes over
-  44e0ed4..d9e4afe): CORRECTED RECORD -- (1) "neutral loses
-  everywhere" (handoff xxi) was FALSE: Sc's d-only row has neutral
-  WINNING (-83.8 mEh, term-certified); the truth is NO universal k=1
-  winner -- which STRENGTHENS the SA-over-ladder optimization as the
-  only road to a dominant k=1; the neutral-as-small-CAS-default
-  survives (uncontracted bases have no authors' contraction).  [The
-  per-row ordering THIS entry reported was the flipped metric's --
-  the honest table (later entry below) inverts the k=1 hierarchy;
-  the no-winner conclusion stands either way.]  (2)
-  series2's dominance is VARIATIONAL AT DOUBLE BUDGET: every k=1
-  window is a subspace of the k=2 chain space, so the -16/-21/-24/-120
-  mEh numbers are the headroom the second radial BUYS, not equal-budget
-  superiority -- every rendered comparison must carry the CAS shape
-  (the budget) per row.  (3) Ti's 3d chain (3d, 4d) is a DECLARED
-  WIDENING beyond its certificate (3d -> (3d), capture 0.9991) --
-  noted in the script; basis.py reads realizations from the per-atom
-  certificate and declares any widening.  FIXED in the probe: the dead
-  declarations gone ("ar" now the fold-boundary derivation via
-  core_pairs, cfg/lam/occ1 deleted), the err0 raw-window ortho printed
-  beside the treated one, the anchor circularity documented in place.
-  BASIS.PY'S DESIGN INPUTS (not probe fixes): the basin gate (the
-  probe ran un-gated, occ_e_ref=None -- the k=2 numbers re-verify at
-  the birth certificate through the gated module); the term selection
-  joins <S^2> beside <L^2>; the anchor uses the stored payload's core
-  fields so the 1:1 row becomes a genuine cross-check; the budget cap
-  stays (vacuous at 2-band shells, live on wider realizations).
-  DECLINED: the "bm" rename and the metric_radials/s_metric_roots
-  duplication (both absorbed when basis.py becomes the one home);
-  re-running the probe (the birth certificate regenerates the
-  authoritative numbers).
-- THE EACH-BY-EACH ROUND's review dispositions (2026-11-09, ticket
-  34's round section carries the record; the fixes = 44e0ed4):
-  DECLINED -- (a) the `_fold_core` report's `"core": "scf"` era tag
-  stays: the payload's era-awareness is load-bearing (the
-  store-anchored test reads era fields: `core_in_span_min` vs
-  `core_comm`); (b) the no-label prefix idiom in scenarios stays:
-  threading `cells._no_label` against the cells→cases import
-  direction costs more than the two declarations it would clean;
-  (c) the lattice windows keep their ao+mo pair: the kind block is
-  the PRIMARY window's comparison (running four kinds per lattice
-  span is scope growth; the preambles scope it).  WATCH -- the
-  unfiltered regen is a full free-grid REBUILD (merge only when
-  filtered): it drops lane/route payloads; run the merge groups
-  after it (bitten once, 2026-11-09).
-- The folded-reference round, MEASURED (2026-11-08/09, ticket 34
-  steps 1-5 -- the logs: elements/{Ti-unc,Sc-unc}/logs/{census,
-  folded_probe,matrix_folded}.log): (1) the unc ROHF basins are ALL
-  s/d-HYBRID-open (~0.4 d per open MO; pure-3d opens are a
-  contracted-subspace property) and no fresh start reaches the
-  deepest basin -- the trusted cache is the one mechanism; (2)
-  run_folded's pick rule is MOM-PRIMARY within dominance gates
-  (character alone loses to the complement's tight core-shell
-  radials at w = 1.0; energy alone declares the ion field's
-  d-BELOW-s inverted filling, eps -1.53 vs -1.19 on Ti); (3) the
-  ion-field valence hybridizes (the folded closed pair ~0.69 s on
-  both twins) -- the C1-gauge Sc-unc cut carries only 0.4628 4s-band
-  weight, below the compression's 0.5 dominance gate (the D2h
-  solver's gauge lands >=0.5; the neutral field's signal is 0.8988)
-  -- a free-route folded cut needs a declared dominance (0.4
-  measured honest: L2 = 6 exact); (4) THE GAPS CLOSED: Ti-unc
-  +124.3 -> 5.5e-13 Eh, Sc-unc +38.7 -> 0.085 mEh (the residual = the
-  C1/D2h gauge of the window cut); (5) the MO-picked windows fail
-  the meters on BOTH fields (the m-incomplete set) -- the AO class
-  is the certified default; the NO arm degenerates with the source
-  at k=1 (the groups [1,5] = the chemistry).  OPEN DECISION: the
-  folded-field cells' campaign identity (the substrate tag in the
-  key grammar, the free-route dominance declaration, the table
-  re-anchoring) -- user-visible before the tables carry the folded
-  rows.
-- The folded-field draw chaos, MEASURED (2026-11-09, ticket 34's
-  tail -- elements/Ti-unc/logs/folded_repro.log is the replay matrix):
-  the certified folded fields do NOT replay -- same chks (mtime
-  predates the certified commits), the exact old module, the same
-  frozen env, both thread counts land wrong basins or the +53877.9
-  garbage basin; Sc-unc fails the same way.  The certified runs were
-  single draws at a basin boundary.  run_folded now carries the
-  post-kernel converged-filling certificate (the certified-era code
-  returned wrong-fill fields silently on replay) and a DECLARED pick
-  rule (picks='gates' | 'three-level' -- each form certified on one
-  twin, each fails the other; the gates' dominance is a declared
-  parameter).  The round's certified numbers stand as
-  draw-documented measurements.  BLOCKED: the window legs, the
-  nested-basis Ti/Sc legs, any folded-field store payload.  FIX
-  DIRECTIONS user-gated: (a) the folded field as a STORED artifact
-  (a folded-field chk beside the ROHF chk); (b) a folded-basin
-  census; (c) the claims stay draw-documented.  The carbon
-  nested-basis keeper is DELIVERED (05af7b9).  AMENDED (2026-11-09,
-  the user's review; second revision after the contracted control
-  experiment -- elements/Ti/logs/folded_review.log): the +400 mEh is
-  BASIS-STABLE construction physics, not span bloat and not
-  confined-core mismatch -- the contracted control measures
-  +334.4/+136.9 mEh with cores identical to 1e-4; it is the folded
-  construction's frozen-core SCF penalty (the missing core-valence
-  self-consistency), the textbook scale for an [Ar]-core TM atom.
-  E_folded ≥ E_neutral always; the folded zero is structurally ~0.3
-  Eh above the true minimum.  The PROGRAM stands: span repair over
-  field repair -- m-complete MO-subspace windows on the neutral field
-  (STEP 1 CERTIFIED: the Ti probe, 3F exact, +0.0033 mEh vs the
-  certified default, the oracle decisive -- the d radial is a
-  three-band mixture no label-picked space approaches);
-  window_compressed DELETED, window_distilled is the one window-side
-  construction (step 2); the folded field stays a draw-documented
-  study; the lane legs on the unc twins run on the neutral field with
-  the disclosed structural offset (~+124 mEh -- the confined core on
-  the full-family span); NOs and the basis pipeline (the per-shell
-  radial-vector contract, the exporter, the on-basis road) are
-  specced future stages.
-- The projected-Gram alternative, DECLINED (2026-11-08, the design
-  round): forming the compression Gram from S-PROJECTED member
-  vectors (bounded spectra, self-interpretable shares) instead of
-  the truncated ones.  The cons beyond the recompute: the idiom fork
-  (the truncated Gram is shared with the pur construction -- changing
-  both is a global re-certification), the marginal gain (the post-hoc
-  per-radial spectrum delivers the interpretability without touching
-  the construction), and the unmeasured ranking difference.  REVISIT
-  CONDITION: the per-radial spectrum showing truncated-ranking
-  distortions (the riding-along tail installs the spectrum).
-- The D2h substrate layer, UNDERSTOOD (2026-11-07, the user-directed
-  probe -- elements/Sc-unc/logs/d2h_probe.log is the record):
-  (1) the D2h ROHF landscape is the SAME multi-basin zoo as C1 --
-  same-filling stationary points at the 0.3-11 mEh scale, each
-  reverse-seed-stable on C1 (the D2h solutions are genuine C1
-  stationary points, not symmetry artifacts); (2) the seed's job is
-  the OCCUPATION basin only -- the solver's irrep-blocked diagonals
-  erase the gauge and land the D2h-canonical solution (Sc-unc: plain
-  and seeded land IDENTICALLY); (3) NEVER symmetrize a degenerate-
-  gauge seed: pyscf.symm.symmetrize_orb AMPUTATES the open MO
-  (measured: the open d became a pz, +183 mEh) and symmetrize_space
-  scrambles the occupation-column pairing (measured: the runaway
-  class) -- the user's MO-selection-by-irreps hypothesis evaluated
-  and declined ON THE SEED SIDE; the solver already irrep-adapts;
-  (4) the Ti-unc basin zoo, CENSUS-RESOLVED (2026-11-08,
-  elements/Ti-unc/logs/census.log): two stationary basins on the unc
-  basis -- the forced-Newton class -848.40648875 (the old trusted
-  record) and the seed-refinement DIIS attractor -848.40744343,
-  1 mEh deeper -- both with s/d-HYBRID opens (~0.4 d per open MO:
-  pure-3d opens are a contracted-subspace property; every fresh
-  forced start DIVERGES, so no ReferenceSpec gate is declared -- the
-  trusted cache is the one mechanism).  The user promoted the deeper
-  basin; the free cells re-run on it.
-  Sc-unc: the trusted record is already the deeper of its two.
-- The lane substrate's D2h basin wander (2026-11-07, the compressed
-  round): the from-scratch plain D2h draw is basin-chaotic (the
-  contracted Ti's plain D2h lands the RUNAWAY -848.2834 while Sc's
-  hits its reference exactly) -- lane_substrate VERIFIES the plain
-  energy against the trusted rungs/rohf.chk and retries C1-seeded on
-  disagreement past 1e-5.  The seeded retry slides to its own
-  solution -- which the census resolved: the attractor it slides to
-  IS the adopted deepest basin (-848.40744343, reverse-seed-stable,
-  reached identically from every seed tested), so after the
-  promotion the retry lands the reference basin EXACTLY -- the
-  substrate and the free route run the same field again.
-- The Ti multi-basin finding (2026-11-07, the consistency probe):
-  the Ti 3d2 4s2 ROHF hosts SAME-FILLING basins 11 mEh apart on the
-  CONTRACTED basis itself (the record's gated -848.40648875 vs an
-  ungated -848.3953); the unc plain aufbau lands the SHALLOW class
-  (-848.39639) -- no variationality violation (the primitive sets
-  are identical, the subspace exact; SEEDED from the contracted
-  record through the cross-overlap, the unc basis reproduces
-  -848.40648875 EXACTLY).  2026-11-08: the Ti-unc reference is now
-  the CENSUSED deepest basin (logs/census.log -- the seeded record
-  itself re-derives: DIIS from it rolls to -848.40744343); the
-  Ti-unc cells re-run on it.  Fact 21 gains a measured instance:
-  even at the right filling, plain aufbau can land 11 mEh high; the
-  seed (not the gate) is the cure when the gate's cycling diverges
-  on the basis.
-- The queued CASCI review (the user, 2026-11-06; PRECEDES the next
-  physics wave): the CASCI calculations get their own review pass —
-  the window-poverty readings (+923 mEh class), the reference-echo
-  roots, the raw-fold anchor <L2> mixing — before any construction
-  rides them.  (From ticket 31, kept alive at its deletion.)
-- The 61c5529..642ac8e review (2026-11-07, both axes; the
-  shell-layer wave).  FIXED IN ROUND: the moc start bypassed the
-  shell layer (`select_valence_mo` on raw patterns -- the unc moc
-  cells selected single-band character; expanded through
-  `realized_patterns`, the four cells rerun); the correction branch
-  of the dense adjudication unpinned (the store-anchored
-  `test_unc_lanes_load_exact_from_the_store` re-verifies the
-  committed Sc-unc/Ti-unc lanes -- ptp, L2/S2, core_pairs, the
-  recorded corrections); `_fold_span` misnamed after the redesign
-  (renamed `_fold_core` with its consumers); the ticket/code
-  adjudication-cap mismatch; the duplicate `sys.path` in
-  band_composition.  DECLINED (with reasons): the `shell_bands`
-  threading as a data clump -- the substrate signature IS the repo's
-  documented convention, and a context object for one new field is
-  speculative (the store-vs-layer divergence the reviewer notes is
-  real but bounded: the layer is case-declaration data like the
-  basis itself, and the lane payloads now carry `core_pairs` to
-  cross-check); moving the band-name derivation out of
-  band_composition -- it is display-layer grouping, not AO selection
-  (fact 1 governs selection; the docstring now says so); bundling
-  the scripts' `_ANG`-class constants into windows -- no consumer
-  variance, a hypothetical seam.  DESIGN SURVEY (the wave's seams,
-  the codebase-design vocabulary): the shell layer is a deliberately
-  small module whose value is LOCALITY (the chemical->band grammar
-  in one home; the deletion test scatters it across six call sites);
-  `confined_core_orbitals` is DEEP (a Roothaan, the cusp physics,
-  and the ion limit behind three parameters; the interface is the
-  test surface -- the unit pins and the ion anchor cross it
-  directly); `_fold_core` concentrates the refusal family; the
-  adjudication INVERTED the anchor's direction (our exact H
-  adjudicates the pinned solver, both numbers kept) -- an epistemic
-  shift recorded in the docstring and below.
-- The adjudication watch (2026-11-07): the lane's independent-solver
-  verification became SELF-verification under the adjudication
-  budget -- the pinned solver's roots are a proposal our exact H
-  corrects (deterministic Davidson skips measured on both validation
-  atoms, all four Ti blocks).  Both numbers are kept (`anchor_dev`,
-  `anchor_corrected`); the risk is a shared-convention error our H
-  and the solver make identically -- covered by the dense commutator
-  certificates and the ion anchor, not by solver independence.
-  Revisit if a block class appears where adjudication is
-  unaffordable (> the budget) AND the solver skips.
-- The f41bb51..HEAD review (2026-11-04, both axes; fixes in the
-  round's commit, ticket 32's closing entry is the record).
-  DESIGN SURVEY (the delta seams; the full src/ survey stays at the
-  wave close): reference.py got DEEPER (one cache/gate skeleton +
-  one acceleration dispatch behind three runners; the object
-  construction `_uhf_object` is now a REAL seam -- two adapters:
-  the production runner and the census arms; the declined cells-axis
-  seam is documented at the module contract, where a seam refusal
-  belongs); the UHF gate's declaration rides the row's
-  ReferenceSpec (the declaration-owns-intent rule held).  The one
-  real shallowness finding is item (1) below.  The scripts'
-  vocabulary module tightened (comm_text deleted).
-  RESOLVED 2026-11-05 (the wave-close refactoring round, 6395de7,
-  after the full-scope design survey): (1) the kernel/lane residual
-  block found its one home (`_apply_family`; plus `_key_core`, the
-  STRONGER triple-duplication the survey caught) -- both runners
-  kept (the deletion test: the fold/cache/store paths genuinely
-  differ); (2) the V1 splits done (the apply-boundary pin three
-  ways, the ladder pin six ways); (3) the V7 citations captured on
-  the frozen twins (and the capture CAUGHT a graze: test_symm_tm's
-  l2 band widened 1e-8 -> 1e-6 with the observed 8.2e-9 cited --
-  1.2x headroom on an SA-leg solver-noise quantity); (4) max_cycle
-  rides the payload beside cycles (read off the live mc, flags by
-  identity; the builder keeps the legacy ==200 key for stores
-  predating the field); (5) cas_label's NO branch deleted (dead --
-  cells makes the span+start combination unrepresentable and the
-  builder filters start=="no").  Also in the round: the verbose
-  duplication RESOLVED (the run_cell kwarg died; the budgets key is
-  the one channel); run_carbon reads the DECLARED row (NOTE: its
-  artifacts now label "C" where the pre-declaration path labeled
-  "C_ccpvdz_s2" -- alignment with run.py's row-driven path, no
-  committed artifact affected); scripts one-homes (payload_of,
-  atomic_write_text).
-- Declinations of the round (2026-11-05, reasons recorded here):
-  stage_facts' c_act absorption -- rides the ECP adapter retirement
-  (ticket 31, its one caller-change moment); the ECP term-exactness
-  and symm_lane L^2 pins' V7 citations -- textbook-integer class,
-  docstrings carry the physics, not the residual class the item
-  targeted; the unknown-atom CLI guard dedup -- four lines, two
-  CLIs, a dedup that adds an import for a TODO's worth of code.
-- The `test_symm_tm` SA legs mispriced as tests (2026-11-05): the
-  fixture's SA-level pins re-run campaign-scale optimizer pairs
-  (1-2 h class) fresh every invocation -- a run in a test costume.
-  RE-SCOPE (the AGENTS Tests boundary, user-directed 2026-11-05):
-  fresh CI legs stay; the SA verdicts become STORE-ANCHORED (load
-  the committed route-batch stores, re-verify the meters -- no
-  optimizer reruns).  Lands at the file's next touch (the U14e wave
-  needs no bump from it; the verdicts already live in the stores).
-- The U14e frac reference's MOM-anchored fix (2026-11-05, evidence in
-  ticket 31): the fractional block's cycle-to-cycle gauge is
-  unanchored on the ECP atom (DIIS diverges; Newton collapses to
-  -12.74 vs the aufbau RHF -49.04; Newton-from-ROHF does not leave
-  the seed) -- the runner docstring's prescribed remedy is MOM-style
-  anchoring of the character-selected block.  Until then the
-  `frac-reference-unconverged` scenario holds the frac folds void.
-  RIDES THE SAME VISIT: the diverged-reference poison-chk hazard
-  (a non-converged SCF leaves a chk the trusted cache would load;
-  the regen head's guards unlink at refusal -- the deeper fix is
-  writers persisting only converged chks).
+### Rides Stage 2 (ticket 37)
 
-- Character-selected folds (2026-11-05, the promoted-pair wave): the
-  fold-tag grammar cannot express a multi-band fold -- the basis
-  carries the physical 6s on bands 14s+15s, the 6p trio on
-  13p/14p/15p, the 7s on 18s/19s/20s (labels are exponent-grid
-  coordinates, not principal numbers), and `closed_electrons`'s
-  per-shell arithmetic assumes one band per shell (a tag like
-  `@14s15s14p15p18s19s` counts 20 closed of 14 valence electrons).
-  So the m-complete 6p PROMOTION -- CAS(10,15), the record's own
-  "inner core-pair valence, to be done m-complete" open question --
-  has no expressible cell: the occupied-prefix fold cannot skip the
-  6p trio (m-set violation at ncore=2), and the p trio enters the
-  window only as virtual columns (the `10f13d14p` probe).  The fix
-  (when wanted): the fold span selected by orbital character (the
-  dominant band set of the named MOs), with the closed count read
-  off the reference occupations -- a real seam extension, not a tag
-  hack.
+- The twins' @s windows (guarded by `_unc_s_block`) and their @s2
+  second radials; the twins' frac cells (the smearing semantics on a
+  43-AO valence + the garbage-column pick — the seeded machinery is
+  the remedy); the UHF anchor re-test under `dm0=`; the swap-basin
+  optimizer class re-run gauge-anchored if the campaign wants
+  in-window solutions.
 
-- The ladder-wave review round (2026-11-01, `701b31c..c02d0c6`, both
-  axes): applied — the module-docstring lockstep, the shared
-  `_substrate` builder, the V1 test split, the `_FOLD_*` renames, the
-  `LadderLeg` NamedTuple.  Declined: splitting the ladder sessions
-  out of ticket 32 (the ticket IS the provenance mechanism, per the
-  Conventions); the map queue-decision placement nit (live prose
-  until the wave closes).  Resolved 2026-11-04: the emitter class is
-  DELETED (the one-table builder owns the render; the sector stays
-  implicit in dets/CAS by design).  Recorded partials (spec axis):
-  the ladder
-  one leg per construction, not per leg (the uniform-construction
-  argument — revisit if a leg's meters ever disagree).
-- Pinned cells' window intake (the symmetry lane's cross-route
-  question, 2026-10-31): the natural pinned-cell windows are
-  D2h-BORN sources only (raw shells, D2h-run MOs/NOs) — free-run
-  windows never cross into pinned cells; the grammar states the
-  restriction at the declaration wave.  The trap it avoids:
-  `label_orb_symm` labels m-mixed columns by dominance, so a
-  free-run window fed to a pinned solver would appear to work and
-  produce a silently wrong solve — any future intake needs an
-  explicit irrep-purity check at the seam.  The laundering routes
-  (NO-density α, radial-transplant β) stay diagnostic experiments,
-  not grammar values.
-- `run_casscf`/`run_sa_casscf` are pass-throughs carrying the stage
-  name — retire at the ECP wave together with `run_u*` (their second
-  consumer); the stage `name=` lives at the call site (2026-10-30;
-  the 2026-11-05 survey confirmed the inventory: one caller + two,
-  both the ticket-31 retirement set).
-- `stage_facts`'s `c_act` parameter: every production caller passes the
-  same derived slice — absorb at the ECP wave with the adapter
-  retirement (2026-11-05 survey re-confirmed; the deepening lands
-  with its one caller-change moment).
-- Ti escape comm band (test_treatments, the sa_free band): quiet
-  through recent suites; capture-not-widen stands (no observed value
-  recorded).
-- The D2h twin's determinism certification is procedural (double-run
-  sha256 in the session record), encoded nowhere in-repo; a generator
-  `--verify` mode is the candidate — declined until a second regen
-  cycle (2026-10-31).
-- The D2h mol construction has two homes by design (the generator's
-  draw, the fixture's load); a shared builder would serve one consumer
-  each — revisit at a third frozen reference (2026-10-31).
+### Disposition candidates (the user's future call)
+
+- **`_COMM_CAP` (cells) = 6000** skips the dense [H,L] meters past
+  6000 dets (the U14e (6,13) sector's em-dashes): this box could
+  afford the raise + an ~80-min targeted re-run of the 24 cached
+  legs if the certification is ever wanted there.
+- The U14e off-basin `moc pur` starts (the multi-solution class,
+  honest meters in the payloads) + the `d14p sa moc_frozen pol`
+  27.7-mEh reconstruction outlier (the frozen-moc gauge's
+  analysis-ruler artifact class).
+- The (4,19)/(4,21)-class lattice rows: the ndet² analysis ceiling —
+  the same class as `_COMM_CAP`.
+
+### Watchlist
+
+- The latent refusal on `--fresh`: the incumbent distilled FRAC
+  cells predate the distillation declaration — their caches mask the
+  construction refusal.
+- The adjudication watch: the pinned solver's roots are proposals
+  our exact H corrects (self-verification, not solver independence)
+  — a shared-convention error is covered by the dense commutator
+  certificates + the ion anchor; revisit if a block class appears
+  where adjudication is unaffordable AND the solver skips.
+- Revisit conditions: the lane-family extraction from cells (if the
+  radial legs grow it); the m-replication/assembly duplication
+  (windows vs basis — extract at the next legitimate change, bitwise
+  A/B); the per-atom prepared-basis bundle (a second consumer or a
+  fifth field); the prior_bands-defaults rule hoist from cells (when
+  next touched); the projected-Gram alternative (if the per-radial
+  spectrum shows truncated-ranking distortions); the D2h determinism
+  `--verify` mode (a second regen cycle); the D2h mol shared builder
+  (a third frozen reference).
+
+### Settled (standing facts, one line each; git history the archive)
+
+- **The U14e campaign COMPLETE** (tickets 36A + 38): the free-mask
+  SA legs certify the ground term END-TO-END — ⁵L, ⟨L²⟩ = 72.00
+  exact, closure + commutators at machine zero, bookkeeping ~1e-3
+  mEh; single-root legs break symmetry as declared; the input CI
+  grounds are ⁵I/⁵F (the ~1 Eh gain IS the ⁵L relaxation); best
+  energies (6,13) −50.456 < (4,15) −50.434 < (4,12) −50.431; the
+  retired tier windows' −50.386 validates the promotion; 8
+  unconverged legs ACCEPTED (the user, 2026-11-16 — the no-free-mask
+  crawl; the physics line rests on the certified legs).
+- **The honest prior table** (Sc/Ti/C/Si, the @r/@s windows): NO
+  universal k=1 winner (atom-dependent, ~11–100 mEh spread) — the
+  SA-over-ladder optimization is the only road to a dominant k=1;
+  @s2's dominance is variational headroom at double budget (every
+  comparison row carries the CAS shape); C's @s2 REFUSES (the
+  rank-1 series average) while Si's stays (a real second radial);
+  the committed probe logs are the flipped-metric era — the module's
+  numbers are the honest successors.
+- **The uncontracted-twins reference disease + the seeded repair**:
+  fresh SCF paths diverge on the unc bases — the CHARACTER HOOK, not
+  the SCF (metric-amplified virtuals carrying span weights ~1 +
+  shell-counter labels selecting AO slivers); the seeded-MOM repair
+  (the projected 6-31G source, source-vocabulary hooks, the
+  character-of-occupied post-check) lands the declared anchors
+  EXACTLY — the product path since Stage 1c; both twins' trusted
+  records verified to machine epsilon.
+- **The folded-field records are draw-documented single draws** (no
+  replay; the post-kernel converged-filling certificate guards
+  production now); the +400 mEh folded offset is basis-stable
+  construction physics (the missing core-valence self-consistency),
+  not span bloat; the certified numbers stand as measurements.
+- **The D2h substrate**: NEVER symmetrize a degenerate-gauge seed
+  (`symmetrize_orb` amputates the open MO, `symmetrize_space`
+  scrambles the pairing); the solver's irrep blocks erase the gauge;
+  pinned-cell windows are D2h-born sources only (any future intake
+  needs an irrep-purity check at the seam).
+- **The basin zoo is census-resolved** (the twins + U14e): the
+  deepest basins are the adopted anchors; plain aufbau can land 10+
+  mEh high at the right filling — the seed, not the gate, is the
+  cure when gate cycling diverges; the Newton path freezes
+  occupations (the occ_ok certificate refuses converged wrong
+  configurations).
 
 ## Examples (worked records in `elements/`)
 
-- `elements/C/`, `elements/Si/` — the p² campaign: the methods grid,
-  scans, multiplet tables.
-- `elements/Sc/`, `elements/Ti/` — the transition-metal campaign:
-  rungs, the radial axis, the d² lattice, term tables.
-- `elements/U/` — the ECP-atom record (`run_u*` until declared).
+- `elements/C/`, `elements/Si/` — the p² campaign.
+- `elements/Sc/`, `elements/Ti/` — the transition-metal campaign
+  (the radial axis, the d² lattice, the prior windows).
+- `elements/Sc-unc/`, `elements/Ti-unc/` — the uncontracted twins
+  (the folded/lane records, the prior axis, the seeded references).
+- `elements/U14e/` — the ECP atom: the certified ⁵L record.
+- `elements/U/` — the frozen pre-campaign ECP workdir;
+  `elements/ecp/` — the ECP seam's certification workdir.
 
 ## Architecture (edge-verified)
 
@@ -698,9 +169,7 @@ deleted, git history the archive.
     declaration    cases -> cells
 
 `natural`'s mathematics is pure at module level (numpy + secondquant
-only — the windows→natural edge retired with the window-kind
-registry, 2026-10-30); its one driver (`no_group_windows`) lazily
-imports the assembly layers. No cycles, no upward edges. Division of
-labor over windows: declaration NAMES (labels), windows BUILDS (the
-kinds + substrate builders), cells BINDS (the start axis picks the
-builder).
+only); its one driver (`no_group_windows`) lazily imports the
+assembly layers. No cycles, no upward edges. Division of labor over
+windows: declaration NAMES (labels), windows BUILDS (the kinds +
+substrate builders), cells BINDS (the start axis picks the builder).

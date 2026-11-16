@@ -215,7 +215,7 @@ def test_purified_core_is_pure(carbon):
     s = mf.get_ovlp()
     assert np.allclose(core.conj().T @ s @ core, np.eye(2), atol=1e-12)
     # same span as the canonical core (principal cosines ~ 1; the
-    # column gauge is arbitrary -- fact 16e)
+    # column gauge is arbitrary -- fact 8)
     def _s_orth(c):
         ev, u = np.linalg.eigh(c.conj().T @ s @ c)
         return c @ (u / np.sqrt(ev)) @ u.conj().T

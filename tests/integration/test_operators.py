@@ -143,7 +143,7 @@ def test_window_closure_certificate_and_blind_spots(carbon):
         c = window_closure(mol, scan_window(mol, mf, thetas, fam_a, fam_b))
         assert c["lperp"] > 0.05, (name, c)   # Lx/Ly see every member tilt
         if "Lz-blind" in name:
-            assert c["lz"] < 1e-13, (name, c)  # fact 18c blind spot, at the
+            assert c["lz"] < 1e-13, (name, c)  # fact 9 blind spot, at the
         else:                                   # one-particle level
             assert c["lz"] > 0.05, (name, c)
 
