@@ -150,50 +150,49 @@ def main() -> None:
             for label, guess in ROHF_CENSUS_GUESSES:
                 m = plain_arm(mol, closed, opens, acc, guess)
                 report(f"{acc} {label}", mol, m, closed, opens, projs)
-        if tag in ("f2d2", "f4"):
-            # the seed arms: the configuration asked for explicitly
-            # (the head's own MOs re-assigned; the hook stays, the
-            # seed owns the start -- run_rohf's dm0= master), then
-            # the BARE seed arm (no hook: plain aufbau maintains the
-            # seed) -- the landscape measurement that says whether a
-            # stationary point of the configuration exists at all,
-            # apart from the weight hook's own preference
-            want = {"l3": 4} if tag == "f4" else {"l3": 2, "l2": 2}
-            dm = seed_density(mf, want)
-            for acc in ACCELERATORS:
-                _m, m = run_rohf(
-                    cfg, str(scratch / f"{tag}-{acc.replace('+', '-')}.chk"),
-                    ref=ReferenceSpec(occ_closed=closed, occ_open=opens,
-                                      conv_accelerator=acc),
-                    dm0=dm)
-                report(f"{acc} seed", mol, m, closed, opens, projs)
-            _m, m = run_rohf(cfg, str(scratch / f"{tag}-bare.chk"),
-                             ref=None, dm0=dm)
-            print(f"  {'bare seed (aufbau)':>20}: E = {m.e_tot:.8f} "
-                  f"conv={bool(m.converged)}  | "
-                  f"{fmt(fingerprint(mol, m, projs))}", flush=True)
-            if not m.converged:
-                # the stall rescue (the twins' recipe's last leg): DIIS
-                # held a neighborhood and stalled -- the Newton switch
-                # converges the tail.  Two forms: plain Newton under
-                # aufbau, and the hook re-attached over the stalled
-                # density (its own occupied columns are the premium's
-                # purest -- the ties break toward the stall's state)
-                n = m.newton()
-                n.conv_tol = 1e-12
-                n.run(dm0=m.make_rdm1())
-                print(f"  {'stall->newton (aufbau)':>20}: "
-                      f"E = {n.e_tot:.8f} conv={bool(n.converged)}  | "
-                      f"{fmt(fingerprint(mol, n, projs))}", flush=True)
-                _m, n2 = run_rohf(
-                    cfg, str(scratch / f"{tag}-stall-hook.chk"),
-                    ref=ReferenceSpec(occ_closed=closed, occ_open=opens,
-                                      conv_accelerator="newton"),
-                    dm0=m.make_rdm1())
-                print(f"  {'stall->hook+newton':>20}: "
-                      f"E = {n2.e_tot:.8f} conv={bool(n2.converged)} "
-                      f"occ_ok={occupation_postcheck(mol, n2, closed, opens)}"
-                      f"  | {fmt(fingerprint(mol, n2, projs))}", flush=True)
+        # the seed arms: the configuration asked for explicitly (the
+        # head's own MOs re-assigned; the hook stays, the seed owns
+        # the start -- run_rohf's dm0= master), then the BARE seed
+        # arm (no hook: plain aufbau maintains the seed) -- the
+        # landscape measurement that says whether a stationary point
+        # of the configuration exists at all, apart from the weight
+        # hook's own preference
+        want = {"l3": 4} if tag == "f4" else {"l3": 2, "l2": 2}
+        dm = seed_density(mf, want)
+        for acc in ACCELERATORS:
+            _m, m = run_rohf(
+                cfg, str(scratch / f"{tag}-{acc.replace('+', '-')}.chk"),
+                ref=ReferenceSpec(occ_closed=closed, occ_open=opens,
+                                  conv_accelerator=acc),
+                dm0=dm)
+            report(f"{acc} seed", mol, m, closed, opens, projs)
+        _m, m = run_rohf(cfg, str(scratch / f"{tag}-bare.chk"),
+                         ref=None, dm0=dm)
+        print(f"  {'bare seed (aufbau)':>20}: E = {m.e_tot:.8f} "
+              f"conv={bool(m.converged)}  | "
+              f"{fmt(fingerprint(mol, m, projs))}", flush=True)
+        if not m.converged:
+            # the stall rescue (the twins' recipe's last leg): DIIS
+            # held a neighborhood and stalled -- the Newton switch
+            # converges the tail.  Two forms: plain Newton under
+            # aufbau, and the hook re-attached over the stalled
+            # density (its own occupied columns are the premium's
+            # purest -- the ties break toward the stall's state)
+            n = m.newton()
+            n.conv_tol = 1e-12
+            n.run(dm0=m.make_rdm1())
+            print(f"  {'stall->newton (aufbau)':>20}: "
+                  f"E = {n.e_tot:.8f} conv={bool(n.converged)}  | "
+                  f"{fmt(fingerprint(mol, n, projs))}", flush=True)
+            _m, n2 = run_rohf(
+                cfg, str(scratch / f"{tag}-stall-hook.chk"),
+                ref=ReferenceSpec(occ_closed=closed, occ_open=opens,
+                                  conv_accelerator="newton"),
+                dm0=m.make_rdm1())
+            print(f"  {'stall->hook+newton':>20}: "
+                  f"E = {n2.e_tot:.8f} conv={bool(n2.converged)} "
+                  f"occ_ok={occupation_postcheck(mol, n2, closed, opens)}"
+                  f"  | {fmt(fingerprint(mol, n2, projs))}", flush=True)
 
     for f in scratch.glob("*.chk"):
         f.unlink()

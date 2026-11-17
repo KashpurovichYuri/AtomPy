@@ -182,13 +182,12 @@ def test_twins_declare_the_seeded_honest_series():
 def test_u14e_declares_the_r1_prior_axis():
     """The ECP atom's prior axis (ticket 39, 2026-11-17): the @r1
     window ONLY -- the @s half is measured-refused (the series census
-    holds no member basin on the ECP substrate: every converged draw
-    of f4/f2d2 is the head f3d1 basin; the discovery log carries the
-    arms), so the case declares NO series (a head-only series is
-    rank-1: @s1 would duplicate @r1 at a second address, @s2 refuses
-    its k=2 construction -- the C precedent), the prior realization
-    is the certified band families, and the prior window's optimizer
-    cells are gated (the comparison is CASCI)."""
+    holds no member basin on the ECP substrate; the verdict lives at
+    the _U14E_PRIOR declaration and logs/series_discovery.log), so
+    the case declares NO series (a head-only series is rank-1: @s1
+    would duplicate @r1, @s2 refuses its k=2 -- the C precedent), the
+    prior realization is the certified band families, and the prior
+    window's optimizer cells are gated (the comparison is CASCI)."""
     cs = CAMPAIGN["U14e"]
     assert cs.series is None
     assert cs.prior_bands == {"5f": ("9f", "10f", "11f"),
