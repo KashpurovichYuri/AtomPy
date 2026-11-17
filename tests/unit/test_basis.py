@@ -12,6 +12,7 @@ from scipy.linalg import eigh as gen_eigh
 
 from atomterm.basis import (SeriesSpec, metric_radials, run_series,
                             series_window, valence_block)
+from atomterm.system import AtomConfig
 from atomterm.windows import member_chains, select_shell_ao
 from helpers import uncontracted_carbon_mole
 
@@ -227,18 +228,49 @@ def test_run_series_head_is_the_trusted_reference(tmp_path):
     _m, head = None, _planted_config(mol, {"2p": ("2p", "3p")},
                                      ["2p"], seed=7)
     head.e_tot = -37.5                      # the declared reference's
+    cfg = AtomConfig("C", "x", spin=2)
     series = (SeriesSpec("p2", ("1s", "2s"), ("2p",), 2, -37.5),)
-    out = run_series(type("Cfg", (), {"symbol": "C", "basis": "x",
-                                      "spin": 2})(), tmp_path, "C",
-                     series, head)
+    out = run_series(cfg, tmp_path, "C", series, head)
     assert out == {"p2": head}
     wrong_energy = (SeriesSpec("p2", ("1s", "2s"), ("2p",), 2, -38.0),)
     with pytest.raises(ValueError, match="not the series head"):
-        run_series(type("Cfg", (), {"symbol": "C", "basis": "x",
-                                    "spin": 2})(), tmp_path, "C",
-                   wrong_energy, head)
+        run_series(cfg, tmp_path, "C", wrong_energy, head)
     bad = (SeriesSpec("p2", ("1s", "2s"), ("2p",), 0, -37.5),)
     with pytest.raises(ValueError, match="mismatched series"):
-        run_series(type("Cfg", (), {"symbol": "C", "basis": "x",
-                                    "spin": 2})(), tmp_path, "C",
-                   bad, head)
+        run_series(cfg, tmp_path, "C", bad, head)
+
+
+def test_run_series_threads_the_declaring_atom_wholesale(
+        tmp_path, monkeypatch):
+    """The members' configs inherit the declaring atom WHOLESALE
+    (``dataclasses.replace``, only the spin varies): the ECP pair, the
+    charge, and the artifact tag ride along.  The constructor call this
+    replaced dropped them -- an ECP atom's members would build
+    all-electron at 8x the electron count (the U14e wave's seam fix,
+    2026-11-17); a stub pins the seam because the honest run is an
+    SCF (campaign compute, not a unit pin)."""
+    from atomterm import basis as _basis_mod
+    from atomterm.system import AtomConfig
+
+    head = type("Mf", (), {"e_tot": -50.5})()
+    cfg = AtomConfig("U", "x", spin=4, ecp="ecp-block", tag="U_tag")
+    series = (SeriesSpec("head", ("1s", "2s"), ("2p",), 4, -50.5),
+              SeriesSpec("f4", ("1s", "2s"), ("2p",), 4, -50.0))
+    seen = {}
+
+    class _Stop(Exception):
+        pass
+
+    def _capture(cfg_x, _chk, ref=None):
+        seen["cfg"], seen["ref"] = cfg_x, ref
+        raise _Stop
+
+    monkeypatch.setattr(_basis_mod, "run_rohf", _capture)
+    with pytest.raises(_Stop):
+        run_series(cfg, tmp_path, "U14e", series, head)
+    mx = seen["cfg"]
+    assert (mx.symbol, mx.basis, mx.spin) == ("U", "x", 4)
+    assert mx.ecp == "ecp-block"            # the pair rides along
+    assert mx.tag == "U_tag" and mx.charge == 0
+    # the gate is the member's own declared basin energy
+    assert seen["ref"].occ_e_ref == -50.0

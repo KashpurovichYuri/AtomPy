@@ -53,6 +53,7 @@ Conventions
 
 from __future__ import annotations
 
+import dataclasses
 from pathlib import Path
 from typing import TYPE_CHECKING, NamedTuple
 
@@ -197,7 +198,7 @@ def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
     chk_dir = Path(workdir) / key / "rungs" / "series"
     chk_dir.mkdir(parents=True, exist_ok=True)
     for spec in series[1:]:
-        cfg_x = type(cfg)(cfg.symbol, cfg.basis, spin=spec.spin)
+        cfg_x = dataclasses.replace(cfg, spin=spec.spin)
         ref = ReferenceSpec(occ_closed=spec.closed, occ_open=spec.open,
                             occ_e_ref=spec.e_ref,
                             seed_basis=seed_basis,
