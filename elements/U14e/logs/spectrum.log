@@ -1,0 +1,48 @@
+U14e  (nao = 177)
+  l=0 (s)  n=15  >1e-01:6 >1e-02:8 >1e-04:12 >1e-06:15 >1e-08:15 >1e-10:15  kappa=3.34e+06  min=2.24e-06  max=7.46e+00
+    tail: 4.98e-02 1.82e-02 6.08e-03 2.18e-03 7.00e-04 2.05e-04 5.17e-05 1.29e-05 2.24e-06
+    max gap: 1.29e-05 -> 2.24e-06 (x6, 8 above)
+    smallest-3 eigvec weight: 12s:0.37, 9s:0.37, 16s:0.31, 13s:0.31
+  l=1 (p)  n=42  >1e-01:21 >1e-02:30 >1e-04:42 >1e-06:42 >1e-08:42 >1e-10:42  kappa=4.89e+04  min=1.07e-04  max=5.22e+00
+    tail: 7.19e-02 7.19e-02 7.19e-02 3.07e-02 3.07e-02 3.07e-02 1.26e-02 1.26e-02 1.26e-02 5.01e-03 5.01e-03 5.01e-03 1.78e-03 1.78e-03 1.78e-03 5.41e-04 5.41e-04 5.41e-04 1.07e-04 1.07e-04 1.07e-04
+    max gap: 5.41e-04 -> 1.07e-04 (x5, 18 above)
+    smallest-3 eigvec weight: 10px:0.24, 10pz:0.24, 10py:0.24, 9px:0.22
+  l=2 (d)  n=50  >1e-01:30 >1e-02:40 >1e-04:50 >1e-06:50 >1e-08:50 >1e-10:50  kappa=3.08e+03  min=1.30e-03  max=4.00e+00
+    tail: 7.40e-02 7.40e-02 7.40e-02 7.40e-02 7.40e-02 2.68e-02 2.68e-02 2.68e-02 2.68e-02 2.68e-02 7.84e-03 7.84e-03 7.84e-03 7.84e-03 7.84e-03 1.30e-03 1.30e-03 1.30e-03 1.30e-03 1.30e-03
+    max gap: 7.84e-03 -> 1.30e-03 (x6, 15 above)
+    smallest-3 eigvec weight: 9dxy:0.31, 8dxy:0.27, 9dxz:0.20, 10dxy:0.19
+  l=3 (f)  n=70  >1e-01:49 >1e-02:63 >1e-04:70 >1e-06:70 >1e-08:70 >1e-10:70  kappa=4.28e+02  min=7.75e-03  max=3.32e+00
+    tail: 7.73e-02 7.73e-02 7.73e-02 7.73e-02 7.73e-02 7.73e-02 7.73e-02 3.07e-02 3.07e-02 3.07e-02 3.07e-02 3.07e-02 3.07e-02 3.07e-02 7.75e-03 7.75e-03 7.75e-03 7.75e-03 7.75e-03 7.75e-03 7.75e-03
+    max gap: 3.07e-02 -> 7.75e-03 (x4, 14 above)
+    smallest-3 eigvec weight: 8f-3:0.28, 7f-3:0.28, 9f-3:0.18, 8f-2:0.15
+
+== prior-chain conditioning (the distillations' own s_r)
+  5f 9f+10f+11f: s_r 3x3 eigenvalues ['2.2278', '0.6729', '0.0993']  kappa=22.44
+  6d 12d+13d+14d: s_r 3x3 eigenvalues ['2.2797', '0.6335', '0.0868']  kappa=26.26
+
+== the head's virtual columns (the hook's ranking field)
+  virtual columns with d+f weight > 0.5: 116; epsilon range 0.057 .. 226.65
+  of which at epsilon > 0.1 (the premium's garbage field): 112
+    col 11: eps=     0.11  w_d=1.000 w_f=0.000
+    col 12: eps=     0.13  w_d=1.000 w_f=0.000
+    col 13: eps=     0.13  w_d=1.000 w_f=0.000
+    col 14: eps=     0.14  w_d=1.000 w_f=0.000
+    col 15: eps=     0.14  w_d=1.000 w_f=0.000
+    col 17: eps=     0.19  w_d=0.000 w_f=1.000
+    col 18: eps=     0.19  w_d=0.000 w_f=0.684
+    col 19: eps=     0.19  w_d=0.000 w_f=0.991
+    col 20: eps=     0.19  w_d=0.000 w_f=1.000
+    col 25: eps=     0.20  w_d=0.000 w_f=0.993
+    col 26: eps=     0.21  w_d=0.000 w_f=0.984
+    col 27: eps=     0.21  w_d=0.000 w_f=0.975
+    ...
+  occupied columns for contrast (eps, w_d, w_f):
+    col 22: eps=   -2.231  w_d=0.000 w_f=0.000
+    col 61: eps=   -1.067  w_d=0.000 w_f=0.000
+    col 88: eps=   -1.065  w_d=0.000 w_f=0.000
+    col 107: eps=   -0.031  w_d=0.987 w_f=0.000
+    col 108: eps=   -0.018  w_d=0.000 w_f=1.000
+    col 109: eps=   -0.014  w_d=0.000 w_f=1.000
+    col 120: eps=   -1.057  w_d=0.000 w_f=0.001
+    col 142: eps=   -0.013  w_d=0.000 w_f=0.998
+    col 143: eps=   -0.198  w_d=0.013 w_f=0.000
