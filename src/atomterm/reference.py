@@ -490,8 +490,11 @@ def _converged_cached(mol, fresh_mf, chkfile, ref, e_gate, cfg,
     re-gated -- the reproducibility unit); a fresh run solves under
     ``ref``'s acceleration and, with a gate energy ``e_gate`` given,
     retries over cycled guesses (default, then "atom", then
-    "huckel") until ``|E - e_gate| <= 1e-4``, else RuntimeError.
-    Returns ``(mol, mf)``."""
+    "huckel") until ``|E - e_gate| <= 1e-4``.  A refused draw's
+    chkfile is deleted before the refusal propagates -- the cache
+    trusts what is present, so the refused run's own chk would
+    poison it (one home here: the skeleton owns the gate, ROHF and
+    UHF alike).  Returns ``(mol, mf)``."""
     try:
         _, rec = scf.chkfile.load_scf(chkfile)
         mf = fresh_mf(None)
@@ -509,6 +512,7 @@ def _converged_cached(mol, fresh_mf, chkfile, ref, e_gate, cfg,
             mf = _accelerated(fresh_mf(guess), ref, dm0)
         else:
             if not (mf.converged and abs(mf.e_tot - e_gate) <= 1e-4):
+                Path(chkfile).unlink(missing_ok=True)
                 raise RuntimeError(
                     f"character-forced SCF did not reach the reference "
                     f"basin E = {e_gate:.8f} (got {mf.e_tot:.8f}, "
@@ -579,7 +583,9 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
         configuration drifted from the seed -- the frozen-assignment
         disease; the basin census or the seed needs revisiting).
         Either refusal deletes the run's chkfile -- a refused draw
-        never poisons the trusted cache.
+        never poisons the trusted cache (the gate's deletion lives
+        in the shared runner skeleton; UHF's gate refusals clean
+        the same way).
 
     Notes
     -----
@@ -651,11 +657,9 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
                 "configuration) -- the basin census or the seed needs "
                 "revisiting")
     except RuntimeError:
-        # a refused draw must not leave a chk the trusted cache would
-        # load -- the cache trusts what is present, so the refusal's
-        # own chk is a poisoned cache (the U14e certification's
-        # hazard: the gate refused f2d2's metastable draw but the SCF
-        # had already written it)
+        # the post-check refusal's cleanup (the gate refusal's lives
+        # in the shared skeleton): a refused draw's chk is a poisoned
+        # cache
         Path(chkfile).unlink(missing_ok=True)
         raise
     return mol, mf
