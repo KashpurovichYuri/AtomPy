@@ -14,7 +14,7 @@ machine-precision closure.
 
 ```bash
 conda activate pyscf    # PySCF 2.13; bare shell: source <conda-root>/etc/profile.d/conda.sh first
-pytest -m fast          # 234 tests, seconds — the per-commit gate's base
+pytest -m fast          # 251 tests, seconds — the per-commit gate's base
 python scripts/run.py C # term tables -> elements/C/
 python scripts/regen_cells.py Ti --method sa-casscf   # one slice of the methods grid
 ```
@@ -251,6 +251,21 @@ the priors must beat; on uncontracted bases no authors' contraction
 exists — the head class is the baseline, and `@s1`/`@s2` measure what
 the series averaging adds; the ROHF anchor row is ΔE's absolute zero
 in both.
+
+**The prior windows' mean-field quality.** The subspace-ROHF
+certificate prices each prior class at the mean-field level: the
+valence solved *confined* to the window against the free reference —
+same configuration, both sides seeded and gated — so a window that is
+expensive here is compromised before any correlation method runs. The
+verdict on the uncontracted twins, every valence configuration:
+**@s2** is mean-field-sound everywhere (1.3–2.2 mEh — the confinement
+costs nothing a correlation method would notice); **@s1** is
+filling-dependent (3.3–38 mEh — one series-average radial misses the
+d-richer configurations' radials); **@r1** is head-filling-only —
+excellent for its own head (+1.4/+1.9 mEh), impoverished for the
+d-richer members (+149/+199 mEh: a d¹-derived radial cannot host a d³
+density). The full 12-row record per twin:
+`elements/Sc-unc/logs/subspace.log`, `elements/Ti-unc/logs/subspace.log`.
 
 **Address guarantees** — the address IS the store identity (chk name,
 payload key, table row) and never renames: a new axis serializes as

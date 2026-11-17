@@ -1,9 +1,9 @@
 """The subspace-ROHF pins (ticket 37 Stage 3): the confined-valence
 runner's exactness at the degenerate limit, its closed-shell
-cross-check against confined_core_orbitals, and the twins'
-per-contraction certificate values.  The substrates build through the
-certified seeded product path (seconds); the solves themselves are
-sub-second."""
+cross-check against confined_core_orbitals, the runner's guard modes,
+and the twins' per-contraction certificate values.  The substrates
+build through the certified seeded product path (seconds); the solves
+themselves are sub-second."""
 
 import numpy as np
 import pytest
@@ -50,6 +50,29 @@ def test_subspace_whole_space_reproduces_the_free_reference_exactly(
 def test_subspace_ion_matches_confined_core_orbitals():
     """The valence-empty solve == confined_core_orbitals's own
     Roothaan loop (two constructions, one confined problem)."""
+    mol, mf_ion, fam_raw, e_loop, rep = _carbon_ion_problem()
+    _, mf_sub = subspace_rohf(mf_ion, fam_raw, 1,
+                              np.zeros((mol.nao_nr(), 0)),
+                              ("l0", "l1"), ())
+    assert abs(mf_sub.e_tot - e_loop) < 1e-6
+    assert rep["comm"] < 1e-9
+
+
+def test_subspace_ion_seedless_form_runs_under_the_newton_arm():
+    """The seedless form composes with the certificate arm: the same
+    confined ion under newton lands the Roothaan loop's energy (the
+    fresh-draw band: < 1e-6 Eh, 2026-11-17)."""
+    mol, mf_ion, fam_raw, e_loop, _rep = _carbon_ion_problem()
+    _, mf_sub = subspace_rohf(mf_ion, fam_raw, 1,
+                              np.zeros((mol.nao_nr(), 0)),
+                              ("l0", "l1"), (), conv_accelerator="newton")
+    assert abs(mf_sub.e_tot - e_loop) < 1e-6
+
+
+def _carbon_ion_problem():
+    """The C4+ ion's confined-one-pair problem: (mol, the bare ROHF
+    substrate, the family's raw columns, the Roothaan loop's energy,
+    its report)."""
     from pyscf import scf
     from atomterm.system import build_mol
     cfg = CAMPAIGN["C"].atom_config()
@@ -65,10 +88,63 @@ def test_subspace_ion_matches_confined_core_orbitals():
     mf_ion = scf.ROHF(mol)   # the ion-like substrate (reads no orbitals)
     c_conf, rep = confined_core_orbitals(mf_ion, fam, 1)
     e_loop = closed_shell_core_energy(mf_ion, c_conf)
-    _, mf_sub = subspace_rohf(mf_ion, fam_raw, 1, np.zeros((n, 0)),
-                              ("l0", "l1"), ())
-    assert abs(mf_sub.e_tot - e_loop) < 1e-6
-    assert rep["comm"] < 1e-9
+    return mol, mf_ion, fam_raw, e_loop, rep
+
+
+def test_subspace_refuses_a_family_narrower_than_the_pairs(
+        carbon_references):
+    """The family-capacity guard: the core's pairs need that many
+    family columns."""
+    mol, mf = carbon_references
+    n = mol.nao_nr()
+    eye = np.eye(n)
+    core1 = select_valence_ao(mol, ["1s"])
+    others = [i for i in range(n) if i not in core1]
+    with pytest.raises(ValueError, match="too narrow"):
+        subspace_rohf(mf, eye[:, core1], 2, eye[:, others],
+                      ("l0",), ("l1",))
+
+
+def test_subspace_refuses_a_core_that_overfreezes_the_atom(
+        carbon_references):
+    """The filling-arithmetic guard: three pairs on carbon leave a
+    negative valence count against the 2-open sector."""
+    mol, mf = carbon_references
+    n = mol.nao_nr()
+    eye = np.eye(n)
+    core1 = select_valence_ao(mol, ["1s"])
+    others = [i for i in range(n) if i not in core1]
+    with pytest.raises(ValueError, match="over-freezes"):
+        subspace_rohf(mf, eye[:, core1], 3, eye[:, others],
+                      ("l0",), ("l1",))
+
+
+def test_subspace_refuses_a_window_too_small_for_the_filling(
+        carbon_references):
+    """The window-capacity guard: the window block must hold the
+    valence filling's columns."""
+    mol, mf = carbon_references
+    n = mol.nao_nr()
+    eye = np.eye(n)
+    core1 = select_valence_ao(mol, ["1s"])
+    d_rows = select_valence_ao(mol, ["3d"])
+    with pytest.raises(ValueError, match="window block holds"):
+        subspace_rohf(mf, eye[:, core1], 1, eye[:, d_rows[:2]],
+                      ("l0",), ("l1",))
+
+
+def test_subspace_refuses_a_seed_the_subspace_cannot_host(
+        carbon_references):
+    """The capture guard: occupied columns with no carrier in the
+    subspace (2s/2p over [1s family | 3d window]) refuse below 0.5."""
+    mol, mf = carbon_references
+    n = mol.nao_nr()
+    eye = np.eye(n)
+    core1 = select_valence_ao(mol, ["1s"])
+    d_rows = select_valence_ao(mol, ["3d"])
+    with pytest.raises(RuntimeError, match="cannot host"):
+        subspace_rohf(mf, eye[:, core1], 1, eye[:, d_rows],
+                      ("l0",), ("l1",))
 
 
 def _twin_substrate(key, spec=None):
@@ -95,11 +171,10 @@ def _twin_substrate(key, spec=None):
 
 @pytest.mark.parametrize("key", ["Sc-unc", "Ti-unc"])
 def test_twin_whole_space_legs_reproduce_their_anchors(key):
-    """The twins' whole-space legs == their declared anchors (the
-    fresh-draw band: < 1e-7 Eh, 2026-11-16)."""
+    """The twins' whole-space legs == their declared anchors (head +
+    both members; the fresh-draw band: < 1e-7 Eh, 2026-11-16)."""
     cs = CAMPAIGN[key]
-    pure = cs.series[2]
-    for spec in (None, pure):
+    for spec in (None, cs.series[1], cs.series[2]):
         cs_t, mol, mf, tag = _twin_substrate(key, spec)
         anchor = (cs_t.ref.occ_e_ref if spec is None else spec.e_ref)
         fam = _ao_family(mol, CORE_SHELLS, cs_t.shell_bands)
@@ -173,3 +248,28 @@ def test_twin_head_r1_certificate_value(key, de_ref):
     d = (mf_sub.e_tot - anchor) * 1e3
     assert abs(d - de_ref) < 0.2, (key, d)
     assert min(mf_sub.subspace["capture"]) > 0.999
+
+
+@pytest.mark.parametrize(
+    "key,de_ref", [("Sc-unc", 148.625), ("Ti-unc", 199.040)])
+def test_twin_pure_d_r1_certificate_value(key, de_ref):
+    """The pure-d member's @r1 3d-span confinement cost: the
+    head-derived single radial cannot host the d-richer configuration's
+    mean field (the certificate's poverty class, 2026-11-16)."""
+    cs_t, mol, mf_head, _ = _twin_substrate(key)
+    spec = cs_t.series[2]
+    _, mol_m, mf_m, tag = _twin_substrate(key, spec)
+    fam = _ao_family(mol, CORE_SHELLS, cs_t.shell_bands)
+    from atomterm.basis import series_window
+    s = mf_head.get_ovlp()
+    win, _ = series_window(mol, [mf_head], s, ("3d",), cs_t.prior_bands,
+                           {"3d": 1}, cs_t.ncore)
+    _, mf_sub = subspace_rohf(mf_m, fam, cs_t.ncore, win,
+                              spec.closed, spec.open,
+                              conv_accelerator="newton")
+    d = (mf_sub.e_tot - spec.e_ref) * 1e3
+    # the fresh draws on the cached verify-rungs reproduce the
+    # certificate values to all printed digits (2026-11-17); the band
+    # absorbs a fresh regeneration's draw-to-draw variation
+    assert abs(d - de_ref) < 1.0, (key, tag, d)
+    assert int(round(np.sum(mf_sub.mo_occ))) == mol_m.nelectron
