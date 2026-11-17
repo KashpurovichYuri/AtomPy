@@ -516,8 +516,8 @@ _U14E_PROMOTED_SECTORS = {"10f13d7s": (5, 1)}
 
 # the ECP atom's prior-axis windows (tickets 39 + 40, 2026-11-17):
 # the head's own density block over the FULL band families (@r1) and
-# the series average (@s1/@s2) -- the poverty-cure candidates against
-# the band-limited incumbent.  The @s half's history is the record's
+# the series average (@s1) -- the poverty-cure candidates against the
+# band-limited incumbent.  The @s half's history is the record's
 # cautionary tale: the series census (logs/series_discovery.log,
 # ~40 arms) measured-REFUSED the members -- and the diagnosis (ticket
 # 40: logs/spectrum.log, logs/mom_census.log) re-attributed the
@@ -526,10 +526,18 @@ _U14E_PROMOTED_SECTORS = {"10f13d7s": (5, 1)}
 # tail), then LANDED both members under the self-seeded MOM (f4
 # -50.31571501, f2d2 -50.34788201, two accelerators independently).
 # The revival: the series declares (seed="self"), @s1 answers whether
-# the series average beats the head's own block, and @s2 is
-# constructible at k=2 -- f2d2 gives the d shell its genuinely second
-# radial
-_U14E_PRIOR = ("5f6d@r1", "5f6d@s1", "5f6d@s2")
+# the series average beats the head's own block.
+# NO 5f6d@s2: the series average carries no SECOND RADIAL in the f
+# shell -- the construction refuses at its certificate (the k=2
+# eigenvalue 1.35e-04 against the leading 2.283758, ratio 5.9e-5 --
+# numerical zero; measured 2026-11-17, logs/regen_s2.log).  The ROHF
+# 5f radial is configuration-inert on this substrate: the three
+# members' f blocks share one direction, so the average stays rank-1
+# and @s2's premise (the configuration-spread radial) fails.  The d
+# shell's spread is never asked -- k is uniform over the window's
+# shells by the tag grammar (the C precedent: the refusing window is
+# not declared; the reason lives here)
+_U14E_PRIOR = ("5f6d@r1", "5f6d@s1")
 
 # THE SHELL LAYER (the port of the multi-column core, the machinery
 # proven on Sc-unc/Ti-unc): the measured realizations from the record's

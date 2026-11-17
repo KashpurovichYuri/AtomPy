@@ -447,20 +447,22 @@ def test_void_reason_voids_the_u14e_optimizer_class():
     spirit made explicit) and the frac cores are void with it (the
     frac reference has no converged basin on the ECP atom); the prior
     windows' optimizer cells are void with prior-anchor-first (the
-    comparison is CASCI) -- exactly the 54 remaining CASCI cells run:
-    the promoted windows' kind blocks + the three prior windows' grids
-    (the band-lattice tier windows retired from the RUN set
+    comparison is CASCI) -- exactly the 45 remaining CASCI cells run:
+    the promoted windows' kind blocks + the two prior windows' grids
+    (the @s2 window is undeclared -- the series average carries no
+    second f radial, the construction refusal at _U14E_PRIOR; the
+    band-lattice tier windows retired from the RUN set
     2026-11-14: the same-l distilled assembly refuses their fresh
     construction; the render had retired their rows 2026-11-06)."""
     spec = CAMPAIGN["U14e"]
     sc = scenarios_for(spec)
     keys = grid_keys(spec) + planned(spec)
-    assert len(keys) == 273   # the @r1/@s1/@s2 prior windows join the plan
+    assert len(keys) == 228   # the @r1/@s1 prior windows join the plan
     for k in keys:
         void = void_reason(k, sc) is not None
         expect = k.method != "casci" or k.core == "frac"
         assert void == expect, k.address
-    assert sum(not void_reason(k, sc) for k in keys) == 54
+    assert sum(not void_reason(k, sc) for k in keys) == 45
 
 
 @fast
@@ -561,8 +563,7 @@ def test_planned_sector_override_shrinks_the_fold():
     assert sorted(by_window) == ["10f13d14p", "10f13d14pno3",
                                  "10f13d7s", "10f13d7sno3",
                                  "5f6d@r1", "5f6d@r1no2",
-                                 "5f6d@s1", "5f6d@s1no2",
-                                 "5f6d@s2", "5f6d@s2no2"]
+                                 "5f6d@s1", "5f6d@s1no2"]
     assert all(k.sector == (4, 0) for k in by_window["10f13d14p"])
     assert all(k.sector == (5, 1) for k in by_window["10f13d7s"])
     # the NO-forms keep their window's sector
@@ -571,7 +572,7 @@ def test_planned_sector_override_shrinks_the_fold():
     # the prior windows: no sector override -- the case default (the
     # incumbent's own, the comparison's)
     assert all(k.sector == (4, 0) for k in by_window["5f6d@r1"])
-    assert all(k.sector == (4, 0) for k in by_window["5f6d@s2"])
+    assert all(k.sector == (4, 0) for k in by_window["5f6d@s1"])
     # the primary's grid: the case-default sector on every key
     assert all(k.sector == (4, 0) for k in grid_keys(spec))
 

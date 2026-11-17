@@ -206,5 +206,5 @@ def test_u14e_declares_the_series_revival():
     # all members spin 4 (Hund; the head is the case's own reference)
     assert all(s.spin == cs.spin for s in cs.series)
     tagged = [w for w in cs.planned_windows if "@" in w]
-    assert tagged == ["5f6d@r1", "5f6d@s1", "5f6d@s2"]
+    assert tagged == ["5f6d@r1", "5f6d@s1"]   # @s2: no second radial
     assert "prior-anchor-first" in {s.name for s in cs.scenarios}

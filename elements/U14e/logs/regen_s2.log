@@ -1,0 +1,19 @@
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_5f6d@s2_4-0_casci_ao_-_pol_raw
+Traceback (most recent call last):
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 440, in <module>
+    main()
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/regen_cells.py", line 396, in main
+    facts = run_cell(key, mf, frac_mf=mf_f,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 935, in run_cell
+    act, ncas, win_report = _window_columns(
+                            ^^^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py", line 765, in _window_columns
+    act, report = series_window(
+                  ^^^^^^^^^^^^^^
+  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/basis.py", line 451, in series_window
+    raise ValueError(
+ValueError: shell '5f': the declared k=2 exceeds the radial signal -- the k-th eigenvalue reads 1.35e-04 against the leading 2.283758 (a single-configuration block is rank-1; only the series average carries the second radial -- lower k or average over the series)
