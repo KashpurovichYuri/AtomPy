@@ -37,11 +37,23 @@ the ticket's git history + elements/<twin>/logs/subspace.log).
   vs the basis authors' coefficients); the term-ID round (splittings
   vs NIST — the acceptance test); then spin–orbit, transition
   moments, g-factors.
-- **The queued CASCI review** (the user, 2026-11-06): the CASCI
-  readings get their own review pass — the window-poverty class
-  (+923 mEh), the reference-echo roots, the raw-fold ⟨L²⟩ mixing —
-  before any new construction rides them; precedes the next physics
-  wave.
+- **The queued CASCI review — EXECUTED 2026-11-17** (the three
+  classes classified; no analysis bugs found): (1) the window-poverty
+  class (+923 mEh) is the correct declared reading — U14e's
+  band-identity 5f6d holds the compact radial, poverty is radial not
+  symmetry (pur payload: exact closure + exact ⟨L²⟩ at +923.1), and
+  the class is the normal CASCI shape campaign-wide (C/Si/Sc rows at
+  +180…+615 with exact certificates); fixed by the README ΔE rule
+  (the partition's mean-field price) + the D-window band clause.
+  (2) the reference-echo roots (ΔE ≡ 0: the reference determinant's
+  singles Brillouin-dead, the CI reads the mean field back) are
+  presented honestly — Ti-unc's (2,5) rows carry them, Sc-unc has
+  none (d¹ lacks the same-l double channel); noted in the twin's
+  element file.  (3) the raw-fold ⟨L²⟩ mixing is the declared
+  (avg, pol)-ruler anisotropy — U14e's 41.9649 is the honest ground
+  root (⁵I on all three fields, no root swap; pur exact 42.0000);
+  noted in U14e's element file.  Candidate left open below (the
+  renderer's note-class).
 - **The folded-field campaign identity** (ticket 34's open
   decision): the substrate tag in the key grammar, the free-route
   dominance declaration, the table re-anchoring — user-visible
@@ -77,6 +89,13 @@ the ticket's git history + elements/<twin>/logs/subspace.log).
   analysis-ruler artifact class).
 - The (4,19)/(4,21)-class lattice rows: the ndet² analysis ceiling —
   the same class as `_COMM_CAP`.
+- **A data-derived note-class for the poverty rows** (the CASCI
+  review's leftover, 2026-11-17): C/Si's D-window CASCI rows read
+  +221…+615 mEh with exact closure certificates but an EMPTY note
+  column — the poverty signal is invisible there.  A renderer
+  note-class (magnitude-derived, keyed on CASCI + ΔE threshold) would
+  surface it; the notes are currently identity-derived only.  Rides
+  `build_methods_tables.py`'s next touch; the user's call.
 - **The Stage-3 adoption decision** (the user's call, the measured
   basis in hand 2026-11-16): `subspace_rohf`'s certificate says the
   @s2 windows are MEAN-FIELD-SOUND everywhere (the confinement costs

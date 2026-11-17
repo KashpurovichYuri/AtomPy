@@ -206,3 +206,12 @@
 | SA-CASSCF, frozen | free | 3d@s2 / D | (2,10) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 | SA-CASSCF, frozen core | free | 3d@s2 / D | (2,10) | Ar·pur | — | — | — | — | — | — | — | — | — | — | — | — | pending |
 <!-- methods:end -->
+
+Reading notes: the ΔE ≡ 0 rows — 3d, 3d@r1, 3d/MO, 3d/MOC at the
+(2,5) sector, and the frozen CASSCF rows over the same windows — are
+reference echoes: the window contains the reference determinant,
+whose singles are Brillouin-dead, so the CI reads the mean field back
+at exact equality (the same-l double shell is the only live channel —
+d² has one; Sc-unc's d¹ has none, hence no echo rows there).  They
+carry no correlation content; their meters classify the window, not
+the atom.
