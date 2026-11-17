@@ -10,10 +10,6 @@ dumps are not kept.
   DESIGN-FIRST, awaiting the user's shape call — the frozen-landscape
   tables (the m-symmetric θ-grid, the member-tilt ladder with the
   ±pair blind spots visible) that replace the retired scan pointers.
-- [40 — the U14e series revival](tickets/40-series-revival.md): the
-  self-seed seam + the declaration + the @s1/@s2 legs (the MOM census
-  landed both members; the poverty question's second half — does the
-  series average beat the head's own block).
 
 Resolved (git history the archive): 29 the Ti-first protocol; 30 the
 module walk; 31 the ECP wave; 32 the symmetry lane (C/Si/Sc/Ti one
@@ -36,7 +32,15 @@ U14e prior axis (2026-11-17: the series census measured-REFUSED the
 draw is the head f³d¹; the @r1 legs ran and CURED the band-identity
 poverty — +146.9/+149.3 vs the incumbent's +923.1, the exact ⁵L
 (72.0000) at machine-zero closure on pur; the optimizer follow-on is
-the disposition candidate below).
+the disposition candidate below); 40 the U14e series REVIVAL
+(2026-11-17: the refusal re-attributed — the weight hook's
+character-only premium, not the landscape; the members landed under
+the self-seeded MOM (`run_rohf(mom_seed=)` + `SeriesSpec
+seed="self"`/`open_counts`, certified at ~4e-9, f²d² under
+diis+newton); @s1 ran — +141.3/+143.7, the series average BEATS the
+head's own block by ~5.6 mEh, exact ⁵L on pur; @s2 MEASURED-REFUSED
+at construction — no second f radial, the 5f radial
+configuration-inert).
 
 ## Issues
 
@@ -85,15 +89,17 @@ the disposition candidate below).
 
 ### Disposition candidates (the user's future call)
 
-- **The U14e @r1 optimizer follow-on** (the Stage-3 YES branch, the
-  user's call 2026-11-17): the @r1 window CURED the band-identity
-  poverty (+146.9/+149.3 vs the incumbent's +923.1; the exact ⁵L
-  72.0000 at machine-zero closure on pur) — the frozen/SA CASSCF
-  legs on it (their pending rows hold their places under
-  prior-anchor-first) would read whether the full-band radial
-  SURVIVES optimization: the free SA escaped the incumbent's compact
-  window; the full-band window may hold.  Entangled with the twins'
-  adoption decision (the same un-gating of `run_casscf`).
+- **The U14e prior optimizer follow-on** (the Stage-3 YES branch, the
+  user's call 2026-11-17; widened 2026-11-17 by ticket 40 — the @s1
+  window is now the best prior): @r1 CURED the band-identity poverty
+  (+146.9/+149.3 vs the incumbent's +923.1) and @s1 BEATS it
+  (+141.3/+143.7, both exact ⁵L at machine-zero closure on pur) —
+  the frozen/SA CASSCF legs on the two prior windows (their pending
+  rows hold their places under prior-anchor-first) would read
+  whether the full-band radial SURVIVES optimization: the free SA
+  escaped the incumbent's compact window; the full-band windows may
+  hold.  Entangled with the twins' adoption decision (the same
+  un-gating of `run_casscf`).
 - **The swap-basin optimizer class re-run gauge-anchored** (the
   Stage-2 leftover): if the campaign wants in-window solutions on the
   twins, the optimizer legs re-run seeded -- rides the Stage-3
@@ -152,16 +158,29 @@ the disposition candidate below).
 ### Settled (standing facts, one line each; git history the archive)
 
 - **The U14e band-identity poverty is the compact radial, and the
-  prior cures it** (ticket 39, 2026-11-17): the incumbent 10f+13d
-  window captures only 82-83% of the head's f-valence density (the
-  full 9f-11f family 96-97%; 13d 92% vs 98.5%); the @r1 prior
-  recovers 84% of the +923 mEh poverty at CASCI (+147) with the
-  exact ⁵L on pur.  The configuration series is ECP-REFUSED (the
-  census, logs/series_discovery.log: ~40 arms hold no f⁴/f²d² basin
-  — every converged draw is the head f³d¹, even the −48.7 stalls
-  relax into it under Newton) — the @s axis has no U14e declaration
-  (the C precedent), and `run_series`'s member-config seam now
-  threads ecp/charge/tag (the ECP-threading fix, dataclasses.replace).
+  prior cures it** (tickets 39 + 40, 2026-11-17): the incumbent
+  10f+13d window captures only 82-83% of the head's f-valence density
+  (the full 9f-11f family 96-97%; 13d 92% vs 98.5%); the @r1 prior
+  recovers 84% of the +923 mEh poverty at CASCI (+147) with the exact
+  ⁵L on pur, and the @s1 series average is the BEST prior
+  (+141.3/+143.7 — ~5.6 mEh below @r1, ~85% cured, exact ⁵L on pur).
+  The census's member refusal was the WEIGHT HOOK's vocabulary, not
+  the landscape: the character-only premium ties ~12 pure d/f valence
+  virtuals + the tight tail at premium ≈ 2.000 (a combinatorial tie
+  broken by column index); the self-seeded MOM lands both members
+  (f⁴ −50.31571501 l3:4.000; f²d² −50.34788201 under two
+  accelerators — plain newton is draw-sensitive there, diis+newton
+  lands the anchor in three fresh draws; on f⁴ diis+newton RELAXES
+  INTO THE HEAD).  The seed pick rule is ε-first within the majority
+  floor, never weight-ranked (the tight-primitive trap).  @s2 is
+  construction-refused: the ROHF 5f radial is configuration-inert —
+  the series average carries no second radial (k=2 eigenvalue 5.9e-5
+  relative), the d shell never asked (k uniform by the tag grammar).
+  The basis carries NO near-dependence tail (minima 2.2e-6 s … 7.8e-3
+  f; the conditioning cut NO-GO by the twins' precedent; the f block
+  is the BEST-conditioned, κ 428).  `run_rohf` deletes a refused
+  draw's chkfile (the gate's or the post-check's) — a refused
+  draw never poisons the trusted cache.
 
 - **The U14e campaign COMPLETE** (tickets 36A + 38): the free-mask
   SA legs certify the ground term END-TO-END — ⁵L, ⟨L²⟩ = 72.00
