@@ -120,13 +120,3 @@
 | SA-CASSCF | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | 1,365 | −50.4138 | −32.0 | −1371.8303 | −0.8696 | 1e-4/200 | 45.2112 | 8e-02 | 5e+00 | 8e+00 | 1.1e+02 | 7.4e+02 | cycle cap; m-incomplete; bands 10f+13d+14p |
 | SA-CASSCF, frozen | free | 5f6d6p / MOC | (4,15) | Rn·7s·pur | 1,365 | −50.3557 | +26.2 | −1370.2481 | +0.7126 | 1e-9/34 | 0.0066 | 3e+00 | 5e+00 | 8e+00 | 3.2e+00 | 1.3e+01 | m-incomplete; bands 10f+13d+14p |
 <!-- methods:end -->
-
-Reading notes: the (avg, pol) substrate is the campaign's ruler — its
-residual anisotropy (‖[H,Lz]‖ 3e-02-class) mixes the CASCI ground
-root's ⟨L²⟩ to 41.9649 on the band-identity windows: the honest root
-of that Hamiltonian, ⁵I on all three core fields (no root swap — the
-pure substrate carries the certified exact 42.0000).  The band-identity
-CASCI rows' ΔE (+923-class) is the window's own poverty — the declared
-bands hold the compact radial, not the physical 5f — with exact
-closure meters; the free CASSCF/SA rows read what relaxing the radials
-recovers.
