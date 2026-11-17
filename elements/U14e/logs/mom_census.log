@@ -1,0 +1,17 @@
+head (trusted): E = -50.38185233  open-block l0:0.013  l1:0.002  l2:0.987  l3:2.998
+
+== member f4  seed want {'l3': 4}  (MOM follows the re-assigned head columns)
+  MOM         diis: E = -50.11677175 conv=False  | l0:0.000  l1:0.005  l2:0.000  l3:3.995
+  MOM  diis+newton: E = -50.38185233 conv=True  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+       repeat (diis): E = -50.11447985 conv=False  | l0:0.015  l1:0.005  l2:0.983  l3:1.996
+  MOM       newton: E = -50.31571501 conv=True  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+       repeat (diis): E = -47.03297055 conv=True  | l0:0.000  l1:0.000  l2:0.000  l3:0.000
+
+== member f2d2  seed want {'l3': 2, 'l2': 2}  (MOM follows the re-assigned head columns)
+  MOM         diis: E = -50.32925146 conv=False  | l0:0.002  l1:0.003  l2:1.998  l3:1.997
+  MOM  diis+newton: E = -50.34788201 conv=True  | l0:0.000  l1:0.004  l2:2.000  l3:1.996
+       repeat (diis): E = -50.11599334 conv=False  | l0:0.021  l1:0.003  l2:0.979  l3:1.997
+  MOM       newton: E = -50.34788201 conv=True  | l0:0.000  l1:0.004  l2:2.000  l3:1.996
+       repeat (diis): E = -47.03297055 conv=True  | l0:0.000  l1:0.000  l2:0.000  l3:0.000
+
+done -- a landed member is a converged MOM arm whose fingerprint carries its configuration

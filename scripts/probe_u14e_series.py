@@ -115,10 +115,22 @@ def seed_density(mf, want):
         have = sorted((i for i in opens if w([i])[0] >= 0.5),
                       key=lambda i: eps[i])[:n_want]
         pick += have
+        have = sorted((i for i in opens if w([i])[0] >= 0.5),
+                      key=lambda i: eps[i])[:n_want]
+        pick += have
         short = n_want - len(have)
         if short > 0:
-            cand = sorted(virt, key=lambda i: (-w([i])[0], eps[i]))
-            cand = [i for i in cand if w([i])[0] >= 0.5][:short]
+            # EPSILON-FIRST within the majority floor -- the weight
+            # (-w, eps) sort this replaced picked the TIGHT-primitive
+            # virtuals (eps 22-39) at full precision; the committed
+            # census's seed arms ran that flawed pick (their recorded
+            # failures are the weight hook's own ranking failures --
+            # the attribution unchanged: those arms re-rank every
+            # cycle, so the seed could not hold anyway).  MOM (the
+            # sibling probe) follows the seed, so ITS pick must be
+            # the valence shell: energy orders, the floor certifies
+            cand = sorted((i for i in virt if w([i])[0] >= 0.5),
+                          key=lambda i: eps[i])[:short]
             if len(cand) < short:
                 raise RuntimeError(
                     f"the seed wants {n_want} {p}-character columns, "
