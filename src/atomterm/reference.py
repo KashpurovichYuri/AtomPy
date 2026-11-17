@@ -14,7 +14,11 @@ basin gate (cycled guesses against a reference energy --
 :class:`ReferenceSpec`), the SEEDED-MOM mode on ill-conditioned bases
 (:class:`ReferenceSpec`'s ``seed_basis``: a projected source carries
 the configuration, the occupations FOLLOW it -- the certified repair
-for the fresh-SCF disease), and the fractional-occupation ensemble
+for the fresh-SCF disease) or its explicit-seed form
+(:func:`run_rohf`'s ``mom_seed``: :func:`mom_self_seed` re-assigns
+the reference's own columns -- the configuration-series members on
+substrates with no foreign source basis), and the fractional-occupation
+ensemble
 (the spherical reference with smeared valence -- :func:`run_frac_occ`).
 
 The UHF class (:func:`run_uhf`) runs the same discipline per spin:
@@ -42,9 +46,10 @@ Conventions
   too.  THREE filling policies share the one insertion point: PySCF's
   aufbau (no patterns), the weight hook (:func:`_forced_rohf_occ` --
   certified on contracted bases), and the MOM-follow hook
-  (:func:`_mom_occ` -- the seeded mode; the seed's occupied columns
-  win an S-overlap contest each cycle, so the metric-amplified
-  virtual tail never competes).
+  (:func:`_mom_occ` -- the seeded mode's ``seed_basis`` source or the
+  explicit ``mom_seed`` master, :func:`mom_self_seed`'s product; the
+  seed's occupied columns win an S-overlap contest each cycle, so the
+  metric-amplified virtual tail never competes).
 - Occupation metrics are S-projector weights ``c^dag P c`` (bounded by
   1 on S-orthonormal columns); the bare quadratic form is unbounded on
   diffuse bases. One home:
@@ -68,9 +73,9 @@ from atomterm.windows import (pattern_projector, project_orbitals,
                              span_projector)
 
 __all__ = ["ReferenceSpec", "run_rohf", "run_uhf", "occupation_postcheck",
-           "projected_source", "uhf_seed_density", "rohf_basin_census",
-           "uhf_basin_census", "run_frac_occ", "uhf_contamination",
-           "run_folded", "subspace_rohf"]
+           "projected_source", "mom_self_seed", "uhf_seed_density",
+           "rohf_basin_census", "uhf_basin_census", "run_frac_occ",
+           "uhf_contamination", "run_folded", "subspace_rohf"]
 
 
 # the occupation contract --------------------------------------------
@@ -247,6 +252,104 @@ def _mom_occ(mol, c_seed, occ_seed):
     return _occ
 
 
+def mom_self_seed(mf, want: dict[str, int]) -> tuple[np.ndarray, np.ndarray]:
+    """The SELF-SEED: the reference's own columns re-assigned to a
+    declared configuration -- the seed :func:`run_rohf`'s ``mom_seed``
+    master follows (the configuration-series members on substrates
+    where no foreign source basis exists and the weight hook cannot
+    express the per-span counts).
+
+    The pick rule, per declared pattern: the reference's own OPEN
+    columns carrying the pattern by MAJORITY weight (>= 1/2) come
+    first, the shortfall filled from its virtuals under the same
+    floor -- and among the floor's candidates the pick is
+    EPSILON-ASCENDING (energy orders the shell), never weight-ranked.
+    The floor certifies the character; energy orders WITHIN it.  A
+    weight-ranked pick is the tight-primitive trap: the virtual
+    primitives of the SAME shell read weights that edge out the
+    valence members' at full precision (both ~ 1.000 -- the
+    difference is numerical, not chemical), so the sort selects the
+    tight end's epsilon ~ 20+ columns as the "shell" (the U14e
+    census's caught bug, 2026-11-17).
+
+    The closed block rides UNTOUCHED -- the configuration varies only
+    the open block; the seed's occupations are the picked columns'
+    (2.0 pairs, 1.0 opens), the :func:`_mom_occ` seed form.
+
+    Parameters
+    ----------
+    mf : the converged reference (reads ``mol``, ``mo_coeff``,
+        ``mo_occ``, ``mo_energy``).
+    want : dict[str, int]
+        AO span pattern -> open-electron count (the
+        :class:`ReferenceSpec` pattern vocabulary).  The counts pin
+        the per-span split the flat open ranking cannot express
+        (``{"l3": 2, "l2": 2}`` = two opens in each shell).
+
+    Returns
+    -------
+    (c_seed, occ_seed)
+        The seed columns (the reference's closed columns then the
+        picks) and their occupations.
+
+    Raises
+    ------
+    ValueError
+        The total wanted count disagrees with the molecule's open
+        count (the seed would change the electron number); two
+        patterns claim one column (overlapping patterns -- a
+        declaration error); a pattern's count exceeds the character
+        the reference carries (the seed would be short a column).
+
+    Notes
+    -----
+    The MOM follow makes the seed's provenance irrelevant to the
+    SCF's stability -- what matters is that the seed's columns are
+    the INTENDED shell's columns, which is exactly what the
+    character-only premium cannot decide and the floor+epsilon rule
+    can.
+    """
+    occ = np.asarray(mf.mo_occ)
+    eps = np.asarray(mf.mo_energy)
+    c = np.asarray(mf.mo_coeff)
+    if sum(want.values()) != mf.mol.spin:
+        raise ValueError(
+            f"the seed wants {sum(want.values())} open electrons but "
+            f"the molecule carries spin {mf.mol.spin} -- a seed that "
+            "changes the electron number is not a configuration")
+    closed = np.flatnonzero(occ == 2.0)
+    opens = np.flatnonzero(occ == 1.0)
+    virt = np.flatnonzero(occ == 0.0)
+    pick: list[int] = []
+    for pattern, n_want in want.items():
+        p = pattern_projector(mf.mol, (pattern,))
+        w = np.einsum("ai,ab,bi->i", c.conj(), p, c).real
+        have = sorted((i for i in opens if w[i] >= 0.5),
+                      key=lambda i: eps[i])[:n_want]
+        pick += have
+        short = n_want - len(have)
+        if short > 0:
+            # epsilon-first within the majority floor -- the
+            # weight-ranked sort this rule replaced is the
+            # tight-primitive trap (the Notes)
+            cand = sorted((i for i in virt if w[i] >= 0.5),
+                          key=lambda i: eps[i])[:short]
+            if len(cand) < short:
+                raise ValueError(
+                    f"the seed wants {n_want} {pattern}-character "
+                    "columns, the reference does not carry them")
+            pick += cand
+    if len(set(pick)) != len(pick):
+        raise ValueError(
+            f"the seed's patterns {tuple(want)} claim one column twice "
+            "(overlapping spans) -- a pattern set that partitions the "
+            "open block is the declared form")
+    cols = np.concatenate([closed, np.asarray(pick, dtype=int)])
+    occ_seed = np.concatenate([np.full(len(closed), 2.0),
+                               np.ones(len(pick))])
+    return c[:, cols], occ_seed
+
+
 @dataclass(frozen=True)
 class ReferenceSpec:
     """The declared recipe for an ROHF reference that plain aufbau
@@ -413,7 +516,7 @@ def _converged_cached(mol, fresh_mf, chkfile, ref, e_gate, cfg,
 
 
 def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
-             dm0=None):
+             dm0=None, mom_seed=None):
     """ROHF for the configured atom, chkfile-cached.
 
     Parameters
@@ -443,6 +546,18 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
         The two masters refuse: ``dm0`` together with
         ``ref.seed_basis`` is a ValueError -- the seed owns the guess
         it builds.
+    mom_seed : (c_seed, occ_seed) pair, optional
+        The EXPLICIT-SEED master: the seed columns + occupations the
+        MOM hook follows (:func:`mom_self_seed`'s product -- the
+        configuration-series members whose substrate admits no
+        foreign source basis and whose per-span counts the flat
+        ranking cannot express).  Arms :func:`_mom_occ`, builds its
+        own initial density from the seed, and gates + post-checks
+        exactly like the ``seed_basis`` mode (``ref`` must declare
+        the occupation patterns -- the post-check's vocabulary; the
+        basin gate reads ``ref.occ_e_ref`` when present).  The two
+        masters refuse: ``mom_seed`` together with ``dm0`` OR with
+        ``ref.seed_basis`` is a ValueError -- one guess, one owner.
 
     Returns
     -------
@@ -452,7 +567,9 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
     Raises
     ------
     ValueError
-        ``dm0`` given together with ``ref.seed_basis``.
+        ``dm0`` given together with ``ref.seed_basis``; ``mom_seed``
+        given together with ``dm0`` or ``ref.seed_basis``;
+        ``mom_seed`` without the declared occupation patterns.
     RuntimeError
         The seeded mode's character post-check failed on the
         converged solution (the configuration drifted from the
@@ -473,14 +590,30 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
             "dm0 and ref.seed_basis are two masters for one guess -- "
             "the seed owns the guess it builds; pass dm0 only for the "
             "caller-supplied form (seedless ref)")
+    if mom_seed is not None:
+        if dm0 is not None or (ref is not None and ref.seed_basis
+                               is not None):
+            raise ValueError(
+                "mom_seed is a second master on the same guess -- one "
+                "seed source per run (dm0, ref.seed_basis, or mom_seed)")
+        if ref is None or ref.occ_closed is None:
+            raise ValueError(
+                "mom_seed needs the declared occupation patterns "
+                "(occ_closed/occ_open -- the character post-check "
+                "verifies the converged solution against them)")
 
     mol = build_mol(cfg)
 
     seeded = ref is not None and ref.seed_basis is not None
+    momed = mom_seed is not None
     if seeded:
         src_chk = f"{chkfile}.{ref.seed_basis}.source.chk"
         c_seed, occ_seed, _ = projected_source(
             cfg, ref, source_basis=ref.seed_basis, chkfile=src_chk)
+        dm0 = (c_seed * occ_seed) @ c_seed.conj().T
+        dm0 = dm0.real.astype(np.float64)
+    elif momed:
+        c_seed, occ_seed = mom_seed
         dm0 = (c_seed * occ_seed) @ c_seed.conj().T
         dm0 = dm0.real.astype(np.float64)
 
@@ -488,7 +621,7 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
         """One unconverged ROHF object: occupation hook attached,
         chkfile/verbosity set, optional starting guess."""
         m = scf.ROHF(mol)
-        if seeded:
+        if seeded or momed:
             m.get_occ = _mom_occ(mol, c_seed, occ_seed)
         elif ref is not None and ref.occ_closed is not None:
             m.get_occ = _forced_rohf_occ(mol, list(ref.occ_closed),
@@ -503,8 +636,8 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
     gate = ref.occ_e_ref if ref is not None else None
     mol, mf = _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg,
                                 dm0=dm0)
-    if seeded and not occupation_postcheck(mol, mf, ref.occ_closed,
-                                           ref.occ_open):
+    if (seeded or momed) and not occupation_postcheck(
+            mol, mf, ref.occ_closed, ref.occ_open):
         raise RuntimeError(
             "the seeded run's converged occupations do not carry the "
             "declared character (the frozen-assignment disease: the "

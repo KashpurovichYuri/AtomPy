@@ -180,6 +180,68 @@ def _mom_mol():
     return uncontracted_carbon_mole()
 
 
+def test_mom_self_seed_prefers_valence_over_tight_primitives():
+    """The self-seed's pick rule at toy scale -- the tight-primitive
+    trap REPRODUCED: a virtual primitive of the same shell reads a
+    weight that edges out the valence member's at full precision
+    (1.000 vs 0.999 -- numerical, not chemical), so the weight-ranked
+    sort this rule replaced selects the high-epsilon primitive as the
+    "shell" (the U14e census's caught bug, 2026-11-17).  The majority
+    floor + epsilon-ascending pick takes the valence column; the
+    closed block rides untouched, pairs first."""
+    from atomterm.reference import mom_self_seed
+
+    mol = _mom_mol()
+    s = mol.intor_symmetric("int1e_ovlp")
+    # the fake reference: one closed 1s pair, one open 2pz (first p
+    # shell), and two virtual p columns -- the valence member
+    # (first-shell pz + a small 2s admixture, l1 weight 0.999, eps
+    # 0.2) and the tight primitive (pure, l1 weight 1.000, eps 22.0:
+    # the HIGH-epsilon column the weight sort would take)
+    eye = np.eye(mol.nao_nr())
+    c_val = 0.9995 * eye[:, [5]]
+    c_val[1, 0] = np.sqrt(1.0 - 0.9995 ** 2)
+    c = np.hstack([eye[:, [0]], eye[:, [5]], c_val, eye[:, [8]]])
+    mf = SimpleNamespace(mol=mol, mo_coeff=c,
+                         mo_occ=np.array([2.0, 1.0, 0.0, 0.0]),
+                         mo_energy=np.array([-5.0, -0.1, 0.2, 22.0]))
+    c_seed, occ_seed = mom_self_seed(mf, {"l1": 2})
+    assert list(occ_seed) == [2.0, 1.0, 1.0]     # closed pair first
+    assert np.array_equal(c_seed[:, 0], c[:, 0])  # closed untouched
+    assert np.array_equal(c_seed[:, 1], c[:, 1])  # the open rides
+    # THE TRAP: the epsilon-first valence column, never the
+    # weight-1.000 primitive at eps 22
+    assert np.array_equal(c_seed[:, 2], c_val[:, 0])
+    # the pick is a genuine S-normalized reference column
+    assert abs(c_seed[:, 2] @ s @ c_seed[:, 2] - 1) < 1e-10
+
+
+def test_mom_self_seed_refuses_unfillable_or_overlapping_wants():
+    """The seed contract's refusals -- all declaration errors, raised
+    before any SCF: a count that changes the electron number, a
+    character the reference's OPEN + VIRTUAL columns cannot fill (the
+    closed block is never a candidate), and two patterns claiming one
+    column."""
+    from atomterm.reference import mom_self_seed
+
+    mol = _mom_mol()
+    eye = np.eye(mol.nao_nr())
+    # exactly ONE open p column; every other p column closed, so
+    # 'l1': 2 outruns the open+virtual supply (sum == spin: past the
+    # electron-number guard)
+    occ = np.zeros(14)
+    occ[[0, 1, 4, 5, 6, 7, 8]] = 2.0        # 1s pair + the rest of p
+    occ[3] = 1.0                            # the one open (2px)
+    mf = SimpleNamespace(mol=mol, mo_coeff=eye, mo_occ=occ,
+                         mo_energy=np.linspace(-5.0, 5.0, 14))
+    with pytest.raises(ValueError, match="electron number"):
+        mom_self_seed(mf, {"l1": 1})          # the molecule's spin is 2
+    with pytest.raises(ValueError, match="does not carry"):
+        mom_self_seed(mf, {"l1": 2})          # 1 open + 0 virtual left
+    with pytest.raises(ValueError, match="claim one column"):
+        mom_self_seed(mf, {"l1": 1, "2p": 1})  # '2p' re-claims the open
+
+
 def test_mom_occ_follows_the_seed_by_max_overlap():
     """The MOM hook's contest: each seeded slot takes the current
     column of max S-overlap (closed pairs first by seed order), the
@@ -276,16 +338,29 @@ def test_reference_spec_refuses_seed_without_patterns():
 
 
 def test_run_rohf_refuses_two_seed_masters():
-    """dm0 and ref.seed_basis are two masters for one guess -- the
-    seed owns the guess it builds; the explicit-dm0 form is the
-    seedless path's (Stage 2's UHF re-test)."""
+    """dm0, ref.seed_basis, and mom_seed are masters for one guess --
+    one seed source per run: the seed owns the guess it builds (the
+    explicit-dm0 form is the seedless path's, Stage 2's UHF re-test),
+    and mom_seed without the declared patterns is not expressible
+    (the character post-check has no vocabulary)."""
     from atomterm.reference import run_rohf
 
     mol = _mom_mol()
-    ref = ReferenceSpec(occ_closed=("l0",), occ_open=("l1",),
-                        seed_basis="6-31g")
+    cfg = SimpleNamespace(symbol="C", basis="ccpvdz", spin=2,
+                          verbose=0, ecp=None, charge=0)
+    seed = (np.eye(mol.nao_nr())[:, :3], np.array([2.0, 1.0, 1.0]))
+    ref_seeded = ReferenceSpec(occ_closed=("l0",), occ_open=("l1",),
+                               seed_basis="6-31g")
     with pytest.raises(ValueError, match="two masters"):
-        run_rohf(SimpleNamespace(symbol="C", basis="ccpvdz", spin=2,
-                                 verbose=0, ecp=None, charge=0),
-                 "elements/C/rungs/two_masters.chk", ref=ref,
+        run_rohf(cfg, "elements/C/rungs/two_masters.chk", ref=ref_seeded,
                  dm0=np.eye(mol.nao_nr()))
+    with pytest.raises(ValueError, match="second master"):
+        run_rohf(cfg, "elements/C/rungs/two_masters.chk", ref=ref_seeded,
+                 mom_seed=seed)
+    with pytest.raises(ValueError, match="second master"):
+        run_rohf(cfg, "elements/C/rungs/two_masters.chk",
+                 ref=ReferenceSpec(occ_closed=("l0",), occ_open=("l1",)),
+                 dm0=np.eye(mol.nao_nr()), mom_seed=seed)
+    with pytest.raises(ValueError, match="needs the declared occupation"):
+        run_rohf(cfg, "elements/C/rungs/two_masters.chk", ref=None,
+                 mom_seed=seed)

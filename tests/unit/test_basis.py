@@ -274,3 +274,94 @@ def test_run_series_threads_the_declaring_atom_wholesale(
     assert mx.tag == "U_tag" and mx.charge == 0
     # the gate is the member's own declared basin energy
     assert seen["ref"].occ_e_ref == -50.0
+
+
+def test_run_series_refuses_bad_self_seed_declarations(
+        tmp_path, monkeypatch):
+    """The self-seed's declaration contract refuses at the seam that
+    consumes it: a seed on the head (it is never re-run -- inert is a
+    wrong declaration), unknown seed forms, a half-declared pair
+    (seed/open_counts declare each other), counts misaligned with the
+    spans, and a count sum off the member's spin -- all BEFORE any
+    run (the stub below must never fire)."""
+    from atomterm import basis as _basis_mod
+
+    head_mf = type("Mf", (), {"e_tot": -37.5})()
+    cfg = AtomConfig("C", "x", spin=2)
+    head = SeriesSpec("p2", ("1s", "2s"), ("2p",), 2, -37.5)
+
+    class _Stop(Exception):
+        pass
+
+    def _stop(*_a, **_k):
+        raise _Stop
+
+    monkeypatch.setattr(_basis_mod, "run_rohf", _stop)
+    with pytest.raises(ValueError, match="declares a seed"):
+        run_series(cfg, tmp_path, "C", (head._replace(seed="self"),),
+                   head_mf)
+    cases = [
+        ("declare each other",
+         (head, SeriesSpec("s2", ("1s",), ("2s", "2p"), 2, -37.0,
+                           seed="self"))),
+        ("declare each other",
+         (head, SeriesSpec("s2", ("1s",), ("2s", "2p"), 2, -37.0,
+                           open_counts=(1, 1)))),
+        ("unknown seed form",
+         (head, SeriesSpec("s2", ("1s",), ("2s", "2p"), 2, -37.0,
+                           seed="proj", open_counts=(1, 1)))),
+        ("does not align",
+         (head, SeriesSpec("s2", ("1s",), ("2s", "2p"), 2, -37.0,
+                           seed="self", open_counts=(2,)))),
+        ("spin is 2",
+         (head, SeriesSpec("s2", ("1s",), ("2s", "2p"), 2, -37.0,
+                           seed="self", open_counts=(2, 1)))),
+    ]
+    for match, series in cases:
+        with pytest.raises(ValueError, match=match):
+            run_series(cfg, tmp_path, "C", series, head_mf)
+
+
+def test_run_series_threads_the_self_seed_from_the_head(
+        tmp_path, monkeypatch):
+    """seed="self" members MOM-run on a seed built from the declaring
+    HEAD's own columns (mom_self_seed over the declared counts): the
+    stub captures the (c_seed, occ_seed) pair and the ref -- NO
+    seed_basis on it (the two-masters rule), the member's own gate,
+    the chk at the series address."""
+    from atomterm import basis as _basis_mod
+
+    mol = uncontracted_carbon_mole()
+    eye = np.eye(mol.nao_nr())
+    occ = np.zeros(mol.nao_nr())
+    occ[[0, 1]] = 2.0                       # the head's closed block
+    occ[3] = 1.0                            # one open 2px
+    head_mf = type("Mf", (), {"e_tot": -37.5, "mol": mol,
+                              "mo_coeff": eye, "mo_occ": occ,
+                              "mo_energy": np.linspace(-5, 5,
+                                                       mol.nao_nr())})()
+    cfg = AtomConfig("C", "x", spin=2)
+    series = (SeriesSpec("p2", ("1s", "2s"), ("2p",), 2, -37.5),
+              SeriesSpec("p2b", ("1s",), ("2p",), 2, -37.0,
+                         seed="self", open_counts=(2,)))
+    seen = {}
+
+    class _Stop(Exception):
+        pass
+
+    def _capture(cfg_x, chk, ref=None, mom_seed=None):
+        seen["cfg"], seen["chk"], seen["ref"], seen["seed"] = (
+            cfg_x, chk, ref, mom_seed)
+        raise _Stop
+
+    monkeypatch.setattr(_basis_mod, "run_rohf", _capture)
+    with pytest.raises(_Stop):
+        run_series(cfg, tmp_path, "C", series, head_mf)
+    c_seed, occ_seed = seen["seed"]
+    assert list(occ_seed) == [2.0, 2.0, 1.0, 1.0]   # pairs first
+    for j, want in enumerate((0, 1, 3, 4)):         # closed + the pick
+        assert np.array_equal(c_seed[:, j], eye[:, want])
+    assert seen["ref"].seed_basis is None   # one seed source per run
+    assert seen["ref"].occ_e_ref == -37.0   # the member's own gate
+    assert str(seen["chk"]) == (str(tmp_path / "C" / "rungs" / "series"
+                                    / "p2b.chk"))

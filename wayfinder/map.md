@@ -10,6 +10,10 @@ dumps are not kept.
   DESIGN-FIRST, awaiting the user's shape call — the frozen-landscape
   tables (the m-symmetric θ-grid, the member-tilt ladder with the
   ±pair blind spots visible) that replace the retired scan pointers.
+- [40 — the U14e series revival](tickets/40-series-revival.md): the
+  self-seed seam + the declaration + the @s1/@s2 legs (the MOM census
+  landed both members; the poverty question's second half — does the
+  series average beat the head's own block).
 
 Resolved (git history the archive): 29 the Ti-first protocol; 30 the
 module walk; 31 the ECP wave; 32 the symmetry lane (C/Si/Sc/Ti one

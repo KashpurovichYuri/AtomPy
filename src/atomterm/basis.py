@@ -59,8 +59,8 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 
-from atomterm.reference import (ReferenceSpec, occupation_postcheck,
-                                run_rohf)
+from atomterm.reference import (ReferenceSpec, mom_self_seed,
+                                occupation_postcheck, run_rohf)
 from atomterm.windows import member_chains
 
 if TYPE_CHECKING:  # the mol/mf annotations (no cycle; system is leaf)
@@ -118,6 +118,25 @@ class SeriesSpec(NamedTuple):
         (:class:`atomterm.reference.ReferenceSpec` semantics; None =
         the ``closed``/``open`` vocabulary serves both sides -- safe
         when both bases speak it, e.g. contracted campaigns).
+    open_counts : tuple[int, ...] | None
+        The per-span open-electron counts, aligned with ``open`` --
+        the SELF-SEED vocabulary (``seed="self"``): the per-span split
+        the flat open ranking cannot express (``open=("l3", "l2")``
+        with ``open_counts=(2, 2)`` = two opens in each shell).
+        Declared ONLY with ``seed="self"`` (inert otherwise -- the
+        weight hook ranks a union, the projected source carries the
+        source's own occupations; a stray declaration refuses).
+    seed : str | None
+        The seed source for the member's SCF: ``"self"`` = the
+        declaring HEAD's own columns re-assigned by ``open_counts``
+        (:func:`atomterm.reference.mom_self_seed`), the member run
+        MOM-anchored under :func:`atomterm.reference.run_rohf`'s
+        ``mom_seed`` master -- the substrate with no foreign source
+        basis and no weight-hook vocabulary for the split (the U14e
+        member refusal's cure, 2026-11-17).  None = the case's
+        ``series_seed`` thread (the projected source) or the bare
+        weight hook.  Only the non-head entries run: the head is the
+        case's own trusted reference and refuses a seed declaration.
 
     Notes
     -----
@@ -139,6 +158,10 @@ class SeriesSpec(NamedTuple):
     # None = the closed/open vocabulary serves both sides)
     source_closed: tuple[str, ...] | None = None
     source_open: tuple[str, ...] | None = None
+    # the SELF-SEED vocabulary (seed="self"): the per-span open counts
+    # the flat ranking cannot express + the seed-source declaration
+    open_counts: tuple[int, ...] | None = None
+    seed: str | None = None
 
 
 # the series -----------------------------------------------------------
@@ -166,6 +189,12 @@ def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
         (the projected source carries the configuration, the MOM
         hook follows it, the character post-check verifies).
         Seedless ⇒ the weight hook (certified on contracted bases).
+        A member declaring ``seed="self"`` overrides the thread for
+        itself: the seed is the HEAD's own columns re-assigned by the
+        member's ``open_counts`` (:func:`mom_self_seed`), the run
+        threaded through the ``mom_seed`` master -- the substrates
+        with no foreign source basis and no flat-ranking vocabulary
+        for the per-span split.
 
     Returns
     -------
@@ -174,8 +203,13 @@ def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
     Raises
     ------
     ValueError
-        the head's spin mismatches the case's (the head IS the case
-        reference; a mismatched declaration is a wrong series).
+        the head's spin mismatches the case's, the head's energy is
+        not the declared reference, the head declares a seed (it is
+        never re-run), a member's seed form is unknown or half-declared
+        (``seed="self"`` and ``open_counts`` declare each other), the
+        counts do not align with the spans or sum to the member's
+        spin, or the head's columns lack the character a self-seed
+        wants (:func:`mom_self_seed`).
     RuntimeError
         a fresh configuration did not reach its declared basin (the
         gate's own error, propagated), or its converged occupations
@@ -194,18 +228,62 @@ def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
             f"{series[0].e_ref:.8f}) -- the head must be the case's own "
             "trusted reference, passed in as head_mf (a foreign mf is "
             "a wrong series, whatever its convergence)")
+    if series[0].seed is not None or series[0].open_counts is not None:
+        raise ValueError(
+            f"the series head {series[0].tag!r} declares a seed "
+            "(seed/open_counts) -- the head is the case's own trusted "
+            "reference and is never re-run, so a seed on it is inert "
+            "(a wrong declaration, not a no-op)")
     out = {series[0].tag: head_mf}
     chk_dir = Path(workdir) / key / "rungs" / "series"
     chk_dir.mkdir(parents=True, exist_ok=True)
     for spec in series[1:]:
+        # the self-seed's declaration contract: the counts and the seed
+        # source are each other's (a stray half is a wrong declaration),
+        # the counts align with the spans and sum to the member's spin
+        # (its open-electron count), and no other seed form exists
+        if spec.seed is not None and spec.seed != "self":
+            raise ValueError(
+                f"series config {spec.tag!r}: unknown seed form "
+                f"{spec.seed!r} -- 'self' (the head's own columns "
+                "re-assigned) or None (the series_seed thread)")
+        if (spec.open_counts is None) != (spec.seed is None):
+            raise ValueError(
+                f"series config {spec.tag!r}: seed={spec.seed!r} and "
+                f"open_counts={spec.open_counts!r} declare each other "
+                "-- the self-seed needs the per-span counts, and "
+                "open_counts without a seed consumer is dead config")
+        if spec.open_counts is not None:
+            if len(spec.open_counts) != len(spec.open):
+                raise ValueError(
+                    f"series config {spec.tag!r}: open_counts "
+                    f"{spec.open_counts!r} does not align with the open "
+                    f"spans {spec.open!r} -- one count per span")
+            if sum(spec.open_counts) != spec.spin:
+                raise ValueError(
+                    f"series config {spec.tag!r}: open_counts "
+                    f"{spec.open_counts!r} sums to "
+                    f"{sum(spec.open_counts)} but the configuration's "
+                    f"spin is {spec.spin} -- the opens are the spin "
+                    "carrier (the maximal-Ms series)")
         cfg_x = dataclasses.replace(cfg, spin=spec.spin)
-        ref = ReferenceSpec(occ_closed=spec.closed, occ_open=spec.open,
-                            occ_e_ref=spec.e_ref,
-                            seed_basis=seed_basis,
-                            source_closed=spec.source_closed,
-                            source_open=spec.source_open,
-                            conv_accelerator=spec.accel)
-        _m, mf_x = run_rohf(cfg_x, str(chk_dir / f"{spec.tag}.chk"), ref=ref)
+        if spec.seed == "self":
+            mom_seed = mom_self_seed(
+                head_mf, dict(zip(spec.open, spec.open_counts)))
+            ref = ReferenceSpec(occ_closed=spec.closed, occ_open=spec.open,
+                                occ_e_ref=spec.e_ref,
+                                conv_accelerator=spec.accel)
+            _m, mf_x = run_rohf(cfg_x, str(chk_dir / f"{spec.tag}.chk"),
+                                ref=ref, mom_seed=mom_seed)
+        else:
+            ref = ReferenceSpec(occ_closed=spec.closed, occ_open=spec.open,
+                                occ_e_ref=spec.e_ref,
+                                seed_basis=seed_basis,
+                                source_closed=spec.source_closed,
+                                source_open=spec.source_open,
+                                conv_accelerator=spec.accel)
+            _m, mf_x = run_rohf(cfg_x, str(chk_dir / f"{spec.tag}.chk"),
+                                ref=ref)
         # the occupation post-check: a run whose converged occupied
         # columns do not carry the declared character is a wrong
         # configuration, refused whatever the energy (the Newton
