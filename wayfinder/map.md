@@ -6,9 +6,6 @@ dumps are not kept.
 
 ## Tickets
 
-- [39 — the U14e prior axis](tickets/39-u14e-prior-axis.md):
-  ACTIVE — the @r/@s windows over the full-band families, the +923
-  poverty question (approved 2026-11-17; the stages in the ticket).
 - [33 — the symmetry-breaking anatomy deliverable](tickets/33-symmetry-anatomy.md):
   DESIGN-FIRST, awaiting the user's shape call — the frozen-landscape
   tables (the m-symmetric θ-grid, the member-tilt ladder with the
@@ -29,7 +26,13 @@ repair certified + integrated, the twins' series + @s legs 36/36 per
 twin, `_unc_s_block` retired, the UHF anchor re-landed, the frac
 class measured-refused, `subspace_rohf` integrated with the battery
 green and the per-contraction ΔE certificate measured — the record in
-the ticket's git history + elements/<twin>/logs/subspace.log).
+the ticket's git history + elements/<twin>/logs/subspace.log); 39 the
+U14e prior axis (2026-11-17: the series census measured-REFUSED the
+@s half — the ECP substrate holds no member basin, every converged
+draw is the head f³d¹; the @r1 legs ran and CURED the band-identity
+poverty — +146.9/+149.3 vs the incumbent's +923.1, the exact ⁵L
+(72.0000) at machine-zero closure on pur; the optimizer follow-on is
+the disposition candidate below).
 
 ## Issues
 
@@ -78,6 +81,15 @@ the ticket's git history + elements/<twin>/logs/subspace.log).
 
 ### Disposition candidates (the user's future call)
 
+- **The U14e @r1 optimizer follow-on** (the Stage-3 YES branch, the
+  user's call 2026-11-17): the @r1 window CURED the band-identity
+  poverty (+146.9/+149.3 vs the incumbent's +923.1; the exact ⁵L
+  72.0000 at machine-zero closure on pur) — the frozen/SA CASSCF
+  legs on it (their pending rows hold their places under
+  prior-anchor-first) would read whether the full-band radial
+  SURVIVES optimization: the free SA escaped the incumbent's compact
+  window; the full-band window may hold.  Entangled with the twins'
+  adoption decision (the same un-gating of `run_casscf`).
 - **The swap-basin optimizer class re-run gauge-anchored** (the
   Stage-2 leftover): if the campaign wants in-window solutions on the
   twins, the optimizer legs re-run seeded -- rides the Stage-3
@@ -134,6 +146,18 @@ the ticket's git history + elements/<twin>/logs/subspace.log).
   frac-bearing atom appears by the next reference-layer wave.
 
 ### Settled (standing facts, one line each; git history the archive)
+
+- **The U14e band-identity poverty is the compact radial, and the
+  prior cures it** (ticket 39, 2026-11-17): the incumbent 10f+13d
+  window captures only 82-83% of the head's f-valence density (the
+  full 9f-11f family 96-97%; 13d 92% vs 98.5%); the @r1 prior
+  recovers 84% of the +923 mEh poverty at CASCI (+147) with the
+  exact ⁵L on pur.  The configuration series is ECP-REFUSED (the
+  census, logs/series_discovery.log: ~40 arms hold no f⁴/f²d² basin
+  — every converged draw is the head f³d¹, even the −48.7 stalls
+  relax into it under Newton) — the @s axis has no U14e declaration
+  (the C precedent), and `run_series`'s member-config seam now
+  threads ecp/charge/tag (the ECP-threading fix, dataclasses.replace).
 
 - **The U14e campaign COMPLETE** (tickets 36A + 38): the free-mask
   SA legs certify the ground term END-TO-END — ⁵L, ⟨L²⟩ = 72.00
