@@ -766,11 +766,21 @@ def _window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
             mol, mfs, mf.get_ovlp(), key.shell_patterns,
             prior_bands if prior_bands is not None else shell_bands,
             {sh: k for sh in key.shell_patterns}, ncol)
+
+        def _cap(r):
+            """The per-shell capture read: configurations with no
+            significant columns on the shell place no demand on the
+            span (f4's zero d occupation -- the vacuous rows are the
+            honest report, not zeros)."""
+            rows = [c for c in r["capture"] if c]
+            if not rows:
+                return "capture n/a (no significant source columns)"
+            return (f"capture {min(min(c) for c in rows):.4f}"
+                    f"-{max(max(c) for c in rows):.4f}")
+
         print("  [window] prior " + "; ".join(
             f"{sh}: k={r['k']} of {len(r['bands'])} bands, "
-            f"discarded {r['discarded']:.4f}, "
-            f"capture {min(min(c) for c in r['capture']):.4f}"
-            f"-{max(max(c) for c in r['capture']):.4f}"
+            f"discarded {r['discarded']:.4f}, {_cap(r)}"
             for sh, r in report.items()), flush=True)
         return act, act.shape[1], report
     act = select_valence_ao(
