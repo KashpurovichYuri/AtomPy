@@ -115,9 +115,6 @@ def seed_density(mf, want):
         have = sorted((i for i in opens if w([i])[0] >= 0.5),
                       key=lambda i: eps[i])[:n_want]
         pick += have
-        have = sorted((i for i in opens if w([i])[0] >= 0.5),
-                      key=lambda i: eps[i])[:n_want]
-        pick += have
         short = n_want - len(have)
         if short > 0:
             # EPSILON-FIRST within the majority floor -- the weight

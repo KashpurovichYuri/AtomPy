@@ -270,8 +270,7 @@ def mom_self_seed(mf, want: dict[str, int]) -> tuple[np.ndarray, np.ndarray]:
     primitives of the SAME shell read weights that edge out the
     valence members' at full precision (both ~ 1.000 -- the
     difference is numerical, not chemical), so the sort selects the
-    tight end's epsilon ~ 20+ columns as the "shell" (the U14e
-    census's caught bug, 2026-11-17).
+    tight end's high-epsilon columns as the "shell".
 
     The closed block rides UNTOUCHED -- the configuration varies only
     the open block; the seed's occupations are the picked columns'
@@ -308,7 +307,9 @@ def mom_self_seed(mf, want: dict[str, int]) -> tuple[np.ndarray, np.ndarray]:
     SCF's stability -- what matters is that the seed's columns are
     the INTENDED shell's columns, which is exactly what the
     character-only premium cannot decide and the floor+epsilon rule
-    can.
+    can.  The trap is a measured instance (2026-11-17): a seed
+    builder that weight-ranked picked the epsilon ~ 22-39 primitives
+    for its valence slots; the trap test reproduces it at toy scale.
     """
     occ = np.asarray(mf.mo_occ)
     eps = np.asarray(mf.mo_energy)

@@ -132,8 +132,8 @@ class SeriesSpec(NamedTuple):
         (:func:`atomterm.reference.mom_self_seed`), the member run
         MOM-anchored under :func:`atomterm.reference.run_rohf`'s
         ``mom_seed`` master -- the substrate with no foreign source
-        basis and no weight-hook vocabulary for the split (the U14e
-        member refusal's cure, 2026-11-17).  None = the case's
+        basis and no flat-ranking vocabulary for the per-span split.
+        None = the case's
         ``series_seed`` thread (the projected source) or the bare
         weight hook.  Only the non-head entries run: the head is the
         case's own trusted reference and refuses a seed declaration.
@@ -247,6 +247,12 @@ def run_series(cfg: "AtomConfig", workdir: str | Path, key: str, series,
                 f"series config {spec.tag!r}: unknown seed form "
                 f"{spec.seed!r} -- 'self' (the head's own columns "
                 "re-assigned) or None (the series_seed thread)")
+        if spec.seed == "self" and spec.source_closed is not None:
+            raise ValueError(
+                f"series config {spec.tag!r}: source_closed/source_open "
+                "are the seed_basis thread's own (the projected "
+                "source's vocabulary) -- a self-seed member declares "
+                "none (its seed needs no vocabulary but the spans)")
         if (spec.open_counts is None) != (spec.seed is None):
             raise ValueError(
                 f"series config {spec.tag!r}: seed={spec.seed!r} and "

@@ -86,6 +86,22 @@ configuration-inert).
   and `closed_electrons` assumes one band per shell; the fix is
   character-selected fold spans with reference-occupation counts —
   a real seam extension when wanted.
+- **Review declinations, ticket-40 wave** (2026-11-17): (a)
+  `SeriesSpec.seed` stays `str | None` + runtime refusal (NOT
+  `Literal["self"]`) — consistency with the declaration-style
+  validation (`ReferenceSpec.accel`'s own pattern), the battery pins
+  the vocabulary; (b) the `_cap` log-line closure stays nested in
+  `_window_columns` — display shaping at its one call site, a module
+  level name would widen the interface for a print; (c) the probes'
+  pick twins (`probe_u14e_mom.seed_columns`,
+  `probe_u14e_series.seed_density`) stay un-retired to the
+  production `mom_self_seed` — committed historical instruments whose
+  logs are the provenance of what ran (their duplicate BLOCK, a
+  real bug, was fixed); (d) the seeded-refusal's surviving
+  `<chk>.<seed_basis>.source.chk` cache is CORRECT, not an
+  asymmetry to fix — the source is the small-basis run certified
+  independently at its own creation (its own post-check); the
+  target's refusal does not impugn it, the cache convention applies.
 
 ### Disposition candidates (the user's future call)
 
