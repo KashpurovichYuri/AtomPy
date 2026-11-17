@@ -6,6 +6,9 @@ dumps are not kept.
 
 ## Tickets
 
+- [39 — the U14e prior axis](tickets/39-u14e-prior-axis.md):
+  ACTIVE — the @r/@s windows over the full-band families, the +923
+  poverty question (approved 2026-11-17; the stages in the ticket).
 - [33 — the symmetry-breaking anatomy deliverable](tickets/33-symmetry-anatomy.md):
   DESIGN-FIRST, awaiting the user's shape call — the frozen-landscape
   tables (the m-symmetric θ-grid, the member-tilt ladder with the

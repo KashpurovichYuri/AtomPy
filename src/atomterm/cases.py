@@ -459,15 +459,18 @@ def _same_l_void(key: str, windows) -> Scenario:
 
 
 
-def _prior_anchor_first(atom: str, sectors) -> Scenario:
+def _prior_anchor_first(atom: str, sectors,
+                        windows: tuple[str, ...] = _PRIOR_WINDOWS) -> Scenario:
     """The prior windows' anchor-first gate (every declared sector --
     the case default and any planned_sectors overrides): their
     OPTIMIZER cells stay void until the CASCI anchors run -- the
     prior comparison is CASCI; the treatment rows over a chosen
     basis come after the adoption decision (the radial-CASSCF legs
-    re-home there)."""
+    re-home there).  The windows default to the contracted metals'
+    shared ``@`` set; an atom whose prior labels differ declares its
+    own (U14e's chemical-shell labels)."""
     cells = []
-    for w in _PRIOR_WINDOWS:
+    for w in windows:
         for lbl in (w, no_label(w)):
             cells += [f"{atom.lower()}_{lbl}_{na}-{nb}_{m}_"
                       for na, nb in sectors
@@ -510,6 +513,22 @@ def _prior_anchor_first(atom: str, sectors) -> Scenario:
 #                       record's own open question)
 _U14E_PROMOTED = ("10f13d", "10f13d7s", "10f13d14p")
 _U14E_PROMOTED_SECTORS = {"10f13d7s": (5, 1)}
+
+# the ECP atom's prior-axis window (ticket 39, 2026-11-17): the @r1
+# candidate -- the head's own density block over the FULL band
+# families, the poverty-cure candidate against the band-limited
+# incumbent.  The @s half is MEASURED-REFUSED: the configuration
+# series has no second rung on this substrate -- the series census
+# (elements/U14e/logs/series_discovery.log, 2026-11-17; ~40 arms:
+# weight hook and bare aufbau, all three accelerators, the gate's
+# guess cycle and dm0-seeded starts, whole-l and band-limited open
+# spans, DIIS-stall Newton rescues) holds neither f4 nor f2d2 --
+# every converged draw is the head f3d1 basin (-50.38185233; the
+# f4-class stalls at -48.70 and relax INTO the head under Newton).
+# A head-only series is rank-1: @s1 would duplicate @r1 at a second
+# address and @s2 refuses its k=2 construction -- the C precedent
+# (the refusing window is not declared; the reason lives here)
+_U14E_PRIOR = ("5f6d@r1",)
 
 # THE SHELL LAYER (the port of the multi-column core, the machinery
 # proven on Sc-unc/Ti-unc): the measured realizations from the record's
@@ -942,10 +961,24 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    # ONLY -- the planned addresses prune under the
                    # replace semantics; the canonical rebuild is the
                    # grid pass + --group planned.
-                   planned_windows=_U14E_PROMOTED[1:],
+                   planned_windows=_U14E_PROMOTED[1:] + _U14E_PRIOR,
                    planned_sectors=_U14E_PROMOTED_SECTORS,
                    render_spans=_U14E_PROMOTED + ("5f6d", "5f6d7s"),
-                   scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID),
+                   scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID,
+                              _prior_anchor_first("u14e", [(4, 0)],
+                                                  windows=_U14E_PRIOR)),
+                   # the prior axis (ticket 39, 2026-11-17): the
+                   # realization is the CERTIFIED band families (the
+                   # band certificate, logs/probe_bands.log); the
+                   # poverty the @r1 window tests is quantified --
+                   # the incumbent 10f band captures 82-83% of the
+                   # head's f-valence density, the full family
+                   # 9f+10f+11f 96-97% (13d: 92% vs 98.5%).  NO
+                   # series field: the @s half is measured-refused
+                   # (the census verdict at _U14E_PRIOR above -- no
+                   # member basin exists to average)
+                   prior_bands={"5f": ("9f", "10f", "11f"),
+                                "6d": ("12d", "13d", "14d")},
                    window_names={"10f13d": "5f6d",
                                  "10f13d7s": "5f6d7s",
                                  "10f13d14p": "5f6d6p"},

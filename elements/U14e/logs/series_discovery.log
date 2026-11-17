@@ -1,0 +1,37 @@
+head (trusted): E = -50.38185233  open-block l0:0.013  l1:0.002  l2:0.987  l3:2.998
+
+== member f4  closed=('l0', 'l1') open=('l3',) spin=4
+        newton default: E = 134.07960618 conv=False occ_ok=False  | l0:0.008  l1:1.000  l2:2.170  l3:0.823
+           newton atom: E = 134.08055960 conv=False occ_ok=False  | l0:0.018  l1:1.003  l2:1.982  l3:0.997
+         newton huckel: E = -50.38185233 conv=False occ_ok=False  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+   diis+newton default: E = 3471.09770223 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+      diis+newton atom: E = 3112.98727535 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+    diis+newton huckel: E = 2777.91601757 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+          diis default: E = 3280.46722203 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+             diis atom: E = 2826.41828225 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+           diis huckel: E = 3148.91076510 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+           newton seed: E = 134.08055961 conv=False occ_ok=False  | l0:0.018  l1:1.003  l2:1.982  l3:0.997
+      diis+newton seed: E = 3434.75377869 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+             diis seed: E = 2688.80318246 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+    bare seed (aufbau): E = -48.69934379 conv=False  | l0:0.000  l1:0.007  l2:0.000  l3:3.993
+  stall->newton (aufbau): E = -50.38185233 conv=True  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+    stall->hook+newton: E = -50.38185233 conv=True occ_ok=False  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+
+== member f2d2  closed=('l0', 'l1') open=('l2', 'l3') spin=4
+        newton default: E = -50.38185233 conv=True occ_ok=True  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+           newton atom: E = -50.38185233 conv=True occ_ok=True  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+         newton huckel: E = -50.38185233 conv=True occ_ok=True  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+   diis+newton default: E = 2790.43309489 conv=False occ_ok=False  | l0:0.995  l1:1.000  l2:2.005  l3:0.000
+      diis+newton atom: E = 2719.07976878 conv=False occ_ok=False  | l0:2.000  l1:0.000  l2:2.000  l3:0.000
+    diis+newton huckel: E = 2972.18158645 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:4.000  l3:0.000
+          diis default: E = 3119.98244517 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:3.000  l3:1.000
+             diis atom: E = 2862.76459339 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:4.000  l3:0.000
+           diis huckel: E = 3144.36384852 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:2.000  l3:2.000
+           newton seed: E = -50.38185233 conv=True occ_ok=True  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+      diis+newton seed: E = 2599.01118470 conv=False occ_ok=False  | l0:0.000  l1:2.000  l2:1.000  l3:1.000
+             diis seed: E = 2791.80285370 conv=False occ_ok=True  | l0:0.000  l1:0.000  l2:4.000  l3:0.000
+    bare seed (aufbau): E = -48.69548264 conv=False  | l0:0.000  l1:0.000  l2:0.000  l3:4.000
+  stall->newton (aufbau): E = -50.38185233 conv=True  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+    stall->hook+newton: E = -50.38185233 conv=True occ_ok=True  | l0:0.013  l1:0.002  l2:0.987  l3:2.998
+
+done -- the declared basin per member: the deepest converged occ_ok arm carrying its configuration's fingerprint
