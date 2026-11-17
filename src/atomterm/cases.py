@@ -514,21 +514,22 @@ def _prior_anchor_first(atom: str, sectors,
 _U14E_PROMOTED = ("10f13d", "10f13d7s", "10f13d14p")
 _U14E_PROMOTED_SECTORS = {"10f13d7s": (5, 1)}
 
-# the ECP atom's prior-axis window (ticket 39, 2026-11-17): the @r1
-# candidate -- the head's own density block over the FULL band
-# families, the poverty-cure candidate against the band-limited
-# incumbent.  The @s half is MEASURED-REFUSED: the configuration
-# series has no second rung on this substrate -- the series census
-# (elements/U14e/logs/series_discovery.log, 2026-11-17; ~40 arms:
-# weight hook and bare aufbau, all three accelerators, the gate's
-# guess cycle and dm0-seeded starts, whole-l and band-limited open
-# spans, DIIS-stall Newton rescues) holds neither f4 nor f2d2 --
-# every converged draw is the head f3d1 basin (-50.38185233; the
-# f4-class stalls at -48.70 and relax INTO the head under Newton).
-# A head-only series is rank-1: @s1 would duplicate @r1 at a second
-# address and @s2 refuses its k=2 construction -- the C precedent
-# (the refusing window is not declared; the reason lives here)
-_U14E_PRIOR = ("5f6d@r1",)
+# the ECP atom's prior-axis windows (tickets 39 + 40, 2026-11-17):
+# the head's own density block over the FULL band families (@r1) and
+# the series average (@s1/@s2) -- the poverty-cure candidates against
+# the band-limited incumbent.  The @s half's history is the record's
+# cautionary tale: the series census (logs/series_discovery.log,
+# ~40 arms) measured-REFUSED the members -- and the diagnosis (ticket
+# 40: logs/spectrum.log, logs/mom_census.log) re-attributed the
+# refusal to the weight hook's character-only premium (a
+# combinatorial tie among ~12 pure d/f valence virtuals + the tight
+# tail), then LANDED both members under the self-seeded MOM (f4
+# -50.31571501, f2d2 -50.34788201, two accelerators independently).
+# The revival: the series declares (seed="self"), @s1 answers whether
+# the series average beats the head's own block, and @s2 is
+# constructible at k=2 -- f2d2 gives the d shell its genuinely second
+# radial
+_U14E_PRIOR = ("5f6d@r1", "5f6d@s1", "5f6d@s2")
 
 # THE SHELL LAYER (the port of the multi-column core, the machinery
 # proven on Sc-unc/Ti-unc): the measured realizations from the record's
@@ -967,16 +968,25 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    scenarios=(_U14E_ANCHOR_FIRST, _U14E_FRAC_VOID,
                               _prior_anchor_first("u14e", [(4, 0)],
                                                   windows=_U14E_PRIOR)),
-                   # the prior axis (ticket 39, 2026-11-17): the
+                   # the prior axis (tickets 39 + 40, 2026-11-17): the
                    # realization is the CERTIFIED band families (the
                    # band certificate, logs/probe_bands.log); the
-                   # poverty the @r1 window tests is quantified --
+                   # poverty the prior windows test is quantified --
                    # the incumbent 10f band captures 82-83% of the
                    # head's f-valence density, the full family
-                   # 9f+10f+11f 96-97% (13d: 92% vs 98.5%).  NO
-                   # series field: the @s half is measured-refused
-                   # (the census verdict at _U14E_PRIOR above -- no
-                   # member basin exists to average)
+                   # 9f+10f+11f 96-97% (13d: 92% vs 98.5%).  The
+                   # series (the census's measured anchors, drawn --
+                   # never pinned: the quasi-degenerate class; the
+                   # members run MOM self-seeded, the flat hook
+                   # cannot hold the split)
+                   series=(SeriesSpec("f3d1", ("l0", "l1"), ("l2", "l3"),
+                                             4, -50.38185233),
+                           SeriesSpec("f4", ("l0", "l1"), ("l3",),
+                                             4, -50.31571501,
+                                      seed="self", open_counts=(4,)),
+                           SeriesSpec("f2d2", ("l0", "l1"), ("l3", "l2"),
+                                             4, -50.34788201,
+                                      seed="self", open_counts=(2, 2))),
                    prior_bands={"5f": ("9f", "10f", "11f"),
                                 "6d": ("12d", "13d", "14d")},
                    window_names={"10f13d": "5f6d",

@@ -179,21 +179,29 @@ def test_twins_declare_the_seeded_honest_series():
             assert m.source_open in (("3d", "4s"), ("3d",))
 
 
-def test_u14e_declares_the_r1_prior_axis():
-    """The ECP atom's prior axis (ticket 39, 2026-11-17): the @r1
-    window ONLY -- the @s half is measured-refused (the series census
-    holds no member basin on the ECP substrate; the verdict lives at
-    the _U14E_PRIOR declaration and logs/series_discovery.log), so
-    the case declares NO series (a head-only series is rank-1: @s1
-    would duplicate @r1, @s2 refuses its k=2 -- the C precedent), the
-    prior realization is the certified band families, and the prior
-    window's optimizer cells are gated (the comparison is CASCI)."""
+def test_u14e_declares_the_series_revival():
+    """The ECP atom's prior axis (tickets 39 + 40, 2026-11-17): the
+    THREE prior windows -- the @s half REVIVED by the self-seeded MOM
+    (the census landed both members; the diagnosis re-attributed the
+    weight hook's refusal to its character-only premium, not the
+    landscape), the series declares the three measured basins
+    (head f3d1 + f4 + f2d2, the members seed="self" with the per-span
+    counts the flat ranking cannot express), the prior realization is
+    the certified band families, and the prior windows' optimizer
+    cells are gated (the comparison is CASCI)."""
     cs = CAMPAIGN["U14e"]
-    assert cs.series is None
     assert cs.prior_bands == {"5f": ("9f", "10f", "11f"),
                               "6d": ("12d", "13d", "14d")}
+    head, f4, f2d2 = cs.series
+    assert (head.tag, head.spin, head.e_ref) == ("f3d1", 4, -50.38185233)
+    assert head.seed is None and head.open_counts is None  # never re-run
+    assert (f4.tag, f4.open, f4.e_ref) == ("f4", ("l3",), -50.31571501)
+    assert (f4.seed, f4.open_counts) == ("self", (4,))
+    assert (f2d2.tag, f2d2.open, f2d2.e_ref) == ("f2d2", ("l3", "l2"),
+                                                 -50.34788201)
+    assert (f2d2.seed, f2d2.open_counts) == ("self", (2, 2))
+    # all members spin 4 (Hund; the head is the case's own reference)
+    assert all(s.spin == cs.spin for s in cs.series)
     tagged = [w for w in cs.planned_windows if "@" in w]
-    assert "5f6d@r1" in tagged
-    # the @s half is refused -- no series source exists
-    assert all(w.partition("@")[2].startswith("r") for w in tagged)
+    assert tagged == ["5f6d@r1", "5f6d@s1", "5f6d@s2"]
     assert "prior-anchor-first" in {s.name for s in cs.scenarios}
