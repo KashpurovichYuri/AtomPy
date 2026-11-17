@@ -242,6 +242,50 @@ def test_mom_self_seed_refuses_unfillable_or_overlapping_wants():
         mom_self_seed(mf, {"l1": 1, "2p": 1})  # '2p' re-claims the open
 
 
+def test_run_rohf_refusal_leaves_no_chk(tmp_path, monkeypatch):
+    """A refused draw (the gate's OR the post-check's) deletes its
+    chkfile -- the cache trusts what is present, so the refused run's
+    own chk is a poisoned cache (the U14e certification's hazard:
+    the gate refused f2d2's metastable draw after the SCF wrote it,
+    2026-11-17)."""
+    import atomterm.reference as _mod
+    from pathlib import Path
+    from atomterm.reference import ReferenceSpec, run_rohf
+
+    mol = _mom_mol()
+    cfg = SimpleNamespace(symbol="C", basis="sto-3g", spin=2,
+                          verbose=0, ecp=None, charge=0)
+    ref = ReferenceSpec(occ_closed=("l0",), occ_open=("l1",),
+                        occ_e_ref=-37.5)
+
+    def _gate_refused(m, ref, dm0=None):
+        Path(m.chkfile).write_text("junk")   # the SCF wrote its chk
+        m.e_tot, m.converged = -999.0, True  # converged, wrong basin
+        return m
+
+    monkeypatch.setattr(_mod, "_accelerated", _gate_refused)
+    chk = str(tmp_path / "gate_refused.chk")
+    with pytest.raises(RuntimeError, match="did not reach"):
+        run_rohf(cfg, chk, ref=ref)
+    assert not Path(chk).exists()
+
+    def _postcheck_refused(m, ref, dm0=None):
+        Path(m.chkfile).write_text("junk")
+        m.e_tot, m.converged = ref.occ_e_ref, True  # the gate passes
+        m.mo_occ = np.zeros(mol.nao_nr())           # the character won't
+        m.mo_coeff = np.eye(mol.nao_nr())
+        return m
+
+    monkeypatch.setattr(_mod, "_accelerated", _postcheck_refused)
+    chk = str(tmp_path / "postcheck_refused.chk")
+    seed = (np.eye(mol.nao_nr())[:, :3], np.array([2.0, 1.0, 1.0]))
+    # the post-check fires on the seeded/momed modes only -- the MOM
+    # master arms it (a plain forced run's gate IS its verification)
+    with pytest.raises(RuntimeError, match="frozen-assignment"):
+        run_rohf(cfg, chk, ref=ref, mom_seed=seed)
+    assert not Path(chk).exists()
+
+
 def test_mom_occ_follows_the_seed_by_max_overlap():
     """The MOM hook's contest: each seeded slot takes the current
     column of max S-overlap (closed pairs first by seed order), the

@@ -65,6 +65,7 @@ Conventions
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 from pyscf import gto, scf
@@ -571,10 +572,13 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
         given together with ``dm0`` or ``ref.seed_basis``;
         ``mom_seed`` without the declared occupation patterns.
     RuntimeError
-        The seeded mode's character post-check failed on the
-        converged solution (the configuration drifted from the
-        seed -- the frozen-assignment disease; the basin census or
-        the seed needs revisiting).
+        The fresh run did not reach the declared basin (the gate's
+        own error, propagated), or the seeded mode's character
+        post-check failed on the converged solution (the
+        configuration drifted from the seed -- the frozen-assignment
+        disease; the basin census or the seed needs revisiting).
+        Either refusal deletes the run's chkfile -- a refused draw
+        never poisons the trusted cache.
 
     Notes
     -----
@@ -634,15 +638,25 @@ def run_rohf(cfg, chkfile: str, ref: ReferenceSpec | None = None,
         return m
 
     gate = ref.occ_e_ref if ref is not None else None
-    mol, mf = _converged_cached(mol, fresh_mf, chkfile, ref, gate, cfg,
-                                dm0=dm0)
-    if (seeded or momed) and not occupation_postcheck(
-            mol, mf, ref.occ_closed, ref.occ_open):
-        raise RuntimeError(
-            "the seeded run's converged occupations do not carry the "
-            "declared character (the frozen-assignment disease: the "
-            "solution drifted from the seed's configuration) -- the "
-            "basin census or the seed needs revisiting")
+    try:
+        mol, mf = _converged_cached(mol, fresh_mf, chkfile, ref, gate,
+                                    cfg, dm0=dm0)
+        if (seeded or momed) and not occupation_postcheck(
+                mol, mf, ref.occ_closed, ref.occ_open):
+            raise RuntimeError(
+                "the seeded run's converged occupations do not carry "
+                "the declared character (the frozen-assignment "
+                "disease: the solution drifted from the seed's "
+                "configuration) -- the basin census or the seed needs "
+                "revisiting")
+    except RuntimeError:
+        # a refused draw must not leave a chk the trusted cache would
+        # load -- the cache trusts what is present, so the refusal's
+        # own chk is a poisoned cache (the U14e certification's
+        # hazard: the gate refused f2d2's metastable draw but the SCF
+        # had already written it)
+        Path(chkfile).unlink(missing_ok=True)
+        raise
     return mol, mf
 
 

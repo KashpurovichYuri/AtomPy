@@ -39,7 +39,7 @@ restrictions lift). Mechanical enforcement: the global
 ## Running things
 
 ```bash
-pytest -m fast                                  # the gate's base: 257 tests, seconds
+pytest -m fast                                  # the gate's base: 258 tests, seconds
 pytest tests/unit/test_X.py tests/integration/Y.py   # + the diff's targeted files
 python scripts/run.py <atoms>                   # term tables -> elements/<Atom>/
 python scripts/regen_cells.py <atom> \
@@ -220,7 +220,7 @@ cold-start warning surface.
 
 ## Tests
 
-`pytest` runs 351 tests. The fast tier: `pytest -m fast` = 257
+`pytest` runs 352 tests. The fast tier: `pytest -m fast` = 258
 tests in seconds (machine-light selection). The heavy tail is
 HOURS-class — the per-commit gate is the fast tier plus the diff's
 targeted files (see Running things); the full-suite run is RETIRED. A
