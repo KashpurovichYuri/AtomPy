@@ -1,0 +1,10 @@
+head (trusted): E = -50.38185233  (occ_e_ref -50.38185233)
+
+the series (tag -> E, the declared e_ref, the delta):
+   f3d1: E = -50.38185233  e_ref -50.38185233  delta 3.85e-09  gate HEAD  accel newton  open-block l2:1.000 l3:3.000
+     f4: E = -50.31571501  e_ref -50.31571501  delta 4.03e-09  gate OK  accel newton  open-block l3:4.000
+        post-check: OK
+   f2d2: E = -50.34788201  e_ref -50.34788201  delta 3.84e-09  gate OK  accel diis+newton  open-block l3:2.000 l2:2.000
+        post-check: OK
+
+certification complete -- the trusted chks are written

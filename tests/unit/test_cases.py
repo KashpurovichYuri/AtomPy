@@ -200,6 +200,9 @@ def test_u14e_declares_the_series_revival():
     assert (f2d2.tag, f2d2.open, f2d2.e_ref) == ("f2d2", ("l3", "l2"),
                                                  -50.34788201)
     assert (f2d2.seed, f2d2.open_counts) == ("self", (2, 2))
+    # the draw-robust policy (three fresh draws at ~4e-9); f4 keeps
+    # the default newton (diis+newton relaxes it INTO the head)
+    assert f2d2.accel == "diis+newton" and f4.accel == "newton"
     # all members spin 4 (Hund; the head is the case's own reference)
     assert all(s.spin == cs.spin for s in cs.series)
     tagged = [w for w in cs.planned_windows if "@" in w]

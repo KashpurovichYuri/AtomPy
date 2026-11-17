@@ -986,7 +986,13 @@ CAMPAIGN: dict[str, CaseSpec] = {
                                       seed="self", open_counts=(4,)),
                            SeriesSpec("f2d2", ("l0", "l1"), ("l3", "l2"),
                                              4, -50.34788201,
-                                      seed="self", open_counts=(2, 2))),
+                                      seed="self", open_counts=(2, 2),
+                                      # diis+newton: the draw-robust policy (three fresh
+                                      # draws land the anchor at ~4e-9; plain newton is
+                                      # draw-sensitive here -- the certification's refused
+                                      # draw; on f4 it would RELAX INTO THE HEAD, the
+                                      # census's measured warning)
+                                      accel="diis+newton")),
                    prior_bands={"5f": ("9f", "10f", "11f"),
                                 "6d": ("12d", "13d", "14d")},
                    window_names={"10f13d": "5f6d",
