@@ -263,8 +263,8 @@ costs nothing a correlation method would notice); **@s1** is
 filling-dependent (3.3–38 mEh — one series-average radial misses the
 d-richer configurations' radials); **@r1** is head-filling-only —
 excellent for its own head (+1.4/+1.9 mEh), impoverished for the
-d-richer members (+149/+199 mEh: a d¹-derived radial cannot host a d³
-density). The full 12-row record per twin:
+d-richer members (+148.6/+199.0 mEh: a d¹-derived radial cannot host a
+d³ density). The full 12-row record per twin:
 `elements/Sc-unc/logs/subspace.log`, `elements/Ti-unc/logs/subspace.log`.
 
 **Address guarantees** — the address IS the store identity (chk name,
