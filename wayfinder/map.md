@@ -15,15 +15,45 @@ w_ref per row).
   READY (42 done) — certificates before tables (the run-instrument
   gate).
 - [44 — Dyall H₀ + NEVPT2 strongly contracted](tickets/44-dyall-nevpt2.md):
-  BLOCKED BY 43 — the parameter-free PT2, intruder-freeness
-  verified.
+  READY (43's gate green) — the parameter-free PT2,
+  intruder-freeness verified.  The validation script grows the new
+  layers' certificates.
 - [45 — PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
-  BLOCKED BY 43 — the declared-scope render + the README reading key.
+  BLOCKED BY 44 — the declared-scope render + the README reading key.
 - [46 — the TABLE.md physics pass](tickets/46-table-physics-pass.md):
   DESIGN-FIRST, user-gated — the render-level significance policy
   (the stores keep everything; the table keeps the physics).
 
-Resolved (git history the archive): 42 the module born (2026-11-18):
+Resolved (git history the archive): 43 the validation script (2026-11-18):
+`scripts/validate_perturb.py` — the run instrument (the run.py
+precedent), the three-layer chain printed as certificate lines on the
+declared C/Si SA scope (grid + planned, ao start, free-route: 14+18
+runnable cells, 3 roots each): (a) twins at campaign size (production
+coupling vs `pyscf_apply`, EN vs the dense Slater–Condon twin), (b)
+the e0 external anchor (the store's PySCF CI energy; the E(2) anchor
+absent — the pyscf-forge note prints), (c) whole-space exactness +
+completeness (production == dense on a synthetic full-support CI) +
+reach containment.  GREEN: C 197 / Si 253 PASS, 0 FAIL
+(logs/validate_perturb.log committed).  THREE FINDINGS the
+certification caught: (1) THE RULER — the analyzation must fold the
+RUN'S OWN core field RAW (`spherical_core=False`, `c_core =
+mo[:, :ncore]`): the stored energies are the kernel's values on that
+field, and the optimized core's gauge p-admixture moves e0 at the
+5e-5 Eh scale between the raw and averaged folds (fact 14 applied to
+the post-hoc analyzation; with it the anchor sits at 1e-15).  (2) THE
+GAUGE CLASS — the Sz=+1 p² CAS block is exactly degenerate: the
+stored SA roots are arbitrary block gauges (support 1/3 dets on the
+pur substrates — Davidson's draw), disclosed per root by the script's
+gauge line; the meters read the stored draw.  (3) THE REACH CLASS —
+on symmetry-adapted tensors (pur) selection rules zero couplings
+INSIDE the brute reach (43 of 63): completeness is certified as
+production == dense (independent constructions on the same tensors),
+the brute count is the disclosed upper bound.  THE LADDER READ
+(preview of 45): ground-root E(2) is FLAT across the ladder — C
+−7.77..−7.79 mEh (compact/@r1/@s1), Si −6.9 → −5.5 (the @s2 decline)
+— against the +250 mEh CAS spread: the external space supplies the
+same small dynamic share on every window (cc-pVDZ's valence is thin —
+the reading key must carry the basis-thinness caveat); 42 the module born (2026-11-18):
 `perturb.py` rungs 0–1 — the FOIS (the exact apply-pattern
 enumeration beside `fois_indices`, the brute spin-preserving
 completeness certificate) and the EN E(2) in two independent

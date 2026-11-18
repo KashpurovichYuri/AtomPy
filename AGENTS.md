@@ -47,6 +47,7 @@ python scripts/regen_cells.py <atom> \
     [--method casci|casscf|sa-casscf] [--window W] [--mask M] \
     [--start ao|mo|moc|no] [--core raw|avg|frac] [--sector NA-NB] [--full]
 python scripts/build_methods_tables.py <atom>    # re-render TABLE.md + TABLE.csv
+python scripts/validate_perturb.py [atoms]       # the PT2 certificate chain (the render gate)
 ```
 
 - **The per-commit gate** (user-directed): the fast tier plus the diff's
