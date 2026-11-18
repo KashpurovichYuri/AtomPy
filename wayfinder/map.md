@@ -6,12 +6,39 @@ dumps are not kept.
 
 ## Tickets
 
-- [33 — the symmetry-breaking anatomy deliverable](tickets/33-symmetry-anatomy.md):
-  DESIGN-FIRST, awaiting the user's shape call — the frozen-landscape
-  tables (the m-symmetric θ-grid, the member-tilt ladder with the
-  ±pair blind spots visible) that replace the retired scan pointers.
+The wave spec: [`specs/pt2-perturbation.md`](specs/pt2-perturbation.md)
+— the perturbation analyzation's contract (the window-ladder
+diagnostic; the schema; the metric surface: R over rows, floor +
+w_ref per row).
 
-Resolved (git history the archive): 29 the Ti-first protocol; 30 the
+- [42 — `perturb.py` rungs 0–1: the FOIS + Epstein–Nesbet](tickets/42-perturb-epstein-nesbet.md):
+  READY — the module born, the EN twins certified on the frozen
+  carbon fixture + synthetic anchors.
+- [43 — the validation script](tickets/43-validate-perturb.md):
+  BLOCKED BY 42 — certificates before tables (the run-instrument
+  gate).
+- [44 — Dyall H₀ + NEVPT2 strongly contracted](tickets/44-dyall-nevpt2.md):
+  BLOCKED BY 42+43 — the parameter-free PT2, intruder-freeness
+  verified.
+- [45 — PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
+  BLOCKED BY 43 — the declared-scope render + the README reading key.
+- [46 — the TABLE.md physics pass](tickets/46-table-physics-pass.md):
+  DESIGN-FIRST, user-gated — the render-level significance policy
+  (the stores keep everything; the table keeps the physics).
+
+Resolved (git history the archive): 33 the symmetry-anatomy
+deliverable — RETIRED UNEXECUTED 2026-11-18 (the user's call); the
+idea stays specified: per-atom Readings sections with (1) the
+m-symmetric θ-grid (θ | ΔE | ‖[H,Lz]‖), (2) the member-tilt ladder
+exposing the ±pair blind spots (descend-with-zero-commutator = the
+directions the sector commutator cannot see), (3) one README reading
+key; everything regenerable from `scans.py`, verification = renderer
+pins. Would have delivered: the explanatory record behind the
+disclosure columns. Unneeded now: the verdicts it would visualize
+already live in the map's settled facts, the element files, and the
+README rules. Revival = re-open a ticket citing this entry (shape
+decisions recorded: descent ladder ~10 rows over the full 31-subset
+map; per-atom Readings; the Readings grammar home); 29 the Ti-first protocol; 30 the
 module walk; 31 the ECP wave; 32 the symmetry lane (C/Si/Sc/Ti one
 table, the route axis, the UHF anchors; closed 2026-11-05); 34 the
 folded reference (steps 1–5 + the gap closures; the After's T-C done
@@ -48,9 +75,12 @@ configuration-inert).
 
 - **The future-wave queue** (ticket 34's After + the standing
   candidates): the contraction-recipe provenance review (our radials
-  vs the basis authors' coefficients); the term-ID round (splittings
-  vs NIST — the acceptance test); then spin–orbit, transition
-  moments, g-factors.
+  vs the basis authors' coefficients); then spin–orbit, transition
+  moments, g-factors.  (The term-ID round — splittings vs NIST —
+  DECLINED 2026-11-18, the user's call.)
+- **The C/Si pinned-lane legs — APPROVED 2026-11-18** (the 2+2
+  pending rows, the last non-twin pendings): `--group lane` on C and
+  Si; minutes-class; closes the lane families completely.
 - **The queued CASCI review — EXECUTED 2026-11-17** (the three
   classes classified; no analysis bugs found): (1) the window-poverty
   class (+923 mEh) is the correct declared reading — U14e's
@@ -146,15 +176,22 @@ configuration-inert).
   surface it; the notes are currently identity-derived only.  Rides
   `build_methods_tables.py`'s next touch; the user's call.
 - **The Stage-3 adoption decision** (the user's call, the measured
-  basis in hand 2026-11-16): `subspace_rohf`'s certificate says the
+  basis in hand 2026-11-16; RE-SCOPED PROBE-FIRST 2026-11-18 — the
+  U14e optimizer wave's evidence: the escape class is universal and
+  the optimizer landscape is window-independent, so the twins' full
+  51+51-row grids would mostly re-measure a characterized class):
+  run a scoped probe batch first (@s2 pur, ~4–6 legs per twin:
+  casscf/sa × maskless/frozen), then scale or decline the full grid
+  ON THE EVIDENCE.  `subspace_rohf`'s certificate says the
   @s2 windows are MEAN-FIELD-SOUND everywhere (the confinement costs
   1.3–2.2 mEh at the ROHF level, every span, every filling, both
   twins), @s1 is filling-dependent (3.3–38 mEh), @r1 is
   head-filling-only (+1.4/+1.9 for its own head, up to +199 mEh for
   the d-richer members).  Un-gating `run_casscf` on the @s2 windows
-  is certified mean-field ground; the execution (the twins' primary
-  legs + the prior treatments' re-homing) waits on the user's go AND
-  the queued CASCI review (which precedes the un-gating wave).
+  is certified mean-field ground; the queued CASCI review EXECUTED
+  2026-11-17 (no analysis bugs found) — the execution waits on the
+  probe batch's go.  The swap-basin re-run (below) bundles with this
+  decision (the same un-gating).
 
 ### Watchlist
 
