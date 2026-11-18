@@ -100,6 +100,14 @@ ROHF reference energy: -50.38185233 Eh
 | u14e_5f6d@r1_4-0_sa-casscf_ao_-_pur_avg | -50.42381047 | -9.656e-01 | 72.00000 | 9.20e-05 | 9.05e-04 | 4.1e-04 | 6.9e-04 | 0.583 | nan | 9.8e-03 | 1.7e-11 |  |
 | u14e_5f6d@r1_4-0_sa-casscf_ao_frozen_pol_avg | -50.23957407 | -7.813e-01 | 71.34020 | 4.21e-02 | 7.54e-01 | 7.4e-02 | 4.0e-01 | 0.583 | nan | 9.8e-03 | 1.6e-11 |  |
 | u14e_5f6d@r1_4-0_sa-casscf_ao_frozen_pur_avg | -50.24117067 | -7.829e-01 | 72.00000 | 6.59e-14 | 4.91e-13 | 1.6e-13 | 3.3e-13 | 0.583 | nan | 1.1e-02 | 1.8e-11 |  |
+| u14e_5f6d@s1_4-0_casscf_ao_-_pol_avg | -50.42244917 | -9.642e-01 | 65.17995 | 1.33e+01 | 8.38e+01 | 5.4e+00 | 6.8e+00 | 0.620 | nan | 7.4e-03 | 1.7e-11 | NOT-CONVERGED |
+| u14e_5f6d@s1_4-0_casscf_ao_-_pur_avg | -50.42286500 | -9.646e-01 | 65.24558 | 1.25e+01 | 7.91e+01 | 4.7e+00 | 6.5e+00 | 0.657 | nan | 7.4e-03 | 1.9e-11 | NOT-CONVERGED |
+| u14e_5f6d@s1_4-0_casscf_ao_frozen_pol_avg | -50.24168192 | -7.834e-01 | 71.39584 | 4.33e-02 | 7.48e-01 | 7.3e-02 | 3.9e-01 | 0.583 | nan | 7.1e-03 | 1.5e-11 |  |
+| u14e_5f6d@s1_4-0_casscf_ao_frozen_pur_avg | -50.24343521 | -7.852e-01 | 72.00000 | 6.04e-14 | 5.75e-13 | 1.6e-13 | 3.3e-13 | 0.583 | nan | 3.5e-03 | 1.7e-11 |  |
+| u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg | -50.42381093 | -9.656e-01 | 72.00000 | 1.98e-04 | 1.85e-03 | 4.9e-04 | 8.2e-04 | 0.583 | nan | 2.8e-06 | 1.8e-11 |  |
+| u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg | -50.42381034 | -9.656e-01 | 72.00000 | 1.07e-04 | 1.01e-03 | 5.7e-04 | 9.3e-04 | 0.583 | nan | 6.5e-07 | 1.6e-11 |  |
+| u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg | -50.24345886 | -7.852e-01 | 71.39593 | 4.33e-02 | 7.48e-01 | 7.3e-02 | 3.9e-01 | 0.583 | nan | 9.8e-03 | 1.7e-11 |  |
+| u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg | -50.24517896 | -7.869e-01 | 72.00000 | 5.40e-14 | 4.29e-13 | 1.6e-13 | 3.3e-13 | 0.583 | nan | 1.1e-02 | 1.8e-11 |  |
 
 configurations per root (top-2 determinants):
 
@@ -679,6 +687,46 @@ configurations per root (top-2 determinants):
 - `u14e_5f6d@r1_4-0_sa-casscf_ao_frozen_pur_avg` root 6: d^2.00f^2.00 (|c|=0.26); d^2.00f^2.00 (|c|=0.22)
 - `u14e_5f6d@r1_4-0_sa-casscf_ao_frozen_pur_avg` root 7: d^2.00f^2.00 (|c|=0.22); d^2.00f^2.00 (|c|=0.22)
 - `u14e_5f6d@r1_4-0_sa-casscf_ao_frozen_pur_avg` root 8: d^2.00f^2.00 (|c|=0.22); d^2.00f^2.00 (|c|=0.19)
+- `u14e_5f6d@s1_4-0_casscf_ao_-_pol_avg` root 0: d^0.94f^3.06 (|c|=0.23); d^0.95f^3.05 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_casscf_ao_-_pur_avg` root 0: d^0.97f^3.03 (|c|=0.23); d^1.03f^2.96 (|c|=0.20)
+- `u14e_5f6d@s1_4-0_casscf_ao_frozen_pol_avg` root 0: d^2.00f^2.00 (|c|=0.22); s^0.01d^1.99f^2.00 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_casscf_ao_frozen_pur_avg` root 0: d^2.00f^2.00 (|c|=0.28); d^2.00f^2.00 (|c|=0.25)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg` root 0: d^1.00f^3.00 (|c|=0.26); d^1.00f^3.00 (|c|=0.25)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg` root 1: d^1.00f^3.00 (|c|=0.26); d^1.00f^3.00 (|c|=0.25)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg` root 2: d^1.00f^3.00 (|c|=0.25); d^1.00f^3.00 (|c|=0.24)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg` root 3: d^1.00f^3.00 (|c|=0.26); d^1.00f^3.00 (|c|=0.22)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg` root 4: d^1.00f^3.00 (|c|=0.35); d^1.00f^3.00 (|c|=0.20)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg` root 5: d^1.00f^3.00 (|c|=0.27); d^1.00f^3.00 (|c|=0.24)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg` root 6: d^1.00f^3.00 (|c|=0.33); d^1.00f^3.00 (|c|=0.27)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg` root 7: d^1.00f^3.00 (|c|=0.22); d^1.00f^3.00 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg` root 8: d^1.00f^3.00 (|c|=0.22); d^1.00f^3.00 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg` root 0: d^1.00f^3.00 (|c|=0.30); d^1.00f^3.00 (|c|=0.23)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg` root 1: d^1.00f^3.00 (|c|=0.29); d^1.00f^3.00 (|c|=0.24)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg` root 2: d^1.00f^3.00 (|c|=0.21); d^1.00f^3.00 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg` root 3: d^1.00f^3.00 (|c|=0.25); d^1.00f^3.00 (|c|=0.22)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg` root 4: d^1.00f^3.00 (|c|=0.20); d^1.00f^3.00 (|c|=0.20)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg` root 5: d^1.00f^3.00 (|c|=0.27); d^1.00f^3.00 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg` root 6: d^1.00f^3.00 (|c|=0.23); d^1.00f^3.00 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg` root 7: d^1.00f^3.00 (|c|=0.25); d^1.00f^3.00 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg` root 8: d^1.00f^3.00 (|c|=0.27); d^1.00f^3.00 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg` root 0: d^2.00f^2.00 (|c|=0.28); s^0.01d^1.99f^2.00 (|c|=0.24)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg` root 1: d^2.00f^2.00 (|c|=0.28); s^0.01d^1.99f^2.00 (|c|=0.24)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg` root 2: d^2.00f^2.00 (|c|=0.21); s^0.01d^1.99f^2.00 (|c|=0.19)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg` root 3: d^2.00f^2.00 (|c|=0.20); s^0.01d^1.99f^2.00 (|c|=0.19)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg` root 4: d^2.00f^2.00 (|c|=0.22); s^0.01d^1.99f^2.00 (|c|=0.21)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg` root 5: s^0.01d^1.99f^2.00 (|c|=0.20); d^2.00f^2.00 (|c|=0.20)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg` root 6: s^0.01d^1.99f^2.00 (|c|=0.23); d^2.00f^2.00 (|c|=0.17)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg` root 7: s^0.01d^1.99f^2.00 (|c|=0.27); s^0.01d^1.99f^2.00 (|c|=0.23)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg` root 8: s^0.01d^1.99f^2.00 (|c|=0.25); s^0.01d^1.99f^2.00 (|c|=0.25)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg` root 0: d^2.00f^2.00 (|c|=0.31); d^2.00f^2.00 (|c|=0.26)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg` root 1: d^2.00f^2.00 (|c|=0.30); d^2.00f^2.00 (|c|=0.26)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg` root 2: d^2.00f^2.00 (|c|=0.21); d^2.00f^2.00 (|c|=0.20)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg` root 3: d^2.00f^2.00 (|c|=0.19); d^2.00f^2.00 (|c|=0.19)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg` root 4: d^2.00f^2.00 (|c|=0.26); d^2.00f^2.00 (|c|=0.22)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg` root 5: d^2.00f^2.00 (|c|=0.23); d^2.00f^2.00 (|c|=0.22)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg` root 6: d^2.00f^2.00 (|c|=0.24); d^2.00f^2.00 (|c|=0.24)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg` root 7: d^2.00f^2.00 (|c|=0.23); d^2.00f^2.00 (|c|=0.22)
+- `u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg` root 8: d^2.00f^2.00 (|c|=0.28); d^2.00f^2.00 (|c|=0.22)
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 

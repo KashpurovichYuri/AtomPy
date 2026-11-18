@@ -72,11 +72,12 @@ configuration-inert).
   decision): the substrate tag in the key grammar, the free-route
   dominance declaration, the table re-anchoring — user-visible
   before any table carries folded rows.
-- **The pinned lane payload seam** (2026-11-11): the lane legs store
-  the certificate schema (anchor_dev/fold/conv) the renderer's
-  data-row condition does not recognize — pinned rows render pending
-  uniformly while their runs sit in the stores. Either the payload
-  gains renderable fields or the class goes store-only.
+- **The pinned lane payload seam — RESOLVED 2026-11-18** (7e4ab14):
+  the renderer's row gate reads all three payload shapes (the lane
+  payloads' ``total`` beside the free cells' ``e_ground``/
+  ``energies_pyscf``); the stored pinned legs render with the
+  bookkeeping-form disclosure.  Ti/Sc 4→0 pending each, the twins
+  54→51, U14e 26→24.
 - **test_symm_tm's SA legs** re-scope to store-anchored verification
   (the AGENTS Tests boundary, user-directed 2026-11-05): fresh CI
   legs stay, the SA verdicts load the committed route-batch stores —
@@ -105,17 +106,24 @@ configuration-inert).
 
 ### Disposition candidates (the user's future call)
 
-- **The U14e prior optimizer follow-on** (the Stage-3 YES branch, the
-  user's call 2026-11-17; widened 2026-11-17 by ticket 40 — the @s1
-  window is now the best prior): @r1 CURED the band-identity poverty
-  (+146.9/+149.3 vs the incumbent's +923.1) and @s1 BEATS it
-  (+141.3/+143.7, both exact ⁵L at machine-zero closure on pur) —
-  the frozen/SA CASSCF legs on the two prior windows (their pending
-  rows hold their places under prior-anchor-first) would read
-  whether the full-band radial SURVIVES optimization: the free SA
-  escaped the incumbent's compact window; the full-band windows may
-  hold.  Entangled with the twins' adoption decision (the same
-  un-gating of `run_casscf`).
+- **The U14e prior optimizer follow-on — EXECUTED 2026-11-18**
+  (bb39a70 + the close commit; the prior-anchor-first scenario's
+  dated claim re-tested by `--full`, both prior windows, 8 legs
+  each): the escape class is UNIVERSAL — the free single-root
+  CASSCF descends ~190 mEh below its CI anchor BY BREAKING ⟨L²⟩
+  (65.0–65.2, [H,Lz] 5e+00–1.3e+01, cycle-capped 1e-5/200); SA
+  holds the cure: −42.0 m at ⟨L²⟩ 72.0000 (4e-7), commutators
+  1e-4, converged, on BOTH priors; the frozen pur class certifies
+  machine-zero exact ⁵L under optimization (1e-13/1e-14, both
+  objectives, both windows).  THE DEEP FINDING: the optimizer's
+  landscape is window-INDEPENDENT — @r1 and @s1 free SA read
+  −50.4238/−1.1418 identically (the escape floors coincide at
+  −50.4298 too): the 5.6 mEh CI-level @s1 advantage was a
+  span-capture artifact of the frozen-orbital read; the relaxation
+  channel dominates.  The basis decision's evidence is complete:
+  both priors optimization-stable under SA, neither prior's
+  identity surviving to the optimizer level.  The twins' adoption
+  decision carries this evidence (the same un-gating).
 - **The swap-basin optimizer class re-run gauge-anchored** (the
   Stage-2 leftover): if the campaign wants in-window solutions on the
   twins, the optimizer legs re-run seeded -- rides the Stage-3

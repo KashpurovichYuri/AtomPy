@@ -1,0 +1,37 @@
+
+===== cells U14e =====
+ROHF E = -50.38185233 Eh
+  [cell] u14e_5f6d@s1_4-0_casci_ao_-_pol_raw
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/stages.py:342: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  core_ref = mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/operators.py:679: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  c_core = (mf.mo_coeff[:, occupied_core_idx(mf, ncore)]
+  [cell] u14e_5f6d@s1_4-0_casci_ao_-_pol_avg
+  [cell] u14e_5f6d@s1_4-0_casci_ao_-_pur_avg
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [cell] u14e_5f6d@s1_4-0_casscf_ao_-_pol_avg
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0001, capture 0.9077-0.9531; 6d: k=1 of 3 bands, discarded 0.0009, capture 0.9818-0.9946
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/cells.py:975: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  else occupied_core_idx(mf, ncore))
+  [cell] u14e_5f6d@s1_4-0_casscf_ao_-_pur_avg
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0001, capture 0.9077-0.9531; 6d: k=1 of 3 bands, discarded 0.0009, capture 0.9818-0.9946
+  [refused] u14e_5f6d@s1_4-0_casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] u14e_5f6d@s1_4-0_casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] u14e_5f6d@s1_4-0_casscf_ao_frozen_pol_avg
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0001, capture 0.9077-0.9531; 6d: k=1 of 3 bands, discarded 0.0009, capture 0.9818-0.9946
+  [cell] u14e_5f6d@s1_4-0_casscf_ao_frozen_pur_avg
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0001, capture 0.9077-0.9531; 6d: k=1 of 3 bands, discarded 0.0009, capture 0.9818-0.9946
+  [cell] u14e_5f6d@s1_4-0_sa-casscf_ao_-_pol_avg
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0001, capture 0.9077-0.9531; 6d: k=1 of 3 bands, discarded 0.0009, capture 0.9818-0.9946
+  [cell] u14e_5f6d@s1_4-0_sa-casscf_ao_-_pur_avg
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0001, capture 0.9077-0.9531; 6d: k=1 of 3 bands, discarded 0.0009, capture 0.9818-0.9946
+  [refused] u14e_5f6d@s1_4-0_sa-casscf_ao_radial_pol_avg -- the radial mask has no member-labeled rows on this case
+  [refused] u14e_5f6d@s1_4-0_sa-casscf_ao_radial_pur_avg -- the radial mask has no member-labeled rows on this case
+  [cell] u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pol_avg
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0001, capture 0.9077-0.9531; 6d: k=1 of 3 bands, discarded 0.0009, capture 0.9818-0.9946
+  [cell] u14e_5f6d@s1_4-0_sa-casscf_ao_frozen_pur_avg
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0001, capture 0.9077-0.9531; 6d: k=1 of 3 bands, discarded 0.0009, capture 0.9818-0.9946
+  wrote elements/U14e/cells.json + cells.md
+
+done
