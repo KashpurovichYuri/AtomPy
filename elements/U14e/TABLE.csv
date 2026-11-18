@@ -55,7 +55,7 @@ CASSCF,free,5f6d@s1 / D,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—
 "CASSCF, frozen",free,5f6d@s1 / D,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
 SA-CASSCF,free,5f6d@s1 / D,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
 "SA-CASSCF, frozen",free,5f6d@s1 / D,"(4,12)",Rn·7s·pur,—,—,—,—,—,—,—,—,—,—,—,—,pending
-CASCI,pinned,5f6d / D,"(4,12)",Rn·7s·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
+CASCI,pinned,5f6d / D,"(4,12)",Rn·7s·lane,"58,905",−49.0374,+1344.4,−1334.3767,+36.5841,—,72.0000,3e-14,1e-12,2e-12,1.1e-13ψ,1.3e-12ψ,bookkeeping form
 CASCI,free,5f6d / D,"(4,12)",Rn·7s·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
 CASSCF,free,5f6d / D,"(4,12)",Rn·7s·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
 SA-CASSCF,free,5f6d / D,"(4,12)",Rn·7s·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
@@ -92,7 +92,7 @@ CASSCF,free,5f6d7s / MOC,"(6,13)",Rn·pur,"16,731",−50.4231,−41.2,−1372.08
 "CASSCF, frozen",free,5f6d7s / MOC,"(6,13)",Rn·pur,"16,731",−50.3831,−1.2,−1370.9946,−0.0339,1e-10/12,0.0001,—,5e+00,9e+00,2.4e-02ψ,5.6e-02ψ,m-incomplete; bands 10f+13d+7s
 SA-CASSCF,free,5f6d7s / MOC,"(6,13)",Rn·pur,"16,731",−50.3860,−4.1,−1371.0726,−0.1119,1e-4/198,1.3487,1e-01,6e+00,8e+00,2.6e+01ψ,5.6e+01ψ,m-incomplete; bands 10f+13d+7s
 "SA-CASSCF, frozen",free,5f6d7s / MOC,"(6,13)",Rn·pur,"16,731",−50.3830,−1.1,−1370.9914,−0.0306,1e-10/12,0.0001,3e-01,5e+00,9e+00,2.4e-02ψ,5.6e-02ψ,m-incomplete; bands 10f+13d+7s
-CASCI,pinned,5f6d7s / D,"(6,13)",Rn·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
+CASCI,pinned,5f6d7s / D,"(6,13)",Rn·lane,"16,731",−48.7645,+1617.3,−1326.9504,+44.0103,—,72.0000,2e-14,8e-09,2e-08,1.2e-10ψ,2.0e-09ψ,bookkeeping form
 CASCI,free,5f6d7s / D,"(6,13)",Rn·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
 CASSCF,free,5f6d7s / D,"(6,13)",Rn·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending
 SA-CASSCF,free,5f6d7s / D,"(6,13)",Rn·lane,—,—,—,—,—,—,—,—,—,—,—,—,pending

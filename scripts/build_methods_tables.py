@@ -255,13 +255,19 @@ def _rows(keys, cells, anchor, spec, floor) -> list[str]:
     policy), in the given order: a payload renders its run, a
     payload-less runnable cell renders its PENDING placeholder (the
     structure), and the construction-refused class holds no place
-    (:func:`_pendingable`)."""
+    (:func:`_pendingable`).  The gate reads the three payload shapes
+    the store carries: the free cells' ``e_ground``/``energies_pyscf``
+    and the LANE payloads' ``total`` (the pinned legs ran through
+    :func:`run_lane_cell` -- a stored lane leg rendering ``pending``
+    was the render/source divergence this gate's original form
+    committed, 2026-11-18)."""
     out = []
     for k in keys:
         if not _method_row(k):
             continue
         p = payload_of(cells, k)
-        if p is not None and ("e_ground" in p or "energies_pyscf" in p):
+        if p is not None and ("e_ground" in p or "energies_pyscf" in p
+                              or "total" in p):
             out.append(_row(k, p, anchor, spec, floor))
         elif _pendingable(k, spec):
             # DATA always renders (the store is the record -- legacy
