@@ -837,3 +837,11 @@ lane cells (tagged windows; the pinned rows carry term energies) and void cells 
 - `u14e_10f13d7s_5-1_sa-casscf_ao_frozen_pur_avg` E -49.36896039
 - `u14e_10f13d7s_5-1_sa-casscf_mo_frozen_pur_avg` E -50.39155226
 - `u14e_10f13d7s_5-1_sa-casscf_moc_frozen_pur_avg` E -50.38297761
+- `u14e_5f6d@6s6p7s_4-0_casci_ao_-_pol_avg` E -49.11287738
+- `u14e_5f6d@6s6p7s_4-0_casscf_ao_-_pol_avg` E -50.43923663
+- `u14e_5f6d@6s6p7s_4-0_sa-casscf_ao_-_pol_avg` E -50.43055110
+- `u14e_5f6d@6s6p7s_4-0_sa-casscf_ao_-_pur_avg` E_term -50.42381003  ptp 4.9e-07  L2 ['72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000', '72.000']  core 5p/span 0.9863
+- `u14e_5f6d7s@6s6p_5-1_casci_ao_-_pol_avg` E -48.84977469
+- `u14e_5f6d7s@6s6p_5-1_casscf_ao_-_pol_avg` E -50.42319641
+- `u14e_5f6d7s@6s6p_5-1_sa-casscf_ao_-_pol_avg` E -50.45285631
+- `u14e_5f6d7s@6s6p_5-1_sa-casscf_ao_-_pur_avg` E_term -50.45150714  ptp 2.3e-02  L2 ['89.998', '89.997', '89.997', '89.998', '71.999', '89.998', '89.998', '89.998', '89.997', '89.998', '89.997', '89.996', '89.998', '89.998', '89.997', '89.996', '89.998']  core 4p/span 0.9863
