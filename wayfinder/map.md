@@ -11,14 +11,11 @@ The wave spec: [`specs/pt2-perturbation.md`](specs/pt2-perturbation.md)
 diagnostic; the schema; the metric surface: R over rows, floor +
 w_ref per row).
 
-- [42 — `perturb.py` rungs 0–1: the FOIS + Epstein–Nesbet](tickets/42-perturb-epstein-nesbet.md):
-  READY — the module born, the EN twins certified on the frozen
-  carbon fixture + synthetic anchors.
 - [43 — the validation script](tickets/43-validate-perturb.md):
-  BLOCKED BY 42 — certificates before tables (the run-instrument
+  READY (42 done) — certificates before tables (the run-instrument
   gate).
 - [44 — Dyall H₀ + NEVPT2 strongly contracted](tickets/44-dyall-nevpt2.md):
-  BLOCKED BY 42+43 — the parameter-free PT2, intruder-freeness
+  BLOCKED BY 43 — the parameter-free PT2, intruder-freeness
   verified.
 - [45 — PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
   BLOCKED BY 43 — the declared-scope render + the README reading key.
@@ -26,7 +23,21 @@ w_ref per row).
   DESIGN-FIRST, user-gated — the render-level significance policy
   (the stores keep everything; the table keeps the physics).
 
-Resolved (git history the archive): 33 the symmetry-anatomy
+Resolved (git history the archive): 42 the module born (2026-11-18):
+`perturb.py` rungs 0–1 — the FOIS (the exact apply-pattern
+enumeration beside `fois_indices`, the brute spin-preserving
+completeness certificate) and the EN E(2) in two independent
+constructions (`epstein_nesbet` matrix-free production vs
+`epstein_nesbet_dense`, the dense Slater-Condon twin) + the
+occupation-sum `diagonal_energies` (the antisymmetrized pair sum —
+the symmetric direct form is WRONG on general arrays; the random
+non-symmetric integrals caught it, the verification rule's
+purpose). Meters: floor + w_ref in `PT2Result`. 7 tests: whole-space
+→ 0, one-electron closed answer, the zero-denominator fail-fast, the
+twins elementwise (complex non-symmetric, 3 shapes), the diagonal
+twin, the cardinality meter, the carbon pin (frozen fixture, NO SCF:
+e0 −1.35139 valence-space ruler, e2 −7.689 mEh, floor 0.054,
+w_ref 0.996 at n_fois 140); 33 the symmetry-anatomy
 deliverable — RETIRED UNEXECUTED 2026-11-18 (the user's call); the
 idea stays specified: per-atom Readings sections with (1) the
 m-symmetric θ-grid (θ | ΔE | ‖[H,Lz]‖), (2) the member-tilt ladder
