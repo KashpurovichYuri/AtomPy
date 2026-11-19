@@ -47,7 +47,6 @@ python scripts/regen_cells.py <atom> \
     [--method casci|casscf|sa-casscf] [--window W] [--mask M] \
     [--start ao|mo|moc|no] [--core raw|avg|frac] [--sector NA-NB] [--full]
 python scripts/build_methods_tables.py <atom>    # re-render TABLE.md + TABLE.csv
-python scripts/validate_perturb.py [atoms]       # the PT2 certificate chain (the render gate)
 ```
 
 - **The per-commit gate** (user-directed): the fast tier plus the diff's
@@ -90,7 +89,7 @@ in the module).
 | `stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: the core-field build (the swap-basin detector reads the RAW field below the core-span tolerance) + analyze + energies vs PySCF + window purity + the ortho divergence guard; module Conventions own the two ruler readings (the reconstruction is the ANALYSIS ruler; max\|dE\| decomposes into anisotropy + window definition + bookkeeping — exactly 0) |
 | `scans.py` | `ScanSpec`, `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free and DETERMINISTIC given the reference: m-symmetric radial curves + member-tilt maps; `ScanSpec` = the declared per-atom anatomy |
 | `analysis.py` | `analyze`, `configuration_summary`, `shell_occupations`, `format_report` | term symbols from ⟨L²⟩/⟨S²⟩ (the half-integer S grid), commutator norms, configuration labels per root (the CI-order bridge runs inside; l-grouping via `lm_sectors`) |
-| `perturb.py` | `PT2Result`, `DyallH0`, `fois_indices`, `diagonal_energies`, `epstein_nesbet`, `epstein_nesbet_dense`, `dyall_h0`, `dyall_e2`, `dyall_e2_dense`, `spin_rdm`, `rdm_cumulants`, `rdm_reconstruct` | the PT2 analyzation (the window-ladder diagnostic: dynamic vs static correlation across a CAS ladder): rung 0 the FOIS (the exact apply-pattern enumeration + the brute spin-preserving completeness certificate), rung 1 the EN E(2) in two independent constructions (the matrix-free production vs the dense Slater-Condon twin), rung 2 the Dyall partition (`dyall_h0` the mean-field H0 beside the canonicalization-rotated tensors; the E(2) with the H0-subtracted numerators and orbital-gap denominators) — the input class is PHYSICAL integrals (the chemist 8-fold, guarded); the active-first relabel maps the CAS beta block through `n_val` (`DyallH0.act/virt` carry the split sets); the density layer (`spin_rdm` the compact spin-orbital k-RDM with secondquant-certified signs, budget-guarded; `rdm_cumulants` the explicit λ2/λ3 — λ4's nontrivial form deferred, stated) with the energy identity, the contraction chain, the Gaussian limit, and the reconstruction as its certifications; with the meters floor + w_ref; pure numpy + detbasis + secondquant at the TENSOR level (the folded-core field in h1, active-first valence columns, sector-preserving CI over the CAS); rung 3 (NEVPT2-SC) and CASPT2 specified-not-built — the contract: `wayfinder/specs/pt2-perturbation.md` |
+| `perturb.py` | *(vacant at the 2026-11-19 replan — the home-grown PT2 ladder deleted; the PySCF-mrpt adapter re-lands here, ticket 44)* | the PT2 analyzation: PySCF's `mrpt.NEVPT` per stored root (strongly contracted; the engine in-env), our layer the adapter + meters + the symmetry probes (README · Analysis) + the render; the contract: `wayfinder/specs/pt2-perturbation.md` |
 | `cases.py` | `CaseSpec`, `Scenario`, `CAMPAIGN`, `scenarios_for`, `run_case`, `run_atom`, `run_carbon` | the DECLARED campaign (the intent manifest): `CaseSpec` fixes atom/reference/window/sectors/term-target/scenarios + the shell layer (`shell_bands`, `shell_radials` — declared, measured-certified) + the render chemistry; `CAMPAIGN` is the ONE declaration — the cell grid, regen, and renderers all derive from it; new atom = a registry row |
 | `cells.py` | `CellKey`, `run_cell`, `load_cell`, `analyze_cell`, `cell_payload`, `prior_tag_of`/`no_label`, `spine_keys`, `window_grid`/`grid_keys`/`planned`/`lattice_keys`, `lane_keys`, `run_lane_cell`/`load_lane_cell`, `void_reason`, `radial_refused` | THE addressing layer: one frozen `CellKey` per grid point, the address grammar as chk name/payload key; VOID cells validated at the key (the scenario RUN GATE — first enabled match; `--full` materializes); the two per-cell construction refusals at their own homes; the pinned lane (the frozen core = the reference's own core columns S-projected); the self-owned store (`ci_stack` stays PySCF order — the bridge lives in operators) |
 | `natural.py` | `ci_rdm1`, `natural_orbitals`, `occupation_groups`, `select_no_window`, `no_group_windows`, `NoCapExceeded` | the NO mathematics: spin-summed 1-RDM from CI roots, NOs = density eigenvectors, occupation-GROUP selection never splits an m-set (scale-aware tolerance); symmetry-safe only from a term-AVERAGED root set — the m-unequal density class REFUSED at the closure meter; `NoCapExceeded` = the declared no_cap budget's refusal type (the runner's per-cell skip) |
@@ -222,7 +221,7 @@ cold-start warning surface.
 
 ## Tests
 
-`pytest` runs 372 tests. The fast tier: `pytest -m fast` = 278
+`pytest` runs 352 tests. The fast tier: `pytest -m fast` = 258
 tests in seconds (machine-light selection). The heavy tail is
 HOURS-class — the per-commit gate is the fast tier plus the diff's
 targeted files (see Running things); the full-suite run is RETIRED. A
@@ -386,8 +385,9 @@ COMPLETE — U14e certified end-to-end (⁵L at machine-precision closure,
 round (2026-11-16) consolidated README/AGENTS/map; ticket 37 (the
 basis-repair bench, the @s wave, the subspace-ROHF) COMPLETE
 (2026-11-12..16 — the seeded-MOM repair, the twins' @s legs, the
-per-contraction ΔE certificate). Next: the queued CASCI review
-(map Issues) precedes the un-gating wave; the Stage-3 adoption
+per-contraction ΔE certificate). Next: the PT2 wave restart — the
+PySCF-mrpt adapter (ticket 44; Step 0's anchors recorded, the
+home-grown ladder deleted 2026-11-19); the Stage-3 adoption
 decision (map Disposition candidates) is the user's call; beyond it
 the candidates: spin–orbit, transition moments, g-factors.
 

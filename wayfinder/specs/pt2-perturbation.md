@@ -1,7 +1,15 @@
-# SPEC — The perturbation analyzation (`perturb.py`)
+# SPEC — The perturbation analyzation (`perturb.py`), PySCF-mrpt-primary
 
-The wave's contract. Tickets 42–46 execute it rung by rung; each
-ticket references this file and carries its own slice.
+The wave's contract, REWRITTEN 2026-11-19 (the replan): the original
+premise — "no PT2 implementation exists in-env" — was FALSE. PySCF
+2.13.1 ships `pyscf/mrpt` natively (`NEVPT` = strongly contracted
+NEVPT2; `dfnevpt2`; **no `caspt2` in 2.13.1** — master-only). The
+home-grown ladder (FOIS/EN rungs 0–1, the Dyall rung, the density
+layer) is DELETED — git history is the archive; the Dyall rung's
+committed numbers were invalid anyway (its virtual-range `eigh` mixed
+α/β virtuals through degenerate eigenspaces; the coupling norm
+collapsed 0.016 → 5.4e-11 on the carbon fixture). The engine is PySCF's;
+we own the analyzation.
 
 ## Problem Statement
 
@@ -20,208 +28,112 @@ ladder saturates where the CAS ladder does not, the "missing" energy
 was dynamic correlation in fact; if the total keeps moving, the
 missing part is static and belongs in the window.
 
-## Solution
+## Architecture
 
-One new deep module, `perturb.py`, in the analysis row: second-order
-perturbation theory over a certified CAS state, built as a ladder of
-H₀ choices from simplest up (Epstein–Nesbet → Dyall → NEVPT2 strongly
-contracted; CASPT2 planned, not built). First atoms: **C and Si**.
-The analyzation is the **window-ladder diagnostic**: apply PT to the
-different CAS windows the campaign already stores, per declared
-solution (root, term-labeled), and read whether dynamic correlation
-mixes with the static one — quantified by how much of the CAS spread
-the corrected ladder flattens. A dedicated validation script
-certifies correctness BEFORE any table renders; results land in a
-per-atom `PERTURBATION_TABLE.md`, separate from TABLE.md. No
-campaign/CellKey integration — post-processing only, wave 1.
+**The seam**: a certified CAS state in its orbital context → PT2
+variant rows. The adapter module keeps the address `perturb.py` (the
+analyzation keeps its home; fresh contract, PySCF-backed — the module
+is NOT pure-numpy anymore; its docstring owns the new boundary).
+Variants are a registry at the seam: `nevpt2-sc` now; CASPT2 joins
+when an env ships it (a NEW conda env alongside the pinned 2.13.1 —
+pre-approved); each variant produces the same row shape.
 
-## User Stories
+**Interface sketch** (one deep function family): consume the substrate
+signature `(mol, mf, mo_full, ncore, ncas, nelecas)` + explicit
+`roots`; internally: rebuild the multi-root CASCI on the stored MO
+(the readout-twin recipe — `casscf.run_irrep_casci`'s pattern), assert
+the rebuilt roots match the stored `ci_stack` BIT-EXACTLY (the
+ticket-43 precedent), then `mrpt.NEVPT(mc, root=k).kernel()` per root,
+extracting the 8 Koopmans-class `(norm, energy)` pairs (public module
+functions `Sr/Si/Sijrs/Sijr/Srsi/Srs/Sij/Sir`). SA solutions enter
+through the readout pass (the kernel refuses `StateAverageFCISolver`).
+`density_fit` stays effectively inert (plain CASCI → exact 4-index
+ERIS).
 
-1. As the researcher, I want to declare which solutions (stored CI
-   roots) to perturb, so that the multi-solution class stays under my
-   control and no draw is silently chosen.
-2. As the researcher, I want each rendered row term-labeled (from the
-   analysis readout), so that a perturbed root's identity is visible
-   without cross-referencing.
-3. As the researcher, I want a separate validation script that
-   certifies the PT2 constructions accurately (twins, analytic
-   identities, cardinalities) at realistic sizes, so that no table
-   ever renders from unvalidated math.
-4. As the researcher, I want Epstein–Nesbet first, so that the
-   universal PT2 baseline exists and every fancier H₀ must face it.
-5. As the researcher, I want the Dyall H₀ and NEVPT2 strongly
-   contracted classes next, so that a parameter-free, intruder-free
-   PT2 is available (no level-shift dials).
-6. As the researcher, I want per-atom `PERTURBATION_TABLE.md` files,
-   so that the dynamic-correlation axis reads beside TABLE.md without
-   overloading it.
-7. As the maintainer, I want the module pure (no optimizer, no
-   chkfiles, no draws), so that reproducibility is the whole
-   computation and the trusted-cache conventions stay untouched.
-8. As the maintainer, I want the module's import edges downward only,
-   so that the architecture stays cycle-free.
-9. As the tester, I want the frozen carbon fixture to carry the unit
-   tier, so that no SCF runs in tests and pins are seconds-class.
-10. As the tester, I want degenerate anchors (CAS = whole space → 0;
-    one active electron → the closed answer; empty active → the MP2
-    limit under Dyall H₀), so that any deviation is a bug, not physics.
-11. As the tester, I want two independent constructions of the
-    Epstein–Nesbet correction (sum formula vs first-order solve), so
-    that term-class errors cannot cancel.
-12. As the tester, I want FOIS cardinality checked against the
-    brute-force excitation count at pinned sizes, so that
-    coupling-only enumeration is proven complete.
-13. As the tester, I want cumulant reconstruction identities (4-RDM
-    cumulants reproduce the lower RDMs), so that the NEVPT2 class
-    inputs are certified before the solves.
-14. As the researcher, I want honest meters per row (denominator
-    floor per class, class dimensions, FOIS completeness), so that the
-    intruder surface is measured, never assumed.
-15. As the maintainer, I want CASPT2 (rung 4) specified but unbuilt,
-    so that the level-shift dial class stays out until certified rungs
-    demand it.
-16. As the researcher, I want the results stored as a per-atom
-    payload (not a CellKey axis), so that the campaign grammar is not
-    widened by a post-processing analyzation.
-17. As the researcher, I want the saturation view (the CAS spread vs
-    the PT2-corrected spread across the window ladder), so that the
-    static/dynamic mixing question has a quantified answer surface.
-18. As the researcher, I want PT applied only to certified-symmetric
-    references, so that the diagnostic reads the static part cleanly
-    and never the broken-symmetry controls.
+**The meters** (replacing EN's floor/w_ref, which died with EN):
+per-class norms/energies; the effective per-class denominator
+(energy/norm — the compression meter, SC's softened intruder read);
+and the SYMMETRY PROBES (README · Analysis):
 
-## Implementation Decisions
+- **gauge redraw** — random unitary inside an exactly degenerate
+  block; E_CAS/⟨L²⟩ as controls; E(2) spread = the disclosure. Per-L
+  expectations: L=0 no gauge; L=1 spread ≈ 0 (transitivity — any
+  spread is a covariance DEFECT, machinery certificate); L≥2 genuine
+  spread possible (formulation property — canonical gauge primary).
+- **component identity** — E(2) across pure M_L components equal by
+  covariance; deviation = a window-closure defect, never gauge.
+- **the canonical gauge**: pure M_L projections via our own Lz/L²
+  analysis (the CI-order bridge) — the escalation if gauge spread
+  reaches interpretation margins.
+- PySCF's internal `canonicalize(cas_natorb=True)` is bypassable via
+  `NEVPT(..., canonicalized=True)` — the designated hook for
+  symmetry-controlled gauges, later if the probes demand it.
 
-- **Module**: `src/atomterm/perturb.py` — analysis row
-  (`analysis · stages · scans · perturb`). Docstring owns the
-  contract; import edges downward only (system, detbasis, secondquant,
-  operators); `natural.py`'s lazy-driver pattern is the model.
-- **Interface** (grows rung by rung, one function + one result type
-  per rung): `epstein_nesbet(sub, ci, roots=…)`, `dyall_e2(…)`,
-  `nevpt2_strong(…)` — with `caspt2(…)` specified, unbuilt. Shared
-  `PT2Result`: correction, per-class breakdown, meters.
-- **Substrate**: the signature `(mol, mf, c_act, ncore, na, nb)` +
-  the stored `ci_stack` (PySCF order; the bridge lives in operators).
-- **Solution selection**: explicit `roots` (indices into the stored
-  stack), default the ground root; term labels via the analysis
-  readout. Declared, never inferred. Multi-state (quasi-degenerate)
-  PT2 is out of scope — per-state corrections only.
-- **Rung ladder**: 0 FOIS (coupling-only enumeration, Slater–Condon
-  native) → 1 Epstein–Nesbet (H₀ = diag H, external) → 2 Dyall H₀
-  (generalized Fock, inactive/active/external range separation) → 3
-  NEVPT2-SC (7 classes, RDM stack to 4-RDM, cumulants + partial
-  integrals, small per-class solves) → 4 CASPT2 (internally
-  contracted, level shift — SPECIFIED, NOT BUILT: its level shift
-  masks exactly the intruder information the diagnostic reads;
-  NEVPT2's per-class floors are signal, CASPT2's shift would hide
-  them. Joins later only on demand, with shift-sensitivity disclosed
-  per row).
-- **Validation first**: `scripts/validate_perturb.py` — the
-  three-layer chain printed as certificates on C and Si at realistic
-  sizes; runs BEFORE the table exists. This script is the run
-  instrument (like `run.py`), not a pytest tier.
-- **Artifacts**: `elements/<Atom>/perturbation.json` (payload store,
-  keyed window × sector × core × root × variant) +
-  `elements/<Atom>/PERTURBATION_TABLE.md` (the render). Separate from
-  TABLE.md/cells.json — no CellKey axis, no regen grammar change.
-- **PERTURBATION_TABLE.md schema — ONE table** (the correction
-  rows; no separate summary table — the per-window read is derivable
-  from the ground-root rows and lives in the README key instead):
-  one row per declared (window, sector, core, root, variant):
-  `window | sector | core | root (term) | ndet | E_ref | ⟨L²⟩ |
-  variant | E_PT2 | E_total | ΔE_total | floor | w_ref | notes` —
-  `root (term)` is the declared index + the analysis term label;
-  `E_ref` on the analysis ruler (disclosed); `variant` ∈ EN / Dyall /
-  NEVPT2 (every variant reads beside the others — the twin grammar);
-  `floor` = min |E₀ − H₀μμ| (per-class min for NEVPT2) — the
-  intruder surface; `w_ref` = 1/(1 + Σ|C⁽¹⁾μ|²) — the reference
-  weight, the expansion-quality gate (below ~0.8 conventionally
-  suspect); `notes` carries FOIS completeness, class dims, refusals.
-  RAW columns only. Three meters total: R over rows, floor + w_ref
-  per row — one decomposition read, two validity gates. (‖C⁽¹⁾‖∞
-  stays an internal debug meter; no table contract.)
-- **The README reading key** (README · Results, one home, brief):
-  R = (ΔE_CAS − ΔE_total)/ΔE_CAS over the window ladder — R ≈ 1
-  dynamic-dominated (the poverty was dynamic; the enlargement was
-  absorbing it), R ≈ 0 static (the missing radial is a true
-  near-degeneracy), intermediate = mixed (each window's E_PT2 share
-  is the dynamic it already holds — read off the E_PT2 column's
-  decline directly). Guards: R > 1 or R < 0 is the
-  intruder/overshoot signature, flagged, never celebrated — read
-  with the floor. Every verdict CONDITIONAL on the row's gates
-  (floor, w_ref) — the ladder-internal honesty: no external ruler
-  exists in-env, so "R = 0.9 at w = 0.95, floors clean" is a
-  finding, "R = 0.9" alone is not. (NEVPT2 class-resolved shares
-  stay payload-level: surfaced only if the ladder read is
-  ambiguous.) The mechanisms' home; tables stay raw.
-- **Render policy (the declared scope)**: the module accepts ANY
-  stored solution; the table renders the DECLARED scope, whose
-  default = the SA-CASSCF roots that deliver identifiable terms
-  (clean ⟨L²⟩/⟨S²⟩ → a term symbol) across the window ladder. The
-  m-incomplete controls (MO/MOC, broken ⟨L²⟩) are excluded from the
-  default — a PT2 correction on a broken-symmetry reference answers
-  nothing about the static/dynamic separation. Other classes (CASCI
-  frozen-orbital rows, excited terms) join by declaration in the
-  payload's scope list. Mirrors the NO-window refusal discipline.
-- **Renderer**: `scripts/build_perturbation_tables.py` reading the
-  payload store; byte-determinism + declared-roots pins.
-- **No chkfiles, no caching**: everything derives deterministically
-  from trusted substrates + stored CI.
-- **External anchor**: none in env (PySCF 2.13 ships no NEVPT2; no
-  forge package). Wave 1 stands on twins + analytic identities +
-  literature class structure; installing pyscf-forge stays an open,
-  user-gated option (recorded, not decided).
+**The reference-class axis**: the same adapter runs NEVPT2 on
+single-root CASSCF and CASCI cells (any solution class feeds the
+seam); E(2) reads against each reference's symmetry-breaking
+amplitude (⟨L²⟩ deviation, commutator norms — in the payloads). The
+question: does PT2 compensate, penalize, or wash out a broken
+reference.
 
-## Testing Decisions
+## Delivery chain
 
-- Unit tier: `tests/unit/test_perturb.py` on the frozen carbon
-  fixture (`carbon` fixture — NO SCF) + synthetic substrates. Good
-  test = one invariant, named for it; degenerate anchors first.
-- The three-layer chain: (a) elementwise twins (EN sum vs solve;
-  FOIS column vs brute-force `slater_condon_matrix` slice; cumulant
-  identities) on inputs that exercise every term class; (b) external
-  anchor deferred (env fact above; open option); (c) exact identities
-  (whole-space → 0; one electron; empty active → MP2 limit under
-  Dyall H₀ — the textbook known answer).
-- Renderer pins: byte-determinism, declared-roots policy (the
-  lane/lattice emitter pattern).
-- The validation script carries the campaign-size correctness
-  evidence (printed certificates), priced at doors — not a test tier.
+`elements/<Atom>/perturbation.json` (payload: rows per cell × root ×
+variant, per-class pairs, meters, full provenance) →
+`elements/<Atom>/PERTURBATION_TABLE.md` + CSV mirror (ONE table
+between markers; the generator refuses stale provenance — the
+stale-render precedent) → the gate `scripts/validate_pt2.py` (the
+certificate chain, green output committed to `logs/`) → README's
+Analysis chapter is the reading discipline (landed 1adb82a). Commit +
+push per batch; handoff at ticket boundaries.
 
-## Out of Scope
+## Steps (the gradual ladder)
 
-- CASPT2 rung 4 construction (specified, unbuilt).
+0. **Smoke** — DONE 2026-11-19: examples 01 + 41 verbatim in-env; O2
+   anchor agreement 3.2e-7 Eh (vs the example's retained reference);
+   C2 SA pattern 0.3 s. The engine works in-env.
+1. **Deletion** — DONE 2026-11-19: `perturb.py` + `test_perturb.py` +
+   `validate_perturb.py` + the committed log removed; counts 352/258;
+   spec/tickets/map/AGENTS lockstep (this commit).
+2. **The adapter** — the new `perturb.py` + unit tests: O2/H2 anchors,
+   per-class sum identity (Σe_class == e_corr), stored-roots
+   bit-exactness, the SA guard exercised, class extraction pinned.
+3. **Simplest real case** — one C SA cell, per-root rows; the two
+   probes (the symmetry answer gets measured here).
+3b. **Reference-class comparison** — NEVPT2 on stored CASSCF/CASCI
+   cells (C, Si) vs SA, against symmetry amplitude.
+4. **The ladder read + render** — C then Si across the window ladder;
+   PERTURBATION_TABLE.md + reading key (R, gauge spread, reference
+   class, basis thinness).
+5. **Gated later** — Ti/Sc + the unc twins (U14e beyond); CASPT2 in a
+   new env; wavefunction-level analyzation (⟨L²⟩/⟨S²⟩ of
+   Ψ⁽⁰⁾+λΨ⁽¹⁾ — explicit first-order reconstructable from git
+   history if the probes demand it).
+
+## Verification
+
+- (a) **Anchors**: O2/6-31G CASCI(6,8) → −0.169785157128 (the
+  example's retained value; agreement band ~1e-6 Eh), H14/STO-3G →
+  −0.094164359938.
+- (b) **Identities**: per-class sum == e_corr (the kernel's own
+  arithmetic, read twice); bit-exact stored-roots assertion before
+  any PT2; NEVPT's SA guard exercised (raises on an SA solver).
+- (c) **The probes**: gauge redraw controls flat (E, ⟨L²⟩), the
+  component identity — the L=1 invariance is itself a machinery
+  certificate.
+- Renderer pins: byte-determinism, declared-roots policy. The gate is
+  a run instrument (the `run.py` precedent), not a pytest tier; the
+  per-commit gate stays fast-tier + targeted files.
+- Test tier: unit tests on the frozen carbon fixture (NO SCF) for the
+  pure parts (row shaping, class extraction, sum identity on
+  synthetic MC objects); the campaign-size evidence priced at doors.
+
+## Out of Scope (wave 1)
+
+- CASPT2 construction (joins on the env upgrade; the reading caution —
+  its level shift masks the intruder signal — lives in the reading
+  key then).
 - Multi-state / quasi-degenerate PT2 (per-state corrections only).
-- Campaign integration: CellKey axis, regen grammar, TABLE.md rows.
-- Atoms beyond C and Si (the twins, Sc/Ti, U14e ride later waves).
-- Spin–orbit, transition moments, g-factors.
-- Installing pyscf-forge (open user-gated option, not this wave).
-
-## Further Notes
-
-- **The diagnostic logic** (the wave's physics goal, stated as
-  falsifiable readings on the saturation view):
-  1. *Dynamic dominates the spread* — E_PT2(compact window) is large
-     and the corrected ladder FLATTENS (ΔE_total ≪ ΔE_CAS): the
-     poverty was dynamic correlation in fact; the CAS enlargement was
-     absorbing it variationally, never saturating.
-  2. *Genuinely static* — E_PT2 is small or window-independent while
-     the corrected ladder keeps the spread: the missing radial is a
-     true near-degeneracy; only in-window variational treatment gets
-     it (the @r1/@s1 verdicts stand as static facts).
-  3. *The mixed regime* — E_PT2 shrinks monotonically as the window
-     grows (the PT2 budget eaten by the CAS) with partial flattening:
-     each window's PT2 share quantifies how much dynamic it already
-     holds — the mixing, measured per window.
-  On C/Si the poverty class (+250.8/+221.5 mEh) is the concrete
-  instance; the U14e +923 mEh poverty and the 1 µH floor coincidence
-  are the later-atom confrontations (out of wave-1 scope, the same
-  instrument).
-- **The physics payoff on the live record**: the window-ladder
-  diagnostic on the stored C/Si CAS; a dynamic axis for the p² terms
-  (³P vs ¹D differential correlation — the selection interface has
-  real content).
-- Rung-by-rung shipping keeps every commit certified: each rung lands
-  with its twins/anchors in the same commit (lockstep rule).
-- Intruder-freeness of NEVPT2 is a theorem our meters VERIFY
-  (per-class denominator floors), never an assumption.
+- Atoms beyond C and Si (Step 5's gated list).
+- Campaign integration: no CellKey axis, no regen grammar change —
+  post-processing on the stores.

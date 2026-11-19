@@ -1,32 +1,34 @@
-# Ticket 45 — `PERTURBATION_TABLE.md`: the declared-scope render
-
-Spec: `wayfinder/specs/pt2-perturbation.md` (the schema section owns
-the table grammar).
+# Ticket 45 — The PT2 runs + PERTURBATION_TABLE.md
 
 ## Goal
 
-`elements/{C,Si}/perturbation.json` + `PERTURBATION_TABLE.md`: ONE
-correction table, raw columns only — `window | sector | core |
-root (term) | ndet | E_ref | ⟨L²⟩ | variant | E_PT2 | E_total |
-ΔE_total | floor | w_ref | notes` — rendered under the DECLARED
-scope (default: SA-CASSCF roots with identifiable terms across the
-window ladder; the m-incomplete MO/MOC controls excluded; everything
-else joinable by declaration). The README reading key (R, the
-guards, the conditional verdicts) lands in the same commit — the
-mechanisms' one home.
+The step-by-step PT2 application on the stored C/Si solutions, then
+the render. Steps 3–4 of the spec's ladder: (3) one C SA cell —
+per-root rows + the two probes (gauge redraw, component identity; the
+symmetry answer measured per README · Analysis); (3b) the
+reference-class axis — NEVPT2 on stored single-root CASSCF/CASCI
+cells vs SA, read against symmetry amplitude; (4) the C then Si
+window-ladder read + the render.
 
-## Status: BLOCKED BY 43 (44's variant columns join at its close;
-the schema declares all variant columns from day one)
+## Status: BLOCKED BY 44
 
 ## Inputs
 
-- `perturbation.json` (the 42/43/44 outputs, keyed window × sector ×
-  core × root × variant);
-- `scripts/build_methods_tables.py` — the emitter conventions to
-  mirror (byte-determinism pins, the marker pattern).
+- `elements/<Atom>/perturbation.json` (the payload the adapter
+  writes; rows per cell × root × variant, per-class pairs, meters,
+  provenance);
+- `scripts/build_perturbation_tables.py` (the renderer: ONE table +
+  CSV mirror between markers; refuses stale provenance — the
+  stale-render precedent);
+- `scripts/validate_pt2.py` (the gate: anchors, identities, probes;
+  green output committed to `logs/`).
 
 ## Verification
 
-Renderer pins: byte-determinism, declared-scope policy (the
-lane/lattice emitter pattern). The tables render from validated
-rungs only (ticket 43's green gate). The fast tier stays green.
+- The table renders ONLY from the payload; byte-determinism pins;
+  declared-roots policy (no silent draws).
+- The reading key (README · Analysis + the element files): R over the
+  ladder, the gauge-spread disclosure, the reference-class axis, the
+  basis-thinness caveat, the per-L expectations.
+- The gate's green log committed with the render (provenance).
+- Fast tier green; counts lockstep.

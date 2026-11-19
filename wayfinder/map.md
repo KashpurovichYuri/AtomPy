@@ -7,24 +7,48 @@ dumps are not kept.
 ## Tickets
 
 The wave spec: [`specs/pt2-perturbation.md`](specs/pt2-perturbation.md)
-— the perturbation analyzation's contract (the window-ladder
-diagnostic; the schema; the metric surface: R over rows, floor +
-w_ref per row).
+— the PT2 analyzation's contract, REWRITTEN PySCF-mrpt-primary
+(2026-11-19): the window-ladder diagnostic; the symmetry probes; the
+delivery chain.
 
-- [43 — the validation script](tickets/43-validate-perturb.md):
-  READY (42 done) — certificates before tables (the run-instrument
-  gate).
-- [44 — Dyall H₀ + NEVPT2 strongly contracted](tickets/44-dyall-nevpt2.md):
-  READY (43's gate green) — the parameter-free PT2,
-  intruder-freeness verified.  The validation script grows the new
-  layers' certificates.
-- [45 — PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
-  BLOCKED BY 44 — the declared-scope render + the README reading key.
+- [44 — the PySCF-mrpt adapter](tickets/44-pyscf-pt2-adapter.md):
+  READY (Step 0 done 2026-11-19: the O2/C2 anchors recorded) — the
+  new `perturb.py` on `pyscf.mrpt.NEVPT`.
+- [45 — the PT2 runs + PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
+  BLOCKED BY 44 — the C cell + the probes, the reference-class axis,
+  the ladder read + the render.
 - [46 — the TABLE.md physics pass](tickets/46-table-physics-pass.md):
   DESIGN-FIRST, user-gated — the render-level significance policy
   (the stores keep everything; the table keeps the physics).
 
-Resolved (git history the archive): 43 the validation script (2026-11-18):
+Resolved (git history the archive): the PT wave REPLAN — DELETION
+(2026-11-19): the spec's "external-anchor-absent" premise was FALSE —
+pyscf 2.13.1 ships `pyscf/mrpt` natively (`NEVPT` = sc_nevpt,
+strongly contracted; `dfnevpt2`; NO caspt2 in 2.13.1, master-only —
+the env fact the original spec missed). The home-grown ladder DELETED
+in one commit: `perturb.py` (the FOIS/EN rungs 0–1, the Dyall rung,
+the density layer), `test_perturb.py`, `validate_perturb.py`, the
+committed `logs/validate_perturb.log` — git history the archive. THE
+BUG that forced honesty: `dyall_h0`'s virtual-range `eigh` mixed α/β
+virtuals through degenerate eigenspaces (coupling norm 0.016 →
+5.4e-11 measured on the carbon fixture) — the committed Dyall script
+numbers were INVALID; the 44b density certificates stood but their
+consumer was gone (the deletion test passes every rung). EN's one
+future perspective — the EXPLICIT first-order wavefunction
+(c_I = V_I0/(E0−H_II)) — archived with it; revival = the
+wavefunction-level analyzation if the probes demand it. Architecture
+now: PySCF owns the PT2 algebra (`mrpt.NEVPT` per root on the stored
+roots — the bit-exact readout precedent); we own the adapter + the
+meters + the probes + the render (README's Analysis chapter, 1adb82a,
+is the reading discipline: the gauge ledger, the two probes, the
+per-L expectations). Step 0 anchors: O2/6-31G CASCI(6,8) NEVPT
+−0.169785475 (vs the example's retained −0.169785157, 3.2e-7), C2
+SA-CASSCF(8,8) → 4-root CASCI → NEVPT(root=1) green in 0.3 s.
+Counts 372/278 → 352/258.  43 the validation script (2026-11-18;
+the artifacts deleted at the 2026-11-19 replan — this record
+describes the DELETED chain, git history the archive; its three
+findings carry: the ruler + the gauge class (now formalized in
+README · Analysis) + the reach class):
 `scripts/validate_perturb.py` — the run instrument (the run.py
 precedent), the three-layer chain printed as certificate lines on the
 declared C/Si SA scope (grid + planned, ao start, free-route: 14+18
@@ -53,7 +77,9 @@ the brute count is the disclosed upper bound.  THE LADDER READ
 −7.77..−7.79 mEh (compact/@r1/@s1), Si −6.9 → −5.5 (the @s2 decline)
 — against the +250 mEh CAS spread: the external space supplies the
 same small dynamic share on every window (cc-pVDZ's valence is thin —
-the reading key must carry the basis-thinness caveat); 42 the module born (2026-11-18):
+the reading key must carry the basis-thinness caveat); 42 the module born
+(2026-11-18; DELETED at the 2026-11-19 replan, git history the
+archive):
 `perturb.py` rungs 0–1 — the FOIS (the exact apply-pattern
 enumeration beside `fois_indices`, the brute spin-preserving
 completeness certificate) and the EN E(2) in two independent
