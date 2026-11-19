@@ -50,13 +50,14 @@ from pyscf import ao2mo  # noqa: E402
 from atomterm.cases import CAMPAIGN, campaign_spec, scenarios_for  # noqa: E402
 from atomterm.cells import (  # noqa: E402
     _key_core, grid_keys, load_cell, planned, void_reason)
-from atomterm.detbasis import determinant_basis, operator_apply  # noqa: E402
+from atomterm.detbasis import (  # noqa: E402
+    determinant_basis, operator_apply, slater_condon_matrix)
 from atomterm.operators import (  # noqa: E402
     active_space_integrals, ci_in_detbasis_order, pyscf_apply,
     spin_block_one_body, spin_block_two_body)
 from atomterm.perturb import (  # noqa: E402
     epstein_nesbet, epstein_nesbet_dense, dyall_e2, dyall_e2_dense,
-    dyall_h0, fois_indices)
+    dyall_h0, fois_indices, rdm_cumulants, rdm_reconstruct, spin_rdm)
 from atomterm.reference import run_rohf  # noqa: E402
 
 # the certificate tolerances (the observed fresh values sit two to six
@@ -201,7 +202,11 @@ def validate_cell(key, mol, mf, spec, data, certs):
           f"symmetry-adapted tensors are declared class)", flush=True)
 
     # (c) whole-space anchor, once per atom on the first cell's
-    # tensors: CAS = valence => the FOIS is empty => E(2) = 0 exact
+    # tensors: CAS = valence => the FOIS is empty => E(2) = 0 exact;
+    # then the density layer on the same cell: the RDM stack's
+    # conventions against the Hamiltonian (the energy identity), the
+    # in-repo gamma anchor, the contraction chain, and the cumulant
+    # reconstruction
     if not certs.whole_space_done:
         ci_ws = np.random.default_rng(1).standard_normal(ndet)
         ci_ws /= np.linalg.norm(ci_ws)
@@ -211,6 +216,48 @@ def validate_cell(key, mol, mf, spec, data, certs):
             f"(CAS = the valence space)",
             res_ws.e2 == 0.0 and res_ws.n_fois == 0)
         certs.whole_space_done = True
+
+        ci0 = ci_in_detbasis_order(np.asarray(data.ci[0]), ncas, na,
+                                   nb)
+        g1 = spin_rdm(ci0, ncas, na, nb, 1)
+        G2 = spin_rdm(ci0, ncas, na, nb, 2)
+        emb_sp = np.arange(ncas)
+        emb_so = np.concatenate([np.arange(ncas),
+                                 n_val + np.arange(ncas)]).astype(int)
+        h1c = spin_block_one_body(h1_s[np.ix_(emb_sp, emb_sp)])
+        gc = gv[np.ix_(emb_so, emb_so, emb_so, emb_so)]
+        H_cas = slater_condon_matrix(determinant_basis(ncas, na, nb),
+                                     one_body=h1c, two_body=gc)
+        e0_cas = float(np.real(np.vdot(
+            ci0, H_cas @ ci0)))
+        e_id = float(np.real(np.sum(h1c * g1) + 0.5 * np.sum(gc * G2)))
+        certs.line(
+            f"density       energy identity diff "
+            f"{abs(e_id - e0_cas):.1e} (E0 = h1:g1 + G:G2/2)",
+            abs(e_id - e0_cas) <= 1e-9)
+        from atomterm.natural import ci_rdm1
+        d_nat = float(np.max(np.abs(
+            g1[:ncas, :ncas] + g1[ncas:, ncas:]
+            - ci_rdm1(determinant_basis(ncas, na, nb), ci0, ncas))))
+        certs.line(
+            f"density       gamma anchor   maxdiff {d_nat:.1e} (vs "
+            f"natural.ci_rdm1)", d_nat <= 1e-9)
+        d_c = float(np.max(np.abs(np.trace(G2, axis1=1, axis2=2)
+                                  + g1)))
+        certs.line(
+            f"density       contraction    maxdiff {d_c:.1e} "
+            f"(G2 middle-pair trace == -gamma)", d_c <= 1e-9)
+        try:
+            G3 = spin_rdm(ci0, ncas, na, nb, 3)
+            lam = rdm_cumulants({1: g1, 2: G2, 3: G3}, 3, 2 * ncas)
+            d_r = float(np.max(np.abs(
+                rdm_reconstruct(lam, 3, 2 * ncas) - G3)))
+            certs.line(
+                f"density       reconstruction maxdiff {d_r:.1e} "
+                f"(Gamma3 = lambda3 + wedges)", d_r <= 1e-9)
+        except ValueError as exc:
+            certs.line(f"density       cumulant stack REFUSED: {exc}",
+                       False)
 
     apply_pyscf = pyscf_apply(h1_s, eri_pyscf, n_val, na, nb)
     v = np.zeros(ndet)

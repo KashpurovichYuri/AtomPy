@@ -7,6 +7,10 @@ PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
 INFO reach          coupled 63 of the brute reach 63 (selection-rule zeros on symmetry-adapted tensors are declared class)
 PASS whole-space  E(2) = 0.0e+00 exact (CAS = the valence space)
+PASS density       energy identity diff 4.4e-16 (E0 = h1:g1 + G:G2/2)
+PASS density       gamma anchor   maxdiff 0.0e+00 (vs natural.ci_rdm1)
+PASS density       contraction    maxdiff 0.0e+00 (G2 middle-pair trace == -gamma)
+PASS density       reconstruction maxdiff 3.1e-33 (Gamma3 = lambda3 + wedges)
 PASS root0 e0-anchor    diff 3.6e-15 (tol 1e-06; store PySCF CI energy)
 PASS root0 coupling      maxdiff 1.7e-16 (tol 1e-10; vs pyscf_apply)
 PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
@@ -400,7 +404,7 @@ INFO root2 EN          e2 -7.957 mEh  floor 0.6983  w_ref 0.995594  n_fois 8
 PASS root2 dyall         e0 anchor 2.4e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
 INFO root2 Dyall       e2 -2.572 mEh  floor 1.0647  w_ref 0.998729  n_fois 6
 NOTE external-anchor absent from the env for E(2): pyscf 2.13 ships no NEVPT2/CASPT2; the pyscf-forge install stays the open user-gated option (the spec records it)
-===== C: 239 PASS, 0 FAIL =====
+===== C: 243 PASS, 0 FAIL =====
 
 ===== perturb validation: Si =====
 PASS substrate    ROHF E = -288.84643692 Eh (trusted cache elements/Si/rungs/rohf.chk)
@@ -410,6 +414,10 @@ PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
 INFO reach          coupled 63 of the brute reach 63 (selection-rule zeros on symmetry-adapted tensors are declared class)
 PASS whole-space  E(2) = 0.0e+00 exact (CAS = the valence space)
+PASS density       energy identity diff 1.1e-16 (E0 = h1:g1 + G:G2/2)
+PASS density       gamma anchor   maxdiff 0.0e+00 (vs natural.ci_rdm1)
+PASS density       contraction    maxdiff 0.0e+00 (G2 middle-pair trace == -gamma)
+PASS density       reconstruction maxdiff 1.5e-33 (Gamma3 = lambda3 + wedges)
 PASS root0 e0-anchor    diff 9.8e-15 (tol 1e-06; store PySCF CI energy)
 PASS root0 coupling      maxdiff 3.3e-16 (tol 1e-10; vs pyscf_apply)
 PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
@@ -917,4 +925,4 @@ INFO root2 EN          e2 -5.560 mEh  floor 0.9066  w_ref 0.994680  n_fois 15
 PASS root2 dyall         e0 anchor 2.0e-12 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
 INFO root2 Dyall       e2 -3.623 mEh  floor 1.4611  w_ref 0.997733  n_fois 10
 NOTE external-anchor absent from the env for E(2): pyscf 2.13 ships no NEVPT2/CASPT2; the pyscf-forge install stays the open user-gated option (the spec records it)
-===== Si: 307 PASS, 0 FAIL =====
+===== Si: 311 PASS, 0 FAIL =====

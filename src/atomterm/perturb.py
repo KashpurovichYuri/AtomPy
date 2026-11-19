@@ -114,6 +114,7 @@ from atomterm.detbasis import (
     operator_apply,
     slater_condon_matrix,
 )
+from atomterm.secondquant import annihilate, create
 
 __all__ = [
     "PT2Result",
@@ -125,6 +126,9 @@ __all__ = [
     "dyall_h0",
     "dyall_e2",
     "dyall_e2_dense",
+    "spin_rdm",
+    "rdm_cumulants",
+    "rdm_reconstruct",
 ]
 
 
@@ -348,6 +352,223 @@ def epstein_nesbet_dense(h1: np.ndarray, g: np.ndarray, n_act: int,
     couplings = couplings[coupled]
     diag = np.diag(h_full)[fois_idx]
     return _assemble(e0, couplings, e0 - diag)
+
+
+# ------------------------------------------------------- rung 3 prep:
+#                                                    the density layer
+
+def spin_rdm(ci: np.ndarray, n_act: int, na: int, nb: int,
+             k: int) -> np.ndarray:
+    """The spin-orbital k-RDM over the COMPACT active space.
+
+    ``Gamma[s1..sk, t1..tk] = <a+_s1 .. a+_sk a_tk .. a_t1>`` -- the
+    first k axes are the creation indices, the last k the
+    annihilation ones (the Hamiltonian's own arrangement: the energy
+    identity ``E0 = Sum h1 g1 + 1/2 Sum G G2`` reads the arrays
+    directly).  Evaluated pair-first: for each reference-det pair
+    the nonzero substitution structure is enumerated and the SIGNS
+    ride secondquant's certified elementary rules -- no independent
+    sign algebra here.  ``k = 1`` reproduces the compact transpose
+    of :func:`_cas_one_rdm` (the conventions pin, tested).
+
+    Raises
+    ------
+    ValueError
+        On a vanished or mislength CI (through :func:`_reference`),
+        or past the array budget ``(2 * n_act) ** (2 * k) > 4e6``
+        (the dense k-RDM is a certified-sizes construction; bigger
+        sectors ride the det-basis aggregates and the dense twin).
+    """
+    dim = 2 * n_act
+    if dim ** (2 * k) > 4_000_000:
+        raise ValueError(
+            f"the dense {k}-RDM over {dim} active spin-orbitals "
+            f"({dim ** (2 * k)} elements) is past the 4e6 budget -- "
+            "certified sizes only; bigger sectors ride the det-basis "
+            "aggregates")
+    dets = determinant_basis(n_act, na, nb)
+    v = np.asarray(ci)
+    if np.count_nonzero(v) == 0:
+        raise ValueError("the reference CI is identically zero")
+    if len(v) != len(dets):
+        raise ValueError(
+            f"the CI length {len(v)} does not match the CAS sector "
+            f"({len(dets)} determinants)")
+    out = np.zeros((dim,) * (2 * k), dtype=np.result_type(v))
+    from itertools import permutations
+
+    def string_sign(nu, t_order, s_order, mu):
+        """``<mu| a+_s1..a+_sk a_tk..a_t1 |nu>``: the rightmost
+        operator acts first (a_t1 annihilates first; s_k is created
+        first).  Signs from secondquant; 0 when the string vanishes."""
+        occ = list(nu)
+        phase = 1
+        for t in t_order:
+            res = annihilate(tuple(occ), t)
+            if res is None:
+                return 0
+            s, occ = res
+            phase *= s
+        for s_ in reversed(s_order):
+            res = create(tuple(occ), s_)
+            if res is None:
+                return 0
+            s, occ = res
+            phase *= s
+        return phase if list(occ) == list(mu) else 0
+
+    for i_mu, mu in enumerate(dets):
+        c_mu = v[i_mu]
+        if c_mu == 0:
+            continue
+        for i_nu, nu in enumerate(dets):
+            c_nu = v[i_nu]
+            if c_nu == 0:
+                continue
+            smu, snu = set(mu), set(nu)
+            dmu, dnu = smu - snu, snu - smu
+            t = len(dmu)
+            if t > k or len(dnu) > k:
+                continue
+            common = sorted(smu & snu)
+            # annihilated = dnu + (k - t) shared spectators; the
+            # intermediate then sits inside mu by construction
+            for extra in combinations(common, k - t):
+                ann = sorted(dnu | set(extra))
+                cre = sorted(dmu | set(extra))
+                if len(ann) != k:
+                    continue
+                for t_order in permutations(ann):
+                    for s_order in permutations(cre):
+                        sgn = string_sign(nu, t_order, s_order, mu)
+                        if sgn:
+                            out[tuple(s_order) + tuple(t_order)] += \
+                                c_mu * c_nu * sgn
+    return out
+
+
+def _compositions(n: int) -> list[tuple[int, ...]]:
+    """All ordered compositions of ``n`` into positive parts."""
+    out: list[tuple[int, ...]] = []
+
+    def rec(rest, acc):
+        if rest == 0:
+            out.append(tuple(acc))
+            return
+        for first in range(1, rest + 1):
+            acc.append(first)
+            rec(rest - first, acc)
+            acc.pop()
+
+    rec(n, [])
+    return out
+
+
+def _parity(perm: tuple[int, ...]) -> int:
+    """The sign of a permutation (as an inversion count)."""
+    sign = 1
+    for i in range(len(perm)):
+        for j in range(i + 1, len(perm)):
+            if perm[i] > perm[j]:
+                sign = -sign
+    return sign
+
+
+def _wedge(factors: list[tuple[int, np.ndarray]], n: int,
+           dim: int) -> np.ndarray:
+    """The antisymmetrized (wedge) product of RDM-cumulant factors.
+
+    ``factors`` = [(degree, array), ...] with the degrees summing to
+    ``n``.  The product runs the creation indices in natural order
+    and sums the annihilation pairing over the permutations:
+    ``(1/n!) Sum_pi sign(pi) prod_j F_j[s-block j, t_{pi(block j)}]``
+    -- its gamma-only case is the Wick/determinant expansion of a
+    single determinant, and a single already-antisymmetric factor
+    reproduces itself (the two properties the reconstruction
+    identity certifies).
+    """
+    from itertools import permutations
+    from math import factorial
+
+    out = np.zeros((dim,) * (2 * n),
+                   dtype=np.result_type(*(f[1] for f in factors)))
+    full = list(np.arange(dim))
+    for perm_t in permutations(range(n)):
+        sgn = _parity(perm_t)
+        if not sgn:
+            continue
+        term = None
+        start = 0
+        for deg_j, arr in factors:
+            slots_s = list(range(start, start + deg_j))  # natural
+            slots_t = [perm_t[p] for p in slots_s]
+            # the factor's axes -> its target positions: [s-block
+            # positions..., n + t-block positions...]
+            targets = slots_s + [n + p for p in slots_t]
+            src_order = np.argsort(targets)
+            moved = arr.transpose(tuple(src_order))
+            shape = [1] * (2 * n)
+            for pos in targets:
+                shape[pos] = dim
+            placed = moved.reshape(shape)
+            term = placed if term is None else term * placed
+            start += deg_j
+        out += sgn * term
+    return out
+
+
+def rdm_cumulants(gammas: dict, k: int, dim: int) -> dict:
+    """The cumulant stack ``{1: gamma, ..., k: lambda_k}`` of the RDM
+    stack, in the EXPLICIT antisymmetrized-product forms (the
+    literature's density-cumulant formulas, not a generic Moebius):
+    ``lambda_2 = Gamma2 - gamma wedge gamma``; ``lambda_3 = Gamma3 -
+    lambda2 wedge gamma - gamma wedge lambda2 - gamma wedge gamma
+    wedge gamma``.  Certified by the Gaussian limit (all cumulants
+    vanish on a single determinant), the total antisymmetry, and the
+    machine-extracted contraction identities; the nontrivial
+    lambda_4 exceeds the dense 4-RDM budget here and rides rung 3's
+    det-basis aggregates (the spec's scope note).  ``gammas`` carries
+    ``{1: gamma, 2: Gamma2, ..., k: Gammak}`` (the compact active
+    arrays of :func:`spin_rdm`); the lambdas live in the same
+    layout.  ``k <= 3`` is the supported stack.
+
+    Raises
+    ------
+    ValueError
+        On ``k > 3`` (the lambda_4 deferral, stated not hidden).
+    """
+    if k > 3:
+        raise ValueError(
+            "the explicit cumulant stack supports k <= 3 (the "
+            "nontrivial lambda_4 exceeds the dense 4-RDM budget; "
+            "rung 3's det-basis aggregates carry the class "
+            "quantities)")
+    lam = {1: gammas[1]}
+    if k >= 2:
+        gamma, G2 = gammas[1], gammas[2]
+        lam[2] = G2 - _wedge([(1, gamma), (1, gamma)], 2, dim)
+    if k >= 3:
+        gamma, l2 = gammas[1], lam[2]
+        lam[3] = gammas[3] - _wedge([(2, l2), (1, gamma)], 3, dim) \
+            - _wedge([(1, gamma), (2, l2)], 3, dim) \
+            - _wedge([(1, gamma), (1, gamma), (1, gamma)], 3, dim)
+    return lam
+
+
+def rdm_reconstruct(lambdas: dict, k: int, dim: int) -> np.ndarray:
+    """The reconstruction identity: ``Gamma_k = lambda_k + Sum_{proper
+    compositions of k} wedge(lambda parts)`` -- the forward's exact
+    inverse (the pair is what the tests certify elementwise; the
+    k = 4 class is out of the supported stack, see
+    :func:`rdm_cumulants`)."""
+    lam = dict(lambdas)
+    acc = lam[k].copy()
+    for comp in _compositions(k):
+        if len(comp) == 1:
+            continue
+        factors = [(c, lam[c]) for c in comp]
+        acc += _wedge(factors, k, dim)
+    return acc
 
 
 # ------------------------------------------------------------- rung 2: Dyall

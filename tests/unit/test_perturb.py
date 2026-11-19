@@ -13,6 +13,7 @@ from helpers import random_integrals
 from atomterm.detbasis import determinant_basis, slater_condon_matrix
 from atomterm.perturb import (
     PT2Result,
+    _reference,
     diagonal_energies,
     dyall_e2,
     dyall_e2_dense,
@@ -20,6 +21,9 @@ from atomterm.perturb import (
     epstein_nesbet,
     epstein_nesbet_dense,
     fois_indices,
+    rdm_cumulants,
+    rdm_reconstruct,
+    spin_rdm,
 )
 
 pytestmark = pytest.mark.fast
@@ -354,3 +358,134 @@ def test_dyall_refuses_non_physical_integrals():
     ci /= np.linalg.norm(ci)
     with pytest.raises(ValueError, match="chemist 8-fold"):
         dyall_h0(h1, g, n_act, na, nb, ci)
+
+
+# -------------------------------------------------- rung 3 prep: the density layer
+
+def test_spin_rdm_energy_identity():
+    # the conventions anchor: E0 = Sum h1 g1 + 1/2 Sum G G2 reads the
+    # arrays DIRECTLY (creation axes first, annihilation last) --
+    # certified against the Hamiltonian on two sectors
+    for seed, n_val, n_act, na, nb in ((81, 5, 3, 2, 0),
+                                       (82, 5, 3, 1, 1)):
+        rng = np.random.default_rng(seed)
+        h1, g = _physical_integrals(rng, n_val)
+        dets_act = determinant_basis(n_act, na, nb)
+        ci = rng.standard_normal(len(dets_act))
+        ci /= np.linalg.norm(ci)
+        dets_v, cas_mask, cas_idx, v = _reference(
+            n_val, n_act, na, nb, ci)
+        H = slater_condon_matrix(dets_v, one_body=h1, two_body=g)
+        e0 = np.vdot(ci, H[np.ix_(cas_idx, cas_idx)] @ ci)
+        g1 = spin_rdm(ci, n_act, na, nb, 1)
+        G2 = spin_rdm(ci, n_act, na, nb, 2)
+        emb = np.concatenate([np.arange(n_act),
+                              n_val + np.arange(n_act)]).astype(int)
+        h1c = h1[np.ix_(emb, emb)]
+        gc = g[np.ix_(emb, emb, emb, emb)]
+        assert e0 == pytest.approx(np.sum(h1c * g1)
+                                   + 0.5 * np.sum(gc * G2), abs=1e-10)
+
+
+def test_spin_rdm_matches_cas_one_rdm_and_natural():
+    # gamma1's two constructions agree (the compact transpose of the
+    # valence-embedded Dyall gamma), and its spin sum matches
+    # natural.ci_rdm1 -- the in-repo external anchor
+    from atomterm.perturb import _cas_one_rdm
+    from atomterm.natural import ci_rdm1
+    rng = np.random.default_rng(91)
+    n_val, n_act, na, nb = 4, 2, 1, 1
+    dets_act = determinant_basis(n_act, na, nb)
+    ci = rng.standard_normal(len(dets_act))
+    ci /= np.linalg.norm(ci)
+    g1 = spin_rdm(ci, n_act, na, nb, 1)
+    idx = np.concatenate([np.arange(n_act),
+                          n_val + np.arange(n_act)]).astype(int)
+    gv = _cas_one_rdm(ci, n_val, n_act, na, nb)
+    assert np.allclose(gv[np.ix_(idx, idx)], g1.T)
+    gamma_nat = ci_rdm1(dets_act, ci, n_act)
+    spin_sum = g1[:n_act, :n_act] + g1[n_act:, n_act:]
+    assert np.allclose(spin_sum, gamma_nat)
+
+
+def test_rdm_contraction_chain():
+    # the exact N-weighted contraction chain Gk -> G(k-1): G2's
+    # middle-pair trace carries the odd-permutation minus sign
+    # (machine-certified convention, not a hand derivation); G3 at a
+    # N=4 sector (the N=2 class is Pauli-trivial: G3 vanishes there)
+    rng = np.random.default_rng(92)
+    n_act, na, nb = 3, 2, 0
+    N = na + nb
+    dets_act = determinant_basis(n_act, na, nb)
+    ci = rng.standard_normal(len(dets_act))
+    ci /= np.linalg.norm(ci)
+    g1 = spin_rdm(ci, n_act, na, nb, 1)
+    G2 = spin_rdm(ci, n_act, na, nb, 2)
+    assert np.allclose(np.trace(G2, axis1=1, axis2=2), -(N - 1) * g1)
+    assert np.allclose(np.trace(G2, axis1=1, axis2=3), (N - 1) * g1)
+    n_act, na, nb = 4, 2, 2
+    N = na + nb
+    dets_act = determinant_basis(n_act, na, nb)
+    ci = rng.standard_normal(len(dets_act))
+    ci /= np.linalg.norm(ci)
+    G2 = spin_rdm(ci, n_act, na, nb, 2)
+    G3 = spin_rdm(ci, n_act, na, nb, 3)
+    assert np.max(np.abs(G3)) > 0  # the nontrivial class
+    assert np.allclose(np.trace(G3, axis1=2, axis2=3),
+                       -(N - 2) * G2.transpose(0, 1, 3, 2))
+
+
+def test_cumulants_vanish_on_single_determinant():
+    # the Gaussian limit: a single determinant's cumulants vanish
+    # exactly (Wick's theorem holds without corrections)
+    n_act, na, nb = 3, 2, 0
+    dets_act = determinant_basis(n_act, na, nb)
+    ci = np.zeros(len(dets_act))
+    ci[0] = 1.0
+    gammas = {k: spin_rdm(ci, n_act, na, nb, k) for k in (1, 2, 3)}
+    lam = rdm_cumulants(gammas, 3, 2 * n_act)
+    for k in (2, 3):
+        assert np.max(np.abs(lam[k])) == 0.0, k
+
+
+def test_rdm_cumulants_refuse_lambda4():
+    # the lambda_4 deferral is stated, not hidden: the explicit
+    # nontrivial lambda_4 exceeds the dense 4-RDM budget (the map
+    # records it; rung 3's det-basis aggregates carry the classes)
+    rng = np.random.default_rng(95)
+    n_act, na, nb = 2, 1, 1
+    dets_act = determinant_basis(n_act, na, nb)
+    ci = rng.standard_normal(len(dets_act))
+    ci /= np.linalg.norm(ci)
+    gammas = {k: spin_rdm(ci, n_act, na, nb, k) for k in (1, 2, 3, 4)}
+    with pytest.raises(ValueError, match="k <= 3"):
+        rdm_cumulants(gammas, 4, 2 * n_act)
+
+
+def test_cumulant_reconstruction_elementwise():
+    # the forward's exact inverse: Gamma_k = lambda_k + Sum over the
+    # proper compositions of k of the wedged lambda parts, at the
+    # correlated N=4 class (lambda2 nonzero; non-Pauli-trivial)
+    rng = np.random.default_rng(93)
+    n_act, na, nb = 4, 2, 2
+    dets_act = determinant_basis(n_act, na, nb)
+    ci = rng.standard_normal(len(dets_act))
+    ci /= np.linalg.norm(ci)
+    gammas = {k: spin_rdm(ci, n_act, na, nb, k) for k in (1, 2, 3)}
+    lam = rdm_cumulants(gammas, 3, 2 * n_act)
+    assert np.max(np.abs(lam[2])) > 0  # correlated: lambda2 nonzero
+    for k in (2, 3):
+        assert np.max(np.abs(rdm_reconstruct(lam, k, 2 * n_act)
+                             - gammas[k])) < 1e-10, k
+
+
+def test_spin_rdm_refuses_oversized_budget():
+    # the dense 4-RDM is a certified-sizes construction: past the
+    # budget the build refuses (declared, disclosed)
+    rng = np.random.default_rng(94)
+    n_act, na, nb = 4, 2, 0
+    dets_act = determinant_basis(n_act, na, nb)
+    ci = rng.standard_normal(len(dets_act))
+    ci /= np.linalg.norm(ci)
+    with pytest.raises(ValueError, match="4e6 budget"):
+        spin_rdm(ci, n_act, na, nb, 4)

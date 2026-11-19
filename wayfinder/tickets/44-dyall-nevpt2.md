@@ -2,8 +2,33 @@
 
 Spec: `wayfinder/specs/pt2-perturbation.md`.
 
-## Status: IN PROGRESS (44a Dyall DONE 2026-11-18; 44b cumulant stack
-+ 44c NEVPT2-SC remain)
+## Status: IN PROGRESS (44a Dyall DONE; 44b density layer DONE
+2026-11-18; 44c NEVPT2-SC remains)
+
+44b (DONE): the density layer — `spin_rdm` (the compact spin-orbital
+k-RDM, pair-first enumeration with secondquant-certified signs,
+budget-guarded at (2 n_act)^(2k) <= 4e6) + `rdm_cumulants` (the
+EXPLICIT lambda2/lambda3 antisymmetrized-product formulas) +
+`rdm_reconstruct`.  Certifications: the energy identity (E0 =
+h1:g1 + G:G2/2 at 4e-16 — the conventions anchor), the
+natural.ci_rdm1 gamma anchor (exact), the CONTRACTION CHAIN
+(machine-extracted convention: G2's s2==t1 middle-pair trace =
+-(N-1) gamma — the odd-permutation minus sign was hand-derived
+wrong twice before the machine settled it), the GAUSSIAN LIMIT
+(all cumulants vanish exactly on a single determinant), and the
+reconstruction identity at the correlated N=4 class.  SCOPE
+DECISIONS (the map records them): lambda4's nontrivial explicit
+form is DEFERRED (the dense 4-RDM budget excludes every N >= 4
+sector; the refusal is declared — `rdm_cumulants` states k <= 3,
+the refusal has its own test) — rung 3's class quantities ride the
+det-basis aggregates + the dense twin at ALL sizes, so nothing
+downstream depends on lambda4.  The wedge-algebra seesaw (three
+normalization candidates rejected by the machine before the
+explicit-form settlement) is in the commit message.  Script
+growth: the density-layer certificate block (energy identity +
+gamma anchor + contraction + reconstruction) on the first cell per
+atom.  Fast tier 278; validation C 243 / Si 311 PASS 0 FAIL;
+counts 372/278.
 
 44a (DONE): `dyall_h0`/`dyall_e2`/`dyall_e2_dense` — the partition
 with the folded-core convention stated honestly (the inactive range
