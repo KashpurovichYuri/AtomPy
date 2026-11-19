@@ -809,6 +809,7 @@
       "diverged": false,
       "converged": true,
       "cycles": 16,
+      "max_cycle": null,
       "conv_dE": 0.0,
       "ortho_err": 1.2212453270876722e-15,
       "e_ground": -37.68236463737019,
@@ -840,6 +841,7 @@
       "configurations": [
         "p^2.00 (|c|=1.00); p^2.00 (|c|=0.00)"
       ],
+      "core_span_overlap": 1.0,
       "cell": "c_2p_2-0_casscf_ao_-_pur_avg"
     },
     "c_2p_2-0_casscf_mo_-_pur_avg": {

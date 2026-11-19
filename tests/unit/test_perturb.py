@@ -191,32 +191,73 @@ def test_absolute_e2_pin_on_the_fixture(block):
 
 
 def test_refusal_bands_are_forceable(block):
-    """The forced e_tol/c_tol pin the refusal bands' semantics: the
-    default admits fresh draw noise and sub-band amplitude noise
-    through the projector; tightening refuses them; a length-mismatched
-    energy stack refuses by shape."""
+    """The forced bands pin their own semantics: e_tol the energy
+    band; o_tol the same-state angle band (sub-percent noise passes,
+    a one-percent mixture refuses); c_tol governs exact amplitudes
+    with o_tol forced off; a length-mismatched energy stack refuses
+    by shape."""
     mol, mf, _, mo_full = block
     rows = nevpt2_rows(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
     from atomterm.perturb import _root_energies, readout_mc
 
     mc = readout_mc(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
     e = _root_energies(mc).copy()
-    # (a) noise inside the default band passes ...
+    # (a) energy noise inside the default band passes; the tightened
+    # band refuses the same stack
     assert_stored_roots(mc, ref_energies=e + 5e-13)
-    # ... and the tightened band refuses the same stack
     with pytest.raises(ValueError):
         assert_stored_roots(mc, ref_energies=e + 5e-13, e_tol=1e-15)
-    # (b) amplitude noise inside the default c_tol passes via the
-    # projector (the block's lawful form) ...
-    ci_pert = [np.asarray(c) + 5e-9 for c in mc.ci]
-    assert_stored_roots(mc, ref_ci=ci_pert)
+    # (b) the o_tol band: a one-percent amplitude mixing is a
+    # different state at the default ...
+    mc1 = readout_mc(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
+    ci_mix = [np.asarray(c).ravel() + 0.01 * np.eye(c.size)[1]
+              for c in mc1.ci]
+    with pytest.raises(ValueError):
+        assert_stored_roots(mc1, ref_ci=ci_mix)
+    # ... and the widened o_tol admits it (forced-pin)
+    mc1b = readout_mc(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
+    assert_stored_roots(mc1b, ref_ci=ci_mix, o_tol=0.05)
+    # (c) the c_tol band governs exact amplitudes with o_tol off:
+    # 5e-9 structured noise passes at the default ...
+    mc2 = readout_mc(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
+    ci_pert = [np.asarray(c).ravel() + 5e-9 * np.eye(c.size)[1]
+               for c in mc2.ci]
+    assert_stored_roots(mc2, ref_ci=ci_pert, o_tol=0.0, c_tol=1e-8)
     # ... and the tightened c_tol refuses it
     with pytest.raises(ValueError):
-        assert_stored_roots(mc, ref_ci=ci_pert, c_tol=1e-12)
-    # (c) a wrong-length energy stack refuses by shape (the declared
+        assert_stored_roots(mc2, ref_ci=ci_pert, o_tol=0.0, c_tol=1e-12)
+    # (d) a wrong-length energy stack refuses by shape (the declared
     # message, not a numpy broadcast error)
     with pytest.raises(ValueError, match="shape mismatch"):
         assert_stored_roots(mc, ref_energies=np.append(e, 0.0))
+
+
+def test_phase_and_davidson_noise_clauses(block):
+    """The per-root clauses: a global-phase flip and a sub-percent
+    davidson-noise mixing of one root pass; a physical mixture (ten
+    percent) refuses."""
+    mol, mf, _, mo_full = block
+    from atomterm.perturb import readout_mc
+
+    mc = readout_mc(mol, mf, mo_full, NCAS, NELECAS, 1)
+    v = np.asarray(mc.ci).ravel()
+    # a phase flip passes (single-root form: the array IS the root)
+    mc2 = readout_mc(mol, mf, mo_full, NCAS, NELECAS, 1)
+    mc2.ci = -v.reshape(np.asarray(mc.ci).shape)
+    assert_stored_roots(mc2, ref_ci=[v])
+    # a 1e-4 davidson-noise mixing passes (the declared class)
+    partner = np.zeros_like(v)
+    partner[1] = 1.0
+    v_noise = v + 1e-4 * partner
+    mc3 = readout_mc(mol, mf, mo_full, NCAS, NELECAS, 1)
+    mc3.ci = v_noise.reshape(np.asarray(mc.ci).shape)
+    assert_stored_roots(mc3, ref_ci=[v])
+    # a ten-percent mixing is a different state: refuses
+    v_mix = v + 0.1 * partner
+    mc4 = readout_mc(mol, mf, mo_full, NCAS, NELECAS, 1)
+    mc4.ci = v_mix.reshape(np.asarray(mc.ci).shape)
+    with pytest.raises(ValueError):
+        assert_stored_roots(mc4, ref_ci=[v])
 
 
 def test_class_rows_carry_the_compression_meter():

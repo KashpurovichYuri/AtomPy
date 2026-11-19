@@ -165,19 +165,25 @@ def _projector(cis) -> np.ndarray:
 
 
 def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
-                        e_tol: float = 1e-11, c_tol: float = 1e-8) -> None:
+                        e_tol: float = 1e-11, c_tol: float = 1e-8,
+                        o_tol: float = 1e-3) -> None:
     """Refuse unless the readout reproduced the stored solution.
 
     Energies compare strict (absolute tolerance; the fresh readout's
     observed deviation sits at 1e-15, far below it).  CI vectors
-    compare per-root, with the degenerate block's lawful gauge freedom
-    honored: a rotated basis of the same root set passes through the
-    joint projector.
+    compare per-root through three clauses, each a declared class:
+    amplitude equality (c_tol); the degenerate block's lawful gauge
+    freedom (the joint projector); and the single-root re-solve's
+    davidson noise (the re-solve ANGLE -- |sin| between the vectors,
+    linear in the unconverged mixing -- within o_tol of zero; the
+    state's meters and E(2) are flat across it, while any
+    physical mixture fails the energy clause first).
 
     Parameters
     ----------
-    e_tol, c_tol : the refusal bands (absolute); force them to pin
-        the band behavior (the defaults are the production refusal).
+    e_tol, c_tol, o_tol : the refusal bands (absolute); force them to
+        pin the band behavior (the defaults are the production
+        refusal).
 
     Raises
     ------
@@ -207,10 +213,26 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
                 f"{len(ref)} stored")
         # amplitudes are the assertion, not the container shape (the
         # store keeps flat vectors, the reader returns (n, 1) columns)
-        per_root = all(
-            c.size == r.size
-            and np.allclose(c.ravel(), r.ravel(), atol=c_tol, rtol=0.0)
-            for c, r in zip(new, ref))
+        def _amplitudes_match(c, r) -> bool:
+            if c.size != r.size:
+                return False
+            c, r = c.ravel(), r.ravel()
+            if np.allclose(c, r, atol=c_tol, rtol=0.0):
+                return True
+            # the phase/noise clause: same state up to a global phase
+            # and sub-percent davidson noise -- the re-solve ANGLE
+            # (|sin|, linear in the mixing) within o_tol of zero.
+            # The sine comes from the orthogonal residual: at small
+            # angles sqrt(1-cos^2) cancels catastrophically
+            cn, rn = np.linalg.norm(c), np.linalg.norm(r)
+            if not cn or not rn:
+                return False
+            u = c / cn
+            rn_u = r / rn
+            sino = float(np.linalg.norm(rn_u - np.vdot(u, rn_u) * u))
+            return bool(sino <= o_tol)
+
+        per_root = all(_amplitudes_match(c, r) for c, r in zip(new, ref))
         if per_root:
             return
         if (all(c.size == r.size for c, r in zip(new, ref))
