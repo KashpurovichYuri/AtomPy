@@ -49,6 +49,42 @@ single-root cells carry a two-ruler 53 µEh split (kernel
 stored E = −37.68241788 vs analysis e_ground −37.68236463) — rows
 read e_ref from KERNEL totals only (the standing discipline).
 
+## Status: step 4 (C) DONE 2026-11-19 -- 26 cells / 66 roots, gate ALL GREEN
+
+The chain: `run_pt2_ladder.py` (the declared set: span ladder
+casci x {ao,mo,moc} x {compact,@r1,@s1}; NO twins; the reference axis
+{casscf,sa-casscf} x {compact,@r1,@s1} x {ao,mo}; the frozen pair)
+-> `elements/C/perturbation.json` -> `build_perturbation_tables.py`
+(ONE table + CSV, byte-deterministic, the stamp = the payload digest,
+the schema refusal) -> `validate_pt2.py` ALL GREEN
+(logs/validate_pt2_C.log): the anchors at 1e-6, the class sums 0e+00
+over 66 roots / 528 classes, totals 3.5e-15, eV columns exact, the
+meter identity 2.8e-17, 26/26 rows-or-refused, the probe clean.
+
+THE C READING (the ladder read): (1) every OPTIMIZED cell (SA/CASSCF,
+all windows and starts) prices -58.11..-58.14 mEh and corrects to
+-37.7405 -- the ladder SATURATES at the optimized level; the
+optimizer repairs the poverty class, and the windows are equivalent
+gauges of one orbital optimum.  (2) The poverty class lives in the
+UNOPTIMIZED thin spans: compact-ao CASCI and 2pno1 price -265.76 mEh
+(-7.23 eV) -- the fuel reading -- and still land 43.2 mEh short of
+the optimized corrected total.  (3) E(2) tracks the orbital DRAW, not
+the span's rotational quality: the moc-start rows carry <L2> = 0.082
+(yet E(2) = -58.1341), the broken single roots carry 1.68..1.92 (yet
+E(2) = -58.0119 across all).  (4) The frozen-core disclosure: the
+compact frozen row prices -243.33 mEh -- 4.2x its free twin (the
+unrelaxed core's Sir class explodes); the @r1 frozen row reads the
+free value.  (5) Broken spans store excited roots beside the ground
+one (mo-start roots 1-2: +28.8 mEh, E(2) -75.97) -- the table's
+spread column reads the GROUND BLOCK only; full per-root records in
+the payload.
+
+DECLINED (the lane axis): the lane payload is its own store class
+(per-irrep-block pinned solutions, term energies -- no ci_stack/
+core_energy); the stored-roots seam needs a lane-native readout twin
+before it can price lane rows.  The irrep route-invariance gate row
+waits with it.  Recorded as the follow-up.
+
 ## Status: BLOCKED BY 44 (superseded by the 3b record above; step 4 next)
 
 ## Inputs

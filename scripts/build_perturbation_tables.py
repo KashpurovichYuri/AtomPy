@@ -1,0 +1,173 @@
+"""Render PERTURBATION_TABLE.md (+ the CSV mirror) from
+``elements/<Atom>/perturbation.json`` -- the render contract: the
+table renders ONLY from the payload (byte-determinism: no render-time
+stamps; the provenance stamp is the payload's digest, so a re-render
+of the same payload is byte-identical), one table between markers,
+and a SCHEMA refusal for stale payloads (the stale-render precedent:
+an old-schema payload refuses with the collector hint -- the payload
+is regenerated, never hand-patched).
+
+Usage: python scripts/build_perturbation_tables.py <atom> [<atom> ...]
+
+Groups branch on key IDENTITY only (the methods-table rule): the span
+ladder (casci, no/no1 absent, no frozen mask), the NO twins (casci +
+no start), the reference axis (casscf / sa-casscf), the frozen pair
+(frozen mask).  Every stored root enters the table through its cell's
+row: root 0's values, the block spread beside them (the declared
+roots policy lives in the payload; a degenerate block renders one
+line with spread ~0, a split block carries its spread).
+"""
+
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from _tables_common import atomic_write_text, replace_block  # noqa: E402
+
+BEGIN = "<!-- pt2 begin -->"
+END = "<!-- pt2 end -->"
+
+HEAD = ("| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) "
+        "| E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |")
+SEP = "|---" * 9 + "|"
+
+
+def _required_schema(payload: dict) -> None:
+    """Refuse a stale/old-schema payload (the stale-render precedent)."""
+    prov = payload.get("provenance", {})
+    need_prov = ("engine", "pyscf_version", "collected", "date",
+                 "declared_roots_policy", "e_ref_partition",
+                 "wobble_note", "stored_roots_bands", "meters")
+    missing = [k for k in need_prov if k not in prov]
+    cells = payload.get("cells")
+    if missing or not isinstance(cells, list) or not cells:
+        sys.exit(f"stale payload for {payload.get('atom')!r}: missing "
+                 f"provenance keys {missing or 'cells'} -- regenerate "
+                 "with scripts/run_pt2_ladder.py")
+    for c in cells:
+        if c.get("disposition") not in ("rows", "refusal"):
+            sys.exit(f"stale payload: cell {c.get('address')!r} has no "
+                     "disposition -- regenerate")
+
+
+def _group(addr: str) -> str:
+    """The row group, by key identity only."""
+    if "_frozen_" in addr:
+        return "the frozen pair (the core-relaxation disclosure)"
+    if "_casci_no_-" in addr:
+        return "the NO twins (CASCI)"
+    if "_casscf" in addr:
+        return "the reference axis (single-root CASSCF vs SA)"
+    return "the span ladder (CASCI: the unoptimized windows)"
+
+
+def _rows(payload: dict) -> list[str]:
+    out, last_group = [], None
+    for c in payload["cells"]:
+        g = _group(c["address"])
+        if g != last_group:
+            out += ["", f"**{g}**", "", HEAD, SEP]
+            last_group = g
+        if c["disposition"] == "refusal":
+            reason = c["refusal_reason"].split("--")[0].strip()
+            out.append(f"| `{c['address']}` | — | — | — | REFUSED: "
+                       f"{reason} | — | — | — | — |")
+            continue
+        roots = c["roots"]
+        r0 = roots[0]
+        # the spread reads the GROUND BLOCK only: the roots degenerate
+        # with root 0 (the gauge block); broken spans store excited
+        # roots beside the ground one and those are different states,
+        # not gauges of it
+        block = [r for r in roots
+                 if abs(r["e_ref"] - r0["e_ref"]) <= 1e-6]
+        e2 = [r["e_corr"] for r in block]
+        spread = (max(e2) - min(e2)) * 1e3
+        out.append(
+            f"| `{c['address']}` | {c['nroots']} "
+            f"| {r0['l2']:.6f} "
+            f"| {r0['e_ref']:.8f} "
+            f"| {r0['e_corr'] * 1e3:+.4f} "
+            f"| {r0['e_corr_eV']:+.4f} "
+            f"| {r0['e_total']:.8f} "
+            f"| {r0['e_total_eV']:+.4f} "
+            f"| {spread:.1e} |")
+    return out
+
+
+def _csv(payload: dict) -> str:
+    lines = ["address,nroots,l2,e_ref_eh,e2_meh,e2_ev,e_pt2_eh,"
+             "e_pt2_ev,spread_meh,disposition"]
+    for c in payload["cells"]:
+        if c["disposition"] == "refusal":
+            lines.append(f"{c['address']},,,,,,,,"
+                         f",refused")
+            continue
+        r0 = c["roots"][0]
+        block = [r for r in c["roots"]
+                 if abs(r["e_ref"] - r0["e_ref"]) <= 1e-6]
+        e2 = [r["e_corr"] for r in block]
+        lines.append(
+            f"{c['address']},{c['nroots']},{r0['l2']:.6f},"
+            f"{r0['e_ref']:.8f},{r0['e_corr'] * 1e3:+.4f},"
+            f"{r0['e_corr_eV']:+.4f},{r0['e_total']:.8f},"
+            f"{r0['e_total_eV']:+.4f},"
+            f"{(max(e2) - min(e2)) * 1e3:.1e},rows")
+    return "\n".join(lines) + "\n"
+
+
+def render_atom(atom: str, workdir: str = "elements") -> None:
+    payload_path = Path(workdir) / atom / "perturbation.json"
+    if not payload_path.exists():
+        sys.exit(f"no {payload_path} -- collect first "
+                 "(scripts/run_pt2_ladder.py)")
+    payload = json.loads(payload_path.read_text())
+    _required_schema(payload)
+    digest = hashlib.sha256(payload_path.read_bytes()).hexdigest()
+    prov = payload["provenance"]
+    block = "\n".join([
+        BEGIN,
+        f"PT2 analyzation: {atom} -- {prov['engine']}, "
+        f"pyscf {prov['pyscf_version']}; payload collected "
+        f"{prov['collected']}.",
+        "",
+        "Reading key: README · Analysis (the reference-class axis, "
+        "the gauge-spread disclosure, the basis-thinness caveat). "
+        "E_ref within its own partition (kernel totals only); "
+        "E_PT2 = E_ref + E(2).  The row reads the GROUND root; the "
+        "block spread runs over the roots degenerate with it (the "
+        "gauge block) -- broken spans store excited roots beside it "
+        "(different states, not gauges; full per-root records live "
+        "in the payload).",
+        "",
+    ] + _rows(payload) + [
+        "",
+        f"<!-- payload sha256 {digest[:16]}... "
+        f"bands: {prov['stored_roots_bands']} -->",
+        END,
+    ]) + "\n"
+    table = Path(workdir) / atom / "PERTURBATION_TABLE.md"
+    if not table.exists():
+        atomic_write_text(table, f"# {atom} -- PT2\n\n" + block)
+    else:
+        replace_block(table, BEGIN, END, block)
+    atomic_write_text(Path(workdir) / atom / "PERTURBATION_TABLE.csv",
+                      _csv(payload))
+    print(f"rendered {table} + PERTURBATION_TABLE.csv "
+          f"(payload sha256 {digest[:16]}...)")
+
+
+def main() -> None:
+    atoms = sys.argv[1:]
+    if not atoms:
+        sys.exit("usage: build_perturbation_tables.py <atom> [...]")
+    for atom in atoms:
+        render_atom(atom)
+
+
+if __name__ == "__main__":
+    main()
