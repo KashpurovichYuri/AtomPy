@@ -95,9 +95,17 @@ push per batch; handoff at ticket boundaries.
 1. **Deletion** — DONE 2026-11-19: `perturb.py` + `test_perturb.py` +
    `validate_perturb.py` + the committed log removed; counts 352/258;
    spec/tickets/map/AGENTS lockstep (this commit).
-2. **The adapter** — the new `perturb.py` + unit tests: O2/H2 anchors,
-   per-class sum identity (Σe_class == e_corr), stored-roots
-   bit-exactness, the SA guard exercised, class extraction pinned.
+2. **The adapter** — DONE 2026-11-19: `perturb.py` rebuilt at the
+   seam; 9 unit tests on the frozen carbon fixture (NO SCF): the
+   exact ³P block on the pur core, the raw-core split pinned 4.4e-5
+   as the unit-scale detector, the gauge-tolerant stored-roots
+   refusal, the plumbing-vs-kernel twin at 1e-10 on the small CAS;
+   4 anchors (O2/H14 at 1e-6, two-root H2 root selection, the
+   kernelled SA guard); counts 365/271.  DISCOVERY: PySCF's
+   SC-NEVPT2 wobbles ~3e-7 Eh run-to-run (thread-parallel reductions
+   in the big contractions; the kernel's own three-run record
+   −0.16978547/−0.16978542/−0.16978512 on O2) — the twin pins sit at
+   that floor; the class plumbing shares it.
 3. **Simplest real case** — one C SA cell, per-root rows; the two
    probes (the symmetry answer gets measured here).
 3b. **Reference-class comparison** — NEVPT2 on stored CASSCF/CASCI

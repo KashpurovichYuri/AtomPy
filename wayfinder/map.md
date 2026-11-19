@@ -11,17 +11,35 @@ The wave spec: [`specs/pt2-perturbation.md`](specs/pt2-perturbation.md)
 (2026-11-19): the window-ladder diagnostic; the symmetry probes; the
 delivery chain.
 
-- [44 — the PySCF-mrpt adapter](tickets/44-pyscf-pt2-adapter.md):
-  READY (Step 0 done 2026-11-19: the O2/C2 anchors recorded) — the
-  new `perturb.py` on `pyscf.mrpt.NEVPT`.
 - [45 — the PT2 runs + PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
-  BLOCKED BY 44 — the C cell + the probes, the reference-class axis,
-  the ladder read + the render.
+  READY (44 done 2026-11-19) — the C cell + the probes, the
+  reference-class axis, the ladder read + the render.
 - [46 — the TABLE.md physics pass](tickets/46-table-physics-pass.md):
   DESIGN-FIRST, user-gated — the render-level significance policy
   (the stores keep everything; the table keeps the physics).
 
-Resolved (git history the archive): the PT wave REPLAN — DELETION
+Resolved (git history the archive): 44 the PySCF-mrpt adapter
+(2026-11-19): `perturb.py` rebuilt at the PySCF boundary —
+`readout_mc` (the run_casci twin without the checkpoint) +
+`assert_stored_roots` (fail-fast; energies strict, CI vectors
+gauge-aware through the degenerate block's joint projector) +
+`nevpt2_rows` (the kernel's canonicalization prelude + the 8
+Koopmans classes via mrpt's public functions; Sijrs/eris and the
+per-class call-shape dispatch mirrored).  Certified: the fixture's
+exact ³P block on the pur core; the RAW-core split pinned at unit
+scale (4.4e-5 Eh, the anisotropy detector class); the gauge-tolerant
+refusal (a random unitary in the block passes, a zapped root
+refuses); the plumbing-vs-kernel twin — 1e-10 on the small CAS, and
+AT CAMPAIGN SIZE THE ENGINE'S OWN WOBBLE FLOOR ~3e-7 Eh RUN-TO-RUN
+(PySCF's kernel three-run record on O2: −0.16978547 / −0.16978542 /
+−0.16978512 — thread-parallel reductions in the big contractions;
+the pins sit at that floor); the O2/H14 anchors at 1e-6 of the
+examples' retained values; two-root H2 root selection; the SA guard
+(kernelled).  13 tests; counts 365/271.  Two unit-tier facts the
+build caught: PySCF returns CI vectors as (n,1) column arrays (the
+store convention handles it), and the kernel loop WRITES the
+canonicalized CI into the shared mc.ci — our plumbing detaches the
+list, the twin pins run on fresh readouts.  the PT wave REPLAN — DELETION
 (2026-11-19): the spec's "external-anchor-absent" premise was FALSE —
 pyscf 2.13.1 ships `pyscf/mrpt` natively (`NEVPT` = sc_nevpt,
 strongly contracted; `dfnevpt2`; NO caspt2 in 2.13.1, master-only —

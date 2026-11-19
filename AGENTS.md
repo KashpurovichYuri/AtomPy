@@ -89,7 +89,7 @@ in the module).
 | `stages.py` | `StageFacts`, `stage_facts` | ONE analysis pass over a finished stage: the core-field build (the swap-basin detector reads the RAW field below the core-span tolerance) + analyze + energies vs PySCF + window purity + the ortho divergence guard; module Conventions own the two ruler readings (the reconstruction is the ANALYSIS ruler; max\|dE\| decomposes into anisotropy + window definition + bookkeeping — exactly 0) |
 | `scans.py` | `ScanSpec`, `scan_window`, `scan_state`, `radial_scan`, `member_tilt_map` | frozen-orbital scans, optimizer-free and DETERMINISTIC given the reference: m-symmetric radial curves + member-tilt maps; `ScanSpec` = the declared per-atom anatomy |
 | `analysis.py` | `analyze`, `configuration_summary`, `shell_occupations`, `format_report` | term symbols from ⟨L²⟩/⟨S²⟩ (the half-integer S grid), commutator norms, configuration labels per root (the CI-order bridge runs inside; l-grouping via `lm_sectors`) |
-| `perturb.py` | *(vacant at the 2026-11-19 replan — the home-grown PT2 ladder deleted; the PySCF-mrpt adapter re-lands here, ticket 44)* | the PT2 analyzation: PySCF's `mrpt.NEVPT` per stored root (strongly contracted; the engine in-env), our layer the adapter + meters + the symmetry probes (README · Analysis) + the render; the contract: `wayfinder/specs/pt2-perturbation.md` |
+| `perturb.py` | `ClassRow`, `PT2Row`, `readout_mc`, `assert_stored_roots`, `nevpt2_rows` | the PT2 analyzation at the PySCF-mrpt boundary (the engine: `pyscf.mrpt.NEVPT`, strongly contracted): `readout_mc` = the multi-root CASCI readout rebuilt on the supplied orbitals (the `run_casci` twin without the checkpoint); `assert_stored_roots` = the fail-fast bit-exact refusal (energies strict; CI vectors gauge-aware -- a degenerate block may lawfully re-solve rotated, the joint projector is the invariant); `nevpt2_rows` = per declared root, the kernel's canonicalization prelude + the 8 Koopmans classes through mrpt's public functions, the sum pinned against `NEVPT(...).kernel()` (the plumbing-vs-kernel twin: 1e-10 on small CAS, the engine's own ~3e-7 Eh run-to-run wobble floor at campaign size); pyscf-only imports (substrate objects arrive built), no chkfiles; the reading discipline: README · Analysis; the contract: `wayfinder/specs/pt2-perturbation.md` |
 | `cases.py` | `CaseSpec`, `Scenario`, `CAMPAIGN`, `scenarios_for`, `run_case`, `run_atom`, `run_carbon` | the DECLARED campaign (the intent manifest): `CaseSpec` fixes atom/reference/window/sectors/term-target/scenarios + the shell layer (`shell_bands`, `shell_radials` — declared, measured-certified) + the render chemistry; `CAMPAIGN` is the ONE declaration — the cell grid, regen, and renderers all derive from it; new atom = a registry row |
 | `cells.py` | `CellKey`, `run_cell`, `load_cell`, `analyze_cell`, `cell_payload`, `prior_tag_of`/`no_label`, `spine_keys`, `window_grid`/`grid_keys`/`planned`/`lattice_keys`, `lane_keys`, `run_lane_cell`/`load_lane_cell`, `void_reason`, `radial_refused` | THE addressing layer: one frozen `CellKey` per grid point, the address grammar as chk name/payload key; VOID cells validated at the key (the scenario RUN GATE — first enabled match; `--full` materializes); the two per-cell construction refusals at their own homes; the pinned lane (the frozen core = the reference's own core columns S-projected); the self-owned store (`ci_stack` stays PySCF order — the bridge lives in operators) |
 | `natural.py` | `ci_rdm1`, `natural_orbitals`, `occupation_groups`, `select_no_window`, `no_group_windows`, `NoCapExceeded` | the NO mathematics: spin-summed 1-RDM from CI roots, NOs = density eigenvectors, occupation-GROUP selection never splits an m-set (scale-aware tolerance); symmetry-safe only from a term-AVERAGED root set — the m-unequal density class REFUSED at the closure meter; `NoCapExceeded` = the declared no_cap budget's refusal type (the runner's per-cell skip) |
@@ -221,7 +221,7 @@ cold-start warning surface.
 
 ## Tests
 
-`pytest` runs 352 tests. The fast tier: `pytest -m fast` = 258
+`pytest` runs 365 tests. The fast tier: `pytest -m fast` = 271
 tests in seconds (machine-light selection). The heavy tail is
 HOURS-class — the per-commit gate is the fast tier plus the diff's
 targeted files (see Running things); the full-suite run is RETIRED. A
@@ -385,9 +385,9 @@ COMPLETE — U14e certified end-to-end (⁵L at machine-precision closure,
 round (2026-11-16) consolidated README/AGENTS/map; ticket 37 (the
 basis-repair bench, the @s wave, the subspace-ROHF) COMPLETE
 (2026-11-12..16 — the seeded-MOM repair, the twins' @s legs, the
-per-contraction ΔE certificate). Next: the PT2 wave restart — the
-PySCF-mrpt adapter (ticket 44; Step 0's anchors recorded, the
-home-grown ladder deleted 2026-11-19); the Stage-3 adoption
+per-contraction ΔE certificate). Next: the PT2 runs (ticket 45 --
+the C cell + the probes, then the ladder read + the render; the
+adapter landed 2026-11-19); the Stage-3 adoption
 decision (map Disposition candidates) is the user's call; beyond it
 the candidates: spin–orbit, transition moments, g-factors.
 
