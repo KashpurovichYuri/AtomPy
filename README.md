@@ -504,6 +504,25 @@ partition is spin-free); the question lives on the orbital side only.
 | L = 1 | rotations act transitively — constant over all gauges; measured spread = a covariance defect (machinery certificate) |
 | L ≥ 2 | rotation orbits do not cover the block — genuine spread is possible (a formulation property, not a bug); the canonical gauge is the primary row, the spread the disclosure |
 
+**Reading the ladder (R and the axes).** The ladder read is a ratio
+rule: *R* = E(2) priced on a window against the dynamic correction
+the optimized solution of the same span carries — a window whose R
+dwarfs its neighbors is *fueling* (the unoptimized span misses
+static radial content the correction cannot replace); a ladder whose
+PT2-corrected totals are flat across windows has SATURATED — the
+CAS-side gain was gauge, not physics.  **The reference-class rule**:
+E(2) is orbital-sensitive and rotation-insensitive — broken
+references (⟨L²⟩ far from 2S(S+1)) price the same correction as
+their kept twins; a refusal class means the store and the readout
+disagree about the solution, and the recovery is the regen loop,
+never a tolerance change for the occasion.  **The basis-thinness
+caveat**: cc-pVDZ-class bases inflate E(2) absolutely (the
+per-class compression meter `e_per_norm` reads how hard each class
+works); absolute eV values are basis-bound, ladder *differences*
+are the usable signal.  **The lane rule**: lane cells are a
+different payload class (no ci_stack/core_energy) — their PT2 rows
+wait on a lane-native readout twin.
+
 **The variant axis.** The engine is strongly contracted NEVPT2:
 parameter-free, intruder-free by construction (Dyall's H₀ makes
 denominators sign-definite orbital-gap sums; the strong contraction

@@ -158,7 +158,8 @@ def collect_atom(atom: str, workdir: str = "elements") -> dict:
                            "reproducibility unit",
             "stored_roots_bands": "energies 1e-11 absolute; CI "
                                   "amplitudes 1e-8 per-root; the "
-                                  "degenerate block's joint projector; "
+                                  "degenerate block's joint projector "
+                                  "(p_tol 1e-6, the solver-tail scale); "
                                   "the re-solve angle (davidson noise) "
                                   "1e-3",
             "meters": "L2/Lz/S2 measured live through the CI-order "

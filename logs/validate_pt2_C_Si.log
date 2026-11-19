@@ -1,0 +1,17 @@
+===== validate_pt2 =====
+PASS  anchor O2  E(2) -0.169785478897 vs -0.169785157128
+PASS  anchor H14  E(2) -0.094164339713 vs -0.094164359938
+PASS  payload C: class sums  max |sum - e_corr| 0.00e+00 over 66 roots / 528 classes
+PASS  payload C: totals  max |e_total - e_ref - e_corr| 3.46e-15
+PASS  payload C: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload C: meter consistency  max |energy - e_per_norm*norm| 2.78e-17
+PASS  payload C: disposition census  26 declared: 26 rows / 0 refused
+PASS  payload Si: class sums  max |sum - e_corr| 0.00e+00 over 104 roots / 832 classes
+PASS  payload Si: totals  max |e_total - e_ref - e_corr| 2.83e-14
+PASS  payload Si: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Si: meter consistency  max |energy - e_per_norm*norm| 3.47e-18
+PASS  payload Si: disposition census  34 declared: 34 rows / 0 refused
+PASS  probe C (c_2p_2-0_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
+PASS  probe Si (si_3p_2-0_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
+
+validate_pt2: ALL GREEN (170 roots certified)

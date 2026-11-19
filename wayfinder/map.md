@@ -12,12 +12,16 @@ The wave spec: [`specs/pt2-perturbation.md`](specs/pt2-perturbation.md)
 delivery chain.
 
 - [45 — the PT2 runs + PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
-  IN PROGRESS (step 3 DONE 2026-11-19 — see the resolved record;
-  next: step 3b the reference-class axis, then step 4 the ladder
-  read + the render).  The ladder's flagship = the CAS-size axis
-  ((4,12)/(4,15)/(6,13) on U14e, gated later); rows = SA-CASSCF
-  converged terms primary, single-root CASSCF the comparison; eV
-  columns per the user's directive.
+  IN PROGRESS (steps 3, 3b, 4 DONE 2026-11-19 — C AND Si collected,
+  rendered, gated ALL GREEN, 170 roots; remaining: the lane-seam
+  follow-up + step 5's gated list).  Measured: the optimized ladder
+  SATURATES (the optimizer repairs the poverty class; the thin
+  spans fuel — C −265.8/Si −236.1 mEh, static remainder 43.2/~41
+  mEh); E(2) is orbital-sensitive, rotation-insensitive at every
+  measured amplitude (⟨L²⟩ 2.00→1.58 pricing the same correction);
+  the frozen-core rows explode 4× (the disclosure).  The seam's
+  band structure is four clauses now (e_tol/c_tol/o_tol/p_tol —
+  the projector's own tail band landed on Si's @s2 SA refusal).
 - [46 — the TABLE.md physics pass](tickets/46-table-physics-pass.md):
   DESIGN-FIRST, user-gated — the render-level significance policy
   (the stores keep everything; the table keeps the physics).

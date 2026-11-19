@@ -221,7 +221,7 @@ cold-start warning surface.
 
 ## Tests
 
-`pytest` runs 365 tests. The fast tier: `pytest -m fast` = 271
+`pytest` runs 371 tests. The fast tier: `pytest -m fast` = 277
 tests in seconds (machine-light selection). The heavy tail is
 HOURS-class — the per-commit gate is the fast tier plus the diff's
 targeted files (see Running things); the full-suite run is RETIRED. A
@@ -385,9 +385,14 @@ COMPLETE — U14e certified end-to-end (⁵L at machine-precision closure,
 round (2026-11-16) consolidated README/AGENTS/map; ticket 37 (the
 basis-repair bench, the @s wave, the subspace-ROHF) COMPLETE
 (2026-11-12..16 — the seeded-MOM repair, the twins' @s legs, the
-per-contraction ΔE certificate). Next: the PT2 runs (ticket 45 --
-the C cell + the probes, then the ladder read + the render; the
-adapter landed 2026-11-19); the Stage-3 adoption
+per-contraction ΔE certificate). State, ticket 45 (2026-11-19): the PT2 wave steps 0–4 are DONE on
+C AND Si (the adapter, the probes, the reference-class axis, the
+ladder collected/rendered/gated — perturbation.json +
+PERTURBATION_TABLE.md/.csv + validate_pt2.py ALL GREEN, 170 roots).
+Remaining there: the lane-seam follow-up (lane payloads carry no
+ci_stack/core_energy — a lane-native readout twin is wanted before
+lane rows) + step 5's gated list (Ti/Sc/unc/U14e CAS ladder,
+CASPT2 env).  Next: the wave review + the Stage-3 adoption
 decision (map Disposition candidates) is the user's call; beyond it
 the candidates: spin–orbit, transition moments, g-factors.
 

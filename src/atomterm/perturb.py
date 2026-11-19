@@ -166,24 +166,26 @@ def _projector(cis) -> np.ndarray:
 
 def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
                         e_tol: float = 1e-11, c_tol: float = 1e-8,
-                        o_tol: float = 1e-3) -> None:
+                        o_tol: float = 1e-3, p_tol: float = 1e-6) -> None:
     """Refuse unless the readout reproduced the stored solution.
 
     Energies compare strict (absolute tolerance; the fresh readout's
     observed deviation sits at 1e-15, far below it).  CI vectors
     compare per-root through three clauses, each a declared class:
     amplitude equality (c_tol); the degenerate block's lawful gauge
-    freedom (the joint projector); and the single-root re-solve's
-    davidson noise (the re-solve ANGLE -- |sin| between the vectors,
-    linear in the unconverged mixing -- within o_tol of zero; the
-    state's meters and E(2) are flat across it, while any
+    freedom (the joint projector, its own band p_tol -- an SA draw's
+    solver tails move the block projector at the tail scale, an
+    order below the vectors' mixing angles); and the single-root
+    re-solve's davidson noise (the re-solve ANGLE -- |sin| between
+    the vectors, linear in the unconverged mixing -- within o_tol of
+    zero; the state's meters and E(2) are flat across it, while any
     physical mixture fails the energy clause first).
 
     Parameters
     ----------
-    e_tol, c_tol, o_tol : the refusal bands (absolute); force them to
-        pin the band behavior (the defaults are the production
-        refusal).
+    e_tol, c_tol, o_tol, p_tol : the refusal bands (absolute); force
+        them to pin the band behavior (the defaults are the
+        production refusal).
 
     Raises
     ------
@@ -237,7 +239,7 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
             return
         if (all(c.size == r.size for c, r in zip(new, ref))
                 and np.allclose(_projector(new), _projector(ref),
-                                atol=c_tol, rtol=0.0)):
+                                atol=p_tol, rtol=0.0)):
             return
         raise ValueError(
             "stored-roots refusal: the readout CI vectors match "

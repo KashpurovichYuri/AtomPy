@@ -85,6 +85,32 @@ core_energy); the stored-roots seam needs a lane-native readout twin
 before it can price lane rows.  The irrep route-invariance gate row
 waits with it.  Recorded as the follow-up.
 
+## Status: step 4 (Si) DONE 2026-11-19 -- 34 cells / 104 roots; C+Si gate ALL GREEN
+
+Si through the same chain: payload + table + CSV + the combined gate
+(logs/validate_pt2_C_Si.log -- 170 roots certified).  ONE refusal
+during collection (si_3p@s2 sa-casscf ao) drove a SEAM discovery:
+the stored SA vectors are an INTRA-block rotation (full-rank cross
+overlap, energies exact) carrying solver tails that move the block
+projector at 2.2e-7 -- above the amplitude band the projector check
+was borrowing.  The projector got its OWN band (p_tol 1e-6, the
+tail scale; pinned: the tail refused at default/admitted widened,
+o_tol forced off so the clause is exercised; the pin needs a
+4-orbital window -- at the fixture's 3-orbital size the block spans
+the whole sector).  The regen loop ran again (scoped --group planned
+--window 3p@s2) and the row stands: -54.5525 mEh, <L2> 2.000000.
+
+THE SI READING (mirrors C): the optimized cells saturate (all
+windows price -55.79..-55.93 mEh; @s2: -54.4..-54.6 -- the bigger
+window absorbed part of the dynamic correction); the thin span
+fuels (compact-ao/3pno1: -236.09 mEh); E(2) tracks the orbital draw
+(moc <L2> = 0.040 yet E(2) = -55.9263 = the clean spans' value);
+the frozen-core row explodes (-226.08, 4x its free twin).  The
+C/Si correspondence is cell-for-cell -- the axis structure, not the
+atom, decides the reading.  (Si compact fuel -236.1 mEh vs the SA
+-55.9: PT2 closes 180.2 of the 221.5 mEh poverty gap; the static
+remainder ~41 mEh.)
+
 ## Status: BLOCKED BY 44 (superseded by the 3b record above; step 4 next)
 
 ## Inputs

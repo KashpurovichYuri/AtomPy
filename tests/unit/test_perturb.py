@@ -223,13 +223,49 @@ def test_refusal_bands_are_forceable(block):
     ci_pert = [np.asarray(c).ravel() + 5e-9 * np.eye(c.size)[1]
                for c in mc2.ci]
     assert_stored_roots(mc2, ref_ci=ci_pert, o_tol=0.0, c_tol=1e-8)
-    # ... and the tightened c_tol refuses it
+    # ... and the tightened bands refuse it (c_tol and p_tol both off)
     with pytest.raises(ValueError):
-        assert_stored_roots(mc2, ref_ci=ci_pert, o_tol=0.0, c_tol=1e-12)
-    # (d) a wrong-length energy stack refuses by shape (the declared
+        assert_stored_roots(mc2, ref_ci=ci_pert, o_tol=0.0, c_tol=1e-12,
+                            p_tol=0.0)
+    # (e) a wrong-length energy stack refuses by shape (the declared
     # message, not a numpy broadcast error)
     with pytest.raises(ValueError, match="shape mismatch"):
         assert_stored_roots(mc, ref_energies=np.append(e, 0.0))
+
+
+def test_projector_band_is_its_own(carbon):
+    """The p_tol band admits the block's solver tails and refuses
+    physical spans: a 1e-4 out-of-block tail on one root moves the
+    joint projector by ~1e-4 (refused at the default, admitted
+    widened; o_tol forced off so the projector clause is the one
+    exercised).  A 4-orbital window: at the fixture's own 3-orbital
+    size the block spans the whole sector and no out-of-block
+    direction exists."""
+    from atomterm.perturb import _projector, readout_mc
+    from atomterm.core import purified_core_orbitals
+    from atomterm.windows import build_full_mo
+
+    _, mol, mf, act_idx = carbon
+    # the fixture's own construction plus a fourth shell column: at
+    # the fixture's 3-orbital size the block spans the whole sector
+    # and no out-of-block direction exists
+    act4 = list(act_idx) + [next(k for k in range(mf.mo_coeff.shape[0])
+                                  if k not in act_idx)]
+    c_core, _ = purified_core_orbitals(mol, mf, 2)
+    mo4 = build_full_mo(mf, [0, 1], act4, c_core=c_core)
+    mc = readout_mc(mol, mf, mo4, 4, (2, 0), 3)
+    p = _projector(list(mc.ci))
+    k = int(np.argmin(np.real(np.diag(p))))
+    u = np.zeros(p.shape[0])
+    u[k] = 1.0
+    u = u - p @ u                       # strictly out of the block
+    u = u / np.linalg.norm(u)
+    ci = [np.asarray(c).ravel().copy() for c in mc.ci]
+    ci_new = [v.copy() for v in ci]
+    ci_new[0] = ci_new[0] + 1e-4 * u
+    with pytest.raises(ValueError):
+        assert_stored_roots(mc, ref_ci=ci_new, o_tol=0.0)
+    assert_stored_roots(mc, ref_ci=ci_new, o_tol=0.0, p_tol=1e-3)
 
 
 def test_phase_and_davidson_noise_clauses(block):
