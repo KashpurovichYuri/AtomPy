@@ -88,6 +88,16 @@ class ClassRow:
         self.norm = norm
         self.energy = energy
 
+    @property
+    def e_per_norm(self) -> float:
+        """The compression meter: energy per unit perturber norm.
+
+        SC's softened intruder read -- a class compressing a large
+        coupling into a small energy (|ratio| far below its peers)
+        sits near a small denominator; a zero norm carries no meter.
+        """
+        return self.energy / self.norm if self.norm else float("nan")
+
     def __repr__(self):
         return (f"ClassRow({self.label} {self.note}: "
                 f"norm {self.norm:.6e}, e {self.energy:.6e})")
@@ -158,11 +168,16 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
                         e_tol: float = 1e-11, c_tol: float = 1e-8) -> None:
     """Refuse unless the readout reproduced the stored solution.
 
-    Energies compare strict (the ticket-43 anchor class: fresh
-    observed 1e-15; bookkeeping rounding sits far below the
-    tolerance).  CI vectors compare per-root, with the degenerate
-    block's lawful gauge freedom honored: a rotated basis of the same
-    root set passes through the joint projector.
+    Energies compare strict (absolute tolerance; the fresh readout's
+    observed deviation sits at 1e-15, far below it).  CI vectors
+    compare per-root, with the degenerate block's lawful gauge freedom
+    honored: a rotated basis of the same root set passes through the
+    joint projector.
+
+    Parameters
+    ----------
+    e_tol, c_tol : the refusal bands (absolute); force them to pin
+        the band behavior (the defaults are the production refusal).
 
     Raises
     ------
@@ -174,9 +189,12 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
         ref = np.atleast_1d(np.asarray(ref_energies, dtype=float)).ravel()
         if e.shape != ref.shape or not np.allclose(e, ref, atol=e_tol,
                                                    rtol=0.0):
+            shown = ("shape mismatch"
+                     if e.shape != ref.shape
+                     else f"max diff {np.max(np.abs(e - ref)):.3e}")
             raise ValueError(
                 "stored-roots refusal: the readout energies "
-                f"(max diff {np.max(np.abs(e - ref)):.3e}) do not "
+                f"({shown}) do not "
                 "reproduce the stored energies -- the substrate does "
                 "not reconstruct the stored run; PT2 refused")
     if ref_ci is not None:

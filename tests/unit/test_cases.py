@@ -208,3 +208,21 @@ def test_u14e_declares_the_series_revival():
     tagged = [w for w in cs.planned_windows if "@" in w]
     assert tagged == ["5f6d@r1", "5f6d@s1"]   # @s2: no second radial
     assert "prior-anchor-first" in {s.name for s in cs.scenarios}
+
+
+def test_cell_substrate_refuses_an_unconverged_reference(monkeypatch):
+    """cell_substrate refuses before touching the store when the
+    rebuilt ROHF did not converge (the forced-parameter path: the
+    trusted cache never produces it)."""
+    import types
+
+    import atomterm.cases as cases
+    from atomterm.cells import CellKey
+
+    def _unconverged(cfg, chk, ref=None):
+        return None, types.SimpleNamespace(converged=False)
+
+    monkeypatch.setattr(cases, "run_rohf", _unconverged)
+    key = CellKey.from_address("c_2p_2-0_casci_ao_-_pur_avg")
+    with pytest.raises(ValueError, match="did not converge"):
+        cases.cell_substrate(key)

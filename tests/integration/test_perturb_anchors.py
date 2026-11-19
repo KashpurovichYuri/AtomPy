@@ -53,6 +53,18 @@ def test_o2_anchor():
                                         abs=1e-14)
 
 
+def _h2():
+    """Stretched H2/STO-3G (1.4 A): the shared small substrate."""
+    mol = gto.Mole()
+    mol.verbose = 0
+    mol.output = None
+    mol.atom = [["H", (0.0, 0.0, 0.0)], ["H", (0.0, 0.0, 1.4)]]
+    mol.basis = "sto-3g"
+    mol.build()
+    mf = scf.RHF(mol)
+    mf.scf()
+    return mol, mf
+
 def test_h14_anchor():
     """H14/STO-3G CASCI(8,10): the second retained anchor, a different
     system class (closed-shell chain, larger active space)."""
@@ -76,14 +88,7 @@ def test_two_root_h2_root_selection():
     the SECOND root (the multi-root path, not just the ground)."""
     from pyscf.mrpt import NEVPT
 
-    mol = gto.Mole()
-    mol.verbose = 0
-    mol.output = None
-    mol.atom = [["H", (0.0, 0.0, 0.0)], ["H", (0.0, 0.0, 1.4)]]
-    mol.basis = "sto-3g"
-    mol.build()
-    mf = scf.RHF(mol)
-    mf.scf()
+    mol, mf = _h2()
     mc = readout_mc(mol, mf, mf.mo_coeff, 2, (1, 1), 2)
     rows = nevpt2_rows(mol, mf, mf.mo_coeff, 2, (1, 1), 2, roots=[0, 1])
     assert [r.root for r in rows] == [0, 1]
@@ -99,14 +104,7 @@ def test_sa_kernelled_object_refuses():
     from pyscf import mcscf
     from pyscf.mrpt import NEVPT
 
-    mol = gto.Mole()
-    mol.verbose = 0
-    mol.output = None
-    mol.atom = [["H", (0.0, 0.0, 0.0)], ["H", (0.0, 0.0, 1.4)]]
-    mol.basis = "sto-3g"
-    mol.build()
-    mf = scf.RHF(mol)
-    mf.scf()
+    mol, mf = _h2()
     mc = mcscf.CASSCF(mf, 2, 2).state_average_(weights=(0.5, 0.5))
     mc.kernel()
     with pytest.raises(RuntimeError):

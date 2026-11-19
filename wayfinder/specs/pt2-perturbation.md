@@ -42,11 +42,18 @@ pre-approved); each variant produces the same row shape.
 signature `(mol, mf, mo_full, ncore, ncas, nelecas)` + explicit
 `roots`; internally: rebuild the multi-root CASCI on the stored MO
 (the readout-twin recipe — `casscf.run_irrep_casci`'s pattern), assert
-the rebuilt roots match the stored `ci_stack` BIT-EXACTLY (the
-ticket-43 precedent), then `mrpt.NEVPT(mc, root=k).kernel()` per root,
+the rebuilt roots match the stored `ci_stack` (the ticket-43
+precedent, in its DECLARED form: energies strict at 1e-11 absolute;
+CI amplitudes per-root at 1e-8 with the exactly degenerate block's
+lawful gauge freedom honored through the joint projector — the store
+keeps flat vectors, the reader (n,1) columns, amplitudes are the
+assertion), then `mrpt.NEVPT(mc, root=k).kernel()` per root,
 extracting the 8 Koopmans-class `(norm, energy)` pairs (public module
-functions `Sr/Si/Sijrs/Sijr/Srsi/Srs/Sij/Sir`). SA solutions enter
-through the readout pass (the kernel refuses `StateAverageFCISolver`).
+functions `Sr/Si/Sijrs/Sijr/Srsi/Srs/Sij/Sir`, plus the kernel's
+canonicalization prelude mirrored through the module's internal ERIS
+/ contraction helpers — the plumbing-vs-kernel twin pins it), SA
+solutions enter through the readout pass (the kernel refuses
+`StateAverageFCISolver`).
 `density_fit` stays effectively inert (plain CASCI → exact 4-index
 ERIS).
 
@@ -134,8 +141,9 @@ push per batch; handoff at ticket boundaries.
   example's retained value; agreement band ~1e-6 Eh), H14/STO-3G →
   −0.094164359938.
 - (b) **Identities**: per-class sum == e_corr (the kernel's own
-  arithmetic, read twice); bit-exact stored-roots assertion before
-  any PT2; NEVPT's SA guard exercised (raises on an SA solver).
+  arithmetic, read twice); the declared stored-roots assertion before
+  any PT2 (strict energies + gauge-aware amplitudes, per
+  Architecture); NEVPT's SA guard exercised (raises on an SA solver).
 - (c) **The probes**: gauge redraw controls flat (E, ⟨L²⟩), the
   component identity — the L=1 invariance is itself a machinery
   certificate.

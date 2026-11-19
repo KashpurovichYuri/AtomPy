@@ -185,6 +185,24 @@ configuration-inert).
 
 ### Open
 
+- **The 2026-11-19 review's declinations** (the two-axis review over
+  the PT2 wave, fixed point 7ab52df): fixed = probe_tmp.py scratch
+  deleted; the AGENTS cases.py layout row (lockstep); the measured
+  values moved out of assert_stored_roots' contract slot; the
+  shape-mismatch refusal message (a numpy broadcast error used to
+  replace the declared text); e_tol/c_tol force-pinned; the
+  compression meter (ClassRow.e_per_norm) landed; the absolute
+  fixture E(2) pin (observed −0.26575851 Eh — which reproduced the
+  campaign poverty-class cell's E(2) from an independent substrate
+  rebuild, ~1e-7 Eh); H2 build one home; probe-A onto _expect; the
+  spec letter amended to the declared stored-roots form + the mrpt
+  internal-prelude honesty.  DECLINED (judgement calls): the probe's
+  _root_row private reach (one instrument; a promoted seam would
+  widen nevpt2_rows' interface for a single consumer — the deletion
+  test fails it); cell_substrate returning a bundle type (fights the
+  declared substrate-signature convention); the _VARIANTS guard
+  (the registry deferral is documented); readout_mc's unused `mol`
+  (the substrate-signature convention).
 - **The future-wave queue** (ticket 34's After + the standing
   candidates): the contraction-recipe provenance review (our radials
   vs the basis authors' coefficients); then spin–orbit, transition

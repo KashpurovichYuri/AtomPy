@@ -21,6 +21,15 @@ pytestmark = pytest.mark.fast
 # active = the 2p shell (AO-row selectors), Sz=+1 sector (na, nb) = (2, 0)
 NCAS, NELECAS, NROOTS = 3, (2, 0), 3
 
+# the fixture's fresh root-0 E(2) (Eh) -- the absolute anchor against
+# the engine itself, observed at pin time (2026-11-19, pyscf 2.13.1).
+# NOTE the coincidence that is not one: the fixture's construction
+# (frozen carbon, pur core, pure-AO 2p readout) is the campaign's
+# poverty-class cell class -- c_2p_2-0_casci_ao_-_pur_avg prices the
+# same E(2), -265.7585 mEh, from an independent substrate rebuild
+# (agreement ~1e-7 Eh, the engine wobble floor)
+E2_FRESH = -0.2657585148
+
 
 @pytest.fixture(scope="module")
 def block(carbon):
@@ -38,9 +47,7 @@ def block(carbon):
 
 
 def test_readout_reproduces_the_degenerate_p2_block(block):
-    """The Sz=+1 p2 sector holds ONLY the 3P states (ML = +1, 0, -1):
-    three determinants, one exact energy -- the spread certifies the
-    pur core (the raw core's polarization splits it; the next test)."""
+    """The Sz=+1 p2 sector holds only the 3P states: one exact energy."""
     mol, mf, mc, mo_full = block
     e = np.atleast_1d(np.asarray(mc.e_cas, dtype=float))
     assert e.shape == (3,)
@@ -48,9 +55,8 @@ def test_readout_reproduces_the_degenerate_p2_block(block):
 
 
 def test_raw_core_field_splits_the_block(carbon):
-    """The raw-core anisotropy detector at unit scale: the same readout
-    on the RAW canonical core polarizes the 3P block (fresh observed
-    4.4e-5 Eh -- the declared class; the pur core above cures it)."""
+    """The raw-core field splits the block (the unit-scale detector,
+    fresh observed 4.4e-5 Eh -- the band below carries the record)."""
     _, mol, mf, act_idx = carbon
     from atomterm.windows import build_full_mo
 
@@ -61,8 +67,7 @@ def test_raw_core_field_splits_the_block(carbon):
 
 
 def test_root_energies_follow_the_store_convention(block):
-    """Root totals = e_cas + the common core part; root 0 reproduces
-    the kernel's own total."""
+    """Root totals = e_cas + the common core part (store convention)."""
     mol, mf, mc, mo_full = block
     from atomterm.perturb import _root_energies
 
@@ -72,8 +77,7 @@ def test_root_energies_follow_the_store_convention(block):
 
 
 def test_stored_roots_assertion_passes_on_truth_and_refuses_drift(block):
-    """The assertion accepts the solution it read out and refuses any
-    drift: energy tamper and vector tamper both raise."""
+    """The assertion passes on truth and refuses energy/vector drift."""
     mol, mf, mc, mo_full = block
     from atomterm.perturb import _root_energies
 
@@ -98,9 +102,7 @@ def test_stored_roots_assertion_passes_on_truth_and_refuses_drift(block):
 
 
 def test_stored_roots_assertion_is_gauge_tolerant_in_the_block(block):
-    """A lawful gauge redraw of the exactly degenerate block (a random
-    unitary inside it) passes -- the joint projector is the
-    invariant; zeroing one root's vector does not."""
+    """A degenerate-block gauge redraw passes; a zapped root refuses."""
     mol, mf, mc, mo_full = block
     from atomterm.perturb import _root_energies
 
@@ -118,10 +120,9 @@ def test_stored_roots_assertion_is_gauge_tolerant_in_the_block(block):
 
 
 def test_rows_carry_the_full_class_breakdown_and_match_the_kernel(block):
-    """The row: eight classes, nonnegative norms, the class sum as
-    e_corr -- pinned against NEVPT(...).kernel() on a FRESH readout
-    (the kernel's loop writes the canonicalized CI into the shared
-    ``mc.ci``; the fixture must stay untouched)."""
+    """Rows carry the full class breakdown and match the kernel
+    (fresh-readout pin -- the kernel writes the canonicalized CI into
+    the shared ``mc.ci``)."""
     mol, mf, mc, mo_full = block
     rows = nevpt2_rows(mol, mf, mo_full, NCAS, NELECAS, NROOTS,
                        roots=[0])
@@ -147,8 +148,7 @@ def test_rows_carry_the_full_class_breakdown_and_match_the_kernel(block):
 
 
 def test_row_refs_exercise_the_assertion_path(block):
-    """nevpt2_rows with refs re-reads the solution and passes; a
-    tampered store refuses the whole call (fail-fast before any PT2)."""
+    """Refs re-read and pass; a tampered store refuses before PT2."""
     from atomterm.perturb import _root_energies
 
     mol, mf, mc, mo_full = block
@@ -172,8 +172,7 @@ def test_variant_whitelist_refuses_unknown(block):
 
 
 def test_sa_solver_objects_refuse_at_the_kernel(carbon):
-    """The engine's SA guard: a state-averaged solver object never
-    enters NEVPT (the multi-root readout is the required form)."""
+    """A state-averaged solver object refuses at the kernel (SA guard)."""
     from pyscf import mcscf
     from pyscf.mrpt import NEVPT
 
@@ -182,3 +181,49 @@ def test_sa_solver_objects_refuse_at_the_kernel(carbon):
         weights=(0.5, 0.5))
     with pytest.raises(RuntimeError):
         NEVPT(mc, root=0).kernel()
+
+
+def test_absolute_e2_pin_on_the_fixture(block):
+    """The fixture's root-0 E(2) sits at its observed fresh value."""
+    mol, mf, _, mo_full = block
+    rows = nevpt2_rows(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
+    assert rows[0].e_corr == pytest.approx(E2_FRESH, abs=1e-6)
+
+
+def test_refusal_bands_are_forceable(block):
+    """The forced e_tol/c_tol pin the refusal bands' semantics: the
+    default admits fresh draw noise and sub-band amplitude noise
+    through the projector; tightening refuses them; a length-mismatched
+    energy stack refuses by shape."""
+    mol, mf, _, mo_full = block
+    rows = nevpt2_rows(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
+    from atomterm.perturb import _root_energies, readout_mc
+
+    mc = readout_mc(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
+    e = _root_energies(mc).copy()
+    # (a) noise inside the default band passes ...
+    assert_stored_roots(mc, ref_energies=e + 5e-13)
+    # ... and the tightened band refuses the same stack
+    with pytest.raises(ValueError):
+        assert_stored_roots(mc, ref_energies=e + 5e-13, e_tol=1e-15)
+    # (b) amplitude noise inside the default c_tol passes via the
+    # projector (the block's lawful form) ...
+    ci_pert = [np.asarray(c) + 5e-9 for c in mc.ci]
+    assert_stored_roots(mc, ref_ci=ci_pert)
+    # ... and the tightened c_tol refuses it
+    with pytest.raises(ValueError):
+        assert_stored_roots(mc, ref_ci=ci_pert, c_tol=1e-12)
+    # (c) a wrong-length energy stack refuses by shape (the declared
+    # message, not a numpy broadcast error)
+    with pytest.raises(ValueError, match="shape mismatch"):
+        assert_stored_roots(mc, ref_energies=np.append(e, 0.0))
+
+
+def test_class_rows_carry_the_compression_meter():
+    """e_per_norm = energy/norm; a zero norm carries no meter (nan)."""
+    from atomterm.perturb import ClassRow
+
+    row = ClassRow("Sir", "(0)'", norm=2.0, energy=-4.0)
+    assert row.e_per_norm == pytest.approx(-2.0)
+    assert ClassRow("Sr", "(-1)'", norm=0.0, energy=0.0).e_per_norm != \
+        ClassRow("Sr", "(-1)'", norm=0.0, energy=0.0).e_per_norm  # nan

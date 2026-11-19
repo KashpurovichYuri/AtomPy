@@ -117,10 +117,11 @@ def main() -> None:
         mc.ci = ci_rot  # inject the redrawn gauge (bypass the re-solve)
         for r in range(nroots):
             w = _to_detbasis(ci_rot[r], ncas, na, nb)
-            l2 = float(np.real(np.vdot(w, ops["L2"] @ w)))
-            ev = float(np.real(np.vdot(w, h_cas @ w)))
-            worst_ctrl = max(worst_ctrl, abs(l2 - 2.0),
-                             abs(ev - e_cas_store[r]))
+            worst_ctrl = max(worst_ctrl,
+                             abs(_expect(ops["L2"], ci_rot[r],
+                                         ncas, na, nb) - 2.0),
+                             abs(_expect(h_cas, ci_rot[r],
+                                         ncas, na, nb) - e_cas_store[r]))
             row = _root_row(mc, r, "nevpt2-sc")
             e_vals.append(row.e_corr)
     spread_a = max(e_vals) - min(e_vals)
