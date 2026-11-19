@@ -92,8 +92,14 @@ the brute one on generic inputs).
 rung 1: :func:`epstein_nesbet` (production: matrix-free couplings +
 :func:`diagonal_energies`) beside :func:`epstein_nesbet_dense` (the
 dense Slater-Condon slice -- the elementwise twin).
-rungs 2-3 (Dyall, NEVPT2-SC) join this ladder under the same result
-type; CASPT2 stays specified (see above), never built here.
+rung 2: the Dyall partition (:func:`dyall_h0` builds the
+mean-field ``H0`` beside the rotated tensors; :func:`dyall_e2` /
+:func:`dyall_e2_dense` the correction in the same two-construction
+pattern).  The empty-active limit is exact MP2 -- the textbook
+anchor.
+rung 3: NEVPT2 strongly contracted joins here (the 7 excitation
+classes as small per-class solves over the density cumulants);
+CASPT2 stays specified (see above), never built here.
 """
 
 from __future__ import annotations
@@ -111,10 +117,14 @@ from atomterm.detbasis import (
 
 __all__ = [
     "PT2Result",
+    "DyallH0",
     "fois_indices",
     "diagonal_energies",
     "epstein_nesbet",
     "epstein_nesbet_dense",
+    "dyall_h0",
+    "dyall_e2",
+    "dyall_e2_dense",
 ]
 
 
@@ -226,6 +236,44 @@ def diagonal_energies(dets: list[tuple[int, ...]], h1: np.ndarray,
     return out
 
 
+def _assemble(e0, num: np.ndarray, denom: np.ndarray) -> PT2Result:
+    """The shared meters assembly of the second-order sums: the
+    first-order amplitudes are the diagonal solve ``C1 = num/denom``;
+    one home for the meters, the zero-denominator raise, and the
+    empty-FOIS convention (``floor = inf``)."""
+    if len(denom) and np.any(denom == 0):
+        raise ValueError(
+            "a zero PT2 denominator: the partition is degenerate -- "
+            "an external configuration sits exactly at the reference "
+            "energy (the intruder the floor meter exists to surface)")
+    c1 = num / denom
+    e2 = np.vdot(num, c1)
+    floor = float(np.min(np.abs(denom))) if len(denom) else float("inf")
+    w_ref = 1.0 / (1.0 + float(np.sum(np.abs(c1) ** 2)))
+    return PT2Result(e0=e0, e2=e2, floor=floor, w_ref=w_ref,
+                     n_fois=int(len(denom)))
+
+
+def _reference(n_val: int, n_act: int, na: int, nb: int,
+               ci: np.ndarray) -> tuple:
+    """The shared reference seam: the valence determinant basis, the
+    CAS index set, and the embedded vector.  Validates the CI (its
+    length must match the CAS sector; it must not vanish)."""
+    dets = determinant_basis(n_val, na, nb)
+    cas_mask = _cas_mask(dets, n_val, n_act)
+    cas_idx = np.nonzero(cas_mask)[0]
+    if np.count_nonzero(ci) == 0:
+        raise ValueError("the reference CI is identically zero")
+    if len(ci) != len(cas_idx):
+        raise ValueError(
+            f"the CI length {len(ci)} does not match the CAS sector "
+            f"({len(cas_idx)} determinants over n_act={n_act}, "
+            f"({na}, {nb}))")
+    v = np.zeros(len(dets), dtype=np.result_type(ci))
+    v[cas_idx] = ci
+    return dets, cas_mask, cas_idx, v
+
+
 def epstein_nesbet(h1: np.ndarray, g: np.ndarray, n_act: int,
                    na: int, nb: int, ci: np.ndarray) -> PT2Result:
     """The Epstein-Nesbet E(2) (rung 1, production construction).
@@ -261,19 +309,8 @@ def epstein_nesbet(h1: np.ndarray, g: np.ndarray, n_act: int,
         must surface, never a numerical accident to divide through.
     """
     n_val = h1.shape[0] // 2
-    dets = determinant_basis(n_val, na, nb)
-    cas_mask = _cas_mask(dets, n_val, n_act)
-    cas_idx = np.nonzero(cas_mask)[0]
-    if np.count_nonzero(ci) == 0:
-        raise ValueError("the reference CI is identically zero")
+    dets, cas_mask, cas_idx, v = _reference(n_val, n_act, na, nb, ci)
 
-    v = np.zeros(len(dets), dtype=np.result_type(h1, g))
-    if len(ci) != len(cas_idx):
-        raise ValueError(
-            f"the CI length {len(ci)} does not match the CAS sector "
-            f"({len(cas_idx)} determinants over n_act={n_act}, "
-            f"({na}, {nb}))")
-    v[cas_idx] = ci
     hv = operator_apply(dets, one_body=h1, two_body=g)(v)
     e0 = np.vdot(ci, hv[cas_idx])
 
@@ -281,18 +318,7 @@ def epstein_nesbet(h1: np.ndarray, g: np.ndarray, n_act: int,
     fois_dets = [dets[k] for k in fois_idx]
     couplings = hv[fois_idx]
     diag = diagonal_energies(fois_dets, h1, g)
-    denom = e0 - diag
-    if len(denom) and np.any(denom == 0):
-        raise ValueError(
-            "a zero EN denominator: the partition is degenerate -- "
-            "an external configuration sits exactly at the reference "
-            "energy (the intruder the floor meter exists to surface)")
-    c1 = couplings / denom
-    e2 = np.vdot(couplings, c1)
-    floor = float(np.min(np.abs(denom))) if len(denom) else float("inf")
-    w_ref = 1.0 / (1.0 + float(np.sum(np.abs(c1) ** 2)))
-    return PT2Result(e0=e0, e2=e2, floor=floor, w_ref=w_ref,
-                     n_fois=int(len(fois_idx)))
+    return _assemble(e0, couplings, e0 - diag)
 
 
 def epstein_nesbet_dense(h1: np.ndarray, g: np.ndarray, n_act: int,
@@ -311,11 +337,7 @@ def epstein_nesbet_dense(h1: np.ndarray, g: np.ndarray, n_act: int,
     path.
     """
     n_val = h1.shape[0] // 2
-    dets = determinant_basis(n_val, na, nb)
-    cas_mask = _cas_mask(dets, n_val, n_act)
-    cas_idx = np.nonzero(cas_mask)[0]
-    if np.count_nonzero(ci) == 0:
-        raise ValueError("the reference CI is identically zero")
+    dets, cas_mask, cas_idx, v = _reference(n_val, n_act, na, nb, ci)
 
     h_full = slater_condon_matrix(dets, one_body=h1, two_body=g)
     e0 = np.vdot(ci, h_full[cas_idx][:, cas_idx] @ ci)
@@ -325,15 +347,184 @@ def epstein_nesbet_dense(h1: np.ndarray, g: np.ndarray, n_act: int,
     fois_idx = fois_idx[coupled]
     couplings = couplings[coupled]
     diag = np.diag(h_full)[fois_idx]
-    denom = e0 - diag
-    if len(denom) and np.any(denom == 0):
-        raise ValueError(
-            "a zero EN denominator: the partition is degenerate -- "
-            "an external configuration sits exactly at the reference "
-            "energy (the intruder the floor meter exists to surface)")
-    c1 = couplings / denom
-    e2 = np.vdot(couplings, c1)
-    floor = float(np.min(np.abs(denom))) if len(denom) else float("inf")
-    w_ref = 1.0 / (1.0 + float(np.sum(np.abs(c1) ** 2)))
-    return PT2Result(e0=e0, e2=e2, floor=floor, w_ref=w_ref,
-                     n_fois=int(len(fois_idx)))
+    return _assemble(e0, couplings, e0 - diag)
+
+
+# ------------------------------------------------------------- rung 2: Dyall
+
+class DyallH0(NamedTuple):
+    """The Dyall mean-field partition of a valence space.
+
+    h1, g : the Hamiltonian tensors re-expressed in the partition's
+        basis (the EXTERNAL ranges canonicalized; the active columns
+        untouched -- the CI's own gauge survives bit-exactly).
+    m : the ``H0`` one-body matrix -- block-diagonal (active block =
+        the mean-field Fock's active block; inactive/virtual blocks =
+        the canonical eigenvalues).  ``H0 = E0 + Sum m a+a - tr(m
+        gamma)`` reproduces ``E0`` on the reference in the trace
+        sense; the constant never reaches an external determinant.
+    eps : the canonical virtual-range energies, in ``virt`` order.
+    gamma : the reference spin-orbital 1-RDM over the valence space.
+    act, virt : the partition's spin-orbital index sets (VALENCE
+        labels: the active-first relabel maps the CAS beta block
+        through ``n_val`` -- the sets are split ranges, never
+        ``arange`` blocks).
+    """
+
+    h1: np.ndarray
+    g: np.ndarray
+    m: np.ndarray
+    eps: np.ndarray
+    gamma: np.ndarray
+    act: np.ndarray
+    virt: np.ndarray
+
+
+def _cas_one_rdm(ci: np.ndarray, n_val: int, n_act: int, na: int,
+                 nb: int) -> np.ndarray:
+    """The reference spin-orbital 1-RDM ``gamma[p, q] = <a+_q a_p>``
+    over the CAS determinants, VALENCE-EMBEDDED: shape
+    ``(2 * n_val, 2 * n_val)``, entries only on the active blocks
+    (alpha ``0..n_act-1``, beta ``n_val..n_val+n_act-1`` -- the
+    active-first relabel maps the CAS beta block through ``n_val``,
+    never onto the alpha columns).  Elementwise through the
+    elementary one-body selectors -- the detbasis machinery's own
+    convention, no independent algebra here."""
+    dets, _, _, v = _reference(n_val, n_act, na, nb, ci)
+    idx = np.concatenate([np.arange(n_act),
+                          n_val + np.arange(n_act)])
+    gamma = np.zeros((2 * n_val, 2 * n_val),
+                     dtype=np.result_type(v))
+    for p in idx:
+        for q in idx:
+            sel = np.zeros((2 * n_val, 2 * n_val))
+            sel[q, p] = 1.0  # <a+_q a_p> rides the (q, p) selector
+            gamma[p, q] = np.vdot(v, operator_apply(
+                dets, one_body=sel, two_body=None)(v))
+    return gamma
+
+
+def dyall_h0(h1: np.ndarray, g: np.ndarray, n_act: int, na: int,
+             nb: int, ci: np.ndarray) -> DyallH0:
+    """The Dyall partition of the valence space (rung 2's ``H0``).
+
+    The folded core IS the inactive range of the Dyall three-way
+    split: its field enters ``h1`` for every column (the fold), and
+    CAS determinants never occupy the external columns (their
+    ``gamma`` vanishes identically there) -- so the partition's
+    in-convention content is the ACTIVE (the CI's own gauge, its
+    mean-field Fock block) beside the VIRTUAL range (canonicalized
+    in place; the rotation is span-preserving -- the CAS determinant
+    span is invariant and the CI survives bit-exactly).  The mean
+    field: ``f = h1 + Sum_k gamma_k (g[p,k,q,k] - g[p,k,k,q])`` --
+    the active-average Coulomb-exchange on top of the folded field.
+    (The textbook full-space three-way construction rides a later
+    wave if a confrontation needs it; the empty-active-with-electrons
+    sector refuses at the reference seam.)
+
+    Returns
+    -------
+    :class:`DyallH0`.
+
+    Raises
+    ------
+    ValueError
+        Through :func:`_reference` on a vanished or mislength CI.
+    """
+    n_val = h1.shape[0] // 2
+    n_s = 2 * n_val
+    _, _, _, v = _reference(n_val, n_act, na, nb, ci)
+    scale = float(np.max(np.abs(g))) or 1.0
+    for gen in ((2, 1, 0, 3), (0, 3, 2, 1), (1, 0, 3, 2)):
+        if not np.allclose(g, g.transpose(gen), atol=1e-9 * scale):
+            raise ValueError(
+                "the Dyall mean field needs PHYSICAL two-body "
+                "integrals (the chemist 8-fold permutational "
+                "symmetry; the violated generator is "
+                f"{gen}): the Fock build would not be hermitian")
+    gamma = _cas_one_rdm(ci, n_val, n_act, na, nb)
+
+    act = np.concatenate([np.arange(n_act),
+                          n_val + np.arange(n_act)])
+    virt = np.setdiff1d(np.arange(n_s), act)
+    gdiag = np.real(np.diag(gamma))
+    f = h1 + np.einsum("k,pkqk->pq", gdiag, g) \
+        - np.einsum("k,pkkq->pq", gdiag, g)
+    rot = np.eye(n_s, dtype=np.result_type(f))
+    if len(virt):
+        w, u = np.linalg.eigh(f[np.ix_(virt, virt)])
+        rot[np.ix_(virt, virt)] = u
+    else:
+        w = np.zeros(0)
+    h1r = rot.conj().T @ h1 @ rot
+    gr = np.einsum("pqrs,pa,qb,rc,sd->abcd", g, rot.conj(), rot.conj(),
+                   rot.conj(), rot.conj(), optimize=True)
+
+    m = np.zeros_like(f)
+    m[np.ix_(act, act)] = f[np.ix_(act, act)]
+    if len(virt):
+        m[np.ix_(virt, virt)] = np.diag(w)
+    return DyallH0(h1=h1r, g=gr, m=m, eps=w, gamma=gamma,
+                   act=act, virt=virt)
+
+
+def dyall_e2(h0: DyallH0, n_act: int, na: int, nb: int,
+             ci: np.ndarray) -> PT2Result:
+    """The Dyall E(2) (rung 2, production construction).
+
+    The correction ``E2 = Sum_mu |<mu|V|Psi>|^2 / (E0 - H0_mu_mu)``
+    with ``V = H - H0``: the numerators carry the ``H0`` column's
+    subtraction (a multi-determinant reference has nonzero
+    transition occupations into the FOIS singles -- the internal
+    contraction of the mean field); the denominators
+    ``E0 - H0_mu_mu = tr(m gamma) - Sum_p m_pp occ_p(mu)`` are
+    orbital-gap sums (sign-definite for a Fock-like ``m``).  The
+    empty-active limit is exact MP2 -- the textbook anchor.
+
+    Raises
+    ------
+    ValueError
+        On an exactly vanishing denominator (through
+        :func:`_assemble`), or a vanished/mislength CI (through
+        :func:`_reference`).
+    """
+    n_val = h0.h1.shape[0] // 2
+    dets, cas_mask, cas_idx, v = _reference(n_val, n_act, na, nb, ci)
+    apply_h = operator_apply(dets, one_body=h0.h1, two_body=h0.g)
+    apply_m = operator_apply(dets, one_body=h0.m, two_body=None)
+    hv = apply_h(v)
+    h0v = apply_m(v)
+    e0 = np.vdot(ci, hv[cas_idx])
+
+    fois_mask = ~cas_mask & (hv != h0v)
+    fois_idx = np.nonzero(fois_mask)[0]
+    fois_dets = [dets[k] for k in fois_idx]
+    num = hv[fois_idx] - h0v[fois_idx]
+    diag_m = diagonal_energies(fois_dets, h0.m,
+                               np.zeros_like(h0.g))
+    tr_mg = float(np.real(np.sum(h0.m * h0.gamma)))
+    denom = tr_mg - diag_m
+    return _assemble(e0, num, denom)
+
+
+def dyall_e2_dense(h0: DyallH0, n_act: int, na: int, nb: int,
+                   ci: np.ndarray) -> PT2Result:
+    """The Dyall E(2), dense evaluation -- the elementwise twin of
+    :func:`dyall_e2`: the H column and the ``H0`` column both from
+    dense Slater-Condon matrices over the full valence sector (no
+    shared code path with the matrix-free production).  Test-tier
+    substrate: quadratic in the sector."""
+    n_val = h0.h1.shape[0] // 2
+    dets, cas_mask, cas_idx, v = _reference(n_val, n_act, na, nb, ci)
+    h_full = slater_condon_matrix(dets, one_body=h0.h1, two_body=h0.g)
+    m_full = slater_condon_matrix(dets, one_body=h0.m, two_body=None)
+    e0 = np.vdot(ci, h_full[cas_idx][:, cas_idx] @ ci)
+    fois_idx = np.nonzero(~cas_mask)[0]
+    num = (h_full[fois_idx][:, cas_idx]
+           - m_full[fois_idx][:, cas_idx]) @ ci
+    coupled = np.nonzero(num != 0)[0]
+    fois_idx = fois_idx[coupled]
+    num = num[coupled]
+    tr_mg = float(np.real(np.sum(h0.m * h0.gamma)))
+    denom = tr_mg - np.diag(m_full)[fois_idx]
+    return _assemble(e0, num, denom)

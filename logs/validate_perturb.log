@@ -13,18 +13,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.957 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.791 mEh  floor 0.6467  w_ref 0.995849  n_fois 63
+PASS root0 dyall         e0 anchor 3.6e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.559 mEh  floor 1.0093  w_ref 0.998761  n_fois 25
 PASS root1 e0-anchor    diff 6.7e-16 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.920 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.786 mEh  floor 0.6467  w_ref 0.995852  n_fois 63
+PASS root1 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.623 mEh  floor 0.9698  w_ref 0.998698  n_fois 25
 PASS root2 e0-anchor    diff 1.6e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.937 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.775 mEh  floor 0.6467  w_ref 0.995861  n_fois 63
+PASS root2 dyall         e0 anchor 1.6e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.593 mEh  floor 0.9659  w_ref 0.998728  n_fois 25
 ---- c_2p_2-0_sa-casscf_ao_-_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 43 == dense 43, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 43, all in the brute reach 63
@@ -35,18 +41,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   26 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.776 mEh  floor 0.6989  w_ref 0.995860  n_fois 26
+PASS root0 dyall         e0 anchor 4.2e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 14
 PASS root1 e0-anchor    diff 1.3e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 4.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   12 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.798 mEh  floor 0.6989  w_ref 0.995844  n_fois 12
+PASS root1 dyall         e0 anchor 1.3e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 15
 PASS root2 e0-anchor    diff 4.0e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 6.7e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   26 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.778 mEh  floor 0.6989  w_ref 0.995859  n_fois 26
+PASS root2 dyall         e0 anchor 4.0e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 15
 ---- c_2p_2-0_sa-casscf_ao_radial_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -57,18 +69,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.987 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.769 mEh  floor 0.6435  w_ref 0.995866  n_fois 63
+PASS root0 dyall         e0 anchor 1.1e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.502 mEh  floor 1.0433  w_ref 0.998815  n_fois 25
 PASS root1 e0-anchor    diff 6.7e-16 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.931 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.791 mEh  floor 0.6434  w_ref 0.995848  n_fois 63
+PASS root1 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 8.7e-19 (tol 1e-10)
+INFO root1 Dyall       e2 -2.603 mEh  floor 0.9627  w_ref 0.998718  n_fois 25
 PASS root2 e0-anchor    diff 1.1e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.942 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.791 mEh  floor 0.6434  w_ref 0.995848  n_fois 63
+PASS root2 dyall         e0 anchor 1.1e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.582 mEh  floor 0.9674  w_ref 0.998738  n_fois 25
 ---- c_2p_2-0_sa-casscf_ao_radial_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 22 == dense 22, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 22, all in the brute reach 63
@@ -79,18 +97,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   8 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.791 mEh  floor 0.6989  w_ref 0.995849  n_fois 8
+PASS root0 dyall         e0 anchor 1.1e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 3
 PASS root1 e0-anchor    diff 1.1e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 4.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   8 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.791 mEh  floor 0.6989  w_ref 0.995849  n_fois 8
+PASS root1 dyall         e0 anchor 1.1e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 7
 PASS root2 e0-anchor    diff 8.9e-16 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 4.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   6 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.770 mEh  floor 0.6989  w_ref 0.995865  n_fois 6
+PASS root2 dyall         e0 anchor 8.9e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 5
 ---- c_2p_2-0_sa-casscf_ao_frozen_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -101,18 +125,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.970 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -356.645 mEh  floor 0.4165  w_ref 0.543458  n_fois 63
+PASS root0 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -199.446 mEh  floor 0.7240  w_ref 0.787369  n_fois 25
 PASS root1 e0-anchor    diff 2.4e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 4.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.958 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -354.419 mEh  floor 0.4165  w_ref 0.546606  n_fois 63
+PASS root1 dyall         e0 anchor 2.4e-15 (tol 1e-06); twin diff 8.3e-17 (tol 1e-10)
+INFO root1 Dyall       e2 -203.699 mEh  floor 0.7074  w_ref 0.779860  n_fois 25
 PASS root2 e0-anchor    diff 6.0e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 1.1e-16 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.953 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -354.365 mEh  floor 0.4165  w_ref 0.546694  n_fois 63
+PASS root2 dyall         e0 anchor 6.0e-15 (tol 1e-06); twin diff 2.8e-17 (tol 1e-10)
+INFO root2 Dyall       e2 -205.701 mEh  floor 0.6928  w_ref 0.776273  n_fois 25
 ---- c_2p_2-0_sa-casscf_ao_frozen_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 19 == dense 19, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 19, all in the brute reach 63
@@ -123,18 +153,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   5 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -354.095 mEh  floor 0.4231  w_ref 0.547047  n_fois 5
+PASS root0 dyall         e0 anchor 4.2e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -187.597 mEh  floor 0.7895  w_ref 0.808150  n_fois 3
 PASS root1 e0-anchor    diff 4.2e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 4.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   7 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -354.119 mEh  floor 0.4231  w_ref 0.547042  n_fois 7
+PASS root1 dyall         e0 anchor 4.2e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -187.597 mEh  floor 0.7895  w_ref 0.808150  n_fois 3
 PASS root2 e0-anchor    diff 4.2e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   7 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -354.119 mEh  floor 0.4231  w_ref 0.547042  n_fois 7
+PASS root2 dyall         e0 anchor 4.2e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -187.597 mEh  floor 0.7895  w_ref 0.808150  n_fois 3
 ---- c_2p@r1_2-0_sa-casscf_ao_-_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -145,18 +181,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.997 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.770 mEh  floor 0.6477  w_ref 0.995864  n_fois 63
+PASS root0 dyall         e0 anchor 3.3e-15 (tol 1e-06); twin diff 4.3e-19 (tol 1e-10)
+INFO root0 Dyall       e2 -2.483 mEh  floor 1.0601  w_ref 0.998833  n_fois 25
 PASS root1 e0-anchor    diff 4.7e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.8e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.947 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.794 mEh  floor 0.6477  w_ref 0.995847  n_fois 63
+PASS root1 dyall         e0 anchor 4.7e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.574 mEh  floor 0.9753  w_ref 0.998746  n_fois 25
 PASS root2 e0-anchor    diff 2.2e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.945 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.787 mEh  floor 0.6477  w_ref 0.995852  n_fois 63
+PASS root2 dyall         e0 anchor 2.2e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.578 mEh  floor 0.9734  w_ref 0.998742  n_fois 25
 ---- c_2p@r1_2-0_sa-casscf_ao_-_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 29 == dense 29, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 29, all in the brute reach 63
@@ -167,18 +209,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   9 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.770 mEh  floor 0.6989  w_ref 0.995865  n_fois 9
+PASS root0 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 9
 PASS root1 e0-anchor    diff 6.7e-16 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   12 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.791 mEh  floor 0.6989  w_ref 0.995849  n_fois 12
+PASS root1 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 7
 PASS root2 e0-anchor    diff 6.7e-16 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   8 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.791 mEh  floor 0.6989  w_ref 0.995849  n_fois 8
+PASS root2 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 5
 SKIP c_2p@r1_2-0_sa-casscf_ao_radial_pol_avg  construction-refused (the prior-window radial mask is undeclared)
 SKIP c_2p@r1_2-0_sa-casscf_ao_radial_pur_avg  construction-refused (the prior-window radial mask is undeclared)
 ---- c_2p@r1_2-0_sa-casscf_ao_frozen_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
@@ -191,18 +239,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.997 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.770 mEh  floor 0.6423  w_ref 0.995864  n_fois 63
+PASS root0 dyall         e0 anchor 2.7e-15 (tol 1e-06); twin diff 1.3e-18 (tol 1e-10)
+INFO root0 Dyall       e2 -2.482 mEh  floor 1.0604  w_ref 0.998834  n_fois 25
 PASS root1 e0-anchor    diff 4.2e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.832 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.794 mEh  floor 0.6423  w_ref 0.995847  n_fois 63
+PASS root1 dyall         e0 anchor 4.2e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.714 mEh  floor 0.8564  w_ref 0.998606  n_fois 25
 PASS root2 e0-anchor    diff 6.7e-16 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.830 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.788 mEh  floor 0.6423  w_ref 0.995851  n_fois 63
+PASS root2 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.715 mEh  floor 0.8556  w_ref 0.998605  n_fois 25
 ---- c_2p@r1_2-0_sa-casscf_ao_frozen_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 29 == dense 29, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 29, all in the brute reach 63
@@ -213,18 +267,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   9 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.770 mEh  floor 0.6989  w_ref 0.995865  n_fois 9
+PASS root0 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 9
 PASS root1 e0-anchor    diff 6.7e-16 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   12 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.791 mEh  floor 0.6989  w_ref 0.995849  n_fois 12
+PASS root1 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 7
 PASS root2 e0-anchor    diff 6.7e-16 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   8 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.791 mEh  floor 0.6989  w_ref 0.995849  n_fois 8
+PASS root2 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 5
 ---- c_2p@s1_2-0_sa-casscf_ao_-_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -235,18 +295,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.933 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.787 mEh  floor 0.6428  w_ref 0.995852  n_fois 63
+PASS root0 dyall         e0 anchor 2.7e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.599 mEh  floor 0.9580  w_ref 0.998722  n_fois 25
 PASS root1 e0-anchor    diff 2.4e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.924 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.794 mEh  floor 0.6428  w_ref 0.995847  n_fois 63
+PASS root1 dyall         e0 anchor 2.4e-15 (tol 1e-06); twin diff 8.7e-19 (tol 1e-10)
+INFO root1 Dyall       e2 -2.612 mEh  floor 0.9503  w_ref 0.998709  n_fois 25
 PASS root2 e0-anchor    diff 3.8e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 4.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 1.7e-18 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.987 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.770 mEh  floor 0.6428  w_ref 0.995864  n_fois 63
+PASS root2 dyall         e0 anchor 3.8e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.504 mEh  floor 1.0409  w_ref 0.998814  n_fois 25
 ---- c_2p@s1_2-0_sa-casscf_ao_-_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 42 == dense 42, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 42, all in the brute reach 63
@@ -257,18 +323,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   18 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.791 mEh  floor 0.6989  w_ref 0.995849  n_fois 18
+PASS root0 dyall         e0 anchor 2.0e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 10
 PASS root1 e0-anchor    diff 2.0e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   20 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.770 mEh  floor 0.6989  w_ref 0.995865  n_fois 20
+PASS root1 dyall         e0 anchor 2.0e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 14
 PASS root2 e0-anchor    diff 2.0e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   12 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.791 mEh  floor 0.6989  w_ref 0.995849  n_fois 12
+PASS root2 dyall         e0 anchor 2.0e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.477 mEh  floor 1.0653  w_ref 0.998839  n_fois 9
 SKIP c_2p@s1_2-0_sa-casscf_ao_radial_pol_avg  construction-refused (the prior-window radial mask is undeclared)
 SKIP c_2p@s1_2-0_sa-casscf_ao_radial_pur_avg  construction-refused (the prior-window radial mask is undeclared)
 ---- c_2p@s1_2-0_sa-casscf_ao_frozen_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
@@ -281,18 +353,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.963 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.945 mEh  floor 0.6445  w_ref 0.995598  n_fois 63
+PASS root0 dyall         e0 anchor 2.4e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.647 mEh  floor 1.0017  w_ref 0.998653  n_fois 25
 PASS root1 e0-anchor    diff 2.2e-16 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 8.7e-17 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.955 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.965 mEh  floor 0.6445  w_ref 0.995586  n_fois 63
+PASS root1 dyall         e0 anchor 2.2e-16 (tol 1e-06); twin diff 8.7e-19 (tol 1e-10)
+INFO root1 Dyall       e2 -2.664 mEh  floor 0.9956  w_ref 0.998636  n_fois 25
 PASS root2 e0-anchor    diff 6.7e-16 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 4.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.932 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.942 mEh  floor 0.6445  w_ref 0.995604  n_fois 63
+PASS root2 dyall         e0 anchor 6.7e-16 (tol 1e-06); twin diff 4.3e-19 (tol 1e-10)
+INFO root2 Dyall       e2 -2.705 mEh  floor 0.9750  w_ref 0.998593  n_fois 25
 ---- c_2p@s1_2-0_sa-casscf_ao_frozen_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 26 == dense 26, e2 diff 1.7e-18
 PASS reach-containment synthetic coupled 26, all in the brute reach 63
@@ -303,20 +381,26 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   8 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -7.935 mEh  floor 0.6983  w_ref 0.995610  n_fois 8
+PASS root0 dyall         e0 anchor 2.4e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.572 mEh  floor 1.0647  w_ref 0.998729  n_fois 5
 PASS root1 e0-anchor    diff 2.4e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   10 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -7.957 mEh  floor 0.6983  w_ref 0.995594  n_fois 10
+PASS root1 dyall         e0 anchor 2.4e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.572 mEh  floor 1.0647  w_ref 0.998729  n_fois 6
 PASS root2 e0-anchor    diff 2.4e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 3.3e-17 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   8 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -7.957 mEh  floor 0.6983  w_ref 0.995594  n_fois 8
+PASS root2 dyall         e0 anchor 2.4e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -2.572 mEh  floor 1.0647  w_ref 0.998729  n_fois 6
 NOTE external-anchor absent from the env for E(2): pyscf 2.13 ships no NEVPT2/CASPT2; the pyscf-forge install stays the open user-gated option (the spec records it)
-===== C: 197 PASS, 0 FAIL =====
+===== C: 239 PASS, 0 FAIL =====
 
 ===== perturb validation: Si =====
 PASS substrate    ROHF E = -288.84643692 Eh (trusted cache elements/Si/rungs/rohf.chk)
@@ -332,18 +416,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.920 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.907 mEh  floor 0.3906  w_ref 0.993330  n_fois 63
+PASS root0 dyall         e0 anchor 9.8e-15 (tol 1e-06); twin diff 4.3e-19 (tol 1e-10)
+INFO root0 Dyall       e2 -3.487 mEh  floor 0.5890  w_ref 0.997659  n_fois 33
 PASS root1 e0-anchor    diff 4.4e-16 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.920 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.963 mEh  floor 0.3906  w_ref 0.993225  n_fois 63
+PASS root1 dyall         e0 anchor 4.4e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.487 mEh  floor 0.5890  w_ref 0.997659  n_fois 33
 PASS root2 e0-anchor    diff 9.2e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.960 mEh  floor 0.3906  w_ref 0.993229  n_fois 63
+PASS root2 dyall         e0 anchor 9.2e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.801 mEh  floor 0.6664  w_ref 0.997572  n_fois 33
 ---- si_3p_2-0_sa-casscf_ao_-_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -354,18 +444,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.807 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.941 mEh  floor 0.3906  w_ref 0.993267  n_fois 63
+PASS root0 dyall         e0 anchor 2.8e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.854 mEh  floor 0.5317  w_ref 0.998004  n_fois 33
 PASS root1 e0-anchor    diff 2.7e-14 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 3.3e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 1.7e-18 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.810 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.997 mEh  floor 0.3906  w_ref 0.993159  n_fois 63
+PASS root1 dyall         e0 anchor 2.7e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -2.872 mEh  floor 0.5325  w_ref 0.997992  n_fois 33
 PASS root2 e0-anchor    diff 2.7e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 4.4e-17 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.995 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.936 mEh  floor 0.3906  w_ref 0.993276  n_fois 63
+PASS root2 dyall         e0 anchor 2.7e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.785 mEh  floor 0.6608  w_ref 0.997573  n_fois 33
 ---- si_3p_2-0_sa-casscf_ao_radial_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -376,18 +472,24 @@ PASS root0 dense-twin    diff 8.7e-19 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.919 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.906 mEh  floor 0.3907  w_ref 0.993334  n_fois 63
+PASS root0 dyall         e0 anchor 1.3e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -3.468 mEh  floor 0.5880  w_ref 0.997672  n_fois 33
 PASS root1 e0-anchor    diff 1.1e-14 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.919 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.963 mEh  floor 0.3906  w_ref 0.993225  n_fois 63
+PASS root1 dyall         e0 anchor 1.1e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.498 mEh  floor 0.5879  w_ref 0.997651  n_fois 33
 PASS root2 e0-anchor    diff 3.0e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 3.5e-17 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.962 mEh  floor 0.3906  w_ref 0.993225  n_fois 63
+PASS root2 dyall         e0 anchor 3.0e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.801 mEh  floor 0.6664  w_ref 0.997571  n_fois 33
 ---- si_3p_2-0_sa-casscf_ao_radial_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 53 == dense 53, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 53, all in the brute reach 63
@@ -398,18 +500,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   45 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.907 mEh  floor 0.4614  w_ref 0.993330  n_fois 45
+PASS root0 dyall         e0 anchor 7.1e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -3.801 mEh  floor 0.6664  w_ref 0.997572  n_fois 27
 PASS root1 e0-anchor    diff 7.3e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   45 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.959 mEh  floor 0.4614  w_ref 0.993232  n_fois 45
+PASS root1 dyall         e0 anchor 7.3e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.801 mEh  floor 0.6664  w_ref 0.997572  n_fois 27
 PASS root2 e0-anchor    diff 7.4e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   35 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.964 mEh  floor 0.4614  w_ref 0.993222  n_fois 35
+PASS root2 dyall         e0 anchor 7.4e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.801 mEh  floor 0.6664  w_ref 0.997572  n_fois 25
 ---- si_3p_2-0_sa-casscf_ao_frozen_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -420,18 +528,24 @@ PASS root0 dense-twin    diff 1.1e-16 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.919 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -350.195 mEh  floor 0.2458  w_ref 0.418604  n_fois 63
+PASS root0 dyall         e0 anchor 1.6e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -192.203 mEh  floor 0.3951  w_ref 0.691966  n_fois 25
 PASS root1 e0-anchor    diff 2.5e-14 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 5.6e-17 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.770 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -352.036 mEh  floor 0.2457  w_ref 0.416216  n_fois 63
+PASS root1 dyall         e0 anchor 2.5e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -222.380 mEh  floor 0.3145  w_ref 0.621815  n_fois 25
 PASS root2 e0-anchor    diff 2.5e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 1.7e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.708 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -352.533 mEh  floor 0.2457  w_ref 0.415519  n_fois 63
+PASS root2 dyall         e0 anchor 2.5e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -226.886 mEh  floor 0.3066  w_ref 0.612777  n_fois 25
 ---- si_3p_2-0_sa-casscf_ao_frozen_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -442,18 +556,24 @@ PASS root0 dense-twin    diff 5.6e-17 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.998 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -352.983 mEh  floor 0.2458  w_ref 0.414802  n_fois 63
+PASS root0 dyall         e0 anchor 1.5e-14 (tol 1e-06); twin diff 5.6e-17 (tol 1e-10)
+INFO root0 Dyall       e2 -167.330 mEh  floor 0.5000  w_ref 0.751403  n_fois 25
 PASS root1 e0-anchor    diff 1.5e-14 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 1.1e-16 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.999 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -353.044 mEh  floor 0.2458  w_ref 0.414802  n_fois 63
+PASS root1 dyall         e0 anchor 1.5e-14 (tol 1e-06); twin diff 2.8e-17 (tol 1e-10)
+INFO root1 Dyall       e2 -167.298 mEh  floor 0.5001  w_ref 0.751479  n_fois 25
 PASS root2 e0-anchor    diff 1.6e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 5.6e-17 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -353.030 mEh  floor 0.2458  w_ref 0.414751  n_fois 63
+PASS root2 dyall         e0 anchor 1.6e-14 (tol 1e-06); twin diff 5.6e-17 (tol 1e-10)
+INFO root2 Dyall       e2 -166.913 mEh  floor 0.5020  w_ref 0.752381  n_fois 25
 ---- si_3p@r1_2-0_sa-casscf_ao_-_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -464,18 +584,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.961 mEh  floor 0.3906  w_ref 0.993228  n_fois 63
+PASS root0 dyall         e0 anchor 1.4e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -3.800 mEh  floor 0.6662  w_ref 0.997572  n_fois 33
 PASS root1 e0-anchor    diff 1.3e-14 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.905 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.962 mEh  floor 0.3906  w_ref 0.993227  n_fois 63
+PASS root1 dyall         e0 anchor 1.3e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.418 mEh  floor 0.5785  w_ref 0.997690  n_fois 33
 PASS root2 e0-anchor    diff 4.7e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 4.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.905 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.907 mEh  floor 0.3906  w_ref 0.993330  n_fois 63
+PASS root2 dyall         e0 anchor 4.7e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.418 mEh  floor 0.5784  w_ref 0.997690  n_fois 33
 ---- si_3p@r1_2-0_sa-casscf_ao_-_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 60 == dense 60, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 60, all in the brute reach 63
@@ -486,18 +612,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   60 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.939 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.915 mEh  floor 0.3906  w_ref 0.993316  n_fois 60
+PASS root0 dyall         e0 anchor 1.7e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -3.574 mEh  floor 0.6051  w_ref 0.997625  n_fois 33
 PASS root1 e0-anchor    diff 1.8e-14 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   60 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.989 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.964 mEh  floor 0.3906  w_ref 0.993222  n_fois 60
+PASS root1 dyall         e0 anchor 1.8e-14 (tol 1e-06); twin diff 4.3e-19 (tol 1e-10)
+INFO root1 Dyall       e2 -3.766 mEh  floor 0.6566  w_ref 0.997575  n_fois 33
 PASS root2 e0-anchor    diff 1.8e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 5.6e-17 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   60 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.934 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.955 mEh  floor 0.3906  w_ref 0.993240  n_fois 60
+PASS root2 dyall         e0 anchor 1.8e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.558 mEh  floor 0.6043  w_ref 0.997627  n_fois 33
 SKIP si_3p@r1_2-0_sa-casscf_ao_radial_pol_avg  construction-refused (the prior-window radial mask is undeclared)
 SKIP si_3p@r1_2-0_sa-casscf_ao_radial_pur_avg  construction-refused (the prior-window radial mask is undeclared)
 ---- si_3p@r1_2-0_sa-casscf_ao_frozen_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
@@ -510,18 +642,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.919 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.909 mEh  floor 0.3907  w_ref 0.993329  n_fois 63
+PASS root0 dyall         e0 anchor 2.0e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -3.482 mEh  floor 0.5880  w_ref 0.997662  n_fois 33
 PASS root1 e0-anchor    diff 7.8e-16 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.963 mEh  floor 0.3906  w_ref 0.993226  n_fois 63
+PASS root1 dyall         e0 anchor 7.8e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.801 mEh  floor 0.6662  w_ref 0.997572  n_fois 33
 PASS root2 e0-anchor    diff 4.4e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 5.6e-17 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.918 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.961 mEh  floor 0.3906  w_ref 0.993228  n_fois 63
+PASS root2 dyall         e0 anchor 4.4e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.480 mEh  floor 0.5879  w_ref 0.997662  n_fois 33
 ---- si_3p@r1_2-0_sa-casscf_ao_frozen_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 54 == dense 54, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 54, all in the brute reach 63
@@ -532,18 +670,24 @@ PASS root0 dense-twin    diff 8.7e-19 (tol 1e-10; EN production vs dense)
 PASS root0 containment   54 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 2/3 dets, max|c| 0.997 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.965 mEh  floor 0.4614  w_ref 0.993222  n_fois 54
+PASS root0 dyall         e0 anchor 3.0e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -3.790 mEh  floor 0.6624  w_ref 0.997572  n_fois 33
 PASS root1 e0-anchor    diff 2.8e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 4.9e-17 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   54 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 2/3 dets, max|c| 0.997 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.908 mEh  floor 0.4614  w_ref 0.993329  n_fois 54
+PASS root1 dyall         e0 anchor 2.8e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.790 mEh  floor 0.6624  w_ref 0.997572  n_fois 33
 PASS root2 e0-anchor    diff 3.3e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 4.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   48 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 1/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.963 mEh  floor 0.4615  w_ref 0.993225  n_fois 48
+PASS root2 dyall         e0 anchor 3.3e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.802 mEh  floor 0.6664  w_ref 0.997571  n_fois 27
 ---- si_3p@s1_2-0_sa-casscf_ao_-_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 63 == dense 63, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 63, all in the brute reach 63
@@ -554,18 +698,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.783 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.959 mEh  floor 0.3906  w_ref 0.993232  n_fois 63
+PASS root0 dyall         e0 anchor 5.9e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -2.888 mEh  floor 0.5421  w_ref 0.997948  n_fois 33
 PASS root1 e0-anchor    diff 6.8e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.856 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.964 mEh  floor 0.3906  w_ref 0.993223  n_fois 63
+PASS root1 dyall         e0 anchor 6.8e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.183 mEh  floor 0.5535  w_ref 0.997801  n_fois 33
 PASS root2 e0-anchor    diff 2.3e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.924 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.907 mEh  floor 0.3906  w_ref 0.993330  n_fois 63
+PASS root2 dyall         e0 anchor 2.3e-14 (tol 1e-06); twin diff 4.3e-19 (tol 1e-10)
+INFO root2 Dyall       e2 -3.506 mEh  floor 0.5924  w_ref 0.997651  n_fois 33
 ---- si_3p@s1_2-0_sa-casscf_ao_-_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 60 == dense 60, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 60, all in the brute reach 63
@@ -576,18 +726,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   60 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.997 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -6.925 mEh  floor 0.3906  w_ref 0.993297  n_fois 60
+PASS root0 dyall         e0 anchor 8.9e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -3.790 mEh  floor 0.6623  w_ref 0.997573  n_fois 33
 PASS root1 e0-anchor    diff 9.8e-15 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 3.3e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   60 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.996 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -6.931 mEh  floor 0.3906  w_ref 0.993285  n_fois 60
+PASS root1 dyall         e0 anchor 9.8e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.787 mEh  floor 0.6619  w_ref 0.997573  n_fois 33
 PASS root2 e0-anchor    diff 9.5e-15 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   60 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.999 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -6.981 mEh  floor 0.3906  w_ref 0.993191  n_fois 60
+PASS root2 dyall         e0 anchor 9.5e-15 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.799 mEh  floor 0.6656  w_ref 0.997572  n_fois 33
 SKIP si_3p@s1_2-0_sa-casscf_ao_radial_pol_avg  construction-refused (the prior-window radial mask is undeclared)
 SKIP si_3p@s1_2-0_sa-casscf_ao_radial_pur_avg  construction-refused (the prior-window radial mask is undeclared)
 ---- si_3p@s1_2-0_sa-casscf_ao_frozen_pol_avg  n_val=12 ncas=3 ndet=66 nroots=3
@@ -600,18 +756,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   63 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 0.919 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -8.136 mEh  floor 0.3900  w_ref 0.991022  n_fois 63
+PASS root0 dyall         e0 anchor 6.9e-15 (tol 1e-06); twin diff 8.7e-19 (tol 1e-10)
+INFO root0 Dyall       e2 -4.268 mEh  floor 0.5893  w_ref 0.996598  n_fois 33
 PASS root1 e0-anchor    diff 1.1e-16 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 1.7e-18 (tol 1e-10; EN production vs dense)
 PASS root1 containment   63 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.917 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -8.196 mEh  floor 0.3900  w_ref 0.990909  n_fois 63
+PASS root1 dyall         e0 anchor 1.1e-16 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -4.264 mEh  floor 0.5887  w_ref 0.996594  n_fois 33
 PASS root2 e0-anchor    diff 2.0e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   63 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.998 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -8.207 mEh  floor 0.3900  w_ref 0.990862  n_fois 63
+PASS root2 dyall         e0 anchor 2.0e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -4.554 mEh  floor 0.6675  w_ref 0.996620  n_fois 33
 ---- si_3p@s1_2-0_sa-casscf_ao_frozen_pur_avg  n_val=12 ncas=3 ndet=66 nroots=3
 PASS completeness production n_fois 60 == dense 60, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 60, all in the brute reach 63
@@ -622,18 +784,24 @@ PASS root0 dense-twin    diff 1.7e-18 (tol 1e-10; EN production vs dense)
 PASS root0 containment   60 coupled, all in the brute FOIS (63)
 INFO root0 gauge        support 3/3 dets, max|c| 1.000 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -8.212 mEh  floor 0.3900  w_ref 0.990879  n_fois 60
+PASS root0 dyall         e0 anchor 1.2e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -4.559 mEh  floor 0.6697  w_ref 0.996623  n_fois 33
 PASS root1 e0-anchor    diff 1.3e-14 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   60 coupled, all in the brute FOIS (63)
 INFO root1 gauge        support 3/3 dets, max|c| 0.998 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -8.133 mEh  floor 0.3900  w_ref 0.991027  n_fois 60
+PASS root1 dyall         e0 anchor 1.3e-14 (tol 1e-06); twin diff 8.7e-19 (tol 1e-10)
+INFO root1 Dyall       e2 -4.554 mEh  floor 0.6677  w_ref 0.996621  n_fois 33
 PASS root2 e0-anchor    diff 1.3e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.1e-17 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 1.7e-18 (tol 1e-10; EN production vs dense)
 PASS root2 containment   60 coupled, all in the brute FOIS (63)
 INFO root2 gauge        support 3/3 dets, max|c| 0.998 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -8.201 mEh  floor 0.3900  w_ref 0.990900  n_fois 60
+PASS root2 dyall         e0 anchor 1.3e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -4.554 mEh  floor 0.6678  w_ref 0.996621  n_fois 33
 ---- si_3p@s2_2-0_sa-casscf_ao_-_pol_avg  n_val=12 ncas=6 ndet=66 nroots=3
 PASS completeness production n_fois 51 == dense 51, e2 diff 1.7e-18
 PASS reach-containment synthetic coupled 51, all in the brute reach 51
@@ -644,18 +812,24 @@ PASS root0 dense-twin    diff 8.7e-19 (tol 1e-10; EN production vs dense)
 PASS root0 containment   51 coupled, all in the brute FOIS (51)
 INFO root0 gauge        support 15/15 dets, max|c| 0.909 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -5.509 mEh  floor 0.3922  w_ref 0.994775  n_fois 51
+PASS root0 dyall         e0 anchor 2.4e-13 (tol 1e-06); twin diff 8.7e-19 (tol 1e-10)
+INFO root0 Dyall       e2 -3.444 mEh  floor 0.5820  w_ref 0.997733  n_fois 40
 PASS root1 e0-anchor    diff 9.4e-14 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 1.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 8.7e-19 (tol 1e-10; EN production vs dense)
 PASS root1 containment   51 coupled, all in the brute FOIS (51)
 INFO root1 gauge        support 15/15 dets, max|c| 0.998 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -5.563 mEh  floor 0.3922  w_ref 0.994673  n_fois 51
+PASS root1 dyall         e0 anchor 9.4e-14 (tol 1e-06); twin diff 3.9e-18 (tol 1e-10)
+INFO root1 Dyall       e2 -3.623 mEh  floor 0.6670  w_ref 0.997734  n_fois 40
 PASS root2 e0-anchor    diff 8.5e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 1.1e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 8.7e-19 (tol 1e-10; EN production vs dense)
 PASS root2 containment   51 coupled, all in the brute FOIS (51)
 INFO root2 gauge        support 15/15 dets, max|c| 0.909 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -5.562 mEh  floor 0.3922  w_ref 0.994675  n_fois 51
+PASS root2 dyall         e0 anchor 8.5e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.444 mEh  floor 0.5820  w_ref 0.997733  n_fois 40
 ---- si_3p@s2_2-0_sa-casscf_ao_-_pur_avg  n_val=12 ncas=6 ndet=66 nroots=3
 PASS completeness production n_fois 15 == dense 15, e2 diff 8.7e-19
 PASS reach-containment synthetic coupled 15, all in the brute reach 51
@@ -666,18 +840,24 @@ PASS root0 dense-twin    diff 8.7e-19 (tol 1e-10; EN production vs dense)
 PASS root0 containment   15 coupled, all in the brute FOIS (51)
 INFO root0 gauge        support 15/15 dets, max|c| 0.994 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -5.561 mEh  floor 0.9066  w_ref 0.994676  n_fois 15
+PASS root0 dyall         e0 anchor 5.5e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root0 Dyall       e2 -3.614 mEh  floor 1.4560  w_ref 0.997732  n_fois 10
 PASS root1 e0-anchor    diff 5.5e-14 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   15 coupled, all in the brute FOIS (51)
 INFO root1 gauge        support 15/15 dets, max|c| 0.994 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -5.510 mEh  floor 0.9066  w_ref 0.994772  n_fois 15
+PASS root1 dyall         e0 anchor 5.5e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.614 mEh  floor 1.4560  w_ref 0.997732  n_fois 10
 PASS root2 e0-anchor    diff 5.5e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 1.4e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   15 coupled, all in the brute FOIS (51)
 INFO root2 gauge        support 15/15 dets, max|c| 0.998 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -5.564 mEh  floor 0.9066  w_ref 0.994670  n_fois 15
+PASS root2 dyall         e0 anchor 5.5e-14 (tol 1e-06); twin diff 8.7e-19 (tol 1e-10)
+INFO root2 Dyall       e2 -3.622 mEh  floor 1.4611  w_ref 0.997734  n_fois 10
 SKIP si_3p@s2_2-0_sa-casscf_ao_radial_pol_avg  construction-refused (the prior-window radial mask is undeclared)
 SKIP si_3p@s2_2-0_sa-casscf_ao_radial_pur_avg  construction-refused (the prior-window radial mask is undeclared)
 ---- si_3p@s2_2-0_sa-casscf_ao_frozen_pol_avg  n_val=12 ncas=6 ndet=66 nroots=3
@@ -690,18 +870,24 @@ PASS root0 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root0 containment   51 coupled, all in the brute FOIS (51)
 INFO root0 gauge        support 15/15 dets, max|c| 0.917 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -5.511 mEh  floor 0.3922  w_ref 0.994773  n_fois 51
+PASS root0 dyall         e0 anchor 7.7e-13 (tol 1e-06); twin diff 4.3e-19 (tol 1e-10)
+INFO root0 Dyall       e2 -3.463 mEh  floor 0.5879  w_ref 0.997728  n_fois 40
 PASS root1 e0-anchor    diff 3.0e-13 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.0e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 1.7e-18 (tol 1e-10; EN production vs dense)
 PASS root1 containment   51 coupled, all in the brute FOIS (51)
 INFO root1 gauge        support 15/15 dets, max|c| 0.994 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -5.562 mEh  floor 0.3921  w_ref 0.994674  n_fois 51
+PASS root1 dyall         e0 anchor 3.0e-13 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root1 Dyall       e2 -3.614 mEh  floor 0.6622  w_ref 0.997732  n_fois 40
 PASS root2 e0-anchor    diff 4.0e-14 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 2.2e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root2 containment   51 coupled, all in the brute FOIS (51)
 INFO root2 gauge        support 15/15 dets, max|c| 0.913 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -5.562 mEh  floor 0.3921  w_ref 0.994674  n_fois 51
+PASS root2 dyall         e0 anchor 4.0e-14 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.449 mEh  floor 0.5868  w_ref 0.997732  n_fois 40
 ---- si_3p@s2_2-0_sa-casscf_ao_frozen_pur_avg  n_val=12 ncas=6 ndet=66 nroots=3
 PASS completeness production n_fois 15 == dense 15, e2 diff 0.0e+00
 PASS reach-containment synthetic coupled 15, all in the brute reach 51
@@ -712,17 +898,23 @@ PASS root0 dense-twin    diff 8.7e-19 (tol 1e-10; EN production vs dense)
 PASS root0 containment   15 coupled, all in the brute FOIS (51)
 INFO root0 gauge        support 15/15 dets, max|c| 0.857 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root0 EN          e2 -5.563 mEh  floor 0.9066  w_ref 0.994674  n_fois 15
+PASS root0 dyall         e0 anchor 2.0e-12 (tol 1e-06); twin diff 4.3e-19 (tol 1e-10)
+INFO root0 Dyall       e2 -3.338 mEh  floor 1.3497  w_ref 0.997760  n_fois 10
 PASS root1 e0-anchor    diff 2.0e-12 (tol 1e-06; store PySCF CI energy)
 PASS root1 coupling      maxdiff 2.8e-16 (tol 1e-10; vs pyscf_apply)
 PASS root1 dense-twin    diff 0.0e+00 (tol 1e-10; EN production vs dense)
 PASS root1 containment   15 coupled, all in the brute FOIS (51)
 INFO root1 gauge        support 15/15 dets, max|c| 0.857 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root1 EN          e2 -5.587 mEh  floor 0.9066  w_ref 0.994627  n_fois 15
+PASS root1 dyall         e0 anchor 2.0e-12 (tol 1e-06); twin diff 8.7e-19 (tol 1e-10)
+INFO root1 Dyall       e2 -3.338 mEh  floor 1.3497  w_ref 0.997760  n_fois 10
 PASS root2 e0-anchor    diff 2.0e-12 (tol 1e-06; store PySCF CI energy)
 PASS root2 coupling      maxdiff 5.6e-16 (tol 1e-10; vs pyscf_apply)
 PASS root2 dense-twin    diff 8.7e-19 (tol 1e-10; EN production vs dense)
 PASS root2 containment   15 coupled, all in the brute FOIS (51)
 INFO root2 gauge        support 15/15 dets, max|c| 0.998 (degenerate-block gauge is chaotic -- the meters read the stored draw)
 INFO root2 EN          e2 -5.560 mEh  floor 0.9066  w_ref 0.994680  n_fois 15
+PASS root2 dyall         e0 anchor 2.0e-12 (tol 1e-06); twin diff 0.0e+00 (tol 1e-10)
+INFO root2 Dyall       e2 -3.623 mEh  floor 1.4611  w_ref 0.997733  n_fois 10
 NOTE external-anchor absent from the env for E(2): pyscf 2.13 ships no NEVPT2/CASPT2; the pyscf-forge install stays the open user-gated option (the spec records it)
-===== Si: 253 PASS, 0 FAIL =====
+===== Si: 307 PASS, 0 FAIL =====

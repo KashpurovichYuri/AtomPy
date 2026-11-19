@@ -55,7 +55,8 @@ from atomterm.operators import (  # noqa: E402
     active_space_integrals, ci_in_detbasis_order, pyscf_apply,
     spin_block_one_body, spin_block_two_body)
 from atomterm.perturb import (  # noqa: E402
-    epstein_nesbet, epstein_nesbet_dense, fois_indices)
+    epstein_nesbet, epstein_nesbet_dense, dyall_e2, dyall_e2_dense,
+    dyall_h0, fois_indices)
 from atomterm.reference import run_rohf  # noqa: E402
 
 # the certificate tolerances (the observed fresh values sit two to six
@@ -261,6 +262,27 @@ def validate_cell(key, mol, mf, spec, data, certs):
         print(f"INFO root{r} EN          e2 {float(np.real(res.e2)) * 1e3:+.3f} "
               f"mEh  floor {res.floor:.4f}  w_ref {res.w_ref:.6f}  "
               f"n_fois {res.n_fois}", flush=True)
+
+        # rung 2: the Dyall partition + correction on the same root
+        try:
+            h0 = dyall_h0(h1v, gv, ncas, na, nb, ci)
+            res_d = dyall_e2(h0, ncas, na, nb, ci)
+            res_dd = dyall_e2_dense(h0, ncas, na, nb, ci)
+            d_dd = float(np.abs(res_d.e2 - res_dd.e2))
+            certs.line(
+                f"root{r} dyall         e0 anchor "
+                f"{abs(float(np.real(res_d.e0)) - e_ref):.1e} "
+                f"(tol {TOL_E0:.0e}); twin diff {d_dd:.1e} "
+                f"(tol {TOL_DENSE:.0e})",
+                abs(float(np.real(res_d.e0)) - e_ref) <= TOL_E0
+                and d_dd <= TOL_DENSE)
+            print(f"INFO root{r} Dyall       e2 "
+                  f"{float(np.real(res_d.e2)) * 1e3:+.3f} mEh  "
+                  f"floor {res_d.floor:.4f}  w_ref "
+                  f"{res_d.w_ref:.6f}  n_fois {res_d.n_fois}",
+                  flush=True)
+        except ValueError as exc:
+            certs.line(f"root{r} dyall         REFUSED: {exc}", False)
     return
 
 
