@@ -38,9 +38,10 @@ CLOSED for SC-NEVPT2 at L=1.  THE NUMBERS: E(2) is ~7.5× the
 EN-era preview (−7.7 mEh) — the H₀-choice axis is a big effect
 (EN's exact-configuration denominators vs Dyall's orbital gaps);
 the class breakdown: Sir (0)' −27.4 mEh leads, then Srsi −10.7,
-Sijrs −7.2, Sij −4.9, Srs −4.5, Sijr −3.4; Sr/Si empty (no core
-hole / no particle in this convention... the classes read zero —
-the pur cell's valence convention).  The stored block sits 26.6 µEh
+Sijrs −7.2, Sij −4.9, Srs −4.5, Sijr −3.4; Sr/Si read EXACTLY zero
+(perturber norms 0 — no N±1 coupling at this 2e/3o CAS on pur); the
+mechanism (structural vs selection-rule) rides the ladder read
+across cells/atoms.  The stored block sits 26.6 µEh
 below ROHF at the same partition (fact 13's near-equality + the SA
 orbital gain); the guard's first real bite: store-flat vs
 reader-column CI shapes (fixed: amplitudes are the assertion).
