@@ -464,6 +464,46 @@ unless same-l — the only live channel is the same-l double shell);
 and NOs of the idempotent ROHF density are the MOs themselves — the
 meaningful NO source is the term-averaged CI density.
 
+## Analysis
+
+**PT2 corrections on certified solutions** — the dynamic-correlation
+axis on top of any classified solution (CASCI, CASSCF, SA-CASSCF, any
+window), via PySCF's own `pyscf.mrpt` (strongly contracted NEVPT2),
+consumed as an adapter: one seam takes the substrate
+(mol, mf, mo, ncore, ncas, nelecas) and the roots; SA solutions enter
+through the multi-root readout pass (the kernel refuses SA solver
+objects — the readout IS the required CASCI). Output: per-root,
+per-Koopmans-class rows (norm, energy), `E_tot = E_CAS + E(2)`.
+
+**Why E(2) is gauge-visible.** The variational energy is an eigenvalue —
+identical for every gauge. E(2) is state-specific: a functional of the
+root's own density matrices, and inside an exactly degenerate term
+block the root IS a gauge (the solver's arbitrary basis choice within
+the pinned subspace). Degenerate perturbation theory diagonalizes the
+effective interaction first; state-specific PT evaluates at the vector
+handed to it. The correction's invariance is a measured property,
+never an assumption.
+
+**Gauge ledger.** Invariant: the block projector, E_CAS, ⟨L²⟩, ⟨S²⟩
+(Casimir-type, ∝ identity on a pure-L block). Gauge-visible: ⟨Lz⟩, the
+density matrices, E(2). Spin is safe by construction (the Dyall
+partition is spin-free); the question lives on the orbital side only.
+
+**The two probes** (they ship with the runs):
+
+| Probe | Measures | Reading |
+|---|---|---|
+| gauge redraw — a random unitary inside the block | E(2) spread; E, ⟨L²⟩ as controls | the error bar every per-root comparison carries; at the margins of an interpretation → the canonical gauge becomes primary |
+| component identity — the pure M_L components | E(2)(M_L) spread | equal by covariance; deviation = a window-closure defect, never gauge |
+
+**Per-L expectations** (exact arithmetic, m-complete basis):
+
+| Block | E(2) across gauges |
+|---|---|
+| L = 0 | no gauge exists |
+| L = 1 | rotations act transitively — constant over all gauges; measured spread = a covariance defect (machinery certificate) |
+| L ≥ 2 | rotation orbits do not cover the block — genuine spread is possible (a formulation property, not a bug); the canonical gauge is the primary row, the spread the disclosure |
+
 ## Files and regeneration
 
 | Module | Owns |
