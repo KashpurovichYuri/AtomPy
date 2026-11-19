@@ -504,6 +504,25 @@ partition is spin-free); the question lives on the orbital side only.
 | L = 1 | rotations act transitively — constant over all gauges; measured spread = a covariance defect (machinery certificate) |
 | L ≥ 2 | rotation orbits do not cover the block — genuine spread is possible (a formulation property, not a bug); the canonical gauge is the primary row, the spread the disclosure |
 
+**The variant axis.** The engine is strongly contracted NEVPT2:
+parameter-free, intruder-free by construction (Dyall's H₀ makes
+denominators sign-definite orbital-gap sums; the strong contraction
+averages each class over its own well-separated Dyall spectrum), and
+strictly size-consistent. The alternatives differ on three axes at
+once — the H₀ construction, the contraction of the perturber space,
+and the presence of empirical dials. CASPT2 (internally contracted,
+non-diagonal H₀) is structurally intruder-exposed: its level shift
+and IPEA push denominators off zero by hand — mEh-scale dials that
+mask exactly the compression information the class meters read; it
+joins only as a disclosed variant on an env upgrade (and needs only
+the 3-RDM where SC-NEVPT2's contractions scale as the 4-RDM class —
+the decisive axis at large CAS). The uncontracted variant (UC:
+every Dyall-sector configuration its own perturber) prices the
+contraction approximation and is the natural carrier of an explicit
+first-order wavefunction — not implemented here (not shipped
+in-env); it is the resurrection path should the wavefunction-level
+analyzation ever be wanted.
+
 ## Files and regeneration
 
 | Module | Owns |
