@@ -32,13 +32,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import numpy as np  # noqa: E402
 
-from atomterm.cases import campaign_spec  # noqa: E402
-from atomterm.cells import CellKey, load_cell  # noqa: E402
+from atomterm.cases import cell_substrate  # noqa: E402
+from atomterm.cells import CellKey  # noqa: E402
 from atomterm.operators import (  # noqa: E402
     build_operators, ci_in_detbasis_order, pyscf_ci_permutation)
 from atomterm.perturb import (  # noqa: E402
     _root_row, nevpt2_rows, readout_mc)
-from atomterm.reference import run_rohf  # noqa: E402
 
 EH_EV = 27.211386245988
 K_REDRAW = 8
@@ -66,14 +65,7 @@ def main() -> None:
     address = (sys.argv[1] if len(sys.argv) > 1
                else "c_2p_2-0_sa-casscf_ao_-_pur_avg")
     key = CellKey.from_address(address)
-    atom = key.atom
-    spec = campaign_spec(atom)
-    cfg = spec.atom_config()
-    mol, mf = run_rohf(cfg, f"elements/{atom}/rungs/rohf.chk",
-                       ref=spec.ref)
-    if not mf.converged:
-        sys.exit(f"{atom}: the reference ROHF did not converge")
-    data = load_cell(key)
+    mol, mf, data = cell_substrate(key)
     na, nb = key.sector
     ncas = int(data.ncas)
     nroots = len(data.ci)

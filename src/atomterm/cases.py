@@ -37,7 +37,8 @@ from pyscf import gto
 from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
 from atomterm.basis import SeriesSpec
-from atomterm.cells import band_tokens, no_label, prior_tag_of
+from atomterm.cells import (CellKey, band_tokens, load_cell, no_label,
+                            prior_tag_of)
 from atomterm.reference import ReferenceSpec, run_rohf
 from atomterm.scans import ScanSpec
 from atomterm.windows import (build_full_mo, closed_electrons, core_shells,
@@ -50,7 +51,8 @@ from atomterm.stages import stage_facts
 from atomterm.analysis import format_report
 
 __all__ = ["CaseSpec", "Scenario", "CAMPAIGN", "campaign_spec",
-           "scenarios_for", "run_case", "run_atom", "run_carbon"]
+           "scenarios_for", "run_case", "run_atom", "run_carbon",
+           "cell_substrate"]
 
 
 # the declaration ----------------------------------------------------
@@ -1281,6 +1283,41 @@ def run_carbon(cfg: AtomConfig | None = None, workdir: str = "elements") -> dict
         workdir=workdir,
         sa_weights=row.sa_weights,
     )
+
+
+def cell_substrate(key: CellKey, workdir: str = "elements"):
+    """The stored cell's live substrate: ``(mol, mf, data)``.
+
+    The post-processing seam's left side: rebuilds the trusted ROHF
+    rung (``<workdir>/<atom>/rungs/rohf.chk`` -- cached chks are
+    TRUSTED, never re-gated) with the atom's own reference class and
+    loads the cell payload beside it.  The caller feeds
+    ``(mol, mf, data.mo_coeff, data.ncas, key.sector, len(data.ci))``
+    to the analysis/PT2 seam; the stored-roots assertion there decides
+    whether today's substrate still reproduces the stored run.
+
+    Parameters
+    ----------
+    key : the :class:`CellKey` of the stored cell.
+    workdir : the store root (``<workdir>/<Atom>/rungs/``).
+
+    Returns
+    -------
+    ``(mol, mf, data)`` -- the PySCF objects and the
+    :class:`atomterm.cells.CellData` payload.
+
+    Raises
+    ------
+    ValueError : the rebuilt ROHF did not converge.
+    """
+    spec = campaign_spec(key.atom)
+    cfg = spec.atom_config()
+    rohf_chk = Path(workdir) / spec.key / "rungs" / "rohf.chk"
+    mol, mf = run_rohf(cfg, str(rohf_chk), ref=spec.ref)
+    if not mf.converged:
+        raise ValueError(
+            f"{key.atom}: the reference ROHF did not converge")
+    return mol, mf, load_cell(key, workdir)
 
 
 if __name__ == "__main__":  # pragma: no cover
