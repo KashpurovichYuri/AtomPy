@@ -143,7 +143,10 @@ def main() -> None:
     worst_ctrl_b = 0.0
     labels = []
     for r in range(nroots):
-        w_pure = vecs[:, r]
+        # the eigenvector lives on the STORED span (coefficients over
+        # w_ref); recombine into detbasis amplitudes -- it doubles as a
+        # detbasis vector only in the nroots == ndet coincidence
+        w_pure = np.tensordot(vecs[:, r], np.asarray(w_ref), axes=(0, 0))
         ml = float(np.real(np.vdot(w_pure, ops["Lz"] @ w_pure)))
         l2 = float(np.real(np.vdot(w_pure, ops["L2"] @ w_pure)))
         ev_e = float(np.real(np.vdot(w_pure, h_cas @ w_pure)))
