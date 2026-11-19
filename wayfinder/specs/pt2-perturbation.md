@@ -106,8 +106,18 @@ push per batch; handoff at ticket boundaries.
    in the big contractions; the kernel's own three-run record
    −0.16978547/−0.16978542/−0.16978512 on O2) — the twin pins sit at
    that floor; the class plumbing shares it.
-3. **Simplest real case** — one C SA cell, per-root rows; the two
-   probes (the symmetry answer gets measured here).
+3. **Simplest real case** — DONE 2026-11-19 (`scripts/probe_pt2_block.py`,
+   the certified pur cell `c_2p_2-0_sa-casscf_ao_-_pur_avg`): E(2) =
+   −58.1340 mEh (**−1.5819 eV**) IDENTICAL across the ³P block;
+   probe A (8 redraws × 3 roots): controls 1.2e-14, spread
+   **7.3e-13 eV** — the engine wobble floor; probe B: pure M_L
+   states exact (−1/0/+1), the real ML=0 component reads the same
+   constant.  SYMMETRY KEPT, per-root rows stand as stored.  The
+   guard's first real bite: store-flat vs reader-column CI shapes —
+   the assertion compares amplitudes (fixed, pinned).  Note: E(2) is
+   ~7.5× the EN-era preview (−7.7 mEh) — the H₀-choice axis (Dyall
+   denominators vs EN's exact-configuration diagonals) is a big
+   effect; the ladder read quantifies it per window.
 3b. **Reference-class comparison** — NEVPT2 on stored CASSCF/CASCI
    cells (C, Si) vs SA, against symmetry amplitude.
 4. **The ladder read + render** — C then Si across the window ladder;

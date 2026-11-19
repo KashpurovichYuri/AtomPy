@@ -12,13 +12,39 @@ The wave spec: [`specs/pt2-perturbation.md`](specs/pt2-perturbation.md)
 delivery chain.
 
 - [45 — the PT2 runs + PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
-  READY (44 done 2026-11-19) — the C cell + the probes, the
-  reference-class axis, the ladder read + the render.
+  IN PROGRESS (step 3 DONE 2026-11-19 — see the resolved record;
+  next: step 3b the reference-class axis, then step 4 the ladder
+  read + the render).  The ladder's flagship = the CAS-size axis
+  ((4,12)/(4,15)/(6,13) on U14e, gated later); rows = SA-CASSCF
+  converged terms primary, single-root CASSCF the comparison; eV
+  columns per the user's directive.
 - [46 — the TABLE.md physics pass](tickets/46-table-physics-pass.md):
   DESIGN-FIRST, user-gated — the render-level significance policy
   (the stores keep everything; the table keeps the physics).
 
-Resolved (git history the archive): 44 the PySCF-mrpt adapter
+Resolved (git history the archive): 45 step 3 — THE SYMMETRY
+PROBES (2026-11-19, `scripts/probe_pt2_block.py`, the certified pur
+cell `c_2p_2-0_sa-casscf_ao_-_pur_avg`): E(2) = −58.1340 mEh
+(−1.5819 eV) IDENTICAL across the ³P Sz=+1 block; probe A (gauge
+redraw, 8 unitaries × 3 roots): controls 1.2e-14 (⟨L²⟩ = 2 exact,
+vHv = e_cas exact), spread 2.7e-11 mEh = **7.3e-13 eV** — the
+engine's wobble floor; probe B: pure M_L states (−1/0/+1) exact
+through the complex-Hermitian Lz block (Lz is anti-Hermitian in the
+real p gauge — the .real symmetrization zeroes it; the machine
+lesson), the REAL ML=0 component reads the same constant, ±1 are
+complex-gauge (covered by A's transitivity).  VERDICT: clean —
+per-root rows stand as stored; the degenerate-block gauge class is
+CLOSED for SC-NEVPT2 at L=1.  THE NUMBERS: E(2) is ~7.5× the
+EN-era preview (−7.7 mEh) — the H₀-choice axis is a big effect
+(EN's exact-configuration denominators vs Dyall's orbital gaps);
+the class breakdown: Sir (0)' −27.4 mEh leads, then Srsi −10.7,
+Sijrs −7.2, Sij −4.9, Srs −4.5, Sijr −3.4; Sr/Si empty (no core
+hole / no particle in this convention... the classes read zero —
+the pur cell's valence convention).  The stored block sits 26.6 µEh
+below ROHF at the same partition (fact 13's near-equality + the SA
+orbital gain); the guard's first real bite: store-flat vs
+reader-column CI shapes (fixed: amplitudes are the assertion).
+44 the PySCF-mrpt adapter
 (2026-11-19): `perturb.py` rebuilt at the PySCF boundary —
 `readout_mc` (the run_casci twin without the checkpoint) +
 `assert_stored_roots` (fail-fast; energies strict, CI vectors

@@ -80,6 +80,10 @@ def test_stored_roots_assertion_passes_on_truth_and_refuses_drift(block):
     e_ref = _root_energies(mc).copy()
     ci_ref = [np.asarray(c).copy() for c in mc.ci]
     assert_stored_roots(mc, ref_energies=e_ref, ref_ci=ci_ref)  # truth
+    # the container shape is not the assertion: the store keeps flat
+    # vectors, the reader returns (n, 1) columns (observed on the
+    # campaign store)
+    assert_stored_roots(mc, ref_ci=[c.ravel() for c in ci_ref])
 
     e_bad = e_ref.copy()
     e_bad[1] += 1e-9

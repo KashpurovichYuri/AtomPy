@@ -187,12 +187,15 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
             raise ValueError(
                 f"stored-roots refusal: {len(new)} roots read out vs "
                 f"{len(ref)} stored")
+        # amplitudes are the assertion, not the container shape (the
+        # store keeps flat vectors, the reader returns (n, 1) columns)
         per_root = all(
-            c.shape == r.shape and np.allclose(c, r, atol=c_tol, rtol=0.0)
+            c.size == r.size
+            and np.allclose(c.ravel(), r.ravel(), atol=c_tol, rtol=0.0)
             for c, r in zip(new, ref))
         if per_root:
             return
-        if (all(c.shape == r.shape for c, r in zip(new, ref))
+        if (all(c.size == r.size for c, r in zip(new, ref))
                 and np.allclose(_projector(new), _projector(ref),
                                 atol=c_tol, rtol=0.0)):
             return
