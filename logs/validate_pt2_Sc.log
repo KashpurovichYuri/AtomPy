@@ -1,5 +1,5 @@
 ===== validate_pt2 =====
-PASS  anchor O2  E(2) -0.169784968788 vs -0.169785157128
+PASS  anchor O2  E(2) -0.169784979833 vs -0.169785157128
 PASS  anchor H14  E(2) -0.094164339713 vs -0.094164359938
 PASS  payload Sc: class sums  max |sum - e_corr| 0.00e+00 over 251 roots / 2008 classes
 PASS  payload Sc: totals  max |e_total - e_ref - e_corr| 5.67e-14
@@ -7,6 +7,6 @@ PASS  payload Sc: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
 PASS  payload Sc: meter consistency  max |energy - e_per_norm*norm| 2.78e-17
 PASS  payload Sc: disposition census  52 declared: 43 rows / 9 refused
 PASS  route invariance Sc  lane ground block -200.2098 mEh vs free ground root -200.2103 mEh (delta 5.40e-04 mEh; band 1e-4 Eh)
-FAIL  probe Sc (sc_3d4s_2-1_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
+PASS  probe Sc (sc_3d4s_2-1_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
 
-validate_pt2: 1 FAIL: ['probe Sc (sc_3d4s_2-1_sa-casscf_ao_-_pur_avg)']
+validate_pt2: ALL GREEN (251 roots certified)

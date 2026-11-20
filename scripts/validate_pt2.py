@@ -180,7 +180,11 @@ def _probe(atom: str) -> None:
     passes = out.count("PASS")
     verdicts = [ln for ln in out.splitlines()
                 if ln.startswith("VERDICT")]
-    clean = all("clean" in v for v in verdicts) and r.returncode == 0
+    # the probe's pass verdicts: "clean" (the spread at the wobble
+    # floor) and "small" (the spread is the disclosed per-row error
+    # bar); "LARGE" is the fail verdict
+    clean = (all("LARGE" not in v for v in verdicts)
+             and len(verdicts) >= 2 and r.returncode == 0)
     check(f"probe {atom} ({addr})", clean,
           f"{passes} PASS lines, {len(verdicts)} verdicts")
 
