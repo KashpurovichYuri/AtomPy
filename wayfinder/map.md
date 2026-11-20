@@ -11,29 +11,39 @@ The wave spec: [`specs/pt2-perturbation.md`](specs/pt2-perturbation.md)
 (2026-11-19): the window-ladder diagnostic; the symmetry probes; the
 delivery chain.
 
-- [45 — the PT2 runs + PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
-  IN PROGRESS (the lane seam + steps 5's ladder DONE 2026-11-20 —
-  ALL SEVEN atoms collected/rendered/gated: C 29, Si 37, Sc 52,
-  Ti 46, the uncs 26/26, U14e 32 cells; the records in the ticket).
-  Measured on the wave's questions: the optimized ladder SATURATES
-  (the optimizer repairs the poverty class; the thin spans fuel);
-  E(2) is orbital-sensitive, rotation-insensitive; the CAS-size
-  axis (U14e's flagship (4,12)/(6,13)/(4,15)): the corrected
-  ladder PREFERS (4,12) — the (4,15) promotion's CAS gain is
-  dynamic double-counting (E(2) −341.7 → −336.0 mEh, the corrected
-  total worsens −50.7655 → −50.7624).  The seam's bands reached
-  their measured per-atom scale (readout_mc(ci0=), e_noise, p_tol
-  1e-4 — the tail sweep Si 2.2e-7 / Ti 3.9e-6 / Ti-unc 5.0e-5; the
-  meters matrix-free — the dense build hit ~1.35 TB on the M-shell
-  pol twins).  Remaining: the closed-out disposition (the user's
-  call) + the declared-out classes' recoveries (the uncs' lane
-  substrate steer; the semi legs' Lowdin needles; the same-l
-  distilled legs).
+- [45 — the PT2 runs + PERTURBATION_TABLE.md]: COMPLETE 2026-11-20
+  and RETIRED to git history (see the resolved record below); the
+  declared-out classes' gated recoveries moved to the Disposition
+  candidates; the 2026-11-20 review + the V&V instrument recorded in
+  Issues.
 - [46 — the TABLE.md physics pass](tickets/46-table-physics-pass.md):
   DESIGN-FIRST, user-gated — the render-level significance policy
   (the stores keep everything; the table keeps the physics).
 
-Resolved (git history the archive): 45 step 3 — THE SYMMETRY
+Resolved (git history the archive): 45 the PT2 wave, COMPLETE
+2026-11-20 (2026-11-19..20): the lane seam (`cells.readout_lane` --
+the store's readout twin, kernel-ready per-block `mc` out;
+`perturb.nevpt2_rows_on` -- the pricing split; `casscf.irrep_solvers`
+-- the pin's one construction; `cases.lane_substrate` moved in) +
+step 5's ladder on ALL SEVEN atoms (C 29, Si 37, Sc 52, Ti 46, the
+uncs 26/26, U14e 32 cells; the combined gate logs/validate_pt2_all.log
+-- 1259 roots certified) + the flagship CAS-size read (the corrected
+ladder PREFERS (4,12): the (4,15) promotion's CAS gain is dynamic
+double-counting, E(2) −341.7 → −336.0 mEh, the corrected total
+worsens −50.7655 → −50.7624) + the seam's measured bands
+(`readout_mc(ci0=)`, e_noise 1e-6, p_tol 1e-4 — the per-atom tail
+sweep Si 2.2e-7 / Ti 3.9e-6 / Ti-unc 5.0e-5; the meters matrix-free
+— the dense build hit ~1.35 TB on the M-shell pol twins) + the
+wave's reading discipline in README · Analysis.  THE WAVE'S ANSWER:
+the optimized ladder SATURATES (the optimizer repairs the poverty
+class; the thin spans fuel and PT2 does not repair them — the
+remainder is static); E(2) is orbital-sensitive,
+rotation-insensitive.  CLOSED OUT with the U14e V&V instrument
+(`scripts/u14e_vv.py`, the run instrument; logs/u14e_vv.log green
+6/6 — the wave's answers re-derived standalone at machine precision:
+E(2) delta 0.0000 mEh, ⟨L²⟩ 72 at 8.9e-15 free / 1.9e-07 pinned,
+route delta 5.3e-09 Eh) and the 2026-11-20 two-axis review + design
+survey (the fixes + declinations in Issues).  45 step 3 — THE SYMMETRY
 PROBES (2026-11-19, `scripts/probe_pt2_block.py`, the certified pur
 cell `c_2p_2-0_sa-casscf_ao_-_pur_avg`): E(2) = −58.1340 mEh
 (−1.5819 eV) IDENTICAL across the ³P Sz=+1 block; probe A (gauge
@@ -196,6 +206,43 @@ configuration-inert).
 
 ### Open
 
+- **The 2026-11-20 wave review + design survey** (ticket 45's close;
+  the two axes + the codebase-design vocabulary over `src/`, fixed
+  point a0fe3fe): fixed = the renderer's ground-block spread got one
+  home (`_ground_spread_meh`); the dead `size` branch retired (no
+  manifest declared it); the lane block-support `assert` → a
+  fail-fast raise (rule 5); `key_core`/`lane_core`/`window_columns`
+  promoted public (the store-free V&V instrument is the third
+  consumer; the docstring refs already pointed there; `__all__` +
+  the layout row + `kernel_cell_payload`'s row gap, one lockstep
+  commit); test_perturb's band labels run (a)-(d); the committed
+  PERTURBATION_TABLEs were one blank line short of the renderer's
+  own bytes (pre-existing drift, surfaced by the re-render, lockstep
+  restored); AGENTS/README test counts lockstep (376/282 — the
+  handoff's 374 was stale at 67ab1da).  DECLINED (judgement calls,
+  recorded): `lane_substrate`'s docstring carries measured instances
+  (the repo's exemplars land measured values in Notes-style prose —
+  `run_rohf`'s own Notes cite Ti numbers; the slot rule reads those
+  as Notes, not contract); `lane_substrate`'s basin-steer retry
+  branch untested (campaign chemistry, run-verified — a pin would be
+  an hours-class test costume); `_meters`/`EH_EV` duplicated across
+  the standalone instruments (the run.py precedent: scripts are
+  self-contained run instruments); `_lane_block`'s 13-parameter
+  clump (a block-context bundle type — a later refactor, not this
+  close); `validate_pt2._probe`'s string-parse coupling to
+  probe_pt2_block.py's stdout (gate + probe are committed together,
+  one home); `validate_pt2`'s `FAILS` module global (script style);
+  the (6,13) leg print-only in the V&V (the handoff's assertion list
+  is (a)-(e); the (6,13) meters carry the certified L=9 disclosure);
+  the UHF-seeded start MO is the symmetric window (the handoff's
+  literal wiring — the reference feeds PySCF's kernel; a
+  broken-orbital-start variant is a follow-up if the spin-broken
+  START class is ever wanted).  THE V&V RUN: logs/u14e_vv.log green
+  6/6 — E(2) delta 0.0000 mEh, ⟨L²⟩ 72 at 8.9e-15 free / 1.9e-07
+  pinned, the (4,15) worsening +3.081 mEh (stored +3.086), route
+  delta 5.3e-09 Eh, the UHF sibling printed (E −6.961 mEh, ⟨S²⟩
+  6.229, all five occupied pairs broken); the (6,13) meters
+  reproduce the certified L=9 disclosure.
 - **The 2026-11-19 review's declinations** (the two-axis review over
   the PT2 wave, fixed point 7ab52df): fixed = probe_tmp.py scratch
   deleted; the AGENTS cases.py layout row (lockstep); the measured
@@ -276,6 +323,17 @@ configuration-inert).
   target's refusal does not impugn it, the cache convention applies.
 
 ### Disposition candidates (the user's future call)
+
+- **The PT2 wave's declared-out classes** (gated recoveries; each
+  carries its measured reason in ticket 45's git history): the uncs'
+  lane legs (the lane substrate's basin steer diverges on today's
+  box); Ti's 3d4d@ar / 3d4s4p4d@ar lanes (the same-l distilled wall
+  — `window_distilled`'s future seam — plus schema-stale stores) and
+  the semi lanes (the Löwdin needle on fresh construction); Sc's
+  semi lanes (the same Löwdin class) + 5 substrate drifts (the regen
+  loop, gated); U14e's 11 refusals (the raw-AO windows' re-solve
+  does not reconstruct; the 7s SA cells past e_noise; the lane legs
+  on real reconstruction failures).
 
 - **The U14e prior optimizer follow-on — EXECUTED 2026-11-18**
   (bb39a70 + the close commit; the prior-anchor-first scenario's
