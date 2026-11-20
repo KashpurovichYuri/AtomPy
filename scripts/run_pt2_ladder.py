@@ -33,6 +33,7 @@ Usage:
 """
 
 import json
+import resource
 import sys
 import time
 from datetime import date, datetime
@@ -45,7 +46,9 @@ from pyscf import __version__ as pyscf_version  # noqa: E402
 
 from atomterm.cases import campaign_spec, cell_substrate, lane_substrate  # noqa: E402
 from atomterm.cells import CellKey, cell_chk  # noqa: E402
-from atomterm.operators import build_operators, ci_in_detbasis_order  # noqa: E402
+from atomterm.detbasis import determinant_basis, operator_apply  # noqa: E402
+from atomterm.operators import (ci_in_detbasis_order, l2_operator_parts,  # noqa: E402
+                                lz_operator, s2_operator_parts)
 from atomterm.perturb import nevpt2_rows  # noqa: E402
 
 EH_EV = 27.211386245988
@@ -191,9 +194,33 @@ def _declared_lane_cells(atom: str) -> list[tuple[str, str]]:
     return out
 
 
-def _expect(mat, ci_pyscf, norb, na, nb) -> float:
+def _meters(mol, mf, c_act, ncore, na, nb):
+    """The meter machinery: the operators as their ACTION
+    (``detbasis.operator_apply`` -- the matrix-free twin; the
+    ``len(dets)^2`` container never forms, any sector size).  The
+    many-body meters read per root through the CI-order bridge."""
+    dets = determinant_basis(c_act.shape[1], na, nb)
+    apply_l2 = operator_apply(dets, *l2_operator_parts(mol, c_act))
+    apply_s2 = operator_apply(dets, *s2_operator_parts(c_act.shape[1]))
+    apply_lz = operator_apply(dets, one_body=lz_operator(mol, c_act))
+
+    def expect(kind, ci_pyscf):
+        w = ci_in_detbasis_order(np.asarray(ci_pyscf).ravel(),
+                                 c_act.shape[1], na, nb)
+        if kind == "l2":
+            return float(np.real(w @ apply_l2(w)))
+        if kind == "s2":
+            return float(np.real(w @ apply_s2(w)))
+        return float(np.real(w @ apply_lz(w)))
+
+    return expect
+
+
+def _expect(kind_or_mat, ci_pyscf, norb, na, nb) -> float:
     w = ci_in_detbasis_order(np.asarray(ci_pyscf).ravel(), norb, na, nb)
-    return float(np.real(np.vdot(w, mat @ w)))
+    if callable(kind_or_mat):
+        return float(np.real(w @ kind_or_mat(w)))
+    return float(np.real(np.vdot(w, kind_or_mat @ w)))
 
 
 def _collect_lane(key, lane_sub, spec, workdir, t0) -> dict:
@@ -286,8 +313,9 @@ def collect_atom(atom: str, workdir: str = "elements") -> dict:
         ncore = (mol.nelectron - (na + nb)) // 2
         mo = np.asarray(data.mo_coeff)
         c_act = mo[:, ncore:ncore + ncas]
-        ops = build_operators(mol, mf, c_act, ncore, na, nb,
-                              spherical_core=False, c_core=mo[:, :ncore])
+        expect = _meters(mol, mf, c_act, ncore, na, nb)
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6
+        print(f"  [rss] {addr} at {rss:.1f} GB", flush=True)
         entry = {
             "address": addr,
             "ncas": ncas, "nroots": nroots,
@@ -317,9 +345,9 @@ def collect_atom(atom: str, workdir: str = "elements") -> dict:
                 "e_total": row.e_total,
                 "e_corr_eV": row.e_corr * EH_EV,
                 "e_total_eV": row.e_total * EH_EV,
-                "l2": _expect(ops["L2"], ci_p, ncas, na, nb),
-                "lz": _expect(ops["Lz"], ci_p, ncas, na, nb),
-                "s2": _expect(ops["S2"], ci_p, ncas, na, nb),
+                "l2": expect("l2", ci_p),
+                "lz": expect("lz", ci_p),
+                "s2": expect("s2", ci_p),
                 "classes": [{
                     "label": c.label, "note": c.note,
                     "norm": c.norm, "energy": c.energy,

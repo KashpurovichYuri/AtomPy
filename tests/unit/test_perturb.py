@@ -296,6 +296,41 @@ def test_phase_and_davidson_noise_clauses(block):
         assert_stored_roots(mc4, ref_ci=[v])
 
 
+def test_same_state_energy_noise_rides_the_vector_certificate(block):
+    """The energy miss with a matching vector certificate passes at
+    the e_noise band and refuses past it; without ref_ci the energy
+    miss stands alone and refuses."""
+    from atomterm.perturb import _root_energies, readout_mc
+
+    mol, mf, _, mo_full = block
+    mc = readout_mc(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
+    e = _root_energies(mc).copy()
+    # energies off 5e-9 (inside e_noise, outside e_tol) + the same
+    # vectors -> the declared same-state noise class passes
+    assert_stored_roots(mc, ref_energies=e + 5e-9, ref_ci=mc.ci)
+    # off 5e-5 (past e_noise) with the same vectors -> refuses
+    with pytest.raises(ValueError, match="same-state noise"):
+        assert_stored_roots(mc, ref_energies=e + 5e-5, ref_ci=mc.ci)
+    # the same 5e-9 miss WITHOUT a vector certificate -> refuses
+    with pytest.raises(ValueError, match="do not reproduce"):
+        assert_stored_roots(mc, ref_energies=e + 5e-9)
+
+
+def test_store_seeded_readout_reproduces(block):
+    """The readout seeded FROM the stored stack reproduces it: the
+    kernel's guess lands the stored states (the reconstruction a
+    quasi-degenerate manifold's plain re-solve re-partitions)."""
+    from atomterm.perturb import _root_energies, readout_mc
+
+    mol, mf, _, mo_full = block
+    mc = readout_mc(mol, mf, mo_full, NCAS, NELECAS, NROOTS)
+    stored = _root_energies(mc).copy()
+    mc2 = readout_mc(mol, mf, mo_full, NCAS, NELECAS, NROOTS,
+                     ci0=list(mc.ci))
+    assert np.allclose(_root_energies(mc2), stored, atol=1e-11,
+                       rtol=0.0)
+
+
 def test_class_rows_carry_the_compression_meter():
     """e_per_norm = energy/norm; a zero norm carries no meter (nan)."""
     from atomterm.perturb import ClassRow

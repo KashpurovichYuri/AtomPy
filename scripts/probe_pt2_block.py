@@ -41,7 +41,10 @@ from atomterm.perturb import (  # noqa: E402
 
 EH_EV = 27.211386245988
 K_REDRAW = 8
-TOL_CTRL = 1e-9      # the controls: exact identities on the block
+TOL_CTRL = 1e-6      # the controls: identities up to the CELL's own
+                     # symmetry residual (C's SA draw 1e-14; Sc's 2.3e-7
+                     # -- the optimizer's repair quality, per cell; a
+                     # machinery error shows at the 1e-1 scale)
 TOL_WOBBLE = 1e-6    # the engine's own run-to-run wobble floor
 
 
@@ -68,6 +71,11 @@ def main() -> None:
     mol, mf, data = cell_substrate(key)
     na, nb = key.sector
     ncas = int(data.ncas)
+    # the term's own <L^2> target (the controls are L(L+1), not the
+    # C 3P constant: Sc 2D reads 6, Ti 3F reads 20 ...)
+    from atomterm.cases import CAMPAIGN
+    spec = CAMPAIGN[key.atom]
+    l2_target = float(spec.term[0] * (spec.term[0] + 1))
     nroots = len(data.ci)
     ncore = (mol.nelectron - (na + nb)) // 2
     mo = np.asarray(data.mo_coeff)
@@ -119,7 +127,7 @@ def main() -> None:
             w = _to_detbasis(ci_rot[r], ncas, na, nb)
             worst_ctrl = max(worst_ctrl,
                              abs(_expect(ops["L2"], ci_rot[r],
-                                         ncas, na, nb) - 2.0),
+                                         ncas, na, nb) - l2_target),
                              abs(_expect(h_cas, ci_rot[r],
                                          ncas, na, nb) - e_cas_store[r]))
             row = _root_row(mc, r, "nevpt2-sc")
@@ -151,7 +159,7 @@ def main() -> None:
         ml = float(np.real(np.vdot(w_pure, ops["Lz"] @ w_pure)))
         l2 = float(np.real(np.vdot(w_pure, ops["L2"] @ w_pure)))
         ev_e = float(np.real(np.vdot(w_pure, h_cas @ w_pure)))
-        worst_ctrl_b = max(worst_ctrl_b, abs(l2 - 2.0),
+        worst_ctrl_b = max(worst_ctrl_b, abs(l2 - l2_target),
                            abs(ev_e - e_cas_store[r]),
                            abs(ml - round(ml)))
         labels.append(f"M_L={round(ml):+d}")

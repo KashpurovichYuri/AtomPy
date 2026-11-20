@@ -519,9 +519,23 @@ never a tolerance change for the occasion.  **The basis-thinness
 caveat**: cc-pVDZ-class bases inflate E(2) absolutely (the
 per-class compression meter `e_per_norm` reads how hard each class
 works); absolute eV values are basis-bound, ladder *differences*
-are the usable signal.  **The lane rule**: lane cells are a
-different payload class (no ci_stack/core_energy) — their PT2 rows
-wait on a lane-native readout twin.
+are the usable signal.  **The lane rule**: lane cells are a different payload class (no
+ci_stack/core_energy) — their rows price through the lane store's own
+readout twin (`cells.readout_lane`: the runner's construction
+re-solved and asserted against the record, per branch component).
+The lane rows are the D2h-pinned components (the blocks hold the
+irrep's own roots; the meters carry their state class) — the core-
+partition axis: the Koopmans classes move with the core, and the
+row's block spread is the term's across-component E(2) disclosure.
+The route-invariance anchor: the lane's ground block vs the free CI
+twin's ground root — agreement certifies the irrep pinning is
+pricing-inert (band 1e-4 Eh; the observed values live in the gate
+log).  **The CAS-size axis** (U14e's promoted trio
+(4,12)/(6,13)/(4,15)): the flagship R-test — the window ITSELF is
+the axis; a flat corrected total across the trio reads saturation,
+a moving one reads the missing static part.  (Ti's same-l CAS-size
+windows are VOID-declared — the distilled same-l construction waits
+on window_distilled's future seam.)
 
 **The variant axis.** The engine is strongly contracted NEVPT2:
 parameter-free, intruder-free by construction (Dyall's H₀ makes

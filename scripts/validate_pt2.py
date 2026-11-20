@@ -164,7 +164,12 @@ def _probe(atom: str) -> None:
     import subprocess
 
     addr = {"C": "c_2p_2-0_sa-casscf_ao_-_pur_avg",
-            "Si": "si_3p_2-0_sa-casscf_ao_-_pur_avg"}.get(atom)
+            "Si": "si_3p_2-0_sa-casscf_ao_-_pur_avg",
+            "Sc": "sc_3d4s_2-1_sa-casscf_ao_-_pur_avg",
+            "Ti": "ti_3d4s_3-1_sa-casscf_ao_-_pur_avg",
+            "Sc-unc": "sc-unc_3d4s_2-1_sa-casscf_ao_-_pur_avg",
+            "Ti-unc": "ti-unc_3d4s_3-1_sa-casscf_ao_-_pur_avg",
+            "U14e": "u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg"}.get(atom)
     if addr is None:
         print(f"SKIP  probe {atom}: no certified SA address declared")
         return

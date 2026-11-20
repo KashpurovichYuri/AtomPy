@@ -1,0 +1,103 @@
+===== pt2 ladder: Sc =====
+  [rss] sc_3d4s_2-1_casci_ao_-_pur_avg at 0.1 GB
+  [rows] sc_3d4s_2-1_casci_ao_-_pur_avg: nroots 9, E(2) root0 -197.9095 mEh (-5.3854 eV), <L2> 6.000000 (0.8 s)
+  [rss] sc_3d4s_2-1_casci_mo_-_pur_avg at 0.2 GB
+  [rows] sc_3d4s_2-1_casci_mo_-_pur_avg: nroots 9, E(2) root0 -181.8475 mEh (-4.9483 eV), <L2> 0.006211 (0.8 s)
+  [rss] sc_3d4s_2-1_casci_moc_-_pur_avg at 0.2 GB
+  [rows] sc_3d4s_2-1_casci_moc_-_pur_avg: nroots 9, E(2) root0 -183.0813 mEh (-4.9819 eV), <L2> 3.353210 (0.7 s)
+  [rss] sc_3d4s@r1_2-1_casci_ao_-_pur_avg at 0.2 GB
+  [rows] sc_3d4s@r1_2-1_casci_ao_-_pur_avg: nroots 9, E(2) root0 -184.2700 mEh (-5.0142 eV), <L2> 6.000000 (0.7 s)
+  [rss] sc_3d4s@r1_2-1_casci_mo_-_pur_avg at 0.2 GB
+  [rows] sc_3d4s@r1_2-1_casci_mo_-_pur_avg: nroots 9, E(2) root0 -181.8475 mEh (-4.9483 eV), <L2> 0.006211 (0.7 s)
+  [rss] sc_3d4s@r1_2-1_casci_moc_-_pur_avg at 0.2 GB
+  [rows] sc_3d4s@r1_2-1_casci_moc_-_pur_avg: nroots 9, E(2) root0 -183.0813 mEh (-4.9819 eV), <L2> 3.353210 (0.7 s)
+  [rss] sc_3d4s@s1_2-1_casci_ao_-_pur_avg at 0.2 GB
+  [rows] sc_3d4s@s1_2-1_casci_ao_-_pur_avg: nroots 9, E(2) root0 -200.1072 mEh (-5.4452 eV), <L2> 6.000000 (0.7 s)
+  [rss] sc_3d4s@s1_2-1_casci_mo_-_pur_avg at 0.2 GB
+  [rows] sc_3d4s@s1_2-1_casci_mo_-_pur_avg: nroots 9, E(2) root0 -181.8475 mEh (-4.9483 eV), <L2> 0.006211 (0.7 s)
+  [rss] sc_3d4s@s1_2-1_casci_moc_-_pur_avg at 0.2 GB
+  [rows] sc_3d4s@s1_2-1_casci_moc_-_pur_avg: nroots 9, E(2) root0 -183.0813 mEh (-4.9819 eV), <L2> 3.353210 (0.8 s)
+  [rss] sc_3d4s@s2_2-1_casci_ao_-_pur_avg at 0.2 GB
+  [refused] sc_3d4s@s2_2-1_casci_ao_-_pur_avg: stored-roots refusal: the readout energies (max diff 4.674e-09) and CI vectors both fail the stored solution -- the substrate does not reconstruct the stored run; PT2 refused
+  [rss] sc_3d4s@s2_2-1_casci_mo_-_pur_avg at 0.2 GB
+  [rows] sc_3d4s@s2_2-1_casci_mo_-_pur_avg: nroots 9, E(2) root0 -180.2857 mEh (-4.9058 eV), <L2> 1.631128 (39.2 s)
+  [rss] sc_3d4s@s2_2-1_casci_moc_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s2_2-1_casci_moc_-_pur_avg: nroots 9, E(2) root0 -179.5226 mEh (-4.8851 eV), <L2> 3.976734 (39.5 s)
+  [rss] sc_3d4sno2_2-1_casci_no_-_pur_avg at 0.4 GB
+  [rows] sc_3d4sno2_2-1_casci_no_-_pur_avg: nroots 9, E(2) root0 -197.9093 mEh (-5.3854 eV), <L2> 6.000000 (0.7 s)
+  [rss] sc_3d4s@r1no2_2-1_casci_no_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@r1no2_2-1_casci_no_-_pur_avg: nroots 9, E(2) root0 -184.2699 mEh (-5.0142 eV), <L2> 6.000000 (0.7 s)
+  [rss] sc_3d4s@s1no2_2-1_casci_no_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s1no2_2-1_casci_no_-_pur_avg: nroots 9, E(2) root0 -200.1069 mEh (-5.4452 eV), <L2> 6.000000 (0.7 s)
+  [rss] sc_3d4s@s2no2_2-1_casci_no_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s2no2_2-1_casci_no_-_pur_avg: nroots 9, E(2) root0 -187.3751 mEh (-5.0987 eV), <L2> 6.000000 (0.7 s)
+  [rss] sc_3d4s_2-1_casscf_ao_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s_2-1_casscf_ao_-_pur_avg: nroots 1, E(2) root0 -165.3314 mEh (-4.4989 eV), <L2> 0.052212 (0.3 s)
+  [rss] sc_3d4s_2-1_casscf_mo_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s_2-1_casscf_mo_-_pur_avg: nroots 1, E(2) root0 -165.5189 mEh (-4.5040 eV), <L2> 0.052779 (0.3 s)
+  [rss] sc_3d4s_2-1_sa-casscf_ao_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s_2-1_sa-casscf_ao_-_pur_avg: nroots 5, E(2) root0 -178.8731 mEh (-4.8674 eV), <L2> 6.000000 (0.5 s)
+  [rss] sc_3d4s_2-1_sa-casscf_mo_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s_2-1_sa-casscf_mo_-_pur_avg: nroots 5, E(2) root0 -169.0268 mEh (-4.5995 eV), <L2> 0.030352 (0.5 s)
+  [rss] sc_3d4s@r1_2-1_casscf_ao_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@r1_2-1_casscf_ao_-_pur_avg: nroots 1, E(2) root0 -165.3308 mEh (-4.4989 eV), <L2> 0.052214 (0.3 s)
+  [rss] sc_3d4s@r1_2-1_casscf_mo_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@r1_2-1_casscf_mo_-_pur_avg: nroots 1, E(2) root0 -165.5189 mEh (-4.5040 eV), <L2> 0.052779 (0.3 s)
+  [rss] sc_3d4s@r1_2-1_sa-casscf_ao_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@r1_2-1_sa-casscf_ao_-_pur_avg: nroots 5, E(2) root0 -178.7477 mEh (-4.8640 eV), <L2> 6.000000 (0.5 s)
+  [rss] sc_3d4s@r1_2-1_sa-casscf_mo_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@r1_2-1_sa-casscf_mo_-_pur_avg: nroots 5, E(2) root0 -169.0268 mEh (-4.5995 eV), <L2> 0.030352 (0.5 s)
+  [rss] sc_3d4s@s1_2-1_casscf_ao_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s1_2-1_casscf_ao_-_pur_avg: nroots 1, E(2) root0 -165.5181 mEh (-4.5040 eV), <L2> 0.052791 (0.3 s)
+  [rss] sc_3d4s@s1_2-1_casscf_mo_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s1_2-1_casscf_mo_-_pur_avg: nroots 1, E(2) root0 -165.5189 mEh (-4.5040 eV), <L2> 0.052779 (0.3 s)
+  [rss] sc_3d4s@s1_2-1_sa-casscf_ao_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s1_2-1_sa-casscf_ao_-_pur_avg: nroots 5, E(2) root0 -178.7235 mEh (-4.8633 eV), <L2> 6.000000 (0.5 s)
+  [rss] sc_3d4s@s1_2-1_sa-casscf_mo_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s1_2-1_sa-casscf_mo_-_pur_avg: nroots 5, E(2) root0 -169.0268 mEh (-4.5995 eV), <L2> 0.030352 (0.5 s)
+  [rss] sc_3d4s@s2_2-1_casscf_ao_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s2_2-1_casscf_ao_-_pur_avg: nroots 1, E(2) root0 -160.0508 mEh (-4.3552 eV), <L2> 2.663913 (4.8 s)
+  [rss] sc_3d4s@s2_2-1_casscf_mo_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s2_2-1_casscf_mo_-_pur_avg: nroots 1, E(2) root0 -160.2229 mEh (-4.3599 eV), <L2> 1.723734 (4.7 s)
+  [rss] sc_3d4s@s2_2-1_sa-casscf_ao_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s2_2-1_sa-casscf_ao_-_pur_avg: nroots 5, E(2) root0 -167.3962 mEh (-4.5551 eV), <L2> 6.000000 (22.1 s)
+  [rss] sc_3d4s@s2_2-1_sa-casscf_mo_-_pur_avg at 0.4 GB
+  [rows] sc_3d4s@s2_2-1_sa-casscf_mo_-_pur_avg: nroots 5, E(2) root0 -164.5925 mEh (-4.4788 eV), <L2> 4.013531 (22.2 s)
+  [rss] sc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg at 0.4 GB
+  [rows] sc_3d4s_2-1_sa-casscf_ao_frozen_pur_avg: nroots 5, E(2) root0 -197.6128 mEh (-5.3773 eV), <L2> 6.000000 (0.5 s)
+  [rss] sc_3d4s@r1_2-1_sa-casscf_ao_frozen_pur_avg at 0.4 GB
+  [rows] sc_3d4s@r1_2-1_sa-casscf_ao_frozen_pur_avg: nroots 5, E(2) root0 -184.2576 mEh (-5.0139 eV), <L2> 6.000000 (0.5 s)
+  plain D2h SCF a wrong basin (-759.73655138 vs the trusted -759.73625510) -- retrying C1-seeded (elements/Sc/rungs/rohf.chk)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9919-0.9919; 4s: k=1 of 1 bands, capture 0.9705-0.9705
+  [lane] sc_3d4s@ar_2-1_casci_ao_-_pur_avg: 4 blocks, E(2) mean -196.7676 mEh (-5.3543 eV), ptp 1.85e+01 mEh (1.7 s)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9919-0.9919; 4s: k=1 of 1 bands, capture 0.9705-0.9705
+  [lane] sc_3d4s@ar_2-1_sa-casscf_ao_-_pur_avg: 4 blocks, E(2) mean -189.2161 mEh (-5.1488 eV), ptp 5.06e+01 mEh (1.6 s)
+  [rss] sc_3d4s@ar_2-1_casci_ao_-_pol_avg at 0.4 GB
+  [rows] sc_3d4s@ar_2-1_casci_ao_-_pol_avg: nroots 9, E(2) root0 -200.2103 mEh (-5.4480 eV), <L2> 6.000000 (0.7 s)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9919-0.9919
+  [lane] sc_3d@ar_2-1_casci_ao_-_pur_avg: 4 blocks, E(2) mean -362.6550 mEh (-9.8683 eV), ptp 8.06e+01 mEh (1.4 s)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9919-0.9919
+  [lane] sc_3d@ar_2-1_sa-casscf_ao_-_pur_avg: 4 blocks, E(2) mean -188.1846 mEh (-5.1208 eV), ptp 1.96e+01 mEh (1.4 s)
+  [rss] sc_3d@ar_2-1_casci_ao_-_pol_avg at 0.4 GB
+  [rows] sc_3d@ar_2-1_casci_ao_-_pol_avg: nroots 9, E(2) root0 -347.4108 mEh (-9.4535 eV), <L2> 12.000000 (0.5 s)
+  [refused] sc_3d3p@semi_4-3_casci_ao_-_pur_avg: Lowdin on a near-linearly-dependent block: min overlap eigenvalue 1.04e-17 <= tol 1e-10; pad/drop the needle directions or raise tol
+  [refused] sc_3d3p@semi_4-3_sa-casscf_ao_-_pur_avg: Lowdin on a near-linearly-dependent block: min overlap eigenvalue 1.04e-17 <= tol 1e-10; pad/drop the needle directions or raise tol
+  [rss] sc_3d3p@semi_4-3_casci_ao_-_pol_avg at 0.4 GB
+  [refused] sc_3d3p@semi_4-3_casci_ao_-_pol_avg: stored-roots refusal: the readout energies (max diff 2.999e-09) and CI vectors both fail the stored solution -- the substrate does not reconstruct the stored run; PT2 refused
+  [refused] sc_3d3p4d@semi_4-3_casci_ao_-_pur_avg: Lowdin on a near-linearly-dependent block: min overlap eigenvalue 1.04e-17 <= tol 1e-10; pad/drop the needle directions or raise tol
+  [refused] sc_3d3p4d@semi_4-3_sa-casscf_ao_-_pur_avg: Lowdin on a near-linearly-dependent block: min overlap eigenvalue 1.04e-17 <= tol 1e-10; pad/drop the needle directions or raise tol
+  [rss] sc_3d3p4d@semi_4-3_casci_ao_-_pol_avg at 0.8 GB
+  [refused] sc_3d3p4d@semi_4-3_casci_ao_-_pol_avg: stored-roots refusal: the readout energies (max diff 6.457e-11) and CI vectors both fail the stored solution -- the substrate does not reconstruct the stored run; PT2 refused
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9919-0.9919; 3p: k=1 of 1 bands, capture 0.9999-0.9999; 4s: k=1 of 1 bands, capture 0.9705-0.9705
+  [lane] sc_3d3p4s@1s2s2p3s_5-4_casci_ao_-_pur_avg: 4 blocks, E(2) mean -135.2798 mEh (-3.6812 eV), ptp 6.01e+00 mEh (28.1 s)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9919-0.9919; 3p: k=1 of 1 bands, capture 0.9999-0.9999; 4s: k=1 of 1 bands, capture 0.9705-0.9705
+  [lane] sc_3d3p4s@1s2s2p3s_5-4_sa-casscf_ao_-_pur_avg: 4 blocks, E(2) mean -116.6250 mEh (-3.1735 eV), ptp 3.88e+01 mEh (24.4 s)
+  [rss] sc_3d3p4s@1s2s2p3s_5-4_casci_ao_-_pol_avg at 1348.1 GB
+  [refused] sc_3d3p4s@1s2s2p3s_5-4_casci_ao_-_pol_avg: stored-roots refusal: the readout energies (max diff 2.381e-09) and CI vectors both fail the stored solution -- the substrate does not reconstruct the stored run; PT2 refused
+  [window] distilled 3s: k=1 of 1 bands, capture 0.9999-0.9999; 3p: k=1 of 1 bands, capture 0.9999-0.9999; 3d: k=1 of 1 bands, capture 0.9919-0.9919
+  [lane] sc_3s3p3d@1s2s2p4s_5-4_casci_ao_-_pur_avg: 4 blocks, E(2) mean -136.5026 mEh (-3.7144 eV), ptp 3.90e+00 mEh (28.0 s)
+  [window] distilled 3s: k=1 of 1 bands, capture 0.9999-0.9999; 3p: k=1 of 1 bands, capture 0.9999-0.9999; 3d: k=1 of 1 bands, capture 0.9919-0.9919
+  [lane] sc_3s3p3d@1s2s2p4s_5-4_sa-casscf_ao_-_pur_avg: 4 blocks, E(2) mean -95.5600 mEh (-2.6003 eV), ptp 3.96e+00 mEh (24.4 s)
+  [rss] sc_3s3p3d@1s2s2p4s_5-4_casci_ao_-_pol_avg at 1348.1 GB
+  [refused] sc_3s3p3d@1s2s2p4s_5-4_casci_ao_-_pol_avg: stored-roots refusal: the readout energies (max diff 3.838e-09) and CI vectors both fail the stored solution -- the substrate does not reconstruct the stored run; PT2 refused
+wrote elements/Sc/perturbation.json: 43 rows / 9 refused of 52 declared cells

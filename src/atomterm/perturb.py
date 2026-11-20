@@ -138,12 +138,21 @@ def _root_energies(mc) -> np.ndarray:
 
 
 def readout_mc(mol, mf, mo_full, ncas: int, nelecas: tuple[int, int],
-               nroots: int):
+               nroots: int, ci0=None):
     """The multi-root CASCI readout on the supplied orbitals.
 
     ``mo_full``'s column layout is the partition (core prefix, active
     block at ``[ncore : ncore+ncas]``, virtual tail); the kernel runs
     exactly as the stored cells' readout pass did.
+
+    ``ci0`` -- the stored CI stack as the davidson GUESS: a
+    quasi-degenerate manifold's plain re-solve may re-partition the
+    roots (measured on the Sc compact cell: the same nine energies to
+    1e-11, a different span at 1.7e-1 -- the stored run's trajectory
+    is not the plain guess's).  Seeding FROM the store makes the
+    re-solve land the stored states -- the reconstruction the
+    stored-roots assertion demands.  Flat rows or the kernel's own
+    container shapes both enter.
 
     Returns the finished ``mcscf.CASCI`` object (``.ci`` a list at
     ``nroots > 1``) -- the object ``mrpt.NEVPT`` consumes.
@@ -151,14 +160,26 @@ def readout_mc(mol, mf, mo_full, ncas: int, nelecas: tuple[int, int],
     mc = mcscf.CASCI(mf, ncas, nelecas)
     mc.mo_coeff = mo_full
     mc.fcisolver.nroots = nroots
-    mc.kernel()
+    if ci0 is None:
+        mc.kernel()
+        return mc
+    na, nb = nelecas
+    nsa = fci.cistring.num_strings(ncas, na)
+    nsb = fci.cistring.num_strings(ncas, nb)
+    guess = [np.asarray(c).ravel().reshape(nsa, nsb) for c in ci0]
+    mc.kernel(ci0=guess)
     return mc
 
 
 def _projector(cis) -> np.ndarray:
-    """The root set's joint projector -- the gauge-invariant object."""
-    dim = cis[0].shape[0]
-    p = np.zeros((dim, dim))
+    """The root set's joint projector -- the gauge-invariant object.
+
+    The vectors enter in any container shape (flat store rows, the
+    reader's (n, 1) columns, PySCF's (na, nb) string matrices) --
+    amplitudes are the assertion, so the projector runs on the
+    ravelled length (the det count)."""
+    v0 = np.asarray(cis[0]).ravel()
+    p = np.zeros((v0.size, v0.size))
     for c in cis:
         v = np.asarray(c).ravel()
         p += np.outer(v, v.conj())
@@ -167,7 +188,8 @@ def _projector(cis) -> np.ndarray:
 
 def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
                         e_tol: float = 1e-11, c_tol: float = 1e-8,
-                        o_tol: float = 1e-3, p_tol: float = 1e-6) -> None:
+                        o_tol: float = 1e-3, p_tol: float = 1e-6,
+                        e_noise: float = 1e-6) -> None:
     """Refuse unless the readout reproduced the stored solution.
 
     Energies compare strict (absolute tolerance; the fresh readout's
@@ -182,70 +204,100 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
     zero; the state's meters and E(2) are flat across it, while any
     physical mixture fails the energy clause first).
 
+    The energy miss does not refuse on its own when a vector
+    certificate is available: the same-state energy noise (a rougher
+    optimizer draw moves the energies a hair while the vectors
+    certify the state) rides the ``e_noise`` band -- measured on the
+    Sc single-root CASSCF class (angle 9e-6, energy 2.7e-11..9.2e-9).
+    Without ``ref_ci`` the energy clause stands alone.
+
     Parameters
     ----------
-    e_tol, c_tol, o_tol, p_tol : the refusal bands (absolute); force
-        them to pin the band behavior (the defaults are the
-        production refusal).
+    e_tol, c_tol, o_tol, p_tol, e_noise : the refusal bands
+        (absolute); force them to pin the band behavior (the defaults
+        are the production refusal).
 
     Raises
     ------
     ValueError : on any mismatch -- the caller's store and the
         readout disagree about what the solution is.
     """
+    e_bad = None
     if ref_energies is not None:
         e = _root_energies(mc)
         ref = np.atleast_1d(np.asarray(ref_energies, dtype=float)).ravel()
         if e.shape != ref.shape or not np.allclose(e, ref, atol=e_tol,
                                                    rtol=0.0):
-            shown = ("shape mismatch"
-                     if e.shape != ref.shape
+            e_bad = ("shape mismatch" if e.shape != ref.shape
                      else f"max diff {np.max(np.abs(e - ref)):.3e}")
-            raise ValueError(
-                "stored-roots refusal: the readout energies "
-                f"({shown}) do not "
-                "reproduce the stored energies -- the substrate does "
-                "not reconstruct the stored run; PT2 refused")
     if ref_ci is not None:
-        new = [mc.ci] if mc.fcisolver.nroots == 1 else list(mc.ci)
-        ref = ([ref_ci] if np.asarray(ref_ci).ndim == 1
-               else [np.asarray(c) for c in ref_ci])
-        if len(new) != len(ref):
+        if not _vectors_match(mc, ref_ci, c_tol, o_tol, p_tol):
+            if e_bad is not None:
+                raise ValueError(
+                    "stored-roots refusal: the readout energies "
+                    f"({e_bad}) and CI vectors both fail the stored "
+                    "solution -- the substrate does not reconstruct "
+                    "the stored run; PT2 refused")
             raise ValueError(
-                f"stored-roots refusal: {len(new)} roots read out vs "
-                f"{len(ref)} stored")
-        # amplitudes are the assertion, not the container shape (the
-        # store keeps flat vectors, the reader returns (n, 1) columns)
-        def _amplitudes_match(c, r) -> bool:
-            if c.size != r.size:
-                return False
-            c, r = c.ravel(), r.ravel()
-            if np.allclose(c, r, atol=c_tol, rtol=0.0):
-                return True
-            # the phase/noise clause: same state up to a global phase
-            # and sub-percent davidson noise -- the re-solve ANGLE
-            # (|sin|, linear in the mixing) within o_tol of zero.
-            # The sine comes from the orthogonal residual: at small
-            # angles sqrt(1-cos^2) cancels catastrophically
-            cn, rn = np.linalg.norm(c), np.linalg.norm(r)
-            if not cn or not rn:
-                return False
-            u = c / cn
-            rn_u = r / rn
-            sino = float(np.linalg.norm(rn_u - np.vdot(u, rn_u) * u))
-            return bool(sino <= o_tol)
-
-        per_root = all(_amplitudes_match(c, r) for c, r in zip(new, ref))
-        if per_root:
-            return
-        if (all(c.size == r.size for c, r in zip(new, ref))
-                and np.allclose(_projector(new), _projector(ref),
-                                atol=p_tol, rtol=0.0)):
-            return
+                "stored-roots refusal: the readout CI vectors match "
+                "neither the stored roots nor their joint projector "
+                "-- the solution is not the stored one; PT2 refused")
+        if e_bad is not None:
+            e = _root_energies(mc)
+            ref = np.atleast_1d(np.asarray(ref_energies,
+                                           dtype=float)).ravel()
+            if (e.shape != ref.shape
+                    or not np.allclose(e, ref, atol=e_noise, rtol=0.0)):
+                raise ValueError(
+                    "stored-roots refusal: the readout energies "
+                    f"({e_bad}) exceed the same-state noise band "
+                    f"({e_noise:g}) -- the substrate does not "
+                    "reconstruct the stored run; PT2 refused")
+    elif e_bad is not None:
         raise ValueError(
-            "stored-roots refusal: the readout CI vectors match "
-            "neither the stored roots nor their joint projector -- "
-            "the solution is not the stored one; PT2 refused")
+            "stored-roots refusal: the readout energies "
+            f"({e_bad}) do not "
+            "reproduce the stored energies -- the substrate does "
+            "not reconstruct the stored run; PT2 refused")
+
+
+def _vectors_match(mc, ref_ci, c_tol: float, o_tol: float,
+                   p_tol: float) -> bool:
+    """The vector certificate: amplitude equality, the degenerate
+    block's joint projector, or the same-state re-solve angle --
+    any clause certifies."""
+    new = [mc.ci] if mc.fcisolver.nroots == 1 else list(mc.ci)
+    ref = ([ref_ci] if np.asarray(ref_ci).ndim == 1
+           else [np.asarray(c) for c in ref_ci])
+    if len(new) != len(ref):
+        return False
+    # amplitudes are the assertion, not the container shape (the
+    # store keeps flat vectors, the reader returns (n, 1) columns)
+    def _amplitudes_match(c, r) -> bool:
+        if c.size != r.size:
+            return False
+        c, r = c.ravel(), r.ravel()
+        if np.allclose(c, r, atol=c_tol, rtol=0.0):
+            return True
+        # the phase/noise clause: same state up to a global phase
+        # and sub-percent davidson noise -- the re-solve ANGLE
+        # (|sin|, linear in the mixing) within o_tol of zero.
+        # The sine comes from the orthogonal residual: at small
+        # angles sqrt(1-cos^2) cancels catastrophically
+        cn, rn = np.linalg.norm(c), np.linalg.norm(r)
+        if not cn or not rn:
+            return False
+        u = c / cn
+        rn_u = r / rn
+        sino = float(np.linalg.norm(rn_u - np.vdot(u, rn_u) * u))
+        return bool(sino <= o_tol)
+
+    if all(_amplitudes_match(c, r) for c, r in zip(new, ref)):
+        return True
+    return bool(
+        all(c.size == r.size for c, r in zip(new, ref))
+        and np.allclose(_projector(new), _projector(ref),
+                        atol=p_tol, rtol=0.0))
 
 
 def _root_row(mc, root: int, variant: str) -> PT2Row:
@@ -366,6 +418,10 @@ def nevpt2_rows(mol, mf, mo_full, ncas: int, nelecas: tuple[int, int],
         raise ValueError(
             f"unknown PT2 variant {variant!r}; available: {_VARIANTS} "
             "(further families join as constructors at this seam)")
-    mc = readout_mc(mol, mf, mo_full, ncas, nelecas, nroots)
+    # the store-seeded readout: the reconstruction starts FROM the
+    # stored state (a quasi-degenerate manifold's plain re-solve
+    # re-partitions the roots -- the seed lands the stored states);
+    # the assertion then certifies the converged result
+    mc = readout_mc(mol, mf, mo_full, ncas, nelecas, nroots, ci0=ref_ci)
     assert_stored_roots(mc, ref_energies=ref_energies, ref_ci=ref_ci)
     return nevpt2_rows_on(mc, roots=roots, variant=variant)
