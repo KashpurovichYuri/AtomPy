@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _tables_common import atomic_write_text, replace_block  # noqa: E402
+from run_pt2_ladder import _declared, _declared_lane_cells  # noqa: E402
 
 BEGIN = "<!-- pt2 begin -->"
 END = "<!-- pt2 end -->"
@@ -52,23 +53,39 @@ def _required_schema(payload: dict) -> None:
         if c.get("disposition") not in ("rows", "refusal"):
             sys.exit(f"stale payload: cell {c.get('address')!r} has no "
                      "disposition -- regenerate")
+        if c.get("lane") and "blocks" not in c:
+            sys.exit(f"stale payload: lane cell {c.get('address')!r} "
+                     "carries no blocks -- regenerate")
 
 
-def _group(addr: str) -> str:
-    """The row group, by key identity only."""
+def _group(c: dict, atom: str) -> str:
+    """The row group, by key identity only (the group vocabulary is
+    the manifest's -- one home)."""
+    addr = c["address"]
+    if c.get("lane") or any(a == addr
+                            for a, _ in _declared_lane_cells(atom)):
+        return ("the pinned lane (the core-partition axis; the D2h "
+                "components)")
     if "_frozen_" in addr:
         return "the frozen pair (the core-relaxation disclosure)"
     if "_casci_no_-" in addr:
         return "the NO twins (CASCI)"
     if "_casscf" in addr:
         return "the reference axis (single-root CASSCF vs SA)"
+    size = _declared(atom).get("size", {})
+    if any(addr.startswith(f"{w}_") for w in size):
+        return "the CAS-size axis (the flagship R-test)"
+    dist = _declared(atom).get("dist", ())
+    if any(addr.startswith(f"{w}_") for w in dist):
+        return "the distilled prior family (CASCI ao)"
     return "the span ladder (CASCI: the unoptimized windows)"
 
 
 def _rows(payload: dict) -> list[str]:
+    atom = payload["atom"]
     out, last_group = [], None
     for c in payload["cells"]:
-        g = _group(c["address"])
+        g = _group(c, atom)
         if g != last_group:
             out += ["", f"**{g}**", "", HEAD, SEP]
             last_group = g
@@ -76,6 +93,24 @@ def _rows(payload: dict) -> list[str]:
             reason = c["refusal_reason"].split("--")[0].strip()
             out.append(f"| `{c['address']}` | — | — | — | REFUSED: "
                        f"{reason} | — | — | — | — |")
+            continue
+        spread = None
+        if c.get("lane"):
+            # the lane rows: one per block root; the spread column
+            # reads the TERM's across-component E(2) ptp
+            spread = c.get("term_e2_ptp", float("nan")) * 1e3
+            for blk in c["blocks"]:
+                r0 = blk["roots"][0]
+                out.append(
+                    f"| `{c['address']}` ·{blk['irrep']} "
+                    f"| {blk['mult']} "
+                    f"| {r0['l2']:.6f} "
+                    f"| {r0['e_ref']:.8f} "
+                    f"| {r0['e_corr'] * 1e3:+.4f} "
+                    f"| {r0['e_corr_eV']:+.4f} "
+                    f"| {r0['e_total']:.8f} "
+                    f"| {r0['e_total_eV']:+.4f} "
+                    f"| {spread:.1e} |")
             continue
         roots = c["roots"]
         r0 = roots[0]
@@ -100,12 +135,23 @@ def _rows(payload: dict) -> list[str]:
 
 
 def _csv(payload: dict) -> str:
+    atom = payload["atom"]
     lines = ["address,nroots,l2,e_ref_eh,e2_meh,e2_ev,e_pt2_eh,"
              "e_pt2_ev,spread_meh,disposition"]
     for c in payload["cells"]:
         if c["disposition"] == "refusal":
             lines.append(f"{c['address']},,,,,,,,"
                          f",refused")
+            continue
+        if c.get("lane"):
+            for blk in c["blocks"]:
+                r0 = blk["roots"][0]
+                lines.append(
+                    f"{c['address']}·{blk['irrep']},{blk['mult']},"
+                    f"{r0['l2']:.6f},{r0['e_ref']:.8f},"
+                    f"{r0['e_corr'] * 1e3:+.4f},{r0['e_corr_eV']:+.4f},"
+                    f"{r0['e_total']:.8f},{r0['e_total_eV']:+.4f},"
+                    f"{c.get('term_e2_ptp', 0.0) * 1e3:.1e},rows")
             continue
         r0 = c["roots"][0]
         block = [r for r in c["roots"]

@@ -28,11 +28,12 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-from pyscf import gto
+from pyscf import gto, scf
 
 from atomterm.detbasis import sector_dimension
 from atomterm.system import AtomConfig, ncore_of, sector_na_nb
@@ -52,7 +53,7 @@ from atomterm.analysis import format_report
 
 __all__ = ["CaseSpec", "Scenario", "CAMPAIGN", "campaign_spec",
            "scenarios_for", "run_case", "run_atom", "run_carbon",
-           "cell_substrate"]
+           "cell_substrate", "lane_substrate"]
 
 
 # the declaration ----------------------------------------------------
@@ -1318,6 +1319,69 @@ def cell_substrate(key: CellKey, workdir: str = "elements"):
         raise ValueError(
             f"{key.atom}: the reference ROHF did not converge")
     return mol, mf, load_cell(key, workdir)
+
+
+def lane_substrate(spec) -> tuple:
+    """The pinned lane's D2h substrate: ``(mol, mf)`` -- plain ROHF at
+    tight tolerance, steered to the case's trusted reference basin.
+
+    The D2h landscape is the SAME multi-basin zoo as the spherical one
+    (measured: same-filling stationary points at the 0.3-11 mEh scale,
+    each reverse-seed-stable on C1; the plain D2h draw itself has
+    landed the aufbau runaway on one atom and the intended basin on
+    its twin), so when the trusted ``rungs/rohf.chk`` exists the plain
+    energy is verified against it and a disagreement past 1e-5 Eh (or
+    a divergence) retries the D2h SCF C1-SEEDED from the reference
+    MOs -- the seed steers the OCCUPATION basin; the solver's
+    irrep-blocked diagonals then land the D2h-canonical solution in it
+    (its own energy, NOT the seed's: the restriction draws its own
+    stationary point, sometimes deeper than the trusted record).  Never
+    symmetrize the seed first: both symmetrizers damage
+    degenerate-gauge seeds (the per-orbital one amputates the open MO;
+    the span-mixing one scrambles the occupation-column pairing --
+    measured in the d2h probe log).  Benign for the lanes: their
+    certificates are basin-blind (the core is the span's own
+    Roothaan).  Cached lane cells never re-run (the certified records
+    stand); the rule governs fresh legs.
+
+    Returns
+    -------
+    ``(mol, mf)`` -- the D2h molecule and its converged ROHF (the
+    pinned lane runner's substrate; :func:`atomterm.cells.readout_lane`
+    takes the same pair beside the stored payload).
+    """
+    mol = gto.M(atom=f"{spec.symbol} 0 0 0", basis=spec.basis,
+                spin=spec.spin, ecp=spec.ecp, symmetry="D2h", verbose=0)
+    mf = scf.ROHF(mol)
+    mf.conv_tol = 1e-12
+    mf.kernel()
+    seed = Path("elements") / spec.key / "rungs" / "rohf.chk"
+    rec = None
+    if seed.exists():
+        _, rec = scf.chkfile.load_scf(str(seed))
+    if not mf.converged or (rec is not None
+                            and abs(mf.e_tot - rec["e_tot"]) > 1e-5):
+        if rec is not None:
+            why = ("diverged" if not mf.converged else
+                   f"a wrong basin ({mf.e_tot:.8f} vs the trusted "
+                   f"{float(rec['e_tot']):.8f})")
+            print(f"  plain D2h SCF {why} -- retrying C1-seeded "
+                  f"({seed})", flush=True)
+            from atomterm.reference import _accelerated, _forced_rohf_occ
+            m = scf.ROHF(mol)
+            m.conv_tol = 1e-12
+            if spec.ref is not None and spec.ref.occ_closed is not None:
+                m.get_occ = _forced_rohf_occ(
+                    mol, list(spec.ref.occ_closed),
+                    list(spec.ref.occ_open))
+            m.mo_coeff = rec["mo_coeff"]
+            m.mo_occ = rec["mo_occ"]
+            m.mo_energy = rec["mo_energy"]
+            mf = _accelerated(m, spec.ref)
+    if not mf.converged:
+        sys.exit(f"the lane substrate SCF did not converge "
+                 f"({spec.symbol}, D2h)")
+    return mol, mf
 
 
 if __name__ == "__main__":  # pragma: no cover

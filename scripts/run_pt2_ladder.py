@@ -3,18 +3,23 @@ written to ``elements/<Atom>/perturbation.json`` -- the renderer's
 only source (the render contract: the table and its rows cannot
 diverge).
 
-THE DECLARED SET (the intent, one list per atom -- stale cells cannot
-leak in; a missing address refuses before any run):
+THE DECLARED SET (the intent, one manifest per atom -- stale cells
+cannot leak in; a missing address refuses before any run):
   the span ladder     CASCI {compact, @r1, @s1[, @s2]} x {ao, mo, moc}
-  the NO twins        CASCI {@r1no1, @s1no1, 2pno1[, @s2no1]}
-  the reference axis  {casscf, sa-casscf} x {compact, @r1, @s1}
-                      x {ao, mo}
+  the NO twins        CASCI per declared window tail
+  the reference axis  {casscf, sa-casscf} x declared windows x
+                      {ao, mo}
   the frozen pair     the core-relaxation disclosure rows
-The LANE (the core-partition axis) is DECLARED OUT for now: the lane
-payload is its own store class (per-irrep-block pinned solutions,
-term energies -- no ci_stack/core_energy), so the stored-roots seam
-needs a lane-native readout twin before it can price lane rows
-(ticket 45's follow-up).
+  the CAS-size axis   U14e's promoted trio (10f13d / 10f13d7s /
+                      10f13d14p) -- the flagship R-test (Ti's same-l
+                      axis is VOID-declared: the distilled same-l
+                      windows wait on window_distilled's future seam)
+  the lane            the core-partition axis: the pinned CI lane +
+                      its pinned SA twin + the free CI twin (the
+                      route-invariance partner) per declared leg;
+                      priced through the lane store's own readout
+                      twin (cells.readout_lane) -- the lane payload
+                      class carries no ci_stack/core_energy
 Every stored root is a row (the declared-roots policy -- no silent
 draws).  Per-root meters (L2 / Lz / S2) are measured LIVE through the
 CI-order bridge; cells.json is never a source.  A stored-roots
@@ -38,7 +43,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 import numpy as np  # noqa: E402
 from pyscf import __version__ as pyscf_version  # noqa: E402
 
-from atomterm.cases import cell_substrate  # noqa: E402
+from atomterm.cases import campaign_spec, cell_substrate, lane_substrate  # noqa: E402
 from atomterm.cells import CellKey, cell_chk  # noqa: E402
 from atomterm.operators import build_operators, ci_in_detbasis_order  # noqa: E402
 from atomterm.perturb import nevpt2_rows  # noqa: E402
@@ -46,29 +51,144 @@ from atomterm.perturb import nevpt2_rows  # noqa: E402
 EH_EV = 27.211386245988
 
 
-def _declared_addresses(atom: str) -> list[str]:
-    """The declared cell set per atom (the manifest -- edit here)."""
-    head, tagged = {
-        "C": ("c_2p", ["c_2p@r1", "c_2p@s1"]),
-        "Si": ("si_3p", ["si_3p@r1", "si_3p@s1", "si_3p@s2"]),
+def _declared(atom: str) -> dict:
+    """The declared set per atom (the manifest -- edit here).
+
+    ``windows``      the span ladder's windows (compact first);
+    ``no_tail``      the NO twins' suffix (``no1``/``no2``/...);
+    ``no_windows``   explicit NO-twin windows (U14e's own pattern);
+    ``size``         the CAS-size axis (window -> its NO-tail suffix),
+                     the flagship R-test;
+    ``dist``         the distilled prior family (casci ao);
+    ``window_sector``  per-window sector overrides (else ``sector``);
+    ``sector``       the ladder's primary sector (the maximal-Ms class
+                     the compact cells carry);
+    ``ref_windows``  the windows the reference axis declares (the unc
+                     twins carry CI-only @s tails);
+    ``frozen``       the frozen pair's windows;
+    ``lane_sectors`` the lane legs -> their own core-derived sector;
+    ``lane_sa``      the legs carrying a pinned SA lane cell.
+    """
+    return {
+        "C": dict(
+            windows=("c_2p", "c_2p@r1", "c_2p@s1"), no_tail="no1",
+            sector="2-0", frozen=("c_2p", "c_2p@r1"),
+            lane_sectors={"c_2p@1s2s": "2-0"},
+            lane_sa=("c_2p@1s2s",)),
+        "Si": dict(
+            windows=("si_3p", "si_3p@r1", "si_3p@s1", "si_3p@s2"),
+            no_tail="no1", sector="2-0",
+            frozen=("si_3p", "si_3p@r1"),
+            lane_sectors={"si_3p@1s2s2p3s": "2-0"},
+            lane_sa=("si_3p@1s2s2p3s",)),
+        "Sc": dict(
+            windows=("sc_3d4s", "sc_3d4s@r1", "sc_3d4s@s1", "sc_3d4s@s2"),
+            no_tail="no2", sector="2-1",
+            frozen=("sc_3d4s", "sc_3d4s@r1"),
+            lane_sectors={"sc_3d4s@ar": "2-1", "sc_3d@ar": "2-1",
+                          "sc_3d3p@semi": "4-3", "sc_3d3p4d@semi": "4-3",
+                          "sc_3d3p4s@1s2s2p3s": "5-4",
+                          "sc_3s3p3d@1s2s2p4s": "5-4"},
+            lane_sa=("sc_3d4s@ar", "sc_3d@ar", "sc_3d3p@semi",
+                     "sc_3d3p4d@semi", "sc_3d3p4s@1s2s2p3s",
+                     "sc_3s3p3d@1s2s2p4s")),
+        "Ti": dict(
+            windows=("ti_3d4s", "ti_3d4s@r1", "ti_3d4s@s1", "ti_3d4s@s2"),
+            no_tail="no2", sector="3-1",
+            # the CAS-size axis (3d4d / 3d4s4p4d) is VOID-declared at
+            # pur: the same-l distilled windows wait on the
+            # member-preserving cross-shell orthogonalization
+            # (window_distilled's future seam; since the distillation
+            # wave 2026-11-10) -- the CAS-size axis is U14e's trio
+            frozen=("ti_3d4s", "ti_3d4s@r1"),
+            lane_sectors={"ti_3d4s@ar": "3-1", "ti_3d@ar": "3-1",
+                          "ti_3d4d@ar": "3-1", "ti_3d4s4p4d@ar": "3-1",
+                          "ti_3d3p@semi": "5-3", "ti_3d3p4d@semi": "5-3",
+                          "ti_3s3p3d@1s2s2p4s": "6-4",
+                          "ti_3d3p4s@1s2s2p3s": "6-4"},
+            lane_sa=("ti_3d4s@ar", "ti_3d@ar", "ti_3d4d@ar",
+                     "ti_3d4s4p4d@ar", "ti_3d3p@semi", "ti_3d3p4d@semi",
+                     "ti_3s3p3d@1s2s2p4s", "ti_3d3p4s@1s2s2p3s")),
+        "Sc-unc": dict(
+            windows=("sc-unc_3d4s", "sc-unc_3d4s@r1", "sc-unc_3d4s@s1",
+                     "sc-unc_3d4s@s2"),
+            no_tail="no2", sector="2-1",
+            ref_windows=("sc-unc_3d4s", "sc-unc_3d4s@r1"),
+            frozen=("sc-unc_3d4s", "sc-unc_3d4s@r1"),
+            lane_sectors={"sc-unc_3d4s@ar": "2-1", "sc-unc_3d@ar": "2-1"},
+            lane_sa=("sc-unc_3d@ar",)),
+        "Ti-unc": dict(
+            windows=("ti-unc_3d4s", "ti-unc_3d4s@r1", "ti-unc_3d4s@s1",
+                     "ti-unc_3d4s@s2"),
+            no_tail="no2", sector="3-1",
+            ref_windows=("ti-unc_3d4s", "ti-unc_3d4s@r1"),
+            frozen=("ti-unc_3d4s", "ti-unc_3d4s@r1"),
+            lane_sectors={"ti-unc_3d4s@ar": "3-1", "ti-unc_3d@ar": "3-1"},
+            lane_sa=("ti-unc_3d@ar",)),
+        "U14e": dict(
+            windows=("u14e_10f13d", "u14e_10f13d7s", "u14e_10f13d14p"),
+            sector="4-0",
+            window_sector={"u14e_10f13d7s": "5-1"},
+            no_windows=("u14e_10f13dno2", "u14e_10f13d14pno3"),
+            dist=("u14e_5f6d@r1", "u14e_5f6d@s1"),
+            frozen=("u14e_10f13d",),
+            lane_sectors={"u14e_5f6d@6s6p7s": "4-0",
+                          "u14e_5f6d7s@6s6p": "5-1"},
+            lane_sa=("u14e_5f6d@6s6p7s", "u14e_5f6d7s@6s6p")),
     }[atom]
-    windows = [head] + tagged
-    ladder = [f"{x}_2-0_casci_{s}_-_pur_avg"
-              for x in windows for s in ("ao", "mo", "moc")]
-    no_tails = ([f"{head}@r1no1", f"{head}@s1no1", f"{head}no1"]
-                + ([f"{head}@s2no1"] if atom == "Si" else []))
-    ladder += [f"{x}_2-0_casci_no_-_pur_avg" for x in no_tails]
-    ref_axis = [f"{x}_2-0_{m}_{s}_-_pur_avg"
-                for x in windows
-                for m in ("casscf", "sa-casscf")
-                for s in ("ao", "mo")]
-    lane = {"C": "c_2p@1s2s", "Si": "si_3p@1s2s2p3s"}[atom]
-    del lane  # the lane axis: DECLARED OUT (its payload class has no
-    # ci_stack/core_energy -- the stored-roots seam needs a lane-native
-    # readout twin first; ticket 45's follow-up)
-    frozen = [f"{x}_2-0_sa-casscf_ao_frozen_pur_avg"
-              for x in (head, f"{head}@r1")]
-    return ladder + ref_axis + frozen
+
+
+def _declared_addresses(atom: str) -> list[str]:
+    """The declared cell set per atom (the grid rows; the lane legs
+    live in :func:`_declared_lane_cells`)."""
+    d = _declared(atom)
+    windows = d["windows"]
+
+    def sect_of(x: str) -> str:
+        return d.get("window_sector", {}).get(x, d["sector"])
+
+    addrs = []
+    for x in windows:
+        addrs += [f"{x}_{sect_of(x)}_casci_{s}_-_pur_avg"
+                  for s in ("ao", "mo", "moc")]
+    if d.get("size"):
+        for x, tail in d["size"].items():
+            addrs += [f"{x}_{sect_of(x)}_casci_{s}_-_pur_avg"
+                      for s in ("ao", "mo", "moc")]
+            addrs.append(f"{x}{tail}_{sect_of(x)}_casci_no_-_pur_avg")
+    if d.get("no_tail"):
+        head = windows[0]
+        addrs.append(f"{head}{d['no_tail']}_{sect_of(head)}_casci_no_-_pur_avg")
+        addrs += [f"{head}@{w.split('@', 1)[1]}{d['no_tail']}"
+                  f"_{sect_of(head)}_casci_no_-_pur_avg" for w in windows[1:]]
+    if d.get("no_windows"):
+        addrs += [f"{x}_{sect_of(x)}_casci_no_-_pur_avg"
+                  for x in d["no_windows"]]
+    if d.get("dist"):
+        for x in d["dist"]:
+            addrs.append(f"{x}_{sect_of(x)}_casci_ao_-_pur_avg")
+    ref_windows = d.get("ref_windows", windows)
+    for x in ref_windows:
+        addrs += [f"{x}_{sect_of(x)}_{m}_{s}_-_pur_avg"
+                  for m in ("casscf", "sa-casscf") for s in ("ao", "mo")]
+    for x in d["frozen"]:
+        addrs.append(f"{x}_{sect_of(x)}_sa-casscf_ao_frozen_pur_avg")
+    return addrs
+
+
+def _declared_lane_cells(atom: str) -> list[tuple[str, str]]:
+    """The declared lane legs as ``(address, kind)``: the pinned CI
+    lane (``pur``), its pinned SA twin where the store carries one,
+    and the free CI twin (``pol`` -- the route-invariance partner,
+    priced through the grid seam)."""
+    d = _declared(atom)
+    out = []
+    for leg, sect in d["lane_sectors"].items():
+        out.append((f"{leg}_{sect}_casci_ao_-_pur_avg", "lane"))
+        if leg in d.get("lane_sa", ()):
+            out.append((f"{leg}_{sect}_sa-casscf_ao_-_pur_avg", "lane"))
+        out.append((f"{leg}_{sect}_casci_ao_-_pol_avg", "grid"))
+    return out
 
 
 def _expect(mat, ci_pyscf, norb, na, nb) -> float:
@@ -76,18 +196,90 @@ def _expect(mat, ci_pyscf, norb, na, nb) -> float:
     return float(np.real(np.vdot(w, mat @ w)))
 
 
+def _collect_lane(key, lane_sub, spec, workdir, t0) -> dict:
+    """One lane cell's entry: the stored-roots twin's re-solve
+    (asserted) + the per-block PT2 rows.  The meters ride the stored
+    payload (the twin asserted them); the block spread is the term's
+    across-component E(2) ptp."""
+    from atomterm.cells import readout_lane
+    from atomterm.perturb import nevpt2_rows_on
+
+    mol, mf = lane_sub
+    entry = {
+        "address": key.address, "lane": True,
+        "sector": list(key.sector),
+        "term": None, "blocks": [],
+        "disposition": "rows", "refusal_reason": None,
+    }
+    try:
+        payload, blocks = readout_lane(
+            key, mol, mf, shell_bands=spec.shell_bands,
+            shell_radials=spec.shell_radials, workdir=workdir)
+    except ValueError as exc:
+        entry["disposition"] = "refusal"
+        entry["refusal_reason"] = str(exc)
+        print(f"  [refused] {key.address}: {exc}", flush=True)
+        return entry
+    entry["term"] = list(payload["term"])
+    entry["core_energy"] = float(payload["total"]) - float(
+        np.mean(payload["energies"]))
+    e2s = []
+    for irrep, mc in blocks.items():
+        blk = {"irrep": irrep, "mult": int(mc.fcisolver.nroots),
+               "roots": []}
+        for r in nevpt2_rows_on(mc):
+            i = r.root
+            e2s.append(r.e_corr)
+            blk["roots"].append({
+                "root": i,
+                "e_ref": r.e_ref,
+                "e_corr": r.e_corr,
+                "e_total": r.e_total,
+                "e_corr_eV": r.e_corr * EH_EV,
+                "e_total_eV": r.e_total * EH_EV,
+                "l2": float(payload["l2"][i]),
+                "s2": float(payload["s2"][i]),
+                "classes": [{
+                    "label": c.label, "note": c.note,
+                    "norm": c.norm, "energy": c.energy,
+                    "energy_meh": c.energy * 1e3,
+                    "e_per_norm": c.e_per_norm,
+                } for c in r.classes],
+            })
+        entry["blocks"].append(blk)
+    entry["term_e2_mean"] = float(np.mean(e2s))
+    entry["term_e2_ptp"] = float(np.ptp(e2s))
+    print(f"  [lane] {key.address}: {len(blocks)} blocks, "
+          f"E(2) mean {entry['term_e2_mean'] * 1e3:+.4f} mEh "
+          f"({entry['term_e2_mean'] * EH_EV:+.4f} eV), ptp "
+          f"{entry['term_e2_ptp'] * 1e3:.2e} mEh "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    return entry
+
+
 def collect_atom(atom: str, workdir: str = "elements") -> dict:
     """One atom's declared ladder: rows + meters + provenance."""
-    missing = [a for a in _declared_addresses(atom)
+    declared = _declared_addresses(atom) + \
+        [a for a, _ in _declared_lane_cells(atom)]
+    missing = [a for a in declared
                if not cell_chk(CellKey.from_address(a), workdir).exists()]
     if missing:
         sys.exit(f"{atom}: {len(missing)} declared addresses are not in "
                  f"the store: {missing[:3]}{'...' if len(missing) > 3 else ''}")
+    spec = campaign_spec(atom)
+    lane_sub = None
     entries = []
-    for addr in _declared_addresses(atom):
+    for addr in declared:
         key = CellKey.from_address(addr)
         na, nb = key.sector
         t0 = time.time()
+        is_lane = dict(_declared_lane_cells(atom)).get(addr) == "lane"
+        if is_lane:
+            if lane_sub is None:
+                lane_sub = lane_substrate(spec)
+            entries.append(_collect_lane(key, lane_sub, spec, workdir,
+                                         t0))
+            continue
         mol, mf, data = cell_substrate(key, workdir)
         ncas = int(data.ncas)
         nroots = len(data.ci)
@@ -164,6 +356,11 @@ def collect_atom(atom: str, workdir: str = "elements") -> dict:
                                   "1e-3",
             "meters": "L2/Lz/S2 measured live through the CI-order "
                       "bridge on the stored draw",
+            "lane_note": "the lane rows are the D2h-pinned components "
+                         "(the blocks' own roots; the meters carry "
+                         "their state class) -- the route-invariance "
+                         "anchor is the lane's ground block against "
+                         "the free CI twin's ground root",
         },
         "cells": entries,
     }

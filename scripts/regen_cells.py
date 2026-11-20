@@ -53,10 +53,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from pyscf import gto, scf  # noqa: E402
-
 from _tables_common import atomic_write_text  # noqa: E402
-from atomterm.cases import CAMPAIGN, campaign_spec, scenarios_for  # noqa: E402
+from atomterm.cases import (CAMPAIGN, campaign_spec,  # noqa: E402
+                            lane_substrate, scenarios_for)
 from atomterm.natural import NoCapExceeded  # noqa: E402
 from atomterm.cells import (CellKey, cell_payload,  # noqa: E402
                             grid_keys, lane_keys, lattice_keys, planned,
@@ -68,146 +67,6 @@ from atomterm.reference import run_frac_occ, run_rohf  # noqa: E402
 from atomterm.system import sector_na_nb  # noqa: E402
 from atomterm.windows import (realized_patterns,  # noqa: E402
                               select_valence_ao)
-
-
-def lane_substrate(spec):
-    """The pinned lane's D2h substrate: plain ROHF at tight tolerance,
-    steered to the case's trusted reference basin.  The D2h landscape
-    is the SAME multi-basin zoo as the spherical one (measured:
-    same-filling stationary points at the 0.3-11 mEh scale, each
-    reverse-seed-stable on C1; the plain D2h draw itself has landed
-    the aufbau runaway on one atom and the intended basin on its
-    twin), so when the trusted ``rungs/rohf.chk`` exists the plain
-    energy is verified against it and a disagreement past 1e-5 Eh
-    (or a divergence) retries the D2h SCF C1-SEEDED from the
-    reference MOs -- the seed steers the OCCUPATION basin; the
-    solver's irrep-blocked diagonals then land the D2h-canonical
-    solution in it (its own energy, NOT the seed's: the restriction
-    draws its own stationary point, sometimes deeper than the
-    trusted record).  Never symmetrize the seed first: both
-    symmetrizers damage degenerate-gauge seeds (the per-orbital one
-    amputates the open MO; the span-mixing one scrambles the
-    occupation-column pairing -- measured in the d2h probe log).
-    Benign for the lanes: their certificates are basin-blind (the
-    core is the span's own Roothaan).  Cached lane cells never
-    re-run (the certified records stand); the rule governs fresh
-    legs."""
-    mol = gto.M(atom=f"{spec.symbol} 0 0 0", basis=spec.basis,
-                spin=spec.spin, ecp=spec.ecp, symmetry="D2h", verbose=0)
-    mf = scf.ROHF(mol)
-    mf.conv_tol = 1e-12
-    mf.kernel()
-    seed = Path("elements") / spec.key / "rungs" / "rohf.chk"
-    rec = None
-    if seed.exists():
-        _, rec = scf.chkfile.load_scf(str(seed))
-    if (not mf.converged or (rec is not None
-                             and abs(mf.e_tot - rec["e_tot"]) > 1e-5)):
-        if rec is not None:
-            why = ("diverged" if not mf.converged else
-                   f"a wrong basin ({mf.e_tot:.8f} vs the trusted "
-                   f"{float(rec['e_tot']):.8f})")
-            print(f"  plain D2h SCF {why} -- retrying C1-seeded "
-                  f"({seed})", flush=True)
-            from atomterm.reference import _accelerated, _forced_rohf_occ
-            m = scf.ROHF(mol)
-            m.conv_tol = 1e-12
-            if spec.ref is not None and spec.ref.occ_closed is not None:
-                m.get_occ = _forced_rohf_occ(
-                    mol, list(spec.ref.occ_closed),
-                    list(spec.ref.occ_open))
-            m.mo_coeff = rec["mo_coeff"]
-            m.mo_occ = rec["mo_occ"]
-            m.mo_energy = rec["mo_energy"]
-            mf = _accelerated(m, spec.ref)
-    if not mf.converged:
-        sys.exit(f"the lane substrate SCF did not converge "
-                 f"({spec.symbol}, D2h)")
-    print(f"lane substrate D2h ROHF E = {mf.e_tot:.8f} Eh", flush=True)
-    return mol, mf
-
-
-def run_queue(name, spec, sector, group) -> list[CellKey]:
-    """The run's queue: the named declared group, or the full grid
-    plus the declared lattice."""
-    if group == "spine":
-        return spine_keys(name, "".join(spec.shell_patterns), sector)
-    if group == "planned":
-        return planned(spec)
-    if group == "lattice":
-        return lattice_keys(spec)
-    if group == "lane":
-        return lane_keys(spec)
-    if group == "route":
-        return route_keys(spec)
-    return grid_keys(spec) + lattice_keys(spec)
-
-
-def _materializes(key: CellKey, scens, full: bool) -> bool:
-    """Whether the run executes the cell: a scenario'd cell runs only
-    under ``--full`` (the void branch stamps the store entry instead).
-    ONE home of the materialization rule -- the frac-head build and
-    the queue branch must never disagree (a disagreement crashes
-    mid-chain: the head absent for a cell the loop runs)."""
-    return full or not void_reason(key, scens)
-
-
-def keep(key: CellKey, args) -> bool:
-    """Key-identity filter: every given axis must match (``-`` = the
-    None mask, the address grammar's convention)."""
-    if args.method and key.method != args.method:
-        return False
-    if args.window and key.window != args.window:
-        return False
-    if args.mask and (key.mask or "-") != args.mask:
-        return False
-    if args.start and key.start != args.start:
-        return False
-    if args.substrate and key.substrate != args.substrate:
-        return False
-    if args.core and key.core != args.core:
-        return False
-    if args.sector and key.sector != args.sector:
-        return False
-    return True
-
-
-def parse_args(argv) -> argparse.Namespace:
-    """The runner's CLI: atoms, one optional group, axis filters (every
-    help string carries its value inventory)."""
-    p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("atoms", nargs="*",
-                   help="declared atoms to run (default: every CAMPAIGN "
-                        "atom, CAMPAIGN order)")
-    p.add_argument("--group", choices=["grid", "spine",
-                                       "planned", "lattice", "lane",
-                                       "route"],
-                   help="one named declared group instead of the full "
-                        "grid: grid | spine | planned | "
-                        "lattice | lane | route")
-    p.add_argument("--full", action="store_true",
-                   help="materialize scenario-voided cells (re-testing "
-                        "their dated claims)")
-    p.add_argument("--fresh", action="store_true",
-                   help="re-run stored cells (ignore the store cache -- "
-                        "payload migrations and re-measures)")
-    p.add_argument("--method",
-                   help="keep this method: casci | casscf | sa-casscf")
-    p.add_argument("--window",
-                   help="keep this window label, e.g. 2p, 3d4s, 3dno1")
-    p.add_argument("--mask",
-                   help="keep this mask: radial | frozen | virtmix | - "
-                        "(the maskless cells)")
-    p.add_argument("--start", help="keep this start: ao | mo | moc | no")
-    p.add_argument("--substrate",
-                   help="keep this substrate: pol | pur")
-    p.add_argument("--core", help="keep this core: raw | avg | frac")
-    p.add_argument("--sector", metavar="NA-NB",
-                   help="keep this (na, nb) sector, e.g. 2-1")
-    args = p.parse_args(argv)
-    args.sector = (tuple(int(x) for x in args.sector.split("-"))
-                   if args.sector else None)
-    return args
 
 
 def render(atom, rohf_e, cells: dict, ruler: str) -> str:

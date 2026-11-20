@@ -51,6 +51,7 @@ __all__ = [
     "constrained_casscf",
     "mask_frozen_window",
     "mask_no_core_window_mix",
+    "irrep_solvers",
     "run_irrep_casci",
     "run_irrep_sa",
 ]
@@ -356,9 +357,17 @@ def constrained_casscf(mf, ncas, nelecas, chkfile, *, mo_full=None, mask=None,
 # the ensemble mix kernel optimizes, run_irrep_casci re-solves the
 # exact roots in the frozen converged window.
 
-def _irrep_solvers(mol, orbsyms, L: int, parity: str, conv_tol: float):
+def irrep_solvers(mol, orbsyms, L: int, parity: str, conv_tol: float):
     """``[(irrep, solver, multiplicity)]`` -- one pinned solver per
-    component block of the term."""
+    component block of the term.
+
+    The pin is the ONE construction behind both the runner
+    (:func:`run_irrep_casci`, :func:`run_irrep_sa`) and the lane
+    store's readout twin
+    (:func:`atomterm.cells.readout_lane`): a block ``mc`` pricing
+    through ``mrpt.NEVPT`` carries the same solver, so the
+    canonicalization's internal natorb re-solve stays in the block.
+    """
     solvers = []
     for irrep, n in branch_d2h(L, parity).items():
         s = fci.direct_spin1_symm.FCI(mol)
@@ -407,8 +416,8 @@ def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
     eri = ao2mo.kernel(mol, c_act)
     orbsyms = orb_irreps(mol, c_act)
     out = {}
-    for irrep, solver, _ in _irrep_solvers(mol, orbsyms, L, parity,
-                                           conv_tol):
+    for irrep, solver, _ in irrep_solvers(mol, orbsyms, L, parity,
+                                          conv_tol):
         e, ci = solver.kernel(h1, eri, c_act.shape[1], (na, nb))
         out[irrep] = (np.atleast_1d(np.asarray(e, dtype=float)),
                       np.asarray(ci))
@@ -458,8 +467,8 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     active = slice(ncore, ncore + ncas)
     mc = mcscf.CASSCF(mf, ncas, (na, nb))
     mc.verbose = 0
-    solvers = _irrep_solvers(mol, orb_irreps(mol, mo_full[:, active]),
-                             L, parity, conv_tol)
+    solvers = irrep_solvers(mol, orb_irreps(mol, mo_full[:, active]),
+                            L, parity, conv_tol)
     mcscf.state_average_mix_(
         mc, [s for _, s, _ in solvers], [1.0 / (2 * L + 1)] * (2 * L + 1))
     trace = _cycle_trace(mc)

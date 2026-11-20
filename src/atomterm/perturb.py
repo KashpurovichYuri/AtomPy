@@ -55,6 +55,7 @@ __all__ = [
     "readout_mc",
     "assert_stored_roots",
     "nevpt2_rows",
+    "nevpt2_rows_on",
 ]
 
 # the Koopmans classes in the kernel's own order, with its print labels
@@ -294,10 +295,50 @@ def _root_row(mc, root: int, variant: str) -> PT2Row:
                   classes=classes)
 
 
+def nevpt2_rows_on(mc, roots=None, variant: str = "nevpt2-sc") -> list[PT2Row]:
+    """PT2 rows on a READY solution (the pricing half).
+
+    ``mc`` is a finished ``mcscf`` object (``mrpt.NEVPT``'s own
+    consumer): ``.mo_coeff`` (the full column partition), ``.ncas``,
+    ``.nelecas``, ``.ci`` (the roots, PySCF order) and ``.e_cas`` /
+    ``.e_tot`` in the root-total convention (``_root_energies``).  The
+    full-sector path is :func:`nevpt2_rows` (readout + assertion +
+    this); the lane blocks enter here directly -- the pinned
+    per-irrep solutions are the store's own readout
+    (:func:`atomterm.cells.readout_lane`), asserted there.
+
+    Parameters
+    ----------
+    mc : the ready solution object.
+    roots : the declared root indices (default: all).
+    variant : the row's variant tag (the whitelist grows with the
+        constructors).
+
+    Returns
+    -------
+    One :class:`PT2Row` per declared root, in the declared order.
+
+    Raises
+    ------
+    ValueError : unknown variant.
+    """
+    if variant not in _VARIANTS:
+        raise ValueError(
+            f"unknown PT2 variant {variant!r}; available: {_VARIANTS} "
+            "(further families join as constructors at this seam)")
+    return [_root_row(mc, k, variant)
+            for k in (range(len(np.atleast_1d(np.asarray(mc.e_cas))))
+                      if roots is None else roots)]
+
+
 def nevpt2_rows(mol, mf, mo_full, ncas: int, nelecas: tuple[int, int],
                 nroots: int, *, roots=None, ref_energies=None, ref_ci=None,
                 variant: str = "nevpt2-sc") -> list[PT2Row]:
-    """PT2 rows for the declared roots of one solution.
+    """PT2 rows for the declared roots of one stored solution.
+
+    The full-sector path: the multi-root CASCI readout on the supplied
+    orbitals, asserted against the stored solution (fail-fast), then
+    :func:`nevpt2_rows_on`'s pricing.
 
     Parameters
     ----------
@@ -327,5 +368,4 @@ def nevpt2_rows(mol, mf, mo_full, ncas: int, nelecas: tuple[int, int],
             "(further families join as constructors at this seam)")
     mc = readout_mc(mol, mf, mo_full, ncas, nelecas, nroots)
     assert_stored_roots(mc, ref_energies=ref_energies, ref_ci=ref_ci)
-    return [_root_row(mc, k, variant)
-            for k in (range(nroots) if roots is None else roots)]
+    return nevpt2_rows_on(mc, roots=roots, variant=variant)

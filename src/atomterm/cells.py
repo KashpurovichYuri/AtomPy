@@ -138,6 +138,7 @@ __all__ = [
     "route_keys",
     "run_lane_cell",
     "load_lane_cell",
+    "readout_lane",
     "radial_refused",
     "void_reason",
 ]
@@ -1300,6 +1301,87 @@ def _root_vectors(ci):
     return [ci] if ci.ndim == 2 else list(ci)
 
 
+def _lane_block(key, irrep, mult, L, ncas, na, nb, e_arr, ci, dets, ids,
+                parts, apply_l2, apply_s2):
+    """One branch component's adjudicated roots, vectors, and meters.
+
+    The DENSE ADJUDICATION (every CI block the budget fits): the
+    pinned Davidson can deterministically SKIP near-degenerate lowest
+    roots (measured on the Sc-unc lane: the Ag ground PAIR of the 2D
+    term -- the solver's second root landed four eigenvalues up; on
+    Ti-unc ALL FOUR blocks skipped), so our own exact H restricted to
+    the block is the ADJUDICATOR: it certifies the pinned roots
+    (``anchor_dev``) and, on deviation, REPLACES them (the corrected
+    blocks recorded; the vectors rebuild from the dense eigenvectors).
+    The external anchor stands -- both numbers are kept; the lane's
+    truth is the exact construction, the solver's deviation the
+    recorded diagnostic.
+
+    Returns
+    -------
+    ``(e_arr, w_blk, corrected, dev)`` -- the adjudicated CAS roots,
+    the vectors in detbasis order, the corrected flag, and the anchor
+    deviation (PySCF-order vectors build from ``w_blk`` through the
+    permutation, should a consumer want the kernel's own convention).
+    """
+    from atomterm.irreps import IRREP_IDS
+    from atomterm.operators import ci_in_detbasis_order
+
+    sel = ids == IRREP_IDS[irrep]
+    block = [d for d, m in zip(dets, sel) if m]
+    ours_vecs = None
+    corrected = False
+    dev = 0.0
+    if key.method == "casci" and len(block) <= _ANCHOR_CAP:
+        from atomterm.detbasis import slater_condon_matrix
+
+        hb = slater_condon_matrix(block,
+                                  one_body=parts["H"][0],
+                                  two_body=parts["H"][1])
+        ev, evec = np.linalg.eigh(hb)
+        # the TARGETED selection: the declared term need not be the
+        # block's ground (measured on the U14e port: an L=6 quintet
+        # sits BELOW the declared L=8 in the raw band window -- the
+        # block-lowest readout interleaves the terms).  The dense
+        # spectrum holds every root; the term meter (<L2> per
+        # eigenvector, cheap through the apply family) SELECTS the
+        # block's lowest `mult` eigenvectors of the TARGET L
+        # (falling back to the lowest when the target is not
+        # found -- the payload's l2 then shows it)
+        want = min(len(ev), _SELECT_DEPTH * mult)
+        idx = np.flatnonzero(sel)
+        l2_of = []
+        for k in range(want):
+            wv = np.zeros(len(dets))
+            wv[idx] = np.real(evec[:, k])
+            l2_of.append(float(np.real(wv @ apply_l2(wv))))
+        l2_of = np.asarray(l2_of)
+        hit = np.flatnonzero(np.abs(l2_of - L * (L + 1)) < 1e-4)
+        pick = (hit[:mult] if len(hit) >= mult
+                else np.arange(mult))          # the fallback
+        dev = float(np.max(np.abs(np.sort(e_arr)[:mult]
+                                  - ev[pick])))
+        if dev > 1e-8 or not np.array_equal(pick, np.arange(mult)):
+            corrected = True
+            e_arr = ev[pick].copy()
+            ours_vecs = evec[:, pick]
+        del hb
+    w_blk = []
+    if ours_vecs is None:
+        for vec in _root_vectors(ci):
+            w = ci_in_detbasis_order(vec, ncas, na, nb)
+            # the pinned vector lives entirely in its block
+            assert abs(np.linalg.norm(w[sel]) - 1.0) < 1e-8, irrep
+            w_blk.append(w)
+    else:
+        idx = np.flatnonzero(sel)
+        for k in range(ours_vecs.shape[1]):
+            w = np.zeros(len(dets))
+            w[idx] = np.real(ours_vecs[:, k])
+            w_blk.append(w)
+    return e_arr, w_blk, corrected, dev
+
+
 def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
                   anchor: bool = False, fresh: bool = False, verbose: int = 0,
                   shell_bands: dict | None = None,
@@ -1466,79 +1548,28 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     for irrep, mult in branch_d2h(L, parity).items():
         e_arr, ci = roots[irrep]
         e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
-        sel = ids == IRREP_IDS[irrep]
-        block = [d for d, m in zip(dets, sel) if m]
-        # the DENSE ADJUDICATION (every CI block the budget fits): the
-        # pinned Davidson can deterministically SKIP near-degenerate
-        # lowest roots (measured on the Sc-unc lane: the Ag ground
-        # PAIR of the 2D term -- the solver's second root landed four
-        # eigenvalues up; on Ti-unc ALL FOUR blocks skipped), so our
-        # own exact H restricted to the block is the ADJUDICATOR: it
-        # certifies the pinned roots (anchor_dev) and, on deviation,
-        # REPLACES them (the corrected blocks recorded; the vectors
-        # rebuild from the dense eigenvectors).  The external anchor
-        # stands -- both numbers are kept; the lane's truth is the
-        # exact construction, the solver's deviation the recorded
-        # diagnostic.
-        ours_vecs = None
-        if key.method == "casci" and len(block) <= _ANCHOR_CAP:
-            hb = slater_condon_matrix(block,
-                                      one_body=parts["H"][0],
-                                      two_body=parts["H"][1])
-            ev, evec = np.linalg.eigh(hb)
-            # the TARGETED selection: the declared term need not be the
-            # block's ground (measured on the U14e port: an L=6 quintet
-            # sits BELOW the declared L=8 in the raw band window -- the
-            # block-lowest readout interleaves the terms).  The dense
-            # spectrum holds every root; the term meter (<L2> per
-            # eigenvector, cheap through the apply family) SELECTS the
-            # block's lowest `mult` eigenvectors of the TARGET L
-            # (falling back to the lowest when the target is not
-            # found -- the payload's l2 then shows it)
-            want = min(len(ev), _SELECT_DEPTH * mult)
-            idx = np.flatnonzero(sel)
-            l2_of = []
-            for k in range(want):
-                wv = np.zeros(len(dets))
-                wv[idx] = np.real(evec[:, k])
-                l2_of.append(float(np.real(wv @ apply_l2(wv))))
-            l2_of = np.asarray(l2_of)
-            hit = np.flatnonzero(np.abs(l2_of - L * (L + 1)) < 1e-4)
-            pick = (hit[:mult] if len(hit) >= mult
-                    else np.arange(mult))          # the fallback
-            dev = float(np.max(np.abs(np.sort(e_arr)[:mult]
-                                      - ev[pick])))
-            anchor_dev = max(anchor_dev, dev)
-            if dev > 1e-8 or not np.array_equal(pick, np.arange(mult)):
-                corrected.append(irrep)
-                e_arr = ev[pick].copy()
-                ours_vecs = evec[:, pick]
-            del hb
+        e_arr, w_blk, corrected_blk, dev = _lane_block(
+            key, irrep, mult, L, ncas, na, nb, e_arr, ci, dets, ids,
+            parts, apply_l2, apply_s2)
+        anchor_dev = max(anchor_dev, dev)
+        if corrected_blk:
+            corrected.append(irrep)
         es.extend(float(x) for x in e_arr[:mult])
-        w_blk = []
-        if ours_vecs is None:
-            for vec in _root_vectors(ci):
-                w = ci_in_detbasis_order(vec, ncas, na, nb)
-                # the pinned vector lives entirely in its block
-                assert abs(np.linalg.norm(w[sel]) - 1.0) < 1e-8, irrep
-                w_blk.append(w)
-        else:
-            idx = np.flatnonzero(sel)
-            for k in range(ours_vecs.shape[1]):
-                w = np.zeros(len(dets))
-                w[idx] = np.real(ours_vecs[:, k])
-                w_blk.append(w)
         w_all.extend(w_blk)
-        if anchor and key.method == "casci" and len(block) > _ANCHOR_CAP:
+        if anchor and key.method == "casci":
             # the opt-in anchor for blocks past the dense-adjudication
             # budget (O(block^3) -- keep deliberate)
-            hb = slater_condon_matrix(block,
-                                      one_body=parts["H"][0],
-                                      two_body=parts["H"][1])
-            ours = np.linalg.eigvalsh(hb)[:mult]
-            anchor_dev = max(anchor_dev,
-                             float(np.max(np.abs(np.sort(e_arr) - ours))))
-            del hb
+            sel = ids == IRREP_IDS[irrep]
+            block = [d for d, m in zip(dets, sel) if m]
+            if len(block) > _ANCHOR_CAP:
+                hb = slater_condon_matrix(block,
+                                          one_body=parts["H"][0],
+                                          two_body=parts["H"][1])
+                ours = np.linalg.eigvalsh(hb)[:mult]
+                anchor_dev = max(anchor_dev,
+                                 float(np.max(np.abs(np.sort(e_arr)
+                                                     - ours))))
+                del hb
         for w in w_blk:
             # the meters read the roots through the apply family
             # (matrix-free, size-independent)
@@ -1676,6 +1707,132 @@ def load_lane_cell(key: CellKey, workdir: str | Path = "elements") -> dict:
                                if field_name == "mo_coeff"
                                else _stored(value))
     return out
+
+
+def readout_lane(key: CellKey, mol, mf, shell_bands: dict | None = None,
+                 shell_radials: dict | None = None,
+                 conv_tol: float = 1e-12, e_tol: float = 1e-9,
+                 m_tol: float = 1e-6,
+                 workdir: str | Path = "elements") -> tuple[dict, dict]:
+    """The lane store's live re-solve: the reader-twin of
+    :func:`run_lane_cell`.
+
+    Rebuilds the lane construction beside the stored payload, re-solves
+    every branch component through the same pinned solvers and the one
+    dense adjudication (``_lane_block``), and FAILS FAST unless the
+    re-solve reproduces the stored solution -- energies strict, the
+    component meters within the davidson-noise band (the lane store
+    carries no CI vectors; energies and meters are the certificate).
+    CI cells re-solve on the deterministic construction window;
+    SA cells on the STORED converged MO (the two-pass pattern's frozen
+    window -- the optimizer is never re-run).
+
+    Parameters
+    ----------
+    key : the stored lane cell (:func:`run_lane_cell`'s grammar).
+    mol, mf : the pinned substrate (``cases.lane_substrate``'s product).
+    shell_bands, shell_radials : the case's shell layer, as the runner
+        took them (the window must rebuild identically).
+    conv_tol : the pinned solvers' CI tolerance (the runner's default).
+    e_tol, m_tol : the refusal bands (absolute; energies strict, the
+        meters carry the re-solve noise).
+
+    Returns
+    -------
+    ``(payload, blocks)`` -- the stored payload (as
+    :func:`load_lane_cell` returned it) and ``{irrep: mc}``, one
+    kernel-ready ``mcscf.CASCI`` per branch component: the readout
+    window, the adjudicated roots (``.e_cas``/``.e_tot`` carrying the
+    block's own bookkeeping -- the analyzation seam's root-total
+    convention) and the re-solved vectors (PySCF order, ``.ci``).
+    The PT2 pricing consumes each block through
+    :func:`atomterm.perturb.nevpt2_rows_on`.
+
+    Raises
+    ------
+    ValueError : the re-solve disagrees with the store.
+    """
+    from pyscf import mcscf
+
+    from atomterm.casscf import irrep_solvers, run_irrep_casci
+    from atomterm.core import closed_shell_core_energy
+    from atomterm.irreps import branch_d2h, det_irreps, orb_irreps
+    from atomterm.operators import build_operator_parts
+    from atomterm.operators import pyscf_ci_permutation
+    from atomterm.windows import build_full_mo
+
+    payload = load_lane_cell(key, workdir)
+    L, parity = payload["term"]
+    na, nb = key.sector
+    core, nf, c_core, _ = _lane_core(key, mol, mf, shell_bands)
+    act, ncas, _ = _window_columns(key, mol, mf, shell_bands, shell_radials)
+    if key.method == "sa-casscf":
+        if "mo_coeff" not in payload:
+            raise KeyError(
+                f"lane store {key.address} carries no converged MO; "
+                "regenerate the cell")
+        mo_read = payload["mo_coeff"]
+    else:
+        mo_read = build_full_mo(mf, list(range(nf)), act, c_core=c_core)
+    c_read = np.asarray(mo_read)[:, nf:nf + ncas]
+
+    roots = run_irrep_casci(mol, mf, c_read, nf, na, nb, L, parity,
+                            conv_tol=conv_tol, c_core=c_core)
+    orbsyms = orb_irreps(mol, c_read)
+    parts = build_operator_parts(mol, mf, c_read, nf, na, nb,
+                                 c_core=c_core)
+    dets = parts["dets"]
+    ids = det_irreps(orbsyms, na, nb)
+    _, _, apply_l2, apply_s2 = _apply_family(
+        mol, mf, c_read, parts, nf, c_core, ncas, na, nb)
+    pinned = dict((irr, s) for irr, s, _ in
+                  irrep_solvers(mol, orbsyms, L, parity, conv_tol))
+    perm = pyscf_ci_permutation(ncas, na, nb)
+    core_part = closed_shell_core_energy(mf, c_core)
+
+    blocks: dict = {}
+    i0 = 0
+    for irrep, mult in branch_d2h(L, parity).items():
+        e_arr, ci = roots[irrep]
+        e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
+        e_arr, w_blk, corrected, dev = _lane_block(
+            key, irrep, mult, L, ncas, na, nb, e_arr, ci, dets, ids,
+            parts, apply_l2, apply_s2)
+        stored_e = payload["energies"][i0:i0 + mult]
+        if len(stored_e) != mult or not np.allclose(
+                e_arr[:mult], stored_e, atol=e_tol, rtol=0.0):
+            raise ValueError(
+                f"lane re-solve refusal: {key.address} block {irrep} "
+                f"energies {np.max(np.abs(e_arr[:mult] - stored_e)):.3e} "
+                "off the stored record -- the substrate does not "
+                "reconstruct the stored run; PT2 refused")
+        for k, w in enumerate(w_blk):
+            m_l2 = float(np.real(w @ apply_l2(w)))
+            m_s2 = float(np.real(w @ apply_s2(w)))
+            if (abs(m_l2 - payload["l2"][i0 + k]) > m_tol
+                    or abs(m_s2 - payload["s2"][i0 + k]) > m_tol):
+                raise ValueError(
+                    f"lane re-solve refusal: {key.address} block "
+                    f"{irrep} root {k} meters (<L2> {m_l2:.6f} vs "
+                    f"{payload['l2'][i0 + k]:.6f}, <S2> {m_s2:.6f} vs "
+                    f"{payload['s2'][i0 + k]:.6f}) off the stored "
+                    "record; PT2 refused")
+        mc = mcscf.CASCI(mf, ncas, (na, nb))
+        mc.mo_coeff = np.asarray(mo_read, dtype=float)
+        # the pinned solver rides the block (the canonicalization's
+        # internal natorb re-solve stays IN the block -- the runner's
+        # own construction; a plain solver would re-solve the whole
+        # sector and land another term), with the per-orbital irrep
+        # labels a kernel run would have set
+        mc.fcisolver = pinned[irrep]
+        mc.orbsym = orbsyms
+        mc.fcisolver.orbsym = np.asarray(orbsyms)
+        mc.ci = [np.asarray(w)[perm] for w in w_blk]
+        mc.e_cas = np.asarray(e_arr[:mult], dtype=float)
+        mc.e_tot = float(mc.e_cas[0] + core_part)
+        blocks[irrep] = mc
+        i0 += mult
+    return payload, blocks
 
 
 # the declared key-sets ----------------------------------------------

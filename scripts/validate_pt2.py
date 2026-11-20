@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import numpy as np  # noqa: E402
+from run_pt2_ladder import _declared_lane_cells  # noqa: E402
 
 EH_EV = 27.211386245988
 ANCHORS = {"O2": -0.169785157128082, "H14": -0.094164359938171}
@@ -86,21 +87,26 @@ def _payload_identities(atom: str) -> int:
     for c in cells:
         if c["disposition"] != "rows":
             continue
-        for r in c["roots"]:
-            n_roots += 1
-            n_classes += len(r["classes"])
-            s = sum(cl["energy"] for cl in r["classes"])
-            worst_sum = max(worst_sum, abs(s - r["e_corr"]))
-            worst_tot = max(worst_tot,
-                            abs(r["e_total"] - r["e_ref"] - r["e_corr"]))
-            worst_ev = max(worst_ev,
-                           abs(r["e_corr_eV"] - r["e_corr"] * EH_EV),
-                           abs(r["e_total_eV"] - r["e_total"] * EH_EV))
-            for cl in r["classes"]:
-                if cl["norm"]:
-                    worst_meter = max(
-                        worst_meter,
-                        abs(cl["energy"] - cl["e_per_norm"] * cl["norm"]))
+        if c.get("lane"):
+            root_lists = [b["roots"] for b in c["blocks"]]
+        else:
+            root_lists = [c["roots"]]
+        for roots in root_lists:
+            for r in roots:
+                n_roots += 1
+                n_classes += len(r["classes"])
+                s = sum(cl["energy"] for cl in r["classes"])
+                worst_sum = max(worst_sum, abs(s - r["e_corr"]))
+                worst_tot = max(worst_tot,
+                                abs(r["e_total"] - r["e_ref"] - r["e_corr"]))
+                worst_ev = max(worst_ev,
+                               abs(r["e_corr_eV"] - r["e_corr"] * EH_EV),
+                               abs(r["e_total_eV"] - r["e_total"] * EH_EV))
+                for cl in r["classes"]:
+                    if cl["norm"]:
+                        worst_meter = max(
+                            worst_meter,
+                            abs(cl["energy"] - cl["e_per_norm"] * cl["norm"]))
     check(f"payload {atom}: class sums", worst_sum <= 1e-12,
           f"max |sum - e_corr| {worst_sum:.2e} over {n_roots} roots / "
           f"{n_classes} classes")
@@ -119,6 +125,39 @@ def _payload_identities(atom: str) -> int:
           f"{len(cells)} declared: {len(cells) - refused} rows / "
           f"{refused} refused")
     return n_roots
+
+
+def _route_invariance(atom: str) -> None:
+    """The irrep route-invariance row: the lane's ground block vs the
+    free CI twin's ground root -- the same term component priced
+    through the pinned route and the free route.  The band is the
+    declared cross-substrate route band (the lane certificates are
+    basin-blind; the observed values land in the ticket record)."""
+    payload = json.loads(
+        (Path("elements") / atom / "perturbation.json").read_text())
+    cells = {c["address"]: c for c in payload["cells"]}
+    lane_addr = free_addr = None
+    for addr, kind in _declared_lane_cells(atom):
+        if kind == "lane" and "casci" in addr and lane_addr is None:
+            lane_addr = addr
+        if kind == "grid" and "_pol_avg" in addr and free_addr is None:
+            free_addr = addr
+    if lane_addr is None or free_addr is None \
+            or lane_addr not in cells or free_addr not in cells:
+        print(f"SKIP  route invariance {atom}: no lane/free pair")
+        return
+    lane = cells[lane_addr]
+    free = cells[free_addr]
+    if lane["disposition"] != "rows" or free["disposition"] != "rows":
+        print(f"SKIP  route invariance {atom}: a refused partner")
+        return
+    lane_e2 = lane["blocks"][0]["roots"][0]["e_corr"]
+    free_e2 = free["roots"][0]["e_corr"]
+    delta = abs(lane_e2 - free_e2)
+    check(f"route invariance {atom}", delta <= 1e-4,
+          f"lane ground block {lane_e2 * 1e3:+.4f} mEh vs free ground "
+          f"root {free_e2 * 1e3:+.4f} mEh (delta {delta * 1e3:.2e} mEh; "
+          f"band 1e-4 Eh)")
 
 
 def _probe(atom: str) -> None:
@@ -149,6 +188,7 @@ def main() -> None:
     _anchors()
     n = sum(_payload_identities(a) for a in atoms)
     for a in atoms:
+        _route_invariance(a)
         _probe(a)
     if FAILS:
         sys.exit(f"\nvalidate_pt2: {len(FAILS)} FAIL: {FAILS}")
