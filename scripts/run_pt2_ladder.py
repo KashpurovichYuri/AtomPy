@@ -136,6 +136,7 @@ def _declared(atom: str) -> dict:
             lane_sectors={}, lane_sa=()),  # the substrate steer: see Sc-unc
         "U14e": dict(
             windows=("u14e_10f13d", "u14e_10f13d7s", "u14e_10f13d14p"),
+            size_group=("u14e_10f13d", "u14e_10f13d7s", "u14e_10f13d14p"),
             sector="4-0",
             window_sector={"u14e_10f13d7s": "5-1"},
             no_windows=("u14e_10f13dno2", "u14e_10f13d14pno3"),
@@ -257,14 +258,17 @@ def _collect_lane(key, lane_sub, spec, workdir, t0) -> dict:
     entry["core_energy"] = float(payload["total"]) - float(
         np.mean(payload["energies"]))
     e2s = []
+    i0 = 0  # the blocks' global meter offset (the payload's l2/s2
+    # lists run in branch order across ALL components -- the same
+    # accumulation readout_lane asserted against)
     for irrep, mc in blocks.items():
-        blk = {"irrep": irrep, "mult": int(mc.fcisolver.nroots),
-               "roots": []}
+        mult = int(mc.fcisolver.nroots)
+        blk = {"irrep": irrep, "mult": mult, "roots": []}
         for r in nevpt2_rows_on(mc):
-            i = r.root
+            i = i0 + r.root
             e2s.append(r.e_corr)
             blk["roots"].append({
-                "root": i,
+                "root": r.root,
                 "e_ref": r.e_ref,
                 "e_corr": r.e_corr,
                 "e_total": r.e_total,
@@ -280,6 +284,7 @@ def _collect_lane(key, lane_sub, spec, workdir, t0) -> dict:
                 } for c in r.classes],
             })
         entry["blocks"].append(blk)
+        i0 += mult
     entry["term_e2_mean"] = float(np.mean(e2s))
     entry["term_e2_ptp"] = float(np.ptp(e2s))
     print(f"  [lane] {key.address}: {len(blocks)} blocks, "

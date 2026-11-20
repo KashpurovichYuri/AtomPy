@@ -147,12 +147,10 @@ def readout_mc(mol, mf, mo_full, ncas: int, nelecas: tuple[int, int],
 
     ``ci0`` -- the stored CI stack as the davidson GUESS: a
     quasi-degenerate manifold's plain re-solve may re-partition the
-    roots (measured on the Sc compact cell: the same nine energies to
-    1e-11, a different span at 1.7e-1 -- the stored run's trajectory
-    is not the plain guess's).  Seeding FROM the store makes the
-    re-solve land the stored states -- the reconstruction the
-    stored-roots assertion demands.  Flat rows or the kernel's own
-    container shapes both enter.
+    roots.  Seeding FROM the store makes the re-solve land the
+    stored states -- the reconstruction the stored-roots assertion
+    demands.  Flat rows or the kernel's own container shapes both
+    enter.
 
     Returns the finished ``mcscf.CASCI`` object (``.ci`` a list at
     ``nroots > 1``) -- the object ``mrpt.NEVPT`` consumes.
@@ -197,11 +195,9 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
     compare per-root through three clauses, each a declared class:
     amplitude equality (c_tol); the degenerate block's lawful gauge
     freedom (the joint projector, its own band p_tol -- an SA draw's
-    solver tails move the block projector at the tail scale,
-    basis-and-atom-dependent: Si 2.2e-7, Ti 3.9e-6, Ti-unc 5.0e-5 --
-    an order below the vectors' mixing angles; an exactly degenerate
+    solver tails move the block projector at the tail scale, an
+    order below the vectors' mixing angles; an exactly degenerate
     PAIR may rotate inside itself, the pair span invariant); and the
-    single-root
     re-solve's davidson noise (the re-solve ANGLE -- |sin| between
     the vectors, linear in the unconverged mixing -- within o_tol of
     zero; the state's meters and E(2) are flat across it, while any
@@ -210,9 +206,8 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
     The energy miss does not refuse on its own when a vector
     certificate is available: the same-state energy noise (a rougher
     optimizer draw moves the energies a hair while the vectors
-    certify the state) rides the ``e_noise`` band -- measured on the
-    Sc single-root CASSCF class (angle 9e-6, energy 2.7e-11..9.2e-9).
-    Without ``ref_ci`` the energy clause stands alone.
+    certify the state) rides the ``e_noise`` band.  Without
+    ``ref_ci`` the energy clause stands alone.
 
     Parameters
     ----------
@@ -225,6 +220,17 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
     ValueError : on any mismatch -- the caller's store and the
         readout disagree about what the solution is.
     """
+    # the bands' measured per-atom/basis sweep (the observation record
+    # lives here, at the point of use -- the constants above are the
+    # contract):
+    #   p_tol   the tail scale: Si 2.2e-7, Ti 3.9e-6, Ti-unc 5.0e-5
+    #   o_tol   the re-solve angle: the Ti-unc SA pair rotates at
+    #           1.03e-3 (lawful; the pair span invariant)
+    #   e_noise the same-state energy noise: the Sc single-root
+    #           CASSCF class carries 2.7e-11..9.2e-9 at angle 9e-6
+    #   ci0     the store seeding (readout_mc): the Sc compact cell's
+    #           plain re-solve kept the nine energies to 1e-11 while
+    #           re-partitioning the span at 1.7e-1
     e_bad = None
     if ref_energies is not None:
         e = _root_energies(mc)

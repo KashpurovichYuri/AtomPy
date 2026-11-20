@@ -28,7 +28,6 @@ from __future__ import annotations
 
 import json
 import re
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -1379,8 +1378,9 @@ def lane_substrate(spec) -> tuple:
             m.mo_energy = rec["mo_energy"]
             mf = _accelerated(m, spec.ref)
     if not mf.converged:
-        sys.exit(f"the lane substrate SCF did not converge "
-                 f"({spec.symbol}, D2h)")
+        raise ValueError(
+            f"the lane substrate SCF did not converge "
+            f"({spec.symbol}, D2h)")
     return mol, mf
 
 

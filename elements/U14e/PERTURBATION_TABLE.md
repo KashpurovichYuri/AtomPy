@@ -6,7 +6,7 @@ PT2 analyzation: U14e -- nevpt2-sc (pyscf.mrpt.NEVPT, strongly contracted), pysc
 Reading key: README · Analysis (the reference-class axis, the gauge-spread disclosure, the basis-thinness caveat). E_ref within its own partition (kernel totals only); E_PT2 = E_ref + E(2).  The row reads the GROUND root; the block spread runs over the roots degenerate with it (the gauge block) -- broken spans store excited roots beside it (different states, not gauges; full per-root records live in the payload).
 
 
-**the span ladder (CASCI: the unoptimized windows)**
+**the CAS-size axis (the flagship R-test)**
 
 | cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
 |---|---|---|---|---|---|---|---|---|
@@ -19,6 +19,12 @@ Reading key: README · Analysis (the reference-class axis, the gauge-spread disc
 | `u14e_10f13d14p_4-0_casci_ao_-_pur_avg` | — | — | — | REFUSED: stored-roots refusal: the readout energies (max diff 3.063e-08) and CI vectors both fail the stored solution | — | — | — | — |
 | `u14e_10f13d14p_4-0_casci_mo_-_pur_avg` | 9 | 3.466372 | -50.37822402 | -359.0757 | -9.7709 | -50.73729969 | -1380.6323 | 0.0e+00 |
 | `u14e_10f13d14p_4-0_casci_moc_-_pur_avg` | 9 | 0.006650 | -50.37808140 | -348.8181 | -9.4918 | -50.72689950 | -1380.3493 | 0.0e+00 |
+| `u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg` | 17 | 71.999999 | -50.42381143 | -341.6651 | -9.2972 | -50.76547655 | -1381.3990 | 8.1e-02 |
+| `u14e_10f13d_4-0_sa-casscf_mo_-_pur_avg` | 17 | 71.999995 | -50.42381662 | -341.6782 | -9.2975 | -50.76549478 | -1381.3995 | 2.8e-03 |
+| `u14e_10f13d7s_5-1_sa-casscf_ao_-_pur_avg` | — | — | — | REFUSED: stored-roots refusal: the readout energies (max diff 2.325e-05) exceed the same-state noise band (1e-06) | — | — | — | — |
+| `u14e_10f13d7s_5-1_sa-casscf_mo_-_pur_avg` | — | — | — | REFUSED: stored-roots refusal: the readout energies (max diff 3.695e-03) exceed the same-state noise band (1e-06) | — | — | — | — |
+| `u14e_10f13d14p_4-0_sa-casscf_ao_-_pur_avg` | 17 | 71.785121 | -50.42637850 | -336.0125 | -9.1434 | -50.76239101 | -1381.3150 | 2.1e-03 |
+| `u14e_10f13d14p_4-0_sa-casscf_mo_-_pur_avg` | 17 | 71.782785 | -50.42638234 | -336.0442 | -9.1442 | -50.76242657 | -1381.3160 | 0.0e+00 |
 
 **the NO twins (CASCI)**
 
@@ -40,41 +46,10 @@ Reading key: README · Analysis (the reference-class axis, the gauge-spread disc
 |---|---|---|---|---|---|---|---|---|
 | `u14e_10f13d_4-0_casscf_ao_-_pur_avg` | 1 | 65.799091 | -50.42946634 | -311.0458 | -8.4640 | -50.74051212 | -1380.7197 | 0.0e+00 |
 | `u14e_10f13d_4-0_casscf_mo_-_pur_avg` | 1 | 64.443470 | -50.43064119 | -317.8351 | -8.6487 | -50.74847625 | -1380.9364 | 0.0e+00 |
-
-**the span ladder (CASCI: the unoptimized windows)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
-| `u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg` | 17 | 71.999999 | -50.42381143 | -341.6651 | -9.2972 | -50.76547655 | -1381.3990 | 8.1e-02 |
-| `u14e_10f13d_4-0_sa-casscf_mo_-_pur_avg` | 17 | 71.999995 | -50.42381662 | -341.6782 | -9.2975 | -50.76549478 | -1381.3995 | 2.8e-03 |
-
-**the reference axis (single-root CASSCF vs SA)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
 | `u14e_10f13d7s_5-1_casscf_ao_-_pur_avg` | 1 | 87.474451 | -50.45379277 | -278.2798 | -7.5724 | -50.73207253 | -1380.4900 | 0.0e+00 |
 | `u14e_10f13d7s_5-1_casscf_mo_-_pur_avg` | 1 | 26.761879 | -50.43979295 | -324.6899 | -8.8353 | -50.76448289 | -1381.3720 | 0.0e+00 |
-
-**the span ladder (CASCI: the unoptimized windows)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
-| `u14e_10f13d7s_5-1_sa-casscf_ao_-_pur_avg` | — | — | — | REFUSED: stored-roots refusal: the readout energies (max diff 2.325e-05) exceed the same-state noise band (1e-06) | — | — | — | — |
-| `u14e_10f13d7s_5-1_sa-casscf_mo_-_pur_avg` | — | — | — | REFUSED: stored-roots refusal: the readout energies (max diff 3.695e-03) exceed the same-state noise band (1e-06) | — | — | — | — |
-
-**the reference axis (single-root CASSCF vs SA)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
 | `u14e_10f13d14p_4-0_casscf_ao_-_pur_avg` | 1 | 64.708978 | -50.43446231 | -309.1237 | -8.4117 | -50.74358598 | -1380.8033 | 0.0e+00 |
 | `u14e_10f13d14p_4-0_casscf_mo_-_pur_avg` | 1 | 64.306769 | -50.43445358 | -310.6789 | -8.4540 | -50.74513243 | -1380.8454 | 0.0e+00 |
-
-**the span ladder (CASCI: the unoptimized windows)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
-| `u14e_10f13d14p_4-0_sa-casscf_ao_-_pur_avg` | 17 | 71.785121 | -50.42637850 | -336.0125 | -9.1434 | -50.76239101 | -1381.3150 | 2.1e-03 |
-| `u14e_10f13d14p_4-0_sa-casscf_mo_-_pur_avg` | 17 | 71.782785 | -50.42638234 | -336.0442 | -9.1442 | -50.76242657 | -1381.3160 | 0.0e+00 |
 
 **the frozen pair (the core-relaxation disclosure)**
 
@@ -101,3 +76,5 @@ Reading key: README · Analysis (the reference-class axis, the gauge-spread disc
 
 <!-- payload sha256 7788dd34ad4d72ba... bands: energies 1e-11 absolute; CI amplitudes 1e-8 per-root; the degenerate block's joint projector (p_tol 1e-4, the solver-tail scale); the re-solve angle (davidson noise) 1e-3; the same-state energy noise 1e-6 -->
 <!-- pt2 end -->
+
+

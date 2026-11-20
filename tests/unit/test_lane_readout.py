@@ -37,17 +37,20 @@ def lane_store(carbon_d2h):
 
 
 def test_lane_readout_twin_reproduces_the_store(lane_store, carbon_d2h):
-    """The twin's re-solve reproduces the stored record exactly: block
-    energies match, and the meters assertion passes (its silence is
-    the invariant)."""
+    """Each block's re-solved roots equal the stored record's own
+    slice (per-block anchoring; the meters assertion's silence is
+    the other half of the invariant)."""
     _, mol, mf, _ = carbon_d2h
     payload, blocks = readout_lane(lane_store, mol, mf, workdir=WORKDIR)
     stored = load_lane_cell(lane_store, WORKDIR)
-    for irrep, mc in blocks.items():
-        assert list(blocks) == ["B1g", "B2g", "B3g"]
+    i0 = 0
+    for mc in blocks.values():
+        mult = mc.fcisolver.nroots
         assert np.allclose(np.asarray(mc.e_cas).ravel(),
-                           np.asarray(stored["energies"]),
+                           np.asarray(stored["energies"][i0:i0 + mult]),
                            atol=1e-11, rtol=0.0)
+        i0 += mult
+    assert i0 == len(stored["energies"])
 
 
 def test_lane_blocks_price_through_the_seam(lane_store, carbon_d2h):

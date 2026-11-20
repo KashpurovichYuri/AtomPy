@@ -22,6 +22,14 @@ Reading key: README · Analysis (the reference-class axis, the gauge-spread disc
 | `si_3p@s2_2-0_casci_ao_-_pur_avg` | 9 | 2.000000 | -288.84769214 | -54.5464 | -1.4843 | -288.90223856 | -7861.4304 | 1.1e-12 |
 | `si_3p@s2_2-0_casci_mo_-_pur_avg` | 9 | 1.957408 | -288.84769214 | -54.5464 | -1.4843 | -288.90223856 | -7861.4304 | 0.0e+00 |
 | `si_3p@s2_2-0_casci_moc_-_pur_avg` | 9 | 1.997293 | -288.84769214 | -54.5464 | -1.4843 | -288.90223856 | -7861.4304 | 0.0e+00 |
+| `si_3p_2-0_sa-casscf_ao_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232614 | -7861.4328 | 7.0e-07 |
+| `si_3p_2-0_sa-casscf_mo_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232618 | -7861.4328 | 2.0e-05 |
+| `si_3p@r1_2-0_sa-casscf_ao_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232619 | -7861.4328 | 1.0e-07 |
+| `si_3p@r1_2-0_sa-casscf_mo_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232618 | -7861.4328 | 2.0e-05 |
+| `si_3p@s1_2-0_sa-casscf_ao_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232617 | -7861.4328 | 2.8e-07 |
+| `si_3p@s1_2-0_sa-casscf_mo_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232618 | -7861.4328 | 2.0e-05 |
+| `si_3p@s2_2-0_sa-casscf_ao_-_pur_avg` | 3 | 2.000000 | -288.84769322 | -54.5525 | -1.4844 | -288.90224568 | -7861.4306 | 1.0e-12 |
+| `si_3p@s2_2-0_sa-casscf_mo_-_pur_avg` | 3 | 1.997292 | -288.84769263 | -54.5514 | -1.4844 | -288.90224403 | -7861.4305 | 0.0e+00 |
 
 **the NO twins (CASCI)**
 
@@ -38,55 +46,12 @@ Reading key: README · Analysis (the reference-class axis, the gauge-spread disc
 |---|---|---|---|---|---|---|---|---|
 | `si_3p_2-0_casscf_ao_-_pur_avg` | 1 | 1.577297 | -288.84643692 | -55.7949 | -1.5183 | -288.90223182 | -7861.4302 | 0.0e+00 |
 | `si_3p_2-0_casscf_mo_-_pur_avg` | 1 | 1.961217 | -288.84643692 | -55.7949 | -1.5183 | -288.90223183 | -7861.4302 | 0.0e+00 |
-
-**the span ladder (CASCI: the unoptimized windows)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
-| `si_3p_2-0_sa-casscf_ao_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232614 | -7861.4328 | 7.0e-07 |
-| `si_3p_2-0_sa-casscf_mo_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232618 | -7861.4328 | 2.0e-05 |
-
-**the reference axis (single-root CASSCF vs SA)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
 | `si_3p@r1_2-0_casscf_ao_-_pur_avg` | 1 | 1.999982 | -288.84643692 | -55.7949 | -1.5183 | -288.90223183 | -7861.4302 | 0.0e+00 |
 | `si_3p@r1_2-0_casscf_mo_-_pur_avg` | 1 | 1.961217 | -288.84643692 | -55.7949 | -1.5183 | -288.90223183 | -7861.4302 | 0.0e+00 |
-
-**the span ladder (CASCI: the unoptimized windows)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
-| `si_3p@r1_2-0_sa-casscf_ao_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232619 | -7861.4328 | 1.0e-07 |
-| `si_3p@r1_2-0_sa-casscf_mo_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232618 | -7861.4328 | 2.0e-05 |
-
-**the reference axis (single-root CASSCF vs SA)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
 | `si_3p@s1_2-0_casscf_ao_-_pur_avg` | 1 | 1.998665 | -288.84643692 | -55.7949 | -1.5183 | -288.90223185 | -7861.4302 | 0.0e+00 |
 | `si_3p@s1_2-0_casscf_mo_-_pur_avg` | 1 | 1.961217 | -288.84643692 | -55.7949 | -1.5183 | -288.90223183 | -7861.4302 | 0.0e+00 |
-
-**the span ladder (CASCI: the unoptimized windows)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
-| `si_3p@s1_2-0_sa-casscf_ao_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232617 | -7861.4328 | 2.8e-07 |
-| `si_3p@s1_2-0_sa-casscf_mo_-_pur_avg` | 3 | 2.000000 | -288.84639779 | -55.9284 | -1.5219 | -288.90232618 | -7861.4328 | 2.0e-05 |
-
-**the reference axis (single-root CASSCF vs SA)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
 | `si_3p@s2_2-0_casscf_ao_-_pur_avg` | 1 | 1.999997 | -288.84773043 | -54.4230 | -1.4809 | -288.90215343 | -7861.4281 | 0.0e+00 |
 | `si_3p@s2_2-0_casscf_mo_-_pur_avg` | 1 | 1.958720 | -288.84773043 | -54.4229 | -1.4809 | -288.90215337 | -7861.4281 | 0.0e+00 |
-
-**the span ladder (CASCI: the unoptimized windows)**
-
-| cell | nroots | ⟨L²⟩ | E_ref (Eh) | E(2) (mEh) | E(2) (eV) | E_PT2 (Eh) | E_PT2 (eV) | block spread (mEh) |
-|---|---|---|---|---|---|---|---|---|
-| `si_3p@s2_2-0_sa-casscf_ao_-_pur_avg` | 3 | 2.000000 | -288.84769322 | -54.5525 | -1.4844 | -288.90224568 | -7861.4306 | 1.0e-12 |
-| `si_3p@s2_2-0_sa-casscf_mo_-_pur_avg` | 3 | 1.997292 | -288.84769263 | -54.5514 | -1.4844 | -288.90224403 | -7861.4305 | 0.0e+00 |
 
 **the frozen pair (the core-relaxation disclosure)**
 
@@ -109,5 +74,7 @@ Reading key: README · Analysis (the reference-class axis, the gauge-spread disc
 
 <!-- payload sha256 ae40607ff4d28ae1... bands: energies 1e-11 absolute; CI amplitudes 1e-8 per-root; the degenerate block's joint projector (p_tol 1e-6, the solver-tail scale); the re-solve angle (davidson noise) 1e-3 -->
 <!-- pt2 end -->
+
+
 
 

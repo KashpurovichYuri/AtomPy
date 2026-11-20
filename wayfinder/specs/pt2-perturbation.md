@@ -125,15 +125,25 @@ push per batch; handoff at ticket boundaries.
    ~7.5× the EN-era preview (−7.7 mEh) — the H₀-choice axis (Dyall
    denominators vs EN's exact-configuration diagonals) is a big
    effect; the ladder read quantifies it per window.
-3b. **Reference-class comparison** — NEVPT2 on stored CASSCF/CASCI
-   cells (C, Si) vs SA, against symmetry amplitude.
-4. **The ladder read + render** — C then Si across the window ladder;
-   PERTURBATION_TABLE.md + reading key (R, gauge spread, reference
-   class, basis thinness).
-5. **Gated later** — Ti/Sc + the unc twins (U14e beyond); CASPT2 in a
-   new env; wavefunction-level analyzation (⟨L²⟩/⟨S²⟩ of
-   Ψ⁽⁰⁾+λΨ⁽¹⁾ — explicit first-order reconstructable from git
-   history if the probes demand it).
+3b. **Reference-class comparison** — DONE 2026-11-19: NEVPT2 on
+   stored CASSCF/CASCI cells (C, Si) vs SA, against symmetry
+   amplitude; E(2) rotation-insensitive at every measured amplitude.
+4. **The ladder read + render** — DONE 2026-11-19/20 (C and Si, then
+   the whole campaign): PERTURBATION_TABLE.md + reading key (R, the
+   gauge spread, the reference class, the basis thinness); the
+   optimized ladder SATURATES on C/Si (the optimizer repairs the
+   poverty class; the thin spans fuel, static remainder 43.2/~41
+   mEh).
+5. **Gated later** — DONE 2026-11-20 for the ladder: Ti/Sc + the
+   unc twins + U14e collected/rendered/gated (the combined gate ALL
+   GREEN, 1259 roots); the CAS-size flagship read: the corrected
+   ladder PREFERS (4,12) -- the (4,15) promotion double-counts
+   dynamic correlation.  Still open here: CASPT2 in a new env (a
+   disclosed variant on the env upgrade); wavefunction-level
+   analyzation (declined -- the resurrection path recorded).  The
+   lane seam (the follow-up) DONE 2026-11-20: cells.readout_lane +
+   nevpt2_rows_on; the lane rows priced on C/Si/Sc/Ti/U14e (the
+   declared-out legs recorded in ticket 45).
 
 ## Verification
 
@@ -160,6 +170,10 @@ push per batch; handoff at ticket boundaries.
   its level shift masks the intruder signal — lives in the reading
   key then).
 - Multi-state / quasi-degenerate PT2 (per-state corrections only).
-- Atoms beyond C and Si (Step 5's gated list).
+- Atoms beyond C and Si (Step 5's gated list) — SUPERSEDED
+  2026-11-20: the whole campaign joined (the user's directive); the
+  lane legs' fresh constructions needed the regen grammar's `lane`
+  group (the store-recovery loop, not a grammar change) -- the
+  post-processing principle stands for the GRID stores.
 - Campaign integration: no CellKey axis, no regen grammar change —
   post-processing on the stores.

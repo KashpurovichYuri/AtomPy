@@ -1,0 +1,19 @@
+===== validate_pt2 =====
+PASS  anchor O2  E(2) -0.169784998945 vs -0.169785157128
+PASS  anchor H14  E(2) -0.094164339713 vs -0.094164359938
+PASS  payload Sc: class sums  max |sum - e_corr| 0.00e+00 over 296 roots / 2368 classes
+PASS  payload Sc: totals  max |e_total - e_ref - e_corr| 5.68e-14
+PASS  payload Sc: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Sc: meter consistency  max |energy - e_per_norm*norm| 1.39e-17
+PASS  payload Sc: disposition census  52 declared: 48 rows / 4 refused
+PASS  payload Ti: class sums  max |sum - e_corr| 0.00e+00 over 314 roots / 2512 classes
+PASS  payload Ti: totals  max |e_total - e_ref - e_corr| 5.65e-14
+PASS  payload Ti: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Ti: meter consistency  max |energy - e_per_norm*norm| 1.39e-17
+PASS  payload Ti: disposition census  46 declared: 46 rows / 0 refused
+PASS  route invariance Sc  lane ground block -200.2102 mEh vs free ground root -200.2104 mEh (delta 1.88e-04 mEh; band 1e-4 Eh) -- the pinning is pricing-inert
+PASS  probe Sc (sc_3d4s_2-1_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
+DISCLOSED  route invariance Ti: lane ground block -216.4439 mEh vs free ground root -214.7738 mEh (delta 1.67e+00 mEh past the band) -- the lane's D2h gauge vs the free draw: the orbital-draw reading, the ticket carries the record
+PASS  probe Ti (ti_3d4s_3-1_sa-casscf_ao_-_pur_avg)  2 PASS lines, 2 verdicts (L>=2: LARGE = the declared spread disclosure)
+
+validate_pt2: ALL GREEN (610 roots certified)

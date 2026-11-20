@@ -1,0 +1,95 @@
+===== pt2 ladder: Ti =====
+  [rss] ti_3d4s_3-1_casci_ao_-_pur_avg at 0.1 GB
+  [rows] ti_3d4s_3-1_casci_ao_-_pur_avg: nroots 9, E(2) root0 -212.1733 mEh (-5.7735 eV), <L2> 12.000000 (0.8 s)
+  [rss] ti_3d4s_3-1_casci_mo_-_pur_avg at 0.2 GB
+  [rows] ti_3d4s_3-1_casci_mo_-_pur_avg: nroots 9, E(2) root0 -191.8327 mEh (-5.2200 eV), <L2> 0.005080 (0.8 s)
+  [rss] ti_3d4s_3-1_casci_moc_-_pur_avg at 0.2 GB
+  [rows] ti_3d4s_3-1_casci_moc_-_pur_avg: nroots 9, E(2) root0 -192.5694 mEh (-5.2401 eV), <L2> 2.092543 (0.8 s)
+  [rss] ti_3d4s@r1_3-1_casci_ao_-_pur_avg at 0.2 GB
+  [rows] ti_3d4s@r1_3-1_casci_ao_-_pur_avg: nroots 9, E(2) root0 -194.9098 mEh (-5.3038 eV), <L2> 12.000000 (0.8 s)
+  [rss] ti_3d4s@r1_3-1_casci_mo_-_pur_avg at 0.2 GB
+  [rows] ti_3d4s@r1_3-1_casci_mo_-_pur_avg: nroots 9, E(2) root0 -191.8327 mEh (-5.2200 eV), <L2> 0.005080 (0.8 s)
+  [rss] ti_3d4s@r1_3-1_casci_moc_-_pur_avg at 0.2 GB
+  [rows] ti_3d4s@r1_3-1_casci_moc_-_pur_avg: nroots 9, E(2) root0 -192.5694 mEh (-5.2401 eV), <L2> 2.092543 (0.8 s)
+  [rss] ti_3d4s@s1_3-1_casci_ao_-_pur_avg at 0.2 GB
+  [rows] ti_3d4s@s1_3-1_casci_ao_-_pur_avg: nroots 9, E(2) root0 -217.7673 mEh (-5.9257 eV), <L2> 12.000000 (0.8 s)
+  [rss] ti_3d4s@s1_3-1_casci_mo_-_pur_avg at 0.2 GB
+  [rows] ti_3d4s@s1_3-1_casci_mo_-_pur_avg: nroots 9, E(2) root0 -191.8327 mEh (-5.2200 eV), <L2> 0.005080 (0.8 s)
+  [rss] ti_3d4s@s1_3-1_casci_moc_-_pur_avg at 0.2 GB
+  [rows] ti_3d4s@s1_3-1_casci_moc_-_pur_avg: nroots 9, E(2) root0 -192.5694 mEh (-5.2401 eV), <L2> 2.092543 (0.8 s)
+  [rss] ti_3d4s@s2_3-1_casci_ao_-_pur_avg at 0.2 GB
+  [rows] ti_3d4s@s2_3-1_casci_ao_-_pur_avg: nroots 9, E(2) root0 -178.4019 mEh (-4.8546 eV), <L2> 12.000000 (42.7 s)
+  [rss] ti_3d4s@s2_3-1_casci_mo_-_pur_avg at 0.4 GB
+  [rows] ti_3d4s@s2_3-1_casci_mo_-_pur_avg: nroots 9, E(2) root0 -189.7010 mEh (-5.1620 eV), <L2> 5.186222 (42.9 s)
+  [rss] ti_3d4s@s2_3-1_casci_moc_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s2_3-1_casci_moc_-_pur_avg: nroots 9, E(2) root0 -189.2326 mEh (-5.1493 eV), <L2> 7.235221 (42.8 s)
+  [rss] ti_3d4sno2_3-1_casci_no_-_pur_avg at 0.5 GB
+  [rows] ti_3d4sno2_3-1_casci_no_-_pur_avg: nroots 9, E(2) root0 -212.2234 mEh (-5.7749 eV), <L2> 12.000000 (0.8 s)
+  [rss] ti_3d4s@r1no2_3-1_casci_no_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@r1no2_3-1_casci_no_-_pur_avg: nroots 9, E(2) root0 -194.9305 mEh (-5.3043 eV), <L2> 12.000000 (0.8 s)
+  [rss] ti_3d4s@s1no2_3-1_casci_no_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s1no2_3-1_casci_no_-_pur_avg: nroots 9, E(2) root0 -217.7588 mEh (-5.9255 eV), <L2> 12.000000 (0.8 s)
+  [rss] ti_3d4s@s2no2_3-1_casci_no_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s2no2_3-1_casci_no_-_pur_avg: nroots 9, E(2) root0 -197.0269 mEh (-5.3614 eV), <L2> 12.000000 (0.8 s)
+  [rss] ti_3d4s_3-1_casscf_ao_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s_3-1_casscf_ao_-_pur_avg: nroots 1, E(2) root0 -174.2323 mEh (-4.7411 eV), <L2> 0.049965 (0.3 s)
+  [rss] ti_3d4s_3-1_casscf_mo_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s_3-1_casscf_mo_-_pur_avg: nroots 1, E(2) root0 -174.2300 mEh (-4.7410 eV), <L2> 0.049958 (0.3 s)
+  [rss] ti_3d4s_3-1_sa-casscf_ao_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s_3-1_sa-casscf_ao_-_pur_avg: nroots 7, E(2) root0 -198.7234 mEh (-5.4075 eV), <L2> 12.005018 (0.6 s)
+  [rss] ti_3d4s_3-1_sa-casscf_mo_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s_3-1_sa-casscf_mo_-_pur_avg: nroots 7, E(2) root0 -179.1644 mEh (-4.8753 eV), <L2> 0.025330 (0.6 s)
+  [rss] ti_3d4s@r1_3-1_casscf_ao_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@r1_3-1_casscf_ao_-_pur_avg: nroots 1, E(2) root0 -174.2298 mEh (-4.7410 eV), <L2> 0.049961 (0.3 s)
+  [rss] ti_3d4s@r1_3-1_casscf_mo_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@r1_3-1_casscf_mo_-_pur_avg: nroots 1, E(2) root0 -174.2300 mEh (-4.7410 eV), <L2> 0.049958 (0.3 s)
+  [rss] ti_3d4s@r1_3-1_sa-casscf_ao_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@r1_3-1_sa-casscf_ao_-_pur_avg: nroots 7, E(2) root0 -193.4693 mEh (-5.2646 eV), <L2> 12.000000 (0.6 s)
+  [rss] ti_3d4s@r1_3-1_sa-casscf_mo_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@r1_3-1_sa-casscf_mo_-_pur_avg: nroots 7, E(2) root0 -179.1644 mEh (-4.8753 eV), <L2> 0.025330 (0.6 s)
+  [rss] ti_3d4s@s1_3-1_casscf_ao_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s1_3-1_casscf_ao_-_pur_avg: nroots 1, E(2) root0 -186.8661 mEh (-5.0849 eV), <L2> 7.567303 (0.3 s)
+  [rss] ti_3d4s@s1_3-1_casscf_mo_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s1_3-1_casscf_mo_-_pur_avg: nroots 1, E(2) root0 -174.2300 mEh (-4.7410 eV), <L2> 0.049958 (0.3 s)
+  [rss] ti_3d4s@s1_3-1_sa-casscf_ao_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s1_3-1_sa-casscf_ao_-_pur_avg: nroots 7, E(2) root0 -198.7240 mEh (-5.4076 eV), <L2> 12.005018 (0.6 s)
+  [rss] ti_3d4s@s1_3-1_sa-casscf_mo_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s1_3-1_sa-casscf_mo_-_pur_avg: nroots 7, E(2) root0 -179.1644 mEh (-4.8753 eV), <L2> 0.025330 (0.6 s)
+  [rss] ti_3d4s@s2_3-1_casscf_ao_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s2_3-1_casscf_ao_-_pur_avg: nroots 1, E(2) root0 -179.3574 mEh (-4.8806 eV), <L2> 11.965886 (6.2 s)
+  [rss] ti_3d4s@s2_3-1_casscf_mo_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s2_3-1_casscf_mo_-_pur_avg: nroots 1, E(2) root0 -165.5071 mEh (-4.5037 eV), <L2> 9.074528 (6.1 s)
+  [rss] ti_3d4s@s2_3-1_sa-casscf_ao_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s2_3-1_sa-casscf_ao_-_pur_avg: nroots 7, E(2) root0 -179.4168 mEh (-4.8822 eV), <L2> 11.999999 (33.4 s)
+  [rss] ti_3d4s@s2_3-1_sa-casscf_mo_-_pur_avg at 0.5 GB
+  [rows] ti_3d4s@s2_3-1_sa-casscf_mo_-_pur_avg: nroots 7, E(2) root0 -171.5098 mEh (-4.6670 eV), <L2> 8.593868 (33.5 s)
+  [rss] ti_3d4s_3-1_sa-casscf_ao_frozen_pur_avg at 0.6 GB
+  [rows] ti_3d4s_3-1_sa-casscf_ao_frozen_pur_avg: nroots 7, E(2) root0 -211.6803 mEh (-5.7601 eV), <L2> 12.000000 (0.6 s)
+  [rss] ti_3d4s@r1_3-1_sa-casscf_ao_frozen_pur_avg at 0.6 GB
+  [rows] ti_3d4s@r1_3-1_sa-casscf_ao_frozen_pur_avg: nroots 7, E(2) root0 -194.9352 mEh (-5.3045 eV), <L2> 12.000000 (0.6 s)
+  plain D2h SCF a wrong basin (-848.28341842 vs the trusted -848.40648875) -- retrying C1-seeded (elements/Ti/rungs/rohf.chk)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9966-0.9966; 4s: k=1 of 1 bands, capture 0.9729-0.9729
+  [lane] ti_3d4s@ar_3-1_casci_ao_-_pur_avg: 4 blocks, E(2) mean -214.9663 mEh (-5.8495 eV), ptp 1.82e+00 mEh (1.5 s)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9966-0.9966; 4s: k=1 of 1 bands, capture 0.9729-0.9729
+  [lane] ti_3d4s@ar_3-1_sa-casscf_ao_-_pur_avg: 4 blocks, E(2) mean -194.0519 mEh (-5.2804 eV), ptp 1.83e+00 mEh (1.4 s)
+  [rss] ti_3d4s@ar_3-1_casci_ao_-_pol_avg at 0.6 GB
+  [rows] ti_3d4s@ar_3-1_casci_ao_-_pol_avg: nroots 9, E(2) root0 -214.7738 mEh (-5.8443 eV), <L2> 12.000000 (0.8 s)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9966-0.9966
+  [lane] ti_3d@ar_3-1_casci_ao_-_pur_avg: 4 blocks, E(2) mean -532.8651 mEh (-14.5000 eV), ptp 4.58e+02 mEh (1.1 s)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9966-0.9966
+  [lane] ti_3d@ar_3-1_sa-casscf_ao_-_pur_avg: 4 blocks, E(2) mean -230.4243 mEh (-6.2702 eV), ptp 6.11e+01 mEh (1.2 s)
+  [rss] ti_3d@ar_3-1_casci_ao_-_pol_avg at 0.6 GB
+  [rows] ti_3d@ar_3-1_casci_ao_-_pol_avg: nroots 9, E(2) root0 -507.3721 mEh (-13.8063 eV), <L2> 6.000000 (0.5 s)
+  [window] distilled 3s: k=1 of 1 bands, capture 0.9999-0.9999; 3p: k=1 of 1 bands, capture 0.9998-0.9998; 3d: k=1 of 1 bands, capture 0.9966-0.9966
+  [lane] ti_3s3p3d@1s2s2p4s_6-4_casci_ao_-_pur_avg: 4 blocks, E(2) mean -153.2720 mEh (-4.1707 eV), ptp 8.08e-01 mEh (18.0 s)
+  [window] distilled 3s: k=1 of 1 bands, capture 0.9999-0.9999; 3p: k=1 of 1 bands, capture 0.9998-0.9998; 3d: k=1 of 1 bands, capture 0.9966-0.9966
+  [lane] ti_3s3p3d@1s2s2p4s_6-4_sa-casscf_ao_-_pur_avg: 4 blocks, E(2) mean -124.7427 mEh (-3.3944 eV), ptp 5.32e+00 mEh (16.5 s)
+  [rss] ti_3s3p3d@1s2s2p4s_6-4_casci_ao_-_pol_avg at 0.6 GB
+  [rows] ti_3s3p3d@1s2s2p4s_6-4_casci_ao_-_pol_avg: nroots 9, E(2) root0 -152.9520 mEh (-4.1620 eV), <L2> 12.000000 (19.5 s)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9966-0.9966; 3p: k=1 of 1 bands, capture 0.9998-0.9998; 4s: k=1 of 1 bands, capture 0.9729-0.9729
+  [lane] ti_3d3p4s@1s2s2p3s_6-4_casci_ao_-_pur_avg: 4 blocks, E(2) mean -147.9028 mEh (-4.0246 eV), ptp 4.30e+00 mEh (18.1 s)
+  [window] distilled 3d: k=1 of 1 bands, capture 0.9966-0.9966; 3p: k=1 of 1 bands, capture 0.9998-0.9998; 4s: k=1 of 1 bands, capture 0.9729-0.9729
+  [lane] ti_3d3p4s@1s2s2p3s_6-4_sa-casscf_ao_-_pur_avg: 4 blocks, E(2) mean -126.7864 mEh (-3.4500 eV), ptp 5.51e+00 mEh (16.7 s)
+  [rss] ti_3d3p4s@1s2s2p3s_6-4_casci_ao_-_pol_avg at 4.1 GB
+  [rows] ti_3d3p4s@1s2s2p3s_6-4_casci_ao_-_pol_avg: nroots 9, E(2) root0 -147.2030 mEh (-4.0056 eV), <L2> 12.000000 (20.0 s)
+wrote elements/Ti/perturbation.json: 46 rows / 0 refused of 46 declared cells

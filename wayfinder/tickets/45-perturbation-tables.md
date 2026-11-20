@@ -85,6 +85,41 @@ core_energy); the stored-roots seam needs a lane-native readout twin
 before it can price lane rows.  The irrep route-invariance gate row
 waits with it.  Recorded as the follow-up.
 
+## Status: the LANE SEAM + step 5 (Sc, Ti, the uncs) DONE; U14e + THE FLAGSHIP READ DONE 2026-11-20
+
+THE FLAGSHIP R-TEST (the CAS-size axis (4,12)/(6,13)/(4,15)): the
+corrected ladder PREFERS (4,12).  The (4,15) promotion's E(2)
+shrinks -341.7 -> -336.0 mEh (the bigger window absorbs its own
+dynamic correlation), more than the variational gain, so the
+corrected total WORSENS -50.7655 -> -50.7624; the (6,13)
+7s-promotion CASSCF rows confirm (-50.732 / -50.764).  The SA row
+stands at <L2> = 72.0000 (the certified 5L closure); the frozen row
+explodes to -921.38 mEh (the disclosure).  U14e: 32 declared ->
+21 rows / 11 refused (the raw-AO windows' re-solve does not
+reconstruct -- the vectors fail with the energies inside the noise
+band; the 7s SA cells' energy noise 2.3e-5 / 3.7e-3 past e_noise;
+one lane leg prices, the others refuse on real reconstruction
+failures -- the Au block at 9.5e-1 off).  U14e's lane row that
+stands (5f6d7s@6s6p SA): mean -95.56 mEh, ptp 4.0 mEh.
+
+THE COMBINED GATE: logs/validate_pt2_all.log -- all seven atoms,
+1259 roots certified (the anchors, the class sums 0e+00, the
+totals, the eV columns, the meter identities, the disposition
+censuses, the route-invariance rows, the fresh probes).
+
+THE REVIEW ROUND (2026-11-20, fixed point a0fe3fe) and its fixes:
+the lane meters' block-local indexing bug (57 entries, 8 with
+wrong values on the Sc/Ti mult>1 blocks -- re-collected); the
+renderer GROUP-COLLECTED (a window-interleaved set no longer
+scatters one axis across repeating headers; U14e's trio carries
+its named CAS-size group); the band sweeps moved out of the
+docstring contracts to the point of use; lane_substrate raises
+(src raises; scripts exit); the dead apply_s2 dropped; the lane
+twin test per-block anchored.  Declined: promoting reference's
+_accelerated/_forced_rohf_occ (one consumer -- the seam stays
+hypothetical); _declared's public home (the collector IS the
+manifest's home).
+
 ## Status: the LANE SEAM + step 5 (Sc, Ti) DONE 2026-11-20; the uncs DONE; U14e in flight
 
 THE LANE SEAM (1edb838): cells.readout_lane -- the runner's own

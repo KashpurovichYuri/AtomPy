@@ -75,6 +75,9 @@ def _group(c: dict, atom: str) -> str:
     size = _declared(atom).get("size", {})
     if any(addr.startswith(f"{w}_") for w in size):
         return "the CAS-size axis (the flagship R-test)"
+    size_group = _declared(atom).get("size_group", ())
+    if any(addr.startswith(f"{w}_") for w in size_group):
+        return "the CAS-size axis (the flagship R-test)"
     dist = _declared(atom).get("dist", ())
     if any(addr.startswith(f"{w}_") for w in dist):
         return "the distilled prior family (CASCI ao)"
@@ -83,55 +86,69 @@ def _group(c: dict, atom: str) -> str:
 
 def _rows(payload: dict) -> list[str]:
     atom = payload["atom"]
-    out, last_group = [], None
+    # GROUP-COLLECTED: one section per group, the cells in payload
+    # order within it -- a window-interleaved declared set must not
+    # scatter one axis across repeating headers (the U14e flagship
+    # read the trio had to be reassembled by hand)
+    sections: dict[str, list[str]] = {}
+    order: list[str] = []
     for c in payload["cells"]:
         g = _group(c, atom)
-        if g != last_group:
-            out += ["", f"**{g}**", "", HEAD, SEP]
-            last_group = g
-        if c["disposition"] == "refusal":
-            reason = c["refusal_reason"].split("--")[0].strip()
-            out.append(f"| `{c['address']}` | — | — | — | REFUSED: "
-                       f"{reason} | — | — | — | — |")
-            continue
-        spread = None
-        if c.get("lane"):
-            # the lane rows: one per block root; the spread column
-            # reads the TERM's across-component E(2) ptp
-            spread = c.get("term_e2_ptp", float("nan")) * 1e3
-            for blk in c["blocks"]:
-                r0 = blk["roots"][0]
-                out.append(
-                    f"| `{c['address']}` ·{blk['irrep']} "
-                    f"| {blk['mult']} "
-                    f"| {r0['l2']:.6f} "
-                    f"| {r0['e_ref']:.8f} "
-                    f"| {r0['e_corr'] * 1e3:+.4f} "
-                    f"| {r0['e_corr_eV']:+.4f} "
-                    f"| {r0['e_total']:.8f} "
-                    f"| {r0['e_total_eV']:+.4f} "
-                    f"| {spread:.1e} |")
-            continue
-        roots = c["roots"]
-        r0 = roots[0]
-        # the spread reads the GROUND BLOCK only: the roots degenerate
-        # with root 0 (the gauge block); broken spans store excited
-        # roots beside the ground one and those are different states,
-        # not gauges of it
-        block = [r for r in roots
-                 if abs(r["e_ref"] - r0["e_ref"]) <= 1e-6]
-        e2 = [r["e_corr"] for r in block]
-        spread = (max(e2) - min(e2)) * 1e3
-        out.append(
-            f"| `{c['address']}` | {c['nroots']} "
-            f"| {r0['l2']:.6f} "
-            f"| {r0['e_ref']:.8f} "
-            f"| {r0['e_corr'] * 1e3:+.4f} "
-            f"| {r0['e_corr_eV']:+.4f} "
-            f"| {r0['e_total']:.8f} "
-            f"| {r0['e_total_eV']:+.4f} "
-            f"| {spread:.1e} |")
+        if g not in sections:
+            sections[g] = []
+            order.append(g)
+        sections[g].append(_cell_row(c))
+    out = []
+    for g in order:
+        out += ["", f"**{g}**", "", HEAD, SEP]
+        out += sections[g]
     return out
+
+
+def _cell_row(c: dict) -> str:
+    """One cell's row(s): the refusal line, the lane rows (one per
+    block root), or the ground-block row."""
+    if c["disposition"] == "refusal":
+        reason = c["refusal_reason"].split("--")[0].strip()
+        return (f"| `{c['address']}` | — | — | — | REFUSED: "
+                f"{reason} | — | — | — | — |")
+    if c.get("lane"):
+        # the lane rows: one per block root; the spread column reads
+        # the TERM's across-component E(2) ptp
+        spread = c.get("term_e2_ptp", float("nan")) * 1e3
+        out = []
+        for blk in c["blocks"]:
+            r0 = blk["roots"][0]
+            out.append(
+                f"| `{c['address']}` ·{blk['irrep']} "
+                f"| {blk['mult']} "
+                f"| {r0['l2']:.6f} "
+                f"| {r0['e_ref']:.8f} "
+                f"| {r0['e_corr'] * 1e3:+.4f} "
+                f"| {r0['e_corr_eV']:+.4f} "
+                f"| {r0['e_total']:.8f} "
+                f"| {r0['e_total_eV']:+.4f} "
+                f"| {spread:.1e} |")
+        return "\n".join(out)
+    roots = c["roots"]
+    r0 = roots[0]
+    # the spread reads the GROUND BLOCK only: the roots degenerate
+    # with root 0 (the gauge block); broken spans store excited
+    # roots beside the ground one and those are different states,
+    # not gauges of it
+    block = [r for r in roots
+             if abs(r["e_ref"] - r0["e_ref"]) <= 1e-6]
+    e2 = [r["e_corr"] for r in block]
+    spread = (max(e2) - min(e2)) * 1e3
+    return (
+        f"| `{c['address']}` | {c['nroots']} "
+        f"| {r0['l2']:.6f} "
+        f"| {r0['e_ref']:.8f} "
+        f"| {r0['e_corr'] * 1e3:+.4f} "
+        f"| {r0['e_corr_eV']:+.4f} "
+        f"| {r0['e_total']:.8f} "
+        f"| {r0['e_total_eV']:+.4f} "
+        f"| {spread:.1e} |")
 
 
 def _csv(payload: dict) -> str:

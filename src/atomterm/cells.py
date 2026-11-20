@@ -1302,7 +1302,7 @@ def _root_vectors(ci):
 
 
 def _lane_block(key, irrep, mult, L, ncas, na, nb, e_arr, ci, dets, ids,
-                parts, apply_l2, apply_s2):
+                parts, apply_l2):
     """One branch component's adjudicated roots, vectors, and meters.
 
     The DENSE ADJUDICATION (every CI block the budget fits): the
@@ -1550,7 +1550,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
         e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
         e_arr, w_blk, corrected_blk, dev = _lane_block(
             key, irrep, mult, L, ncas, na, nb, e_arr, ci, dets, ids,
-            parts, apply_l2, apply_s2)
+            parts, apply_l2)
         anchor_dev = max(anchor_dev, dev)
         if corrected_blk:
             corrected.append(irrep)
@@ -1736,6 +1736,7 @@ def readout_lane(key: CellKey, mol, mf, shell_bands: dict | None = None,
     conv_tol : the pinned solvers' CI tolerance (the runner's default).
     e_tol, m_tol : the refusal bands (absolute; energies strict, the
         meters carry the re-solve noise).
+    workdir : the store root (``<workdir>/<Atom>/rungs/``).
 
     Returns
     -------
@@ -1797,7 +1798,7 @@ def readout_lane(key: CellKey, mol, mf, shell_bands: dict | None = None,
         e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
         e_arr, w_blk, corrected, dev = _lane_block(
             key, irrep, mult, L, ncas, na, nb, e_arr, ci, dets, ids,
-            parts, apply_l2, apply_s2)
+            parts, apply_l2)
         stored_e = payload["energies"][i0:i0 + mult]
         if len(stored_e) != mult or not np.allclose(
                 e_arr[:mult], stored_e, atol=e_tol, rtol=0.0):
