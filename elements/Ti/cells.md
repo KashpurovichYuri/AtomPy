@@ -2424,13 +2424,13 @@ configurations per root (top-2 determinants):
 
 lane cells (tagged windows; the pinned rows carry term energies) and void cells (scenario-gated):
 
-- `ti_3d4s@ar_3-1_casci_ao_-_pur_avg` E_term -848.39307837  ptp 4.9e-15  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
+- `ti_3d4s@ar_3-1_casci_ao_-_pur_avg` E_term -848.39307837  ptp 2.7e-15  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']  core 9p/span 0.9999
 - `ti_3d4d@ar_3-1_casci_ao_-_pur_avg` E_term -848.21559573  ptp 5.0e-02  L2 ['6.000', '6.000', '30.000', '6.000', '30.000', '6.000', '30.000']
 - `ti_3d4s4p4d@ar_3-1_casci_ao_-_pur_avg` E_term -848.43744803  ptp 2.4e-13  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
 - `ti_3d3p@semi_5-3_casci_ao_-_pur_avg` E_term -848.45198083  ptp 2.8e-14  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
 - `ti_3d3p4d@semi_5-3_casci_ao_-_pur_avg` E_term -848.49911928  ptp 1.1e-13  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
-- `ti_3s3p3d@1s2s2p4s_6-4_casci_ao_-_pur_avg` E_term -848.45488332  ptp 5.7e-14  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
-- `ti_3d3p4s@1s2s2p3s_6-4_casci_ao_-_pur_avg` E_term -848.45291987  ptp 3.3e-13  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']
+- `ti_3s3p3d@1s2s2p4s_6-4_casci_ao_-_pur_avg` E_term -848.45488332  ptp 7.1e-14  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']  core 6p/span 0.0111
+- `ti_3d3p4s@1s2s2p3s_6-4_casci_ao_-_pur_avg` E_term -848.45291987  ptp 2.9e-13  L2 ['12.000', '12.000', '12.000', '12.000', '12.000', '12.000', '12.000']  core 6p/span 1.0000
 - `ti_3d3p4d@semi_5-3_casci_ao_-_pol_avg` E -848.49911928
 - `ti_3s3p3d@1s2s2p4s_6-4_casci_ao_-_pol_avg` E -848.45488332
 - `ti_3d3p4s@1s2s2p3s_6-4_casci_ao_-_pol_avg` E -848.45291987

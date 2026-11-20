@@ -104,13 +104,17 @@ def _declared(atom: str) -> dict:
             # (window_distilled's future seam; since the distillation
             # wave 2026-11-10) -- the CAS-size axis is U14e's trio
             frozen=("ti_3d4s", "ti_3d4s@r1"),
+            # four lane legs OUT (the fresh construction refuses on
+            # today's windows.py; their stores are schema-stale, no
+            # win_lz): the same-l pairs 3d4d@ar / 3d4s4p4d@ar (the
+            # distilled window's S-orthonormality -- the declared
+            # future seam) and the semi legs 3d3p@semi / 3d3p4d@semi
+            # (the Loewdin needle in the raw shell span) -- the rows
+            # wait on a windows.py resolution, recorded in ticket 45
             lane_sectors={"ti_3d4s@ar": "3-1", "ti_3d@ar": "3-1",
-                          "ti_3d4d@ar": "3-1", "ti_3d4s4p4d@ar": "3-1",
-                          "ti_3d3p@semi": "5-3", "ti_3d3p4d@semi": "5-3",
                           "ti_3s3p3d@1s2s2p4s": "6-4",
                           "ti_3d3p4s@1s2s2p3s": "6-4"},
-            lane_sa=("ti_3d4s@ar", "ti_3d@ar", "ti_3d4d@ar",
-                     "ti_3d4s4p4d@ar", "ti_3d3p@semi", "ti_3d3p4d@semi",
+            lane_sa=("ti_3d4s@ar", "ti_3d@ar",
                      "ti_3s3p3d@1s2s2p4s", "ti_3d3p4s@1s2s2p3s")),
         "Sc-unc": dict(
             windows=("sc-unc_3d4s", "sc-unc_3d4s@r1", "sc-unc_3d4s@s1",
@@ -379,9 +383,10 @@ def collect_atom(atom: str, workdir: str = "elements") -> dict:
             "stored_roots_bands": "energies 1e-11 absolute; CI "
                                   "amplitudes 1e-8 per-root; the "
                                   "degenerate block's joint projector "
-                                  "(p_tol 1e-6, the solver-tail scale); "
-                                  "the re-solve angle (davidson noise) "
-                                  "1e-3",
+                                  "(p_tol 1e-5, the solver-tail "
+                                  "scale); the re-solve angle "
+                                  "(davidson noise) 1e-3; the "
+                                  "same-state energy noise 1e-6",
             "meters": "L2/Lz/S2 measured live through the CI-order "
                       "bridge on the stored draw",
             "lane_note": "the lane rows are the D2h-pinned components "

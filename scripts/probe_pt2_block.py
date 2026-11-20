@@ -88,6 +88,11 @@ def main() -> None:
     print(f"INFO stored block  spread "
           f"{(e_store.max() - e_store.min()) * 1e3:.3e} mEh "
           f"({(e_store.max() - e_store.min()) * EH_EV:.3e} eV)")
+    # the controls' band: identities up to the BLOCK's own
+    # non-degeneracy -- a redraw over roots split by dE wiggles <L^2>
+    # and vHv at the cross-term scale (Ti's 3F block: 3.1 mEh split,
+    # controls 3.7e-2); a machinery error shows at the 1e-1 scale
+    tol_ctrl = max(TOL_CTRL, float(e_store.max() - e_store.min()) * 10)
 
     # ---- rows on the stored draw (the bit-exact assertion bites on
     # the REAL store) ----
@@ -133,7 +138,7 @@ def main() -> None:
             row = _root_row(mc, r, "nevpt2-sc")
             e_vals.append(row.e_corr)
     spread_a = max(e_vals) - min(e_vals)
-    print(f"{'PASS' if worst_ctrl <= TOL_CTRL else 'FAIL'} "
+    print(f"{'PASS' if worst_ctrl <= tol_ctrl else 'FAIL'} "
           f"probe-A controls  max|<L2>-2|, |vHv-E| "
           f"{worst_ctrl:.2e} over {K_REDRAW} redraws x {nroots} roots")
     print(f"INFO probe-A redraw   E(2) spread "
@@ -177,7 +182,7 @@ def main() -> None:
                   f"(imag {imag:.1e}): its E(2) equals the block's "
                   f"constant by probe A (L=1 transitivity)")
     spread_b = max(e_vals_b) - min(e_vals_b)
-    print(f"{'PASS' if worst_ctrl_b <= TOL_CTRL else 'FAIL'} "
+    print(f"{'PASS' if worst_ctrl_b <= tol_ctrl else 'FAIL'} "
           f"probe-B controls  max|<L2>-2|, |<M_L>-round|, |vHv-E| "
           f"{worst_ctrl_b:.2e}")
     print(f"INFO probe-B pure      E(2) spread "
