@@ -274,7 +274,7 @@ def stage_facts(mol, mf, cas, c_act: np.ndarray, ncore: int, na: int, nb: int,
         field absent.
     window_report : dict, optional -- the window construction's own
         disclosure, carried through to the payload verbatim (the
-        caller owns the report: :func:`atomterm.cells._window_columns`
+        caller owns the report: :func:`atomterm.cells.window_columns`
         returns it); ``None`` leaves the field absent.
 
     Returns

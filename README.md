@@ -14,7 +14,7 @@ machine-precision closure.
 
 ```bash
 conda activate pyscf    # PySCF 2.13; bare shell: source <conda-root>/etc/profile.d/conda.sh first
-pytest -m fast          # 258 tests, seconds — the per-commit gate's base
+pytest -m fast          # 282 tests, seconds — the per-commit gate's base
 python scripts/run.py C # term tables -> elements/C/
 python scripts/regen_cells.py Ti --method sa-casscf   # one slice of the methods grid
 ```

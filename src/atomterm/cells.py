@@ -124,6 +124,9 @@ __all__ = [
     "cell_chk",
     "cell_payload",
     "kernel_cell_payload",
+    "key_core",
+    "lane_core",
+    "window_columns",
     "load_cell",
     "no_label",
     "prior_tag_of",
@@ -605,7 +608,7 @@ def _pick_no_window(wins, k: int):
         "open the sector)")
 
 
-def _lane_core(key: CellKey, mol, mf,
+def lane_core(key: CellKey, mol, mf,
                shell_bands: dict | None = None
                ) -> tuple[tuple[str, ...], int, np.ndarray, dict]:
     """One home for the core resolution shared by the free core branch
@@ -694,7 +697,7 @@ def _lane_core(key: CellKey, mol, mf,
     return core, n_pairs, c_core, report
 
 
-def _key_core(key: CellKey, mol, mf,
+def key_core(key: CellKey, mol, mf,
               shell_bands: dict | None = None
               ) -> tuple[int, np.ndarray | None, np.ndarray | None]:
     """One home for the key->core resolution shared by the run
@@ -713,14 +716,14 @@ def _key_core(key: CellKey, mol, mf,
     ncore = ncore_of(mol.nelectron, na + nb)
     c_run = None
     if key.core_tag is not None:
-        _, ncore, c_run, _w = _lane_core(key, mol, mf, shell_bands)
+        _, ncore, c_run, _w = lane_core(key, mol, mf, shell_bands)
     c_pur = (None if c_run is not None
              else purified_core_orbitals(mol, mf, ncore)[0]
              if key.substrate == "pur" else None)
     return ncore, (c_run if c_run is not None else c_pur), c_pur
 
 
-def _window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
+def window_columns(key, mol, mf, shell_bands, shell_radials, ncol=None,
                     prior_bands=None, series_mfs=None):
     """The window object ``build_full_mo`` consumes: the raw AO rows,
     the distilled-shell columns when the case declares radials, or the
@@ -932,8 +935,8 @@ def run_cell(key: CellKey, mf, mol=None, *, frac_mf=None, budgets: dict = None,
             f"for core={key.core}, mask={key.mask} -- the fractional "
             "reference's open shell and the member-labeled radial "
             "substrate are row-space constructs")
-    ncore, c_core, c_pur = _key_core(key, mol, mf, shell_bands)
-    act, ncas, win_report = _window_columns(
+    ncore, c_core, c_pur = key_core(key, mol, mf, shell_bands)
+    act, ncas, win_report = window_columns(
         key, mol, mf, shell_bands, shell_radials,
         ncol=ncore, prior_bands=prior_bands, series_mfs=series_mfs)
 
@@ -1103,7 +1106,7 @@ def analyze_cell(key: CellKey, mol, mf, shell_bands: dict | None = None,
     ncas = data.ncas or _window_ncas(key, mol, shell_bands, shell_radials)
     if sector_dimension(ncas, na, nb) > _COMM_CAP:
         return None
-    ncore, c_core, _ = _key_core(key, mol, mf, shell_bands)
+    ncore, c_core, _ = key_core(key, mol, mf, shell_bands)
     facts = _facts(key, mol, mf, cas, ncore, ncas, na, nb, c_core=c_core)
     # the run's own verdict rides the store (the cache has no live mc
     # object to read; the default would claim every stored run
@@ -1182,7 +1185,7 @@ def kernel_cell_payload(key: CellKey, mol=None, mf=None,
                                     ci_in_detbasis_order, window_closure)
 
     na, nb = key.sector
-    ncore, c_core, _ = _key_core(key, mol, mf, shell_bands)
+    ncore, c_core, _ = key_core(key, mol, mf, shell_bands)
     ncas = data.ncas or _window_ncas(key, mol, shell_bands, shell_radials)
     c_act = np.asarray(data.mo_coeff)[:, ncore:ncore + ncas]
     parts = build_operator_parts(mol, mf, c_act, ncore, na, nb,
@@ -1370,8 +1373,15 @@ def _lane_block(key, irrep, mult, L, ncas, na, nb, e_arr, ci, dets, ids,
     if ours_vecs is None:
         for vec in _root_vectors(ci):
             w = ci_in_detbasis_order(vec, ncas, na, nb)
-            # the pinned vector lives entirely in its block
-            assert abs(np.linalg.norm(w[sel]) - 1.0) < 1e-8, irrep
+            # the pinned vector lives entirely in its block -- a
+            # declared invariant, raised (never an assert: it must
+            # survive python -O)
+            if abs(np.linalg.norm(w[sel]) - 1.0) >= 1e-8:
+                raise ValueError(
+                    f"{key.address}: the pinned {irrep} root leaves "
+                    f"its D2h block ({1.0 - np.linalg.norm(w[sel]):.1e}"
+                    " support outside) -- the solver's irrep pin does "
+                    "not match the window")
             w_blk.append(w)
     else:
         idx = np.flatnonzero(sel)
@@ -1391,7 +1401,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     The core resolves through the shell layer to its raw AO-shell span
     (Loewdin-orthonormalized), and the FROZEN CORE is the reference's
     OWN core -- the occupied columns S-projected onto that span
-    (:func:`_lane_core`; the field and the bookkeeping join the
+    (:func:`lane_core`; the field and the bookkeeping join the
     neutral anchor BY CONSTRUCTION; ``ncore`` follows the pair count,
     never the span width); the
     window placed by :func:`atomterm.windows.build_full_mo` against
@@ -1455,7 +1465,7 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
     ------
     ValueError
         the key is not a lane cell; the core construction refuses the
-        key (:func:`_lane_core`: window/core overlap, a sector
+        key (:func:`lane_core`: window/core overlap, a sector
         disagreeing with the core-derived electron count, an absent
         core shell).
     """
@@ -1483,8 +1493,8 @@ def run_lane_cell(key: CellKey, mol, mf, term, conv_tol: float = 1e-12,
 
     L, parity = term
     na, nb = key.sector
-    core, nf, c_core, core_report = _lane_core(key, mol, mf, shell_bands)
-    act, ncas, _ = _window_columns(key, mol, mf, shell_bands, shell_radials)
+    core, nf, c_core, core_report = lane_core(key, mol, mf, shell_bands)
+    act, ncas, _ = window_columns(key, mol, mf, shell_bands, shell_radials)
     mo = build_full_mo(mf, list(range(nf)), act, c_core=c_core)
     c = mo[:, nf:nf + ncas]
 
@@ -1765,8 +1775,8 @@ def readout_lane(key: CellKey, mol, mf, shell_bands: dict | None = None,
     payload = load_lane_cell(key, workdir)
     L, parity = payload["term"]
     na, nb = key.sector
-    core, nf, c_core, _ = _lane_core(key, mol, mf, shell_bands)
-    act, ncas, _ = _window_columns(key, mol, mf, shell_bands, shell_radials)
+    core, nf, c_core, _ = lane_core(key, mol, mf, shell_bands)
+    act, ncas, _ = window_columns(key, mol, mf, shell_bands, shell_radials)
     if key.method == "sa-casscf":
         if "mo_coeff" not in payload:
             raise KeyError(

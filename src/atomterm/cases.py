@@ -954,12 +954,12 @@ CAMPAIGN: dict[str, CaseSpec] = {
                    run_casscf=False,          # the multi-solution class
                    # the lane class RETURNS at the CHEMICAL width
                    # (the case now distills -- the lane window rides
-                   # _window_columns like every other, delivering the
+                   # window_columns like every other, delivering the
                    # CAS(4,12)/(6,13) shapes instead of the retired
                    # 36-column band span): one lane per section at its
                    # ruler core.  The (4,15) section carries NONE: its
                    # window shares the 6p rows with the 5-pair core
-                   # and _lane_core refuses the overlap (a declared
+                   # and lane_core refuses the overlap (a declared
                    # non-disjoint partition is a grid axis, not a
                    # lane one)
                    lane_windows=("5f6d@6s6p7s", "5f6d7s@6s6p"),

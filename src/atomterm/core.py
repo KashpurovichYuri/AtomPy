@@ -197,7 +197,7 @@ def confined_core_orbitals(mf, c_span: np.ndarray,
     mf : the reference (``get_hcore``; ``mol`` for the eri). No
         converged orbitals are read.
     c_span : (nao, M) S-orthonormal span columns (the core's raw-AO
-        span, :func:`atomterm.cells._lane_core`).
+        span, :func:`atomterm.cells.lane_core`).
     n_pairs : the core's doubly-occupied pair count (the CHEMISTRY:
         :func:`atomterm.windows.closed_electrons` over the core's
         shells, halved).

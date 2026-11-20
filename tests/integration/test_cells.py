@@ -283,7 +283,7 @@ def test_lane_keys_derive_from_the_declaration():
         ("3d3p4d@semi", (4, 3)), ("3d3p4s@1s2s2p3s", (5, 4)),
         ("3s3p3d@1s2s2p4s", (5, 4))]
     # U14e's lanes: BACK at the CHEMICAL width (the case distills --
-    # the lane window rides _window_columns, CAS(4,12)/(6,13), not
+    # the lane window rides window_columns, CAS(4,12)/(6,13), not
     # the retired 36-column band span); the (4,15) section carries
     # none (its window shares the 6p rows with the 5-pair core)
     assert [(k.window, k.sector) for k in lane_keys(CAMPAIGN["U14e"])] == [

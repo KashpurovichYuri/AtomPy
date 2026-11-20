@@ -1,0 +1,63 @@
+===== references =====
+  ROHF E = -50.38185233  (trusted rung elements/U14e/rungs/rohf.chk)
+  UHF  E = -50.38881343  (E_uhf - E_rohf = -6.961 mEh)
+  [new physics, printed not asserted] <S2> = 6.228941 (Sz exact by construction); pairing spectrum: 5 occupied pairs, 5 below 1 - 1e-6, smallest [0.88349911 0.99772338 0.9983828 ]
+
+===== free SA 10f13d (4,0) =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e_vv.py:213: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_full = build_full_mo(mf_sub, occupied_core_idx(mf_sub,
+  [sa] free-10f13d: ensemble -50.42381002 (conv 5.6e-09, 50 cycles), ncas 12, 38.4 s, rss 1.7 GB
+  root0: e_ref -50.42381143, E(2) -341.6651 mEh (-9.2972 eV), total -50.76547655; <L2> in [71.999998, 71.999999], <S2> max dev 8.88e-15
+  [PASS] (a) SA (4,12) E(2) ~ the committed payload root 0: fresh -341.6651 mEh vs anchor -341.6651 (delta -0.0000, band ±5.0)
+  [PASS] (b) <L2> = 72 / <S2> = 6 on every free SA (4,12) root: 17 roots, max dev 8.88e-15 (band 1e-05)
+
+===== free SA 10f13d14p (4,0) =====
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 14p: k=1 of 1 bands, capture 0.9088-0.9112
+  [sa] free-10f13d14p: ensemble -50.42530622 (conv 4.0e-07, 200 cycles), ncas 15, 172.0 s, rss 1.9 GB
+  root0: e_ref -50.42637717, E(2) -336.0183 mEh (-9.1435 eV), total -50.76239546; <L2> in [71.781895, 71.965380], <S2> max dev 7.11e-15
+
+===== free SA 10f13d7s (5,1) =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e_vv.py:213: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_full = build_full_mo(mf_sub, occupied_core_idx(mf_sub,
+  [sa] free-10f13d7s: ensemble -50.45271849 (conv 8.3e-09, 46 cycles), ncas 13, 75.7 s, rss 1.9 GB
+  root0: e_ref -50.45285604, E(2) -282.0774 mEh (-7.6757 eV), total -50.73493345; <L2> in [89.998694, 89.999857], <S2> max dev 6.00e+00
+
+===== pinned substrate (the D2h lane) =====
+  plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
+  D2h ROHF E = -50.38185233
+
+===== pinned SA 5f6d@6s6p7s (4,0) =====
+  [window] distilled 5f: k=1 of 3 bands, capture 0.9328-0.9420; 6d: k=1 of 3 bands, capture 0.9828-0.9828
+  [pinned] pinned-5f6d@6s6p7s: ensemble -50.42381003 (conv 3.6983038853577455e-09, 26 cycles), blocks ['Au', 'B1u', 'B2u', 'B3u'], 24.1 s, rss 18.3 GB
+  term E(2): mean -341.7445 mEh, ptp 5.53e-02 mEh over 17 components; <L2> in [72.000000, 72.000000]
+  [PASS] (b) <L2> = 72 / <S2> = 6 on every pinned SA (4,12) component: 17 components, max dev 1.94e-07 (band 1e-05)
+  [PASS] (d) the pinned SA route ~ the free route at (4,12): pinned ensemble -50.42381003 vs free -50.42381002 (delta -5.27e-09 Eh, band 0.001)
+
+===== pinned SA 5f6d7s@6s6p (5,1) =====
+  [window] distilled 5f: k=1 of 3 bands, capture 0.9328-0.9420; 6d: k=1 of 3 bands, capture 0.9828-0.9828; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+  [pinned] pinned-5f6d7s@6s6p: ensemble -50.45150714 (conv 6.587008272163075e-09, 72 cycles), blocks ['Au', 'B1u', 'B2u', 'B3u'], 146.0 s, rss 19.6 GB
+  term E(2): mean -285.4319 mEh, ptp 5.00e+01 mEh over 17 components; <L2> in [71.998561, 89.998778]
+
+===== UHF-seeded SA 10f13d (4,12) =====
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  [sa] uhf-seeded: ensemble -50.42381002 (conv 6.4e-09, 2 cycles), ncas 12, 5.6 s, rss 19.6 GB
+  root0: e_ref -50.42381051, E(2) -341.6633 mEh (-9.2971 eV), total -50.76547385; <L2> in [71.999998, 72.000000], <S2> max dev 8.88e-15
+  [PASS] (b) the UHF-seeded SA recovers <L2> = 72 / <S2> = 6: 17 roots from the spin-broken start, max dev 8.88e-15 (band 1e-05)
+
+===== (c) the CAS-size axis =====
+  [PASS] (c) the (4,15) promotion WORSENS the corrected total: fresh: (4,12) -50.76547655 -> (4,15) -50.76239546 (+3.081 mEh); stored: -50.76547655 -> -50.76239101 (+3.086 mEh)
+
+===== verdict =====
+  PASS  (a) SA (4,12) E(2) ~ the committed payload root 0
+  PASS  (b) <L2> = 72 / <S2> = 6 on every free SA (4,12) root
+  PASS  (b) <L2> = 72 / <S2> = 6 on every pinned SA (4,12) component
+  PASS  (d) the pinned SA route ~ the free route at (4,12)
+  PASS  (b) the UHF-seeded SA recovers <L2> = 72 / <S2> = 6
+  PASS  (c) the (4,15) promotion WORSENS the corrected total
+6/6 assertions hold
