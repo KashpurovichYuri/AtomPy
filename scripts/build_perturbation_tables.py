@@ -72,9 +72,6 @@ def _group(c: dict, atom: str) -> str:
         return "the NO twins (CASCI)"
     if "_casscf" in addr:
         return "the reference axis (single-root CASSCF vs SA)"
-    size = _declared(atom).get("size", {})
-    if any(addr.startswith(f"{w}_") for w in size):
-        return "the CAS-size axis (the flagship R-test)"
     size_group = _declared(atom).get("size_group", ())
     if any(addr.startswith(f"{w}_") for w in size_group):
         return "the CAS-size axis (the flagship R-test)"
@@ -105,6 +102,17 @@ def _rows(payload: dict) -> list[str]:
     return out
 
 
+def _ground_spread_meh(roots: list[dict]) -> float:
+    """The spread reads the GROUND BLOCK only: the roots degenerate
+    with root 0 (the gauge block); broken spans store excited roots
+    beside the ground one and those are different states, not gauges
+    of it."""
+    r0 = roots[0]
+    e2 = [r["e_corr"] for r in roots
+          if abs(r["e_ref"] - r0["e_ref"]) <= 1e-6]
+    return (max(e2) - min(e2)) * 1e3
+
+
 def _cell_row(c: dict) -> str:
     """One cell's row(s): the refusal line, the lane rows (one per
     block root), or the ground-block row."""
@@ -132,14 +140,7 @@ def _cell_row(c: dict) -> str:
         return "\n".join(out)
     roots = c["roots"]
     r0 = roots[0]
-    # the spread reads the GROUND BLOCK only: the roots degenerate
-    # with root 0 (the gauge block); broken spans store excited
-    # roots beside the ground one and those are different states,
-    # not gauges of it
-    block = [r for r in roots
-             if abs(r["e_ref"] - r0["e_ref"]) <= 1e-6]
-    e2 = [r["e_corr"] for r in block]
-    spread = (max(e2) - min(e2)) * 1e3
+    spread = _ground_spread_meh(roots)
     return (
         f"| `{c['address']}` | {c['nroots']} "
         f"| {r0['l2']:.6f} "
@@ -171,15 +172,13 @@ def _csv(payload: dict) -> str:
                     f"{c.get('term_e2_ptp', 0.0) * 1e3:.1e},rows")
             continue
         r0 = c["roots"][0]
-        block = [r for r in c["roots"]
-                 if abs(r["e_ref"] - r0["e_ref"]) <= 1e-6]
-        e2 = [r["e_corr"] for r in block]
+        spread = _ground_spread_meh(c["roots"])
         lines.append(
             f"{c['address']},{c['nroots']},{r0['l2']:.6f},"
             f"{r0['e_ref']:.8f},{r0['e_corr'] * 1e3:+.4f},"
             f"{r0['e_corr_eV']:+.4f},{r0['e_total']:.8f},"
             f"{r0['e_total_eV']:+.4f},"
-            f"{(max(e2) - min(e2)) * 1e3:.1e},rows")
+            f"{spread:.1e},rows")
     return "\n".join(lines) + "\n"
 
 

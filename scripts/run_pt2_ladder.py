@@ -161,11 +161,6 @@ def _declared_addresses(atom: str) -> list[str]:
     for x in windows:
         addrs += [f"{x}_{sect_of(x)}_casci_{s}_-_pur_avg"
                   for s in ("ao", "mo", "moc")]
-    if d.get("size"):
-        for x, tail in d["size"].items():
-            addrs += [f"{x}_{sect_of(x)}_casci_{s}_-_pur_avg"
-                      for s in ("ao", "mo", "moc")]
-            addrs.append(f"{x}{tail}_{sect_of(x)}_casci_no_-_pur_avg")
     if d.get("no_tail"):
         head = windows[0]
         addrs.append(f"{head}{d['no_tail']}_{sect_of(head)}_casci_no_-_pur_avg")
@@ -221,13 +216,6 @@ def _meters(mol, mf, c_act, ncore, na, nb):
         return float(np.real(w @ apply_lz(w)))
 
     return expect
-
-
-def _expect(kind_or_mat, ci_pyscf, norb, na, nb) -> float:
-    w = ci_in_detbasis_order(np.asarray(ci_pyscf).ravel(), norb, na, nb)
-    if callable(kind_or_mat):
-        return float(np.real(w @ kind_or_mat(w)))
-    return float(np.real(np.vdot(w, kind_or_mat @ w)))
 
 
 def _collect_lane(key, lane_sub, spec, workdir, t0) -> dict:

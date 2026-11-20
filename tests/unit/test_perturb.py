@@ -227,7 +227,7 @@ def test_refusal_bands_are_forceable(block):
     with pytest.raises(ValueError):
         assert_stored_roots(mc2, ref_ci=ci_pert, o_tol=0.0, c_tol=1e-12,
                             p_tol=0.0)
-    # (e) a wrong-length energy stack refuses by shape (the declared
+    # (d) a wrong-length energy stack refuses by shape (the declared
     # message, not a numpy broadcast error)
     with pytest.raises(ValueError, match="shape mismatch"):
         assert_stored_roots(mc, ref_energies=np.append(e, 0.0))
