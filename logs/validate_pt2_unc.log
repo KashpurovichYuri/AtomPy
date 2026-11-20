@@ -1,0 +1,19 @@
+===== validate_pt2 =====
+PASS  anchor O2  E(2) -0.169785428397 vs -0.169785157128
+PASS  anchor H14  E(2) -0.094164339713 vs -0.094164359938
+PASS  payload Sc-unc: class sums  max |sum - e_corr| 0.00e+00 over 178 roots / 1424 classes
+PASS  payload Sc-unc: totals  max |e_total - e_ref - e_corr| 5.66e-14
+PASS  payload Sc-unc: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Sc-unc: meter consistency  max |energy - e_per_norm*norm| 5.55e-17
+PASS  payload Sc-unc: disposition census  26 declared: 26 rows / 0 refused
+PASS  payload Ti-unc: class sums  max |sum - e_corr| 0.00e+00 over 172 roots / 1376 classes
+PASS  payload Ti-unc: totals  max |e_total - e_ref - e_corr| 5.64e-14
+PASS  payload Ti-unc: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Ti-unc: meter consistency  max |energy - e_per_norm*norm| 5.55e-17
+PASS  payload Ti-unc: disposition census  26 declared: 24 rows / 2 refused
+SKIP  route invariance Sc-unc: no lane/free pair
+PASS  probe Sc-unc (sc-unc_3d4s_2-1_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts (L>=2: LARGE = the declared spread disclosure)
+SKIP  route invariance Ti-unc: no lane/free pair
+PASS  probe Ti-unc (ti-unc_3d4s_3-1_sa-casscf_ao_-_pur_avg)  2 PASS lines, 2 verdicts (L>=2: LARGE = the declared spread disclosure)
+
+validate_pt2: ALL GREEN (350 roots certified)

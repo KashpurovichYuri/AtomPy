@@ -262,10 +262,10 @@ def test_projector_band_is_its_own(carbon):
     u = u / np.linalg.norm(u)
     ci = [np.asarray(c).ravel().copy() for c in mc.ci]
     ci_new = [v.copy() for v in ci]
-    ci_new[0] = ci_new[0] + 1e-4 * u
+    ci_new[0] = ci_new[0] + 5e-4 * u
     with pytest.raises(ValueError):
         assert_stored_roots(mc, ref_ci=ci_new, o_tol=0.0)
-    assert_stored_roots(mc, ref_ci=ci_new, o_tol=0.0, p_tol=1e-3)
+    assert_stored_roots(mc, ref_ci=ci_new, o_tol=0.0, p_tol=5e-3)
 
 
 def test_phase_and_davidson_noise_clauses(block):

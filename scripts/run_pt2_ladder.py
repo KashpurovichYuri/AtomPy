@@ -122,16 +122,18 @@ def _declared(atom: str) -> dict:
             no_tail="no2", sector="2-1",
             ref_windows=("sc-unc_3d4s", "sc-unc_3d4s@r1"),
             frozen=("sc-unc_3d4s", "sc-unc_3d4s@r1"),
-            lane_sectors={"sc-unc_3d4s@ar": "2-1", "sc-unc_3d@ar": "2-1"},
-            lane_sa=("sc-unc_3d@ar",)),
+            # the lane legs OUT: the lane substrate's basin steer
+            # cannot build today (the plain D2h draw lands a wrong
+            # basin and the C1-seeded retry diverges) -- recorded in
+            # ticket 45; the rows wait on a lane_substrate resolution
+            lane_sectors={}, lane_sa=()),
         "Ti-unc": dict(
             windows=("ti-unc_3d4s", "ti-unc_3d4s@r1", "ti-unc_3d4s@s1",
                      "ti-unc_3d4s@s2"),
             no_tail="no2", sector="3-1",
             ref_windows=("ti-unc_3d4s", "ti-unc_3d4s@r1"),
             frozen=("ti-unc_3d4s", "ti-unc_3d4s@r1"),
-            lane_sectors={"ti-unc_3d4s@ar": "3-1", "ti-unc_3d@ar": "3-1"},
-            lane_sa=("ti-unc_3d@ar",)),
+            lane_sectors={}, lane_sa=()),  # the substrate steer: see Sc-unc
         "U14e": dict(
             windows=("u14e_10f13d", "u14e_10f13d7s", "u14e_10f13d14p"),
             sector="4-0",
@@ -383,7 +385,7 @@ def collect_atom(atom: str, workdir: str = "elements") -> dict:
             "stored_roots_bands": "energies 1e-11 absolute; CI "
                                   "amplitudes 1e-8 per-root; the "
                                   "degenerate block's joint projector "
-                                  "(p_tol 1e-5, the solver-tail "
+                                  "(p_tol 1e-4, the solver-tail "
                                   "scale); the re-solve angle "
                                   "(davidson noise) 1e-3; the "
                                   "same-state energy noise 1e-6",

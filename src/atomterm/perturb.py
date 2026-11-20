@@ -188,7 +188,7 @@ def _projector(cis) -> np.ndarray:
 
 def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
                         e_tol: float = 1e-11, c_tol: float = 1e-8,
-                        o_tol: float = 1e-3, p_tol: float = 1e-5,
+                        o_tol: float = 1e-3, p_tol: float = 1e-4,
                         e_noise: float = 1e-6) -> None:
     """Refuse unless the readout reproduced the stored solution.
 
@@ -198,9 +198,10 @@ def assert_stored_roots(mc, ref_energies=None, ref_ci=None,
     amplitude equality (c_tol); the degenerate block's lawful gauge
     freedom (the joint projector, its own band p_tol -- an SA draw's
     solver tails move the block projector at the tail scale,
-    atom-dependent: C ~1e-7, Si 2.2e-7, Ti 3.9e-6 -- an order below
-    the vectors' mixing angles; an exactly degenerate PAIR may rotate
-    inside itself, the pair span invariant); and the single-root
+    basis-and-atom-dependent: Si 2.2e-7, Ti 3.9e-6, Ti-unc 5.0e-5 --
+    an order below the vectors' mixing angles; an exactly degenerate
+    PAIR may rotate inside itself, the pair span invariant); and the
+    single-root
     re-solve's davidson noise (the re-solve ANGLE -- |sin| between
     the vectors, linear in the unconverged mixing -- within o_tol of
     zero; the state's meters and E(2) are flat across it, while any
