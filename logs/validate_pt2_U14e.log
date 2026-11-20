@@ -1,0 +1,12 @@
+===== validate_pt2 =====
+PASS  anchor O2  E(2) -0.169784972379 vs -0.169785157128
+PASS  anchor H14  E(2) -0.094164339713 vs -0.094164359938
+PASS  payload U14e: class sums  max |sum - e_corr| 0.00e+00 over 197 roots / 1576 classes
+PASS  payload U14e: totals  max |e_total - e_ref - e_corr| 3.55e-15
+PASS  payload U14e: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload U14e: meter consistency  max |energy - e_per_norm*norm| 2.22e-16
+PASS  payload U14e: disposition census  32 declared: 21 rows / 11 refused
+SKIP  route invariance U14e: a refused partner
+PASS  probe U14e (u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
+
+validate_pt2: ALL GREEN (197 roots certified)

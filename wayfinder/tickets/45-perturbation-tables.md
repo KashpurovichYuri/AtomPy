@@ -85,6 +85,69 @@ core_energy); the stored-roots seam needs a lane-native readout twin
 before it can price lane rows.  The irrep route-invariance gate row
 waits with it.  Recorded as the follow-up.
 
+## Status: the LANE SEAM + step 5 (Sc, Ti) DONE 2026-11-20; the uncs DONE; U14e in flight
+
+THE LANE SEAM (1edb838): cells.readout_lane -- the runner's own
+re-solve recipe asserted against the record (energies strict, the
+meters within the re-solve noise band), per-block kernel-ready mc
+objects out through perturb.nevpt2_rows_on; casscf.irrep_solvers
+promoted (the pin's one construction, runner and twin share it);
+cases.lane_substrate moved in from scripts (the substrate family's
+second member).  MEASURED (C): the CI lane's ground block prices
+-682.3334 mEh = the free twin's root EXACTLY (the irrep pinning is
+pricing-inert); the SA lane's B1g prices -58.1340 = the certified
+grid SA value.  The lane blocks hold the D2h det-class states (the
+meters carry them) -- the lane rows are the core-partition
+disclosure axis, as declared.  Route invariance: C delta 0,
+Si 1.04e-5 mEh, Sc 5.4e-7 Eh -- pricing-inert where the substrates
+agree; Ti DISCLOSES 1.76 mEh (the lane's D2h-canonical draw and the
+free rung land the SAME basin and energy with DIFFERENT orbital
+gauges -- E(2) moves at the mEh scale: the wave's orbital-draw
+finding read at the route axis).
+
+THE SEAM'S BANDS reached their per-atom scale (each measured, none
+an occasion-tolerance):
+- readout_mc(ci0=): the reconstruction starts FROM the stored stack
+  -- a quasi-degenerate manifold's plain re-solve RE-PARTITIONS the
+  roots (Sc compact: the same nine energies to 1e-11, a different
+  span at 1.7e-1).
+- assert_stored_roots(e_noise=1e-6): the energy miss consults the
+  vector certificate (the Sc single-root CASSCF class: angle 9e-6,
+  energy 2.7e-11..9.2e-9).
+- p_tol 1e-4: the tail sweep measured -- Si 2.2e-7, Ti 3.9e-6,
+  Ti-unc 5.0e-5; an exactly degenerate PAIR may rotate inside
+  itself (Ti's SA roots 0-1: angle 0.17, the pair span invariant).
+- the meters went MATRIX-FREE (detbasis.operator_apply -- bitwise
+  equal to the dense values on C, 0.0 over 69 roots): the dense
+  meter build on the M-shell pol twins exploded to ~1.35 TB (the
+  door's price in logs/collect_sc.tmp.log; the 3d3p4d@semi pol twin
+  PRICED through it).
+- the probe instrument went term-aware: the controls read L(L+1)
+  and scale with the BLOCK's own non-degeneracy (Sc's SA residual
+  2.3e-7; Ti's 3F block: 3.08 mEh split -> controls 3.7e-2); the
+  gate's probe predicate carries the per-L rule (L >= 2 admits
+  LARGE as the declared spread disclosure).
+
+Sc: 52 declared -> 43 rows / 9 refused (4 Lowdin construction
+drifts on the semi legs -- the store predates today's strict
+Lowdin; 5 genuine substrate drifts -- the regen loop, gated).
+Ti: 46 -> 41 rows / 5 refused (four lane legs OUT: the same-l pairs
+3d4d@ar / 3d4s4p4d@ar -- the distilled window's S-orthonormality,
+the declared future seam, their stores schema-stale -- and the semi
+legs, the Lowdin needle on fresh construction; the CI lanes
+regenerated fresh).  Sc-unc 25/1, Ti-unc 24/2.  The uncs' LANE legs
+declared out: the lane substrate's basin steer cannot build today
+(the plain D2h draw lands a wrong basin, the C1-seeded retry
+diverges).  regen_cells.py: the run_queue/_materializes/keep/
+parse_args block restored (lost in the lane_substrate move; the
+unit tier never imports scripts, so it stayed silent).
+Gates ALL GREEN: logs/validate_pt2_Sc.log, _Ti.log, _unc.log.
+READINGS: the lane rows carry the core-partition axis (the CI lanes'
+det-class disclosure: ptp 262/152 mEh on C/Si; the SA lanes' ptp
+17/5.5 mEh); the frozen rows explode as declared (Ti-unc's @r1
+frozen: -710.27 mEh); the route axis reads the orbital-draw
+sensitivity at mEh scale.
+
 ## Status: step 4 (Si) DONE 2026-11-19 -- 34 cells / 104 roots; C+Si gate ALL GREEN
 
 Si through the same chain: payload + table + CSV + the combined gate

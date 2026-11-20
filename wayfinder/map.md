@@ -12,16 +12,23 @@ The wave spec: [`specs/pt2-perturbation.md`](specs/pt2-perturbation.md)
 delivery chain.
 
 - [45 — the PT2 runs + PERTURBATION_TABLE.md](tickets/45-perturbation-tables.md):
-  IN PROGRESS (steps 3, 3b, 4 DONE 2026-11-19 — C AND Si collected,
-  rendered, gated ALL GREEN, 170 roots; remaining: the lane-seam
-  follow-up + step 5's gated list).  Measured: the optimized ladder
-  SATURATES (the optimizer repairs the poverty class; the thin
-  spans fuel — C −265.8/Si −236.1 mEh, static remainder 43.2/~41
-  mEh); E(2) is orbital-sensitive, rotation-insensitive at every
-  measured amplitude (⟨L²⟩ 2.00→1.58 pricing the same correction);
-  the frozen-core rows explode 4× (the disclosure).  The seam's
-  band structure is four clauses now (e_tol/c_tol/o_tol/p_tol —
-  the projector's own tail band landed on Si's @s2 SA refusal).
+  IN PROGRESS (the lane seam + steps 5's ladder DONE 2026-11-20 —
+  ALL SEVEN atoms collected/rendered/gated: C 29, Si 37, Sc 52,
+  Ti 46, the uncs 26/26, U14e 32 cells; the records in the ticket).
+  Measured on the wave's questions: the optimized ladder SATURATES
+  (the optimizer repairs the poverty class; the thin spans fuel);
+  E(2) is orbital-sensitive, rotation-insensitive; the CAS-size
+  axis (U14e's flagship (4,12)/(6,13)/(4,15)): the corrected
+  ladder PREFERS (4,12) — the (4,15) promotion's CAS gain is
+  dynamic double-counting (E(2) −341.7 → −336.0 mEh, the corrected
+  total worsens −50.7655 → −50.7624).  The seam's bands reached
+  their measured per-atom scale (readout_mc(ci0=), e_noise, p_tol
+  1e-4 — the tail sweep Si 2.2e-7 / Ti 3.9e-6 / Ti-unc 5.0e-5; the
+  meters matrix-free — the dense build hit ~1.35 TB on the M-shell
+  pol twins).  Remaining: the closed-out disposition (the user's
+  call) + the declared-out classes' recoveries (the uncs' lane
+  substrate steer; the semi legs' Lowdin needles; the same-l
+  distilled legs).
 - [46 — the TABLE.md physics pass](tickets/46-table-physics-pass.md):
   DESIGN-FIRST, user-gated — the render-level significance policy
   (the stores keep everything; the table keeps the physics).

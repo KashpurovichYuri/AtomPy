@@ -1,0 +1,54 @@
+===== validate_pt2 =====
+PASS  anchor O2  E(2) -0.169785487920 vs -0.169785157128
+PASS  anchor H14  E(2) -0.094164339713 vs -0.094164359938
+PASS  payload C: class sums  max |sum - e_corr| 0.00e+00 over 75 roots / 600 classes
+PASS  payload C: totals  max |e_total - e_ref - e_corr| 3.46e-15
+PASS  payload C: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload C: meter consistency  max |energy - e_per_norm*norm| 2.78e-17
+PASS  payload C: disposition census  29 declared: 29 rows / 0 refused
+PASS  payload Si: class sums  max |sum - e_corr| 0.00e+00 over 113 roots / 904 classes
+PASS  payload Si: totals  max |e_total - e_ref - e_corr| 2.83e-14
+PASS  payload Si: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Si: meter consistency  max |energy - e_per_norm*norm| 1.39e-17
+PASS  payload Si: disposition census  37 declared: 37 rows / 0 refused
+PASS  payload Sc: class sums  max |sum - e_corr| 0.00e+00 over 251 roots / 2008 classes
+PASS  payload Sc: totals  max |e_total - e_ref - e_corr| 5.67e-14
+PASS  payload Sc: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Sc: meter consistency  max |energy - e_per_norm*norm| 2.78e-17
+PASS  payload Sc: disposition census  52 declared: 43 rows / 9 refused
+PASS  payload Ti: class sums  max |sum - e_corr| 0.00e+00 over 273 roots / 2184 classes
+PASS  payload Ti: totals  max |e_total - e_ref - e_corr| 5.63e-14
+PASS  payload Ti: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Ti: meter consistency  max |energy - e_per_norm*norm| 5.55e-17
+PASS  payload Ti: disposition census  46 declared: 41 rows / 5 refused
+PASS  payload Sc-unc: class sums  max |sum - e_corr| 0.00e+00 over 178 roots / 1424 classes
+PASS  payload Sc-unc: totals  max |e_total - e_ref - e_corr| 5.66e-14
+PASS  payload Sc-unc: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Sc-unc: meter consistency  max |energy - e_per_norm*norm| 5.55e-17
+PASS  payload Sc-unc: disposition census  26 declared: 26 rows / 0 refused
+PASS  payload Ti-unc: class sums  max |sum - e_corr| 0.00e+00 over 172 roots / 1376 classes
+PASS  payload Ti-unc: totals  max |e_total - e_ref - e_corr| 5.64e-14
+PASS  payload Ti-unc: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload Ti-unc: meter consistency  max |energy - e_per_norm*norm| 5.55e-17
+PASS  payload Ti-unc: disposition census  26 declared: 24 rows / 2 refused
+PASS  payload U14e: class sums  max |sum - e_corr| 0.00e+00 over 197 roots / 1576 classes
+PASS  payload U14e: totals  max |e_total - e_ref - e_corr| 3.55e-15
+PASS  payload U14e: eV columns  max |eV - Eh*27.211386245988| 0.00e+00
+PASS  payload U14e: meter consistency  max |energy - e_per_norm*norm| 2.22e-16
+PASS  payload U14e: disposition census  32 declared: 21 rows / 11 refused
+PASS  route invariance C  lane ground block -682.3334 mEh vs free ground root -682.3334 mEh (delta 6.66e-13 mEh; band 1e-4 Eh) -- the pinning is pricing-inert
+PASS  probe C (c_2p_2-0_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
+PASS  route invariance Si  lane ground block -381.9356 mEh vs free ground root -381.9356 mEh (delta 1.04e-05 mEh; band 1e-4 Eh) -- the pinning is pricing-inert
+PASS  probe Si (si_3p_2-0_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
+PASS  route invariance Sc  lane ground block -200.2098 mEh vs free ground root -200.2103 mEh (delta 5.40e-04 mEh; band 1e-4 Eh) -- the pinning is pricing-inert
+PASS  probe Sc (sc_3d4s_2-1_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
+DISCLOSED  route invariance Ti: lane ground block -216.4629 mEh vs free ground root -214.6999 mEh (delta 1.76e+00 mEh past the band) -- the lane's D2h gauge vs the free draw: the orbital-draw reading, the ticket carries the record
+PASS  probe Ti (ti_3d4s_3-1_sa-casscf_ao_-_pur_avg)  2 PASS lines, 2 verdicts (L>=2: LARGE = the declared spread disclosure)
+SKIP  route invariance Sc-unc: no lane/free pair
+PASS  probe Sc-unc (sc-unc_3d4s_2-1_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts (L>=2: LARGE = the declared spread disclosure)
+SKIP  route invariance Ti-unc: no lane/free pair
+PASS  probe Ti-unc (ti-unc_3d4s_3-1_sa-casscf_ao_-_pur_avg)  2 PASS lines, 2 verdicts (L>=2: LARGE = the declared spread disclosure)
+SKIP  route invariance U14e: a refused partner
+PASS  probe U14e (u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg)  3 PASS lines, 2 verdicts
+
+validate_pt2: ALL GREEN (1259 roots certified)
