@@ -69,6 +69,89 @@ from atomterm.windows import (realized_patterns,  # noqa: E402
                               select_valence_ao)
 
 
+def run_queue(name, spec, sector, group) -> list[CellKey]:
+    """The run's queue: the named declared group, or the full grid
+    plus the declared lattice."""
+    if group == "spine":
+        return spine_keys(name, "".join(spec.shell_patterns), sector)
+    if group == "planned":
+        return planned(spec)
+    if group == "lattice":
+        return lattice_keys(spec)
+    if group == "lane":
+        return lane_keys(spec)
+    if group == "route":
+        return route_keys(spec)
+    return grid_keys(spec) + lattice_keys(spec)
+
+
+def _materializes(key: CellKey, scens, full: bool) -> bool:
+    """Whether the run executes the cell: a scenario'd cell runs only
+    under ``--full`` (the void branch stamps the store entry instead).
+    ONE home of the materialization rule -- the frac-head build and
+    the queue branch must never disagree (a disagreement crashes
+    mid-chain: the head absent for a cell the loop runs)."""
+    return full or not void_reason(key, scens)
+
+
+def keep(key: CellKey, args) -> bool:
+    """Key-identity filter: every given axis must match (``-`` = the
+    None mask, the address grammar's convention)."""
+    if args.method and key.method != args.method:
+        return False
+    if args.window and key.window != args.window:
+        return False
+    if args.mask and (key.mask or "-") != args.mask:
+        return False
+    if args.start and key.start != args.start:
+        return False
+    if args.substrate and key.substrate != args.substrate:
+        return False
+    if args.core and key.core != args.core:
+        return False
+    if args.sector and key.sector != args.sector:
+        return False
+    return True
+
+
+def parse_args(argv) -> argparse.Namespace:
+    """The runner's CLI: atoms, one optional group, axis filters (every
+    help string carries its value inventory)."""
+    p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    p.add_argument("atoms", nargs="*",
+                   help="declared atoms to run (default: every CAMPAIGN "
+                        "atom, CAMPAIGN order)")
+    p.add_argument("--group", choices=["grid", "spine",
+                                       "planned", "lattice", "lane",
+                                       "route"],
+                   help="one named declared group instead of the full "
+                        "grid: grid | spine | planned | "
+                        "lattice | lane | route")
+    p.add_argument("--full", action="store_true",
+                   help="materialize scenario-voided cells (re-testing "
+                        "their dated claims)")
+    p.add_argument("--fresh", action="store_true",
+                   help="re-run stored cells (ignore the store cache -- "
+                        "payload migrations and re-measures)")
+    p.add_argument("--method",
+                   help="keep this method: casci | casscf | sa-casscf")
+    p.add_argument("--window",
+                   help="keep this window label, e.g. 2p, 3d4s, 3dno1")
+    p.add_argument("--mask",
+                   help="keep this mask: radial | frozen | virtmix | - "
+                        "(the maskless cells)")
+    p.add_argument("--start", help="keep this start: ao | mo | moc | no")
+    p.add_argument("--substrate",
+                   help="keep this substrate: pol | pur")
+    p.add_argument("--core", help="keep this core: raw | avg | frac")
+    p.add_argument("--sector", metavar="NA-NB",
+                   help="keep this (na, nb) sector, e.g. 2-1")
+    args = p.parse_args(argv)
+    args.sector = (tuple(int(x) for x in args.sector.split("-"))
+                   if args.sector else None)
+    return args
+
+
 def render(atom, rohf_e, cells: dict, ruler: str) -> str:
     """The cells.md report: one row per stored FACTS cell
     (key-addressed, the ruler's ΔE within its sector only), plus
