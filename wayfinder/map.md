@@ -206,6 +206,30 @@ configuration-inert).
 
 ### Open
 
+- **The u14e V&V family + the scripts regroup** (2026-11-21, the
+  user's directive: several INDEPENDENT scripts, one per CAS, each
+  readable top-to-bottom, PySCF-direct; metadata from one shared
+  place only): `scripts/u14e/` — `_vv_common.py` (metadata, the
+  trusted-rung loader, anchors, meters, ledger, the row store + the
+  one `VV.md` table), the 4_12/4_15/6_13/uhf legs, and the old
+  orchestrator re-formed as the thin driver.  The free routes are
+  fully independent of the production construction chain (the
+  window written out, certified elementwise against the production
+  builder at 2.2e-16; SA/readout/PT2 called directly); the meters
+  are the kept analysis; the pinned route and the 6_13 7s radial
+  are marked production calls.  Green: (a) −0.0029 mEh, (b) 3.0e-06,
+  (d) 3.3e-09 Eh, (a15) −0.0006, (c) fresh-vs-fresh +3.087 (stored
+  +3.086) — logs/u14e_vv_*.log + elements/U14e/VV.md.  THE
+  REGROUP: `scripts/probes/` (the declaration-provenance
+  instruments; `probe_pt2_block` stays the gate's live dependency),
+  `scripts/generators/`, `complete_u14e_table.sh` retired.  TWO
+  DISCLOSURES recorded: the UHF-seeded SA from a RAW start descends
+  broken (⟨L²⟩ dev 7.2e+01; the committed converged-start reading
+  holds — the repair holds the converged gauge, a raw spin-broken
+  start escapes); the production-distilled 7s radial is 0.52
+  core-lean, its pur remainder 0.0092 of the window gram — the
+  (6,13) window's 7s direction is compromised on the pur substrate,
+  the class behind the stored (6,13) SA refusals.
 - **The 2026-11-20 wave review + design survey** (ticket 45's close;
   the two axes + the codebase-design vocabulary over `src/`, fixed
   point a0fe3fe): fixed = the renderer's ground-block spread got one
