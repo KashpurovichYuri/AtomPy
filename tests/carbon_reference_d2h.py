@@ -3,7 +3,7 @@ symmetry-adapted single-threaded draw): the symmetry lane's
 deterministic substrate. Floats are repr-round-trip exact -- loading
 this module reproduces the SCF state bitwise and NO SCF runs in the
 unit tier. Regenerate (only if the basis or defaults ever change)
-with scripts/generate_fixture_carbon.py d2h."""
+with scripts/generators/generate_fixture_carbon.py d2h."""
 
 import numpy as np
 

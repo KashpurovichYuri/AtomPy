@@ -29,7 +29,7 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.reference import run_rohf  # noqa: E402

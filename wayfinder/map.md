@@ -44,7 +44,7 @@ rotation-insensitive.  CLOSED OUT with the U14e V&V instrument
 E(2) delta 0.0000 mEh, ⟨L²⟩ 72 at 8.9e-15 free / 1.9e-07 pinned,
 route delta 5.3e-09 Eh) and the 2026-11-20 two-axis review + design
 survey (the fixes + declinations in Issues).  45 step 3 — THE SYMMETRY
-PROBES (2026-11-19, `scripts/probe_pt2_block.py`, the certified pur
+PROBES (2026-11-19, `scripts/probes/probe_pt2_block.py`, the certified pur
 cell `c_2p_2-0_sa-casscf_ao_-_pur_avg`): E(2) = −58.1340 mEh
 (−1.5819 eV) IDENTICAL across the ³P Sz=+1 block; probe A (gauge
 redraw, 8 unitaries × 3 roots): controls 1.2e-14 (⟨L²⟩ = 2 exact,

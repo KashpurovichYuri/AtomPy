@@ -588,7 +588,7 @@ def shell_realization(shell: str, layer: dict | None = None) -> tuple[str, ...]:
     (``"10d"`` is a counter, not a shell). The declaration lives on
     the campaign (:attr:`atomterm.cases.CaseSpec.shell_bands`),
     certified by the measured composition
-    (:func:`scripts.band_composition`-style profiles).
+    (:func:`scripts.probes.band_composition`-style profiles).
 
     Parameters
     ----------

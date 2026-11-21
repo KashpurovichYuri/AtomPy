@@ -144,7 +144,7 @@ class CaseSpec:
         (:func:`atomterm.windows.shell_realization`).  None = the 1:1
         identity (each shell IS its own band -- the contracted-basis
         behavior).  The realization is BASIS-SPECIFIC and certified by
-        the measured composition (``scripts/band_composition.py``):
+        the measured composition (``scripts/probes/band_composition.py``):
         a chemical shell over multi-zeta contractions or uncontracted
         primitive bands is multi-column, and its CORE freezes
         ``closed_electrons`` pairs over that span
@@ -599,7 +599,8 @@ _U14E_FRAC_VOID = Scenario(
 # The uncontracted validation twins (the shell-layer wave): the same
 # chemical shells and term targets as the certified rows, on the
 # primitive split of the same basis (data/<el>_ccpvdz_unc.txt, the
-# make_uncontracted.py split).  The SHELL LAYER is declared as
+# scripts/generators/make_uncontracted.py split).  The SHELL LAYER is
+# declared as
 # CONTIGUOUS BAND RANGES partitioning each l-family (disjoint across
 # shells; the boundaries from the measured composition,
 # elements/<Key>/logs/band_composition.log -- the greedy capture

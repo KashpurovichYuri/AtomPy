@@ -12,7 +12,7 @@ Certificates:
       equal the Eh columns through the conversion constant;
   (c) the probe: gauge redraw (8 unitaries x the ground block) on the
       certified compact SA cell -- the E(2) spread at the engine's
-      wobble floor, controls flat (probe_pt2_block.py, invoked
+      wobble floor, controls flat (probes/probe_pt2_block.py, invoked
       fresh);
   (d) the disposition census: every declared cell rows-or-refused,
       zero silent draws.
@@ -189,7 +189,7 @@ def _probe(atom: str) -> None:
         print(f"SKIP  probe {atom}: no certified SA address declared")
         return
     r = subprocess.run(
-        [sys.executable, "scripts/probe_pt2_block.py", addr],
+        [sys.executable, "scripts/probes/probe_pt2_block.py", addr],
         capture_output=True, text=True)
     out = r.stdout + r.stderr
     passes = out.count("PASS")
