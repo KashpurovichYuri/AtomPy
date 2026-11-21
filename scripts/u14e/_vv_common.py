@@ -1,24 +1,18 @@
-"""The u14e V&V family's shared core: metadata, the trusted reference,
-the committed anchors, the analysis meters, the verdict ledger, the
-row store and the one rendered table.  The DERIVATIONS live in the
-legs -- each leg is readable top-to-bottom, PySCF-direct: the SCF
-loaded from the trusted rung, the window written out, the CAS/SA
-kernels called directly, the engine's own NEVPT per root.
+"""The u14e V&V family's shared core: metadata, the trusted rungs, the
+committed anchors, the analysis meters, the derivations' thin
+helpers, the verdict ledger, the row store and the one rendered
+table.  The DERIVATIONS live in the legs -- each leg readable
+top-to-bottom; the free routes are PySCF-direct (independent of the
+production construction chain), the pinned routes and the 6_13
+distilled radial are marked production calls (under test /
+genuinely distilled machinery).
 
-This module owns only what the legs share (the metadata-from-a-common-
-place allowance): the atom identity (read from the trusted rung and
-cross-checked against the campaign declaration), the committed payload
-anchors, the analysis meters (atomterm's angular operators -- the
-project's double-certified construction; re-implementing L^2 per leg
-would be its own error surface), the ledger and the table.
-
-Run the legs from the repo root:
-    python scripts/u14e/u14e_vv_4_12.py [--pinned] [--ground-only]
+Run the legs from the repo root (or all through the driver):
+    python scripts/u14e/u14e_vv_4_12.py [--ground-only]
     python scripts/u14e/u14e_vv_4_15.py [--ground-only]
-    python scripts/u14e/u14e_vv_6_13.py
+    python scripts/u14e/u14e_vv_6_13.py [--ground-only]
     python scripts/u14e/u14e_vv_uhf.py
-or all of them through the driver:
-    python scripts/u14e/u14e_vv_orchestration.py
+    python scripts/u14e/u14e_vv_orchestration.py [--ground-only]
 """
 
 import json
@@ -29,7 +23,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 import numpy as np  # noqa: E402
-from pyscf import scf  # noqa: E402
+from pyscf import mcscf, mrpt, scf  # noqa: E402
 
 from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.detbasis import determinant_basis, operator_apply  # noqa: E402
@@ -41,31 +35,33 @@ EH_EV = 27.211386245988
 L_L2 = 72.0  # the 5L parent term: L = 8 -> L(L+1)
 S_S2 = 6.0   # spin 4 -> S = 2 -> S(S+1)
 
-ATOM_DIR = Path("elements") / "U14e"
-ROWS = ATOM_DIR / "vv.json"
-TABLE = ATOM_DIR / "VV.md"
-PAYLOAD = ATOM_DIR / "perturbation.json"
+ROWS = Path(__file__).resolve().parent / "vv.json"
+TABLE = Path(__file__).resolve().parent / "VV.md"
+PAYLOAD = Path("elements") / "U14e" / "perturbation.json"
+RUNGS = Path("elements") / "U14e" / "rungs"
 
-# the assertion bands (declared constants; each cites the first green
-# run's observed values -- logs/u14e_vv.log, 2026-11-20):
-BAND_L2 = 1e-5     # the Casimir meters are gauge-invariant; observed:
-                   # free 8.9e-15, pinned 1.9e-07 (17 roots each)
+# the assertion bands (declared constants; each cites the observed
+# fresh values -- logs/u14e_vv_*.log):
+BAND_L2 = 1e-5     # the Casimir meters are gauge-invariant; the
+                   # seeded readout's observed dev 3.0e-06 (free)
+                   # and 1.9e-07 (pinned, all 72.000000)
 BAND_E2_MEH = 2.0  # a fresh SA draw is a new orbital gauge and E(2)
-                   # is state-specific: the gauge-movement scale is
-                   # the route record's Ti disclosure (1.76 mEh); the
-                   # first green run's observed delta was 0.0000 mEh
-BAND_ROUTE = 1e-6  # Eh; the comparison surface is the ENSEMBLE
-                   # energy (variational, gauge-invariant across the
-                   # routes), not E(2) -- E(2) moves at the mEh scale
-                   # across gauges and is printed, never asserted;
-                   # observed 5.3e-09 Eh
+                   # is state-specific; observed delta 0.0006-0.0029
+                   # mEh (the engine wobble is ~0.3 uEh run-to-run)
+BAND_ROUTE = 1e-6  # Eh; the ENSEMBLE energy is the route comparison
+                   # surface (variational, gauge-invariant; E(2) is
+                   # orbital-sensitive and printed, never asserted);
+                   # observed 3.3e-09 Eh
+BAND_CLASS = 0.01  # the certified-class meters (the (6,13) pinned
+                   # components: 16 at L(L+1)=90 + one at 72)
 
+
+# the rungs -----------------------------------------------------------
 
 def load_rung(chk: str) -> tuple:
-    """One rung, LOADED (never re-run): the molecule from the chk, an
-    SCF object rebuilt around it, the converged record spliced in
-    (``converged`` set True -- the trusted cache IS the converged
-    record).  Detects the spin class from the record's mo_coeff."""
+    """One rung, LOADED (never re-run -- the cache is the
+    reproducibility unit): the molecule from the chk, an SCF object
+    rebuilt around it, the converged record spliced in."""
     from pyscf.lib import chkfile as _chk
     mol = _chk.load_mol(chk)
     rec = _chk.load(chk, "scf")
@@ -78,28 +74,36 @@ def load_rung(chk: str) -> tuple:
     return mol, mf
 
 
-def load_reference(chk: str | None = None):
-    """The trusted rung, LOADED -- never re-run (the reproducibility
-    unit).  The molecule comes from the chk itself (the campaign's own
-    basis/ECP/spin); one cross-check asserts the chk's identity
-    scalars still match a freshly built declared molecule, so the two
-    cannot drift apart silently."""
-    chk = chk or str(ATOM_DIR / "rungs" / "rohf.chk")
-    mol, mf = load_rung(chk)
+def load_reference() -> tuple:
+    """The trusted ROHF rung; the chk's identity scalars cross-checked
+    against a freshly built declared molecule."""
+    mol, mf = load_rung(str(RUNGS / "rohf.chk"))
     from atomterm.system import build_mol
     declared = build_mol(campaign_spec("U14e").atom_config())
     if (mol.nelectron != declared.nelectron or mol.spin != declared.spin
             or mol.nao != declared.nao):
-        sys.exit(f"{chk}: the rung's identity (nelectron "
-                 f"{mol.nelectron}, spin {mol.spin}, nao {mol.nao}) "
-                 f"drifted from the declaration (nelectron "
-                 f"{declared.nelectron}, spin {declared.spin}, nao "
-                 f"{declared.nao})")
-    print(f"  ROHF (trusted rung, loaded): E = {mf.e_tot:.8f}, "
-          f"nao {mol.nao}, nelectron {mol.nelectron}, spin "
-          f"{mol.spin}", flush=True)
+        sys.exit(f"the ROHF rung's identity drifted from the "
+                 f"declaration (nelectron {mol.nelectron}, spin "
+                 f"{mol.spin}, nao {mol.nao} vs {declared.nelectron}/"
+                 f"{declared.spin}/{declared.nao})")
+    print(f"  ROHF (trusted rung, loaded): E = {mf.e_tot:.8f}, nao "
+          f"{mol.nao}", flush=True)
     return mol, mf
 
+
+_ROHF_E = None
+
+
+def rohf_energy() -> float:
+    """The reference energy -- the zero of every dE in the table."""
+    global _ROHF_E
+    if _ROHF_E is None:
+        _, mf = load_rung(str(RUNGS / "rohf.chk"))
+        _ROHF_E = float(mf.e_tot)
+    return _ROHF_E
+
+
+# the committed anchors ------------------------------------------------
 
 def anchor(addr: str) -> dict:
     """The committed payload row an assertion reads -- fail fast
@@ -113,12 +117,14 @@ def anchor(addr: str) -> dict:
     sys.exit(f"anchor {addr} not in {PAYLOAD}")
 
 
+# the analysis meters --------------------------------------------------
+
 def meters(mol, c_act, na: int, nb: int):
     """The analysis meters as their ACTION (atomterm's angular
     operators through the matrix-free application; the many-body
-    meters read per root through the CI-order bridge).  This is the
-    one piece of atomterm analysis the legs keep -- the construction
-    is double-certified in angular.py, and the meters are the terms'
+    meters read per root through the CI-order bridge).  The one piece
+    of atomterm analysis the legs keep -- the construction is
+    double-certified in angular.py; the meters are the terms'
     identity, not part of the derivation under test."""
     norb = c_act.shape[1]
     dets = determinant_basis(norb, na, nb)
@@ -135,7 +141,185 @@ def meters(mol, c_act, na: int, nb: int):
     return expect
 
 
-# the verdict ledger --------------------------------------------------
+# the derivations' thin helpers (one home; the legs show the setup) ----
+
+def free_kernel(mf, ncas: int, sector, mo_full, weights=None,
+                nroots: int = 1):
+    """The free route's two kernels, written once: CASSCF (plain
+    single root, or ``state_average_`` over ``weights``), then the
+    two-pass readout (CASCI, ``canonicalization = False`` -- the
+    window exactly as converged), seeded from the SA kernel's own
+    vectors (the faithful two-pass form; unseeded, the davidson tails
+    mix a quasi-degenerate block at the 1e-5 level and the meters
+    carry it).  Returns (mc, cas)."""
+    mc = mcscf.CASSCF(mf, ncas, sector)
+    if weights is not None and len(weights) > 1:
+        mc.state_average_(list(weights))
+    mc.kernel(mo_full)
+    cas = mcscf.CASCI(mf, ncas, sector)
+    cas.mo_coeff = mc.mo_coeff
+    cas.canonicalization = False
+    cas.fcisolver.nroots = nroots
+    if weights is not None and len(weights) > 1:
+        from pyscf.fci import cistring
+        nsa = cistring.num_strings(ncas, sector[0])
+        nsb = cistring.num_strings(ncas, sector[1])
+        cas.kernel(ci0=[np.asarray(c).ravel().reshape(nsa, nsb)
+                        for c in mc.ci])
+    else:
+        cas.kernel()
+    return mc, cas
+
+
+def core_part_of(cas) -> tuple:
+    """The per-root totals convention of the analyzation seam:
+    ``e_cas[k] + core part`` (e_tot's first entry minus e_cas's
+    first).  Returns (core_e, e_cas array)."""
+    e_tot_0 = float(np.atleast_1d(np.asarray(cas.e_tot)).ravel()[0])
+    e_cas = np.atleast_1d(np.asarray(cas.e_cas)).ravel()
+    return e_tot_0 - float(e_cas[0]), e_cas
+
+
+def price(cas, expect, roots=None) -> list:
+    """PT2 through the engine's own NEVPT per root + the meters on
+    the priced states (the readout's own roots)."""
+    out = []
+    e_cas = np.atleast_1d(np.asarray(cas.e_cas)).ravel()
+    multi = len(e_cas) > 1
+    for k in (range(len(e_cas)) if roots is None else roots):
+        pt = mrpt.NEVPT(cas, root=k)
+        if multi:
+            pt.ci = list(pt.ci)   # detach: the kernel writes the shared list
+        e2 = float(pt.kernel())
+        # nroots=1 returns the (nsa, nsb) vector itself, not a list
+        ci = np.asarray(cas.ci if not multi else cas.ci[k]).ravel()
+        out.append({"root": k, "e2": e2, "l2": expect("l2", ci),
+                    "s2": expect("s2", ci)})
+    return out
+
+
+def lane_route(spec, key_addr: str, sector):
+    """The pinned route's substrate + window -- the PRODUCTION wiring,
+    marked (under test): ``lane_substrate`` (the D2h landscape,
+    basin-steered), ``lane_core`` (the reference's own core columns
+    S-projected), ``window_columns``, the lane assembly.  Returns
+    (lmol, lmf, c_core, nf, mo, ncas, act) -- ``act`` the
+    PRE-projection distilled columns (the survival diagnostics read
+    them; ``mo``'s window block is already projected+renormalized)."""
+    from atomterm.cases import lane_substrate
+    from atomterm.cells import CellKey, lane_core, window_columns
+    from atomterm.windows import build_full_mo
+
+    lmol, lmf = lane_substrate(spec)
+    key = CellKey.from_address(key_addr)
+    _core, nf, c_core, _rep = lane_core(key, lmol, lmf,
+                                        spec.shell_bands)
+    act, ncas, _w = window_columns(key, lmol, lmf, spec.shell_bands,
+                                   spec.shell_radials)
+    mo = build_full_mo(lmf, list(range(nf)), act, c_core=c_core)
+    return lmol, lmf, c_core, nf, mo, ncas, act
+
+
+def pinned_ci_run(lmol, lmf, mo, nf, ncas, sector, L, parity, c_core,
+                  conv_tol: float = 1e-12, c_read=None):
+    """The pinned route at the CI level (``run_irrep_casci`` -- the
+    exact per-component roots at the fixed window, no optimizer).
+    Returns the roots dict ``{irrep: (e_arr, ci)}`` and the columns
+    the solvers read (``c_read``, the caller's symmetrized block when
+    given)."""
+    from atomterm.casscf import run_irrep_casci
+    if c_read is None:
+        c_read = np.asarray(mo)[:, nf:nf + ncas]
+    return run_irrep_casci(lmol, lmf, c_read, nf, sector[0],
+                           sector[1], L, parity, conv_tol=conv_tol,
+                           c_core=c_core), c_read
+
+
+def pinned_sa_run(lmol, lmf, mo, nf, ncas, sector, L, parity, c_core,
+                  conv_tol: float = 1e-12, c_read=None):
+    """The pinned route at the SA level (``run_irrep_sa``'s two-pass
+    pattern -- the ensemble mix kernel, then the exact per-component
+    roots re-solved in the frozen converged window).  Returns
+    (out, c_read): the result dict (``e_tot``, ``mo``, ``roots``)."""
+    from atomterm.casscf import run_irrep_sa
+    if c_read is None:
+        c_read = np.asarray(mo)[:, nf:nf + ncas]
+    out = run_irrep_sa(lmol, lmf, c_read, nf, sector[0], sector[1],
+                       L, parity, conv_tol=conv_tol, c_core=c_core)
+    return out, c_read
+
+
+def make_blocks(lmol, lmf, mo, nf, ncas, sector, L, parity, c_core,
+                roots, c_read=None):
+    """The pinned solvers' per-block kernel-ready ``CASCI`` objects on
+    the given window and roots (the lane construction -- the pinned
+    solver rides the block so mrpt's canonicalization stays in it;
+    ``.e_tot`` carries the block's own bookkeeping).  Returns
+    (blocks, expect, c_read): ``[(irrep, mc)]``."""
+    from atomterm.casscf import irrep_solvers
+    from atomterm.core import closed_shell_core_energy
+    from atomterm.irreps import branch_d2h, orb_irreps
+    from pyscf import mcscf as _mcscf
+
+    if c_read is None:
+        c_read = np.asarray(mo)[:, nf:nf + ncas]
+    else:
+        c_read = np.asarray(c_read)
+    orbsyms = orb_irreps(lmol, c_read)
+    pinned = {irr: s for irr, s, _ in
+              irrep_solvers(lmol, orbsyms, L, parity, conv_tol=1e-12)}
+    core_part = closed_shell_core_energy(lmf, c_core)
+    expect = meters(lmol, c_read, *sector)
+    blocks = []
+    for irrep, mult in branch_d2h(L, parity).items():
+        e_arr, ci = roots[irrep]
+        e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
+        mc = _mcscf.CASCI(lmf, ncas, sector)
+        mc.mo_coeff = np.asarray(mo, dtype=float)
+        mc.fcisolver = pinned[irrep]
+        mc.orbsym = orbsyms
+        mc.fcisolver.orbsym = np.asarray(orbsyms)
+        ci_arr = np.asarray(ci)
+        mc.ci = ([ci_arr] if ci_arr.ndim == 2
+                 else [np.asarray(x) for x in ci_arr])
+        mc.e_cas = e_arr[:mult]
+        mc.e_tot = float(mc.e_cas[0] + core_part)
+        blocks.append((irrep, mc))
+    return blocks, expect, c_read
+
+
+def nevpt_rows(mc, roots=None):
+    """PT2 rows on a ready solution -- the engine's own canonicalization
+    prelude + the eight class solves, via ``nevpt2_rows_on``."""
+    from atomterm.perturb import nevpt2_rows_on
+    return nevpt2_rows_on(mc, roots=roots)
+
+
+def meters_all(blocks, expect):
+    """The meters over EVERY block component (in branch order) --
+    independent of any PT2 root cut."""
+    l2s, s2s = [], []
+    for _, mc in blocks:
+        for k in range(len(np.atleast_1d(mc.e_cas))):
+            ci = np.asarray(mc.ci[k]).ravel()
+            l2s.append(expect("l2", ci))
+            s2s.append(expect("s2", ci))
+    return l2s, s2s
+
+
+def pinned_price(blocks, roots_per_block=None):
+    """PT2 per block root; returns the flat list of
+    ``(irrep, PT2Row)``.  (Kept for callers wanting the flat form;
+    the legs usually iterate ``nevpt2_rows_on`` per block.)"""
+    from atomterm.perturb import nevpt2_rows_on
+    out = []
+    for irrep, mc in blocks:
+        for row in nevpt2_rows_on(mc, roots=roots_per_block):
+            out.append((irrep, row))
+    return out
+
+
+# the verdict ledger ---------------------------------------------------
 
 class Verdict:
     """Every check lands one row; the exit code is the verdict.
@@ -170,50 +354,93 @@ class Verdict:
 
 # the row store + the one table ---------------------------------------
 
+def de_fmt(de_eh: float) -> str:
+    """One delta, both units: ``mEh / eV`` (4 decimals)."""
+    return f"{de_eh * 1e3:+.4f} / {de_eh * EH_EV:+.4f}"
+
+
 def drop_row(row: dict) -> None:
     """One leg's result row, merged into the family's store
-    (``leg`` + ``route`` is the key)."""
+    (``method`` + ``route`` + ``cas`` is the key)."""
     rows = json.loads(ROWS.read_text()) if ROWS.exists() else {}
-    rows[f"{row['leg']}|{row['route']}"] = row
+    rows[f"{row['method']}|{row['route']}|{row['cas']}"] = row
     ROWS.write_text(json.dumps(rows, indent=1) + "\n")
     render_table()
 
 
-_ROW_ORDER = (("4_12", "free"), ("4_12", "pinned"), ("4_15", "free"),
-              ("6_13", "free"), ("ref", "uhf"))
+_ORDER = (["rohf|-|-", "uhf|-|-"] +
+          [f"{m}|{r}|{c}" for c in ("(4,12)", "(4,15)", "(6,13)")
+           for m, r in (("casscf", "free"), ("sa-casscf", "free"),
+                        ("ci", "pinned"), ("sa-casscf", "pinned"))])
+
+
+def fmt_range(vals, nd: int = 4) -> str:
+    """One value when the set agrees, ``a..b`` when it scatters."""
+    lo, hi = min(vals), max(vals)
+    if hi - lo < 10 ** (-nd) / 2:
+        return f"{lo:.{nd}f}"
+    return f"{lo:.{nd}f}..{hi:.{nd}f}"
 
 
 def render_table() -> None:
-    """The small committed table (elements/U14e/VV.md): one row per
-    run leg, beside its committed-payload anchor."""
+    """The small committed table: the reference rows lead (ROHF is
+    the zero of every dE), then one row per method x route x CAS.
+    Every energy <= 4 decimals; deltas in the ``mEh / eV`` slash
+    form."""
     rows = json.loads(ROWS.read_text()) if ROWS.exists() else {}
-    order = [k for k in _ROW_ORDER if k in rows]
+    order = [k for k in _ORDER if k in rows]
     order += [k for k in rows if k not in order]
+    e0 = rohf_energy()
     out = [
         "# U14e -- the V&V family",
         "",
-        "One row per leg of `scripts/u14e/u14e_vv_*.py` (the "
-        "standalone, PySCF-direct derivations), beside the committed "
-        "payload anchor (`perturbation.json`) it asserts against. "
-        "Re-rendered by every leg after it drops its row; the full "
-        "record lives in `logs/u14e_vv_*.log`.",
+        "One row per method x route x CAS from `scripts/u14e/"
+        "u14e_vv_*.py` -- standalone, PySCF-direct derivations of the "
+        "committed campaign answers.  dE is against the ROHF reference "
+        "(the first row -- the zero of every dE), before the "
+        "perturbation (dE_var) and after (dE_tot); each in `mEh / eV`. "
+        "E(2) is the SC-NEVPT2 correction (pyscf.mrpt, strongly "
+        "contracted).  The fresh-vs-committed assertions and the "
+        "full per-root record live in `logs/u14e_vv_*.log`; the "
+        "committed payload is `elements/U14e/perturbation.json`.",
         "",
-        "| leg | route | CAS | E_ref (Eh) | E(2) (mEh) | total (Eh) "
-        "| anchor E(2) (mEh) | delta (mEh) | &lt;L²&gt; | &lt;S²&gt; "
-        "| date |",
+        "| method | route | CAS | &lt;L²&gt; | &lt;S²&gt; "
+        "| E_var (Eh) | dE_var (mEh/eV) | E(2) (mEh/eV) "
+        "| E_tot (Eh) | dE_tot (mEh/eV) | date |",
         "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for k in order:
         r = rows[k]
-        a = ("—" if r.get("anchor_e2_meh") is None
-             else f"{r['anchor_e2_meh']:+.4f}")
+        de_var = r["e_var"] - e0
+        de_tot = r["e_tot"] - e0
+        e2 = (f"{r['e2_meh']:+.4f} / {r['e2_ev']:+.4f}"
+              if r.get("e2_meh") is not None else "—")
         out.append(
-            f"| {r['leg']} | {r['route']} | {r['cas']} "
-            f"| {r['e_ref']:.8f} | {r['e2_meh']:+.4f} "
-            f"| {r['e_total']:.8f} | {a} "
-            f"| {r['delta_meh']:+.4f} | {r['l2']} | {r['s2']} "
+            f"| {r['method']} | {r['route']} | {r['cas']} "
+            f"| {r['l2']} | {r['s2']} "
+            f"| {r['e_var']:.4f} | {de_fmt(de_var)} | {e2} "
+            f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} "
             f"| {r['date']} |")
-    out += ["", "Atomic units; E(2) = SC-NEVPT2 (pyscf.mrpt, strongly "
-            "contracted); the meters are atomterm's exact angular "
-            "operators.", ""]
+    out += ["", "The meters are atomterm's exact angular operators "
+            "(double-certified); the pinned SA rows carry the run's "
+            "own ensemble total; the pinned CI rows carry the TERM "
+            "energy (the components' mean plus the core bookkeeping "
+            "constant) -- their dE is that constant's "
+            "projected-density form, not comparable to the free "
+            "rows.", ""]
     TABLE.write_text("\n".join(out))
+
+
+def std_row(method: str, route: str, cas: str, e_var: float,
+            e2_meh: float | None, e_tot: float, l2: str, s2: str) -> dict:
+    """One table row in the family's schema (the deltas are computed
+    at render time against the ROHF row; ``l2``/``s2`` pre-formatted)."""
+    return {
+        "method": method, "route": route, "cas": cas,
+        "l2": l2, "s2": s2,
+        "e_var": e_var,
+        "e2_meh": e2_meh,
+        "e2_ev": None if e2_meh is None else e2_meh * EH_EV / 1e3,
+        "e_tot": e_tot,
+        "date": date.today().isoformat(),
+    }

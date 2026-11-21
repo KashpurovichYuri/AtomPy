@@ -1,10 +1,11 @@
-  ROHF (trusted rung, loaded): E = -50.38185233, nao 177, nelectron 14, spin 4
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
 /home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
   mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
-/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_12.py:94: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_12.py:86: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
   mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), sel,
   window: 12 AO columns (('10f', 7), ('13d', 5)), visible construction == production build_full_mo (block dev 2.2e-16, complement span dev 1.9e-08)
-  [sa] ensemble -50.42381003, converged True (31.9 s)
+  [casscf] e_tot -50.42984646, converged False, <L2> 71.817064 (125.5 s)
+  [note] free CASSCF (the single-root draw class): <L2> 71.817064, E(2) -301.9729 mEh (the committed draw priced -311.0458; the single-root endpoints differ by draw -- the meters are the disclosure)
   root 0: e_ref -50.42381186, E(2) -341.6680 mEh, <L2> 72.000000, <S2> 6.000000
   root 1: e_ref -50.42381186, E(2) -341.6679 mEh, <L2> 72.000000, <S2> 6.000000
   root 2: e_ref -50.42381137, E(2) -341.7289 mEh, <L2> 71.999998, <S2> 6.000000
@@ -22,16 +23,20 @@
   root 14: e_ref -50.42380873, E(2) -341.7299 mEh, <L2> 71.999998, <S2> 6.000000
   root 15: e_ref -50.42380792, E(2) -341.6631 mEh, <L2> 71.999999, <S2> 6.000000
   root 16: e_ref -50.42380792, E(2) -341.6631 mEh, <L2> 71.999999, <S2> 6.000000
-  [PASS] (a) E(2) root 0 ~ the committed payload row: fresh -341.6680 mEh vs anchor -341.6651 (delta -0.0029, band +-2.0)
-  [PASS] (b) <L2> = 72 / <S2> = 6 on every root: 17 roots, max dev 3.00e-06 (band 1e-05)
+  [PASS] (a) SA E(2) root 0 ~ the committed payload row: fresh -341.6680 mEh vs anchor -341.6651 (delta -0.0029, band +-2.0)
+  [PASS] (b) <L2> = 72 / <S2> = 6 on every SA root: 17 roots, max dev 3.00e-06 (band 1e-05)
+  [sa] ensemble -50.42381003, converged True (164.5 s)
   plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
   [window] distilled 5f: k=1 of 3 bands, capture 0.9328-0.9420; 6d: k=1 of 3 bands, capture 0.9828-0.9828
-  [pinned] ensemble -50.42381003, converged True
-  term E(2): mean -341.7481 mEh, ptp 3.95e-02 mEh over 17 components; <L2> in [72.000000, 72.000000]
-  [PASS] (d) the pinned route ~ the visible free route (ensemble energies): pinned -50.42381003 vs free -50.42381003 (delta -3.32e-09 Eh, band 1e-06)
+  [pinned ci] term e_var -48.93509710, E(2) mean -1779.9931 mEh, ptp 2.95e-01 mEh, <L2> [72.000000, 72.000000] (138.2 s)
+  [note] pinned CI (the pinned analog of the unoptimized row): <L2> in [72.0000, 72.0000], <S2> max 6.0000; E(2) mean -1779.9931 mEh
+  [pinned sa] ensemble -50.42381003, term E(2) mean -341.7316 mEh, ptp 7.29e-02 mEh, <L2> [72.000000, 72.000000] (164.3 s)
+  [PASS] (d) the pinned SA ensemble ~ the free SA ensemble: pinned -50.42381003 vs free -50.42381003 (delta -3.29e-09 Eh, band 1e-06)
 
 ===== verdict =====
-  PASS  (a) E(2) root 0 ~ the committed payload row
-  PASS  (b) <L2> = 72 / <S2> = 6 on every root
-  PASS  (d) the pinned route ~ the visible free route (ensemble energies)
+  REPORT  free CASSCF (the single-root draw class)
+  PASS  (a) SA E(2) root 0 ~ the committed payload row
+  PASS  (b) <L2> = 72 / <S2> = 6 on every SA root
+  REPORT  pinned CI (the pinned analog of the unoptimized row)
+  PASS  (d) the pinned SA ensemble ~ the free SA ensemble
 3/3 assertions hold

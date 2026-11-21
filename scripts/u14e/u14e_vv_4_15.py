@@ -1,51 +1,60 @@
 """The CAS(4,15) V&V leg -- the 14p-promotion leg of the flagship
-CAS-size axis (the (4,12)/(4,15)/(6,13) trio), PySCF-direct and
-readable top-to-bottom.
+CAS-size axis.  Two routes (free CASSCF, free SA).  THE PINNED LEGS,
+ATTEMPTED AND MEASURED OUT (2026-11-21): the 14p column's survival
+norm against the frozen core span is 0.28 (92% core-lean -- it is
+one of the radials the occupied 6p is built from); the attempted
+pinned legs priced garbage on that remainder (term e_var -46.95,
+<L2> 0..42 -- not the term) and the irrep-purity chain broke at
+every re-orthogonalization.  The declared refusal ("a non-disjoint
+partition is a grid axis, not a lane one") is thereby
+MEASURED-correct; the free rows carry the (4,15) experiment, and the
+leg re-measures the survival norms each run (the disclosure below).
+A disjoint (6,21)-class partition (dropping 6p from the core, the
+semi-class move) is the possible follow-up.
 
-THE SETUP (all visible below): the trusted ROHF rung loaded; the
-core = the rotation-closed span over the occupied prefix (substrate
-chemistry -- the certified construction, marked); the window = the
-AO columns of the 10f (7) + 13d (5) + 14p (3) shells, written out
-(band-pure at k=1 -- the visible selection IS the stored distilled
-window; the production builder cross-checked elementwise); SA over
-the ground term's 17 M_L components; the two-pass readout; the
-engine's own NEVPT per root; atomterm's meters.
+THE SETUP (all visible in ``main``): the trusted ROHF rung loaded;
+the core = the rotation-closed span (marked); the window = the AO
+columns of the 10f (7) + 13d (5) + 14p (3) shells, written out and
+certified elementwise against the production builder; free CASSCF
+(single root, the draw class) and free SA (17 components, the
+two-pass readout); PT2 through the engine's own NEVPT; atomterm's
+meters.
 
 THE ASSERTIONS:
-  (a15) fresh E(2) root 0 ~ the committed payload row
-        (u14e_10f13d14p_4-0_sa-casscf_ao_-_pur_avg, root 0);
+  (a15) fresh SA E(2) root 0 ~ the committed payload row, band
+        +-2 mEh;
   (c)   the (4,15) promotion WORSENS the corrected total: fresh vs
         fresh when the 4_12 leg's row is in the family store, else
         fresh (4,15) against the stored (4,12)/(4,15) pair --
         disclosed which reading ran.
 
 Run from the repo root:
-    OMP_NUM_THREADS=16 python scripts/u14e/u14e_vv_4_15.py \
+    OMP_NUM_THREADS=16 python scripts/u14e/u14e_vv_4_15.py \\
         [--ground-only]  |  tee logs/u14e_vv_4_15.log
 """
 
 import json
 import sys
 import time
-from datetime import date
 
 import numpy as np
-from pyscf import mcscf, mrpt
 
-from _vv_common import (BAND_E2_MEH, BAND_L2, EH_EV, L_L2, S_S2,
-                        ROWS, Verdict, anchor, drop_row,
-                        load_reference, meters)
+from _vv_common import (BAND_E2_MEH, ROWS, Verdict, anchor,
+                        core_part_of, drop_row, fmt_range, free_kernel, lane_route,
+                        load_reference, meters, price, std_row)
 
 ADDR_415 = "u14e_10f13d14p_4-0_sa-casscf_ao_-_pur_avg"
 ADDR_412 = "u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg"
+ADDR_415_LANE = "u14e_10f13d14p@6s6p7s_4-0_sa-casscf_ao_-_pur_avg"
 SECTOR = (4, 0)
 NCORE = 5
 SHELLS = (("10f", 7), ("13d", 5), ("14p", 3))
+ROOTS = 17
 
 
 def visible_window(mol, mf, c_core):
     """The window, written out (the same treatment as the 4_12 leg,
-    one more shell) -- asserted against the production builder."""
+    one more shell) -- certified against the production builder."""
     labels = [lab.split()[-1] for lab in mol.ao_labels()]
     sel = [i for i, lab in enumerate(labels)
            if any(lab.startswith(w) for w, _ in SHELLS)]
@@ -77,17 +86,11 @@ def visible_window(mol, mf, c_core):
     from atomterm.windows import build_full_mo, occupied_core_idx
     mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), sel,
                             c_core=c_core)
-    # the certification: the core+window block elementwise (same
-    # input, same Loewdin gauge); the virtual complement by SPAN
-    # (any S-orthonormal basis of it is valid for the CAS optimizer)
     nc = C.shape[1]
     dev_blk = np.max(np.abs(mo[:, :nc] - mo_prod[:, :nc]))
     proj = mo_prod[:, nc:]
     resid = mo[:, nc:] - proj @ (proj.T @ S @ mo[:, nc:])
     dev_span = np.max(np.abs(resid))
-    # the span band cites the observed: 1.9e-08 on this box (the
-    # diffuse tail's overlap conditioning); the block equality is
-    # the certificate
     if dev_blk > 1e-9 or dev_span > 1e-6:
         sys.exit(f"the visible window construction disagrees with "
                  f"the production builder (block dev {dev_blk:.2e}, "
@@ -99,97 +102,115 @@ def visible_window(mol, mf, c_core):
     return mo
 
 
+def survival_disclosure(spec):
+    """The measured reason the pinned (4,15) is out: each distilled
+    column's S-norm after removing the lane core's span (the 14p
+    radial is one of the occupied 6p's own radials)."""
+    from _vv_common import lane_route
+    lmol, lmf, c_core_l, nf, _mo, ncas_l, act = lane_route(
+        spec, ADDR_415_LANE, SECTOR)
+    S = lmf.get_ovlp()
+    overl = np.linalg.norm(c_core_l.T @ S @ act, axis=0)
+    surv = np.sqrt(np.maximum(1.0 - overl ** 2, 0.0))
+    lbl = [lab for lab, n in SHELLS for _ in range(n)]
+    return [f"{lb} {x:.4f}" for lb, x in zip(lbl, surv) if x < 0.99]
+
+
 def main(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     ground_only = "--ground-only" in argv
+    pt2_roots = [0] if ground_only else None
     v = Verdict()
     mol, mf = load_reference()
     from atomterm.core import purified_core_orbitals
+    from atomterm.cases import campaign_spec
     c_core = purified_core_orbitals(mol, mf, NCORE)[0]
     mo_full = visible_window(mol, mf, c_core)
+    expect = meters(mol, mo_full[:, NCORE:NCORE + 15], *SECTOR)
+    weights = [1.0 / 17] * 17
 
+    # ---- the pinned (4,15): measured out (the disclosure) -------------
+    lean = survival_disclosure(campaign_spec("U14e"))
+    v.note("the pinned (4,15): attempted and measured out",
+           f"the 14p column's survival norm against the frozen core "
+           f"span: {'; '.join(lean)} (92% core-lean) -- the "
+           f"attempted pinned legs priced garbage on that remainder "
+           f"(term e_var -46.95, <L2> 0..42, irrep tails breaking "
+           f"every re-orthogonalization); the declared refusal is "
+           f"measured-correct.  A disjoint (6,21)-class partition "
+           f"(dropping 6p from the core) is the possible follow-up")
+
+    # ---- free CASSCF (single root; the escape class, no assertion) --
     t0 = time.time()
-    mc = mcscf.CASSCF(mf, 15, SECTOR)
-    mc.state_average_([1.0 / 17] * 17)
-    mc.kernel(mo_full)
-    print(f"  [sa] ensemble {mc.e_tot:.8f}, converged "
-          f"{mc.converged} ({time.time() - t0:.1f} s)", flush=True)
-    cas = mcscf.CASCI(mf, 15, SECTOR)
-    cas.mo_coeff = mc.mo_coeff
-    cas.canonicalization = False
-    cas.fcisolver.nroots = 17
-    # seed the readout FROM the SA kernel's own vectors (the two-pass
-    # pattern's faithful form -- production's readout_mc(ci0=...);
-    # unseeded, the davidson tails mix the quasi-degenerate block at
-    # the 1e-5 level and the meters carry it)
-    from pyscf.fci import cistring
-    nsa = cistring.num_strings(cas.ncas, SECTOR[0])
-    nsb = cistring.num_strings(cas.ncas, SECTOR[1])
-    guess = [np.asarray(c).ravel().reshape(nsa, nsb) for c in mc.ci]
-    cas.kernel(ci0=guess)
-    expect = meters(mol, cas.mo_coeff[:, NCORE:NCORE + 15], *SECTOR)
+    mc_c, cas_c = free_kernel(mf, 15, SECTOR, mo_full)
+    r_c = price(cas_c, expect, roots=[0])[0]
+    print(f"  [casscf] e_tot {mc_c.e_tot:.8f}, converged "
+          f"{mc_c.converged}, <L2> {r_c['l2']:.6f} "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    v.note("free CASSCF (the single-root draw class)",
+           f"<L2> {r_c['l2']:.6f}, E(2) {r_c['e2'] * 1e3:+.4f} mEh")
+    drop_row(std_row("casscf", "free", "(4,15)", float(mc_c.e_tot),
+                     r_c["e2"] * 1e3, float(cas_c.e_tot),
+                     f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}"))
+
+    # ---- free SA ------------------------------------------------------
+    t0 = time.time()
+    mc_sa, cas_sa = free_kernel(mf, 15, SECTOR, mo_full,
+                                weights=weights, nroots=ROOTS)
+    core_e, e_cas = core_part_of(cas_sa)
+    expect_sa = meters(mol, cas_sa.mo_coeff[:, NCORE:NCORE + 15],
+                       *SECTOR)
     a0 = anchor(ADDR_415)["roots"][0]
-    e_tot_0 = float(np.atleast_1d(np.asarray(cas.e_tot)).ravel()[0])
-    e_cas = np.atleast_1d(np.asarray(cas.e_cas)).ravel()
-    core_e = e_tot_0 - float(e_cas[0])
-    rows = []
-    for k in (range(1) if ground_only else range(17)):
-        pt = mrpt.NEVPT(cas, root=k)
-        pt.ci = list(pt.ci)
-        e2 = float(pt.kernel())
-        rows.append({"root": k, "e_ref": float(e_cas[k] + core_e),
-                     "e2": e2, "l2": expect("l2", cas.ci[k]),
-                     "s2": expect("s2", cas.ci[k])})
-        print(f"  root {k}: e_ref {rows[-1]['e_ref']:.8f}, E(2) "
-              f"{e2 * 1e3:+.4f} mEh, <L2> {rows[-1]['l2']:.6f}, "
-              f"<S2> {rows[-1]['s2']:.6f}", flush=True)
+    rows = price(cas_sa, expect_sa,
+                 roots=range(1) if ground_only else range(ROOTS))
+    for r in rows:
+        r["e_ref"] = float(e_cas[r["root"]] + core_e)
+        print(f"  root {r['root']}: e_ref {r['e_ref']:.8f}, E(2) "
+              f"{r['e2'] * 1e3:+.4f} mEh, <L2> {r['l2']:.6f}, "
+              f"<S2> {r['s2']:.6f}", flush=True)
     r0 = rows[0]
     d_meh = (r0["e2"] - a0["e_corr"]) * 1e3
-    v.check("(a15) E(2) root 0 ~ the committed payload row",
+    v.check("(a15) SA E(2) root 0 ~ the committed payload row",
             abs(d_meh) <= BAND_E2_MEH,
             f"fresh {r0['e2'] * 1e3:+.4f} mEh vs anchor "
             f"{a0['e_corr'] * 1e3:+.4f} (delta {d_meh:+.4f}, band "
             f"+-{BAND_E2_MEH})")
-    dev_m = max(abs(r["l2"] - L_L2) for r in rows)
-    dev_s = max(abs(r["s2"] - S_S2) for r in rows)
-    v.note("the (4,15) meters", f"<L2> in "
-           f"[{min(r['l2'] for r in rows):.6f}, "
-           f"{max(r['l2'] for r in rows):.6f}] (the stored row "
-           f"carries 71.785 on root 0 -- the promotion's 6p rows "
-           f"cost some closure; printed, not asserted)")
-    drop_row({
-        "leg": "4_15", "route": "free", "cas": "CAS(4,15)",
-        "e_ref": r0["e_ref"], "e2_meh": r0["e2"] * 1e3,
-        "e_total": r0["e_ref"] + r0["e2"],
-        "anchor_e2_meh": a0["e_corr"] * 1e3, "delta_meh": d_meh,
-        "l2": f"{min(r['l2'] for r in rows):.6f}.."
-              f"{max(r['l2'] for r in rows):.6f}",
-        "s2": f"{max(abs(r['s2'] - S_S2) for r in rows):.1e} dev",
-        "date": date.today().isoformat(),
-    })
+    v.note("the (4,15) meters",
+           f"<L2> in [{min(r['l2'] for r in rows):.4f}, "
+           f"{max(r['l2'] for r in rows):.4f}] (the promotion's 6p "
+           f"rows cost some closure; the stored row carries 71.785 "
+           f"on root 0 -- printed, not asserted)")
+    print(f"  [sa] ensemble {mc_sa.e_tot:.8f}, converged "
+          f"{mc_sa.converged} ({time.time() - t0:.1f} s)", flush=True)
+    drop_row(std_row("sa-casscf", "free", "(4,15)",
+                     float(e_cas[0] + core_e), r0["e2"] * 1e3,
+                     float(r0["e_ref"] + r0["e2"]),
+                     fmt_range([r['l2'] for r in rows]),
+                     f"{max(r['s2'] for r in rows):.4f}"))
 
-    # (c) the CAS-size ordering -- fresh vs fresh when the 4_12 row
-    # is in the store, else fresh (4,15) against the stored pair
+    # ---- (c) the CAS-size ordering ------------------------------------
     fresh_412 = None
     if ROWS.exists():
-        fresh_412 = json.loads(ROWS.read_text()).get("4_12|free")
+        fresh_412 = json.loads(ROWS.read_text()).get(
+            "sa-casscf|free|(4,12)")
     s412 = anchor(ADDR_412)["roots"][0]["e_total"]
     s415 = a0["e_total"]
+    tot_fresh = r0["e_ref"] + r0["e2"]
     if fresh_412 is not None:
-        tot_f, tot_p = fresh_412["e_total"], r0["e_ref"] + r0["e2"]
-        gap = (tot_p - tot_f) * 1e3
+        tot_412 = fresh_412["e_tot"]
         v.check("(c) the (4,15) promotion WORSENS the corrected "
-                "total (fresh vs fresh)", tot_p > tot_f,
-                f"(4,12) {tot_f:.8f} -> (4,15) {tot_p:.8f} "
-                f"(+{gap:.3f} mEh); stored: {s412:.8f} -> {s415:.8f} "
+                "total (fresh vs fresh)", tot_fresh > tot_412,
+                f"(4,12) {tot_412:.4f} -> (4,15) {tot_fresh:.4f} "
+                f"(+{(tot_fresh - tot_412) * 1e3:.3f} mEh); stored: "
+                f"{s412:.4f} -> {s415:.4f} "
                 f"(+{(s415 - s412) * 1e3:.3f} mEh)")
     else:
         v.note("(c) the CAS-size ordering",
                f"the fresh (4,12) row is not in the store (run "
                f"u14e_vv_4_12.py first for the fresh-vs-fresh "
-               f"reading); stored: {s412:.8f} -> {s415:.8f} "
+               f"reading); stored: {s412:.4f} -> {s415:.4f} "
                f"(+{(s415 - s412) * 1e3:.3f} mEh); the fresh (4,15) "
-               f"total {r0['e_ref'] + r0['e2']:.8f}")
+               f"total {tot_fresh:.4f}")
     ok = v.report()
     return 0 if ok else 1
 

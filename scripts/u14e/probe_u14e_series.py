@@ -37,7 +37,6 @@ from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.reference import (ROHF_CENSUS_GUESSES, ReferenceSpec,  # noqa: E402
                                 _accelerated, _forced_rohf_occ,
                                 occupation_postcheck, run_rohf)
-from atomterm.system import build_mol  # noqa: E402
 from atomterm.windows import pattern_projector  # noqa: E402
 
 # the declared members: the closed block stays the case reference's

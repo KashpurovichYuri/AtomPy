@@ -1,30 +1,44 @@
-  ROHF (trusted rung, loaded): E = -50.38185233, nao 177, nelectron 14, spin 4
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
 /home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
   mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
 /home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
   mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
   [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
-  window: the distilled span, 13 columns (the 10f/13d bands are the identity; the 7s radial is the production distillation, core-lean 0.52 re-orthogonalized away); the window gram's min 0.009167
-  [sa] ensemble -50.44768497, converged True (65.3 s)
-  root 0: e_ref -50.45324468, E(2) -308.4104 mEh, <L2> 38.336739, <S2> 6.000000
-  root 1: e_ref -50.45324468, E(2) -308.4104 mEh, <L2> 38.336722, <S2> 6.000000
-  root 2: e_ref -50.45279811, E(2) -307.6171 mEh, <L2> 43.073770, <S2> 6.000000
-  root 3: e_ref -50.45279811, E(2) -307.6180 mEh, <L2> 43.073645, <S2> 6.000000
-  root 4: e_ref -50.45107292, E(2) -308.8666 mEh, <L2> 43.788057, <S2> 6.000000
-  root 5: e_ref -50.45107292, E(2) -308.8669 mEh, <L2> 43.789406, <S2> 6.000000
-  root 6: e_ref -50.44916932, E(2) -310.1991 mEh, <L2> 50.373537, <S2> 6.000000
-  root 7: e_ref -50.44916932, E(2) -310.1988 mEh, <L2> 49.633983, <S2> 6.000000
-  root 8: e_ref -50.44740586, E(2) -310.9026 mEh, <L2> 48.675432, <S2> 6.000000
-  root 9: e_ref -50.44740586, E(2) -310.9000 mEh, <L2> 46.779104, <S2> 6.000000
-  root 10: e_ref -50.44566968, E(2) -311.2851 mEh, <L2> 47.862009, <S2> 6.000000
-  root 11: e_ref -50.44566966, E(2) -311.2851 mEh, <L2> 45.276460, <S2> 6.000000
-  root 12: e_ref -50.44376137, E(2) -311.9668 mEh, <L2> 50.348838, <S2> 6.000000
-  root 13: e_ref -50.44375888, E(2) -311.9803 mEh, <L2> 46.382427, <S2> 6.000000
-  root 14: e_ref -50.44193063, E(2) -312.9918 mEh, <L2> 49.344976, <S2> 6.000000
-  root 15: e_ref -50.44166404, E(2) -313.1048 mEh, <L2> 46.314593, <S2> 6.000000
-  root 16: e_ref -50.44080844, E(2) -313.7598 mEh, <L2> 46.155919, <S2> 6.000000
-  [note] the (6,13) meters (the disclosure leg): <L2> in [38.336722, 50.373537], <S2> up to 6.000 over 17 roots; ensemble -50.44768497 (draw-dependent on this flat near-degenerate manifold).  THE FINDING this leg exposes: the production-distilled 7s radial is 0.52 core-lean and its pur remainder is 0.0092 of the window gram -- the (6,13) window's 7s direction is compromised on the pur substrate, the class behind the stored (6,13) SA refusals (the declared-out record).  The certified block-ground classification (L=9) lives in the route-wave record's pinned components.  E(2) root 0 -308.4104 mEh, total -50.76165510
+  [diagnostic] distilled columns' S-norm after removing the pur core span: 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 0.8536
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13.py:66: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
+  [diagnostic] the assembled window block [5:18] matches act's columns from index 1 onward (the placement the production assembly chose)
+  [casscf] e_tot -50.44941224, converged False, <L2> 22.328195 (166.0 s)
+  [note] free CASSCF (the single-root draw class): <L2> 22.328195, E(2) -307.2710 mEh
+  root 0: e_ref -50.45285591, E(2) -282.0763 mEh, <L2> 23.781647, <S2> 12.000000
+  root 1: e_ref -50.45285190, E(2) -282.0684 mEh, <L2> 23.394270, <S2> 12.000000
+  root 2: e_ref -50.45284488, E(2) -282.0779 mEh, <L2> 25.991302, <S2> 12.000000
+  root 3: e_ref -50.45282882, E(2) -282.1017 mEh, <L2> 24.173428, <S2> 12.000000
+  root 4: e_ref -50.45282820, E(2) -282.1014 mEh, <L2> 29.056829, <S2> 12.000000
+  root 5: e_ref -50.45280024, E(2) -282.1317 mEh, <L2> 28.333673, <S2> 12.000000
+  root 6: e_ref -50.45280002, E(2) -282.1321 mEh, <L2> 30.235764, <S2> 12.000000
+  root 7: e_ref -50.45276682, E(2) -282.1660 mEh, <L2> 32.583395, <S2> 12.000000
+  root 8: e_ref -50.45276679, E(2) -282.1660 mEh, <L2> 33.510226, <S2> 12.000000
+  root 9: e_ref -50.45273221, E(2) -282.2103 mEh, <L2> 37.043008, <S2> 12.000000
+  root 10: e_ref -50.45273216, E(2) -282.2102 mEh, <L2> 37.236398, <S2> 12.000000
+  root 11: e_ref -50.45269547, E(2) -282.2453 mEh, <L2> 40.418327, <S2> 12.000000
+  root 12: e_ref -50.45269528, E(2) -282.2442 mEh, <L2> 40.466274, <S2> 12.000000
+  root 13: e_ref -50.45264647, E(2) -282.2935 mEh, <L2> 42.469721, <S2> 12.000000
+  root 14: e_ref -50.45264588, E(2) -282.2937 mEh, <L2> 42.402111, <S2> 12.000000
+  root 15: e_ref -50.45256258, E(2) -282.3507 mEh, <L2> 44.928480, <S2> 12.000000
+  root 16: e_ref -50.45256258, E(2) -282.3507 mEh, <L2> 44.979176, <S2> 12.000000
+  [note] free SA (the draw-dependent meters): <L2> in [23.3943, 44.9792], <S2> up to 12.0000 -- the free-SA roots partition this flat near-degenerate manifold draw-dependently (mixed classes read); E(2) root 0 -282.0763 mEh, total -50.7349 (the stored (6,13) CASSCF rows read -50.732)
+  [sa] ensemble -50.45274213, converged True (316.5 s)
+  plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
+  [window] distilled 5f: k=1 of 3 bands, capture 0.9328-0.9420; 6d: k=1 of 3 bands, capture 0.9828-0.9828; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+  [pinned ci] term e_var -48.78751972, <L2> [72.000000, 90.000000] (267.2 s)
+  [note] pinned CI: <L2> in [72.0000, 90.0000], <S2> max 12.0000; E(2) mean -1823.7784 mEh
+  [pinned sa] ensemble -50.45150714, <L2> [71.998766, 89.998577] (491.2 s)
+  [PASS] the pinned (6,13) components read the certified L=9 block ground (16 at ~90 + one at ~72): 17 components: 16 in 90 +- 0.01, 1 in 72 +- 0.01 (the declared 5L is not this block's ground -- the route-wave record's classification, re-derived)
 
 ===== verdict =====
-  REPORT  the (6,13) meters (the disclosure leg)
-0/0 assertions hold
+  REPORT  free CASSCF (the single-root draw class)
+  REPORT  free SA (the draw-dependent meters)
+  REPORT  pinned CI
+  PASS  the pinned (6,13) components read the certified L=9 block ground (16 at ~90 + one at ~72)
+1/1 assertions hold

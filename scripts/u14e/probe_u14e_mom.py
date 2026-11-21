@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.reference import (_accelerated, _mom_occ,  # noqa: E402
-                                occupation_postcheck, run_rohf)
+                                run_rohf)
 from atomterm.windows import pattern_projector  # noqa: E402
 
 MEMBERS = (

@@ -1,65 +1,59 @@
-"""The CAS(4,12) V&V leg -- the 5L state-averaged leg, PySCF-direct
-and readable top-to-bottom.
+"""The CAS(4,12) V&V leg -- the 5L leg, four routes, PySCF-direct.
 
-THE SETUP (all visible below):
-  1. the trusted ROHF rung LOADED (never re-run -- the cache is the
-     reproducibility unit); its identity cross-checked against the
-     campaign declaration;
-  2. the core: the rotation-closed span over the occupied prefix
-     (atomterm.core's certified construction -- a raw core polarizes
-     and splits the term, and the committed anchors live on this
-     substrate; this is substrate chemistry, not the derivation
-     under test);
-  3. the window: the AO columns of the 10f (7) + 13d (5) shells,
-     written out -- selected by label prefix, projected out of the
-     core span, Loewdin-orthonormalized, the S-orthonormal
-     complement filled by the deflated overlap.  These shells are
-     band-pure at k=1, so the visible selection IS the stored
-     distilled window; the production builder's product is
-     cross-checked elementwise (the certification assert);
-  4. the SA: PySCF's CASSCF with state_average_ over the ground
-     term's 17 M_L components (L = 8, u);
-  5. the two-pass readout (CASCI, canonicalization off) in the
-     frozen converged window;
-  6. PT2: the engine's own mrpt.NEVPT(mc, root=k).kernel() per root;
-  7. the meters: atomterm's exact angular operators (shared core).
+THE SETUP (all visible in ``main``): the trusted ROHF rung loaded;
+the core = the rotation-closed span over the occupied prefix
+(atomterm.core -- substrate chemistry, marked); the window = the AO
+columns of the 10f (7) + 13d (5) shells, written out and certified
+elementwise against the production builder (block dev 2.2e-16).
+THE FOUR ROUTES:
+  free CASSCF   the visible window, PySCF's plain single-root kernel
+  free SA       state_average_ over the ground term's 17 M_L
+                components (L = 8, u), then the two-pass readout
+                (seeded from the SA kernel's own vectors)
+  pinned CI     the production lane construction (marked: under
+                test) -- per-block wfnsym solvers, no optimizer
+  pinned SA     run_irrep_sa's two-pass ensemble, per-block readout
+PT2: the engine's own mrpt.NEVPT per root; the meters: atomterm's
+exact angular operators.
 
 THE ASSERTIONS:
-  (a) fresh E(2) root 0 ~ the committed payload row
-      (u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg, root 0), band +-2 mEh;
-  (b) <L2> = 72 / <S2> = 6 on every root (band 1e-5);
-  --pinned adds (d): the D2h-pinned route ~ this visible free route.
-  The pinned route is the PRODUCTION evaluator (run_irrep_sa on the
-  lane substrate) -- it is the thing under test; the free route
-  above is the independent reference.
+  (a) fresh SA E(2) root 0 ~ the committed payload row, band +-2 mEh;
+  (b) <L2> = 72 / <S2> = 6 on every SA root, band 1e-5;
+  (d) the pinned SA ensemble ~ the free SA ensemble, band 1e-6 Eh.
+The free CASSCF row carries NO assertion -- the single-root draw is
+the escape class by physics (the meters disclose it).
 
 Run from the repo root:
     OMP_NUM_THREADS=16 python scripts/u14e/u14e_vv_4_12.py \
-        [--pinned] [--ground-only]  |  tee logs/u14e_vv_4_12.log
+        [--ground-only]  |  tee logs/u14e_vv_4_12.log
 """
 
 import sys
 import time
-from datetime import date
 
 import numpy as np
-from pyscf import gto, mcscf, mrpt, scf
-
-from _vv_common import (ATOM_DIR, BAND_E2_MEH, BAND_L2, BAND_ROUTE,
-                        EH_EV, L_L2, S_S2, Verdict, anchor, drop_row,
-                        load_reference, meters)
+from _vv_common import (BAND_E2_MEH, BAND_L2, BAND_ROUTE, L_L2, S_S2,
+                        Verdict, anchor, core_part_of, drop_row,
+                        free_kernel, lane_route, load_reference,
+                        make_blocks, meters, meters_all, nevpt_rows,
+                        pinned_ci_run, pinned_sa_run, price, std_row)
 
 ADDR_412 = "u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg"
-SECTOR = (4, 0)   # (na, nb): the maximal-Ms sector, 4 open alpha
-NCORE = 5         # 6s2 6p6 7s2 -- five closed pairs
-SHELLS = (("10f", 7), ("13d", 5))   # the window's AO shells
+ADDR_412_LANE = "u14e_5f6d@6s6p7s_4-0_sa-casscf_ao_-_pur_avg"
+ADDR_412_CASSCF = "u14e_10f13d_4-0_casscf_ao_-_pur_avg"
+SECTOR = (4, 0)
+NCORE = 5
+SHELLS = (("10f", 7), ("13d", 5))
+L, PARITY = 8, "u"
+ROOTS = 17
 
 
 def visible_window(mol, mf, c_core):
     """The window, written out: select the shells' AO columns, project
     the core span out (the S metric), Loewdin-orthonormalize, fill the
-    complement by the deflated overlap.  Returns (mo_full, c_act) and
-    asserts elementwise agreement with the production builder."""
+    complement from the canonical virtuals.  Certified elementwise
+    (core+window) against the production builder; the complement by
+    span."""
     labels = [lab.split()[-1] for lab in mol.ao_labels()]
     sel = [i for i, lab in enumerate(labels)
            if any(lab.startswith(w) for w, _ in SHELLS)]
@@ -72,7 +66,6 @@ def visible_window(mol, mf, c_core):
     act = np.zeros((nao, ncas))
     for k, i in enumerate(sel):
         act[i, k] = 1.0
-    # out of the core span, then Loewdin in the window's complement
     P_core = c_core @ c_core.T @ S   # the metric projector
     w = act - P_core @ act
     g = w.T @ S @ w
@@ -89,21 +82,16 @@ def visible_window(mol, mf, c_core):
         sys.exit(f"the complement came out {c_virt.shape[1]} wide, "
                  f"expected {nao - C.shape[1]}")
     mo = np.hstack([C, c_virt])
-    # the production builder's product: the elementwise certification
     from atomterm.windows import build_full_mo, occupied_core_idx
     mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), sel,
                             c_core=c_core)
-    # the certification: the core+window block elementwise (same
-    # input, same Loewdin gauge); the virtual complement by SPAN
-    # (any S-orthonormal basis of it is valid for the CAS optimizer)
     nc = C.shape[1]
     dev_blk = np.max(np.abs(mo[:, :nc] - mo_prod[:, :nc]))
     proj = mo_prod[:, nc:]
     resid = mo[:, nc:] - proj @ (proj.T @ S @ mo[:, nc:])
     dev_span = np.max(np.abs(resid))
-    # the span band cites the observed: 1.9e-08 on this box (the
-    # diffuse tail's overlap conditioning); the block equality is
-    # the certificate
+    # the span band cites the observed: 1.9e-08 (the diffuse tail's
+    # overlap conditioning); the block equality is the certificate
     if dev_blk > 1e-9 or dev_span > 1e-6:
         sys.exit(f"the visible window construction disagrees with "
                  f"the production builder (block dev {dev_blk:.2e}, "
@@ -112,173 +100,144 @@ def visible_window(mol, mf, c_core):
           f"construction == production build_full_mo (block dev "
           f"{dev_blk:.1e}, complement span dev {dev_span:.1e})",
           flush=True)
-    return mo, mo[:, NCORE:NCORE + ncas]
+    return mo
 
 
-def free_leg(mol, mf, mo_full, v, ground_only):
-    """The visible free route: SA -> readout -> PT2 -> meters."""
+def main(argv=None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    ground_only = "--ground-only" in argv
+    pt2_roots = [0] if ground_only else None
+    v = Verdict()
+    mol, mf = load_reference()
+    from atomterm.core import purified_core_orbitals
+    c_core = purified_core_orbitals(mol, mf, NCORE)[0]
+    mo_full = visible_window(mol, mf, c_core)
+    expect = meters(mol, mo_full[:, NCORE:NCORE + 12], *SECTOR)
+    weights = [1.0 / 17] * 17
+
+    # ---- free CASSCF (single root; the escape class, no assertion) --
     t0 = time.time()
-    mc = mcscf.CASSCF(mf, 12, SECTOR)
-    mc.state_average_([1.0 / 17] * 17)
-    mc.kernel(mo_full)
-    print(f"  [sa] ensemble {mc.e_tot:.8f}, converged "
-          f"{mc.converged} ({time.time() - t0:.1f} s)", flush=True)
-    if not mc.converged:
-        v.note("the SA kernel converged", "False -- the PySCF kernel "
-               "hit its cycle cap; the readout still prices the "
-               "frozen window")
-    cas = mcscf.CASCI(mf, 12, SECTOR)
-    cas.mo_coeff = mc.mo_coeff
-    cas.canonicalization = False  # the window exactly as converged
-    cas.fcisolver.nroots = 17
-    # seed the readout FROM the SA kernel's own vectors (the two-pass
-    # pattern's faithful form -- production's readout_mc(ci0=...);
-    # unseeded, the davidson tails mix the quasi-degenerate block at
-    # the 1e-5 level and the meters carry it)
-    from pyscf.fci import cistring
-    nsa = cistring.num_strings(cas.ncas, SECTOR[0])
-    nsb = cistring.num_strings(cas.ncas, SECTOR[1])
-    guess = [np.asarray(c).ravel().reshape(nsa, nsb) for c in mc.ci]
-    cas.kernel(ci0=guess)
-    expect = meters(mol, cas.mo_coeff[:, NCORE:NCORE + 12], *SECTOR)
+    mc_c, cas_c = free_kernel(mf, 12, SECTOR, mo_full)
+    r_c = price(cas_c, expect, roots=[0])[0]
+    a_c = anchor(ADDR_412_CASSCF)["roots"][0]
+    print(f"  [casscf] e_tot {mc_c.e_tot:.8f}, converged "
+          f"{mc_c.converged}, <L2> {r_c['l2']:.6f} "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    v.note("free CASSCF (the single-root draw class)",
+           f"<L2> {r_c['l2']:.6f}, E(2) {r_c['e2'] * 1e3:+.4f} mEh "
+           f"(the committed draw priced {a_c['e_corr'] * 1e3:+.4f}; "
+           f"the single-root endpoints differ by draw -- the meters "
+           f"are the disclosure)")
+    drop_row(std_row("casscf", "free", "(4,12)", float(mc_c.e_tot),
+                     r_c["e2"] * 1e3, float(cas_c.e_tot),
+                     f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}"))
+
+    # ---- free SA ------------------------------------------------------
+    t0 = time.time()
+    mc_sa, cas_sa = free_kernel(mf, 12, SECTOR, mo_full,
+                                weights=weights, nroots=ROOTS)
+    core_e, e_cas = core_part_of(cas_sa)
+    expect_sa = meters(mol, cas_sa.mo_coeff[:, NCORE:NCORE + 12],
+                       *SECTOR)
     a0 = anchor(ADDR_412)["roots"][0]
-    # per-root totals in the analyzation seam's convention
-    # (e_cas[k] + the common core part -- e_tot's first entry minus
-    # e_cas's first entry)
-    e_tot_0 = float(np.atleast_1d(np.asarray(cas.e_tot)).ravel()[0])
-    e_cas = np.atleast_1d(np.asarray(cas.e_cas)).ravel()
-    core_e = e_tot_0 - float(e_cas[0])
-    rows = []
-    for k in (range(1) if ground_only else range(17)):
-        pt = mrpt.NEVPT(cas, root=k)
-        pt.ci = list(pt.ci)   # detach: the kernel writes the shared list
-        e2 = float(pt.kernel())
-        rows.append({"root": k, "e_ref": float(e_cas[k] + core_e),
-                     "e2": e2,
-                     "l2": expect("l2", cas.ci[k]),
-                     "s2": expect("s2", cas.ci[k])})
-        print(f"  root {k}: e_ref {rows[-1]['e_ref']:.8f}, E(2) "
-              f"{e2 * 1e3:+.4f} mEh, <L2> {rows[-1]['l2']:.6f}, "
-              f"<S2> {rows[-1]['s2']:.6f}", flush=True)
+    rows = price(cas_sa, expect_sa,
+                 roots=range(1) if ground_only else range(ROOTS))
+    for r in rows:
+        r["e_ref"] = float(e_cas[r["root"]] + core_e)
+        print(f"  root {r['root']}: e_ref {r['e_ref']:.8f}, E(2) "
+              f"{r['e2'] * 1e3:+.4f} mEh, <L2> {r['l2']:.6f}, "
+              f"<S2> {r['s2']:.6f}", flush=True)
     r0 = rows[0]
     d_meh = (r0["e2"] - a0["e_corr"]) * 1e3
-    v.check("(a) E(2) root 0 ~ the committed payload row",
+    v.check("(a) SA E(2) root 0 ~ the committed payload row",
             abs(d_meh) <= BAND_E2_MEH,
             f"fresh {r0['e2'] * 1e3:+.4f} mEh vs anchor "
             f"{a0['e_corr'] * 1e3:+.4f} (delta {d_meh:+.4f}, band "
             f"+-{BAND_E2_MEH})")
     dev_m = max(abs(r["l2"] - L_L2) for r in rows)
     dev_s = max(abs(r["s2"] - S_S2) for r in rows)
-    v.check("(b) <L2> = 72 / <S2> = 6 on every root",
+    v.check("(b) <L2> = 72 / <S2> = 6 on every SA root",
             max(dev_m, dev_s) <= BAND_L2,
             f"{len(rows)} roots, max dev {max(dev_m, dev_s):.2e} "
             f"(band {BAND_L2:g})")
-    drop_row({
-        "leg": "4_12", "route": "free", "cas": "CAS(4,12)",
-        "e_ref": r0["e_ref"], "e2_meh": r0["e2"] * 1e3,
-        "e_total": r0["e_ref"] + r0["e2"],
-        "anchor_e2_meh": a0["e_corr"] * 1e3, "delta_meh": d_meh,
-        "l2": f"{min(r['l2'] for r in rows):.6f}.."
-              f"{max(r['l2'] for r in rows):.6f}",
-        "s2": f"{max(abs(r['s2'] - S_S2) for r in rows):.1e} dev",
-        "date": date.today().isoformat(),
-    })
-    return mc
+    drop_row(std_row("sa-casscf", "free", "(4,12)",
+                     float(e_cas[0] + core_e), r0["e2"] * 1e3,
+                     float(r0["e_ref"] + r0["e2"]),
+                     fmt_range([r['l2'] for r in rows]),
+                     f"{max(r['s2'] for r in rows):.4f}"))
+    print(f"  [sa] ensemble {mc_sa.e_tot:.8f}, converged "
+          f"{mc_sa.converged} ({time.time() - t0:.1f} s)", flush=True)
 
+    # ---- the pinned substrate (built once, two legs) ------------------
+    from atomterm.cases import campaign_spec
+    lmol, lmf, c_core_l, nf, mo_l, ncas_l, _act = lane_route(
+        campaign_spec("U14e"), ADDR_412_LANE, SECTOR)
 
-def pinned_leg(mol, mf, v, ground_only):
-    """The D2h-pinned route -- the PRODUCTION evaluator, under test:
-    the lane substrate, the lane core, run_irrep_sa's two-pass
-    pattern; PT2 through the per-block pinned solvers."""
-    from atomterm.cases import campaign_spec, lane_substrate
-    from atomterm.casscf import run_irrep_sa
-    from atomterm.cells import CellKey, lane_core, window_columns
-    from atomterm.windows import build_full_mo
+    # ---- pinned CI (per-block solvers, no optimizer) ------------------
+    t0 = time.time()
+    roots_ci, _ = pinned_ci_run(lmol, lmf, mo_l, nf, ncas_l, SECTOR,
+                                L, PARITY, c_core_l)
+    blocks, expect_p, _ = make_blocks(lmol, lmf, mo_l, nf, ncas_l,
+                                      SECTOR, L, PARITY, c_core_l,
+                                      roots_ci)
+    l2s, s2s = meters_all(blocks, expect_p)
+    e2s = [row.e_corr for _, mc in blocks
+           for row in nevpt_rows(mc, pt2_roots)]
+    term_means = []
+    for _, mc in blocks:
+        ec = np.atleast_1d(mc.e_cas).ravel()
+        cb = float(mc.e_tot) - float(ec[0])
+        term_means.append(float(np.mean(ec + cb)))
+    e_var_ci = float(np.mean(term_means))
+    print(f"  [pinned ci] term e_var {e_var_ci:.8f}, E(2) mean "
+          f"{np.mean(e2s) * 1e3:+.4f} mEh, ptp "
+          f"{np.ptp(e2s) * 1e3:.2e} mEh, <L2> "
+          f"[{min(l2s):.6f}, {max(l2s):.6f}] "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    v.note("pinned CI (the pinned analog of the unoptimized row)",
+           f"<L2> in [{min(l2s):.4f}, {max(l2s):.4f}], <S2> max "
+           f"{max(s2s):.4f}; E(2) mean {np.mean(e2s) * 1e3:+.4f} mEh")
+    drop_row(std_row("ci", "pinned", "(4,12)", e_var_ci,
+                     float(np.mean(e2s) * 1e3),
+                     float(e_var_ci + np.mean(e2s)),
+                     fmt_range(l2s),
+                     f"{max(s2s):.4f}"))
 
-    spec = campaign_spec("U14e")
-    lmol, lmf = lane_substrate(spec)
-    key = CellKey.from_address(
-        "u14e_5f6d@6s6p7s_4-0_sa-casscf_ao_-_pur_avg")
-    _core, nf, c_core, _rep = lane_core(key, lmol, lmf,
-                                        spec.shell_bands)
-    act, ncas, _w = window_columns(key, lmol, lmf, spec.shell_bands,
-                                   spec.shell_radials)
-    mo = build_full_mo(lmf, list(range(nf)), act, c_core=c_core)
-    out = run_irrep_sa(lmol, lmf, mo[:, nf:nf + ncas], nf, *SECTOR,
-                       8, "u", c_core=c_core)
-    print(f"  [pinned] ensemble {out['e_tot']:.8f}, converged "
-          f"{out['converged']}", flush=True)
-    c_read = np.asarray(out["mo"])[:, nf:nf + ncas]
-    expect = meters(lmol, c_read, *SECTOR)
-    e2s, l2s = [], []
-    from atomterm.core import closed_shell_core_energy
-    from atomterm.irreps import branch_d2h, orb_irreps
-    from atomterm.casscf import irrep_solvers
-    from atomterm.perturb import nevpt2_rows_on
-    from pyscf import mcscf
-    orbsyms = orb_irreps(lmol, c_read)
-    pinned = {irr: s for irr, s, _ in
-              irrep_solvers(lmol, orbsyms, 8, "u", 1e-12)}
-    core_part = closed_shell_core_energy(lmf, c_core)
-    for irrep, mult in branch_d2h(8, "u").items():
-        e_arr, ci = out["roots"][irrep]
-        e_arr = np.atleast_1d(np.asarray(e_arr, dtype=float))
-        mc = mcscf.CASCI(lmf, ncas, SECTOR)
-        mc.mo_coeff = np.asarray(out["mo"], dtype=float)
-        mc.fcisolver = pinned[irrep]
-        mc.orbsym = orbsyms
-        mc.fcisolver.orbsym = np.asarray(orbsyms)
-        ci_arr = np.asarray(ci)
-        mc.ci = ([ci_arr] if ci_arr.ndim == 2
-                 else [np.asarray(x) for x in ci_arr])
-        mc.e_cas = e_arr[:mult]
-        mc.e_tot = float(mc.e_cas[0] + core_part)
-        for row in nevpt2_rows_on(mc, roots=[0] if ground_only
-                                  else None):
-            e2s.append(row.e_corr)
-            ci_vec = np.asarray(mc.ci[row.root]).ravel()
-            l2s.append(expect("l2", ci_vec))
-    e2s = np.array(e2s)
-    print(f"  term E(2): mean {e2s.mean() * 1e3:+.4f} mEh, ptp "
-          f"{np.ptp(e2s) * 1e3:.2e} mEh over {len(e2s)} components; "
-          f"<L2> in [{min(l2s):.6f}, {max(l2s):.6f}]", flush=True)
-    free_ens = v.free_ensemble
-    delta = out["e_tot"] - free_ens
-    v.check("(d) the pinned route ~ the visible free route "
-            "(ensemble energies)", abs(delta) <= BAND_ROUTE,
-            f"pinned {out['e_tot']:.8f} vs free {free_ens:.8f} "
+    # ---- pinned SA ----------------------------------------------------
+    t0 = time.time()
+    out_sa, _ = pinned_sa_run(lmol, lmf, mo_l, nf, ncas_l, SECTOR,
+                              L, PARITY, c_core_l)
+    blocks_s, expect_s, _ = make_blocks(lmol, lmf,
+                                        np.asarray(out_sa["mo"]),
+                                        nf, ncas_l, SECTOR, L, PARITY,
+                                        c_core_l, out_sa["roots"])
+    l2s_s, s2s_s = meters_all(blocks_s, expect_s)
+    e2s_s = [row.e_corr for _, mc in blocks_s
+             for row in nevpt_rows(mc, pt2_roots)]
+    print(f"  [pinned sa] ensemble {out_sa['e_tot']:.8f}, term E(2) "
+          f"mean {np.mean(e2s_s) * 1e3:+.4f} mEh, ptp "
+          f"{np.ptp(e2s_s) * 1e3:.2e} mEh, <L2> "
+          f"[{min(l2s_s):.6f}, {max(l2s_s):.6f}] "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    delta = float(out_sa["e_tot"]) - float(mc_sa.e_tot)
+    v.check("(d) the pinned SA ensemble ~ the free SA ensemble",
+            abs(delta) <= BAND_ROUTE,
+            f"pinned {out_sa['e_tot']:.8f} vs free {mc_sa.e_tot:.8f} "
             f"(delta {delta:+.2e} Eh, band {BAND_ROUTE:g})")
-    drop_row({
-        "leg": "4_12", "route": "pinned", "cas": "CAS(4,12)",
-        "e_ref": float(out["e_tot"]), "e2_meh": float(e2s.mean() * 1e3),
-        "e_total": float(out["e_tot"] + e2s.mean()),
-        "anchor_e2_meh": None, "delta_meh": float(delta * 1e3),
-        "l2": f"{min(l2s):.6f}..{max(l2s):.6f}",
-        "s2": "72-block exact", "date": date.today().isoformat(),
-    })
+    drop_row(std_row("sa-casscf", "pinned", "(4,12)",
+                     float(out_sa["e_tot"]),
+                     float(np.mean(e2s_s) * 1e3),
+                     float(out_sa["e_tot"] + np.mean(e2s_s)),
+                     fmt_range(l2s_s),
+                     f"{max(s2s_s):.4f}"))
 
-
-def mrpt_rows(mc, ground_only):
-    from atomterm.perturb import nevpt2_rows_on
-    return nevpt2_rows_on(mc, roots=[0] if ground_only else None)
-
-
-def main(argv=None) -> int:
-    argv = sys.argv[1:] if argv is None else argv
-    ground_only = "--ground-only" in argv
-    pinned = "--pinned" in argv
-    v = Verdict()
-    mol, mf = load_reference()
-    # the substrate (marked: substrate chemistry, not under test)
-    from atomterm.core import purified_core_orbitals
-    c_core = purified_core_orbitals(mol, mf, NCORE)[0]
-    mo_full, _c_act = visible_window(mol, mf, c_core)
-    mc = free_leg(mol, mf, mo_full, v, ground_only)
-    v.free_ensemble = float(mc.e_tot)
-    if pinned:
-        pinned_leg(mol, mf, v, ground_only)
     ok = v.report()
     return 0 if ok else 1
+
+
+def nevpt_rows(mc, pt2_roots):
+    from atomterm.perturb import nevpt2_rows_on
+    return nevpt2_rows_on(mc, roots=pt2_roots)
 
 
 if __name__ == "__main__":
