@@ -1,0 +1,33 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177, nelectron 14, spin 4
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_15.py:78: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), sel,
+  window: 15 AO columns (('10f', 7), ('13d', 5), ('14p', 3)), visible construction == production build_full_mo (block dev 2.2e-16, complement span dev 1.9e-08)
+  [sa] ensemble -50.42530743, converged True (170.0 s)
+  root 0: e_ref -50.42637972, E(2) -336.0132 mEh, <L2> 71.784763, <S2> 6.000000
+  root 1: e_ref -50.42637765, E(2) -335.9998 mEh, <L2> 71.786660, <S2> 6.000000
+  root 2: e_ref -50.42637668, E(2) -336.0114 mEh, <L2> 71.786566, <S2> 6.000000
+  root 3: e_ref -50.42637412, E(2) -336.0232 mEh, <L2> 71.790097, <S2> 6.000000
+  root 4: e_ref -50.42637336, E(2) -336.0131 mEh, <L2> 71.790958, <S2> 6.000000
+  root 5: e_ref -50.42506240, E(2) -336.9296 mEh, <L2> 71.943808, <S2> 6.000000
+  root 6: e_ref -50.42506216, E(2) -336.9332 mEh, <L2> 71.943772, <S2> 6.000000
+  root 7: e_ref -50.42506155, E(2) -336.9334 mEh, <L2> 71.944012, <S2> 6.000000
+  root 8: e_ref -50.42505770, E(2) -336.9710 mEh, <L2> 71.945836, <S2> 6.000000
+  root 9: e_ref -50.42497766, E(2) -336.9240 mEh, <L2> 71.937663, <S2> 6.000000
+  root 10: e_ref -50.42497750, E(2) -336.9511 mEh, <L2> 71.937678, <S2> 6.000000
+  root 11: e_ref -50.42497686, E(2) -336.9692 mEh, <L2> 71.937570, <S2> 6.000000
+  root 12: e_ref -50.42464555, E(2) -337.0154 mEh, <L2> 71.964589, <S2> 6.000000
+  root 13: e_ref -50.42464434, E(2) -337.0230 mEh, <L2> 71.964633, <S2> 6.000000
+  root 14: e_ref -50.42462725, E(2) -337.0109 mEh, <L2> 71.965308, <S2> 6.000000
+  root 15: e_ref -50.42462666, E(2) -337.0101 mEh, <L2> 71.965332, <S2> 6.000000
+  root 16: e_ref -50.42462514, E(2) -337.0067 mEh, <L2> 71.965391, <S2> 6.000000
+  [PASS] (a15) E(2) root 0 ~ the committed payload row: fresh -336.0132 mEh vs anchor -336.0125 (delta -0.0006, band +-2.0)
+  [note] the (4,15) meters: <L2> in [71.784763, 71.965391] (the stored row carries 71.785 on root 0 -- the promotion's 6p rows cost some closure; printed, not asserted)
+  [PASS] (c) the (4,15) promotion WORSENS the corrected total (fresh vs fresh): (4,12) -50.76547989 -> (4,15) -50.76239288 (+3.087 mEh); stored: -50.76547655 -> -50.76239101 (+3.086 mEh)
+
+===== verdict =====
+  PASS  (a15) E(2) root 0 ~ the committed payload row
+  REPORT  the (4,15) meters
+  PASS  (c) the (4,15) promotion WORSENS the corrected total (fresh vs fresh)
+2/2 assertions hold

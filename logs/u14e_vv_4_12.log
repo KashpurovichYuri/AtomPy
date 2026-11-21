@@ -1,0 +1,37 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177, nelectron 14, spin 4
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_12.py:94: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), sel,
+  window: 12 AO columns (('10f', 7), ('13d', 5)), visible construction == production build_full_mo (block dev 2.2e-16, complement span dev 1.9e-08)
+  [sa] ensemble -50.42381003, converged True (31.9 s)
+  root 0: e_ref -50.42381186, E(2) -341.6680 mEh, <L2> 72.000000, <S2> 6.000000
+  root 1: e_ref -50.42381186, E(2) -341.6679 mEh, <L2> 72.000000, <S2> 6.000000
+  root 2: e_ref -50.42381137, E(2) -341.7289 mEh, <L2> 71.999998, <S2> 6.000000
+  root 3: e_ref -50.42381136, E(2) -341.7288 mEh, <L2> 71.999998, <S2> 6.000000
+  root 4: e_ref -50.42381085, E(2) -341.7476 mEh, <L2> 71.999997, <S2> 6.000000
+  root 5: e_ref -50.42381084, E(2) -341.7482 mEh, <L2> 71.999997, <S2> 6.000000
+  root 6: e_ref -50.42381038, E(2) -341.7438 mEh, <L2> 71.999998, <S2> 6.000000
+  root 7: e_ref -50.42381033, E(2) -341.7550 mEh, <L2> 71.999997, <S2> 6.000000
+  root 8: e_ref -50.42381004, E(2) -341.7206 mEh, <L2> 71.999998, <S2> 6.000000
+  root 9: e_ref -50.42380985, E(2) -341.7540 mEh, <L2> 71.999997, <S2> 6.000000
+  root 10: e_ref -50.42380974, E(2) -341.7347 mEh, <L2> 71.999997, <S2> 6.000000
+  root 11: e_ref -50.42380933, E(2) -341.7465 mEh, <L2> 71.999997, <S2> 6.000000
+  root 12: e_ref -50.42380932, E(2) -341.7461 mEh, <L2> 71.999997, <S2> 6.000000
+  root 13: e_ref -50.42380873, E(2) -341.7298 mEh, <L2> 71.999998, <S2> 6.000000
+  root 14: e_ref -50.42380873, E(2) -341.7299 mEh, <L2> 71.999998, <S2> 6.000000
+  root 15: e_ref -50.42380792, E(2) -341.6631 mEh, <L2> 71.999999, <S2> 6.000000
+  root 16: e_ref -50.42380792, E(2) -341.6631 mEh, <L2> 71.999999, <S2> 6.000000
+  [PASS] (a) E(2) root 0 ~ the committed payload row: fresh -341.6680 mEh vs anchor -341.6651 (delta -0.0029, band +-2.0)
+  [PASS] (b) <L2> = 72 / <S2> = 6 on every root: 17 roots, max dev 3.00e-06 (band 1e-05)
+  plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
+  [window] distilled 5f: k=1 of 3 bands, capture 0.9328-0.9420; 6d: k=1 of 3 bands, capture 0.9828-0.9828
+  [pinned] ensemble -50.42381003, converged True
+  term E(2): mean -341.7481 mEh, ptp 3.95e-02 mEh over 17 components; <L2> in [72.000000, 72.000000]
+  [PASS] (d) the pinned route ~ the visible free route (ensemble energies): pinned -50.42381003 vs free -50.42381003 (delta -3.32e-09 Eh, band 1e-06)
+
+===== verdict =====
+  PASS  (a) E(2) root 0 ~ the committed payload row
+  PASS  (b) <L2> = 72 / <S2> = 6 on every root
+  PASS  (d) the pinned route ~ the visible free route (ensemble energies)
+3/3 assertions hold

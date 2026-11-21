@@ -1,0 +1,15 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177, nelectron 14, spin 4
+  UHF (trusted rung, loaded): E = -50.38881343
+  E_uhf - E_rohf = -6.961 mEh (the broken solution's descent)
+  [note] (e) the UHF sibling's spin honesty: <S2> = 6.228941 (Sz exact by construction; the exact 5-fold would read 6.000); pairing spectrum: 5 occupied pairs, 5 below 1 - 1e-6, smallest [0.88349911 0.99772338 0.9983828 ]
+  [note] (e) the ROHF-vs-UHF reference comparison: ROHF -50.38185233 vs UHF -50.38881343 (UHF -6.961 mEh lower); the cores assume one closed-shell density -- the UHF object is a reference-class product, not a cells axis
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [sa] UHF-seeded ensemble -59.60465152, converged False (91.3 s)
+  [note] the UHF-seeded SA from the RAW start descends broken: <L2> dev 7.20e+01 (the term identity lost; <L2> in [0.0329, 0.1587], ensemble -59.6047 -- an energy of the UHF-CASCI partition, not comparable to the ROHF-route optimum -50.4238).  The committed orchestrator record (logs/u14e_vv.log) measured the CONVERGED-start reading: the repair holds there (dev 8.9e-15, 2 cycles).  Together: the SA repair holds the converged gauge; a raw spin-broken start escapes
+
+===== verdict =====
+  REPORT  (e) the UHF sibling's spin honesty
+  REPORT  (e) the ROHF-vs-UHF reference comparison
+  REPORT  the UHF-seeded SA from the RAW start descends broken
+0/0 assertions hold

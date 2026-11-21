@@ -1,0 +1,30 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177, nelectron 14, spin 4
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+  window: the distilled span, 13 columns (the 10f/13d bands are the identity; the 7s radial is the production distillation, core-lean 0.52 re-orthogonalized away); the window gram's min 0.009167
+  [sa] ensemble -50.44768497, converged True (65.3 s)
+  root 0: e_ref -50.45324468, E(2) -308.4104 mEh, <L2> 38.336739, <S2> 6.000000
+  root 1: e_ref -50.45324468, E(2) -308.4104 mEh, <L2> 38.336722, <S2> 6.000000
+  root 2: e_ref -50.45279811, E(2) -307.6171 mEh, <L2> 43.073770, <S2> 6.000000
+  root 3: e_ref -50.45279811, E(2) -307.6180 mEh, <L2> 43.073645, <S2> 6.000000
+  root 4: e_ref -50.45107292, E(2) -308.8666 mEh, <L2> 43.788057, <S2> 6.000000
+  root 5: e_ref -50.45107292, E(2) -308.8669 mEh, <L2> 43.789406, <S2> 6.000000
+  root 6: e_ref -50.44916932, E(2) -310.1991 mEh, <L2> 50.373537, <S2> 6.000000
+  root 7: e_ref -50.44916932, E(2) -310.1988 mEh, <L2> 49.633983, <S2> 6.000000
+  root 8: e_ref -50.44740586, E(2) -310.9026 mEh, <L2> 48.675432, <S2> 6.000000
+  root 9: e_ref -50.44740586, E(2) -310.9000 mEh, <L2> 46.779104, <S2> 6.000000
+  root 10: e_ref -50.44566968, E(2) -311.2851 mEh, <L2> 47.862009, <S2> 6.000000
+  root 11: e_ref -50.44566966, E(2) -311.2851 mEh, <L2> 45.276460, <S2> 6.000000
+  root 12: e_ref -50.44376137, E(2) -311.9668 mEh, <L2> 50.348838, <S2> 6.000000
+  root 13: e_ref -50.44375888, E(2) -311.9803 mEh, <L2> 46.382427, <S2> 6.000000
+  root 14: e_ref -50.44193063, E(2) -312.9918 mEh, <L2> 49.344976, <S2> 6.000000
+  root 15: e_ref -50.44166404, E(2) -313.1048 mEh, <L2> 46.314593, <S2> 6.000000
+  root 16: e_ref -50.44080844, E(2) -313.7598 mEh, <L2> 46.155919, <S2> 6.000000
+  [note] the (6,13) meters (the disclosure leg): <L2> in [38.336722, 50.373537], <S2> up to 6.000 over 17 roots; ensemble -50.44768497 (draw-dependent on this flat near-degenerate manifold).  THE FINDING this leg exposes: the production-distilled 7s radial is 0.52 core-lean and its pur remainder is 0.0092 of the window gram -- the (6,13) window's 7s direction is compromised on the pur substrate, the class behind the stored (6,13) SA refusals (the declared-out record).  The certified block-ground classification (L=9) lives in the route-wave record's pinned components.  E(2) root 0 -308.4104 mEh, total -50.76165510
+
+===== verdict =====
+  REPORT  the (6,13) meters (the disclosure leg)
+0/0 assertions hold
