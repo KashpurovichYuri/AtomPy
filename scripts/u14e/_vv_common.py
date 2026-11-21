@@ -17,7 +17,6 @@ Run the legs from the repo root (or all through the driver):
 
 import json
 import sys
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
@@ -28,8 +27,7 @@ from pyscf import mcscf, mrpt, scf  # noqa: E402
 from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.detbasis import determinant_basis, operator_apply  # noqa: E402
 from atomterm.operators import (  # noqa: E402
-    ci_in_detbasis_order, l2_operator_parts, lz_operator,
-    s2_operator_parts)
+    ci_in_detbasis_order, l2_operator_parts, s2_operator_parts)
 
 EH_EV = 27.211386245988
 L_L2 = 72.0  # the 5L parent term: L = 8 -> L(L+1)
@@ -130,8 +128,7 @@ def meters(mol, c_act, na: int, nb: int):
     dets = determinant_basis(norb, na, nb)
     apply_l2 = operator_apply(dets, *l2_operator_parts(mol, c_act))
     apply_s2 = operator_apply(dets, *s2_operator_parts(norb))
-    apply_lz = operator_apply(dets, one_body=lz_operator(mol, c_act))
-    apply = {"l2": apply_l2, "s2": apply_s2, "lz": apply_lz}
+    apply = {"l2": apply_l2, "s2": apply_s2}
 
     def expect(kind: str, ci_pyscf) -> float:
         w = ci_in_detbasis_order(np.asarray(ci_pyscf).ravel(),
@@ -265,6 +262,10 @@ def make_blocks(lmol, lmf, mo, nf, ncas, sector, L, parity, c_core,
         c_read = np.asarray(mo)[:, nf:nf + ncas]
     else:
         c_read = np.asarray(c_read)
+        # the block mc must carry the columns the solvers read (the
+        # symmetrized ones) in its active slots
+        mo = np.array(mo, dtype=float)
+        mo[:, nf:nf + ncas] = c_read
     orbsyms = orb_irreps(lmol, c_read)
     pinned = {irr: s for irr, s, _ in
               irrep_solvers(lmol, orbsyms, L, parity, conv_tol=1e-12)}
@@ -295,6 +296,52 @@ def nevpt_rows(mc, roots=None):
     return nevpt2_rows_on(mc, roots=roots)
 
 
+def symmetrize_columns(mol, S, c, tol: float = 1e-4):
+    """Re-project each column onto its DOMINANT D2h irrep -- the
+    disclosed CLEANUP for the tiny irrep tails a core projection's
+    conditioning leaves (``orb_irreps``/``label_orb_symm`` refuses
+    past ~1e-6); the core projection itself is physics and is never
+    undone here.  The projection is the METRIC projector
+    ``P_k = D_k (D_k^T S D_k)^{-1} D_k^T S`` per irrep block: the
+    irrep spans are mutually S-orthogonal and partition the AO space,
+    so ``sum_k ||P_k v||^2_S = ||v||^2_S`` exactly and the impurity
+    ``1 - max_k ||P_k v||^2_S / ||v||^2_S`` sits in ``[0, 1]``
+    whatever the blocks' internal gauge (a coordinate-only
+    projection overcounts when ``D_k`` is not S-orthonormal -- the
+    defect the certification caught).  The impurity is measured on
+    the S-normalized column, so it is scale-free; already-pure
+    columns project to themselves (the identity on their span) and
+    come back just normalized.  Returns ``(c_fixed, impurities)`` --
+    the impurities are the per-column BEFORE values, the caller
+    discloses them; raises past ``tol`` (a real mixing class, not
+    the projection-conditioning dirt this cleanup owns)."""
+    projs = []
+    for d in mol.symm_orb:
+        d = np.asarray(d)
+        G = d.T @ S @ d
+        projs.append((d, np.linalg.solve(G, d.T @ S)))  # P_k v = d @ (G^-1 d^T S v)
+    fixed = np.empty_like(c)
+    imp = []
+    for j in range(c.shape[1]):
+        v = np.asarray(c[:, j], dtype=float)
+        n2 = float(v @ S @ v)
+        best_w, best_n = None, -1.0
+        for d, Ginv_dT in projs:
+            w = d @ (Ginv_dT @ v)
+            n_k = float(w @ S @ w)
+            if n_k > best_n:
+                best_w, best_n = w, n_k
+        imp.append(1.0 - best_n / n2)
+        fixed[:, j] = best_w / np.sqrt(best_n)
+    worst = max(imp)
+    if worst > tol:
+        raise ValueError(
+            f"a column carries irrep impurity {worst:.2e} past the "
+            f"tolerance {tol:.1e} -- a real mixing class, not the "
+            f"projection-conditioning dirt this cleanup owns")
+    return fixed, imp
+
+
 def meters_all(blocks, expect):
     """The meters over EVERY block component (in branch order) --
     independent of any PT2 root cut."""
@@ -305,18 +352,6 @@ def meters_all(blocks, expect):
             l2s.append(expect("l2", ci))
             s2s.append(expect("s2", ci))
     return l2s, s2s
-
-
-def pinned_price(blocks, roots_per_block=None):
-    """PT2 per block root; returns the flat list of
-    ``(irrep, PT2Row)``.  (Kept for callers wanting the flat form;
-    the legs usually iterate ``nevpt2_rows_on`` per block.)"""
-    from atomterm.perturb import nevpt2_rows_on
-    out = []
-    for irrep, mc in blocks:
-        for row in nevpt2_rows_on(mc, roots=roots_per_block):
-            out.append((irrep, row))
-    return out
 
 
 # the verdict ledger ---------------------------------------------------
@@ -370,8 +405,9 @@ def drop_row(row: dict) -> None:
 
 _ORDER = (["rohf|-|-", "uhf|-|-"] +
           [f"{m}|{r}|{c}" for c in ("(4,12)", "(4,15)", "(6,13)")
-           for m, r in (("casscf", "free"), ("sa-casscf", "free"),
-                        ("ci", "pinned"), ("sa-casscf", "pinned"))])
+           for m, r in (("casci", "free"), ("casscf", "free"),
+                        ("sa-casscf", "free"), ("ci", "pinned"),
+                        ("sa-casscf", "pinned"))])
 
 
 def fmt_range(vals, nd: int = 4) -> str:
@@ -394,53 +430,70 @@ def render_table() -> None:
     out = [
         "# U14e -- the V&V family",
         "",
-        "One row per method x route x CAS from `scripts/u14e/"
-        "u14e_vv_*.py` -- standalone, PySCF-direct derivations of the "
-        "committed campaign answers.  dE is against the ROHF reference "
-        "(the first row -- the zero of every dE), before the "
-        "perturbation (dE_var) and after (dE_tot); each in `mEh / eV`. "
-        "E(2) is the SC-NEVPT2 correction (pyscf.mrpt, strongly "
-        "contracted).  The fresh-vs-committed assertions and the "
-        "full per-root record live in `logs/u14e_vv_*.log`; the "
-        "committed payload is `elements/U14e/perturbation.json`.",
-        "",
         "| method | route | CAS | &lt;L²&gt; | &lt;S²&gt; "
-        "| E_var (Eh) | dE_var (mEh/eV) | E(2) (mEh/eV) "
-        "| E_tot (Eh) | dE_tot (mEh/eV) | date |",
-        "|---|---|---|---|---|---|---|---|---|---|---|",
+        "| E_method (Eh) | dE_method (mEh/eV) | E(2) (mEh/eV) "
+        "| E_tot (Eh) | dE_tot (mEh/eV) |",
+        "|---|---|---|---|---|---|---|---|---|---|",
     ]
     for k in order:
         r = rows[k]
-        de_var = r["e_var"] - e0
+        de_var = r["e_method"] - e0
         de_tot = r["e_tot"] - e0
         e2 = (f"{r['e2_meh']:+.4f} / {r['e2_ev']:+.4f}"
               if r.get("e2_meh") is not None else "—")
         out.append(
             f"| {r['method']} | {r['route']} | {r['cas']} "
             f"| {r['l2']} | {r['s2']} "
-            f"| {r['e_var']:.4f} | {de_fmt(de_var)} | {e2} "
-            f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} "
-            f"| {r['date']} |")
-    out += ["", "The meters are atomterm's exact angular operators "
-            "(double-certified); the pinned SA rows carry the run's "
-            "own ensemble total; the pinned CI rows carry the TERM "
-            "energy (the components' mean plus the core bookkeeping "
-            "constant) -- their dE is that constant's "
-            "projected-density form, not comparable to the free "
-            "rows.", ""]
+            f"| {r['e_method']:.4f} | {de_fmt(de_var)} | {e2} "
+            f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} |")
+    out += [
+        "",
+        "E_method -- the method's own energy (the CASSCF/SA total; "
+        "the pinned CI value is the TERM energy, the components' mean "
+        "plus the core bookkeeping constant -- its dE is that "
+        "constant's projected-density form, not comparable to the "
+        "free rows).  E_tot = E_method + E(2) (SC-NEVPT2, pyscf.mrpt, "
+        "strongly contracted); dE against the ROHF row.",
+        "",
+        "&lt;L²&gt;/&lt;S²&gt; -- the ground root for the single-root "
+        "methods; min..max over the ensemble's 17 roots (free SA) or "
+        "over the term's pinned components (pinned rows).  The spread "
+        "is the disclosure (draw-dependent partitions, closure costs, "
+        "block-ground classes); the per-root record lives in "
+        "`logs/u14e_vv_*.log`, the committed campaign payload in "
+        "`elements/U14e/perturbation.json` -- two independent "
+        "sources, compared here.",
+        "",
+    ]
+    if "ci|pinned|(4,15)" in rows:
+        out += ["The pinned (4,15) rows are the RE-ATTEMPT under the "
+                "corrected symmetrizer (the first attempt's pricing "
+                "was untrusted: its symmetrizer measured impurity on "
+                "unnormalized columns and destroyed one); the 14p "
+                "column's survival norm against the frozen core span "
+                "is 0.28 -- 92% core-lean, the promoted direction's "
+                "remainder.", ""]
+    else:
+        out += ["The pinned (4,15) legs are measured out: the 14p "
+                "column's survival norm against the frozen core span "
+                "is 0.28 (92% core-lean -- it is one of the occupied "
+                "6p's own radials); a disjoint (6,21)-class partition "
+                "(dropping 6p from the core) is the possible "
+                "follow-up.", ""]
     TABLE.write_text("\n".join(out))
 
 
-def std_row(method: str, route: str, cas: str, e_var: float,
+def std_row(method: str, route: str, cas: str, e_method: float,
             e2_meh: float | None, e_tot: float, l2: str, s2: str) -> dict:
     """One table row in the family's schema (the deltas are computed
-    at render time against the ROHF row; ``l2``/``s2`` pre-formatted)."""
+    at render time against the ROHF row; ``l2``/``s2`` pre-formatted;
+    ``e_method`` -- the method's own energy, whatever its semantics;
+    ``e_tot`` -- the PT2-corrected total, ``e_method + E(2)``)."""
     return {
         "method": method, "route": route, "cas": cas,
         "l2": l2, "s2": s2,
-        "e_var": e_var,
+        "e_method": e_method,
         "e2_meh": e2_meh,
         "e2_ev": None if e2_meh is None else e2_meh * EH_EV / 1e3,
         "e_tot": e_tot,
-        "date": date.today().isoformat(),
     }

@@ -9,8 +9,8 @@ is the unit tier's determinism contract (certified by double-run
 sha256), so a casual regen silently re-baselines every unit pin.
 
 Usage:
-    python scripts/generate_fixture_carbon.py          # the C1 ROHF
-    python scripts/generate_fixture_carbon.py d2h      # the D2h twin
+    python scripts/generators/generate_fixture_carbon.py          # the C1 ROHF
+    python scripts/generators/generate_fixture_carbon.py d2h      # the D2h twin
 """
 
 from __future__ import annotations

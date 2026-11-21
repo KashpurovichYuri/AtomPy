@@ -17,7 +17,7 @@ explicit-seed master joins run_rohf's vocabulary and the series
 revives; if not, the refusal stands with the landscape attribution.
 
 Usage:
-    OMP_NUM_THREADS=16 python scripts/probe_u14e_mom.py \
+    OMP_NUM_THREADS=16 python scripts/u14e/probe_u14e_mom.py \
         > elements/U14e/logs/mom_census.log
 """
 

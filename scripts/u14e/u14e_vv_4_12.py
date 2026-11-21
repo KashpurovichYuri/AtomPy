@@ -5,18 +5,23 @@ the core = the rotation-closed span over the occupied prefix
 (atomterm.core -- substrate chemistry, marked); the window = the AO
 columns of the 10f (7) + 13d (5) shells, written out and certified
 elementwise against the production builder (block dev 2.2e-16).
-THE FOUR ROUTES:
-  free CASSCF   the visible window, PySCF's plain single-root kernel
-  free SA       state_average_ over the ground term's 17 M_L
-                components (L = 8, u), then the two-pass readout
-                (seeded from the SA kernel's own vectors)
-  pinned CI     the production lane construction (marked: under
-                test) -- per-block wfnsym solvers, no optimizer
-  pinned SA     run_irrep_sa's two-pass ensemble, per-block readout
+THE FIVE ROUTES:
+  free CASCI     the frozen input window, no optimizer -- the
+                 pricing class (what the perturbation sees as built)
+  free CASSCF    the visible window, PySCF's plain single-root kernel
+  free SA        state_average_ over the ground term's 17 M_L
+                 components (L = 8, u), then the two-pass readout
+                 (seeded from the SA kernel's own vectors)
+  pinned CI      the production lane construction (marked: under
+                 test) -- per-block wfnsym solvers, no optimizer
+  pinned SA      run_irrep_sa's two-pass ensemble, per-block readout
 PT2: the engine's own mrpt.NEVPT per root; the meters: atomterm's
 exact angular operators.
 
 THE ASSERTIONS:
+  (a0) the frozen-window CASCI ground reads <L2> = 72 -- exact by
+       construction (rotation-closed window, complete sector), the
+       certified input-window baseline re-derived;
   (a) fresh SA E(2) root 0 ~ the committed payload row, band +-2 mEh;
   (b) <L2> = 72 / <S2> = 6 on every SA root, band 1e-5;
   (d) the pinned SA ensemble ~ the free SA ensemble, band 1e-6 Eh.
@@ -32,11 +37,14 @@ import sys
 import time
 
 import numpy as np
+from pyscf import mcscf
+
 from _vv_common import (BAND_E2_MEH, BAND_L2, BAND_ROUTE, L_L2, S_S2,
                         Verdict, anchor, core_part_of, drop_row,
-                        free_kernel, lane_route, load_reference,
-                        make_blocks, meters, meters_all, nevpt_rows,
-                        pinned_ci_run, pinned_sa_run, price, std_row)
+                        fmt_range, free_kernel, lane_route,
+                        load_reference, make_blocks, meters, meters_all,
+                        nevpt_rows, pinned_ci_run, pinned_sa_run, price,
+                        std_row)
 
 ADDR_412 = "u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg"
 ADDR_412_LANE = "u14e_5f6d@6s6p7s_4-0_sa-casscf_ao_-_pur_avg"
@@ -115,6 +123,28 @@ def main(argv=None) -> int:
     expect = meters(mol, mo_full[:, NCORE:NCORE + 12], *SECTOR)
     weights = [1.0 / 17] * 17
 
+    # ---- free CASCI (the frozen input window; the pricing class) -----
+    # no optimizer, deterministic: the window prices the term AS BUILT
+    # (the campaign's "fuel" reading -- what the perturbation sees
+    # before any relaxation)
+    t0 = time.time()
+    cas_f = mcscf.CASCI(mf, 12, SECTOR)
+    cas_f.canonicalization = False
+    cas_f.kernel(mo_full)
+    r_f = price(cas_f, expect, roots=[0])[0]
+    print(f"  [casci] e_tot {cas_f.e_tot:.8f}, <L2> {r_f['l2']:.6f} "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    v.check("(a0) the frozen-window CASCI ground reads <L2> = 72 "
+            "(exact by construction: the input window is "
+            "rotation-closed, the (4,0) sector complete -- the "
+            "certified input-window baseline, re-derived)",
+            abs(r_f["l2"] - L_L2) <= BAND_L2,
+            f"<L2> {r_f['l2']:.6f} (band {BAND_L2:g})")
+    drop_row(std_row("casci", "free", "(4,12)", float(cas_f.e_tot),
+                     r_f["e2"] * 1e3,
+                     float(cas_f.e_tot) + r_f["e2"],
+                     f"{r_f['l2']:.4f}", f"{r_f['s2']:.4f}"))
+
     # ---- free CASSCF (single root; the escape class, no assertion) --
     t0 = time.time()
     mc_c, cas_c = free_kernel(mf, 12, SECTOR, mo_full)
@@ -129,7 +159,8 @@ def main(argv=None) -> int:
            f"the single-root endpoints differ by draw -- the meters "
            f"are the disclosure)")
     drop_row(std_row("casscf", "free", "(4,12)", float(mc_c.e_tot),
-                     r_c["e2"] * 1e3, float(cas_c.e_tot),
+                     r_c["e2"] * 1e3,
+                     float(mc_c.e_tot) + r_c["e2"],
                      f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}"))
 
     # ---- free SA ------------------------------------------------------
@@ -233,11 +264,6 @@ def main(argv=None) -> int:
 
     ok = v.report()
     return 0 if ok else 1
-
-
-def nevpt_rows(mc, pt2_roots):
-    from atomterm.perturb import nevpt2_rows_on
-    return nevpt2_rows_on(mc, roots=pt2_roots)
 
 
 if __name__ == "__main__":

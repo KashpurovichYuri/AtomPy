@@ -27,7 +27,7 @@ and only their band capture matters.  The DECLARATION is the caller's
 decision; this log is its evidence.
 
 Usage:
-    python scripts/band_composition.py Sc data/sc_ccpvdz_unc.txt --spin 1 \
+    python scripts/probes/band_composition.py Sc data/sc_ccpvdz_unc.txt --spin 1 \
         > elements/Sc-unc/logs/band_composition.log
 """
 

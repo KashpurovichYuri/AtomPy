@@ -20,7 +20,7 @@ needs:
   signature, quantified on THIS basis).
 
 Usage:
-    OMP_NUM_THREADS=8 python scripts/probe_u14e_spectrum.py \
+    OMP_NUM_THREADS=8 python scripts/u14e/probe_u14e_spectrum.py \
         > elements/U14e/logs/spectrum.log
 """
 

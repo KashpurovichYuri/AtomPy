@@ -11,12 +11,16 @@ DIAGNOSTIC that exposes the assembly's behavior on this window: each
 distilled column's S-norm after removing the pur core span (the 7s
 is core-lean), and where the assembled window actually landed.
 
-THE FOUR ROUTES: free CASSCF / free SA on the production window;
-pinned CI / pinned SA on the lane window (the lane construction).
-THE CERTIFIED-CLASS CHECK: the pinned components read the L=9 block
-ground (16 at ~90 + one at ~72) -- the declared 5L is not this
-block's ground; the free-SA meters are draw-dependent on this flat
-near-degenerate manifold and are printed, not asserted.
+THE FIVE ROUTES: free CASCI / free CASSCF / free SA on the production
+window; pinned CI / pinned SA on the lane window (the lane
+construction).  THE CERTIFIED-CLASS CHECK: the pinned components read
+the L=9 block ground (16 at ~90 + one at ~72) -- the declared 5L is
+not this block's ground; the free-SA meters are draw-dependent on
+this flat near-degenerate manifold and are printed, not asserted.
+THE SPIN CROSS-CHECK: the <S2> = 12 roots are verified as S = 3 by
+PySCF's own spin_square -- an independent spin construction agreeing
+with atomterm's meters (the 7s pair broken in the active space; the
+electron count is right).
 
 Run from the repo root:
     OMP_NUM_THREADS=16 python scripts/u14e/u14e_vv_6_13.py \
@@ -27,6 +31,8 @@ import sys
 import time
 
 import numpy as np
+from pyscf import mcscf
+from pyscf.mcscf import addons as _mcaddons
 
 from _vv_common import (BAND_CLASS, L_L2, Verdict, core_part_of,
                         drop_row, fmt_range, free_kernel, load_reference,
@@ -106,19 +112,40 @@ def main(argv=None) -> int:
     c_core = purified_core_orbitals(mol, mf, NCORE)[0]
     mo_full, ncas = production_window(mol, mf, spec)
     weights = [1.0 / 17] * 17
+    expect_in = meters(mol, mo_full[:, NCORE:NCORE + ncas], *SECTOR)
+
+    # ---- free CASCI (the frozen input window; the pricing class) -----
+    t0 = time.time()
+    cas_f = mcscf.CASCI(mf, ncas, SECTOR)
+    cas_f.canonicalization = False
+    cas_f.kernel(mo_full)
+    r_f = price(cas_f, expect_in, roots=[0])[0]
+    l_f = r_f["l2"]
+    l_def = min(abs(l_f - lx * (lx + 1)) for lx in range(16))
+    print(f"  [casci] e_tot {cas_f.e_tot:.8f}, <L2> {l_f:.6f} "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    v.note("free CASCI (the frozen input window)",
+           f"<L2> {l_f:.6f} -- closest L(L+1) within {l_def:.2e} "
+           f"(the window is rotation-closed, so the ground has a "
+           f"definite L; WHICH L is the disclosure), E(2) "
+           f"{r_f['e2'] * 1e3:+.4f} mEh")
+    drop_row(std_row("casci", "free", "(6,13)", float(cas_f.e_tot),
+                     r_f["e2"] * 1e3,
+                     float(cas_f.e_tot) + r_f["e2"],
+                     f"{l_f:.4f}", f"{r_f['s2']:.4f}"))
 
     # ---- free CASSCF (single root; no assertion) ----------------------
     t0 = time.time()
     mc_c, cas_c = free_kernel(mf, ncas, SECTOR, mo_full)
-    r_c = price(cas_c, meters(mol, mo_full[:, NCORE:NCORE + ncas],
-                              *SECTOR), roots=[0])[0]
+    r_c = price(cas_c, expect_in, roots=[0])[0]
     print(f"  [casscf] e_tot {mc_c.e_tot:.8f}, converged "
           f"{mc_c.converged}, <L2> {r_c['l2']:.6f} "
           f"({time.time() - t0:.1f} s)", flush=True)
     v.note("free CASSCF (the single-root draw class)",
            f"<L2> {r_c['l2']:.6f}, E(2) {r_c['e2'] * 1e3:+.4f} mEh")
     drop_row(std_row("casscf", "free", "(6,13)", float(mc_c.e_tot),
-                     r_c["e2"] * 1e3, float(cas_c.e_tot),
+                     r_c["e2"] * 1e3,
+                     float(mc_c.e_tot) + r_c["e2"],
                      f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}"))
 
     # ---- free SA (the draw-dependent meters, printed) -----------------
@@ -153,9 +180,28 @@ def main(argv=None) -> int:
                      fmt_range([r['l2'] for r in rows]),
                      f"{max(r['s2'] for r in rows):.4f}"))
 
+    # ---- the <S2> = 12 class: PySCF's OWN spin meter ------------------
+    # the (5,1) sector hosts S = 3 (6 electrons all parallel: the 7s
+    # pair broken in the active space; 6 = 5f3(3) + 6d1(1) + 7s2(2) --
+    # the count is RIGHT).  spin_square is an independent construction
+    # of S^2 (fci.spin_op algebra vs atomterm's operator application);
+    # its second return is 2S+1, so S = 3 reads (12, 7)
+    k12 = max(range(len(rows)), key=lambda k: rows[k]["s2"])
+    ss, mult = _mcaddons.spin_square(cas_sa, ci=cas_sa.ci[k12])
+    s_of = (np.sqrt(4.0 * ss + 1.0) - 1.0) / 2.0
+    s_at = (np.sqrt(4.0 * rows[k12]["s2"] + 1.0) - 1.0) / 2.0
+    v.check("the free-SA <S2>=12 root is S = 3 by PySCF's own "
+            "spin_square (the two independent spin constructions "
+            "agree)",
+            abs(ss - rows[k12]["s2"]) <= 1e-6 and abs(s_of - 3.0) <= 1e-6,
+            f"root {k12}: spin_square (S^2, 2S+1) = ({ss:.8f}, "
+            f"{mult:.4f}) -> S = {s_of:.6f}; atomterm's meters read "
+            f"<S2> {rows[k12]['s2']:.8f} -> S = {s_at:.6f} -- the "
+            f"7s-broken septet class, the electron count RIGHT")
+
     # ---- the pinned route (re-derives the certified class) ------------
     from _vv_common import lane_route
-    lmol, lmf, c_core_l, nf, mo_l, ncas_l = lane_route(
+    lmol, lmf, c_core_l, nf, mo_l, ncas_l, _act_l = lane_route(
         spec, KEY_613_LANE, SECTOR)
 
     # pinned CI
@@ -209,6 +255,21 @@ def main(argv=None) -> int:
             f"{BAND_CLASS:g}, {near72} in 72 +- {BAND_CLASS:g} "
             f"(the declared 5L is not this block's ground -- the "
             f"route-wave record's classification, re-derived)")
+    # the L=9 block ground's spin class, by PySCF's own meter
+    # (the flat component index -> its block + component, the same
+    # walk meters_all uses)
+    k_s = max(range(len(s2s_s)), key=lambda k: s2s_s[k])
+    acc, bmc, bci = 0, None, None
+    for _, mc in blocks_s:
+        n = len(np.atleast_1d(mc.e_cas))
+        if acc + n > k_s:
+            bmc, bci = mc, k_s - acc
+            break
+        acc += n
+    ss_p, mult_p = _mcaddons.spin_square(bmc, ci=bmc.ci[bci])
+    v.note("the pinned block ground's spin class (PySCF spin_square)",
+           f"max-<S2> component: (S^2, 2S+1) = ({ss_p:.8f}, "
+           f"{mult_p:.4f}) vs atomterm's meters {max(s2s_s):.8f}")
     drop_row(std_row("sa-casscf", "pinned", "(6,13)",
                      float(out_sa["e_tot"]),
                      float(np.mean(e2s_s) * 1e3),

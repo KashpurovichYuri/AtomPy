@@ -21,7 +21,7 @@ to the trusted series paths -- are the caller's next step, in the
 product format ``run_series`` loads trusted.
 
 Usage:
-    OMP_NUM_THREADS=16 python scripts/probe_u14e_series.py \
+    OMP_NUM_THREADS=16 python scripts/u14e/probe_u14e_series.py \
         > elements/U14e/logs/series_discovery.log
 """
 

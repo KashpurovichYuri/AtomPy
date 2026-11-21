@@ -1,32 +1,39 @@
 """The CAS(4,15) V&V leg -- the 14p-promotion leg of the flagship
-CAS-size axis.  Two routes (free CASSCF, free SA).  THE PINNED LEGS,
-ATTEMPTED AND MEASURED OUT (2026-11-21): the 14p column's survival
-norm against the frozen core span is 0.28 (92% core-lean -- it is
-one of the radials the occupied 6p is built from); the attempted
-pinned legs priced garbage on that remainder (term e_var -46.95,
-<L2> 0..42 -- not the term) and the irrep-purity chain broke at
-every re-orthogonalization.  The declared refusal ("a non-disjoint
-partition is a grid axis, not a lane one") is thereby
-MEASURED-correct; the free rows carry the (4,15) experiment, and the
-leg re-measures the survival norms each run (the disclosure below).
-A disjoint (6,21)-class partition (dropping 6p from the core, the
-semi-class move) is the possible follow-up.
+CAS-size axis, FIVE routes.  THE PINNED LEGS ARE THE RE-ATTEMPT: the
+first attempt's garbage pricing (term e_var -46.95, <L2> 0..42) is
+UNTRUSTED evidence -- its symmetrizer measured the irrep impurity on
+UNNORMALIZED columns (a negative impurity = a destroyed column) and
+so broke the window it priced.  The corrected ``symmetrize_columns``
+(impurity on S-normalized columns; pure columns pass; refuse past
+tolerance) is certified standalone before this leg runs.  The leg
+discloses, per run: each distilled column's SURVIVAL norm against the
+frozen core span (the 14p column reads ~0.28 -- 92% core-lean: it is
+one of the occupied 6p's own radials), and the irrep tails the
+projection's conditioning left (the re-projection is the disclosed
+cleanup; the core projection itself is physics, not a knob).
 
 THE SETUP (all visible in ``main``): the trusted ROHF rung loaded;
 the core = the rotation-closed span (marked); the window = the AO
 columns of the 10f (7) + 13d (5) + 14p (3) shells, written out and
-certified elementwise against the production builder; free CASSCF
-(single root, the draw class) and free SA (17 components, the
-two-pass readout); PT2 through the engine's own NEVPT; atomterm's
-meters.
+certified elementwise against the production builder; free CASCI /
+free CASSCF / free SA on the visible window; pinned CI / pinned SA
+on the BAND-NAMED lane window (``10f13d14p@6s6p7s`` -- the
+chemical-named lane key is the refused form, the shell ``6p`` would
+sit in both the window and its core; the band realizations may share
+rows per ``lane_core``'s own contract); PT2 through the engine's own
+NEVPT; atomterm's meters.
 
 THE ASSERTIONS:
   (a15) fresh SA E(2) root 0 ~ the committed payload row, band
         +-2 mEh;
   (c)   the (4,15) promotion WORSENS the corrected total: fresh vs
         fresh when the 4_12 leg's row is in the family store, else
-        fresh (4,15) against the stored (4,12)/(4,15) pair --
-        disclosed which reading ran.
+        fresh (4,15) against the stored pair -- disclosed which
+        reading ran.
+The free CASSCF row carries NO assertion (the draw class); the
+casci/pinned meters are disclosed (the input window is
+rotation-closed, so its CASCI ground has a definite L -- which L is
+the open physics this leg measures).
 
 Run from the repo root:
     OMP_NUM_THREADS=16 python scripts/u14e/u14e_vv_4_15.py \\
@@ -38,10 +45,13 @@ import sys
 import time
 
 import numpy as np
+from pyscf import mcscf
 
 from _vv_common import (BAND_E2_MEH, ROWS, Verdict, anchor,
-                        core_part_of, drop_row, fmt_range, free_kernel, lane_route,
-                        load_reference, meters, price, std_row)
+                        core_part_of, drop_row, fmt_range, free_kernel,
+                        lane_route, load_reference, make_blocks, meters,
+                        meters_all, nevpt_rows, pinned_ci_run,
+                        pinned_sa_run, price, std_row, symmetrize_columns)
 
 ADDR_415 = "u14e_10f13d14p_4-0_sa-casscf_ao_-_pur_avg"
 ADDR_412 = "u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg"
@@ -49,6 +59,7 @@ ADDR_415_LANE = "u14e_10f13d14p@6s6p7s_4-0_sa-casscf_ao_-_pur_avg"
 SECTOR = (4, 0)
 NCORE = 5
 SHELLS = (("10f", 7), ("13d", 5), ("14p", 3))
+L, PARITY = 8, "u"
 ROOTS = 17
 
 
@@ -102,20 +113,6 @@ def visible_window(mol, mf, c_core):
     return mo
 
 
-def survival_disclosure(spec):
-    """The measured reason the pinned (4,15) is out: each distilled
-    column's S-norm after removing the lane core's span (the 14p
-    radial is one of the occupied 6p's own radials)."""
-    from _vv_common import lane_route
-    lmol, lmf, c_core_l, nf, _mo, ncas_l, act = lane_route(
-        spec, ADDR_415_LANE, SECTOR)
-    S = lmf.get_ovlp()
-    overl = np.linalg.norm(c_core_l.T @ S @ act, axis=0)
-    surv = np.sqrt(np.maximum(1.0 - overl ** 2, 0.0))
-    lbl = [lab for lab, n in SHELLS for _ in range(n)]
-    return [f"{lb} {x:.4f}" for lb, x in zip(lbl, surv) if x < 0.99]
-
-
 def main(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     ground_only = "--ground-only" in argv
@@ -129,16 +126,25 @@ def main(argv=None) -> int:
     expect = meters(mol, mo_full[:, NCORE:NCORE + 15], *SECTOR)
     weights = [1.0 / 17] * 17
 
-    # ---- the pinned (4,15): measured out (the disclosure) -------------
-    lean = survival_disclosure(campaign_spec("U14e"))
-    v.note("the pinned (4,15): attempted and measured out",
-           f"the 14p column's survival norm against the frozen core "
-           f"span: {'; '.join(lean)} (92% core-lean) -- the "
-           f"attempted pinned legs priced garbage on that remainder "
-           f"(term e_var -46.95, <L2> 0..42, irrep tails breaking "
-           f"every re-orthogonalization); the declared refusal is "
-           f"measured-correct.  A disjoint (6,21)-class partition "
-           f"(dropping 6p from the core) is the possible follow-up")
+    # ---- free CASCI (the frozen input window; the pricing class) -----
+    t0 = time.time()
+    cas_f = mcscf.CASCI(mf, 15, SECTOR)
+    cas_f.canonicalization = False
+    cas_f.kernel(mo_full)
+    r_f = price(cas_f, expect, roots=[0])[0]
+    l_f = r_f["l2"]
+    l_def = min(abs(l_f - lx * (lx + 1)) for lx in range(16))
+    print(f"  [casci] e_tot {cas_f.e_tot:.8f}, <L2> {l_f:.6f} "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    v.note("free CASCI (the frozen input window)",
+           f"<L2> {l_f:.6f} -- closest L(L+1) within "
+           f"{l_def:.2e} (the window is rotation-closed, so the "
+           f"ground has a definite L; which L is the open physics "
+           f"this leg measures), E(2) {r_f['e2'] * 1e3:+.4f} mEh")
+    drop_row(std_row("casci", "free", "(4,15)", float(cas_f.e_tot),
+                     r_f["e2"] * 1e3,
+                     float(cas_f.e_tot) + r_f["e2"],
+                     f"{l_f:.4f}", f"{r_f['s2']:.4f}"))
 
     # ---- free CASSCF (single root; the escape class, no assertion) --
     t0 = time.time()
@@ -150,7 +156,8 @@ def main(argv=None) -> int:
     v.note("free CASSCF (the single-root draw class)",
            f"<L2> {r_c['l2']:.6f}, E(2) {r_c['e2'] * 1e3:+.4f} mEh")
     drop_row(std_row("casscf", "free", "(4,15)", float(mc_c.e_tot),
-                     r_c["e2"] * 1e3, float(cas_c.e_tot),
+                     r_c["e2"] * 1e3,
+                     float(mc_c.e_tot) + r_c["e2"],
                      f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}"))
 
     # ---- free SA ------------------------------------------------------
@@ -188,7 +195,7 @@ def main(argv=None) -> int:
                      fmt_range([r['l2'] for r in rows]),
                      f"{max(r['s2'] for r in rows):.4f}"))
 
-    # ---- (c) the CAS-size ordering ------------------------------------
+    # ---- (c) the CAS-size ordering (the flagship read) ----------------
     fresh_412 = None
     if ROWS.exists():
         fresh_412 = json.loads(ROWS.read_text()).get(
@@ -211,6 +218,100 @@ def main(argv=None) -> int:
                f"reading); stored: {s412:.4f} -> {s415:.4f} "
                f"(+{(s415 - s412) * 1e3:.3f} mEh); the fresh (4,15) "
                f"total {tot_fresh:.4f}")
+
+    # ---- the pinned substrate (built once: disclosures + two legs) ----
+    lmol, lmf, c_core_l, nf, mo_l, ncas_l, act_l = lane_route(
+        campaign_spec("U14e"), ADDR_415_LANE, SECTOR)
+    S_l = lmf.get_ovlp()
+    # the survival norms: the PRE-projection distilled columns vs the
+    # frozen core span (mo's block is already projected + renormalized
+    # -- measuring it would be vacuous)
+    overl = np.linalg.norm(c_core_l.T @ S_l @ act_l, axis=0)
+    surv = np.sqrt(np.maximum(1.0 - overl ** 2, 0.0))
+    lbl = [lab for lab, n in SHELLS for _ in range(n)]
+    lean = [f"{lb} {x:.4f}" for lb, x in zip(lbl, surv) if x < 0.99]
+    print(f"  [pinned window] {ncas_l} columns; survival norms vs the "
+          f"frozen core span: "
+          f"{'; '.join(lean) if lean else 'all at 1.0'} "
+          f"(the 14p remainder is the promoted direction)", flush=True)
+    # the frozen-core projection leaves tiny irrep tails (label_orb_symm
+    # refuses past ~1e-6); re-project onto the dominant D2h irrep --
+    # the disclosed CLEANUP (the core projection is physics, not a knob)
+    c_read_l = mo_l[:, nf:nf + ncas_l]
+    c_read_l, imp = symmetrize_columns(lmol, S_l, c_read_l)
+    print(f"  [pinned window] irrep tails re-projected (max "
+          f"{max(imp):.1e})", flush=True)
+
+    # ---- pinned CI (per-block solvers, no optimizer) ------------------
+    t0 = time.time()
+    roots_ci, _ = pinned_ci_run(lmol, lmf, mo_l, nf, ncas_l, SECTOR,
+                                L, PARITY, c_core_l, c_read=c_read_l)
+    blocks, expect_p, _ = make_blocks(lmol, lmf, mo_l, nf, ncas_l,
+                                      SECTOR, L, PARITY, c_core_l,
+                                      roots_ci, c_read=c_read_l)
+    l2s, s2s = meters_all(blocks, expect_p)
+    e2s = [row.e_corr for _, mc in blocks
+           for row in nevpt_rows(mc, pt2_roots)]
+    term_means = []
+    for _, mc in blocks:
+        ec = np.atleast_1d(mc.e_cas).ravel()
+        cb = float(mc.e_tot) - float(ec[0])
+        term_means.append(float(np.mean(ec + cb)))
+    e_m_ci = float(np.mean(term_means))
+    print(f"  [pinned ci] term e_method {e_m_ci:.8f}, E(2) mean "
+          f"{np.mean(e2s) * 1e3:+.4f} mEh, ptp "
+          f"{np.ptp(e2s) * 1e3:.2e} mEh, <L2> "
+          f"[{min(l2s):.6f}, {max(l2s):.6f}] "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    v.note("pinned CI (the band-named lane window, corrected "
+           "symmetrizer)",
+           f"<L2> in [{min(l2s):.4f}, {max(l2s):.4f}], <S2> max "
+           f"{max(s2s):.4f}; E(2) mean {np.mean(e2s) * 1e3:+.4f} mEh "
+           f"(the block grounds' L classes ARE the finding: the "
+           f"clean-5L reading is 17 components at 72)")
+    drop_row(std_row("ci", "pinned", "(4,15)", e_m_ci,
+                     float(np.mean(e2s) * 1e3),
+                     float(e_m_ci + np.mean(e2s)),
+                     fmt_range(l2s), f"{max(s2s):.4f}"))
+
+    # ---- pinned SA ----------------------------------------------------
+    t0 = time.time()
+    out_sa, _ = pinned_sa_run(lmol, lmf, mo_l, nf, ncas_l, SECTOR,
+                              L, PARITY, c_core_l, c_read=c_read_l)
+    blocks_s, expect_s, _ = make_blocks(lmol, lmf,
+                                        np.asarray(out_sa["mo"]),
+                                        nf, ncas_l, SECTOR, L, PARITY,
+                                        c_core_l, out_sa["roots"])
+    l2s_s, s2s_s = meters_all(blocks_s, expect_s)
+    e2s_s = [row.e_corr for _, mc in blocks_s
+             for row in nevpt_rows(mc, pt2_roots)]
+    print(f"  [pinned sa] ensemble {out_sa['e_tot']:.8f}, term E(2) "
+          f"mean {np.mean(e2s_s) * 1e3:+.4f} mEh, ptp "
+          f"{np.ptp(e2s_s) * 1e3:.2e} mEh, <L2> "
+          f"[{min(l2s_s):.6f}, {max(l2s_s):.6f}] "
+          f"({time.time() - t0:.1f} s)", flush=True)
+    delta = float(out_sa["e_tot"]) - float(mc_sa.e_tot)
+    v.note("(d15) the pinned SA ensemble vs the free SA ensemble",
+           f"pinned {out_sa['e_tot']:.8f} vs free {mc_sa.e_tot:.8f} "
+           f"(delta {delta:+.2e} Eh -- the ensemble is the route "
+           f"comparison surface; at (4,12) the same reading held at "
+           f"3.3e-09)")
+    drop_row(std_row("sa-casscf", "pinned", "(4,15)",
+                     float(out_sa["e_tot"]),
+                     float(np.mean(e2s_s) * 1e3),
+                     float(out_sa["e_tot"] + np.mean(e2s_s)),
+                     fmt_range(l2s_s), f"{max(s2s_s):.4f}"))
+    # the CAS-size ordering at the pinned route (vs the fresh (4,12))
+    p12 = (json.loads(ROWS.read_text()).get("sa-casscf|pinned|(4,12)")
+           if ROWS.exists() else None)
+    if p12 is not None:
+        tot15 = float(out_sa["e_tot"]) + float(np.mean(e2s_s))
+        v.note("the CAS-size ordering at the pinned route",
+               f"(4,12) {p12['e_tot']:.4f} -> (4,15) {tot15:.4f} "
+               f"(+{(tot15 - p12['e_tot']) * 1e3:+.3f} mEh "
+               f"corrected); <L2> pinned components: (4,12) "
+               f"{p12['l2']} vs (4,15) {fmt_range(l2s_s)} -- the "
+               f"free-route (c) check is the gating comparison")
     ok = v.report()
     return 0 if ok else 1
 

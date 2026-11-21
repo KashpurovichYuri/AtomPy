@@ -19,7 +19,7 @@ constant):
 - ``series2`` mean + config-spread (k=2, where the spectrum certifies).
 
 Usage:
-    python scripts/probe_series_source.py Sc > elements/Sc/logs/series_source_probe.log
+    python scripts/probes/probe_series_source.py Sc > elements/Sc/logs/series_source_probe.log
 """
 
 import json

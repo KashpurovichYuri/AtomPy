@@ -21,7 +21,7 @@ real bite: the store keeps flat CI vectors, the reader returns
 (n,1) columns -- the assertion compares amplitudes, not shapes.
 
 Usage:
-    python scripts/probe_pt2_block.py [address]
+    python scripts/probes/probe_pt2_block.py [address]
     (default: c_2p_2-0_sa-casscf_ao_-_pur_avg -- the certified class)
 """
 
