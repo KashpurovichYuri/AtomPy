@@ -245,16 +245,28 @@ configuration-inert).
   at (4,12) reads 17 × 72.000000): the promoted direction
   DESTABILIZES the term identity in the pinned route, the (6,13)
   block-ground-shift class.  THE PINNED SA MEASURED OUT — THE
-  SUBSPACE-GEOMETRY VERDICT: the certified core/irrep intersection
+  RADIAL-IDENTITY VERDICT: the certified core/irrep intersection
   window is NEAR-NULL on the real substrate — the 14p column
   vanishes into it (post-subtraction S-norm ~5e-10, the typed
   `VanishedColumnError`, re-measured every run).  The mechanism,
-  measured: the lane core's columns are cross-irrep mixed (82/16/2
-  percent spreads — the global orthonormalization mixes the p
-  blocks), so the core and irrep projectors do NOT commute; a
-  92%-core-lean column's core-orthogonality is achieved only by
-  cross-block cancellation, which irrep purity forbids — no
-  irrep-pure core-orthogonal representative exists.  VERDICT: the
+  corrected (2026-11-22, the second derivation): THE 14p DIRECTION
+  IS ONE OF THE OCCUPIED 6p's OWN RADIALS — its in-block content
+  and the core's in-block content are the same radial, so the
+  core-orthogonality of the full vector is achieved only by
+  cross-block cancellation; at irrep purity the remainder is
+  EMPTY.  The core's mixed columns (82/16/2 percent spreads) are a
+  BASIS artifact — the core SPAN is irrep-invariant and the
+  projector is span-dependent — so a per-irrep orthonormalization
+  of the core would be a NO-OP (the earlier projector-
+  non-commutation mechanism RETRACTED; `lane_core` needs no fix).
+  The pinned (4,15) ≡ the pinned (4,12) at this partition — the
+  pinning purity excludes the promoted direction BY IDENTITY, not
+  by difficulty; the free route is the only host and its measured
+  cost (+3.09 mEh corrected, closure 71.78) is the experiment's
+  answer; the pinned casci's window residual lean 5.2e-04 is the
+  assembly's global-Lowdin cross-block mixing (a gauge artifact;
+  the block-aware construction rides the build_full_mo fix).
+  VERDICT: the
   project-then-validate promotion into `lane_core` DECLINED (src
   unchanged); the disjoint (6,21)-class partition is the recorded
   follow-up (Disposition candidates).  THE
