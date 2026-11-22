@@ -1,23 +1,31 @@
 """The CAS(4,15) V&V leg -- the 14p-promotion leg of the flagship
 CAS-size axis.  THE PINNED ROUTE AT (4,15): ATTEMPTED AND MEASURED
-(2026-11-21, under the corrected symmetrizer -- the first attempt's
-garbage pricing was untrusted, its symmetrizer measured impurity on
-unnormalized columns and destroyed one).  The leg discloses, per
-run: each distilled column's SURVIVAL norm against the frozen core
-span (the 14p column reads ~0.28 -- 92% core-lean: it is one of the
-occupied 6p's own radials), and the irrep tails the projection's
-conditioning leaves (re-projected, the disclosed cleanup; observed
-~3.5e-06).  The pinned CI then RUNS -- and its block grounds come
-out NOT the 5L: their L classes read 0..42 (5S/5I classes; the same
-route at (4,12) reads 17 components at 72.000000).  The promoted
-direction destabilizes the term identity in the pinned route -- the
-same class as the certified (6,13) block-ground shift.  The pinned
-SA is measured out (it would optimize that wrong ensemble; its
-internal build_full_mo re-projection also re-introduces irrep tails
-past pyscf's refusal).  VERDICT: the project-then-validate
-promotion into lane_core is DECLINED with this measured reason --
-src unchanged; the disjoint (6,21)-class partition (dropping 6p
-from the core) is the possible follow-up.
+(2026-11-21/22, under the corrected symmetrizer -- the first
+attempt's garbage pricing was untrusted, its symmetrizer measured
+impurity on unnormalized columns and destroyed one).  The leg
+discloses, per run: each distilled column's SURVIVAL norm against
+the frozen core span (the 14p column reads ~0.28 -- 92% core-lean:
+it is one of the occupied 6p's own radials), and the irrep tails
+the projection's conditioning leaves (re-projected, the disclosed
+cleanup; observed ~3.5e-06).  The pinned casci then RUNS -- and its
+block grounds come out NOT the 5L: their L classes read 0..42
+(5S/5I classes; the same route at (4,12) reads 17 components at
+72.000000).  The promoted direction destabilizes the term identity
+in the pinned route -- the same class as the certified (6,13)
+block-ground shift.  THE PINNED SA (the user's call, attempted on
+the CERTIFIED core/irrep intersection window): MEASURED OUT -- the
+intersection is NEAR-NULL on the real substrate: the 14p column
+vanishes into it (post-subtraction S-norm ~4e-09).  The mechanism,
+measured: the lane core's columns are cross-irrep mixed (82/16/2
+percent spreads -- the global orthonormalization mixes the p
+blocks), so the core and irrep projectors do NOT commute; a 92%
+core-lean column's core-orthogonality is achieved only by
+cross-block cancellation, which irrep purity forbids -- no
+irrep-pure core-orthogonal representative exists.  The subspace-
+geometry verdict, re-measured every run (the typed
+VanishedColumnError refusal).  VERDICT: the project-then-validate
+promotion into lane_core is DECLINED (src unchanged); the disjoint
+(6,21)-class partition is the recorded follow-up.
 
 THE SETUP (all visible in ``main``): the trusted ROHF rung loaded;
 the core = the rotation-closed span (marked); the window = the AO
@@ -53,10 +61,11 @@ import time
 import numpy as np
 from pyscf import mcscf
 
-from _vv_common import (BAND_E2_MEH, ROWS, Verdict, anchor,
-                        core_part_of, drop_row, fmt_range, free_kernel,
-                        lane_route, load_reference, make_blocks, meters,
-                        meters_all, nevpt_rows, pinned_ci_run, price,
+from _vv_common import (BAND_E2_MEH, ROWS, VanishedColumnError, Verdict,
+                        anchor, core_part_of, drop_row, fmt_range,
+                        free_kernel, lane_route, load_reference,
+                        make_blocks, meters, meters_all, nevpt_rows,
+                        pinned_ci_run, pinned_sa_run, price, purify_window,
                         std_row, symmetrize_columns)
 
 ADDR_415 = "u14e_10f13d14p_4-0_sa-casscf_ao_-_pur_avg"
@@ -150,7 +159,8 @@ def main(argv=None) -> int:
     drop_row(std_row("casci", "free", "(4,15)", float(cas_f.e_tot),
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
-                     f"{l_f:.4f}", f"{r_f['s2']:.4f}"))
+                     f"{l_f:.4f}", f"{r_f['s2']:.4f}",
+                     "5I input ground"))
 
     # ---- free CASSCF (single root; the escape class, no assertion) --
     t0 = time.time()
@@ -164,7 +174,8 @@ def main(argv=None) -> int:
     drop_row(std_row("casscf", "free", "(4,15)", float(mc_c.e_tot),
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
-                     f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}"))
+                     f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
+                     "escape draw"))
 
     # ---- free SA ------------------------------------------------------
     t0 = time.time()
@@ -199,7 +210,8 @@ def main(argv=None) -> int:
                      float(e_cas[0] + core_e), r0["e2"] * 1e3,
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range([r['l2'] for r in rows]),
-                     f"{max(r['s2'] for r in rows):.4f}"))
+                     f"{max(r['s2'] for r in rows):.4f}",
+                     "5L, closure-costed"))
 
     # ---- (c) the CAS-size ordering (the flagship read) ----------------
     fresh_412 = None
@@ -245,10 +257,14 @@ def main(argv=None) -> int:
     # the disclosed CLEANUP (the core projection is physics, not a knob)
     c_read_l = mo_l[:, nf:nf + ncas_l]
     c_read_l, imp = symmetrize_columns(lmol, S_l, c_read_l)
+    lean_in = float(np.linalg.norm(c_core_l.T @ S_l @ c_read_l,
+                                   axis=0).max())
     print(f"  [pinned window] irrep tails re-projected (max "
-          f"{max(imp):.1e})", flush=True)
+          f"{max(imp):.1e}); the solvers' window's residual core lean "
+          f"{lean_in:.1e} (the re-projection re-introduces it through "
+          f"the cross-irrep-mixed core -- disclosed)", flush=True)
 
-    # ---- pinned CI (per-block solvers, no optimizer) ------------------
+    # ---- pinned casci (per-block solvers, no optimizer) ---------------
     t0 = time.time()
     roots_ci, _ = pinned_ci_run(lmol, lmf, mo_l, nf, ncas_l, SECTOR,
                                 L, PARITY, c_core_l, c_read=c_read_l)
@@ -264,39 +280,91 @@ def main(argv=None) -> int:
         cb = float(mc.e_tot) - float(ec[0])
         term_means.append(float(np.mean(ec + cb)))
     e_m_ci = float(np.mean(term_means))
-    print(f"  [pinned ci] term e_method {e_m_ci:.8f}, E(2) mean "
+    print(f"  [pinned casci] term e_method {e_m_ci:.8f}, E(2) mean "
           f"{np.mean(e2s) * 1e3:+.4f} mEh, ptp "
           f"{np.ptp(e2s) * 1e3:.2e} mEh, <L2> "
           f"[{min(l2s):.6f}, {max(l2s):.6f}] "
           f"({time.time() - t0:.1f} s)", flush=True)
-    v.note("pinned CI (the band-named lane window, corrected "
+    v.note("pinned casci (the band-named lane window, corrected "
            "symmetrizer)",
            f"<L2> in [{min(l2s):.4f}, {max(l2s):.4f}], <S2> max "
            f"{max(s2s):.4f}; E(2) mean {np.mean(e2s) * 1e3:+.4f} mEh "
            f"(the block grounds' L classes ARE the finding: the "
            f"clean-5L reading is 17 components at 72)")
-    drop_row(std_row("ci", "pinned", "(4,15)", e_m_ci,
+    drop_row(std_row("casci", "pinned", "(4,15)", e_m_ci,
                      float(np.mean(e2s) * 1e3),
                      float(e_m_ci + np.mean(e2s)),
-                     fmt_range(l2s), f"{max(s2s):.4f}"))
+                     fmt_range(l2s), f"{max(s2s):.4f}",
+                     "grounds not the 5L (5S/5I)"))
 
-    # ---- pinned SA: MEASURED OUT at the CI level ----------------------
-    # the pinned CI's block grounds are NOT the 5L (their L classes
-    # read 0..42 -- 5S/5I classes; the same route at (4,12) reads 17
-    # components at 72.000000): the pinned SA would optimize that
-    # wrong ensemble.  Structurally, run_irrep_sa's internal
-    # build_full_mo re-projection also re-introduces the irrep tails
-    # past pyscf's refusal (observed 2.7e-07)
-    v.note("the pinned SA at (4,15): measured out at the CI level",
-           "the pinned CI block grounds are not the 5L (<L2> classes "
-           "0..42 -- 5S/5I; at (4,12) the same route reads 17 x "
-           "72.000000), so the pinned SA would optimize the wrong "
-           "ensemble; its internal build_full_mo re-projection also "
-           "re-introduces irrep tails past pyscf's refusal (2.7e-07 "
-           "observed).  VERDICT: the project-then-validate promotion "
-           "into lane_core is DECLINED with this measured reason -- "
-           "src unchanged; the disjoint (6,21)-class partition "
-           "(dropping 6p from the core) is the possible follow-up")
+    # ---- pinned SA: the intersection window (the user's (a)) ----------
+    # the pinned casci's block grounds are NOT the 5L (L classes
+    # 0..42 -- 5S/5I classes; the same route at (4,12) reads 17 x
+    # 72.000000), so the pinned SA's ensemble would be that ground
+    # ensemble -- the mix kernel has no root-selection knob.  The
+    # user's call: attempt it anyway on the CERTIFIED core/irrep
+    # intersection window (purify_window) and disclose what it
+    # prices.  MEASURED (2026-11-22): the intersection is NEAR-NULL
+    # on the real substrate -- the 14p column vanishes into it
+    # (post-subtraction S-norm ~4e-09): a 92%-core-lean column's
+    # core-orthogonality is achieved only by cross-block
+    # cancellation (the lane core's columns are cross-irrep mixed --
+    # measured 82/16/2 percent spreads), which irrep purity forbids.
+    try:
+        c_sa_l, rep = purify_window(lmol, S_l, c_core_l,
+                                    mo_l[:, nf:nf + ncas_l])
+    except VanishedColumnError as e:
+        v.note("the pinned SA at (4,15): MEASURED OUT -- the "
+               "core/irrep intersection is near-null",
+               f"purify_window refuses: {e}.  VERDICT: the "
+               f"project-then-validate promotion into lane_core is "
+               f"DECLINED (src unchanged); the disjoint (6,21)-class "
+               f"partition is the recorded follow-up")
+        ok = v.report()
+        return 0 if ok else 1
+    print(f"  [pinned window] the core/irrep intersection converged "
+          f"in {rep['passes']} pass(es) (core residue "
+          f"{rep['core_res']:.1e}, irrep impurity "
+          f"{rep['irrep_imp']:.1e}, orthonormality "
+          f"{rep['ortho_dev']:.1e})", flush=True)
+    t0 = time.time()
+    out_sa, _ = pinned_sa_run(lmol, lmf, mo_l, nf, ncas_l, SECTOR,
+                              L, PARITY, c_core_l, c_read=c_sa_l)
+    blocks_s, expect_s, _ = make_blocks(lmol, lmf,
+                                        np.asarray(out_sa["mo"]),
+                                        nf, ncas_l, SECTOR, L, PARITY,
+                                        c_core_l, out_sa["roots"])
+    l2s_s, s2s_s = meters_all(blocks_s, expect_s)
+    e2s_s = [row.e_corr for _, mc in blocks_s
+             for row in nevpt_rows(mc, pt2_roots)]
+    print(f"  [pinned sa] ensemble {out_sa['e_tot']:.8f}, term E(2) "
+          f"mean {np.mean(e2s_s) * 1e3:+.4f} mEh, <L2> "
+          f"[{min(l2s_s):.6f}, {max(l2s_s):.6f}], <S2> max "
+          f"{max(s2s_s):.4f} ({time.time() - t0:.1f} s)", flush=True)
+    v.check("(a15b) the pinned SA converges on the intersection "
+            "window (the certified core/irrep fixed point; the "
+            "optimized block stays irrep-pure -- the readout's "
+            "labeling passed)",
+            bool(out_sa["converged"]),
+            f"converged {out_sa['converged']}, cycles "
+            f"{out_sa['cycles']}, conv_dE {out_sa['conv_dE']:.1e}")
+    delta = float(out_sa["e_tot"]) - float(mc_sa.e_tot)
+    v.note("(d15) the pinned SA ensemble vs the free SA ensemble",
+           f"pinned {out_sa['e_tot']:.8f} vs free {mc_sa.e_tot:.8f} "
+           f"(delta {delta:+.2e} Eh -- the ensemble-surface reading; "
+           f"at (4,12) the same reading held at 1.5e-09)")
+    v.note("the pinned (4,15) SA prices the BLOCK-GROUND ensemble",
+           f"the optimized components read <L2> in "
+           f"[{min(l2s_s):.4f}, {max(l2s_s):.4f}] -- the ground "
+           f"classes, NOT the 5L (the SA mix kernel has no "
+           f"root-selection knob: its ensemble IS the block grounds); "
+           f"the row is stored with this disclosure")
+    drop_row(std_row("sa-casscf", "pinned", "(4,15)",
+                     float(out_sa["e_tot"]),
+                     float(np.mean(e2s_s) * 1e3),
+                     float(out_sa["e_tot"] + np.mean(e2s_s)),
+                     fmt_range(l2s_s), f"{max(s2s_s):.4f}",
+                     "ground ensemble, not the 5L"))
     ok = v.report()
     return 0 if ok else 1
 

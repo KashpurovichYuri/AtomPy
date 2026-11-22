@@ -132,7 +132,8 @@ def main(argv=None) -> int:
     drop_row(std_row("casci", "free", "(6,13)", float(cas_f.e_tot),
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
-                     f"{l_f:.4f}", f"{r_f['s2']:.4f}"))
+                     f"{l_f:.4f}", f"{r_f['s2']:.4f}",
+                     "L-mixed (assembly disclosure)"))
 
     # ---- free CASSCF (single root; no assertion) ----------------------
     t0 = time.time()
@@ -146,7 +147,8 @@ def main(argv=None) -> int:
     drop_row(std_row("casscf", "free", "(6,13)", float(mc_c.e_tot),
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
-                     f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}"))
+                     f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
+                     "escape draw"))
 
     # ---- free SA (the draw-dependent meters, printed) -----------------
     t0 = time.time()
@@ -178,7 +180,8 @@ def main(argv=None) -> int:
                      float(e_cas[0] + core_e), r0["e2"] * 1e3,
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range([r['l2'] for r in rows]),
-                     f"{max(r['s2'] for r in rows):.4f}"))
+                     f"{max(r['s2'] for r in rows):.4f}",
+                     "mixed classes"))
 
     # ---- the <S2> = 12 class: PySCF's OWN spin meter ------------------
     # the (5,1) sector hosts S = 3 (6 electrons all parallel: the 7s
@@ -220,17 +223,17 @@ def main(argv=None) -> int:
         cb = float(mc.e_tot) - float(ec[0])
         term_means.append(float(np.mean(ec + cb)))
     e_var_ci = float(np.mean(term_means))
-    print(f"  [pinned ci] term e_var {e_var_ci:.8f}, <L2> "
+    print(f"  [pinned casci] term e_var {e_var_ci:.8f}, <L2> "
           f"[{min(l2s):.6f}, {max(l2s):.6f}] ({time.time() - t0:.1f} s)",
           flush=True)
-    v.note("pinned CI", f"<L2> in [{min(l2s):.4f}, {max(l2s):.4f}], "
+    v.note("pinned casci", f"<L2> in [{min(l2s):.4f}, {max(l2s):.4f}], "
            f"<S2> max {max(s2s):.4f}; E(2) mean "
            f"{np.mean(e2s) * 1e3:+.4f} mEh")
-    drop_row(std_row("ci", "pinned", "(6,13)", e_var_ci,
+    drop_row(std_row("casci", "pinned", "(6,13)", e_var_ci,
                      float(np.mean(e2s) * 1e3),
                      float(e_var_ci + np.mean(e2s)),
                      fmt_range(l2s),
-                     f"{max(s2s):.4f}"))
+                     f"{max(s2s):.4f}", "L=9 ground + the 5L present"))
 
     # pinned SA + THE CERTIFIED-CLASS CHECK
     t0 = time.time()
@@ -275,7 +278,7 @@ def main(argv=None) -> int:
                      float(np.mean(e2s_s) * 1e3),
                      float(out_sa["e_tot"] + np.mean(e2s_s)),
                      fmt_range(l2s_s),
-                     f"{max(s2s_s):.4f}"))
+                     f"{max(s2s_s):.4f}", "the 72-component ok"))
 
     ok = v.report()
     return 0 if ok else 1

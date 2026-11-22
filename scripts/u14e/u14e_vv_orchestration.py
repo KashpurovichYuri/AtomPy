@@ -8,8 +8,8 @@ wiring; its green record: logs/u14e_vv.log at 6e2ab39..30808bd,
 2026-11-20) and is now the driver for the per-CAS family:
     u14e_vv_4_12.py   the CAS(4,12) leg, five routes
     u14e_vv_4_15.py   the CAS(4,15) leg (the pinned route measured:
-                      the block grounds are not the 5L -- the
-                      promotion destabilizes the term identity;
+                      the block grounds are not the 5L; the pinned
+                      SA prices that ground ensemble, disclosed;
                       src unchanged)
     u14e_vv_6_13.py   the CAS(6,13) disclosure leg, five routes +
                       the PySCF spin_square cross-check

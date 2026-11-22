@@ -238,17 +238,26 @@ configuration-inert).
   re-attempt, under the corrected symmetrizer): the 14p column's
   survival norm vs the frozen core 0.28 (92% core-lean — it is one
   of the occupied 6p's own radials); the pinned CI runs (tails
-  3.5e-06 re-projected) and its block grounds come out NOT the 5L —
-  L classes 0..42 (the 5S/5I classes; the same route at (4,12)
-  reads 17 × 72.000000): the promoted direction DESTABILIZES the
-  term identity in the pinned route, the (6,13) block-ground-shift
-  class.  The pinned SA measured out (it would optimize that wrong
-  ensemble; `run_irrep_sa`'s internal build_full_mo re-projection
-  also re-introduces the tails past pyscf's refusal, 2.7e-07
-  observed).  VERDICT: the project-then-validate promotion into
-  `lane_core` DECLINED with this measured reason — src unchanged;
-  the disjoint (6,21)-class partition (dropping 6p from the core)
-  is the recorded follow-up (Disposition candidates).  THE
+  3.5e-06 re-projected; the solvers' window's residual core lean
+  5.2e-04 — the re-projection re-introduces it through the
+  cross-irrep-mixed core, disclosed) and its block grounds come out
+  NOT the 5L — L classes 0..42 (the 5S/5I classes; the same route
+  at (4,12) reads 17 × 72.000000): the promoted direction
+  DESTABILIZES the term identity in the pinned route, the (6,13)
+  block-ground-shift class.  THE PINNED SA MEASURED OUT — THE
+  SUBSPACE-GEOMETRY VERDICT: the certified core/irrep intersection
+  window is NEAR-NULL on the real substrate — the 14p column
+  vanishes into it (post-subtraction S-norm ~5e-10, the typed
+  `VanishedColumnError`, re-measured every run).  The mechanism,
+  measured: the lane core's columns are cross-irrep mixed (82/16/2
+  percent spreads — the global orthonormalization mixes the p
+  blocks), so the core and irrep projectors do NOT commute; a
+  92%-core-lean column's core-orthogonality is achieved only by
+  cross-block cancellation, which irrep purity forbids — no
+  irrep-pure core-orthogonal representative exists.  VERDICT: the
+  project-then-validate promotion into `lane_core` DECLINED (src
+  unchanged); the disjoint (6,21)-class partition is the recorded
+  follow-up (Disposition candidates).  THE
   INPUT-WINDOW GROUND: the frozen CASCI at (4,12)/(4,15) reads the
   certified ⁵I (42.000000, definite L) — the SA promotes it to the
   ⁵L (the record's "~1 Eh gain IS the ⁵L relaxation"); the (6,13)
@@ -275,6 +284,8 @@ configuration-inert).
   overclaim stands as history (superseded).  THE DRAW-DEPENDENCE
   DISCLOSURES carried: the free single-root CASSCF rows sit in the
   draw class by physics (⟨L²⟩ 71.82/71.60/22.30 observed); the
+  (4,15) free SA hit the cycle cap in one draw (converged False,
+  numbers within bands — the log discloses); the
   UHF-seeded SA from a RAW start is a coin toss (one draw descended
   broken, ⟨L²⟩ dev 7.2e+01, git history at 824b5d8; this wave's
   draw recovered); the (6,13) free-SA meters partition the flat
@@ -400,6 +411,19 @@ configuration-inert).
 
 ### Disposition candidates (the user's future call)
 
+- **The NO probe for (4,15) — POSTPONED (the user's debt,
+  2026-11-22)**: occupations + NO-group selection
+  (`natural.no_group_windows`) from the term-averaged 17-root SA
+  density — does a p-type direction survive the selection, with
+  what occupation?  A window-quality datum, not a pinned-route
+  rescue (the block-ground phenomenon is span physics).
+- **The ⁵L-selected-density → NO-window construction — POSTPONED
+  (the user's debt, 2026-11-22)**: the root-extraction-by-identity
+  machinery (extra roots per pinned block; the meters classify
+  ⟨L²⟩≈72, ⟨S²⟩=6) as the tool toward a better initial window — the
+  ⁵L-selected roots' density feeding the NO window.  The same
+  experiment quantifies the ⁵L's push-down under the block grounds
+  (the destabilization measure) when wanted.
 - **The (4,15) disjoint partition — the (6,21)-class follow-up**
   (recorded 2026-11-22, the V&V wave's measured-out verdict): the
   14p direction is 92% core-lean at the Rn·7s core, and the pinned

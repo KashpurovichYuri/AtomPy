@@ -296,6 +296,21 @@ def nevpt_rows(mc, roots=None):
     return nevpt2_rows_on(mc, roots=roots)
 
 
+def _irrep_projectors(mol, S):
+    """``[(D_k, G_k^{-1} D_k^T S)]`` per irrep block -- the metric
+    projector pieces, ``P_k v = D_k @ (Ginv_dTS @ v)``.  The irrep
+    spans are mutually S-orthogonal and partition the AO space, so
+    ``sum_k ||P_k v||^2_S = ||v||^2_S`` whatever the blocks' internal
+    gauge (pyscf keeps raw AO selectors in single-irrep blocks,
+    max|D^T S D - I| = 0.25 on the sto-3g probe)."""
+    projs = []
+    for d in mol.symm_orb:
+        d = np.asarray(d)
+        G = d.T @ S @ d
+        projs.append((d, np.linalg.solve(G, d.T @ S)))
+    return projs
+
+
 def symmetrize_columns(mol, S, c, tol: float = 1e-4):
     """Re-project each column onto its DOMINANT D2h irrep -- the
     disclosed CLEANUP for the tiny irrep tails a core projection's
@@ -315,11 +330,7 @@ def symmetrize_columns(mol, S, c, tol: float = 1e-4):
     the impurities are the per-column BEFORE values, the caller
     discloses them; raises past ``tol`` (a real mixing class, not
     the projection-conditioning dirt this cleanup owns)."""
-    projs = []
-    for d in mol.symm_orb:
-        d = np.asarray(d)
-        G = d.T @ S @ d
-        projs.append((d, np.linalg.solve(G, d.T @ S)))  # P_k v = d @ (G^-1 d^T S v)
+    projs = _irrep_projectors(mol, S)
     fixed = np.empty_like(c)
     imp = []
     for j in range(c.shape[1]):
@@ -342,6 +353,105 @@ def symmetrize_columns(mol, S, c, tol: float = 1e-4):
     return fixed, imp
 
 
+def dominant_irreps(mol, S, c):
+    """Per column, the id of the irrep span holding the most of it
+    (the metric-projector weights); :func:`symmetrize_columns`
+    re-projects onto these."""
+    projs = _irrep_projectors(mol, S)
+    ids = []
+    for j in range(c.shape[1]):
+        v = np.asarray(c[:, j], dtype=float)
+        best_k, best_n = 0, -1.0
+        for k, (d, Ginv_dTS) in enumerate(projs):
+            w = d @ (Ginv_dTS @ v)
+            nk = float(w @ S @ w)
+            if nk > best_n:
+                best_k, best_n = k, nk
+        ids.append(best_k)
+    return ids
+
+
+def purify_window(mol, S, c_core, c, tol: float = 1e-10):
+    """Converge a window block to the INTERSECTION of the frozen-core
+    S-orthogonalization and the dominant-irrep purity, in closed form.
+
+    The pair of projections does not commute to machine precision on
+    a core-lean column (measured at (4,15): a single pass leaves a
+    2.7e-07 tail after the assembly's internal re-projection -- past
+    pyscf's orb labeling), and the naive iterate converges only
+    geometrically (rate ~0.36 at 92% core-lean -- stalled at 5e-04
+    after 8 passes).  The closed form removes the core's content
+    within each dominant-irrep block exactly: the block subtracts
+    ``B_k = P_k(c_core)`` -- ALL core columns projected into
+    ``span(D_k)`` -- so no assignment of core columns to blocks is
+    needed (the lane core's global orthonormalization mixes across
+    irrep blocks; a per-assigned-block form stalls at 5.3e-04).
+
+    Returns ``(c_fixed, report)`` with ``report = (passes,
+    core_res, irrep_imp, ortho_dev)``; raises on genuinely-mixed
+    input (via :func:`symmetrize_columns`' contract), on a vanished
+    column (a Gram eigenvalue ~0 -- dependent columns, not a window),
+    or when the verification residues miss ``tol``.  THE CONTRACT:
+    the caller passes the ASSEMBLED block (the pipeline's form --
+    ``build_full_mo``'s output, already core-orthogonal); a
+    genuinely-core-lean RAW column is refused -- core-projecting it
+    is the assembly's job, and a global pre-projection here would
+    SYNTHESIZE irrep content against a cross-irrep-mixed core (the
+    defect the certification caught: the remainder picks up the
+    core's other-block directions at the correlation scale).  THE
+    CORE NEED NOT BE IRREP-PURE: the lane core's global
+    orthonormalization mixes across irrep blocks (measured:
+    per-assigned-block subtraction stalls at a 5.3e-04 core
+    residue), so each block removes the core's COMPLETE content
+    within its span, ``B_k = P_k(c_core)`` -- assignments
+    irrelevant."""
+    v, imp = symmetrize_columns(mol, S, c)
+    ids = dominant_irreps(mol, S, v)
+    projs = _irrep_projectors(mol, S)
+    fixed = np.empty_like(v)
+    for k in sorted(set(ids)):
+        cols = [j for j, kid in enumerate(ids) if kid == k]
+        d, Ginv_dTS = projs[k]
+        sub = v[:, cols]
+        B = d @ (Ginv_dTS @ c_core)     # ALL core columns, in span(D_k)
+        Gb = B.T @ S @ B
+        gb, Ub = np.linalg.eigh(Gb)
+        keep = gb > 1e-10 * gb.max()
+        Bk = B @ Ub[:, keep] / np.sqrt(gb[keep])
+        sub = sub - Bk @ (Bk.T @ S @ sub)   # the block's complete core
+        sub = d @ (Ginv_dTS @ sub)          # the irrep cleanup: no-op
+        norms = np.sqrt(np.diag(sub.T @ S @ sub))
+        if norms.min() < 1e-8:
+            raise VanishedColumnError(
+                f"a window column vanished into the core (post-"
+                f"subtraction S-norm {norms.min():.1e}) -- the "
+                f"core/irrep intersection is near-null for it: a "
+                f"core-orthogonal representative at irrep purity does "
+                f"not exist")
+        sub = sub / norms
+        g = sub.T @ S @ sub
+        gv, U = np.linalg.eigh(g)
+        if gv.min() <= 1e-10 * max(gv.max(), 1.0):
+            raise ValueError(
+                f"the window block is rank-deficient in irrep {k} "
+                f"(smallest Gram eigenvalue {gv.min():.1e}) -- "
+                f"dependent columns, not a window")
+        sub = sub @ U @ np.diag(gv ** -0.5) @ U.T
+        for q, j in enumerate(cols):
+            fixed[:, j] = sub[:, q]
+    core_res = float(np.linalg.norm(c_core.T @ S @ fixed, axis=0).max())
+    _, imp_v = symmetrize_columns(mol, S, fixed, tol=1.0)
+    ortho_dev = float(np.max(np.abs(
+        fixed.T @ S @ fixed - np.eye(fixed.shape[1]))))
+    if core_res > tol or max(imp_v) > tol or ortho_dev > 1e-8:
+        raise ValueError(
+            f"the closed-form intersection missed its tolerances "
+            f"(core residue {core_res:.1e}, irrep impurity "
+            f"{max(imp_v):.1e}, orthonormality {ortho_dev:.1e})")
+    return fixed, {"passes": 1, "core_res": core_res,
+                   "irrep_imp": float(max(imp_v)), "ortho_dev": ortho_dev}
+
+
 def meters_all(blocks, expect):
     """The meters over EVERY block component (in branch order) --
     independent of any PT2 root cut."""
@@ -355,6 +465,13 @@ def meters_all(blocks, expect):
 
 
 # the verdict ledger ---------------------------------------------------
+
+
+class VanishedColumnError(ValueError):
+    """A window column vanished into the core inside
+    :func:`purify_window` -- the core/irrep intersection is near-null
+    for that column: a core-orthogonal representative of it does not
+    exist at irrep purity (the pinned-(4,15) class)."""
 
 class Verdict:
     """Every check lands one row; the exit code is the verdict.
@@ -406,7 +523,7 @@ def drop_row(row: dict) -> None:
 _ORDER = (["rohf|-|-", "uhf|-|-"] +
           [f"{m}|{r}|{c}" for c in ("(4,12)", "(4,15)", "(6,13)")
            for m, r in (("casci", "free"), ("casscf", "free"),
-                        ("sa-casscf", "free"), ("ci", "pinned"),
+                        ("sa-casscf", "free"), ("casci", "pinned"),
                         ("sa-casscf", "pinned"))])
 
 
@@ -432,8 +549,8 @@ def render_table() -> None:
         "",
         "| method | route | CAS | &lt;L²&gt; | &lt;S²&gt; "
         "| E_method (Eh) | dE_method (mEh/eV) | E(2) (mEh/eV) "
-        "| E_tot (Eh) | dE_tot (mEh/eV) |",
-        "|---|---|---|---|---|---|---|---|---|---|",
+        "| E_tot (Eh) | dE_tot (mEh/eV) | term |",
+        "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for k in order:
         r = rows[k]
@@ -445,15 +562,25 @@ def render_table() -> None:
             f"| {r['method']} | {r['route']} | {r['cas']} "
             f"| {r['l2']} | {r['s2']} "
             f"| {r['e_method']:.4f} | {de_fmt(de_var)} | {e2} "
-            f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} |")
+            f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} "
+            f"| {r.get('term', '—')} |")
     out += [
         "",
         "E_method -- the method's own energy (the CASSCF/SA total; "
-        "the pinned CI value is the TERM energy, the components' mean "
-        "plus the core bookkeeping constant -- its dE is that "
+        "the pinned casci value is the TERM energy, the components' "
+        "mean plus the core bookkeeping constant -- its dE is that "
         "constant's projected-density form, not comparable to the "
         "free rows).  E_tot = E_method + E(2) (SC-NEVPT2, pyscf.mrpt, "
         "strongly contracted); dE against the ROHF row.",
+        "",
+        "E(2) comparability -- within a row, E_tot = E_method + E(2); "
+        "across rows, compare E_tot at matched partitions.  The "
+        "frozen-window rows' large E(2) is the UNOPTIMIZED gauge: "
+        "the optimizer converts PT2-priced (dynamic) correlation "
+        "into variationally-absorbed (static) correlation -- read "
+        "that trade down the E_method/E(2) columns (at (4,12): "
+        "casci E(2) -1054 mEh -&gt; SA -342 mEh while E_var falls "
+        "+923 -&gt; -42 mEh; the net is the E_tot column).",
         "",
         "&lt;L²&gt;/&lt;S²&gt; -- the ground root for the single-root "
         "methods; min..max over the ensemble's 17 roots (free SA) or "
@@ -465,18 +592,23 @@ def render_table() -> None:
         "sources, compared here.",
         "",
     ]
-    if "ci|pinned|(4,15)" in rows:
+    if "casci|pinned|(4,15)" in rows:
         out += ["The pinned (4,15) row is the RE-ATTEMPT under the "
                 "corrected symmetrizer, and it MEASURED the refusal: "
                 "the 14p column's survival norm against the frozen "
-                "core span is 0.28 (92% core-lean) and the pinned-CI "
-                "block grounds come out NOT the 5L (L classes 0..42, "
-                "the 5S/5I classes -- at (4,12) the same route reads "
-                "17 components at 72.000000).  The pinned (4,15) SA "
-                "is measured out (it would optimize that wrong "
-                "ensemble).  The free rows carry the (4,15) "
-                "experiment; the project-then-validate promotion "
-                "into lane_core is declined, src unchanged.", ""]
+                "core span is 0.28 (92% core-lean); the pinned "
+                "casci's block grounds come out NOT the 5L (L "
+                "classes 0..42, the 5S/5I classes -- at (4,12) the "
+                "same route reads 17 components at 72.000000); and "
+                "the pinned SA has NO VALID WINDOW: the core/irrep "
+                "intersection is near-null on the real substrate (the "
+                "column vanishes at ~4e-09 -- the lane core's columns "
+                "are cross-irrep mixed, so core-orthogonality and "
+                "irrep purity are unachievable together for a "
+                "92%-core-lean direction).  The free rows carry the "
+                "(4,15) experiment; the project-then-validate "
+                "promotion into lane_core is declined, src "
+                "unchanged.", ""]
     else:
         out += ["The pinned (4,15) legs are measured out: the 14p "
                 "column's survival norm against the frozen core span "
@@ -488,11 +620,14 @@ def render_table() -> None:
 
 
 def std_row(method: str, route: str, cas: str, e_method: float,
-            e2_meh: float | None, e_tot: float, l2: str, s2: str) -> dict:
+            e2_meh: float | None, e_tot: float, l2: str, s2: str,
+            term: str = "—") -> dict:
     """One table row in the family's schema (the deltas are computed
     at render time against the ROHF row; ``l2``/``s2`` pre-formatted;
     ``e_method`` -- the method's own energy, whatever its semantics;
-    ``e_tot`` -- the PT2-corrected total, ``e_method + E(2)``)."""
+    ``e_tot`` -- the PT2-corrected total, ``e_method + E(2)``;
+    ``term`` -- the row's term-identity disclosure, the pick
+    column)."""
     return {
         "method": method, "route": route, "cas": cas,
         "l2": l2, "s2": s2,
@@ -500,4 +635,5 @@ def std_row(method: str, route: str, cas: str, e_method: float,
         "e2_meh": e2_meh,
         "e2_ev": None if e2_meh is None else e2_meh * EH_EV / 1e3,
         "e_tot": e_tot,
+        "term": term,
     }

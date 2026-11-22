@@ -144,7 +144,8 @@ def main(argv=None) -> int:
     drop_row(std_row("casci", "free", "(4,12)", float(cas_f.e_tot),
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
-                     f"{r_f['l2']:.4f}", f"{r_f['s2']:.4f}"))
+                     f"{r_f['l2']:.4f}", f"{r_f['s2']:.4f}",
+                     "5I input ground"))
 
     # ---- free CASSCF (single root; the escape class, no assertion) --
     t0 = time.time()
@@ -162,7 +163,8 @@ def main(argv=None) -> int:
     drop_row(std_row("casscf", "free", "(4,12)", float(mc_c.e_tot),
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
-                     f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}"))
+                     f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
+                     "escape draw"))
 
     # ---- free SA ------------------------------------------------------
     t0 = time.time()
@@ -196,7 +198,7 @@ def main(argv=None) -> int:
                      float(e_cas[0] + core_e), r0["e2"] * 1e3,
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range([r['l2'] for r in rows]),
-                     f"{max(r['s2'] for r in rows):.4f}"))
+                     f"{max(r['s2'] for r in rows):.4f}", "5L"))
     print(f"  [sa] ensemble {mc_sa.e_tot:.8f}, converged "
           f"{mc_sa.converged} ({time.time() - t0:.1f} s)", flush=True)
 
@@ -221,19 +223,19 @@ def main(argv=None) -> int:
         cb = float(mc.e_tot) - float(ec[0])
         term_means.append(float(np.mean(ec + cb)))
     e_var_ci = float(np.mean(term_means))
-    print(f"  [pinned ci] term e_var {e_var_ci:.8f}, E(2) mean "
+    print(f"  [pinned casci] term e_var {e_var_ci:.8f}, E(2) mean "
           f"{np.mean(e2s) * 1e3:+.4f} mEh, ptp "
           f"{np.ptp(e2s) * 1e3:.2e} mEh, <L2> "
           f"[{min(l2s):.6f}, {max(l2s):.6f}] "
           f"({time.time() - t0:.1f} s)", flush=True)
-    v.note("pinned CI (the pinned analog of the unoptimized row)",
+    v.note("pinned casci (the pinned analog of the unoptimized row)",
            f"<L2> in [{min(l2s):.4f}, {max(l2s):.4f}], <S2> max "
            f"{max(s2s):.4f}; E(2) mean {np.mean(e2s) * 1e3:+.4f} mEh")
-    drop_row(std_row("ci", "pinned", "(4,12)", e_var_ci,
+    drop_row(std_row("casci", "pinned", "(4,12)", e_var_ci,
                      float(np.mean(e2s) * 1e3),
                      float(e_var_ci + np.mean(e2s)),
                      fmt_range(l2s),
-                     f"{max(s2s):.4f}"))
+                     f"{max(s2s):.4f}", "5L (term energy)"))
 
     # ---- pinned SA ----------------------------------------------------
     t0 = time.time()
@@ -261,7 +263,7 @@ def main(argv=None) -> int:
                      float(np.mean(e2s_s) * 1e3),
                      float(out_sa["e_tot"] + np.mean(e2s_s)),
                      fmt_range(l2s_s),
-                     f"{max(s2s_s):.4f}"))
+                     f"{max(s2s_s):.4f}", "5L"))
 
     ok = v.report()
     return 0 if ok else 1
