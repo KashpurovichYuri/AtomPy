@@ -290,9 +290,20 @@ configuration-inert).
   broken, ⟨L²⟩ dev 7.2e+01, git history at 824b5d8; this wave's
   draw recovered); the (6,13) free-SA meters partition the flat
   near-degenerate manifold draw-dependently; the (6,13) production
-  assembly's FOREIGN FIRST COLUMN (act from index 1 onward; the
-  distilled 7s keeps S-norm 0.8536) — behind the stored (6,13) SA
-  refusals.
+  assembly's defect is MEASURED PRECISELY (the 2026-11-22 span
+  diagnostic, principal angles between the intended distilled span
+  and the assembled block): the assembled span MISSING the intended
+  7s direction entirely (leak 1.00), a CORE-s combination leaked IN
+  (dominated by the inner s radials 12s/13s/11s/10s — newness 1.00,
+  the forbidden core-direction class), the valence-s combination
+  re-dealt 52% and 10f+3 corrupted 0.52 — the mechanism is
+  `build_full_mo`'s Loewdin re-dealing the s sector under the 7s
+  column's core-lean conditioning (S-norm 0.8536; near-degenerate
+  Gram eigenvalues, the eigensystem gauge swap) — behind the (6,13)
+  L-mixed frozen CASCI ground (18.0085), the mixed free-SA meters,
+  and the stored (6,13) SA refusals; the src fix (span-preserving
+  per-column treatment vs a stabilized Loewdin gauge) is the
+  user's next-pass decision, informed by this diagnostic.
 - **The 2026-11-20 wave review + design survey** (ticket 45's close;
   the two axes + the codebase-design vocabulary over `src/`, fixed
   point a0fe3fe): fixed = the renderer's ground-block spread got one
@@ -411,6 +422,21 @@ configuration-inert).
 
 ### Disposition candidates (the user's future call)
 
+- **The V&V error-detection instruments — proposed 2026-11-22**
+  (the wave's caught-error base: four certification-caught math
+  bugs, two latent crashes, two presentation bugs, one wrong
+  assertion, one construction defect): (a) the window-closure
+  preamble in every V&V leg — `‖[P,Lz]‖` + `‖[P,L⊥]‖`
+  (`operators.window_closure`) before any compute, disclose/refuse
+  past a band — would have flagged the (6,13) assembly defect
+  mechanically; (b) a render-time consistency check in
+  `render_table` — `E_tot = E_method + E(2)` per row, the
+  reference rows leading, the term column present; (c) the
+  pre-flight gate — the driver's `--ground-only` pass (minutes)
+  before any full chain, catching the latent-crash class at 1%
+  cost; (d) the span-health tool — the principal-angles comparison
+  of the intended vs assembled window spans (the (6,13)
+  diagnostic, formalizable as a probe).  The user's call on scope.
 - **The NO probe for (4,15) — POSTPONED (the user's debt,
   2026-11-22)**: occupations + NO-group selection
   (`natural.no_group_windows`) from the term-averaged 17-root SA
