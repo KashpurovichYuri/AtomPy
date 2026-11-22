@@ -466,13 +466,17 @@ def render_table() -> None:
         "",
     ]
     if "ci|pinned|(4,15)" in rows:
-        out += ["The pinned (4,15) rows are the RE-ATTEMPT under the "
-                "corrected symmetrizer (the first attempt's pricing "
-                "was untrusted: its symmetrizer measured impurity on "
-                "unnormalized columns and destroyed one); the 14p "
-                "column's survival norm against the frozen core span "
-                "is 0.28 -- 92% core-lean, the promoted direction's "
-                "remainder.", ""]
+        out += ["The pinned (4,15) row is the RE-ATTEMPT under the "
+                "corrected symmetrizer, and it MEASURED the refusal: "
+                "the 14p column's survival norm against the frozen "
+                "core span is 0.28 (92% core-lean) and the pinned-CI "
+                "block grounds come out NOT the 5L (L classes 0..42, "
+                "the 5S/5I classes -- at (4,12) the same route reads "
+                "17 components at 72.000000).  The pinned (4,15) SA "
+                "is measured out (it would optimize that wrong "
+                "ensemble).  The free rows carry the (4,15) "
+                "experiment; the project-then-validate promotion "
+                "into lane_core is declined, src unchanged.", ""]
     else:
         out += ["The pinned (4,15) legs are measured out: the 14p "
                 "column's survival norm against the frozen core span "

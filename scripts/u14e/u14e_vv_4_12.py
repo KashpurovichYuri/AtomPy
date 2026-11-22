@@ -19,9 +19,8 @@ PT2: the engine's own mrpt.NEVPT per root; the meters: atomterm's
 exact angular operators.
 
 THE ASSERTIONS:
-  (a0) the frozen-window CASCI ground reads <L2> = 72 -- exact by
-       construction (rotation-closed window, complete sector), the
-       certified input-window baseline re-derived;
+  (a0) the frozen-window CASCI ground reads the certified 5I
+       (<L2> = 42, definite L) -- the SA promotes it to the 5L;
   (a) fresh SA E(2) root 0 ~ the committed payload row, band +-2 mEh;
   (b) <L2> = 72 / <S2> = 6 on every SA root, band 1e-5;
   (d) the pinned SA ensemble ~ the free SA ensemble, band 1e-6 Eh.
@@ -53,6 +52,7 @@ SECTOR = (4, 0)
 NCORE = 5
 SHELLS = (("10f", 7), ("13d", 5))
 L, PARITY = 8, "u"
+L2_5I = 42.0  # the certified INPUT-window ground: L = 6 -> L(L+1)
 ROOTS = 17
 
 
@@ -134,12 +134,13 @@ def main(argv=None) -> int:
     r_f = price(cas_f, expect, roots=[0])[0]
     print(f"  [casci] e_tot {cas_f.e_tot:.8f}, <L2> {r_f['l2']:.6f} "
           f"({time.time() - t0:.1f} s)", flush=True)
-    v.check("(a0) the frozen-window CASCI ground reads <L2> = 72 "
-            "(exact by construction: the input window is "
-            "rotation-closed, the (4,0) sector complete -- the "
-            "certified input-window baseline, re-derived)",
-            abs(r_f["l2"] - L_L2) <= BAND_L2,
-            f"<L2> {r_f['l2']:.6f} (band {BAND_L2:g})")
+    v.check("(a0) the frozen-window CASCI ground reads the certified "
+            "5I (<L2> = 42, definite L -- the input window is "
+            "rotation-closed, the (4,0) sector complete; the SA then "
+            "promotes it to the 5L -- the certified record's 'the ~1 "
+            "Eh gain IS the 5L relaxation')",
+            abs(r_f["l2"] - L2_5I) <= BAND_L2,
+            f"<L2> {r_f['l2']:.6f} vs 42 (band {BAND_L2:g})")
     drop_row(std_row("casci", "free", "(4,12)", float(cas_f.e_tot),
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],

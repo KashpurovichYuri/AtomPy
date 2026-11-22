@@ -206,43 +206,82 @@ configuration-inert).
 
 ### Open
 
-- **The u14e V&V family + the scripts regroup** (2026-11-21, the
-  user's directive: several INDEPENDENT scripts, one per CAS, each
-  readable top-to-bottom, PySCF-direct; metadata from one shared
-  place only): `scripts/u14e/` — `_vv_common.py` (metadata, the
-  trusted-rung loader, anchors, meters, the derivations' thin
-  helpers, the ledger, the row store + the one `VV.md` table, all
-  in the family dir), the per-CAS legs running a FOUR-ROUTE matrix
-  (free CASSCF, free SA, pinned CI, pinned SA — the pinned legs
-  structurally unavailable at (4,15): the 6p/core overlap, the
-  declared refusal), `u14e_vv_uhf.py` (the reference rows + (e)),
-  and the old orchestrator re-formed as the thin driver.  The free
-  routes are fully independent of the production construction chain
-  (the window written out, certified elementwise against the
-  production builder at 2.2e-16; SA/readout/PT2 called directly);
+- **The u14e V&V family + the scripts regroup — COMPLETE
+  (2026-11-21/22)** (the user's directive: several INDEPENDENT
+  scripts, one per CAS, each readable top-to-bottom, PySCF-direct;
+  metadata from one shared place only): `scripts/u14e/` —
+  `_vv_common.py` (metadata, the trusted-rung loader, anchors,
+  meters, the derivations' thin helpers, the corrected
+  `symmetrize_columns`, the ledger, the row store + the one `VV.md`
+  table), the per-CAS legs running the FIVE-route matrix (free
+  CASCI — the frozen-window pricing class, free CASSCF, free SA,
+  pinned CI, pinned SA), `u14e_vv_uhf.py` (the reference rows +
+  (e)), the thin driver.  The free routes are fully independent of
+  the production construction chain (the window written out,
+  certified elementwise against the production builder at 2.2e-16);
   the meters are the kept analysis; the pinned route and the 6_13
-  distilled radial are marked production calls.  THE TABLE: the
-  ROHF row leads (the dE zero), the UHF row beside it; per row
-  E_var / dE_var / E(2) / E_tot / dE_tot, each delta in the
-  `mEh / eV` slash form, <= 4 decimals; the fresh-vs-committed
-  assertions live in the logs.  Green: (a) −0.0029 mEh, (b) 3.0e-06,
-  (d) 3.3e-09 Eh, (a15) −0.0019, (c) fresh-vs-fresh +3.084 (stored
-  +3.086); the pinned CI/SA components read 72.000000 exactly.
-  THE REGROUP: `scripts/probes/` (the declaration-provenance
-  instruments; `probe_pt2_block` stays the gate's live dependency),
-  `scripts/generators/`, `complete_u14e_table.sh` retired.  THREE
-  DISCLOSURES recorded: the free single-root CASSCF rows sit in the
-  draw class by physics (⟨L²⟩ 71.82/71.60/22.31 observed; the
-  meters disclose, no assertion); the UHF-seeded SA from a RAW
-  start is DRAW-DEPENDENT (one family draw descended broken, ⟨L²⟩
-  dev 7.2e+01 — that log in git history at 824b5d8; another
-  recovered, ensemble = the ROHF-route optimum; the committed
-  converged-start reading always holds); the (6,13) production
-  assembly places the distilled window with a FOREIGN FIRST COLUMN
-  (the leg's diagnostic: act's columns from index 1 onward; the
-  distilled 7s keeps S-norm 0.8536 after removing the pur core
-  span) — the inconsistency behind the stored (6,13) SA refusals,
-  documented alongside the pinned legs' clean L=9 classification.
+  distilled radial are marked production calls.  THE TABLE (the
+  user's schema): the ROHF row leads (the dE zero), the UHF row
+  beside it; per row E_method / dE_method / E(2) / E_tot / dE_tot,
+  each delta in the `mEh / eV` slash form, <= 4 decimals, no date
+  column; E_tot = E_method + E(2) everywhere; the footers carry the
+  E_method semantics (the pinned CI value is the TERM energy) + the
+  ⟨L²⟩/⟨S²⟩ reading key.  THE SYMMETRIZER (certified standalone;
+  the certification caught two bugs before any run: the
+  coordinate-only projection overcounts on non-S-orthonormal D2h
+  blocks — pyscf keeps raw AO selectors in single-irrep blocks —
+  and the projector's transcribe dropped the S): the per-irrep
+  METRIC projector `P_k = D_k(D_k^T S D_k)^{-1}D_k^T S`, impurity
+  in [0,1] whatever the blocks' gauge; pure → 0 exact, dirtied →
+  the analytic value at machine precision, a 50/50 mix raises.
+  THE PINNED (4,15) — ATTEMPTED AND MEASURED (the user's
+  re-attempt, under the corrected symmetrizer): the 14p column's
+  survival norm vs the frozen core 0.28 (92% core-lean — it is one
+  of the occupied 6p's own radials); the pinned CI runs (tails
+  3.5e-06 re-projected) and its block grounds come out NOT the 5L —
+  L classes 0..42 (the 5S/5I classes; the same route at (4,12)
+  reads 17 × 72.000000): the promoted direction DESTABILIZES the
+  term identity in the pinned route, the (6,13) block-ground-shift
+  class.  The pinned SA measured out (it would optimize that wrong
+  ensemble; `run_irrep_sa`'s internal build_full_mo re-projection
+  also re-introduces the tails past pyscf's refusal, 2.7e-07
+  observed).  VERDICT: the project-then-validate promotion into
+  `lane_core` DECLINED with this measured reason — src unchanged;
+  the disjoint (6,21)-class partition (dropping 6p from the core)
+  is the recorded follow-up (Disposition candidates).  THE
+  INPUT-WINDOW GROUND: the frozen CASCI at (4,12)/(4,15) reads the
+  certified ⁵I (42.000000, definite L) — the SA promotes it to the
+  ⁵L (the record's "~1 Eh gain IS the ⁵L relaxation"); the (6,13)
+  frozen CASCI reads ⟨L²⟩ 18.0085, NOT definite-L — a fresh
+  disclosure of the foreign-first-column assembly inconsistency
+  class.  THE SPIN CROSS-CHECK: the (6,13) ⟨S²⟩ = 12 class
+  verified through pyscf's own spin_square (an independent spin
+  construction): (S², 2S+1) = (12.00000000, 7) → S = 3, agreeing
+  with atomterm's meters at machine precision — the 7s-broken
+  septet class, the electron count right.  Green: (a0) the ⁵I
+  re-derived, (a) −0.0029 mEh, (b) 3.0e-06, (d) +1.5e-09 Eh, (a15)
+  +0.0032 within the ±2 mEh band, (c) fresh-vs-fresh +3.091
+  (stored +3.086), 6_13 2/2, uhf green (the raw-start draw
+  RECOVERED this draw, dev 2.8e-05 — the draw-dependent class
+  disclosed).  THE REGROUP: `scripts/probes/` (`probe_pt2_block`
+  stays the gate's live dependency), `scripts/generators/`,
+  `complete_u14e_table.sh` retired; the moved instruments' usage
+  paths lockstep; `collect_*.tmp.log` renamed.  THE DECLINATIONS
+  (the 2026-11-22 two-axis review): the shared derivation helpers
+  in `_vv_common` (`free_kernel`/`price` — the independence the
+  directive wants is vs src/, not between sibling legs); the
+  (6,13) converged-False disclosed in the log, not the table (the
+  provenance convention); c4ad3e6's `--pinned-only` message
+  overclaim stands as history (superseded).  THE DRAW-DEPENDENCE
+  DISCLOSURES carried: the free single-root CASSCF rows sit in the
+  draw class by physics (⟨L²⟩ 71.82/71.60/22.30 observed); the
+  UHF-seeded SA from a RAW start is a coin toss (one draw descended
+  broken, ⟨L²⟩ dev 7.2e+01, git history at 824b5d8; this wave's
+  draw recovered); the (6,13) free-SA meters partition the flat
+  near-degenerate manifold draw-dependently; the (6,13) production
+  assembly's FOREIGN FIRST COLUMN (act from index 1 onward; the
+  distilled 7s keeps S-norm 0.8536) — behind the stored (6,13) SA
+  refusals.
 - **The 2026-11-20 wave review + design survey** (ticket 45's close;
   the two axes + the codebase-design vocabulary over `src/`, fixed
   point a0fe3fe): fixed = the renderer's ground-block spread got one
@@ -361,6 +400,13 @@ configuration-inert).
 
 ### Disposition candidates (the user's future call)
 
+- **The (4,15) disjoint partition — the (6,21)-class follow-up**
+  (recorded 2026-11-22, the V&V wave's measured-out verdict): the
+  14p direction is 92% core-lean at the Rn·7s core, and the pinned
+  route's block grounds leave the ⁵L when it is present.  Dropping
+  6p from the core (the disjoint partition, the semi-class move)
+  would give the promoted radial room without the core entanglement
+  — a grid-axis declaration, a campaign-regen decision.
 - **The PT2 wave's declared-out classes** (gated recoveries; each
   carries its measured reason in ticket 45's git history): the uncs'
   lane legs (the lane substrate's basin steer diverges on today's

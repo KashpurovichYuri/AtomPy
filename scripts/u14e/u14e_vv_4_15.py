@@ -1,27 +1,34 @@
 """The CAS(4,15) V&V leg -- the 14p-promotion leg of the flagship
-CAS-size axis, FIVE routes.  THE PINNED LEGS ARE THE RE-ATTEMPT: the
-first attempt's garbage pricing (term e_var -46.95, <L2> 0..42) is
-UNTRUSTED evidence -- its symmetrizer measured the irrep impurity on
-UNNORMALIZED columns (a negative impurity = a destroyed column) and
-so broke the window it priced.  The corrected ``symmetrize_columns``
-(impurity on S-normalized columns; pure columns pass; refuse past
-tolerance) is certified standalone before this leg runs.  The leg
-discloses, per run: each distilled column's SURVIVAL norm against the
-frozen core span (the 14p column reads ~0.28 -- 92% core-lean: it is
-one of the occupied 6p's own radials), and the irrep tails the
-projection's conditioning left (the re-projection is the disclosed
-cleanup; the core projection itself is physics, not a knob).
+CAS-size axis.  THE PINNED ROUTE AT (4,15): ATTEMPTED AND MEASURED
+(2026-11-21, under the corrected symmetrizer -- the first attempt's
+garbage pricing was untrusted, its symmetrizer measured impurity on
+unnormalized columns and destroyed one).  The leg discloses, per
+run: each distilled column's SURVIVAL norm against the frozen core
+span (the 14p column reads ~0.28 -- 92% core-lean: it is one of the
+occupied 6p's own radials), and the irrep tails the projection's
+conditioning leaves (re-projected, the disclosed cleanup; observed
+~3.5e-06).  The pinned CI then RUNS -- and its block grounds come
+out NOT the 5L: their L classes read 0..42 (5S/5I classes; the same
+route at (4,12) reads 17 components at 72.000000).  The promoted
+direction destabilizes the term identity in the pinned route -- the
+same class as the certified (6,13) block-ground shift.  The pinned
+SA is measured out (it would optimize that wrong ensemble; its
+internal build_full_mo re-projection also re-introduces irrep tails
+past pyscf's refusal).  VERDICT: the project-then-validate
+promotion into lane_core is DECLINED with this measured reason --
+src unchanged; the disjoint (6,21)-class partition (dropping 6p
+from the core) is the possible follow-up.
 
 THE SETUP (all visible in ``main``): the trusted ROHF rung loaded;
 the core = the rotation-closed span (marked); the window = the AO
 columns of the 10f (7) + 13d (5) + 14p (3) shells, written out and
 certified elementwise against the production builder; free CASCI /
-free CASSCF / free SA on the visible window; pinned CI / pinned SA
-on the BAND-NAMED lane window (``10f13d14p@6s6p7s`` -- the
-chemical-named lane key is the refused form, the shell ``6p`` would
-sit in both the window and its core; the band realizations may share
-rows per ``lane_core``'s own contract); PT2 through the engine's own
-NEVPT; atomterm's meters.
+free CASSCF / free SA on the visible window; pinned CI on the
+BAND-NAMED lane window (``10f13d14p@6s6p7s`` -- the chemical-named
+lane key is the refused form, the shell ``6p`` would sit in both
+the window and its core; the band realizations may share rows per
+``lane_core``'s own contract); PT2 through the engine's own NEVPT;
+atomterm's meters.
 
 THE ASSERTIONS:
   (a15) fresh SA E(2) root 0 ~ the committed payload row, band
@@ -31,9 +38,8 @@ THE ASSERTIONS:
         fresh (4,15) against the stored pair -- disclosed which
         reading ran.
 The free CASSCF row carries NO assertion (the draw class); the
-casci/pinned meters are disclosed (the input window is
-rotation-closed, so its CASCI ground has a definite L -- which L is
-the open physics this leg measures).
+casci meters are disclosed (the certified INPUT-window ground is
+the 5I -- the SA promotes it to the 5L).
 
 Run from the repo root:
     OMP_NUM_THREADS=16 python scripts/u14e/u14e_vv_4_15.py \\
@@ -50,8 +56,8 @@ from pyscf import mcscf
 from _vv_common import (BAND_E2_MEH, ROWS, Verdict, anchor,
                         core_part_of, drop_row, fmt_range, free_kernel,
                         lane_route, load_reference, make_blocks, meters,
-                        meters_all, nevpt_rows, pinned_ci_run,
-                        pinned_sa_run, price, std_row, symmetrize_columns)
+                        meters_all, nevpt_rows, pinned_ci_run, price,
+                        std_row, symmetrize_columns)
 
 ADDR_415 = "u14e_10f13d14p_4-0_sa-casscf_ao_-_pur_avg"
 ADDR_412 = "u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg"
@@ -137,10 +143,10 @@ def main(argv=None) -> int:
     print(f"  [casci] e_tot {cas_f.e_tot:.8f}, <L2> {l_f:.6f} "
           f"({time.time() - t0:.1f} s)", flush=True)
     v.note("free CASCI (the frozen input window)",
-           f"<L2> {l_f:.6f} -- closest L(L+1) within "
-           f"{l_def:.2e} (the window is rotation-closed, so the "
-           f"ground has a definite L; which L is the open physics "
-           f"this leg measures), E(2) {r_f['e2'] * 1e3:+.4f} mEh")
+           f"<L2> {l_f:.6f} -- closest L(L+1) within {l_def:.2e}; "
+           f"the certified INPUT-window ground class (the 5I, L = 6, "
+           f"the same reading as the (4,12) leg) -- the SA promotes "
+           f"it to the 5L; E(2) {r_f['e2'] * 1e3:+.4f} mEh")
     drop_row(std_row("casci", "free", "(4,15)", float(cas_f.e_tot),
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
@@ -274,44 +280,23 @@ def main(argv=None) -> int:
                      float(e_m_ci + np.mean(e2s)),
                      fmt_range(l2s), f"{max(s2s):.4f}"))
 
-    # ---- pinned SA ----------------------------------------------------
-    t0 = time.time()
-    out_sa, _ = pinned_sa_run(lmol, lmf, mo_l, nf, ncas_l, SECTOR,
-                              L, PARITY, c_core_l, c_read=c_read_l)
-    blocks_s, expect_s, _ = make_blocks(lmol, lmf,
-                                        np.asarray(out_sa["mo"]),
-                                        nf, ncas_l, SECTOR, L, PARITY,
-                                        c_core_l, out_sa["roots"])
-    l2s_s, s2s_s = meters_all(blocks_s, expect_s)
-    e2s_s = [row.e_corr for _, mc in blocks_s
-             for row in nevpt_rows(mc, pt2_roots)]
-    print(f"  [pinned sa] ensemble {out_sa['e_tot']:.8f}, term E(2) "
-          f"mean {np.mean(e2s_s) * 1e3:+.4f} mEh, ptp "
-          f"{np.ptp(e2s_s) * 1e3:.2e} mEh, <L2> "
-          f"[{min(l2s_s):.6f}, {max(l2s_s):.6f}] "
-          f"({time.time() - t0:.1f} s)", flush=True)
-    delta = float(out_sa["e_tot"]) - float(mc_sa.e_tot)
-    v.note("(d15) the pinned SA ensemble vs the free SA ensemble",
-           f"pinned {out_sa['e_tot']:.8f} vs free {mc_sa.e_tot:.8f} "
-           f"(delta {delta:+.2e} Eh -- the ensemble is the route "
-           f"comparison surface; at (4,12) the same reading held at "
-           f"3.3e-09)")
-    drop_row(std_row("sa-casscf", "pinned", "(4,15)",
-                     float(out_sa["e_tot"]),
-                     float(np.mean(e2s_s) * 1e3),
-                     float(out_sa["e_tot"] + np.mean(e2s_s)),
-                     fmt_range(l2s_s), f"{max(s2s_s):.4f}"))
-    # the CAS-size ordering at the pinned route (vs the fresh (4,12))
-    p12 = (json.loads(ROWS.read_text()).get("sa-casscf|pinned|(4,12)")
-           if ROWS.exists() else None)
-    if p12 is not None:
-        tot15 = float(out_sa["e_tot"]) + float(np.mean(e2s_s))
-        v.note("the CAS-size ordering at the pinned route",
-               f"(4,12) {p12['e_tot']:.4f} -> (4,15) {tot15:.4f} "
-               f"(+{(tot15 - p12['e_tot']) * 1e3:+.3f} mEh "
-               f"corrected); <L2> pinned components: (4,12) "
-               f"{p12['l2']} vs (4,15) {fmt_range(l2s_s)} -- the "
-               f"free-route (c) check is the gating comparison")
+    # ---- pinned SA: MEASURED OUT at the CI level ----------------------
+    # the pinned CI's block grounds are NOT the 5L (their L classes
+    # read 0..42 -- 5S/5I classes; the same route at (4,12) reads 17
+    # components at 72.000000): the pinned SA would optimize that
+    # wrong ensemble.  Structurally, run_irrep_sa's internal
+    # build_full_mo re-projection also re-introduces the irrep tails
+    # past pyscf's refusal (observed 2.7e-07)
+    v.note("the pinned SA at (4,15): measured out at the CI level",
+           "the pinned CI block grounds are not the 5L (<L2> classes "
+           "0..42 -- 5S/5I; at (4,12) the same route reads 17 x "
+           "72.000000), so the pinned SA would optimize the wrong "
+           "ensemble; its internal build_full_mo re-projection also "
+           "re-introduces irrep tails past pyscf's refusal (2.7e-07 "
+           "observed).  VERDICT: the project-then-validate promotion "
+           "into lane_core is DECLINED with this measured reason -- "
+           "src unchanged; the disjoint (6,21)-class partition "
+           "(dropping 6p from the core) is the possible follow-up")
     ok = v.report()
     return 0 if ok else 1
 
