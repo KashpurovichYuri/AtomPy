@@ -1,0 +1,39 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_vv_span.py:56: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, nc), act,
+[A] act's own column order, dominant AO per column:
+    ['10f-3', '10f-2', '10f-1', '10f+0', '10f+1', '10f+2', '10f+3', '13dxy', '13dyz', '13dz^2', '13dxz', '13dx2-y2', '18s']
+[A] principal cosines act vs assembled: [1.       1.       1.       1.       1.       1.       1.       1.       1.       1.       1.       1.       0.853641]
+[A] principal cosines projected vs assembled: [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+[A] closure[      act]: lz=2.01e-13 lperp=3.34e-13
+[A] closure[projected]: lz=2.01e-13 lperp=3.35e-13
+[A] closure[assembled]: lz=2.01e-13 lperp=3.35e-13
+[A] closure[    c_pur]: lz=1.26e-13 lperp=1.33e-13
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_vv_span.py:87: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, nc), act,
+[B] frozen CASCI e_tot -49.31677250
+[B] correct slice: <L2> 12.000000 (closest L(L+1) off 6.34e-09), <S2> 12.000000
+[B] shifted slice (+1 column): <L2> 18.008492 -- the incident's artifact
+[B] per-orbital occupations (act order; last = the distilled s): [6.007e-04 1.556e-03 4.926e-04 9.979e-01 4.926e-04 1.556e-03 6.007e-04 9.983e-01 9.993e-01 9.989e-01 9.993e-01 9.983e-01 2.859e-03]
+  plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 14p: k=1 of 1 bands, capture 0.9088-0.9112
+[C] act's dominant AO per column: ['10f-3', '10f-2', '10f-1', '10f+0', '10f+1', '10f+2', '10f+3', '13dxy', '13dyz', '13dz^2', '13dxz', '13dx2-y2', '14px', '14py', '14pz']
+[C] the distilled p columns vs the occupied closed MOs [0, 1, 2, 3, 4] (|<v,S,MO>|):
+    col 12: 0.000 0.387 0.871 0.038 0.000
+    col 13: 0.000 0.863 0.377 0.156 0.000
+    col 14: 0.000 0.127 0.097 0.940 0.000
+[C] the pinned core's per-block content ranks (the C1 m-mixed occupied 6p, S-projected onto the declared span):
+      Ag: cols [9, 11], core rank 2, post-subtraction norms [1. 1.]
+     B1g: cols [7], core rank 0, post-subtraction norms [1.]
+     B2g: cols [10], core rank 0, post-subtraction norms [1.]
+     B3g: cols [8], core rank 0, post-subtraction norms [1.]
+      Au: cols [1], core rank 0, post-subtraction norms [1.]
+     B1u: cols [3, 5, 14], core rank 2, post-subtraction norms [1.  1.  0.2]
+     B2u: cols [0, 2, 13], core rank 3, post-subtraction norms [1.000e+00 1.000e+00 1.587e-09]
+     B3u: cols [4, 6, 12], core rank 3, post-subtraction norms [1.000e+00 1.000e+00 3.572e-08]
+[C] m-pure feed: refused (feed-gauge-independent): a window column vanished into the core (post-subtraction S-norm 1.6e-09) -- the column lies inside the frozen core's span and has no core-orthogonal remainder

@@ -270,6 +270,9 @@ def main(argv=None) -> int:
                      float(e_var_ci + np.mean(e2s)),
                      fmt_range(l2s),
                      f"{max(s2s):.4f}", "L=9 ground + the 5L present",
+                     # the pinned CI's tolerance: pinned_ci_run's
+                     # conv_tol default (1e-12; CI solves have no
+                     # iteration structure)
                      conv=conv_of(1e-12, None)))
 
     # pinned SA + THE CERTIFIED-CLASS CHECK

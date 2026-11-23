@@ -13,11 +13,14 @@ block grounds come out NOT the 5L: their L classes read 0..42
 72.000000).  The promoted direction destabilizes the term identity
 in the pinned route -- the same class as the certified (6,13)
 block-ground shift.  THE PINNED SA (the user's call, attempted on
-the certified intersection window): MEASURED OUT -- the 14p columns
-vanish into the pinned route's frozen core (post-subtraction
-S-norm ~7e-09, the typed VanishedColumnError, re-measured every
-run).  THE MECHANISM, MEASURED (the 2026-11-22 second validation,
-the block-content ranks): the declared core span of @6s6p7s
+the certified intersection window): MEASURED OUT -- ``purify_window``
+refuses every run (the refusal's form is draw-dependent: a column
+vanishes into the frozen core, post-subtraction S-norms
+at the 1e-09..1e-08 scale, or the closed form misses its tolerances, the f/d
+columns' C1 core-tails at ~5e-05 -- the verdict is constant),
+re-measured every run.  THE MECHANISM, MEASURED (the 2026-11-22
+second validation, the block-content ranks): the declared core
+span of @6s6p7s
 realizes 6p as THREE bands (13p/14p/15p -- ``shell_bands``); the
 pinned route's frozen core is the C1 reference's m-mixed occupied
 6p, S-projected onto that span -- it contributes THREE independent
@@ -66,11 +69,11 @@ import time
 import numpy as np
 from pyscf import mcscf
 
-from _vv_common import (BAND_E2_MEH, ROWS, VanishedColumnError, Verdict,
-                        anchor, core_part_of, drop_row, fmt_range,
-                        free_kernel, lane_route, load_reference,
-                        make_blocks, meters, meters_all, nevpt_rows,
-                        pinned_ci_run, pinned_sa_run, price, purify_window,
+from _vv_common import (BAND_E2_MEH, ROWS, Verdict, anchor, conv_of,
+                        core_part_of, drop_row, fmt_range, free_kernel,
+                        lane_route, load_reference, make_blocks, meters,
+                        meters_all, nevpt_rows, pinned_ci_run,
+                        pinned_sa_run, price, purify_window,
                         std_row, symmetrize_columns)
 
 ADDR_415 = "u14e_10f13d14p_4-0_sa-casscf_ao_-_pur_avg"
@@ -165,11 +168,12 @@ def main(argv=None) -> int:
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
                      f"{l_f:.4f}", f"{r_f['s2']:.4f}",
-                     "5I input ground"))
+                     "5I input ground",
+                     conv=conv_of(cas_f.fcisolver.conv_tol, None)))
 
     # ---- free CASSCF (single root; the escape class, no assertion) --
     t0 = time.time()
-    mc_c, cas_c = free_kernel(mf, 15, SECTOR, mo_full)
+    mc_c, cas_c = free_kernel(mf, 15, SECTOR, mo_full, track_iters=True)
     r_c = price(cas_c, expect, roots=[0])[0]
     print(f"  [casscf] e_tot {mc_c.e_tot:.8f}, converged "
           f"{mc_c.converged}, <L2> {r_c['l2']:.6f} "
@@ -180,12 +184,15 @@ def main(argv=None) -> int:
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
                      f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
-                     "escape draw"))
+                     "escape draw",
+                     conv=conv_of(mc_c.final_de, mc_c.n_macro,
+                                  bool(mc_c.converged))))
 
     # ---- free SA ------------------------------------------------------
     t0 = time.time()
     mc_sa, cas_sa = free_kernel(mf, 15, SECTOR, mo_full,
-                                weights=weights, nroots=ROOTS)
+                                weights=weights, nroots=ROOTS,
+                                track_iters=True)
     core_e, e_cas = core_part_of(cas_sa)
     expect_sa = meters(mol, cas_sa.mo_coeff[:, NCORE:NCORE + 15],
                        *SECTOR)
@@ -216,7 +223,9 @@ def main(argv=None) -> int:
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range([r['l2'] for r in rows]),
                      f"{max(r['s2'] for r in rows):.4f}",
-                     "5L, closure-costed"))
+                     "5L, closure-costed",
+                     conv=conv_of(mc_sa.final_de, mc_sa.n_macro,
+                                  bool(mc_sa.converged))))
 
     # ---- (c) the CAS-size ordering (the flagship read) ----------------
     fresh_412 = None
@@ -301,7 +310,10 @@ def main(argv=None) -> int:
                      float(np.mean(e2s) * 1e3),
                      float(e_m_ci + np.mean(e2s)),
                      fmt_range(l2s), f"{max(s2s):.4f}",
-                     "grounds not the 5L (5S/5I)"))
+                     "grounds not the 5L (5S/5I)",
+                     # pinned_ci_run's conv_tol default (1e-12; a CI
+                     # solve has no iteration structure)
+                     conv=conv_of(1e-12, None)))
 
     # ---- pinned SA: the intersection window (the user's (a)) ----------
     # the pinned casci's block grounds are NOT the 5L (L classes
@@ -316,12 +328,18 @@ def main(argv=None) -> int:
     # THREE bands (13p/14p/15p), and the C1 reference's m-mixed
     # occupied 6p, S-projected onto that span, contributes THREE
     # independent directions per p block (the instrumented ranks:
-    # B2u 3, B3u 3), SPANNING THE 14p SLOTS ENTIRELY: the columns
-    # vanish (post-subtraction S-norm ~7e-09).
+    # B2u 3, B3u 3; probe_u14e_vv_span.py), SPANNING THE 14p SLOTS
+    # ENTIRELY.  The refusal's FORM is draw-dependent (the lane
+    # substrate's SCF redraws): a column vanishes (post-subtraction
+    # S-norms at the 1e-09..1e-08 scale) or the closed form misses
+    # its tolerances
+    # (the f/d columns' C1 core-tails, ~5e-05) -- constant in
+    # verdict.
     try:
         c_sa_l, rep = purify_window(lmol, S_l, c_core_l,
                                     mo_l[:, nf:nf + ncas_l])
-    except VanishedColumnError as e:
+    except ValueError as e:   # VanishedColumnError or the tolerance
+        # miss -- both are the pinned route's no-remainder verdict
         v.note("the pinned SA at (4,15): MEASURED OUT -- the "
                "promoted band is core-span content for the pinned "
                "route",

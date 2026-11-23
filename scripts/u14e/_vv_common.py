@@ -154,13 +154,12 @@ def free_kernel(mf, ncas: int, sector, mo_full, weights=None,
     record; the default off leaves the historical path untouched."""
     mc = mcscf.CASSCF(mf, ncas, sector)
     if track_iters:
-        _it = {"imacro": -1, "de": float("nan"), "conv": None}
+        _it = {"imacro": -1, "de": float("nan")}
 
         def _cb(envs):
             if envs.get("imacro", -1) > _it["imacro"]:
                 _it["imacro"] = envs["imacro"]
                 _it["de"] = abs(float(envs.get("de", float("nan"))))
-                _it["conv"] = envs.get("conv")
         mc.callback = _cb
     if weights is not None and len(weights) > 1:
         mc.state_average_(list(weights))
@@ -593,6 +592,8 @@ def render_table() -> None:
         # the render-time consistency check: the store's own bookkeeping
         if r.get("e2_meh") is not None and abs(
                 r["e_method"] + r["e2_meh"] * 1e-3 - r["e_tot"]) > 5e-4:
+            # 5e-4 -- an order above the table's 4-decimal rendering
+            # scale: the store's bookkeeping must vanish well below it
             raise ValueError(
                 f"render check: row {k} violates E_tot = E_method + "
                 f"E(2) by {r['e_method'] + r['e2_meh'] * 1e-3 - r['e_tot']:.2e} Eh")
@@ -648,8 +649,9 @@ def render_table() -> None:
                 "projected onto that span) spans the 14p slots "
                 "ENTIRELY -- the promoted columns are core-span "
                 "content by construction, the pinned SA has no "
-                "window at this partition (the typed "
-                "VanishedColumnError, re-measured every run), and "
+                "window at this partition (purify_window refuses "
+                "every run -- the vanish or the tolerance miss, "
+                "draw-dependent in form), and "
                 "the pinned casci's block grounds come out NOT the "
                 "5L (L classes 0..42; at (4,12) the same route reads "
                 "17 components at 72.000000).  The pinned (4,15) is "

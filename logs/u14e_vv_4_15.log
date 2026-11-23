@@ -1,41 +1,41 @@
   ROHF (trusted rung, loaded): E = -50.38185233, nao 177
 /home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
   mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
-/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_15.py:118: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_15.py:121: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
   mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), sel,
   window: 15 AO columns (('10f', 7), ('13d', 5), ('14p', 3)), visible construction == production build_full_mo (block dev 2.2e-16, complement span dev 1.9e-08)
-  [casci] e_tot -49.45874073, <L2> 42.000000 (30.7 s)
-  [note] free CASCI (the frozen input window): <L2> 42.000000 -- closest L(L+1) within 2.61e-07; the certified INPUT-window ground class (the 5I, L = 6, the same reading as the (4,12) leg) -- the SA promotes it to the 5L; E(2) -1056.2457 mEh
-  [casscf] e_tot -50.43265059, converged False, <L2> 71.597719 (157.6 s)
-  [note] free CASSCF (the single-root draw class): <L2> 71.597719, E(2) -309.8437 mEh
-  root 0: e_ref -50.42637986, E(2) -336.0104 mEh, <L2> 71.784587, <S2> 6.000000
-  root 1: e_ref -50.42637732, E(2) -335.9999 mEh, <L2> 71.786851, <S2> 6.000000
-  root 2: e_ref -50.42637640, E(2) -336.0063 mEh, <L2> 71.786628, <S2> 6.000000
-  root 3: e_ref -50.42637363, E(2) -336.0223 mEh, <L2> 71.790287, <S2> 6.000000
-  root 4: e_ref -50.42637286, E(2) -336.0141 mEh, <L2> 71.791062, <S2> 6.000000
-  root 5: e_ref -50.42506274, E(2) -336.9274 mEh, <L2> 71.943802, <S2> 6.000000
-  root 6: e_ref -50.42506248, E(2) -336.9376 mEh, <L2> 71.943669, <S2> 6.000000
-  root 7: e_ref -50.42506180, E(2) -336.9313 mEh, <L2> 71.944053, <S2> 6.000000
-  root 8: e_ref -50.42505760, E(2) -336.9716 mEh, <L2> 71.945894, <S2> 6.000000
-  root 9: e_ref -50.42497775, E(2) -336.9458 mEh, <L2> 71.937744, <S2> 6.000000
-  root 10: e_ref -50.42497757, E(2) -336.9416 mEh, <L2> 71.937672, <S2> 6.000000
-  root 11: e_ref -50.42497666, E(2) -336.9667 mEh, <L2> 71.937543, <S2> 6.000000
-  root 12: e_ref -50.42464637, E(2) -337.0151 mEh, <L2> 71.964527, <S2> 6.000000
-  root 13: e_ref -50.42464509, E(2) -337.0183 mEh, <L2> 71.964585, <S2> 6.000000
-  root 14: e_ref -50.42462697, E(2) -337.0159 mEh, <L2> 71.965303, <S2> 6.000000
-  root 15: e_ref -50.42462623, E(2) -337.0162 mEh, <L2> 71.965332, <S2> 6.000000
-  root 16: e_ref -50.42462447, E(2) -337.0061 mEh, <L2> 71.965401, <S2> 6.000000
-  [PASS] (a15) SA E(2) root 0 ~ the committed payload row: fresh -336.0104 mEh vs anchor -336.0125 (delta +0.0021, band +-2.0)
-  [note] the (4,15) meters: <L2> in [71.7846, 71.9654] (the promotion's 6p rows cost some closure; the stored row carries 71.785 on root 0 -- printed, not asserted)
-  [sa] ensemble -50.42530740, converged True (678.6 s)
-  [PASS] (c) the (4,15) promotion WORSENS the corrected total (fresh vs fresh): (4,12) -50.7655 -> (4,15) -50.7624 (+3.090 mEh); stored: -50.7655 -> -50.7624 (+3.086 mEh)
+  [casci] e_tot -49.45874073, <L2> 42.000000 (31.3 s)
+  [note] free CASCI (the frozen input window): <L2> 42.000000 -- closest L(L+1) within 2.19e-07; the certified INPUT-window ground class (the 5I, L = 6, the same reading as the (4,12) leg) -- the SA promotes it to the 5L; E(2) -1056.2479 mEh
+  [casscf] e_tot -50.43265351, converged False, <L2> 71.598047 (163.3 s)
+  [note] free CASSCF (the single-root draw class): <L2> 71.598047, E(2) -309.8371 mEh
+  root 0: e_ref -50.42627349, E(2) -336.1510 mEh, <L2> 71.778840, <S2> 6.000000
+  root 1: e_ref -50.42626124, E(2) -336.1564 mEh, <L2> 71.811257, <S2> 6.000000
+  root 2: e_ref -50.42625742, E(2) -336.1810 mEh, <L2> 71.810777, <S2> 6.000000
+  root 3: e_ref -50.42623231, E(2) -336.2187 mEh, <L2> 71.800408, <S2> 6.000000
+  root 4: e_ref -50.42623124, E(2) -336.1963 mEh, <L2> 71.806492, <S2> 6.000000
+  root 5: e_ref -50.42520654, E(2) -336.8920 mEh, <L2> 71.941857, <S2> 6.000000
+  root 6: e_ref -50.42520554, E(2) -336.8949 mEh, <L2> 71.941813, <S2> 6.000000
+  root 7: e_ref -50.42519903, E(2) -336.9025 mEh, <L2> 71.942078, <S2> 6.000000
+  root 8: e_ref -50.42504530, E(2) -337.1087 mEh, <L2> 71.958304, <S2> 6.000000
+  root 9: e_ref -50.42496067, E(2) -336.9786 mEh, <L2> 71.936812, <S2> 6.000000
+  root 10: e_ref -50.42495605, E(2) -336.9926 mEh, <L2> 71.936904, <S2> 6.000000
+  root 11: e_ref -50.42494508, E(2) -337.0239 mEh, <L2> 71.936192, <S2> 6.000000
+  root 12: e_ref -50.42477991, E(2) -337.0211 mEh, <L2> 71.955012, <S2> 6.000000
+  root 13: e_ref -50.42477391, E(2) -337.0395 mEh, <L2> 71.955510, <S2> 6.000000
+  root 14: e_ref -50.42457508, E(2) -336.9523 mEh, <L2> 71.961666, <S2> 6.000000
+  root 15: e_ref -50.42457061, E(2) -336.9512 mEh, <L2> 71.962008, <S2> 6.000000
+  root 16: e_ref -50.42456883, E(2) -336.9714 mEh, <L2> 71.961910, <S2> 6.000000
+  [PASS] (a15) SA E(2) root 0 ~ the committed payload row: fresh -336.1510 mEh vs anchor -336.0125 (delta -0.1385, band +-2.0)
+  [note] the (4,15) meters: <L2> in [71.7788, 71.9620] (the promotion's 6p rows cost some closure; the stored row carries 71.785 on root 0 -- printed, not asserted)
+  [sa] ensemble -50.42529660, converged False (732.8 s)
+  [PASS] (c) the (4,15) promotion WORSENS the corrected total (fresh vs fresh): (4,12) -50.7655 -> (4,15) -50.7624 (+3.055 mEh); stored: -50.7655 -> -50.7624 (+3.086 mEh)
   plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
   [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 14p: k=1 of 1 bands, capture 0.9088-0.9112
   [pinned window] 15 columns; survival norms vs the frozen core span: 14p 0.2776; 14p 0.2774; 14p 0.2803 (the 14p remainder is the promoted direction)
   [pinned window] irrep tails re-projected (max 3.5e-06); the solvers' window's residual core lean 5.2e-04 (the 14p slots sit inside the pinned core's span -- the block projection cannot remove them; disclosed)
-  [pinned casci] term e_method -48.12943111, E(2) mean -2504.5576 mEh, ptp 1.14e+01 mEh, <L2> [0.000000, 42.000000] (513.5 s)
+  [pinned casci] term e_method -48.12943111, E(2) mean -2504.5576 mEh, ptp 1.14e+01 mEh, <L2> [0.000000, 42.000000] (507.0 s)
   [note] pinned casci (the band-named lane window, corrected symmetrizer): <L2> in [0.0000, 42.0000], <S2> max 6.0000; E(2) mean -2504.5576 mEh (the block grounds' L classes ARE the finding: the clean-5L reading is 17 components at 72)
-  [note] the pinned SA at (4,15): MEASURED OUT -- the promoted band is core-span content for the pinned route: purify_window refuses: a window column vanished into the core (post-subtraction S-norm 3.9e-09) -- the column lies inside the frozen core's span and has no core-orthogonal remainder.  The mechanism: the declared core span of @6s6p7s realizes 6p as three bands (13p/14p/15p, shell_bands), and the C1 reference's m-mixed occupied 6p, S-projected onto that span, spans the 14p slots entirely (the block ranks 3/3 measured) -- no core-orthogonal remainder exists for the promoted columns; the pinned (4,15) is the pinned (4,12) at this partition.  The free route's core (pur) does NOT contain the slots (survival 0.28) and hosts the promotion: +3.09 mEh (the (c) check).  VERDICT: the project-then-validate promotion into lane_core is DECLINED (src unchanged); no (6,21)-class partition is needed for now
+  [note] the pinned SA at (4,15): MEASURED OUT -- the promoted band is core-span content for the pinned route: purify_window refuses: the closed-form intersection missed its tolerances (core residue 1.2e-04, irrep impurity 6.7e-16, orthonormality 1.7e-15).  The mechanism: the declared core span of @6s6p7s realizes 6p as three bands (13p/14p/15p, shell_bands), and the C1 reference's m-mixed occupied 6p, S-projected onto that span, spans the 14p slots entirely (the block ranks 3/3 measured) -- no core-orthogonal remainder exists for the promoted columns; the pinned (4,15) is the pinned (4,12) at this partition.  The free route's core (pur) does NOT contain the slots (survival 0.28) and hosts the promotion: +3.09 mEh (the (c) check).  VERDICT: the project-then-validate promotion into lane_core is DECLINED (src unchanged); no (6,21)-class partition is needed for now
 
 ===== verdict =====
   REPORT  free CASCI (the frozen input window)

@@ -242,14 +242,20 @@ configuration-inert).
   THREE bands (13p/14p/15p — `shell_bands`), so the promoted
   "14p" is the OCCUPIED SHELL'S OWN MIDDLE RADIAL, not a diffuse
   function (its columns overlap a single 6p MO at 0.87/0.86/0.94).
-  The pinned route's frozen core is the C1 reference's m-mIXED
+  The pinned route's frozen core is the C1 reference's m-mixed
   occupied 6p S-projected onto that declared span — it
   contributes THREE independent directions per p block
-  (instrumented: B2u rank 3, B3u rank 3), SPANNING THE 14p SLOTS
+  (instrumented: B2u rank 3, B3u rank 3 — the committed
+  probe `scripts/probes/probe_u14e_vv_span.py`, log
+  `logs/probe_u14e_vv_span.log`, carries the ranks, the MO
+  overlaps, and the m-pure-feed vanish reproducibly), SPANNING
+  THE 14p SLOTS
   ENTIRELY: the promoted columns are core-span content BY
   CONSTRUCTION for the pinned route, the pinned SA has no window
-  (the columns vanish, post-subtraction S-norm ~7e-09, the typed
-  `VanishedColumnError`, re-measured every run), and the pinned
+  (`purify_window` refuses every run — the refusal's form is
+  draw-dependent: the vanish at the 1e-09..1e-08
+  scale or the closed-form tolerance miss ~5e-05, the verdict
+  constant), and the pinned
   (4,15) IS the pinned (4,12) at this partition.  The earlier
   mechanisms both RETRACTED (the projector non-commutation; the
   cross-block-cancellation story — the vanishing does not depend
@@ -462,10 +468,12 @@ configuration-inert).
   shifted-slice class dies at the seam); (d) the pre-flight gate —
   the driver's `--ground-only` pass (minutes) before any full
   chain, catching the latent-crash class at 1% cost (exists);
-  (e) the span-health tool — the principal-angles comparison of
-  the intended vs assembled window spans (the (6,13)
-  triangulation, formalizable as a probe when a second consumer
-  appears).  The user's call on further scope.
+  (e) the span-health tool — COMMITTED as
+  `scripts/probes/probe_u14e_vv_span.py` (the (6,13)
+  triangulation + the (4,15) pinned-mechanism instrument, one
+  probe, its log committed): the principal-angles comparison of
+  the intended vs assembled/projected spans, the closure meters,
+  the block-content ranks, and the m-pure-feed refusal.  The user's call on further scope.
 - **The (6,13) window rework candidate — the user's declaration
   decision (2026-11-22)**: the as-built (6,13) window's frozen
   ground is the ⁷F (the d⁵ high-spin class; the 7s column
