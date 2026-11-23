@@ -596,13 +596,14 @@ def drop_row(row: dict) -> None:
 _ORDER = (["rohf|-|-", "uhf|-|-"] +
           [f"{m}|free|{c}"
            for m in ("casci", "casscf", "sa-casscf")
-           for c in ("(4,12)", "(4,15)", "(6,13)", "(6,13)@r1+MOs")] +
+           for c in ("(4,12)", "(4,12)@r1", "(4,15)", "(4,15)@r1",
+                     "(6,13)", "(6,13)@r1")] +
           [f"{m}|pinned|{c}"
            for m in ("casci", "sa-casscf")
            for c in ("(4,12)", "(4,15)", "(6,13)")] +
           [f"{m}|pinned@pur|{c}"
            for m in ("casci", "sa-casscf")
-           for c in ("(4,12)", "(4,15)", "(6,13)", "(6,13)@r1+MOs")])
+           for c in ("(4,12)", "(4,15)", "(6,13)", "(6,13)@r1")])
 
 
 def fmt_range(vals, nd: int = 4) -> str:
@@ -643,8 +644,17 @@ def render_table() -> None:
         "| E_tot (Eh) | dE_tot (mEh/eV) | term |",
         "|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
+    # the method-block separators (the campaign tables' === rule
+    # rows): the references share one block, each optimizer class
+    # reads its own
+    _group = {"rohf": "ref", "uhf": "ref"}
+    prev = None
     for k in order:
         r = rows[k]
+        g = _group.get(r["method"], r["method"])
+        if prev is not None and g != prev:
+            out.append("|" + " === |" * 12)
+        prev = g
         de_var = r["e_method"] - e0
         de_tot = r["e_tot"] - e0
         e2 = (f"{r['e2_meh']:+.4f} / {r['e2_ev']:+.4f}"
@@ -766,13 +776,13 @@ def render_table() -> None:
                 "itself is healthy: assembled span = projected span "
                 "exactly, closure meters ~1e-13 (the campaign cell "
                 "agreed all along).", ""]
-    if "casci|pinned@pur|(6,13)@r1+MOs" in rows:
+    if "casci|pinned@pur|(6,13)@r1" in rows:
         out += ["THE (6,13) FIX AND ITS CLASS RECORD: the "
                 "quasi-degenerate block's partition is window- and "
                 "core-sensitive -- the as-built window on the pur "
                 "core reads 12..42 (the low-L block grounds), the "
                 "lane's certified record reads 16 x ~90 + one x 72, "
-                "and the @r1+MOs window (the @r f/d radials + the "
+                "and the @r1 window (the @r f/d radials + the "
                 "reference's own pair MO, s-sector-projected) reads "
                 "17 x 72.000000 (max dev 3.3e-08): the declared 5L "
                 "is the exact ground of every irrep block on the "

@@ -259,6 +259,28 @@ configuration-inert).
   lane-retirement decision).  README carries the
   window-composition review table + the <L2>-expectation ladder
   (closure buys exactness; the window's economics buy the value).
+  THE CONVERGENCE ROUND (the user's review, 2026-11-23): the table's
+  method blocks demarcated by === rule rows; the label
+  "(6,13)@r1+MOs" -> "(6,13)@r1"; the as-built (4,15)/(6,13) legs
+  re-run under the 200-macro budget — the capped "51*" rows
+  resolve: the (4,15) CASSCF converges at 150 macro, the (6,13) at
+  192 (right at the edge — the flat manifold genuinely needs the
+  budget), and the SA<CASSCF inversion the user flagged is
+  RESOLVED (the capped draw was the artifact; the converged
+  (6,13) CASSCF reads 5.3 mEh deeper and restores the normal
+  ordering — 1.9 mEh below the SA ground).  THE @r1 LADDER
+  (`u14e_vv_r1_ladder.py`, green 4/4): the matched prior-axis
+  source across the CAS axis — (4,12)@r1 reproduces the campaign's
+  certified frozen record EXACTLY (-50.23250753, +149.3 mEh,
+  <L2> 72.000); (4,15)@r1's frozen total is IDENTICAL to (4,12)@r1
+  to 8 decimals — the promoted 14p column is a frozen-level
+  spectator (its +3.09 mEh cost appears only in the optimized
+  totals); the converged CASSCF/SAs land the incumbent optima on
+  every window (the optimizer erases the radial signal's history
+  at (4,12)/(4,15); at (6,13) the @r1 draw descends 7.4 mEh
+  deeper than the as-built's — the better s channel).  The V&V
+  table reads in === blocks; the conv column publishes true macro
+  counts everywhere.
 - **The u14e V&V family + the scripts regroup — COMPLETE
   (2026-11-21/22)** (the user's directive: several INDEPENDENT
   scripts, one per CAS, each readable top-to-bottom, PySCF-direct;

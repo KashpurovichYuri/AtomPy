@@ -37,7 +37,7 @@ reads a definite L on a rotation-closed window (the closure meters
 ~1e-13); the frozen total sits near the reference (dE << +1065 mEh,
 the as-built's frozen dE).  Then the free CASSCF / free SA (the
 campaign budgets: max_cycle_macro 200 -- the optimizer-budget
-directive) with PT2 -> the ``...|(6,13)@r1+MOs`` table rows.  The
+directive) with PT2 -> the ``...|(6,13)@r1`` table rows.  The
 manifold physics to expect: the (6,13) quasi-degenerate block (the
 certified lane record: the declared 5L is not the block ground --
 16 x ~90 + one x ~72); the frozen ground's class and pair
@@ -244,7 +244,7 @@ def main(argv=None) -> int:
     print(f"  [casci] e_tot {cas_f.e_tot:.8f}, <L2> {l_f:.6f}, "
           f"occ(7s) {occ_s:.4f}, dE {de_meh:+.1f} mEh "
           f"({time.time() - t0:.1f} s)", flush=True)
-    v.check("the @r1+MOs window is rotation-closed (the definite-L "
+    v.check("the @r1 window is rotation-closed (the definite-L "
             "certificate)",
             cl["lz"] <= 1e-10 and cl["lperp"] <= 1e-10,
             f"||[P,Lz]|| {cl['lz']:.2e}, ||[P,Lperp]|| "
@@ -267,7 +267,7 @@ def main(argv=None) -> int:
     v.note("free CASCI (the frozen input window)",
            f"E(2) {r_f['e2'] * 1e3:+.4f} mEh, <S2> "
            f"{r_f['s2']:.4f}")
-    drop_row(std_row("casci", "free", "(6,13)@r1+MOs",
+    drop_row(std_row("casci", "free", "(6,13)@r1",
                      float(cas_f.e_tot),
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
@@ -287,7 +287,7 @@ def main(argv=None) -> int:
     v.note("free CASSCF (the single-root draw class)",
            f"<L2> {r_c['l2']:.6f}, occ(7s) {occ_c:.4f}, E(2) "
            f"{r_c['e2'] * 1e3:+.4f} mEh")
-    drop_row(std_row("casscf", "free", "(6,13)@r1+MOs",
+    drop_row(std_row("casscf", "free", "(6,13)@r1",
                      float(mc_c.e_tot),
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
@@ -336,7 +336,7 @@ def main(argv=None) -> int:
             f"<S2> {rows[k12]['s2']:.8f} -> S = {s_at:.6f}")
     print(f"  [sa] ensemble {mc_sa.e_tot:.8f}, converged "
           f"{mc_sa.converged} ({time.time() - t0:.1f} s)", flush=True)
-    drop_row(std_row("sa-casscf", "free", "(6,13)@r1+MOs",
+    drop_row(std_row("sa-casscf", "free", "(6,13)@r1",
                      float(e_cas[0] + core_e), r0["e2"] * 1e3,
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range(l2s_sa),

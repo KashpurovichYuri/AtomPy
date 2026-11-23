@@ -7,35 +7,35 @@
   mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
   [closure] assembled window: ||[P,Lz]|| 2.01e-13, ||[P,Lperp]|| 3.35e-13 (rotation closure -- the frozen ground's definite-L certificate)
   [diagnostic] the assembled window block [4:17] matches act's columns from index 0 onward (the placement the production assembly chose)
-  [casci] e_tot -49.31677250, <L2> 12.000000 (40.4 s)
-  [note] free CASCI (the frozen input window): <L2> 12.000000 -- closest L(L+1) within 6.34e-09 (the window is rotation-closed, so the ground has a definite L; WHICH L is the disclosure), E(2) -1081.0323 mEh
-  [casscf] e_tot -50.44956209, converged False, <L2> 71.319358 (152.9 s)
-  [note] free CASSCF (the single-root draw class): <L2> 71.319358, E(2) -307.1157 mEh
-  root 0: e_ref -50.45285618, E(2) -282.0713 mEh, <L2> 89.998805, <S2> 12.000000
-  root 1: e_ref -50.45285425, E(2) -282.0657 mEh, <L2> 89.998837, <S2> 12.000000
-  root 2: e_ref -50.45283912, E(2) -282.0867 mEh, <L2> 89.998720, <S2> 12.000000
-  root 3: e_ref -50.45282662, E(2) -282.1060 mEh, <L2> 89.998834, <S2> 12.000000
-  root 4: e_ref -50.45282478, E(2) -282.1003 mEh, <L2> 89.998783, <S2> 12.000000
-  root 5: e_ref -50.45279881, E(2) -282.1330 mEh, <L2> 89.998951, <S2> 12.000000
-  root 6: e_ref -50.45279868, E(2) -282.1333 mEh, <L2> 89.998950, <S2> 12.000000
-  root 7: e_ref -50.45276649, E(2) -282.1677 mEh, <L2> 89.999137, <S2> 12.000000
-  root 8: e_ref -50.45276626, E(2) -282.1677 mEh, <L2> 89.999138, <S2> 12.000000
-  root 9: e_ref -50.45273234, E(2) -282.2108 mEh, <L2> 89.999329, <S2> 12.000000
-  root 10: e_ref -50.45273193, E(2) -282.2102 mEh, <L2> 89.999331, <S2> 12.000000
-  root 11: e_ref -50.45269593, E(2) -282.2457 mEh, <L2> 89.999489, <S2> 12.000000
-  root 12: e_ref -50.45269465, E(2) -282.2461 mEh, <L2> 89.999492, <S2> 12.000000
-  root 13: e_ref -50.45264541, E(2) -282.2939 mEh, <L2> 89.999657, <S2> 12.000000
-  root 14: e_ref -50.45264497, E(2) -282.2943 mEh, <L2> 89.999658, <S2> 12.000000
-  root 15: e_ref -50.45256449, E(2) -282.3477 mEh, <L2> 89.999850, <S2> 12.000000
-  root 16: e_ref -50.45256446, E(2) -282.3476 mEh, <L2> 89.999850, <S2> 12.000000
-  [note] free SA (the draw-dependent meters): <L2> in [89.9987, 89.9999], <S2> up to 12.0000 -- the free-SA roots partition this flat near-degenerate manifold draw-dependently (this draw: the L=9 class (90), S=3); E(2) root 0 -282.0713 mEh, total -50.7349 (the prior committed run's rows read -50.732 -- git history)
-  [sa] ensemble -50.45274149, converged True (326.4 s)
-  [PASS] the free-SA <S2>=12 root is S = 3 by PySCF's own spin_square (the two independent spin constructions agree): root 3: spin_square (S^2, 2S+1) = (12.00000000, 7.0000) -> S = 3.000000; atomterm's meters read <S2> 12.00000000 -> S = 3.000000 -- the all-parallel d5+f1 septet class, the electron count RIGHT
+  [casci] e_tot -49.31677250, <L2> 12.000000 (41.9 s)
+  [note] free CASCI (the frozen input window): <L2> 12.000000 -- closest L(L+1) within 6.34e-09 (the window is rotation-closed, so the ground has a definite L; WHICH L is the disclosure), E(2) -1081.0320 mEh
+  [casscf] e_tot -50.45485682, converged True, <L2> 71.664477 (624.5 s)
+  [note] free CASSCF (the single-root draw class): <L2> 71.664477, E(2) -305.7784 mEh
+  root 0: e_ref -50.45285585, E(2) -282.0756 mEh, <L2> 89.998712, <S2> 12.000000
+  root 1: e_ref -50.45285196, E(2) -282.0679 mEh, <L2> 89.998754, <S2> 12.000000
+  root 2: e_ref -50.45284474, E(2) -282.0776 mEh, <L2> 89.998691, <S2> 12.000000
+  root 3: e_ref -50.45282882, E(2) -282.1018 mEh, <L2> 89.998789, <S2> 12.000000
+  root 4: e_ref -50.45282791, E(2) -282.1007 mEh, <L2> 89.998774, <S2> 12.000000
+  root 5: e_ref -50.45280014, E(2) -282.1313 mEh, <L2> 89.998921, <S2> 12.000000
+  root 6: e_ref -50.45280006, E(2) -282.1312 mEh, <L2> 89.998919, <S2> 12.000000
+  root 7: e_ref -50.45276685, E(2) -282.1655 mEh, <L2> 89.999106, <S2> 12.000000
+  root 8: e_ref -50.45276661, E(2) -282.1656 mEh, <L2> 89.999107, <S2> 12.000000
+  root 9: e_ref -50.45273223, E(2) -282.2099 mEh, <L2> 89.999300, <S2> 12.000000
+  root 10: e_ref -50.45273220, E(2) -282.2099 mEh, <L2> 89.999300, <S2> 12.000000
+  root 11: e_ref -50.45269551, E(2) -282.2450 mEh, <L2> 89.999467, <S2> 12.000000
+  root 12: e_ref -50.45269547, E(2) -282.2448 mEh, <L2> 89.999467, <S2> 12.000000
+  root 13: e_ref -50.45264610, E(2) -282.2935 mEh, <L2> 89.999641, <S2> 12.000000
+  root 14: e_ref -50.45264597, E(2) -282.2935 mEh, <L2> 89.999639, <S2> 12.000000
+  root 15: e_ref -50.45256260, E(2) -282.3510 mEh, <L2> 89.999856, <S2> 12.000000
+  root 16: e_ref -50.45256260, E(2) -282.3508 mEh, <L2> 89.999856, <S2> 12.000000
+  [note] free SA (the draw-dependent meters): <L2> in [89.9987, 89.9999], <S2> up to 12.0000 -- the free-SA roots partition this flat near-degenerate manifold draw-dependently (this draw: the L=9 class (90), S=3); E(2) root 0 -282.0756 mEh, total -50.7349 (the prior committed run's rows read -50.732 -- git history)
+  [sa] ensemble -50.45274209, converged True (365.2 s)
+  [PASS] the free-SA <S2>=12 root is S = 3 by PySCF's own spin_square (the two independent spin constructions agree): root 15: spin_square (S^2, 2S+1) = (12.00000000, 7.0000) -> S = 3.000000; atomterm's meters read <S2> 12.00000000 -> S = 3.000000 -- the all-parallel d5+f1 septet class, the electron count RIGHT
   plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
   [window] distilled 5f: k=1 of 3 bands, capture 0.9328-0.9420; 6d: k=1 of 3 bands, capture 0.9828-0.9828; 7s: k=1 of 3 bands, capture 0.2713-0.7097
-  [pinned casci] term e_var -48.78636895, <L2> [72.000000, 90.000000] (272.5 s)
-  [note] pinned casci: <L2> in [72.0000, 90.0000], <S2> max 12.0000; E(2) mean -1823.7784 mEh
-  [pinned sa] ensemble -50.45150713, <L2> [71.998654, 89.998940] (540.9 s)
+  [pinned casci] term e_var -48.78636895, <L2> [72.000000, 90.000000] (270.4 s)
+  [note] pinned casci: <L2> in [72.0000, 90.0000], <S2> max 12.0000; E(2) mean -1823.7788 mEh
+  [pinned sa] ensemble -50.45150714, <L2> [71.998676, 89.998627] (503.9 s)
   [PASS] the pinned (6,13) components read the certified L=9 block ground (16 at ~90 + one at ~72): 17 components: 16 in 90 +- 0.01, 1 in 72 +- 0.01 (the declared 5L is not this block's ground -- the route-wave record's classification, re-derived)
   [note] the pinned block ground's spin class (PySCF spin_square): max-<S2> component: (S^2, 2S+1) = (12.00000000, 7.0000) vs atomterm's meters 12.00000000
 

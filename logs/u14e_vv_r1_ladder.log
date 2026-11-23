@@ -1,0 +1,45 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+===== (4,12)@r1 =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+  [window] 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420
+  [window] 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_r1_ladder.py:74: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, ncore), act,
+  [closure] ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.30e-13
+  [PASS] (4,12)@r1: the window is rotation-closed (the definite-L certificate): ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.30e-13
+  [casci] e_tot -50.23250753, <L2> 71.999967, dE +149.3 mEh (8.9 s)
+  [PASS] (4,12)@r1: the frozen ground reads a definite L: <L2> 71.999967 -- closest L(L+1) within 3.25e-05 (WHICH L is the disclosure)
+  [note] (4,12)@r1 casci: dE +149.3 mEh, E(2) -445.0011 mEh, <S2> 6.0000
+  [casscf] e_tot -50.43068563, converged True, <L2> 71.934245 (282.1 s)
+  [note] (4,12)@r1 casscf: <L2> 71.934245, E(2) -312.8311 mEh
+  [sa] ensemble -50.42381003, converged True, <L2> [71.999997, 72.000000] (158.0 s)
+  [note] (4,12)@r1 sa: <L2> max dev from 72 2.85e-06; E(2) root 0 -341.6698 mEh, total -50.7655
+===== (4,15)@r1 =====
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112
+  [window] 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420
+  [window] 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+  [window] 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112
+  [closure] ||[P,Lz]|| 2.91e-13, ||[P,Lperp]|| 4.81e-13
+  [PASS] (4,15)@r1: the window is rotation-closed (the definite-L certificate): ||[P,Lz]|| 2.91e-13, ||[P,Lperp]|| 4.81e-13
+  [casci] e_tot -50.23250753, <L2> 71.999966, dE +149.3 mEh (31.0 s)
+  [PASS] (4,15)@r1: the frozen ground reads a definite L: <L2> 71.999966 -- closest L(L+1) within 3.38e-05 (WHICH L is the disclosure)
+  [note] (4,15)@r1 casci: dE +149.3 mEh, E(2) -445.1709 mEh, <S2> 6.0000
+  [casscf] e_tot -50.43445384, converged True, <L2> 71.729059 (434.2 s)
+  [note] (4,15)@r1 casscf: <L2> 71.729059, E(2) -310.7611 mEh
+  [sa] ensemble -50.42530742, converged True, <L2> [71.784689, 71.965415] (600.6 s)
+  [note] (4,15)@r1 sa: <L2> max dev from 72 2.15e-01; E(2) root 0 -336.0202 mEh, total -50.7624
+
+===== verdict =====
+  PASS  (4,12)@r1: the window is rotation-closed (the definite-L certificate)
+  PASS  (4,12)@r1: the frozen ground reads a definite L
+  REPORT  (4,12)@r1 casci
+  REPORT  (4,12)@r1 casscf
+  REPORT  (4,12)@r1 sa
+  PASS  (4,15)@r1: the window is rotation-closed (the definite-L certificate)
+  PASS  (4,15)@r1: the frozen ground reads a definite L
+  REPORT  (4,15)@r1 casci
+  REPORT  (4,15)@r1 casscf
+  REPORT  (4,15)@r1 sa
+4/4 assertions hold

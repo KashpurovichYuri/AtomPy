@@ -29,7 +29,7 @@ THE LADDER (the approved plan):
       rows.  New information: the class disclosure is the point.
   C3  pin-on-pur (6,13): the class re-derivation on the as-built
       distilled window (the lane's certified class: 16 x ~90 +
-      one x ~72) and on step B's @r1+MOs window (disclosed).
+      one x ~72) and on step B's @r1 window (disclosed).
   C4  the pinned SA on the LEAN LANE window at (4,15) (the approved
       cheap first pinned-(4,15) SA; the lane construction has no
       purify_window refusal -- the vanish class was the PUR route's
@@ -297,7 +297,7 @@ def main(argv=None) -> int:
         ADDR_613, mol_c1, mf_c1, spec, mf_d2h)
     pinned_section(v, "(6,13)", mol_d2h, mf_d2h, mo613, nf613,
                    ncas613, c_pur613, (5, 1), c3_roots, sa=False)
-    print("  [C3] pin-on-pur (6,13): the @r1+MOs window (step B's)",
+    print("  [C3] pin-on-pur (6,13): the @r1 window (step B's)",
           flush=True)
     act_s, ncas_s, purity_loss = act_s_mo_of(mol_c1, mf_c1, mol_d2h,
                                              spec)
@@ -305,7 +305,7 @@ def main(argv=None) -> int:
           f"block weight loss {purity_loss:.2e}", flush=True)
     mo_s = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nf613),
                          act_s, c_core=c_pur613)
-    pinned_section(v, "(6,13)@r1+MOs", mol_d2h, mf_d2h, mo_s, nf613,
+    pinned_section(v, "(6,13)@r1", mol_d2h, mf_d2h, mo_s, nf613,
                    ncas_s, c_pur613, (5, 1), c3_roots, sa=False)
 
     # ---- C4: the pinned SA on the lean lane window (4,15) --------------

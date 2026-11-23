@@ -14,13 +14,17 @@ wiring; its green record: logs/u14e_vv.log at 6e2ab39..30808bd,
     u14e_vv_6_13.py   the CAS(6,13) disclosure leg, five routes +
                       the PySCF spin_square cross-check
     u14e_vv_6_13_r1.py the CAS(6,13) @r1 leg (the prior-axis 7s fix:
-                      the density-block window, the acceptance
-                      controls, free routes + PT2)
+                      the density-block window + the pair-MO s
+                      channel, the acceptance controls, free routes
+                      + PT2)
+    u14e_vv_r1_ladder.py the @r1 CAS-ladder leg ((4,12)/(4,15) at the
+                      matched prior-axis source, free routes + PT2)
+    u14e_vv_unification.py the pin-on-pur unification ladder (C0-C4)
     u14e_vv_uhf.py    the reference comparison + the two table
                       reference rows
 
 Run from the repo root:
-    OMP_NUM_THREADS=16 python scripts/u14e/u14e_vv_orchestration.py \
+    OMP_NUM_THREADS=64 python scripts/u14e/u14e_vv_orchestration.py \
         [--ground-only]  |  tee logs/u14e_vv_family.log
 """
 
@@ -34,6 +38,8 @@ import u14e_vv_4_12   # noqa: E402
 import u14e_vv_4_15   # noqa: E402
 import u14e_vv_6_13   # noqa: E402
 import u14e_vv_6_13_r1  # noqa: E402
+import u14e_vv_r1_ladder  # noqa: E402
+import u14e_vv_unification  # noqa: E402
 import u14e_vv_uhf    # noqa: E402
 
 
@@ -45,6 +51,8 @@ def main(argv=None) -> int:
     extra = ["--ground-only"] if "--ground-only" in argv else []
     legs = [("4_12", u14e_vv_4_12), ("4_15", u14e_vv_4_15),
             ("6_13", u14e_vv_6_13), ("6_13_r1", u14e_vv_6_13_r1),
+            ("r1_ladder", u14e_vv_r1_ladder),
+            ("unification", u14e_vv_unification),
             ("uhf", u14e_vv_uhf)]
     bad_rc = []
     for name, leg in legs:
