@@ -193,13 +193,13 @@ def main(argv=None) -> int:
               f"<S2> {r['s2']:.6f}", flush=True)
     r0 = rows[0]
     l2s_sa = [r["l2"] for r in rows]
-    at90 = max(abs(x - 90.0) for x in l2s_sa) <= BAND_CLASS
-    klass = ("the L=9 class (90), S=3" if at90 else "mixed classes")
+    at_l9 = max(abs(x - 90.0) for x in l2s_sa) <= BAND_CLASS
+    l9_class = "the L=9 class (90), S=3" if at_l9 else "mixed classes"
     v.note("free SA (the draw-dependent meters)",
            f"<L2> in [{min(l2s_sa):.4f}, {max(l2s_sa):.4f}], <S2> up "
            f"to {max(r['s2'] for r in rows):.4f} -- the free-SA roots "
            f"partition this flat near-degenerate manifold "
-           f"draw-dependently (this draw: {klass}); E(2) root 0 "
+           f"draw-dependently (this draw: {l9_class}); E(2) root 0 "
            f"{r0['e2'] * 1e3:+.4f} mEh, total "
            f"{r0['e_ref'] + r0['e2']:.4f} (the prior committed "
            f"run's rows read -50.732 -- git history)")
@@ -210,7 +210,7 @@ def main(argv=None) -> int:
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range(l2s_sa),
                      f"{max(r['s2'] for r in rows):.4f}",
-                     klass,
+                     l9_class,
                      conv=conv_of(mc_sa.final_de, mc_sa.n_macro,
                                   bool(mc_sa.converged))))
 
