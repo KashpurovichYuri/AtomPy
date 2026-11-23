@@ -13,14 +13,26 @@ is core-lean), and where the assembled window actually landed.
 
 THE FIVE ROUTES: free CASCI / free CASSCF / free SA on the production
 window; pinned CI / pinned SA on the lane window (the lane
-construction).  THE CERTIFIED-CLASS CHECK: the pinned components read
-the L=9 block ground (16 at ~90 + one at ~72) -- the declared 5L is
-not this block's ground; the free-SA meters are draw-dependent on
-this flat near-degenerate manifold and are printed, not asserted.
-THE SPIN CROSS-CHECK: the <S2> = 12 roots are verified as S = 3 by
-PySCF's own spin_square -- an independent spin construction agreeing
-with atomterm's meters (the 7s pair broken in the active space; the
-electron count is right).
+construction).  THE WINDOW IS HEALTHY (the 2026-11-22 correction, two
+sources): the assembled span IS the projected distilled span exactly
+(principal cosines all 1 against (I-P)act), the closure meters read
+~1e-13 (the campaign cell's win_lz/win_lperp agree) -- the earlier
+"L-mixed 18.0085" was an ARTIFACT of this leg's shifted meter slice
+(NCORE=5 vs the key's ncore=4; the kernels themselves always ran the
+true window: PySCF derives ncore=4 from the sector).  THE REAL
+DISCLOSURE: the frozen ground is the 7F (L=3, S=3 definite -- the
+d5 high-spin class + one f, the 7s column UNOCCUPIED at 3e-03): the
+as-built window's variational ground abandons the intended
+configuration -- the weak distillation captures (10f 0.82, 7s
+0.27-0.71) drive it.  THE CERTIFIED-CLASS CHECK: the pinned
+components read the L=9 block ground (16 at ~90 + one at ~72) -- the
+declared 5L is not this block's ground; the free-SA meters are
+draw-dependent on this flat near-degenerate manifold and are printed,
+not asserted.  THE SPIN CROSS-CHECK: the <S2> = 12 roots are verified
+as S = 3 by PySCF's own spin_square -- an independent spin
+construction agreeing with atomterm's meters (the electron count is
+right; the septet is the all-parallel d5+f1 class, not a 7s-broken
+pair).
 
 Run from the repo root:
     OMP_NUM_THREADS=16 python scripts/u14e/u14e_vv_6_13.py \
@@ -34,7 +46,7 @@ import numpy as np
 from pyscf import mcscf
 from pyscf.mcscf import addons as _mcaddons
 
-from _vv_common import (BAND_CLASS, L_L2, Verdict, core_part_of,
+from _vv_common import (BAND_CLASS, L_L2, Verdict, conv_of, core_part_of,
                         drop_row, fmt_range, free_kernel, load_reference,
                         make_blocks, meters, meters_all, nevpt_rows,
                         pinned_ci_run, pinned_sa_run, price, std_row)
@@ -42,21 +54,33 @@ from _vv_common import (BAND_CLASS, L_L2, Verdict, core_part_of,
 KEY_613 = "u14e_10f13d7s_5-1_sa-casscf_ao_-_pur_avg"
 KEY_613_LANE = "u14e_5f6d7s@6s6p_5-1_sa-casscf_ao_-_pur_avg"
 SECTOR = (5, 1)
-NCORE = 5
+# the core PAIR count of this key: 14 electrons - (5+1) active = 8 in
+# 4 pairs.  MUST equal key_core's ncore (asserted in production_window)
+# -- the 2026-11-22 incident: hardcoded 5 here shifted every leg meter
+# slice by one (the kernels were unaffected; PySCF derives ncore=4
+# itself), and the shifted-slice <L2> read the artifact 18.0085.
+NCORE = 4
 L, PARITY = 8, "u"
 ROOTS = 17
 
 
 def production_window(mol, mf, spec):
     """The production recipe, written out (``run_cell``'s exact three
-    calls) + the leg's diagnostic: each distilled column's S-norm
-    after removing the pur core span, and where the assembled window
-    actually landed."""
+    calls) + the leg's preamble: the key's core-pair identity (the
+    assert that guards the slice incident), each distilled column's
+    S-norm after removing the pur core span, the assembled window's
+    placement against act, and the CLOSURE METERS of the assembled
+    window (rotation closure is the frozen ground's definite-L
+    certificate -- measured every run)."""
     from atomterm.cells import CellKey, key_core, window_columns
     from atomterm.windows import build_full_mo, occupied_core_idx
+    from atomterm.operators import window_closure
 
     key = CellKey.from_address(KEY_613)
     nc, c_core, c_pur = key_core(key, mol, mf, spec.shell_bands)
+    assert nc == NCORE, (f"the key's core pairs {nc} != the leg's "
+                         f"NCORE {NCORE} -- the meter slices would "
+                         f"shift (the 2026-11-22 incident)")
     act, ncas, _rep = window_columns(key, mol, mf, spec.shell_bands,
                                      spec.shell_radials, ncol=nc)
     S = mf.get_ovlp()
@@ -72,21 +96,21 @@ def production_window(mol, mf, spec):
     mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
                             c_core=c_pur)
     mo_win = mo_prod[:, NCORE:NCORE + ncas]
-    O = np.abs(mo_win.T @ S @ np.linalg.cholesky(
-        np.linalg.cholesky(act.T @ S @ act).T)) if False else \
-        np.abs(mo_win.T @ S @ act)
+    cl = window_closure(mol, mo_win)
+    print(f"  [closure] assembled window: ||[P,Lz]|| "
+          f"{cl['lz']:.2e}, ||[P,Lperp]|| {cl['lperp']:.2e} "
+          f"(rotation closure -- the frozen ground's definite-L "
+          f"certificate)", flush=True)
+    O = np.abs(mo_win.T @ S @ act)
     place = int(np.argmax(O.max(axis=0) > 0.95)) if \
         (O.max(axis=0) > 0.95).any() else -1
-    print(f"  [diagnostic] the assembled window block [5:{5 + ncas}] "
-          f"matches act's columns from index {place} onward "
-          f"(the placement the production assembly chose)",
-          flush=True)
+    print(f"  [diagnostic] the assembled window block "
+          f"[{NCORE}:{NCORE + ncas}] matches act's columns from "
+          f"index {place} onward (the placement the production "
+          f"assembly chose)", flush=True)
     if norms.min() < 1e-1:
         print(f"  [diagnostic] FINDING: a distilled direction is "
-              f"core-lean (min norm {norms.min():.4f}) -- the "
-              f"(6,13) window's 7s direction is compromised on the "
-              f"pur substrate, the class behind the stored (6,13) "
-              f"SA refusals", flush=True)
+              f"core-lean (min norm {norms.min():.4f})", flush=True)
     return mo_prod, ncas
 
 
@@ -107,9 +131,7 @@ def main(argv=None) -> int:
     v = Verdict()
     mol, mf = load_reference()
     from atomterm.cases import campaign_spec
-    from atomterm.core import purified_core_orbitals
     spec = campaign_spec("U14e")
-    c_core = purified_core_orbitals(mol, mf, NCORE)[0]
     mo_full, ncas = production_window(mol, mf, spec)
     weights = [1.0 / 17] * 17
     expect_in = meters(mol, mo_full[:, NCORE:NCORE + ncas], *SECTOR)
@@ -133,11 +155,13 @@ def main(argv=None) -> int:
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
                      f"{l_f:.4f}", f"{r_f['s2']:.4f}",
-                     "L-mixed (assembly disclosure)"))
+                     "definite-L: the 7F, S=3 (the d5 high-spin "
+                     "ground; the 7s column unoccupied)",
+                     conv=conv_of(cas_f.fcisolver.conv_tol, None)))
 
     # ---- free CASSCF (single root; no assertion) ----------------------
     t0 = time.time()
-    mc_c, cas_c = free_kernel(mf, ncas, SECTOR, mo_full)
+    mc_c, cas_c = free_kernel(mf, ncas, SECTOR, mo_full, track_iters=True)
     r_c = price(cas_c, expect_in, roots=[0])[0]
     print(f"  [casscf] e_tot {mc_c.e_tot:.8f}, converged "
           f"{mc_c.converged}, <L2> {r_c['l2']:.6f} "
@@ -148,12 +172,15 @@ def main(argv=None) -> int:
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
                      f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
-                     "escape draw"))
+                     "escape draw",
+                     conv=conv_of(mc_c.final_de, mc_c.n_macro,
+                                  bool(mc_c.converged))))
 
     # ---- free SA (the draw-dependent meters, printed) -----------------
     t0 = time.time()
     mc_sa, cas_sa = free_kernel(mf, ncas, SECTOR, mo_full,
-                                weights=weights, nroots=ROOTS)
+                                weights=weights, nroots=ROOTS,
+                                track_iters=True)
     core_e, e_cas = core_part_of(cas_sa)
     expect_sa = meters(mol, cas_sa.mo_coeff[:, NCORE:NCORE + ncas],
                        *SECTOR)
@@ -165,30 +192,38 @@ def main(argv=None) -> int:
               f"{r['e2'] * 1e3:+.4f} mEh, <L2> {r['l2']:.6f}, "
               f"<S2> {r['s2']:.6f}", flush=True)
     r0 = rows[0]
+    l2s_sa = [r["l2"] for r in rows]
+    at90 = max(abs(x - 90.0) for x in l2s_sa) <= BAND_CLASS
+    klass = ("the L=9 class (90), S=3" if at90 else "mixed classes")
     v.note("free SA (the draw-dependent meters)",
-           f"<L2> in [{min(r['l2'] for r in rows):.4f}, "
-           f"{max(r['l2'] for r in rows):.4f}], <S2> up to "
-           f"{max(r['s2'] for r in rows):.4f} -- the free-SA roots "
+           f"<L2> in [{min(l2s_sa):.4f}, {max(l2s_sa):.4f}], <S2> up "
+           f"to {max(r['s2'] for r in rows):.4f} -- the free-SA roots "
            f"partition this flat near-degenerate manifold "
-           f"draw-dependently (mixed classes read); E(2) root 0 "
+           f"draw-dependently (this draw: {klass}); E(2) root 0 "
            f"{r0['e2'] * 1e3:+.4f} mEh, total "
-           f"{r0['e_ref'] + r0['e2']:.4f} (the stored (6,13) "
-           f"CASSCF rows read -50.732)")
+           f"{r0['e_ref'] + r0['e2']:.4f} (the prior committed "
+           f"run's rows read -50.732 -- git history)")
     print(f"  [sa] ensemble {mc_sa.e_tot:.8f}, converged "
           f"{mc_sa.converged} ({time.time() - t0:.1f} s)", flush=True)
     drop_row(std_row("sa-casscf", "free", "(6,13)",
                      float(e_cas[0] + core_e), r0["e2"] * 1e3,
                      float(r0["e_ref"] + r0["e2"]),
-                     fmt_range([r['l2'] for r in rows]),
+                     fmt_range(l2s_sa),
                      f"{max(r['s2'] for r in rows):.4f}",
-                     "mixed classes"))
+                     klass,
+                     conv=conv_of(mc_sa.final_de, mc_sa.n_macro,
+                                  bool(mc_sa.converged))))
 
     # ---- the <S2> = 12 class: PySCF's OWN spin meter ------------------
-    # the (5,1) sector hosts S = 3 (6 electrons all parallel: the 7s
-    # pair broken in the active space; 6 = 5f3(3) + 6d1(1) + 7s2(2) --
-    # the count is RIGHT).  spin_square is an independent construction
-    # of S^2 (fci.spin_op algebra vs atomterm's operator application);
-    # its second return is 2S+1, so S = 3 reads (12, 7)
+    # the (5,1) sector hosts S = 3 (6 electrons all parallel).  The
+    # frozen occupations MEASURED (2026-11-22): the d5 high-spin class
+    # (five d columns at ~0.99) + one f (10f+0 at 0.998) -- the 7s
+    # column UNOCCUPIED (3e-03): the window's variational ground
+    # abandons the intended 5f3 6d1 7s2 configuration, the weak
+    # distillation captures (7s 0.27-0.71) driving it.  spin_square is
+    # an independent construction of S^2 (fci.spin_op algebra vs
+    # atomterm's operator application); its second return is 2S+1, so
+    # S = 3 reads (12, 7)
     k12 = max(range(len(rows)), key=lambda k: rows[k]["s2"])
     ss, mult = _mcaddons.spin_square(cas_sa, ci=cas_sa.ci[k12])
     s_of = (np.sqrt(4.0 * ss + 1.0) - 1.0) / 2.0
@@ -200,7 +235,8 @@ def main(argv=None) -> int:
             f"root {k12}: spin_square (S^2, 2S+1) = ({ss:.8f}, "
             f"{mult:.4f}) -> S = {s_of:.6f}; atomterm's meters read "
             f"<S2> {rows[k12]['s2']:.8f} -> S = {s_at:.6f} -- the "
-            f"7s-broken septet class, the electron count RIGHT")
+            f"all-parallel d5+f1 septet class, the electron count "
+            f"RIGHT")
 
     # ---- the pinned route (re-derives the certified class) ------------
     from _vv_common import lane_route
@@ -233,7 +269,8 @@ def main(argv=None) -> int:
                      float(np.mean(e2s) * 1e3),
                      float(e_var_ci + np.mean(e2s)),
                      fmt_range(l2s),
-                     f"{max(s2s):.4f}", "L=9 ground + the 5L present"))
+                     f"{max(s2s):.4f}", "L=9 ground + the 5L present",
+                     conv=conv_of(1e-12, None)))
 
     # pinned SA + THE CERTIFIED-CLASS CHECK
     t0 = time.time()
@@ -278,7 +315,9 @@ def main(argv=None) -> int:
                      float(np.mean(e2s_s) * 1e3),
                      float(out_sa["e_tot"] + np.mean(e2s_s)),
                      fmt_range(l2s_s),
-                     f"{max(s2s_s):.4f}", "the 72-component ok"))
+                     f"{max(s2s_s):.4f}", "the 72-component ok",
+                     conv=conv_of(out_sa["conv_dE"], out_sa["cycles"],
+                                  bool(out_sa["converged"]))))
 
     ok = v.report()
     return 0 if ok else 1

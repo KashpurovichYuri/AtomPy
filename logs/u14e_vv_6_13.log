@@ -1,42 +1,41 @@
   ROHF (trusted rung, loaded): E = -50.38185233, nao 177
-/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
-  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
 /home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
   mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
   [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
   [diagnostic] distilled columns' S-norm after removing the pur core span: 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 0.8536
-/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13.py:72: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13.py:96: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
   mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
-  [diagnostic] the assembled window block [5:18] matches act's columns from index 1 onward (the placement the production assembly chose)
-  [casci] e_tot -49.31677250, <L2> 18.008492 (41.2 s)
-  [note] free CASCI (the frozen input window): <L2> 18.008492 -- closest L(L+1) within 1.99e+00 (the window is rotation-closed, so the ground has a definite L; WHICH L is the disclosure), E(2) -1081.0321 mEh
-  [casscf] e_tot -50.44940969, converged False, <L2> 22.299395 (140.1 s)
-  [note] free CASSCF (the single-root draw class): <L2> 22.299395, E(2) -307.3006 mEh
-  root 0: e_ref -50.45281849, E(2) -282.0857 mEh, <L2> 28.310874, <S2> 12.000000
-  root 1: e_ref -50.45281835, E(2) -282.0858 mEh, <L2> 28.472122, <S2> 12.000000
-  root 2: e_ref -50.45278284, E(2) -282.1368 mEh, <L2> 30.544413, <S2> 12.000000
-  root 3: e_ref -50.45278259, E(2) -282.1372 mEh, <L2> 30.484844, <S2> 12.000000
-  root 4: e_ref -50.45276163, E(2) -282.1734 mEh, <L2> 32.623469, <S2> 12.000000
-  root 5: e_ref -50.45276072, E(2) -282.1732 mEh, <L2> 31.912059, <S2> 12.000000
-  root 6: e_ref -50.45274253, E(2) -282.1962 mEh, <L2> 32.969157, <S2> 12.000000
-  root 7: e_ref -50.45273548, E(2) -282.1970 mEh, <L2> 33.806978, <S2> 12.000000
-  root 8: e_ref -50.45272260, E(2) -282.2047 mEh, <L2> 37.880482, <S2> 12.000000
-  root 9: e_ref -50.45271577, E(2) -282.2110 mEh, <L2> 36.858657, <S2> 12.000000
-  root 10: e_ref -50.45271118, E(2) -282.2136 mEh, <L2> 39.524697, <S2> 12.000000
-  root 11: e_ref -50.45270404, E(2) -282.2205 mEh, <L2> 40.906980, <S2> 12.000000
-  root 12: e_ref -50.45269783, E(2) -282.2325 mEh, <L2> 39.186130, <S2> 12.000000
-  root 13: e_ref -50.45267812, E(2) -282.2423 mEh, <L2> 42.266719, <S2> 12.000000
-  root 14: e_ref -50.45266928, E(2) -282.2398 mEh, <L2> 40.243062, <S2> 12.000000
-  root 15: e_ref -50.45265455, E(2) -282.2362 mEh, <L2> 30.972775, <S2> 12.000000
-  root 16: e_ref -50.45262932, E(2) -282.2667 mEh, <L2> 44.146640, <S2> 12.000000
-  [note] free SA (the draw-dependent meters): <L2> in [28.3109, 44.1466], <S2> up to 12.0000 -- the free-SA roots partition this flat near-degenerate manifold draw-dependently (mixed classes read); E(2) root 0 -282.0857 mEh, total -50.7349 (the stored (6,13) CASSCF rows read -50.732)
-  [sa] ensemble -50.45272855, converged True (317.9 s)
-  [PASS] the free-SA <S2>=12 root is S = 3 by PySCF's own spin_square (the two independent spin constructions agree): root 0: spin_square (S^2, 2S+1) = (12.00000000, 7.0000) -> S = 3.000000; atomterm's meters read <S2> 12.00000000 -> S = 3.000000 -- the 7s-broken septet class, the electron count RIGHT
+  [closure] assembled window: ||[P,Lz]|| 2.01e-13, ||[P,Lperp]|| 3.35e-13 (rotation closure -- the frozen ground's definite-L certificate)
+  [diagnostic] the assembled window block [4:17] matches act's columns from index 0 onward (the placement the production assembly chose)
+  [casci] e_tot -49.31677250, <L2> 12.000000 (40.4 s)
+  [note] free CASCI (the frozen input window): <L2> 12.000000 -- closest L(L+1) within 6.34e-09 (the window is rotation-closed, so the ground has a definite L; WHICH L is the disclosure), E(2) -1081.0323 mEh
+  [casscf] e_tot -50.44956209, converged False, <L2> 71.319358 (152.9 s)
+  [note] free CASSCF (the single-root draw class): <L2> 71.319358, E(2) -307.1157 mEh
+  root 0: e_ref -50.45285618, E(2) -282.0713 mEh, <L2> 89.998805, <S2> 12.000000
+  root 1: e_ref -50.45285425, E(2) -282.0657 mEh, <L2> 89.998837, <S2> 12.000000
+  root 2: e_ref -50.45283912, E(2) -282.0867 mEh, <L2> 89.998720, <S2> 12.000000
+  root 3: e_ref -50.45282662, E(2) -282.1060 mEh, <L2> 89.998834, <S2> 12.000000
+  root 4: e_ref -50.45282478, E(2) -282.1003 mEh, <L2> 89.998783, <S2> 12.000000
+  root 5: e_ref -50.45279881, E(2) -282.1330 mEh, <L2> 89.998951, <S2> 12.000000
+  root 6: e_ref -50.45279868, E(2) -282.1333 mEh, <L2> 89.998950, <S2> 12.000000
+  root 7: e_ref -50.45276649, E(2) -282.1677 mEh, <L2> 89.999137, <S2> 12.000000
+  root 8: e_ref -50.45276626, E(2) -282.1677 mEh, <L2> 89.999138, <S2> 12.000000
+  root 9: e_ref -50.45273234, E(2) -282.2108 mEh, <L2> 89.999329, <S2> 12.000000
+  root 10: e_ref -50.45273193, E(2) -282.2102 mEh, <L2> 89.999331, <S2> 12.000000
+  root 11: e_ref -50.45269593, E(2) -282.2457 mEh, <L2> 89.999489, <S2> 12.000000
+  root 12: e_ref -50.45269465, E(2) -282.2461 mEh, <L2> 89.999492, <S2> 12.000000
+  root 13: e_ref -50.45264541, E(2) -282.2939 mEh, <L2> 89.999657, <S2> 12.000000
+  root 14: e_ref -50.45264497, E(2) -282.2943 mEh, <L2> 89.999658, <S2> 12.000000
+  root 15: e_ref -50.45256449, E(2) -282.3477 mEh, <L2> 89.999850, <S2> 12.000000
+  root 16: e_ref -50.45256446, E(2) -282.3476 mEh, <L2> 89.999850, <S2> 12.000000
+  [note] free SA (the draw-dependent meters): <L2> in [89.9987, 89.9999], <S2> up to 12.0000 -- the free-SA roots partition this flat near-degenerate manifold draw-dependently (this draw: the L=9 class (90), S=3); E(2) root 0 -282.0713 mEh, total -50.7349 (the prior committed run's rows read -50.732 -- git history)
+  [sa] ensemble -50.45274149, converged True (326.4 s)
+  [PASS] the free-SA <S2>=12 root is S = 3 by PySCF's own spin_square (the two independent spin constructions agree): root 3: spin_square (S^2, 2S+1) = (12.00000000, 7.0000) -> S = 3.000000; atomterm's meters read <S2> 12.00000000 -> S = 3.000000 -- the all-parallel d5+f1 septet class, the electron count RIGHT
   plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
   [window] distilled 5f: k=1 of 3 bands, capture 0.9328-0.9420; 6d: k=1 of 3 bands, capture 0.9828-0.9828; 7s: k=1 of 3 bands, capture 0.2713-0.7097
-  [pinned ci] term e_var -48.78636895, <L2> [72.000000, 90.000000] (270.4 s)
-  [note] pinned CI: <L2> in [72.0000, 90.0000], <S2> max 12.0000; E(2) mean -1823.7784 mEh
-  [pinned sa] ensemble -50.45150713, <L2> [71.998520, 89.998835] (484.6 s)
+  [pinned casci] term e_var -48.78636895, <L2> [72.000000, 90.000000] (272.5 s)
+  [note] pinned casci: <L2> in [72.0000, 90.0000], <S2> max 12.0000; E(2) mean -1823.7784 mEh
+  [pinned sa] ensemble -50.45150713, <L2> [71.998654, 89.998940] (540.9 s)
   [PASS] the pinned (6,13) components read the certified L=9 block ground (16 at ~90 + one at ~72): 17 components: 16 in 90 +- 0.01, 1 in 72 +- 0.01 (the declared 5L is not this block's ground -- the route-wave record's classification, re-derived)
   [note] the pinned block ground's spin class (PySCF spin_square): max-<S2> component: (S^2, 2S+1) = (12.00000000, 7.0000) vs atomterm's meters 12.00000000
 
@@ -45,7 +44,7 @@
   REPORT  free CASSCF (the single-root draw class)
   REPORT  free SA (the draw-dependent meters)
   PASS  the free-SA <S2>=12 root is S = 3 by PySCF's own spin_square (the two independent spin constructions agree)
-  REPORT  pinned CI
+  REPORT  pinned casci
   PASS  the pinned (6,13) components read the certified L=9 block ground (16 at ~90 + one at ~72)
   REPORT  the pinned block ground's spin class (PySCF spin_square)
 2/2 assertions hold

@@ -141,18 +141,33 @@ def meters(mol, c_act, na: int, nb: int):
 # the derivations' thin helpers (one home; the legs show the setup) ----
 
 def free_kernel(mf, ncas: int, sector, mo_full, weights=None,
-                nroots: int = 1):
+                nroots: int = 1, track_iters: bool = False):
     """The free route's two kernels, written once: CASSCF (plain
     single root, or ``state_average_`` over ``weights``), then the
     two-pass readout (CASCI, ``canonicalization = False`` -- the
     window exactly as converged), seeded from the SA kernel's own
     vectors (the faithful two-pass form; unseeded, the davidson tails
     mix a quasi-degenerate block at the 1e-5 level and the meters
-    carry it).  Returns (mc, cas)."""
+    carry it).  Returns (mc, cas).  ``track_iters`` rides the
+    optimizer's callback (its ``locals()`` carry ``imacro``/``de``/
+    ``conv``) and sets ``mc.n_macro``/``mc.final_de`` -- the conv
+    record; the default off leaves the historical path untouched."""
     mc = mcscf.CASSCF(mf, ncas, sector)
+    if track_iters:
+        _it = {"imacro": -1, "de": float("nan"), "conv": None}
+
+        def _cb(envs):
+            if envs.get("imacro", -1) > _it["imacro"]:
+                _it["imacro"] = envs["imacro"]
+                _it["de"] = abs(float(envs.get("de", float("nan"))))
+                _it["conv"] = envs.get("conv")
+        mc.callback = _cb
     if weights is not None and len(weights) > 1:
         mc.state_average_(list(weights))
     mc.kernel(mo_full)
+    if track_iters:
+        mc.n_macro = _it["imacro"] + 1
+        mc.final_de = _it["de"]
     cas = mcscf.CASCI(mf, ncas, sector)
     cas.mo_coeff = mc.mo_coeff
     cas.canonicalization = False
@@ -375,12 +390,11 @@ def purify_window(mol, S, c_core, c, tol: float = 1e-10):
     """Converge a window block to the INTERSECTION of the frozen-core
     S-orthogonalization and the dominant-irrep purity, in closed form.
 
-    The pair of projections does not commute to machine precision on
-    a core-lean column (measured at (4,15): a single pass leaves a
-    2.7e-07 tail after the assembly's internal re-projection -- past
-    pyscf's orb labeling), and the naive iterate converges only
-    geometrically (rate ~0.36 at 92% core-lean -- stalled at 5e-04
-    after 8 passes).  The closed form removes the core's content
+    The naive iterate (project core, project irrep, renormalize)
+    converges only geometrically on a core-lean column (measured at
+    (4,15): rate ~0.36 at 92% core-lean -- stalled at 5e-04 after 8
+    passes; a single pass leaves a 2.7e-07 tail past pyscf's orb
+    labeling).  The closed form removes the core's content
     within each dominant-irrep block exactly: the block subtracts
     ``B_k = P_k(c_core)`` -- ALL core columns projected into
     ``span(D_k)`` -- so no assignment of core columns to blocks is
@@ -390,7 +404,10 @@ def purify_window(mol, S, c_core, c, tol: float = 1e-10):
     Returns ``(c_fixed, report)`` with ``report = (passes,
     core_res, irrep_imp, ortho_dev)``; raises on genuinely-mixed
     input (via :func:`symmetrize_columns`' contract), on a vanished
-    column (a Gram eigenvalue ~0 -- dependent columns, not a window),
+    column (the column lies INSIDE the frozen core's span -- it has
+    no core-orthogonal remainder at all; the measured (4,15) class:
+    the C1 reference's m-mixed occupied core, S-projected onto the
+    declared shell span, contributes the promoted band's own slots),
     or when the verification residues miss ``tol``.  THE CONTRACT:
     the caller passes the ASSEMBLED block (the pipeline's form --
     ``build_full_mo``'s output, already core-orthogonal); a
@@ -424,10 +441,9 @@ def purify_window(mol, S, c_core, c, tol: float = 1e-10):
         if norms.min() < 1e-8:
             raise VanishedColumnError(
                 f"a window column vanished into the core (post-"
-                f"subtraction S-norm {norms.min():.1e}) -- the "
-                f"core/irrep intersection is near-null for it: a "
-                f"core-orthogonal representative at irrep purity does "
-                f"not exist")
+                f"subtraction S-norm {norms.min():.1e}) -- the column "
+                f"lies inside the frozen core's span and has no core-"
+                f"orthogonal remainder")
         sub = sub / norms
         g = sub.T @ S @ sub
         gv, U = np.linalg.eigh(g)
@@ -469,9 +485,11 @@ def meters_all(blocks, expect):
 
 class VanishedColumnError(ValueError):
     """A window column vanished into the core inside
-    :func:`purify_window` -- the core/irrep intersection is near-null
-    for that column: a core-orthogonal representative of it does not
-    exist at irrep purity (the pinned-(4,15) class)."""
+    :func:`purify_window` -- the column lies inside the frozen core's
+    span (no core-orthogonal remainder exists for it; the measured
+    (4,15) class: the C1 reference's m-mixed occupied core, projected
+    onto the declared shell span, spans the promoted band's own
+    slots)."""
 
 class Verdict:
     """Every check lands one row; the exit code is the verdict.
@@ -521,10 +539,11 @@ def drop_row(row: dict) -> None:
 
 
 _ORDER = (["rohf|-|-", "uhf|-|-"] +
-          [f"{m}|{r}|{c}" for c in ("(4,12)", "(4,15)", "(6,13)")
+          [f"{m}|{r}|{c}"
            for m, r in (("casci", "free"), ("casscf", "free"),
                         ("sa-casscf", "free"), ("casci", "pinned"),
-                        ("sa-casscf", "pinned"))])
+                        ("sa-casscf", "pinned"))
+           for c in ("(4,12)", "(4,15)", "(6,13)")])
 
 
 def fmt_range(vals, nd: int = 4) -> str:
@@ -533,6 +552,19 @@ def fmt_range(vals, nd: int = 4) -> str:
     if hi - lo < 10 ** (-nd) / 2:
         return f"{lo:.{nd}f}"
     return f"{lo:.{nd}f}..{hi:.{nd}f}"
+
+
+def conv_of(precision, n_iters, converged=True) -> str:
+    """The conv cell: ``"<precision>/<n_iters>"`` (the user's form).
+    ``precision`` -- the achieved |dE| where the optimizer reports it
+    (PySCF's callback ``de``; ``run_irrep_sa``'s ``conv_dE``), else
+    the requested tolerance; ``n_iters`` -- the optimizer's macro
+    cycle count, ``None`` for the CI solves (no iteration
+    structure); ``*`` marks a cycle-cap draw (not converged)."""
+    star = "" if converged else "*"
+    p = "—" if precision is None else f"{precision:.1e}"
+    n = "—" if n_iters is None else str(n_iters)
+    return f"{p}/{n}{star}"
 
 
 def render_table() -> None:
@@ -547,10 +579,10 @@ def render_table() -> None:
     out = [
         "# U14e -- the V&V family",
         "",
-        "| method | route | CAS | &lt;L²&gt; | &lt;S²&gt; "
+        "| method | route | CAS | &lt;L²&gt; | &lt;S²&gt; | conv "
         "| E_method (Eh) | dE_method (mEh/eV) | E(2) (mEh/eV) "
         "| E_tot (Eh) | dE_tot (mEh/eV) | term |",
-        "|---|---|---|---|---|---|---|---|---|---|---|",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for k in order:
         r = rows[k]
@@ -558,9 +590,15 @@ def render_table() -> None:
         de_tot = r["e_tot"] - e0
         e2 = (f"{r['e2_meh']:+.4f} / {r['e2_ev']:+.4f}"
               if r.get("e2_meh") is not None else "—")
+        # the render-time consistency check: the store's own bookkeeping
+        if r.get("e2_meh") is not None and abs(
+                r["e_method"] + r["e2_meh"] * 1e-3 - r["e_tot"]) > 5e-4:
+            raise ValueError(
+                f"render check: row {k} violates E_tot = E_method + "
+                f"E(2) by {r['e_method'] + r['e2_meh'] * 1e-3 - r['e_tot']:.2e} Eh")
         out.append(
             f"| {r['method']} | {r['route']} | {r['cas']} "
-            f"| {r['l2']} | {r['s2']} "
+            f"| {r['l2']} | {r['s2']} | {r.get('conv') or '—'} "
             f"| {r['e_method']:.4f} | {de_fmt(de_var)} | {e2} "
             f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} "
             f"| {r.get('term', '—')} |")
@@ -591,43 +629,73 @@ def render_table() -> None:
         "`elements/U14e/perturbation.json` -- two independent "
         "sources, compared here.",
         "",
+        "conv -- \"&lt;precision&gt;/&lt;n_iters&gt;\": the "
+        "optimizer's achieved |dE| (the callback's final macro-step "
+        "delta; the pinned SA's conv_dE) over its macro-cycle count; "
+        "the CI solves carry the requested CI tolerance with no "
+        "iteration structure (—).  ``*`` marks a cycle-cap draw "
+        "(not converged; the run's log discloses).  Cells read — "
+        "where a run's record predates the column (the convergence "
+        "flag lives in that run's log).",
+        "",
     ]
     if "casci|pinned|(4,15)" in rows:
         out += ["The pinned (4,15) row is the RE-ATTEMPT under the "
                 "corrected symmetrizer, and it MEASURED the refusal: "
-                "the 14p column's survival norm against the frozen "
-                "core span is 0.28 (92% core-lean); the pinned "
-                "casci's block grounds come out NOT the 5L (L "
-                "classes 0..42, the 5S/5I classes -- at (4,12) the "
-                "same route reads 17 components at 72.000000); and "
-                "the pinned SA has NO VALID WINDOW: the core/irrep "
-                "intersection is near-null on the real substrate (the "
-                "column vanishes at ~4e-09 -- the lane core's columns "
-                "are cross-irrep mixed, so core-orthogonality and "
-                "irrep purity are unachievable together for a "
-                "92%-core-lean direction).  The free rows carry the "
-                "(4,15) experiment; the project-then-validate "
-                "promotion into lane_core is declined, src "
+                "the declared core span of @6s6p7s realizes 6p as "
+                "THREE bands (13p/14p/15p), and the pinned route's "
+                "frozen core (the C1 reference's m-mixed occupied 6p "
+                "projected onto that span) spans the 14p slots "
+                "ENTIRELY -- the promoted columns are core-span "
+                "content by construction, the pinned SA has no "
+                "window at this partition (the typed "
+                "VanishedColumnError, re-measured every run), and "
+                "the pinned casci's block grounds come out NOT the "
+                "5L (L classes 0..42; at (4,12) the same route reads "
+                "17 components at 72.000000).  The pinned (4,15) is "
+                "the pinned (4,12) here.  The FREE route's core (the "
+                "pur substrate) does not contain the slots (survival "
+                "0.28) and hosts the promotion -- its measured cost "
+                "+3.09 mEh (fresh, twice) is the experiment's "
+                "answer; the lane_core promotion is declined, src "
                 "unchanged.", ""]
     else:
-        out += ["The pinned (4,15) legs are measured out: the 14p "
-                "column's survival norm against the frozen core span "
-                "is 0.28 (92% core-lean -- it is one of the occupied "
-                "6p's own radials); a disjoint (6,21)-class partition "
-                "(dropping 6p from the core) is the possible "
-                "follow-up.", ""]
+        out += ["The pinned (4,15) legs are measured out: the "
+                "declared core span of @6s6p7s realizes 6p as three "
+                "bands (13p/14p/15p), and the pinned route's frozen "
+                "core spans the 14p slots entirely -- the promoted "
+                "columns are core-span content by construction (the "
+                "typed VanishedColumnError).  The free route hosts "
+                "the promotion.", ""]
+    if "casci|free|(6,13)" in rows:
+        out += ["The (6,13) rows carry the CORRECTED meters (the "
+                "2026-11-22 slice incident: the leg's meter slices "
+                "ran one column off the key's core-pair count; the "
+                "kernels were never affected).  The frozen ground is "
+                "the 7F -- L = 3, S = 3 definite (the d5 high-spin "
+                "class + one f; the 7s column UNOCCUPIED at 3e-03): "
+                "the as-built window's variational ground abandons "
+                "the intended 5f3 6d1 7s2 configuration, driven by "
+                "the weak distillation captures (10f 0.82, 13d 0.92, "
+                "7s 0.27-0.71).  The window-rework candidate is the "
+                "s distillation's k (2 or 3 of the 3 s bands) -- a "
+                "declaration change, the user's call.  The window "
+                "itself is healthy: assembled span = projected span "
+                "exactly, closure meters ~1e-13 (the campaign cell "
+                "agreed all along).", ""]
     TABLE.write_text("\n".join(out))
 
 
 def std_row(method: str, route: str, cas: str, e_method: float,
             e2_meh: float | None, e_tot: float, l2: str, s2: str,
-            term: str = "—") -> dict:
+            term: str = "—", conv: str | None = None) -> dict:
     """One table row in the family's schema (the deltas are computed
     at render time against the ROHF row; ``l2``/``s2`` pre-formatted;
     ``e_method`` -- the method's own energy, whatever its semantics;
     ``e_tot`` -- the PT2-corrected total, ``e_method + E(2)``;
     ``term`` -- the row's term-identity disclosure, the pick
-    column)."""
+    column; ``conv`` -- the ``"<precision>/<n_iters>"`` cell,
+    ``conv_of``'s form)."""
     return {
         "method": method, "route": route, "cas": cas,
         "l2": l2, "s2": s2,
@@ -636,4 +704,5 @@ def std_row(method: str, route: str, cas: str, e_method: float,
         "e2_ev": None if e2_meh is None else e2_meh * EH_EV / 1e3,
         "e_tot": e_tot,
         "term": term,
+        "conv": conv,
     }

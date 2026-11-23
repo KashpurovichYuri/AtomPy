@@ -235,51 +235,50 @@ configuration-inert).
   in [0,1] whatever the blocks' gauge; pure → 0 exact, dirtied →
   the analytic value at machine precision, a 50/50 mix raises.
   THE PINNED (4,15) — ATTEMPTED AND MEASURED (the user's
-  re-attempt, under the corrected symmetrizer): the 14p column's
-  survival norm vs the frozen core 0.28 (92% core-lean — it is one
-  of the occupied 6p's own radials); the pinned CI runs (tails
-  3.5e-06 re-projected; the solvers' window's residual core lean
-  5.2e-04 — the re-projection re-introduces it through the
-  cross-irrep-mixed core, disclosed) and its block grounds come out
-  NOT the 5L — L classes 0..42 (the 5S/5I classes; the same route
-  at (4,12) reads 17 × 72.000000): the promoted direction
-  DESTABILIZES the term identity in the pinned route, the (6,13)
-  block-ground-shift class.  THE PINNED SA MEASURED OUT — THE
-  RADIAL-IDENTITY VERDICT: the certified core/irrep intersection
-  window is NEAR-NULL on the real substrate — the 14p column
-  vanishes into it (post-subtraction S-norm ~5e-10, the typed
-  `VanishedColumnError`, re-measured every run).  The mechanism,
-  corrected (2026-11-22, the second derivation): THE 14p DIRECTION
-  IS ONE OF THE OCCUPIED 6p's OWN RADIALS — its in-block content
-  and the core's in-block content are the same radial, so the
-  core-orthogonality of the full vector is achieved only by
-  cross-block cancellation; at irrep purity the remainder is
-  EMPTY.  The core's mixed columns (82/16/2 percent spreads) are a
-  BASIS artifact — the core SPAN is irrep-invariant and the
-  projector is span-dependent — so a per-irrep orthonormalization
-  of the core would be a NO-OP (the earlier projector-
-  non-commutation mechanism RETRACTED; `lane_core` needs no fix).
-  The pinned (4,15) ≡ the pinned (4,12) at this partition — the
-  pinning purity excludes the promoted direction BY IDENTITY, not
-  by difficulty; the free route is the only host and its measured
-  cost (+3.09 mEh corrected, closure 71.78) is the experiment's
-  answer; the pinned casci's window residual lean 5.2e-04 is the
-  assembly's global-Lowdin cross-block mixing (a gauge artifact;
-  the block-aware construction rides the build_full_mo fix).
-  VERDICT: the
+  re-attempt, under the corrected symmetrizer); the mechanism
+  CORRECTED AND VALIDATED (the 2026-11-22 second validation, the
+  user's challenge — the block-content ranks measured): the
+  declared core span of `@6s6p7s` realizes the chemical 6p as
+  THREE bands (13p/14p/15p — `shell_bands`), so the promoted
+  "14p" is the OCCUPIED SHELL'S OWN MIDDLE RADIAL, not a diffuse
+  function (its columns overlap a single 6p MO at 0.87/0.86/0.94).
+  The pinned route's frozen core is the C1 reference's m-mIXED
+  occupied 6p S-projected onto that declared span — it
+  contributes THREE independent directions per p block
+  (instrumented: B2u rank 3, B3u rank 3), SPANNING THE 14p SLOTS
+  ENTIRELY: the promoted columns are core-span content BY
+  CONSTRUCTION for the pinned route, the pinned SA has no window
+  (the columns vanish, post-subtraction S-norm ~7e-09, the typed
+  `VanishedColumnError`, re-measured every run), and the pinned
+  (4,15) IS the pinned (4,12) at this partition.  The earlier
+  mechanisms both RETRACTED (the projector non-commutation; the
+  cross-block-cancellation story — the vanishing does not depend
+  on the feed's gauge: the M-PURE feed vanishes identically).
+  The pinned casci RUNS (the solvers' window keeps the 14p with a
+  5.2e-04 core lean — the slots are inside its core's span, the
+  block projection cannot remove them) and its block grounds come
+  out NOT the 5L — L classes 0..42 (the same route at (4,12)
+  reads 17 × 72.000000): the promoted direction DESTABILIZES the
+  term identity in the pinned route, the (6,13)
+  block-ground-shift class.  The FREE route's core (the pur
+  substrate) does NOT contain the slots (survival 0.28) and
+  hosts the promotion — its measured cost (+3.09 mEh corrected,
+  closure 71.78) is the experiment's answer.  VERDICT: the
   project-then-validate promotion into `lane_core` DECLINED (src
-  unchanged); the disjoint (6,21)-class partition is the recorded
-  follow-up (Disposition candidates).  THE
+  unchanged); no (6,21)-class partition is needed for now (the
+  user's call).  THE
   INPUT-WINDOW GROUND: the frozen CASCI at (4,12)/(4,15) reads the
   certified ⁵I (42.000000, definite L) — the SA promotes it to the
   ⁵L (the record's "~1 Eh gain IS the ⁵L relaxation"); the (6,13)
-  frozen CASCI reads ⟨L²⟩ 18.0085, NOT definite-L — a fresh
-  disclosure of the foreign-first-column assembly inconsistency
-  class.  THE SPIN CROSS-CHECK: the (6,13) ⟨S²⟩ = 12 class
-  verified through pyscf's own spin_square (an independent spin
-  construction): (S², 2S+1) = (12.00000000, 7) → S = 3, agreeing
-  with atomterm's meters at machine precision — the 7s-broken
-  septet class, the electron count right.  Green: (a0) the ⁵I
+  frozen CASCI reads the ⁷F (⟨L²⟩ = ⟨S²⟩ = 12.000000, definite
+  L = 3, S = 3 — the d⁵ high-spin class, the 7s column
+  unoccupied; the leg's earlier "18.0085, NOT definite-L" was the
+  shifted-slice meter artifact, RETRACTED above).  THE SPIN
+  CROSS-CHECK: the (6,13) ⟨S²⟩ = 12 class verified through
+  pyscf's own spin_square (an independent spin construction):
+  (S², 2S+1) = (12.00000000, 7) → S = 3, agreeing with atomterm's
+  meters at machine precision — the all-parallel d⁵+f¹ septet
+  class, the electron count right.  Green: (a0) the ⁵I
   re-derived, (a) −0.0029 mEh, (b) 3.0e-06, (d) +1.5e-09 Eh, (a15)
   +0.0032 within the ±2 mEh band, (c) fresh-vs-fresh +3.091
   (stored +3.086), 6_13 2/2, uhf green (the raw-start draw
@@ -301,21 +300,34 @@ configuration-inert).
   UHF-seeded SA from a RAW start is a coin toss (one draw descended
   broken, ⟨L²⟩ dev 7.2e+01, git history at 824b5d8; this wave's
   draw recovered); the (6,13) free-SA meters partition the flat
-  near-degenerate manifold draw-dependently; the (6,13) production
-  assembly's defect is MEASURED PRECISELY (the 2026-11-22 span
-  diagnostic, principal angles between the intended distilled span
-  and the assembled block): the assembled span MISSING the intended
-  7s direction entirely (leak 1.00), a CORE-s combination leaked IN
-  (dominated by the inner s radials 12s/13s/11s/10s — newness 1.00,
-  the forbidden core-direction class), the valence-s combination
-  re-dealt 52% and 10f+3 corrupted 0.52 — the mechanism is
-  `build_full_mo`'s Loewdin re-dealing the s sector under the 7s
-  column's core-lean conditioning (S-norm 0.8536; near-degenerate
-  Gram eigenvalues, the eigensystem gauge swap) — behind the (6,13)
-  L-mixed frozen CASCI ground (18.0085), the mixed free-SA meters,
-  and the stored (6,13) SA refusals; the src fix (span-preserving
-  per-column treatment vs a stabilized Loewdin gauge) is the
-  user's next-pass decision, informed by this diagnostic.
+  near-degenerate manifold draw-dependently; the (6,13)
+  "assembly defect" is RETRACTED — MEASURED OUT (the 2026-11-22
+  triangulation second pass, two sources): the earlier span
+  diagnostic's reads were ARTIFACTS OF ITS OWN SHIFTED SLICE (it
+  and the 6_13 V&V leg hardcoded NCORE=5 while the key's core is
+  ncore_of(14, 6) = 4 pairs — the leg's meter slices ran one
+  column off; the KERNELS were never affected: PySCF derives
+  ncore=4 from the sector).  The assembled span IS the projected
+  distilled span exactly (principal cosines all 1 against
+  (I−P)act; the one 0.8536 tilt = the honest 7s projection
+  survival), the closure meters ~1e-13 on act/projected/assembled
+  AND on c_pur, and the CAMPAIGN CELL agreed all along
+  (`cells.json` (6,13) casci: ground_l2 12.00000003, win_lz/lperp
+  ~1e-13).  The TRUE frozen (6,13) ground: the 7F — L = 3, S = 3
+  definite (⟨L²⟩ = ⟨S²⟩ = 12.000000; the occupations measured:
+  five d columns at ~0.99 + one f at 0.998, the 7s column
+  UNOCCUPIED at 3e-03): the as-built window's variational ground
+  abandons the intended 5f³6d¹7s² configuration — driven by the
+  WEAK DISTILLATION CAPTURES (10f 0.82, 13d 0.92, 7s 0.27–0.71),
+  not by any assembly corruption.  THE WINDOW REWORK the user
+  intuits lands HERE: a larger s k in the (6,13) distillation
+  declaration (k_s = 2 or 3 of the 3 s bands — the user's
+  declaration change), a new-case decision.  THE LEG FIXED:
+  NCORE = 4 + the key-identity assert; the SGS replacement of
+  build_full_mo's Loewdin DECLINED — no measured defect (the
+  gauge never corrupted a span; the windows are healthy at
+  machine precision).  The (4,15) lean/verdict paragraphs above
+  are untouched (their mechanisms are lane-side and stand).
 - **The 2026-11-20 wave review + design survey** (ticket 45's close;
   the two axes + the codebase-design vocabulary over `src/`, fixed
   point a0fe3fe): fixed = the renderer's ground-block spread got one
@@ -434,21 +446,34 @@ configuration-inert).
 
 ### Disposition candidates (the user's future call)
 
-- **The V&V error-detection instruments — proposed 2026-11-22**
-  (the wave's caught-error base: four certification-caught math
-  bugs, two latent crashes, two presentation bugs, one wrong
-  assertion, one construction defect): (a) the window-closure
-  preamble in every V&V leg — `‖[P,Lz]‖` + `‖[P,L⊥]‖`
-  (`operators.window_closure`) before any compute, disclose/refuse
-  past a band — would have flagged the (6,13) assembly defect
-  mechanically; (b) a render-time consistency check in
-  `render_table` — `E_tot = E_method + E(2)` per row, the
-  reference rows leading, the term column present; (c) the
-  pre-flight gate — the driver's `--ground-only` pass (minutes)
-  before any full chain, catching the latent-crash class at 1%
-  cost; (d) the span-health tool — the principal-angles comparison
-  of the intended vs assembled window spans (the (6,13)
-  diagnostic, formalizable as a probe).  The user's call on scope.
+- **The V&V error-detection instruments — proposed 2026-11-22,
+  FIRST TWO LANDED 2026-11-22** (the wave's caught-error base: four
+  certification-caught math bugs, two latent crashes, two
+  presentation bugs, one wrong assertion, one construction defect
+  — and the (6,13) shifted-slice meter artifact, caught by the
+  two-source comparison against the campaign cell): (a) the
+  window-closure preamble — LANDED in the 6_13 leg
+  (`window_closure` printed per run; the other legs get it at
+  their next legitimate re-run, keeping their committed logs
+  byte-reproducible from HEAD); (b) the render-time consistency
+  check — LANDED in `render_table` (raises on any row violating
+  E_tot = E_method + E(2)); (c) the SLICE-IDENTITY assert — LANDED
+  (the leg asserts `key_core`'s ncore == its NCORE constant: the
+  shifted-slice class dies at the seam); (d) the pre-flight gate —
+  the driver's `--ground-only` pass (minutes) before any full
+  chain, catching the latent-crash class at 1% cost (exists);
+  (e) the span-health tool — the principal-angles comparison of
+  the intended vs assembled window spans (the (6,13)
+  triangulation, formalizable as a probe when a second consumer
+  appears).  The user's call on further scope.
+- **The (6,13) window rework candidate — the user's declaration
+  decision (2026-11-22)**: the as-built (6,13) window's frozen
+  ground is the ⁷F (the d⁵ high-spin class; the 7s column
+  unoccupied) — the 7s distillation's k=1-of-3 capture (0.27–0.71)
+  is the weakest radial in the campaign.  The candidate: declare
+  k_s = 2 or 3 for the (6,13) s chain (a CaseSpec/`shell_radials`
+  change — new windows, new cells), THEN re-read the frozen
+  ground's term.  No code — a declaration change.
 - **The NO probe for (4,15) — POSTPONED (the user's debt,
   2026-11-22)**: occupations + NO-group selection
   (`natural.no_group_windows`) from the term-averaged 17-root SA
@@ -462,13 +487,15 @@ configuration-inert).
   ⁵L-selected roots' density feeding the NO window.  The same
   experiment quantifies the ⁵L's push-down under the block grounds
   (the destabilization measure) when wanted.
-- **The (4,15) disjoint partition — the (6,21)-class follow-up**
-  (recorded 2026-11-22, the V&V wave's measured-out verdict): the
-  14p direction is 92% core-lean at the Rn·7s core, and the pinned
-  route's block grounds leave the ⁵L when it is present.  Dropping
-  6p from the core (the disjoint partition, the semi-class move)
-  would give the promoted radial room without the core entanglement
-  — a grid-axis declaration, a campaign-regen decision.
+- **The (4,15) disjoint partition — the (6,21)-class follow-up —
+  NOT NEEDED for now (the user's call, 2026-11-22)**: the second
+  validation showed the promoted 14p band is the occupied 6p
+  shell's own middle radial (`shell_bands`: 6p = 13p/14p/15p), and
+  the pinned route's declared core span contains those slots by
+  construction — the pinned (4,15) is the pinned (4,12).  Dropping
+  6p from the core would be a different chemistry (the semi-class
+  move), not a repair of this experiment.
+
 - **The PT2 wave's declared-out classes** (gated recoveries; each
   carries its measured reason in ticket 45's git history): the uncs'
   lane legs (the lane substrate's basin steer diverges on today's

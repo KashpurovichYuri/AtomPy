@@ -13,19 +13,24 @@ block grounds come out NOT the 5L: their L classes read 0..42
 72.000000).  The promoted direction destabilizes the term identity
 in the pinned route -- the same class as the certified (6,13)
 block-ground shift.  THE PINNED SA (the user's call, attempted on
-the CERTIFIED core/irrep intersection window): MEASURED OUT -- the
-intersection is NEAR-NULL on the real substrate: the 14p column
-vanishes into it (post-subtraction S-norm ~4e-09).  The mechanism,
-measured: the lane core's columns are cross-irrep mixed (82/16/2
-percent spreads -- the global orthonormalization mixes the p
-blocks), so the core and irrep projectors do NOT commute; a 92%
-core-lean column's core-orthogonality is achieved only by
-cross-block cancellation, which irrep purity forbids -- no
-irrep-pure core-orthogonal representative exists.  The subspace-
-geometry verdict, re-measured every run (the typed
-VanishedColumnError refusal).  VERDICT: the project-then-validate
-promotion into lane_core is DECLINED (src unchanged); the disjoint
-(6,21)-class partition is the recorded follow-up.
+the certified intersection window): MEASURED OUT -- the 14p columns
+vanish into the pinned route's frozen core (post-subtraction
+S-norm ~7e-09, the typed VanishedColumnError, re-measured every
+run).  THE MECHANISM, MEASURED (the 2026-11-22 second validation,
+the block-content ranks): the declared core span of @6s6p7s
+realizes 6p as THREE bands (13p/14p/15p -- ``shell_bands``); the
+pinned route's frozen core is the C1 reference's m-mixed occupied
+6p, S-projected onto that span -- it contributes THREE independent
+directions per p block, SPANNING THE 14p SLOTS ENTIRELY (the
+instrumented ranks: B2u 3, B3u 3).  The promoted columns are
+core-span content BY CONSTRUCTION for the pinned route: no
+core-orthogonal remainder exists for them, and the pinned (4,15)
+is the pinned (4,12) at this partition.  THE FREE ROUTE'S CORE
+(the pur substrate) does NOT contain the slots (the survival
+norms 0.28) and hosts the promotion -- its measured cost +3.09
+mEh (the (c) check) is the experiment's answer.  VERDICT: the
+project-then-validate promotion into lane_core is DECLINED (src
+unchanged); no (6,21)-class partition is needed for now.
 
 THE SETUP (all visible in ``main``): the trusted ROHF rung loaded;
 the core = the rotation-closed span (marked); the window = the AO
@@ -261,8 +266,9 @@ def main(argv=None) -> int:
                                    axis=0).max())
     print(f"  [pinned window] irrep tails re-projected (max "
           f"{max(imp):.1e}); the solvers' window's residual core lean "
-          f"{lean_in:.1e} (the re-projection re-introduces it through "
-          f"the cross-irrep-mixed core -- disclosed)", flush=True)
+          f"{lean_in:.1e} (the 14p slots sit inside the pinned core's "
+          f"span -- the block projection cannot remove them; "
+          f"disclosed)", flush=True)
 
     # ---- pinned casci (per-block solvers, no optimizer) ---------------
     t0 = time.time()
@@ -302,24 +308,37 @@ def main(argv=None) -> int:
     # 0..42 -- 5S/5I classes; the same route at (4,12) reads 17 x
     # 72.000000), so the pinned SA's ensemble would be that ground
     # ensemble -- the mix kernel has no root-selection knob.  The
-    # user's call: attempt it anyway on the CERTIFIED core/irrep
-    # intersection window (purify_window) and disclose what it
-    # prices.  MEASURED (2026-11-22): the intersection is NEAR-NULL
-    # on the real substrate -- the 14p column vanishes into it
-    # (post-subtraction S-norm ~4e-09): a 92%-core-lean column's
-    # core-orthogonality is achieved only by cross-block
-    # cancellation (the lane core's columns are cross-irrep mixed --
-    # measured 82/16/2 percent spreads), which irrep purity forbids.
+    # user's call: attempt it anyway on the certified intersection
+    # window (purify_window) and disclose what it prices.
+    # MEASURED (2026-11-22, the second validation): the promoted
+    # columns are core-span content BY CONSTRUCTION for the pinned
+    # route -- the declared core span of @6s6p7s realizes 6p as
+    # THREE bands (13p/14p/15p), and the C1 reference's m-mixed
+    # occupied 6p, S-projected onto that span, contributes THREE
+    # independent directions per p block (the instrumented ranks:
+    # B2u 3, B3u 3), SPANNING THE 14p SLOTS ENTIRELY: the columns
+    # vanish (post-subtraction S-norm ~7e-09).
     try:
         c_sa_l, rep = purify_window(lmol, S_l, c_core_l,
                                     mo_l[:, nf:nf + ncas_l])
     except VanishedColumnError as e:
         v.note("the pinned SA at (4,15): MEASURED OUT -- the "
-               "core/irrep intersection is near-null",
-               f"purify_window refuses: {e}.  VERDICT: the "
-               f"project-then-validate promotion into lane_core is "
-               f"DECLINED (src unchanged); the disjoint (6,21)-class "
-               f"partition is the recorded follow-up")
+               "promoted band is core-span content for the pinned "
+               "route",
+               f"purify_window refuses: {e}.  The mechanism: the "
+               f"declared core span of @6s6p7s realizes 6p as three "
+               f"bands (13p/14p/15p, shell_bands), and the C1 "
+               f"reference's m-mixed occupied 6p, S-projected onto "
+               f"that span, spans the 14p slots entirely (the block "
+               f"ranks 3/3 measured) -- no core-orthogonal remainder "
+               f"exists for the promoted columns; the pinned (4,15) "
+               f"is the pinned (4,12) at this partition.  The free "
+               f"route's core (pur) does NOT contain the slots "
+               f"(survival 0.28) and hosts the promotion: +3.09 mEh "
+               f"(the (c) check).  VERDICT: the project-then-"
+               f"validate promotion into lane_core is DECLINED (src "
+               f"unchanged); no (6,21)-class partition is needed for "
+               f"now")
         ok = v.report()
         return 0 if ok else 1
     print(f"  [pinned window] the core/irrep intersection converged "
