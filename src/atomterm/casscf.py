@@ -133,11 +133,21 @@ def _cycle_trace(mc) -> list:
     its mutable cell -- PySCF never stores the count (the loop counter
     is kernel-local); the per-cycle ``callback`` IS the instrument,
     chained onto any user callback.  The cell reads ``[count, dE,
-    e_prev]`` after ``kernel()``: the macro-cycle count, the final
+    e_prev]`` after ``kernel()``: the MACRO-cycle count, the final
     |delta e_tot| (the convergence precision; NaN before the second
     cycle), and the previous cycle's energy.
+
+    The count is the number of DISTINCT ``imacro`` values seen: PySCF
+    fires the callback once per MICRO iteration AND once per macro
+    cycle (the macro-level ``locals()`` carry the leftover ``imicro``),
+    so an invocation count inflates by the micro overhead -- measured
+    200 invocations on a 50-macro capped draw.  ``imacro`` is 1-based
+    (incremented at the loop top), so distinct values == the cycle
+    count; the last callback is always the final macro-cycle-end call,
+    so ``dE`` is the last macro step's true delta.
     """
     out = [0, float("nan"), None]
+    imacros = set()
     prev = getattr(mc, "callback", None)
 
     def _tick(env):
@@ -145,7 +155,10 @@ def _cycle_trace(mc) -> list:
         if out[2] is not None:
             out[1] = abs(e - out[2])
         out[2] = e
-        out[0] += 1
+        m = env.get("imacro", None)
+        if m is not None and m not in imacros:
+            imacros.add(m)
+            out[0] = len(imacros)
         if callable(prev):
             prev(env)
 
@@ -426,7 +439,7 @@ def run_irrep_casci(mol, mf, c_act, ncore: int, na: int, nb: int,
 
 def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
                  L: int, parity: str, conv_tol: float = 1e-12,
-                 c_core=None) -> dict:
+                 c_core=None, mc_opts: dict = None) -> dict:
     """The pinned route at the SA level: the component ensemble, optimized.
 
     ``mcscf.state_average_mix_`` over the pinned solvers with uniform
@@ -437,9 +450,14 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
 
     Parameters
     ----------
-    As :func:`run_irrep_casci` (the optimizer convergence is PySCF's
-    default; the readout solvers take ``conv_tol``), including the
-    ``c_core`` core passthrough.
+    As :func:`run_irrep_casci` (the readout solvers take ``conv_tol``),
+    including the ``c_core`` core passthrough.
+    mc_opts : dict, optional
+        Attributes set on the ensemble's mc object before the kernel
+        (optimizer knobs: ``max_cycle_macro``, ``conv_tol``, ...) --
+        the same contract as :func:`constrained_casscf`'s; ``None``
+        (the default) leaves PySCF's defaults -- the historical path,
+        the lane records' convention.
 
     Returns
     -------
@@ -467,6 +485,8 @@ def run_irrep_sa(mol, mf, c_act, ncore: int, na: int, nb: int,
     active = slice(ncore, ncore + ncas)
     mc = mcscf.CASSCF(mf, ncas, (na, nb))
     mc.verbose = 0
+    for k, v in (mc_opts or {}).items():
+        setattr(mc, k, v)
     solvers = irrep_solvers(mol, orb_irreps(mol, mo_full[:, active]),
                             L, parity, conv_tol)
     mcscf.state_average_mix_(

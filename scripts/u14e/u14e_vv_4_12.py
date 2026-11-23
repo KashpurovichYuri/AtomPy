@@ -39,7 +39,7 @@ import numpy as np
 from pyscf import mcscf
 
 from _vv_common import (BAND_E2_MEH, BAND_L2, BAND_ROUTE, L_L2, S_S2,
-                        Verdict, anchor, core_part_of, drop_row,
+                        Verdict, anchor, conv_of, core_part_of, drop_row,
                         fmt_range, free_kernel, lane_route,
                         load_reference, make_blocks, meters, meters_all,
                         nevpt_rows, pinned_ci_run, pinned_sa_run, price,
@@ -145,11 +145,12 @@ def main(argv=None) -> int:
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
                      f"{r_f['l2']:.4f}", f"{r_f['s2']:.4f}",
-                     "5I input ground"))
+                     "5I input ground",
+                     conv=conv_of(cas_f.fcisolver.conv_tol, None)))
 
     # ---- free CASSCF (single root; the escape class, no assertion) --
     t0 = time.time()
-    mc_c, cas_c = free_kernel(mf, 12, SECTOR, mo_full)
+    mc_c, cas_c = free_kernel(mf, 12, SECTOR, mo_full, track_iters=True)
     r_c = price(cas_c, expect, roots=[0])[0]
     a_c = anchor(ADDR_412_CASSCF)["roots"][0]
     print(f"  [casscf] e_tot {mc_c.e_tot:.8f}, converged "
@@ -164,12 +165,15 @@ def main(argv=None) -> int:
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
                      f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
-                     "escape draw"))
+                     "escape draw",
+                     conv=conv_of(mc_c.final_de, mc_c.n_macro,
+                                  bool(mc_c.converged))))
 
     # ---- free SA ------------------------------------------------------
     t0 = time.time()
     mc_sa, cas_sa = free_kernel(mf, 12, SECTOR, mo_full,
-                                weights=weights, nroots=ROOTS)
+                                weights=weights, nroots=ROOTS,
+                                track_iters=True)
     core_e, e_cas = core_part_of(cas_sa)
     expect_sa = meters(mol, cas_sa.mo_coeff[:, NCORE:NCORE + 12],
                        *SECTOR)
@@ -198,7 +202,9 @@ def main(argv=None) -> int:
                      float(e_cas[0] + core_e), r0["e2"] * 1e3,
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range([r['l2'] for r in rows]),
-                     f"{max(r['s2'] for r in rows):.4f}", "5L"))
+                     f"{max(r['s2'] for r in rows):.4f}", "5L",
+                     conv=conv_of(mc_sa.final_de, mc_sa.n_macro,
+                                  bool(mc_sa.converged))))
     print(f"  [sa] ensemble {mc_sa.e_tot:.8f}, converged "
           f"{mc_sa.converged} ({time.time() - t0:.1f} s)", flush=True)
 
@@ -235,7 +241,11 @@ def main(argv=None) -> int:
                      float(np.mean(e2s) * 1e3),
                      float(e_var_ci + np.mean(e2s)),
                      fmt_range(l2s),
-                     f"{max(s2s):.4f}", "5L (term energy)"))
+                     f"{max(s2s):.4f}", "5L (term energy)",
+                     # the pinned CI's tolerance: pinned_ci_run's
+                     # conv_tol default (1e-12; CI solves have no
+                     # iteration structure)
+                     conv=conv_of(1e-12, None)))
 
     # ---- pinned SA ----------------------------------------------------
     t0 = time.time()
@@ -263,7 +273,9 @@ def main(argv=None) -> int:
                      float(np.mean(e2s_s) * 1e3),
                      float(out_sa["e_tot"] + np.mean(e2s_s)),
                      fmt_range(l2s_s),
-                     f"{max(s2s_s):.4f}", "5L"))
+                     f"{max(s2s_s):.4f}", "5L",
+                     conv=conv_of(out_sa["conv_dE"], out_sa["cycles"],
+                                  bool(out_sa["converged"]))))
 
     ok = v.report()
     return 0 if ok else 1

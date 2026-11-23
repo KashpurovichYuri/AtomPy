@@ -27,7 +27,6 @@ import time
 from pathlib import Path
 
 import numpy as np
-from pyscf import mcscf
 
 from _vv_common import (EH_EV, L_L2, RUNGS, S_S2, Verdict, drop_row,
                         load_reference, load_rung, meters, std_row)
@@ -131,21 +130,20 @@ def main(argv=None) -> int:
 
     # the UHF-seeded SA: the visible free-route construction riding
     # the UHF object -- from a RAW start, does the SA repair recover
-    # the term identity?
+    # the term identity?  free_kernel = the family's faithful two-pass
+    # (the readout seeded from the SA kernel's own vectors) + the conv
+    # capture (track_iters)
     from atomterm.core import purified_core_orbitals
+    from _vv_common import free_kernel
     c_core = purified_core_orbitals(mol, mf_rohf, NCORE)[0]
     mo_full = visible_window(mol, mf_rohf, c_core)
     t0 = time.time()
-    mc = mcscf.CASSCF(mf_uhf, 12, SECTOR)
-    mc.state_average_([1.0 / 17] * 17)
-    mc.kernel(mo_full)
+    mc, cas = free_kernel(mf_uhf, 12, SECTOR, mo_full,
+                          weights=[1.0 / 17] * 17, nroots=17,
+                          track_iters=True)
     print(f"  [sa] UHF-seeded ensemble {mc.e_tot:.8f}, converged "
-          f"{mc.converged} ({time.time() - t0:.1f} s)", flush=True)
-    cas = mcscf.CASCI(mf_uhf, 12, SECTOR)
-    cas.mo_coeff = mc.mo_coeff
-    cas.canonicalization = False
-    cas.fcisolver.nroots = 17
-    cas.kernel()
+          f"{mc.converged}, conv {mc.final_de:.1e}/{mc.n_macro} "
+          f"({time.time() - t0:.1f} s)", flush=True)
     expect = meters(mol_u, cas.mo_coeff[:, NCORE:NCORE + 12],
                     *SECTOR)
     l2s = [expect("l2", cas.ci[k]) for k in range(17)]
@@ -154,13 +152,17 @@ def main(argv=None) -> int:
         v.note("the UHF-seeded SA from the RAW start descends broken "
                "(this draw)",
                f"<L2> dev {dev:.2e} (<L2> in [{min(l2s):.4f}, "
-               f"{max(l2s):.4f}], ensemble {mc.e_tot:.4f} -- an "
+               f"{max(l2s):.4f}], ensemble {mc.e_tot:.4f}, conv "
+               f"{mc.final_de:.1e}/{mc.n_macro}"
+               f"{'' if mc.converged else '*'} -- an "
                f"energy of the UHF-CASCI partition, not comparable "
                f"to the ROHF-route optimum)")
     else:
         v.note("the UHF-seeded SA recovers <L2> = 72 from the RAW "
                "start (this draw)",
-               f"17 roots, max dev {dev:.2e}, ensemble {mc.e_tot:.8f} "
+               f"17 roots, max dev {dev:.2e}, ensemble {mc.e_tot:.8f}, "
+               f"conv {mc.final_de:.1e}/{mc.n_macro}"
+               f"{'' if mc.converged else '*'} "
                f"= the ROHF-route optimum.  DRAW-DEPENDENT class: "
                f"the family's earlier draw descended broken (<L2> "
                f"dev 7.2e+01, that log in git history at the "

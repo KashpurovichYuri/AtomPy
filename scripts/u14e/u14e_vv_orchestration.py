@@ -13,6 +13,9 @@ wiring; its green record: logs/u14e_vv.log at 6e2ab39..30808bd,
                       src unchanged)
     u14e_vv_6_13.py   the CAS(6,13) disclosure leg, five routes +
                       the PySCF spin_square cross-check
+    u14e_vv_6_13_r1.py the CAS(6,13) @r1 leg (the prior-axis 7s fix:
+                      the density-block window, the acceptance
+                      controls, free routes + PT2)
     u14e_vv_uhf.py    the reference comparison + the two table
                       reference rows
 
@@ -30,6 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import u14e_vv_4_12   # noqa: E402
 import u14e_vv_4_15   # noqa: E402
 import u14e_vv_6_13   # noqa: E402
+import u14e_vv_6_13_r1  # noqa: E402
 import u14e_vv_uhf    # noqa: E402
 
 
@@ -40,7 +44,8 @@ def main(argv=None) -> int:
         sys.exit(f"unknown flags: {bad}")
     extra = ["--ground-only"] if "--ground-only" in argv else []
     legs = [("4_12", u14e_vv_4_12), ("4_15", u14e_vv_4_15),
-            ("6_13", u14e_vv_6_13), ("uhf", u14e_vv_uhf)]
+            ("6_13", u14e_vv_6_13), ("6_13_r1", u14e_vv_6_13_r1),
+            ("uhf", u14e_vv_uhf)]
     bad_rc = []
     for name, leg in legs:
         print(f"\n===== leg {name} =====", flush=True)

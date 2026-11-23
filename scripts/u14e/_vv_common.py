@@ -141,31 +141,50 @@ def meters(mol, c_act, na: int, nb: int):
 # the derivations' thin helpers (one home; the legs show the setup) ----
 
 def free_kernel(mf, ncas: int, sector, mo_full, weights=None,
-                nroots: int = 1, track_iters: bool = False):
+                nroots: int = 1, track_iters: bool = False,
+                max_cycle_macro: int = 200):
     """The free route's two kernels, written once: CASSCF (plain
     single root, or ``state_average_`` over ``weights``), then the
     two-pass readout (CASCI, ``canonicalization = False`` -- the
     window exactly as converged), seeded from the SA kernel's own
     vectors (the faithful two-pass form; unseeded, the davidson tails
     mix a quasi-degenerate block at the 1e-5 level and the meters
-    carry it).  Returns (mc, cas).  ``track_iters`` rides the
-    optimizer's callback (its ``locals()`` carry ``imacro``/``de``/
-    ``conv``) and sets ``mc.n_macro``/``mc.final_de`` -- the conv
-    record; the default off leaves the historical path untouched."""
+    carry it).  Returns (mc, cas).
+
+    The optimizer budget is the user's directive ("enable even 200
+    iters"): ``max_cycle_macro=200`` -- above the campaign cells'
+    effective cap (PySCF's default 50 macro cycles; the campaign set
+    no optimizer knobs, its stored ``cycles`` counts callback
+    invocations = macro + micro).  ``conv_tol`` stays PySCF's 1e-7 --
+    the campaign's effective value (converged draws landed |dE|
+    1e-8..1e-9, below the tolerance, on the final macro step).
+
+    ``track_iters`` rides the optimizer's callback and sets
+    ``mc.n_macro``/``mc.final_de`` -- the conv record.  PySCF's
+    ``imacro`` is 1-based and its callback fires per MICRO iteration
+    AND per macro cycle, so: ``n_macro`` = the max ``imacro`` seen
+    (the true macro-cycle count), ``final_de`` = the LAST call's
+    |dE| (the last callback is always the final macro-cycle-end
+    call; taking the first call of the final cycle instead reads the
+    previous cycle's stale delta, and ``max imacro + 1`` overcounts).
+    The default off leaves the historical path untouched."""
     mc = mcscf.CASSCF(mf, ncas, sector)
+    mc.max_cycle_macro = max_cycle_macro
+    mc.conv_tol = 1e-7
     if track_iters:
-        _it = {"imacro": -1, "de": float("nan")}
+        _it = {"imacro": 0, "de": float("nan")}
 
         def _cb(envs):
-            if envs.get("imacro", -1) > _it["imacro"]:
-                _it["imacro"] = envs["imacro"]
-                _it["de"] = abs(float(envs.get("de", float("nan"))))
+            _it["de"] = abs(float(envs.get("de", float("nan"))))
+            m = int(envs.get("imacro", 0))
+            if m > _it["imacro"]:
+                _it["imacro"] = m
         mc.callback = _cb
     if weights is not None and len(weights) > 1:
         mc.state_average_(list(weights))
     mc.kernel(mo_full)
     if track_iters:
-        mc.n_macro = _it["imacro"] + 1
+        mc.n_macro = _it["imacro"]
         mc.final_de = _it["de"]
     cas = mcscf.CASCI(mf, ncas, sector)
     cas.mo_coeff = mc.mo_coeff
@@ -247,16 +266,20 @@ def pinned_ci_run(lmol, lmf, mo, nf, ncas, sector, L, parity, c_core,
 
 
 def pinned_sa_run(lmol, lmf, mo, nf, ncas, sector, L, parity, c_core,
-                  conv_tol: float = 1e-12, c_read=None):
+                  conv_tol: float = 1e-12, c_read=None,
+                  mc_opts: dict = None):
     """The pinned route at the SA level (``run_irrep_sa``'s two-pass
     pattern -- the ensemble mix kernel, then the exact per-component
     roots re-solved in the frozen converged window).  Returns
-    (out, c_read): the result dict (``e_tot``, ``mo``, ``roots``)."""
+    (out, c_read): the result dict (``e_tot``, ``mo``, ``roots``);
+    ``mc_opts`` -- the ensemble optimizer's budget (the user's
+    200-macro-cycle directive; ``None`` = PySCF's defaults)."""
     from atomterm.casscf import run_irrep_sa
     if c_read is None:
         c_read = np.asarray(mo)[:, nf:nf + ncas]
     out = run_irrep_sa(lmol, lmf, c_read, nf, sector[0], sector[1],
-                       L, parity, conv_tol=conv_tol, c_core=c_core)
+                       L, parity, conv_tol=conv_tol, c_core=c_core,
+                       mc_opts=mc_opts)
     return out, c_read
 
 
@@ -383,6 +406,39 @@ def dominant_irreps(mol, S, c):
                 best_k, best_n = k, nk
         ids.append(best_k)
     return ids
+
+
+def orthonormal_per_irrep(mol, S, act):
+    """S-orthonormalize the act block WITHIN each dominant-irrep
+    group -- the pre-assembly treatment for blocks whose columns are
+    irrep-pure but not mutually S-orthogonal (the MOs-window class:
+    the replaced s column overlaps the f/d columns at ~1e-2, and
+    ``build_full_mo``'s global Loewdin would mix the pure columns
+    ACROSS irrep blocks -- the assembled block then fails pyscf's
+    orb labeling at the ~1e-04 scale).  Per-group Loewdin never
+    leaves a group, so every column's purity is preserved exactly;
+    the groups are mutually S-orthogonal, so the block comes out
+    S-orthonormal overall and the assembly's global Loewdin becomes
+    the identity.  Returns (act_fixed, worst_purity_loss) -- the loss
+    is the largest per-column dominant-block weight defect (the
+    caller discloses it; ~1e-16 when the input is already clean)."""
+    projs = _irrep_projectors(mol, S)
+    ids = dominant_irreps(mol, S, act)
+    fixed = np.empty_like(act)
+    worst = 0.0
+    for k in sorted(set(ids)):
+        cols = [j for j, kid in enumerate(ids) if kid == k]
+        sub = np.asarray(act)[:, cols]
+        g = sub.T @ S @ sub
+        gv, U = np.linalg.eigh(g)
+        sub = sub @ U @ np.diag(gv ** -0.5) @ U.T
+        fixed[:, cols] = sub
+        d, Ginv_dTS = projs[k]
+        for q in range(sub.shape[1]):
+            w = d @ (Ginv_dTS @ sub[:, q])
+            n2 = float(sub[:, q] @ S @ sub[:, q])
+            worst = max(worst, 1.0 - float(w @ S @ w) / n2)
+    return fixed, worst
 
 
 def purify_window(mol, S, c_core, c, tol: float = 1e-10):
@@ -538,11 +594,15 @@ def drop_row(row: dict) -> None:
 
 
 _ORDER = (["rohf|-|-", "uhf|-|-"] +
-          [f"{m}|{r}|{c}"
-           for m, r in (("casci", "free"), ("casscf", "free"),
-                        ("sa-casscf", "free"), ("casci", "pinned"),
-                        ("sa-casscf", "pinned"))
-           for c in ("(4,12)", "(4,15)", "(6,13)")])
+          [f"{m}|free|{c}"
+           for m in ("casci", "casscf", "sa-casscf")
+           for c in ("(4,12)", "(4,15)", "(6,13)", "(6,13)@r1+MOs")] +
+          [f"{m}|pinned|{c}"
+           for m in ("casci", "sa-casscf")
+           for c in ("(4,12)", "(4,15)", "(6,13)")] +
+          [f"{m}|pinned@pur|{c}"
+           for m in ("casci", "sa-casscf")
+           for c in ("(4,12)", "(4,15)", "(6,13)", "(6,13)@r1+MOs")])
 
 
 def fmt_range(vals, nd: int = 4) -> str:
@@ -632,7 +692,10 @@ def render_table() -> None:
         "",
         "conv -- \"&lt;precision&gt;/&lt;n_iters&gt;\": the "
         "optimizer's achieved |dE| (the callback's final macro-step "
-        "delta; the pinned SA's conv_dE) over its macro-cycle count; "
+        "delta; the pinned SA's conv_dE) over its MACRO-cycle count "
+        "(the store's callback-count records predating 2026-11-23 "
+        "inflate by the micro overhead -- the campaign cells' '200' "
+        "= 50 macro + ~150 micro); "
         "the CI solves carry the requested CI tolerance with no "
         "iteration structure (—).  ``*`` marks a cycle-cap draw "
         "(not converged; the run's log discloses).  Cells read — "
@@ -669,6 +732,26 @@ def render_table() -> None:
                 "columns are core-span content by construction (the "
                 "typed VanishedColumnError).  The free route hosts "
                 "the promotion.", ""]
+    if "casci|pinned@pur|(4,12)" in rows:
+        out += ["THE UNIFICATION (the pin-on-pur route: the C1 "
+                "rung's AO integrals -- gauge-independent -- on a "
+                "D2h-tagged wrapper, NO D2h SCF anywhere; the "
+                "purified core): at (4,12) the frozen CI reads the "
+                "certified lane record 17 x 72.000000 (max dev "
+                "1.1e-13) and the SA the 5L ensemble (17/17 at "
+                "72.000000, 7 macro cycles) -- the lane construction "
+                "reproduced without the lane.  At (4,15) the pur "
+                "core hosts the promotion the lane core's span "
+                "swallowed: the frozen CI's block grounds read L "
+                "classes 0..42 (the p-promotion configurations "
+                "f3d1p1 are cheaper frozen than the 5L), and the "
+                "SA's optimization recovers it -- <L2> 71.79-71.96, "
+                "converged in 25 macro cycles.  The lane window's "
+                "own SA is REFUSED at the labeling seam (its "
+                "promoted columns are core-span content; the "
+                "internal re-projection cannot reach the labeling "
+                "tolerance) -- the certified no-window class, "
+                "witnessed at both seams.", ""]
     if "casci|free|(6,13)" in rows:
         out += ["The (6,13) rows carry the CORRECTED meters (the "
                 "2026-11-22 slice incident: the leg's meter slices "
@@ -679,12 +762,31 @@ def render_table() -> None:
                 "the as-built window's variational ground abandons "
                 "the intended 5f3 6d1 7s2 configuration, driven by "
                 "the weak distillation captures (10f 0.82, 13d 0.92, "
-                "7s 0.27-0.71).  The window-rework candidate is the "
-                "s distillation's k (2 or 3 of the 3 s bands) -- a "
-                "declaration change, the user's call.  The window "
+                "7s 0.27-0.71).  The window "
                 "itself is healthy: assembled span = projected span "
                 "exactly, closure meters ~1e-13 (the campaign cell "
                 "agreed all along).", ""]
+    if "casci|pinned@pur|(6,13)@r1+MOs" in rows:
+        out += ["THE (6,13) FIX AND ITS CLASS RECORD: the "
+                "quasi-degenerate block's partition is window- and "
+                "core-sensitive -- the as-built window on the pur "
+                "core reads 12..42 (the low-L block grounds), the "
+                "lane's certified record reads 16 x ~90 + one x 72, "
+                "and the @r1+MOs window (the @r f/d radials + the "
+                "reference's own pair MO, s-sector-projected) reads "
+                "17 x 72.000000 (max dev 3.3e-08): the declared 5L "
+                "is the exact ground of every irrep block on the "
+                "honest window.  The frozen free-CASCI ground on "
+                "that window is the 5L itself at +140.5 mEh (occ(7s) "
+                "0.53 -- the L=8 root mixes 7s2/7s1/7s0 "
+                "configurations; the column-usage jump from the "
+                "as-built's 3e-03 is the fix's deliverable).  The "
+                "pair MO is s-diffuse across >= 6 primitives (the "
+                "declared 3-band span's radial captures cos^2 0.71; "
+                "a single band ~0.27), so the s channel takes the "
+                "reference's own pair MO projected onto its pure-s "
+                "sector (the m-mixed C1 d tail 1.3% removed -- "
+                "closure restored to 3.3e-13).", ""]
     TABLE.write_text("\n".join(out))
 
 

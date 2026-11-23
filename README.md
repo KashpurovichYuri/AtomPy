@@ -314,6 +314,53 @@ blocks) are separated by rule rows; the ROHF anchor row leads — ΔE's zero —
 follows where the store carries it. The tables render what ran;
 per-section legends live nowhere.
 
+**The window-composition approaches, reviewed (the U14e record).** The
+window is the campaign's central object: which columns enter the CAS
+decides both the economics (how much of the reference's relaxation the
+window captures) and the symmetry (rotation closure ⇒ definite L). The
+approaches, compared on the uranium record:
+
+| approach | columns' source | m-complete | capture | U14e record |
+|---|---|---|---|---|
+| raw band rows | declared AO bands, identity realization | by declaration | none | the pre-distillation baseline |
+| `mo` slice | canonical SCF columns | **no** (hybrid-open gauge) | full | control: ⟨L²⟩ = 0.0019 — rejected |
+| `moc` pick | character-selected SCF valence | no | partial | control: the same disease |
+| incumbent distillation | occupied-block span Gram, k × m-set | yes (m-replicated) | 10f 0.82 / 13d 0.92 / 7s 0.27–0.71 | (6,13): frozen ⁷F at +1065 mEh — the weak-window record |
+| prior axis (`@r`/`@s`) | configuration-density blocks, capture-maximizing | yes | 5f 0.93 / 6d 0.98 / 7s 0.71 | (4,12): ⁵L frozen at +149 mEh |
+| lane core route | D2h SCF + the reference's occupied core S-projected onto the declared span | lane-native | full | (4,12) certified 17×72.000000; (4,15) refuses (no window) |
+| pin-on-pur (unified) | no SCF — the C1 rung's integrals on a D2h-tagged wrapper + the purified core | yes | as the window's | (4,12): 17×72.000000 at dev 1.1e-13 |
+| mixed source | `@r` radials + the reference's own pair MO, s-sector-projected | exact (‖[P,L⊥]‖ 3.3e-13) | pair MO at cos² 0.987 | (6,13): frozen ⁵L at +140.5 mEh — the declared term wins frozen |
+
+The prescription the record states: **per-channel sources by the
+channel's character**. A closed pair (l = 0, one m) takes the
+reference's own MO, sector-projected — the C1 gauge's m-mixed tail
+measured 1.3 % and removed (an l = 0 direction is L-invariant, so
+rotation closure survives the projection); open shells (f/d, many m)
+take density-block radials rebuilt m-replicated — their SCF orbitals
+are irreducibly m-delocalized (a raw-ROHF MO span never
+rotation-closes). The single-band fallback for the 7s pair measured
+structurally insufficient (the pair MO is s-diffuse across ≥6
+primitives; the best band alone carries ~0.27 of it, the declared
+three-band span's distilled radial cos² 0.71).
+
+**What buys ⟨L²⟩ = L(L+1) exactly, and what buys 72.0.** Rotation
+closure is the exactness certificate: a closed window's CI commutes
+with the many-body L², so *every* root reads some L(L+1) at solver
+noise — frozen CASCI included (measured 3.6e-06; the pinned block
+construction pins to 1e-13). The optimizer adds nothing to exactness.
+The *value* 72.0 is the window's economic answer: the ⁵L must beat its
+rivals, which takes (i) enough relaxation captured — AO bands froze
+the ⁵I at +923 mEh, the prior axis re-ordered the classes (+149), the
+pair-MO channel brought the (6,13) ⁵L to +140.5, the frozen winner —
+and (ii) no cheaper foreign-configuration class in the sector: the
+(4,15) p-promotions are cheaper frozen, so the block grounds leave the
+⁵L and the SA's optimization recovers it (71.79–71.96). On
+quasi-degenerate manifolds the class partition is window- and
+core-sensitive — the (6,13) block reads 12..42 (as-built window,
+pur core), 16×90 + one×72 (lane), **17×72.000000** (`@r1`+MOs, pur
+core) — the honest window makes the *declared* term the exact ground
+of every irrep block.
+
 **Route (free vs pinned).** The *free* route is the native
 symmetry-blind driver: one Davidson CI over the whole sector;
 symmetry is *measured* afterwards (⟨L²⟩, the commutators, ptp). The

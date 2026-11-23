@@ -4,8 +4,8 @@
   [note] (e) the ROHF-vs-UHF reference comparison: UHF -0.0070 mEh (-0.1894 eV) below the ROHF basin; the cores assume one closed-shell density -- the UHF object is a reference-class product, not a cells axis
 /home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
   mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
-  [sa] UHF-seeded ensemble -50.42381003, converged True (31.3 s)
-  [note] the UHF-seeded SA recovers <L2> = 72 from the RAW start (this draw): 17 roots, max dev 2.79e-05, ensemble -50.42381003 = the ROHF-route optimum.  DRAW-DEPENDENT class: the family's earlier draw descended broken (<L2> dev 7.2e+01, that log in git history at the 824b5d8 commit), and the committed converged-start reading holds regardless (dev 8.9e-15) -- the SA repair holds the converged gauge; the raw spin-broken start is a coin toss
+  [sa] UHF-seeded ensemble -50.42381003, converged True, conv 3.2e-09/11 (32.5 s)
+  [note] the UHF-seeded SA recovers <L2> = 72 from the RAW start (this draw): 17 roots, max dev 3.00e-06, ensemble -50.42381003, conv 3.2e-09/11 = the ROHF-route optimum.  DRAW-DEPENDENT class: the family's earlier draw descended broken (<L2> dev 7.2e+01, that log in git history at the 824b5d8 commit), and the committed converged-start reading holds regardless (dev 8.9e-15) -- the SA repair holds the converged gauge; the raw spin-broken start is a coin toss
 
 ===== verdict =====
   REPORT  (e) the UHF sibling's spin honesty

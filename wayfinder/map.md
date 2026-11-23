@@ -206,6 +206,59 @@ configuration-inert).
 
 ### Open
 
+- **The u14e V&V wave continued — the (6,13) fix + the unification
+  ladder — COMPLETE (2026-11-23)** (the lx4 plan: the optimizer
+  budgets, the (6,13) @r1 fix, the pin-on-pur unification, the
+  backfills).  THE OPTIMIZER BUDGET: `free_kernel` carries
+  `max_cycle_macro=200` (the campaign's effective cap was PySCF's
+  default 50 — its budgets carry only `sa_weights`) + explicit
+  `conv_tol=1e-7`; the conv-column tracker's two bugs fixed (PySCF's
+  `imacro` is 1-based — the old `max+1` overcounted; `final_de`
+  captured a stale one-cycle-late delta; verified on a probe: the
+  old rule read 3 cycles / 1.5e-06 for a 2-cycle / 2.1e-10 run);
+  `cells._cycle_trace` counts DISTINCT `imacro`s now (the store's
+  callback-count records predating 2026-11-23 inflate by the micro
+  overhead — the campaign cells' "200" = 50 macro + ~150 micro; the
+  `cycles == max_cycle` cap-hitting identity starts working);
+  `run_irrep_sa` gained `mc_opts` (default None = the historical
+  path).  THE (6,13) FIX (leg `u14e_vv_6_13_r1.py`, the @r1+MOs
+  window): the as-built window's 7s capture is declaration-bound —
+  the pair MO (occupied col 143, the promoted 5th pair, occ 2.0) is
+  s-diffuse across >= 6 primitives, the declared 3-band span's
+  radial captures cos^2 0.71, the single-band fallback ~0.27
+  (structurally insufficient — DECLINED); the fix: the s channel =
+  the pair MO projected onto its PURE-s sector (the C1 gauge's
+  m-mixed d tail 1.3% removed — the raw MO breaks closure at
+  8.4e-02, caught by the certificate; restored to 3.3e-13) —
+  frozen ground = the 5L ITSELF at +140.5 mEh (occ(7s) 0.53; the
+  occ~2 control re-scoping is the user's pending call — the leg
+  reads RED on that one check as committed).  THE UNIFICATION
+  LADDER (`u14e_vv_unification.py`, green 5/5;
+  `logs/u14e_vv_unification.log`): C0 the wrapper probe (the D2h
+  clone's integrals bit-identical, ovlp/hcore dev 0.0; CASCI
+  agreement 2.95e-08 reproducing the campaign's frozen @r1 record
+  -50.2325; the distilled columns irrep-pure at 2.2e-16); C1 THE
+  GATE HELD BOTH HALVES (17 x 72.000000 frozen, max dev 1.1e-13 +
+  the SA 17/17 at 72.000000, 7 macro cycles) — the certified lane
+  record reproduced with NO D2h SCF; C2 pin-on-pur (4,15): the
+  frozen block grounds 0..42 (the p-promotion configurations f3d1p1
+  cheaper frozen than the 5L) + the SA near-5L (71.79-71.96, 25
+  macro cycles) — the FIRST pinned-(4,15) SA; C3 the class trilogy:
+  as-built pinpur 12..42 / lane 16x90+72 / @r1+MOs pinpur
+  17 x 72.000000 (dev 3.3e-08) — the declared 5L the exact ground
+  of every irrep block on the honest window; C4 the lane window's
+  pinned SA REFUSED at the labeling seam (promoted columns
+  core-span content, measured 3.3e-06 raw / 2.7e-07 post-cleanup —
+  the certified no-window class, witnessed at both seams;
+  disclosed).  NEW INSTRUMENT: `orthonormal_per_irrep` in
+  `_vv_common` (the pre-assembly treatment for blocks whose
+  replaced columns overlap the pure ones — the assembly's global
+  Loewdin would mix the pure columns across irrep blocks; per-group
+  treatment preserves purity at 2.2e-16).  FINDING: the (6,13)
+  class is lane-construction-dependent (the counterweight in the
+  lane-retirement decision).  README carries the
+  window-composition review table + the <L2>-expectation ladder
+  (closure buys exactness; the window's economics buy the value).
 - **The u14e V&V family + the scripts regroup — COMPLETE
   (2026-11-21/22)** (the user's directive: several INDEPENDENT
   scripts, one per CAS, each readable top-to-bottom, PySCF-direct;
@@ -452,6 +505,23 @@ configuration-inert).
 
 ### Disposition candidates (the user's future call)
 
+- **The (6,13) occ control re-scoping — proposed 2026-11-23** (the
+  user's call): the frozen ⁵L ground on the @r1+MOs window uses the
+  pair column at **0.53** — the L=8 root mixes 7s²/7s¹/7s⁰
+  configurations internally (the class is right; the
+  pure-configuration expectation isn't).  The control as written
+  (occ ≈ 2) reads RED; re-scope to a disclosure — the column-usage
+  jump 3e-03 → 5.3e-01 plus the ⁵L class IS the fix's deliverable —
+  and keep closure / definite-L / ΔE as the gates.
+- **The lane retirement — PARKED 2026-11-23** (the user's call; the
+  gate HELD): the pin-on-pur route reproduces the (4,12) lane
+  record at machine precision with no D2h SCF anywhere, and hosts
+  what the lane refuses (the (4,15) SA).  The counterweight: the
+  (6,13) class is lane-construction-dependent (12..42 pur-as-built
+  vs 16×90+72 lane vs 17×72.000000 @r1+MOs) — the lane's (6,13)
+  record is a property of the lane construction, worth knowing
+  before retiring.  The campaign lane cells stay as the certified
+  record either way; any regen is a separate call.
 - **The V&V error-detection instruments — proposed 2026-11-22,
   FIRST TWO LANDED 2026-11-22** (the wave's caught-error base: four
   certification-caught math bugs, two latent crashes, two

@@ -1,0 +1,58 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+  [PASS] C0: the wrapper's AO quantities are the C1 mol's (gauge-independent integrals): nao 177/177, ovlp dev 0.00e+00, hcore dev 0.00e+00
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_unification.py:89: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc), act,
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_unification.py:224: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo412_c1 = build_full_mo(mf_c1, occupied_core_idx(mf_c1, nc_c1),
+  [PASS] C0: the CASCI on the hybrid reproduces the C1-mol value (and the campaign's frozen @r1 record): C1 -50.2325075273 | wrapper -50.2325074978 | dev 2.95e-08 (the campaign's frozen row: -50.2325, +149.3 mEh)
+  [PASS] C0: the distilled window columns are irrep-pure on the wrapper (no cleanup needed; the labels resolve): max impurity 2.22e-16; labels [6, 4, 6, 5, 7, 5, 7, 1, 3, 0, 2, 0]
+  [C1] pin-on-pur (4,12): the gate
+  [(4,12) casci] 17 components, <L2> in [72.000000, 72.000000] (max dev from 72 1.14e-13), <S2> max 6.000000 (3.0 s)
+  [PASS] C1 GATE: the pin-on-pur (4,12) frozen CI reads the certified lane record 17 x 72.000000: 17/17 components at 72.000000 +- 1e-05 (max dev 1.14e-13) -- the certified lane record reproduced through the unified route
+  [note] (4,12) casci: E(2) mean -541.9734 mEh over the priced roots
+  [(4,12) sa] ensemble -50.42381003, converged True (cycles 7), <L2> [72.000000, 72.000000] (38.3 s)
+  [PASS] C1 GATE: the pin-on-pur (4,12) SA reads the 5L ensemble: 17/17 SA components at 72.000000 +- 1e-05 -- the 5L ensemble, the lane record's second half
+  [C2] pin-on-pur (4,15)
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 14p: k=1 of 1 bands, capture 0.9088-0.9112
+  [(4,15) casci] 17 components, <L2> in [-0.000000, 42.000000] (max dev from 72 7.20e+01), <S2> max 6.000000 (3.9 s)
+  [note] (4,15) casci: E(2) mean -1056.2621 mEh over the priced roots
+  [(4,15) sa] ensemble -50.42530741, converged True (cycles 25), <L2> [71.785960, 71.964911] (153.3 s)
+  [C3] pin-on-pur (6,13): the as-built distilled window
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_unification.py:89: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc), act,
+  [(6,13) casci] 17 components, <L2> in [12.000000, 42.000000] (max dev from 72 6.00e+01), <S2> max 12.000000 (33.2 s)
+  [note] (6,13) casci: E(2) mean -1081.0607 mEh over the priced roots
+  [C3] pin-on-pur (6,13): the @r1+MOs window (step B's)
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13_r1.py:80: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  core = set(occupied_core_idx(mf, NCORE))
+  [C3] the per-irrep orthonormalization: worst dominant-block weight loss 2.22e-16
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_unification.py:306: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_s = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nf613),
+  [(6,13)@r1+MOs casci] 17 components, <L2> in [72.000000, 72.000000] (max dev from 72 3.29e-08), <S2> max 6.000000 (34.4 s)
+  [note] (6,13)@r1+MOs casci: E(2) mean -536.2002 mEh over the priced roots
+  [C4] the lean lane window's pinned SA (4,15)
+  plain D2h SCF diverged -- retrying C1-seeded (elements/U14e/rungs/rohf.chk)
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 14p: k=1 of 1 bands, capture 0.9088-0.9112
+  [C4] the assembled lane window's irrep impurities: max 3.46e-06 (the labeling seam's dirt scale)
+  [note] C4: the lean lane window's pinned SA is REFUSED (the certified no-window class at this partition): pyscf's orb labeling rejects the SA's internally re-projected columns: orbitals [13 14] not symmetrized, norm = [0.99999973 0.99999975] -- the promoted 14p columns are core-span content (the 4_15 leg's certified mechanism); the pinned-(4,15) SA result is the pin-on-pur route's (C2).  The lane chain itself fired: plain D2h diverged, the C1-seeded retry converged
+
+===== verdict =====
+  PASS  C0: the wrapper's AO quantities are the C1 mol's (gauge-independent integrals)
+  PASS  C0: the CASCI on the hybrid reproduces the C1-mol value (and the campaign's frozen @r1 record)
+  PASS  C0: the distilled window columns are irrep-pure on the wrapper (no cleanup needed; the labels resolve)
+  PASS  C1 GATE: the pin-on-pur (4,12) frozen CI reads the certified lane record 17 x 72.000000
+  REPORT  (4,12) casci
+  PASS  C1 GATE: the pin-on-pur (4,12) SA reads the 5L ensemble
+  REPORT  (4,15) casci
+  REPORT  (6,13) casci
+  REPORT  (6,13)@r1+MOs casci
+  REPORT  C4: the lean lane window's pinned SA is REFUSED (the certified no-window class at this partition)
+5/5 assertions hold

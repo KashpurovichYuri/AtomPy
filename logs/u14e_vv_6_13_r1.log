@@ -1,0 +1,55 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+  [window] 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420
+  [window] 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+  [window] 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+  [diagnostic] distilled columns' S-norm after removing the pur core span: 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 0.8534
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13_r1.py:80: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  core = set(occupied_core_idx(mf, NCORE))
+  [s channel] the reference's 7s pair MO (occupied column 143, occ 2.0) replaces the distilled radial at 12: its l-sector weights s 0.987327 / d 0.012673 (the m-mixed C1 tail -- fact 12's residue; PROJECTED OUT), the s-pure column keeps cos^2 0.987327 of the pair MO, whose cos^2 against the distilled radial was 0.7094 (the declared 3-band span misses it)
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13_r1.py:178: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
+  [closure] assembled window: ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.30e-13 (rotation closure -- the definite-L certificate)
+  [s channel] the assembled block's orthonormality deviation 1.55e-15
+  [anatomy] the window's s column at index 12 of 13
+  [casci] e_tot -50.24132548, <L2> 71.999996, occ(7s) 0.5335, dE +140.5 mEh (40.9 s)
+  [PASS] the @r1+MOs window is rotation-closed (the definite-L certificate): ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.30e-13 (the band: the as-built's observed ~1e-13)
+  [PASS] the frozen ground reads a definite L: <L2> 71.999996 -- closest L(L+1) within 3.55e-06 (WHICH L is the disclosure)
+  [FAIL] the 7s pair forms (the fix's acceptance: the s occupation ~2; the as-built read 3e-03): occ(7s) = 0.5335
+  [PASS] the frozen total sits near the reference (dE << +1065, the as-built's frozen dE): dE +140.5 mEh (the @r1 (4,12) class sits at +149.3; the frozen (6,13) has one more shell's variational freedom)
+  [note] free CASCI (the frozen input window): E(2) -437.1603 mEh, <S2> 6.0000
+  [casscf] e_tot -50.46233984, converged True, <L2> 72.080350, occ(7s) 0.5285 (124.3 s)
+  [note] free CASSCF (the single-root draw class): <L2> 72.080350, occ(7s) 0.5285, E(2) -295.3475 mEh
+  root 0: e_ref -50.45285582, E(2) -282.0771 mEh, <L2> 89.998732, <S2> 12.000000
+  root 1: e_ref -50.45285243, E(2) -282.0692 mEh, <L2> 89.998769, <S2> 12.000000
+  root 2: e_ref -50.45284351, E(2) -282.0820 mEh, <L2> 89.998697, <S2> 12.000000
+  root 3: e_ref -50.45282824, E(2) -282.1049 mEh, <L2> 89.998797, <S2> 12.000000
+  root 4: e_ref -50.45282762, E(2) -282.1030 mEh, <L2> 89.998778, <S2> 12.000000
+  root 5: e_ref -50.45279991, E(2) -282.1341 mEh, <L2> 89.998926, <S2> 12.000000
+  root 6: e_ref -50.45279983, E(2) -282.1345 mEh, <L2> 89.998926, <S2> 12.000000
+  root 7: e_ref -50.45276682, E(2) -282.1682 mEh, <L2> 89.999113, <S2> 12.000000
+  root 8: e_ref -50.45276678, E(2) -282.1682 mEh, <L2> 89.999113, <S2> 12.000000
+  root 9: e_ref -50.45273229, E(2) -282.2123 mEh, <L2> 89.999306, <S2> 12.000000
+  root 10: e_ref -50.45273201, E(2) -282.2119 mEh, <L2> 89.999307, <S2> 12.000000
+  root 11: e_ref -50.45269558, E(2) -282.2471 mEh, <L2> 89.999472, <S2> 12.000000
+  root 12: e_ref -50.45269503, E(2) -282.2452 mEh, <L2> 89.999473, <S2> 12.000000
+  root 13: e_ref -50.45264652, E(2) -282.2952 mEh, <L2> 89.999641, <S2> 12.000000
+  root 14: e_ref -50.45264543, E(2) -282.2958 mEh, <L2> 89.999643, <S2> 12.000000
+  root 15: e_ref -50.45256257, E(2) -282.3511 mEh, <L2> 89.999855, <S2> 12.000000
+  root 16: e_ref -50.45256253, E(2) -282.3509 mEh, <L2> 89.999856, <S2> 12.000000
+  [note] free SA (the draw-dependent meters): <L2> in [89.9987, 89.9999], <S2> up to 12.0000 -- the free-SA roots partition the manifold draw-dependently; E(2) root 0 -282.0771 mEh, total -50.7349
+  [PASS] the free-SA max-<S2> root's spin class agrees between PySCF's spin_square and atomterm's meters (the two independent spin constructions): root 3: spin_square (S^2, 2S+1) = (12.00000000, 7.0000) -> S = 3.000000; atomterm's meters read <S2> 12.00000000 -> S = 3.000000
+  [sa] ensemble -50.45274194, converged True (327.3 s)
+
+===== verdict =====
+  PASS  the @r1+MOs window is rotation-closed (the definite-L certificate)
+  PASS  the frozen ground reads a definite L
+  FAIL  the 7s pair forms (the fix's acceptance: the s occupation ~2; the as-built read 3e-03)
+  PASS  the frozen total sits near the reference (dE << +1065, the as-built's frozen dE)
+  REPORT  free CASCI (the frozen input window)
+  REPORT  free CASSCF (the single-root draw class)
+  REPORT  free SA (the draw-dependent meters)
+  PASS  the free-SA max-<S2> root's spin class agrees between PySCF's spin_square and atomterm's meters (the two independent spin constructions)
+4/5 assertions hold
