@@ -245,6 +245,30 @@ themselves as the window — no distillation, m-incomplete by
 construction; the `NO` kind (store-only) asks the *correlated*
 density — the term-averaged CI's natural orbitals.
 
+**The prior-axis device.** Per chemical shell, four steps: (1) the AO
+**chain** — the m-complete (band, m) slots of the shell's declared
+bands; (2) the density **block** — the configuration's
+occupation-weighted valence density restricted to the shell's rows
+(the core columns cut off at the core boundary; m-summed, so
+m-scalar by construction); (3) the generalized eigenproblem
+**(block, S_r⁻¹)** — in Cholesky coordinates `eigh(Lᵀ B L)`, the
+vectors transported back through `L⁻ᵀ` — whose top-k eigenvectors
+are the k radials **maximizing the capture**: each significant
+source column's S-projection on the radial span; (4) m-replication
+of each radial across the chain — the rotation closure.  `@r` reads
+the head configuration's block; `@s` averages the blocks **at the
+density level** over the configuration series (each member an
+occupation-forced SCF; density matrices add — the average block *is*
+the ensemble density, no gauge problem) and runs the eigenproblem
+once — the configuration spread then shows up honestly as the
+second eigenvalue, which is exactly the `@s2` certificate.  The
+device is contraction-building in the basis-author sense: a k=1
+radial *is* one fixed combination of the shell's primitives, and
+exporting its coefficients yields a physics-derived contracted
+basis (the campaign's stance is the other reading — state-adaptive
+radials derived and certified per case, "the radial directions are
+data, never a basis rewrite").
+
 **The prior comparison's baseline.** On contracted bases the untagged
 incumbent is the authors' 1:1 contraction — the equal-budget baseline
 the priors must beat; on uncontracted bases no authors' contraction

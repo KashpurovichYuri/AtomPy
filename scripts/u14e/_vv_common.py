@@ -639,10 +639,10 @@ def render_table() -> None:
     out = [
         "# U14e -- the V&V family",
         "",
-        "| method | route | CAS | &lt;L²&gt; | &lt;S²&gt; | conv "
+        "| method | CAS | &lt;L²&gt; | &lt;S²&gt; | conv "
         "| E_method (Eh) | dE_method (mEh/eV) | E(2) (mEh/eV) "
-        "| E_tot (Eh) | dE_tot (mEh/eV) | term |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "| E_tot (Eh) | dE_tot (mEh/eV) |",
+        "|---|---|---|---|---|---|---|---|---|---|",
     ]
     # the method-block separators (the campaign tables' === rule
     # rows): the references share one block, each optimizer class
@@ -653,7 +653,7 @@ def render_table() -> None:
         r = rows[k]
         g = _group.get(r["method"], r["method"])
         if prev is not None and g != prev:
-            out.append("|" + " === |" * 12)
+            out.append("|" + " === |" * 10)
         prev = g
         de_var = r["e_method"] - e0
         de_tot = r["e_tot"] - e0
@@ -667,12 +667,13 @@ def render_table() -> None:
             raise ValueError(
                 f"render check: row {k} violates E_tot = E_method + "
                 f"E(2) by {r['e_method'] + r['e2_meh'] * 1e-3 - r['e_tot']:.2e} Eh")
+        method = (r["method"] if r["route"] == "-"
+                  else f"{r['method']} ({r['route']})")
         out.append(
-            f"| {r['method']} | {r['route']} | {r['cas']} "
+            f"| {method} | {r['cas']} "
             f"| {r['l2']} | {r['s2']} | {r.get('conv') or '—'} "
             f"| {r['e_method']:.4f} | {de_fmt(de_var)} | {e2} "
-            f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} "
-            f"| {r.get('term', '—')} |")
+            f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} |")
     out += [
         "",
         "E_method -- the method's own energy (the CASSCF/SA total; "
@@ -681,6 +682,18 @@ def render_table() -> None:
         "constant's projected-density form, not comparable to the "
         "free rows).  E_tot = E_method + E(2) (SC-NEVPT2, pyscf.mrpt, "
         "strongly contracted); dE against the ROHF row.",
+        "",
+        "The frozen casci rows are the PRICING class (what PT2 sees "
+        "as built, no optimizer).  The class flip across windows is "
+        "the window's economics: the raw-band windows freeze the 5I "
+        "((4,12)/(4,15), <L2> 42.0) and the 7F ((6,13), <L2> 12.0 -- "
+        "the 7s column unoccupied at 3e-03); the @r1 windows freeze "
+        "the declared 5L (<L2> 72.0 -- at (6,13) via the pair-MO s "
+        "channel).  All rotation-closed, so every reading is an "
+        "EXACT definite L (the closure certificate) -- the windows "
+        "differ in WHICH L wins.  The casscf single-root rows are "
+        "the escape-draw class (no assertion); the SA rows carry "
+        "the term average over the 17 M_L components.",
         "",
         "E(2) comparability -- within a row, E_tot = E_method + E(2); "
         "across rows, compare E_tot at matched partitions.  The "
@@ -706,8 +719,10 @@ def render_table() -> None:
         "(the store's callback-count records predating 2026-11-23 "
         "inflate by the micro overhead -- the campaign cells' '200' "
         "= 50 macro + ~150 micro); "
-        "the CI solves carry the requested CI tolerance with no "
-        "iteration structure (—).  ``*`` marks a cycle-cap draw "
+        "the CI solves carry the REQUESTED CI tolerance with no "
+        "iteration structure (—): the free rows solve at 1e-8, the "
+        "pinned solvers at 1e-12 (why the pinned <L²> exactness "
+        "reads 1e-13).  ``*`` marks a cycle-cap draw "
         "(not converged; the run's log discloses).  Cells read — "
         "where a run's record predates the column (the convergence "
         "flag lives in that run's log).",

@@ -1,53 +1,55 @@
 # U14e -- the V&V family
 
-| method | route | CAS | &lt;L²&gt; | &lt;S²&gt; | conv | E_method (Eh) | dE_method (mEh/eV) | E(2) (mEh/eV) | E_tot (Eh) | dE_tot (mEh/eV) | term |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| rohf | - | - | - | - | — | -50.3819 | +0.0000 / +0.0000 | — | -50.3819 | +0.0000 / +0.0000 | — |
-| uhf | - | - | - | 6.2289 (det) | — | -50.3888 | -6.9611 / -0.1894 | — | -50.3888 | -6.9611 / -0.1894 | — |
-| === | === | === | === | === | === | === | === | === | === | === | === |
-| casci | free | (4,12) | 42.0000 | 6.0000 | 1.0e-08/— | -49.4587 | +923.1246 / +25.1195 | -1053.8257 / -28.6761 | -50.5126 | -130.7012 / -3.5566 | 5I input ground |
-| casci | free | (4,12)@r1 | 72.0000 | 6.0000 | 1.0e-08/— | -50.2325 | +149.3448 / +4.0639 | -445.0011 / -12.1091 | -50.6775 | -295.6563 / -8.0452 | definite-L (the class is the disclosure) |
-| casci | free | (4,15) | 42.0000 | 6.0000 | 1.0e-08/— | -49.4587 | +923.1116 / +25.1191 | -1056.2479 / -28.7420 | -50.5150 | -133.1363 / -3.6228 | 5I input ground |
-| casci | free | (4,15)@r1 | 72.0000 | 6.0000 | 1.0e-08/— | -50.2325 | +149.3448 / +4.0639 | -445.1709 / -12.1137 | -50.6777 | -295.8261 / -8.0498 | definite-L (the class is the disclosure) |
-| casci | free | (6,13) | 12.0000 | 12.0000 | 1.0e-08/— | -49.3168 | +1065.0798 / +28.9823 | -1081.0320 / -29.4164 | -50.3978 | -15.9522 / -0.4341 | definite-L: the 7F, S=3 (the d5 high-spin ground; the 7s column unoccupied) |
-| casci | free | (6,13)@r1 | 72.0000 | 6.0000 | 1.0e-08/— | -50.2413 | +140.5269 / +3.8239 | -437.1603 / -11.8957 | -50.6785 | -296.6334 / -8.0718 | definite-L (the 7s pair = the reference's own MO column) |
-| === | === | === | === | === | === | === | === | === | === | === | === |
-| casscf | free | (4,12) | 71.7466 | 6.0000 | 6.9e-08/86 | -50.4307 | -48.8344 / -1.3289 | -312.6618 / -8.5080 | -50.7433 | -361.4962 / -9.8368 | escape draw |
-| casscf | free | (4,12)@r1 | 71.9342 | 6.0000 | 5.1e-08/122 | -50.4307 | -48.8333 / -1.3288 | -312.8311 / -8.5126 | -50.7435 | -361.6644 / -9.8414 | escape draw |
-| casscf | free | (4,15) | 71.3283 | 6.0000 | 6.3e-09/150 | -50.4345 | -52.6014 / -1.4314 | -309.9138 / -8.4332 | -50.7444 | -362.5152 / -9.8645 | escape draw |
-| casscf | free | (4,15)@r1 | 71.7291 | 6.0000 | 2.6e-08/162 | -50.4345 | -52.6015 / -1.4314 | -310.7611 / -8.4562 | -50.7452 | -363.3626 / -9.8876 | escape draw |
-| casscf | free | (6,13) | 71.6645 | 6.0000 | 7.9e-08/192 | -50.4549 | -73.0045 / -1.9866 | -305.7784 / -8.3207 | -50.7606 | -378.7829 / -10.3072 | escape draw |
-| casscf | free | (6,13)@r1 | 72.0804 | 6.0000 | 2.6e-08/40 | -50.4623 | -80.4875 / -2.1902 | -295.3475 / -8.0368 | -50.7577 | -375.8350 / -10.2270 | escape draw |
-| === | === | === | === | === | === | === | === | === | === | === | === |
-| sa-casscf | free | (4,12) | 72.0000 | 6.0000 | 3.2e-09/11 | -50.4238 | -41.9595 / -1.1418 | -341.6680 / -9.2973 | -50.7655 | -383.6276 / -10.4390 | 5L |
-| sa-casscf | free | (4,12)@r1 | 72.0000 | 6.0000 | 1.6e-08/8 | -50.4238 | -41.9593 / -1.1418 | -341.6698 / -9.2973 | -50.7655 | -383.6291 / -10.4391 | 5L |
-| sa-casscf | free | (4,15) | 71.7845..71.9654 | 6.0000 | 8.5e-08/50 | -50.4264 | -44.5275 / -1.2117 | -336.0098 / -9.1433 | -50.7624 | -380.5373 / -10.3549 | 5L, closure-costed |
-| sa-casscf | free | (4,15)@r1 | 71.7847..71.9654 | 6.0000 | 1.9e-08/27 | -50.4264 | -44.5272 / -1.2116 | -336.0202 / -9.1436 | -50.7624 | -380.5474 / -10.3552 | draw-dependent |
-| sa-casscf | free | (6,13) | 89.9987..89.9999 | 12.0000 | 1.3e-08/11 | -50.4529 | -71.0035 / -1.9321 | -282.0756 / -7.6757 | -50.7349 | -353.0792 / -9.6078 | the L=9 class (90), S=3 |
-| sa-casscf | free | (6,13)@r1 | 89.9987..89.9999 | 12.0000 | 9.7e-09/12 | -50.4529 | -71.0035 / -1.9321 | -282.0771 / -7.6757 | -50.7349 | -353.0806 / -9.6078 | draw-dependent partition |
-| === | === | === | === | === | === | === | === | === | === | === | === |
-| casci | pinned | (4,12) | 72.0000 | 6.0000 | 1.0e-12/— | -48.9351 | +1446.7552 / +39.3682 | -1779.9780 / -48.4357 | -50.7151 | -333.2228 / -9.0675 | 5L (term energy) |
-| casci | pinned | (4,15) | 0.0000..42.0000 | 6.0000 | 1.0e-12/— | -48.1294 | +2252.4212 / +61.2915 | -2504.5576 / -68.1525 | -50.6340 | -252.1364 / -6.8610 | grounds not the 5L (5S/5I) |
-| casci | pinned | (6,13) | 72.0000..90.0000 | 12.0000 | 1.0e-12/— | -48.7864 | +1595.4834 / +43.4153 | -1823.7788 / -49.6276 | -50.6101 | -228.2955 / -6.2122 | L=9 ground + the 5L present |
-| === | === | === | === | === | === | === | === | === | === | === | === |
-| sa-casscf | pinned | (4,12) | 72.0000 | 6.0000 | 1.8e-09/7 | -50.4238 | -41.9577 / -1.1417 | -341.7335 / -9.2990 | -50.7655 | -383.6912 / -10.4408 | 5L |
-| sa-casscf | pinned | (6,13) | 71.9987..89.9986 | 12.0000 | 1.2e-09/17 | -50.4515 | -69.6548 / -1.8954 | -285.4669 / -7.7680 | -50.7370 | -355.1217 / -9.6634 | the 72-component ok |
-| === | === | === | === | === | === | === | === | === | === | === | === |
-| casci | pinned@pur | (4,12) | 72.0000 | 6.0000 | 1.0e-12/— | -50.1871 | +194.7967 / +5.3007 | -541.9734 / -14.7478 | -50.7290 | -347.1767 / -9.4472 | the certified class |
-| casci | pinned@pur | (4,15) | -0.0000..42.0000 | 6.0000 | 1.0e-12/— | -49.4575 | +924.3799 / +25.1537 | -1056.2621 / -28.7424 | -50.5137 | -131.8823 / -3.5887 | block grounds |
-| casci | pinned@pur | (6,13) | 12.0000..42.0000 | 12.0000 | 1.0e-12/— | -49.3005 | +1081.3149 / +29.4241 | -1081.0607 / -29.4172 | -50.3816 | +0.2543 / +0.0069 | block grounds |
-| casci | pinned@pur | (6,13)@r1 | 72.0000 | 6.0000 | 1.0e-12/— | -50.1960 | +185.8035 / +5.0560 | -536.2002 / -14.5907 | -50.7322 | -350.3967 / -9.5348 | block grounds |
-| === | === | === | === | === | === | === | === | === | === | === | === |
-| sa-casscf | pinned@pur | (4,12) | 72.0000 | 6.0000 | 4.5e-09/7 | -50.4238 | -41.9577 / -1.1417 | -341.7378 / -9.2992 | -50.7655 | -383.6955 / -10.4409 | draw-dependent partition |
-| sa-casscf | pinned@pur | (4,15) | 71.7860..71.9649 | 6.0000 | 1.0e-07/25 | -50.4253 | -43.4551 / -1.1825 | -336.7134 / -9.1624 | -50.7620 | -380.1685 / -10.3449 | draw-dependent partition |
+| method | CAS | &lt;L²&gt; | &lt;S²&gt; | conv | E_method (Eh) | dE_method (mEh/eV) | E(2) (mEh/eV) | E_tot (Eh) | dE_tot (mEh/eV) |
+|---|---|---|---|---|---|---|---|---|---|
+| rohf | - | - | - | — | -50.3819 | +0.0000 / +0.0000 | — | -50.3819 | +0.0000 / +0.0000 |
+| uhf | - | - | 6.2289 (det) | — | -50.3888 | -6.9611 / -0.1894 | — | -50.3888 | -6.9611 / -0.1894 |
+| === | === | === | === | === | === | === | === | === | === |
+| casci (free) | (4,12) | 42.0000 | 6.0000 | 1.0e-08/— | -49.4587 | +923.1246 / +25.1195 | -1053.8257 / -28.6761 | -50.5126 | -130.7012 / -3.5566 |
+| casci (free) | (4,12)@r1 | 72.0000 | 6.0000 | 1.0e-08/— | -50.2325 | +149.3448 / +4.0639 | -445.0011 / -12.1091 | -50.6775 | -295.6563 / -8.0452 |
+| casci (free) | (4,15) | 42.0000 | 6.0000 | 1.0e-08/— | -49.4587 | +923.1116 / +25.1191 | -1056.2479 / -28.7420 | -50.5150 | -133.1363 / -3.6228 |
+| casci (free) | (4,15)@r1 | 72.0000 | 6.0000 | 1.0e-08/— | -50.2325 | +149.3448 / +4.0639 | -445.1709 / -12.1137 | -50.6777 | -295.8261 / -8.0498 |
+| casci (free) | (6,13) | 12.0000 | 12.0000 | 1.0e-08/— | -49.3168 | +1065.0798 / +28.9823 | -1081.0320 / -29.4164 | -50.3978 | -15.9522 / -0.4341 |
+| casci (free) | (6,13)@r1 | 72.0000 | 6.0000 | 1.0e-08/— | -50.2413 | +140.5269 / +3.8239 | -437.1603 / -11.8957 | -50.6785 | -296.6334 / -8.0718 |
+| === | === | === | === | === | === | === | === | === | === |
+| casscf (free) | (4,12) | 71.7466 | 6.0000 | 6.9e-08/86 | -50.4307 | -48.8344 / -1.3289 | -312.6618 / -8.5080 | -50.7433 | -361.4962 / -9.8368 |
+| casscf (free) | (4,12)@r1 | 71.9342 | 6.0000 | 5.1e-08/122 | -50.4307 | -48.8333 / -1.3288 | -312.8311 / -8.5126 | -50.7435 | -361.6644 / -9.8414 |
+| casscf (free) | (4,15) | 71.3283 | 6.0000 | 6.3e-09/150 | -50.4345 | -52.6014 / -1.4314 | -309.9138 / -8.4332 | -50.7444 | -362.5152 / -9.8645 |
+| casscf (free) | (4,15)@r1 | 71.7291 | 6.0000 | 2.6e-08/162 | -50.4345 | -52.6015 / -1.4314 | -310.7611 / -8.4562 | -50.7452 | -363.3626 / -9.8876 |
+| casscf (free) | (6,13) | 71.6645 | 6.0000 | 7.9e-08/192 | -50.4549 | -73.0045 / -1.9866 | -305.7784 / -8.3207 | -50.7606 | -378.7829 / -10.3072 |
+| casscf (free) | (6,13)@r1 | 72.0804 | 6.0000 | 2.6e-08/40 | -50.4623 | -80.4875 / -2.1902 | -295.3475 / -8.0368 | -50.7577 | -375.8350 / -10.2270 |
+| === | === | === | === | === | === | === | === | === | === |
+| sa-casscf (free) | (4,12) | 72.0000 | 6.0000 | 3.2e-09/11 | -50.4238 | -41.9595 / -1.1418 | -341.6680 / -9.2973 | -50.7655 | -383.6276 / -10.4390 |
+| sa-casscf (free) | (4,12)@r1 | 72.0000 | 6.0000 | 1.6e-08/8 | -50.4238 | -41.9593 / -1.1418 | -341.6698 / -9.2973 | -50.7655 | -383.6291 / -10.4391 |
+| sa-casscf (free) | (4,15) | 71.7845..71.9654 | 6.0000 | 8.5e-08/50 | -50.4264 | -44.5275 / -1.2117 | -336.0098 / -9.1433 | -50.7624 | -380.5373 / -10.3549 |
+| sa-casscf (free) | (4,15)@r1 | 71.7847..71.9654 | 6.0000 | 1.9e-08/27 | -50.4264 | -44.5272 / -1.2116 | -336.0202 / -9.1436 | -50.7624 | -380.5474 / -10.3552 |
+| sa-casscf (free) | (6,13) | 89.9987..89.9999 | 12.0000 | 1.3e-08/11 | -50.4529 | -71.0035 / -1.9321 | -282.0756 / -7.6757 | -50.7349 | -353.0792 / -9.6078 |
+| sa-casscf (free) | (6,13)@r1 | 89.9987..89.9999 | 12.0000 | 9.7e-09/12 | -50.4529 | -71.0035 / -1.9321 | -282.0771 / -7.6757 | -50.7349 | -353.0806 / -9.6078 |
+| === | === | === | === | === | === | === | === | === | === |
+| casci (pinned) | (4,12) | 72.0000 | 6.0000 | 1.0e-12/— | -48.9351 | +1446.7552 / +39.3682 | -1779.9780 / -48.4357 | -50.7151 | -333.2228 / -9.0675 |
+| casci (pinned) | (4,15) | 0.0000..42.0000 | 6.0000 | 1.0e-12/— | -48.1294 | +2252.4212 / +61.2915 | -2504.5576 / -68.1525 | -50.6340 | -252.1364 / -6.8610 |
+| casci (pinned) | (6,13) | 72.0000..90.0000 | 12.0000 | 1.0e-12/— | -48.7864 | +1595.4834 / +43.4153 | -1823.7788 / -49.6276 | -50.6101 | -228.2955 / -6.2122 |
+| === | === | === | === | === | === | === | === | === | === |
+| sa-casscf (pinned) | (4,12) | 72.0000 | 6.0000 | 1.8e-09/7 | -50.4238 | -41.9577 / -1.1417 | -341.7335 / -9.2990 | -50.7655 | -383.6912 / -10.4408 |
+| sa-casscf (pinned) | (6,13) | 71.9987..89.9986 | 12.0000 | 1.2e-09/17 | -50.4515 | -69.6548 / -1.8954 | -285.4669 / -7.7680 | -50.7370 | -355.1217 / -9.6634 |
+| === | === | === | === | === | === | === | === | === | === |
+| casci (pinned@pur) | (4,12) | 72.0000 | 6.0000 | 1.0e-12/— | -50.1871 | +194.7967 / +5.3007 | -541.9734 / -14.7478 | -50.7290 | -347.1767 / -9.4472 |
+| casci (pinned@pur) | (4,15) | -0.0000..42.0000 | 6.0000 | 1.0e-12/— | -49.4575 | +924.3799 / +25.1537 | -1056.2621 / -28.7424 | -50.5137 | -131.8823 / -3.5887 |
+| casci (pinned@pur) | (6,13) | 12.0000..42.0000 | 12.0000 | 1.0e-12/— | -49.3005 | +1081.3149 / +29.4241 | -1081.0607 / -29.4172 | -50.3816 | +0.2543 / +0.0069 |
+| casci (pinned@pur) | (6,13)@r1 | 72.0000 | 6.0000 | 1.0e-12/— | -50.1960 | +185.8035 / +5.0560 | -536.2002 / -14.5907 | -50.7322 | -350.3967 / -9.5348 |
+| === | === | === | === | === | === | === | === | === | === |
+| sa-casscf (pinned@pur) | (4,12) | 72.0000 | 6.0000 | 4.5e-09/7 | -50.4238 | -41.9577 / -1.1417 | -341.7378 / -9.2992 | -50.7655 | -383.6955 / -10.4409 |
+| sa-casscf (pinned@pur) | (4,15) | 71.7860..71.9649 | 6.0000 | 1.0e-07/25 | -50.4253 | -43.4551 / -1.1825 | -336.7134 / -9.1624 | -50.7620 | -380.1685 / -10.3449 |
 
 E_method -- the method's own energy (the CASSCF/SA total; the pinned casci value is the TERM energy, the components' mean plus the core bookkeeping constant -- its dE is that constant's projected-density form, not comparable to the free rows).  E_tot = E_method + E(2) (SC-NEVPT2, pyscf.mrpt, strongly contracted); dE against the ROHF row.
+
+The frozen casci rows are the PRICING class (what PT2 sees as built, no optimizer).  The class flip across windows is the window's economics: the raw-band windows freeze the 5I ((4,12)/(4,15), <L2> 42.0) and the 7F ((6,13), <L2> 12.0 -- the 7s column unoccupied at 3e-03); the @r1 windows freeze the declared 5L (<L2> 72.0 -- at (6,13) via the pair-MO s channel).  All rotation-closed, so every reading is an EXACT definite L (the closure certificate) -- the windows differ in WHICH L wins.  The casscf single-root rows are the escape-draw class (no assertion); the SA rows carry the term average over the 17 M_L components.
 
 E(2) comparability -- within a row, E_tot = E_method + E(2); across rows, compare E_tot at matched partitions.  The frozen-window rows' large E(2) is the UNOPTIMIZED gauge: the optimizer converts PT2-priced (dynamic) correlation into variationally-absorbed (static) correlation -- read that trade down the E_method/E(2) columns (at (4,12): casci E(2) -1054 mEh -&gt; SA -342 mEh while E_var falls +923 -&gt; -42 mEh; the net is the E_tot column).
 
 &lt;L²&gt;/&lt;S²&gt; -- the ground root for the single-root methods; min..max over the ensemble's 17 roots (free SA) or over the term's pinned components (pinned rows).  The spread is the disclosure (draw-dependent partitions, closure costs, block-ground classes); the per-root record lives in `logs/u14e_vv_*.log`, the committed campaign payload in `elements/U14e/perturbation.json` -- two independent sources, compared here.
 
-conv -- "&lt;precision&gt;/&lt;n_iters&gt;": the optimizer's achieved |dE| (the callback's final macro-step delta; the pinned SA's conv_dE) over its MACRO-cycle count (the store's callback-count records predating 2026-11-23 inflate by the micro overhead -- the campaign cells' '200' = 50 macro + ~150 micro); the CI solves carry the requested CI tolerance with no iteration structure (—).  ``*`` marks a cycle-cap draw (not converged; the run's log discloses).  Cells read — where a run's record predates the column (the convergence flag lives in that run's log).
+conv -- "&lt;precision&gt;/&lt;n_iters&gt;": the optimizer's achieved |dE| (the callback's final macro-step delta; the pinned SA's conv_dE) over its MACRO-cycle count (the store's callback-count records predating 2026-11-23 inflate by the micro overhead -- the campaign cells' '200' = 50 macro + ~150 micro); the CI solves carry the REQUESTED CI tolerance with no iteration structure (—): the free rows solve at 1e-8, the pinned solvers at 1e-12 (why the pinned <L²> exactness reads 1e-13).  ``*`` marks a cycle-cap draw (not converged; the run's log discloses).  Cells read — where a run's record predates the column (the convergence flag lives in that run's log).
 
 The pinned (4,15) row is the RE-ATTEMPT under the corrected symmetrizer, and it MEASURED the refusal: the declared core span of @6s6p7s realizes 6p as THREE bands (13p/14p/15p), and the pinned route's frozen core (the C1 reference's m-mixed occupied 6p projected onto that span) spans the 14p slots ENTIRELY -- the promoted columns are core-span content by construction, the pinned SA has no window at this partition (purify_window refuses every run -- the vanish or the tolerance miss, draw-dependent in form), and the pinned casci's block grounds come out NOT the 5L (L classes 0..42; at (4,12) the same route reads 17 components at 72.000000).  The pinned (4,15) is the pinned (4,12) here.  The FREE route's core (the pur substrate) does not contain the slots (survival 0.28) and hosts the promotion -- its measured cost +3.09 mEh (fresh, twice) is the experiment's answer; the lane_core promotion is declined, src unchanged.
 
