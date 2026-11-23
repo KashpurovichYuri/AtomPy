@@ -27,19 +27,45 @@
 | sa-casscf (free) | (6,13)@r1 | 89.9987..89.9999 | 12.0000 | 9.7e-09/12 | -50.4529 | -71.0035 / -1.9321 | -282.0771 / -7.6757 | -50.7349 | -353.0806 / -9.6078 |
 | === | === | === | === | === | === | === | === | === | === |
 | casci (pinned) | (4,12) | 72.0000 | 6.0000 | 1.0e-12/— | -48.9351 | +1446.7552 / +39.3682 | -1779.9780 / -48.4357 | -50.7151 | -333.2228 / -9.0675 |
+| casci (pinned) | (4,12)@r1 |  — | — | — | — | — | — | — | — |
 | casci (pinned) | (4,15) | 0.0000..42.0000 | 6.0000 | 1.0e-12/— | -48.1294 | +2252.4212 / +61.2915 | -2504.5576 / -68.1525 | -50.6340 | -252.1364 / -6.8610 |
+| casci (pinned) | (4,15)@r1 |  — | — | — | — | — | — | — | — |
 | casci (pinned) | (6,13) | 72.0000..90.0000 | 12.0000 | 1.0e-12/— | -48.7864 | +1595.4834 / +43.4153 | -1823.7788 / -49.6276 | -50.6101 | -228.2955 / -6.2122 |
+| casci (pinned) | (6,13)@r1 |  — | — | — | — | — | — | — | — |
+| === | === | === | === | === | === | === | === | === | === |
+| casscf (pinned) | (4,12) |  — | — | — | — | — | — | — | — |
+| casscf (pinned) | (4,12)@r1 |  — | — | — | — | — | — | — | — |
+| casscf (pinned) | (4,15) |  — | — | — | — | — | — | — | — |
+| casscf (pinned) | (4,15)@r1 |  — | — | — | — | — | — | — | — |
+| casscf (pinned) | (6,13) |  — | — | — | — | — | — | — | — |
+| casscf (pinned) | (6,13)@r1 |  — | — | — | — | — | — | — | — |
 | === | === | === | === | === | === | === | === | === | === |
 | sa-casscf (pinned) | (4,12) | 72.0000 | 6.0000 | 1.8e-09/7 | -50.4238 | -41.9577 / -1.1417 | -341.7335 / -9.2990 | -50.7655 | -383.6912 / -10.4408 |
+| sa-casscf (pinned) | (4,12)@r1 |  — | — | — | — | — | — | — | — |
+| sa-casscf (pinned) | (4,15) |  — | — | — | — | — | — | — | — |
+| sa-casscf (pinned) | (4,15)@r1 |  — | — | — | — | — | — | — | — |
 | sa-casscf (pinned) | (6,13) | 71.9987..89.9986 | 12.0000 | 1.2e-09/17 | -50.4515 | -69.6548 / -1.8954 | -285.4669 / -7.7680 | -50.7370 | -355.1217 / -9.6634 |
+| sa-casscf (pinned) | (6,13)@r1 |  — | — | — | — | — | — | — | — |
 | === | === | === | === | === | === | === | === | === | === |
-| casci (pinned@pur) | (4,12) | 72.0000 | 6.0000 | 1.0e-12/— | -50.1871 | +194.7967 / +5.3007 | -541.9734 / -14.7478 | -50.7290 | -347.1767 / -9.4472 |
+| casci (pinned@pur) | (4,12) | -0.0000..42.0000 | 6.0000 | 1.0e-12/— | -49.4575 | +924.3949 / +25.1541 | -1053.3148 / -28.6622 | -50.5108 | -128.9199 / -3.5081 |
+| casci (pinned@pur) | (4,12)@r1 | 72.0000 | 6.0000 | 1.0e-12/— | -50.1871 | +194.7967 / +5.3007 | -541.9734 / -14.7478 | -50.7290 | -347.1767 / -9.4472 |
 | casci (pinned@pur) | (4,15) | -0.0000..42.0000 | 6.0000 | 1.0e-12/— | -49.4575 | +924.3799 / +25.1537 | -1056.2621 / -28.7424 | -50.5137 | -131.8823 / -3.5887 |
+| casci (pinned@pur) | (4,15)@r1 | 72.0000 | 6.0000 | 1.0e-12/— | -50.1871 | +194.7417 / +5.2992 | -459.3198 / -12.4987 | -50.6464 | -264.5782 / -7.1995 |
 | casci (pinned@pur) | (6,13) | 12.0000..42.0000 | 12.0000 | 1.0e-12/— | -49.3005 | +1081.3149 / +29.4241 | -1081.0607 / -29.4172 | -50.3816 | +0.2543 / +0.0069 |
 | casci (pinned@pur) | (6,13)@r1 | 72.0000 | 6.0000 | 1.0e-12/— | -50.1960 | +185.8035 / +5.0560 | -536.2002 / -14.5907 | -50.7322 | -350.3967 / -9.5348 |
 | === | === | === | === | === | === | === | === | === | === |
-| sa-casscf (pinned@pur) | (4,12) | 72.0000 | 6.0000 | 4.5e-09/7 | -50.4238 | -41.9577 / -1.1417 | -341.7378 / -9.2992 | -50.7655 | -383.6955 / -10.4409 |
+| casscf (pinned@pur) | (4,12) |  — | — | — | — | — | — | — | — |
+| casscf (pinned@pur) | (4,12)@r1 |  — | — | — | — | — | — | — | — |
+| casscf (pinned@pur) | (4,15) |  — | — | — | — | — | — | — | — |
+| casscf (pinned@pur) | (4,15)@r1 |  — | — | — | — | — | — | — | — |
+| casscf (pinned@pur) | (6,13) |  — | — | — | — | — | — | — | — |
+| casscf (pinned@pur) | (6,13)@r1 |  — | — | — | — | — | — | — | — |
+| === | === | === | === | === | === | === | === | === | === |
+| sa-casscf (pinned@pur) | (4,12)@r1 | 72.0000 | 6.0000 | 4.5e-09/7 | -50.4238 | -41.9577 / -1.1417 | -341.7378 / -9.2992 | -50.7655 | -383.6955 / -10.4409 |
 | sa-casscf (pinned@pur) | (4,15) | 71.7860..71.9649 | 6.0000 | 1.0e-07/25 | -50.4253 | -43.4551 / -1.1825 | -336.7134 / -9.1624 | -50.7620 | -380.1685 / -10.3449 |
+| sa-casscf (pinned@pur) | (4,15)@r1 | 71.7472..71.9468 | 6.0000 | 1.9e-08/23 | -50.4253 | -43.4553 / -1.1825 | -319.2236 / -8.6865 | -50.7445 | -362.6788 / -9.8690 |
+| sa-casscf (pinned@pur) | (6,13) | 71.9971..89.9932 | 12.0000 | 7.6e-10/13 | -50.4515 | -69.6548 / -1.8954 | -1580.4205 / -43.0054 | -52.0319 | -1650.0753 / -44.9008 |
+| sa-casscf (pinned@pur) | (6,13)@r1 | 71.9996..89.9998 | 12.0000 | 3.7e-08/8 | -50.4515 | -69.6548 / -1.8954 | -475.1761 / -12.9302 | -50.9267 | -544.8309 / -14.8256 |
 
 E_method -- the method's own energy (the CASSCF/SA total; the pinned casci value is the TERM energy, the components' mean plus the core bookkeeping constant -- its dE is that constant's projected-density form, not comparable to the free rows).  E_tot = E_method + E(2) (SC-NEVPT2, pyscf.mrpt, strongly contracted); dE against the ROHF row.
 
@@ -48,6 +74,8 @@ The frozen casci rows are the PRICING class (what PT2 sees as built, no optimize
 E(2) comparability -- within a row, E_tot = E_method + E(2); across rows, compare E_tot at matched partitions.  The frozen-window rows' large E(2) is the UNOPTIMIZED gauge: the optimizer converts PT2-priced (dynamic) correlation into variationally-absorbed (static) correlation -- read that trade down the E_method/E(2) columns (at (4,12): casci E(2) -1054 mEh -&gt; SA -342 mEh while E_var falls +923 -&gt; -42 mEh; the net is the E_tot column).
 
 &lt;L²&gt;/&lt;S²&gt; -- the ground root for the single-root methods; min..max over the ensemble's 17 roots (free SA) or over the term's pinned components (pinned rows).  The spread is the disclosure (draw-dependent partitions, closure costs, block-ground classes); the per-root record lives in `logs/u14e_vv_*.log`, the committed campaign payload in `elements/U14e/perturbation.json` -- two independent sources, compared here.
+
+The dash (—) rows -- the matrix stays complete, the runs do not exist: the pinned routes carry NO single-root method (the term pin lives in the 2L+1-component ensemble; a one-root run cannot carry it); the pinned (lane) route's address grammar carries at most one @-tag (the core tag -- no @r1 source windows there; the prior axis rides the pinned@pur route); the lane (4,15) SA is the certified refusal (the promoted columns are core-span content -- no window exists at that partition).
 
 conv -- "&lt;precision&gt;/&lt;n_iters&gt;": the optimizer's achieved |dE| (the callback's final macro-step delta; the pinned SA's conv_dE) over its MACRO-cycle count (the store's callback-count records predating 2026-11-23 inflate by the micro overhead -- the campaign cells' '200' = 50 macro + ~150 micro); the CI solves carry the REQUESTED CI tolerance with no iteration structure (—): the free rows solve at 1e-8, the pinned solvers at 1e-12 (why the pinned <L²> exactness reads 1e-13).  ``*`` marks a cycle-cap draw (not converged; the run's log discloses).  Cells read — where a run's record predates the column (the convergence flag lives in that run's log).
 

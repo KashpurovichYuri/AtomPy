@@ -1,0 +1,52 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+  [window] 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420
+  [window] 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+  [window] 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+  [diagnostic] distilled columns' S-norm after removing the pur core span: 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 0.8534
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13_r1.py:80: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  core = set(occupied_core_idx(mf, NCORE))
+  [s channel] the reference's 7s pair MO (occupied column 143, occ 2.0) replaces the distilled radial at 12: its l-sector weights s 0.987327 / d 0.012673 (the m-mixed C1 tail -- fact 12's residue; PROJECTED OUT), the s-pure column keeps cos^2 0.987327 of the pair MO, whose cos^2 against the distilled radial was 0.7094 (the declared 3-band span misses it)
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13_r1.py:178: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
+  [closure] assembled window: ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.30e-13 (rotation closure -- the definite-L certificate)
+  [s channel] the assembled block's orthonormality deviation 1.55e-15
+  [window] the input closure ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.30e-13; the s column at 12
+===== A: CASSCF, input window =====
+  [A] E -50.45485707, converged True (61 macro, |dE| 6.8e-08, 159 s)
+  [A] ground root: <L2> 64.080396, <S2> 6.000000 (spin_square: 6.000000, 5.0); the converged window's closure: ||[P,Lz]|| 1.74e+00, ||[P,Lperp]|| 6.34e+00
+  [A] occupations:
+    0:0.50  1:0.49  2:0.44  3:0.24  4:0.36  5:0.50  6:0.50  7:0.46  8:0.08  9:0.04  10:0.07  11:0.45  12:1.86
+===== B: free SA x17, input window =====
+  [B] ensemble -50.45274176, converged True (12 macro, |dE| 9.7e-09, 82 s); root 0 e_ref -50.45285539
+  [B] ground root: <L2> 89.998745, <S2> 12.000000 (spin_square: 12.000000, 7.0); the converged window's closure: ||[P,Lz]|| 1.67e-02, ||[P,Lperp]|| 1.91e-02
+  [B] occupations:
+    0:0.58  1:0.57  2:0.61  3:0.25  4:0.29  5:0.33  6:0.37  7:0.54  8:0.56  9:0.23  10:0.29  11:0.38  12:1.00
+  [B] the fingerprint read: s column occ 1.000; f block sum 3.00; d block sum 2.00
+===== C: free SA x17, started from A's orbitals =====
+  [C] ensemble -50.42696762, converged True (15 macro, 87 s)
+  [C] ground root: <L2> 57.442936, <S2> 6.000000 (spin_square: 6.000000, 5.0); the converged window's closure: ||[P,Lz]|| 2.66e+00, ||[P,Lperp]|| 5.00e+00
+===== D: CASSCF, started from B's orbitals =====
+  [D] E -50.45480733, converged True (19 macro, 45 s)
+  [D] ground root: <L2> 83.738814, <S2> 11.999999 (spin_square: 11.999999, 7.0); the converged window's closure: ||[P,Lz]|| 2.26e+00, ||[P,Lperp]|| 4.95e+00
+===== E1: the pinned SA on the @r1 window =====
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_sa_basins.py:164: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_d2h = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, _nc),
+  [E1] ensemble -50.45150713, converged True (cycles 8, 121 s); <L2> [71.998947, 89.998892], <S2> max 12.000000
+===== E2: free SA x17, started from E1's orbitals =====
+  [E2] ensemble -50.45274194, converged True (5 macro, 22 s)
+  [E2] ground root: <L2> 89.998778, <S2> 12.000000 (spin_square: 12.000000, 7.0); the converged window's closure: ||[P,Lz]|| 1.60e-02, ||[P,Lperp]|| 1.97e-02
+  [E2] occupations:
+    0:0.57  1:0.57  2:0.63  3:0.21  4:0.29  5:0.34  6:0.39  7:0.54  8:0.56  9:0.21  10:0.30  11:0.39  12:1.00
+
+===== the valley map =====
+  A  casscf   (input seed)      E -50.45485707
+  D  casscf   (B's seed)        E -50.45480733
+  B  sa x17   (input seed)      ensemble -50.45274176
+  C  sa x17   (A's seed)        ensemble -50.42696762
+  E1 pinned sa                  ensemble -50.45150713
+  E2 sa x17   (E1's seed)       ensemble -50.45274194
+(648 s total)

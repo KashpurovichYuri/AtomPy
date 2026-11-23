@@ -1,0 +1,65 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_unification.py:89: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc), act,
+  [(4,12) casci] 17 components, <L2> in [-0.000000, 42.000000] (2.9 s)
+  [(4,12)] the counts: 72.0 +- 0.01: 0; 90.0 +- 0.01: 0; other: 17
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112
+  [(4,15)@r1 casci] 17 components, <L2> in [72.000000, 72.000000] (3.8 s)
+  [(4,15)@r1] the counts: 72.0 +- 0.01: 17; 90.0 +- 0.01: 0; other: 0
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112
+  [(4,15)@r1 sa] ensemble -50.42530758, converged True (cycles 23, 201.1 s); <L2> [71.747197, 71.946788]
+  [(4,15)@r1] the counts: 72.0 +- 0.01: 0; 90.0 +- 0.01: 0; other: 17
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_pinned_matrix.py:170: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo613 = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc613),
+  [(6,13) sa] ensemble -50.45150714, converged True (cycles 13, 199.5 s); <L2> [71.997054, 89.993163]
+    (6,13) Au[0]: <L2> 89.992985, <S2> 12.000000
+    (6,13) Au[1]: <L2> 89.988658, <S2> 12.000000
+    (6,13) Au[2]: <L2> 89.984576, <S2> 12.000000
+    (6,13) Au[3]: <L2> 89.985443, <S2> 12.000000
+    (6,13) Au[4]: <L2> 71.997054, <S2> 6.000000
+    (6,13) B1u[0]: <L2> 89.992980, <S2> 12.000000
+    (6,13) B1u[1]: <L2> 89.988359, <S2> 12.000000
+    (6,13) B1u[2]: <L2> 89.985700, <S2> 12.000000
+    (6,13) B1u[3]: <L2> 89.984626, <S2> 12.000000
+    (6,13) B2u[0]: <L2> 89.990511, <S2> 11.999998
+    (6,13) B2u[1]: <L2> 89.990152, <S2> 12.000000
+    (6,13) B2u[2]: <L2> 89.989607, <S2> 12.000000
+    (6,13) B2u[3]: <L2> 89.986203, <S2> 12.000000
+    (6,13) B3u[0]: <L2> 89.993163, <S2> 11.999999
+    (6,13) B3u[1]: <L2> 89.990242, <S2> 12.000000
+    (6,13) B3u[2]: <L2> 89.986600, <S2> 12.000000
+    (6,13) B3u[3]: <L2> 89.983817, <S2> 12.000000
+  [(6,13)] the counts: 72.0 +- 0.01: 1; 90.0 +- 0.01: 6; other: 10
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13_r1.py:80: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  core = set(occupied_core_idx(mf, NCORE))
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_pinned_matrix.py:177: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_s = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc613),
+  [(6,13)@r1 sa] ensemble -50.45150713, converged True (cycles 8, 159.2 s); <L2> [71.999637, 89.999784]
+    (6,13)@r1 Au[0]: <L2> 89.999684, <S2> 12.000000
+    (6,13)@r1 Au[1]: <L2> 89.999562, <S2> 12.000000
+    (6,13)@r1 Au[2]: <L2> 89.999414, <S2> 12.000000
+    (6,13)@r1 Au[3]: <L2> 89.999457, <S2> 12.000000
+    (6,13)@r1 Au[4]: <L2> 71.999637, <S2> 6.000000
+    (6,13)@r1 B1u[0]: <L2> 89.999619, <S2> 11.999996
+    (6,13)@r1 B1u[1]: <L2> 89.999341, <S2> 11.999998
+    (6,13)@r1 B1u[2]: <L2> 89.999491, <S2> 11.999999
+    (6,13)@r1 B1u[3]: <L2> 89.999784, <S2> 12.000000
+    (6,13)@r1 B2u[0]: <L2> 89.999675, <S2> 11.999999
+    (6,13)@r1 B2u[1]: <L2> 89.999606, <S2> 11.999999
+    (6,13)@r1 B2u[2]: <L2> 89.999535, <S2> 12.000000
+    (6,13)@r1 B2u[3]: <L2> 89.999171, <S2> 12.000000
+    (6,13)@r1 B3u[0]: <L2> 89.999676, <S2> 12.000000
+    (6,13)@r1 B3u[1]: <L2> 89.999573, <S2> 12.000000
+    (6,13)@r1 B3u[2]: <L2> 89.999289, <S2> 12.000000
+    (6,13)@r1 B3u[3]: <L2> 89.999354, <S2> 12.000000
+  [(6,13)@r1] the counts: 72.0 +- 0.01: 1; 90.0 +- 0.01: 16; other: 0
+
+===== verdict =====
+0/0 assertions hold

@@ -598,12 +598,36 @@ _ORDER = (["rohf|-|-", "uhf|-|-"] +
            for m in ("casci", "casscf", "sa-casscf")
            for c in ("(4,12)", "(4,12)@r1", "(4,15)", "(4,15)@r1",
                      "(6,13)", "(6,13)@r1")] +
-          [f"{m}|pinned|{c}"
-           for m in ("casci", "sa-casscf")
-           for c in ("(4,12)", "(4,15)", "(6,13)")] +
-          [f"{m}|pinned@pur|{c}"
-           for m in ("casci", "sa-casscf")
-           for c in ("(4,12)", "(4,15)", "(6,13)", "(6,13)@r1")])
+          [f"{m}|{r}|{c}"
+           for r in ("pinned", "pinned@pur")
+           for m in ("casci", "casscf", "sa-casscf")
+           for c in ("(4,12)", "(4,12)@r1", "(4,15)", "(4,15)@r1",
+                     "(6,13)", "(6,13)@r1")])
+
+# the rows that cannot run, rendered as dash rows at their _ORDER
+# positions (the user's directive: the matrix stays complete; the
+# reason lives in the footer legend)
+DASH_ROW_REASONS = {
+    "casscf|pinned|(4,12)": "no single-root pinned method",
+    "casscf|pinned|(4,12)@r1": "no single-root pinned method",
+    "casscf|pinned|(4,15)": "no single-root pinned method",
+    "casscf|pinned|(4,15)@r1": "no single-root pinned method",
+    "casscf|pinned|(6,13)": "no single-root pinned method",
+    "casscf|pinned|(6,13)@r1": "no single-root pinned method",
+    "casscf|pinned@pur|(4,12)": "no single-root pinned method",
+    "casscf|pinned@pur|(4,12)@r1": "no single-root pinned method",
+    "casscf|pinned@pur|(4,15)": "no single-root pinned method",
+    "casscf|pinned@pur|(4,15)@r1": "no single-root pinned method",
+    "casscf|pinned@pur|(6,13)": "no single-root pinned method",
+    "casscf|pinned@pur|(6,13)@r1": "no single-root pinned method",
+    "casci|pinned|(4,12)@r1": "the lane grammar carries no source tag",
+    "casci|pinned|(4,15)@r1": "the lane grammar carries no source tag",
+    "casci|pinned|(6,13)@r1": "the lane grammar carries no source tag",
+    "sa-casscf|pinned|(4,12)@r1": "the lane grammar carries no source tag",
+    "sa-casscf|pinned|(4,15)@r1": "the lane grammar carries no source tag",
+    "sa-casscf|pinned|(6,13)@r1": "the lane grammar carries no source tag",
+    "sa-casscf|pinned|(4,15)": "the certified refusal (no window)",
+}
 
 
 def fmt_range(vals, nd: int = 4) -> str:
@@ -633,8 +657,9 @@ def render_table() -> None:
     Every energy <= 4 decimals; deltas in the ``mEh / eV`` slash
     form."""
     rows = json.loads(ROWS.read_text()) if ROWS.exists() else {}
-    order = [k for k in _ORDER if k in rows]
-    order += [k for k in rows if k not in order]
+    order = [k for k in _ORDER if k in rows or k in DASH_ROW_REASONS]
+    known = set(_ORDER)
+    order += [k for k in rows if k not in known]
     e0 = rohf_energy()
     out = [
         "# U14e -- the V&V family",
@@ -650,7 +675,17 @@ def render_table() -> None:
     _group = {"rohf": "ref", "uhf": "ref"}
     prev = None
     for k in order:
-        r = rows[k]
+        r = rows.get(k)
+        if r is None:
+            if k not in DASH_ROW_REASONS:
+                continue
+            method, route, cas = k.split("|")
+            label = method if route == "-" else f"{method} ({route})"
+            if prev is not None and _group.get(method, method) != prev:
+                out.append("|" + " === |" * 10)
+            prev = _group.get(method, method)
+            out.append(f"| {label} | {cas} | " + " — |" * 8)
+            continue
         g = _group.get(r["method"], r["method"])
         if prev is not None and g != prev:
             out.append("|" + " === |" * 10)
@@ -712,6 +747,16 @@ def render_table() -> None:
         "`logs/u14e_vv_*.log`, the committed campaign payload in "
         "`elements/U14e/perturbation.json` -- two independent "
         "sources, compared here.",
+        "",
+        "The dash (—) rows -- the matrix stays complete, the runs do "
+        "not exist: the pinned routes carry NO single-root method "
+        "(the term pin lives in the 2L+1-component ensemble; a "
+        "one-root run cannot carry it); the pinned (lane) route's "
+        "address grammar carries at most one @-tag (the core tag -- "
+        "no @r1 source windows there; the prior axis rides the "
+        "pinned@pur route); the lane (4,15) SA is the certified "
+        "refusal (the promoted columns are core-span content -- no "
+        "window exists at that partition).",
         "",
         "conv -- \"&lt;precision&gt;/&lt;n_iters&gt;\": the "
         "optimizer's achieved |dE| (the callback's final macro-step "
