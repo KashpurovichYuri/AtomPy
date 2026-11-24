@@ -1,0 +1,14 @@
+  [mol] the D2h U atom: nao 177, the irreps ['Ag', 'B1g', 'B2g', 'B3g', 'Au', 'B1u', 'B2u', 'B3u']
+  [E] the numeric signs determined for 177/177 AOs (the remainder vanish on the grid)
+  [C2z] the numeric signs determined for 177/177 AOs (the remainder vanish on the grid)
+  [C2y] the numeric signs determined for 177/177 AOs (the remainder vanish on the grid)
+  [C2x] the numeric signs determined for 177/177 AOs (the remainder vanish on the grid)
+  [i] the numeric signs determined for 177/177 AOs (the remainder vanish on the grid)
+  [s_xy] the numeric signs determined for 177/177 AOs (the remainder vanish on the grid)
+  [s_xz] the numeric signs determined for 177/177 AOs (the remainder vanish on the grid)
+  [s_yz] the numeric signs determined for 177/177 AOs (the remainder vanish on the grid)
+  [verdict] 64 op x irrep checks, 0 failures -- the D2h assignment CERTIFIED
+  [table] the character-table orthogonality: PASS
+  [note] the conflation is group theory: s and dz2/dx2-y2 are ALL invariant under every D2h operation -- no axis relabeling separates them; the 7 f functions MUST distribute over the four u-irreps (2 each + f0 in Au)
+
+CERTIFIED (0 s total)

@@ -38,32 +38,6 @@
   "term": "5L",
   "conv": "3.2e-09/11"
  },
- "casci|pinned|(4,12)": {
-  "method": "casci",
-  "route": "pinned",
-  "cas": "(4,12)",
-  "l2": "72.0000",
-  "s2": "6.0000",
-  "e_method": -48.93509709535529,
-  "e2_meh": -1779.9780470298606,
-  "e2_ev": -48.43567014710892,
-  "e_tot": -50.715075142385146,
-  "term": "5L (term energy)",
-  "conv": "1.0e-12/\u2014"
- },
- "sa-casscf|pinned|(4,12)": {
-  "method": "sa-casscf",
-  "route": "pinned",
-  "cas": "(4,12)",
-  "l2": "72.0000",
-  "s2": "6.0000",
-  "e_method": -50.42381002809927,
-  "e2_meh": -341.7335383595528,
-  "e2_ev": -9.299043305509947,
-  "e_tot": -50.765543566458824,
-  "term": "5L",
-  "conv": "1.8e-09/7"
- },
  "casci|free|(4,15)": {
   "method": "casci",
   "route": "free",
@@ -103,19 +77,6 @@
   "term": "5L, closure-costed",
   "conv": "8.5e-08/50"
  },
- "casci|pinned|(4,15)": {
-  "method": "casci",
-  "route": "pinned",
-  "cas": "(4,15)",
-  "l2": "0.0000..42.0000",
-  "s2": "6.0000",
-  "e_method": -48.12943111011892,
-  "e2_meh": -2504.5576020864537,
-  "e2_ev": -68.1524842857,
-  "e_tot": -50.63398871220538,
-  "term": "grounds not the 5L (5S/5I)",
-  "conv": "1.0e-12/\u2014"
- },
  "casci|free|(6,13)": {
   "method": "casci",
   "route": "free",
@@ -154,32 +115,6 @@
   "e_tot": -50.73493148682303,
   "term": "the L=9 class (90), S=3",
   "conv": "1.3e-08/11"
- },
- "casci|pinned|(6,13)": {
-  "method": "casci",
-  "route": "pinned",
-  "cas": "(6,13)",
-  "l2": "72.0000..90.0000",
-  "s2": "12.0000",
-  "e_method": -48.786368949152084,
-  "e2_meh": -1823.7788375573996,
-  "e2_ev": -49.627550376033405,
-  "e_tot": -50.61014778670948,
-  "term": "L=9 ground + the 5L present",
-  "conv": "1.0e-12/\u2014"
- },
- "sa-casscf|pinned|(6,13)": {
-  "method": "sa-casscf",
-  "route": "pinned",
-  "cas": "(6,13)",
-  "l2": "71.9987..89.9986",
-  "s2": "12.0000",
-  "e_method": -50.45150713940849,
-  "e2_meh": -285.4669416131377,
-  "e2_ev": -7.767951208695994,
-  "e_tot": -50.73697408102163,
-  "term": "the 72-component ok",
-  "conv": "1.2e-09/17"
  },
  "rohf|-|-": {
   "method": "rohf",
@@ -246,19 +181,6 @@
   "term": "draw-dependent partition",
   "conv": "9.7e-09/12"
  },
- "casci|pinned@pur|(4,15)": {
-  "method": "casci",
-  "route": "pinned@pur",
-  "cas": "(4,15)",
-  "l2": "-0.0000..42.0000",
-  "s2": "6.0000",
-  "e_method": -49.457472467036325,
-  "e2_meh": -1056.2621357140345,
-  "e2_ev": -28.742356951926787,
-  "e_tot": -50.51373460275036,
-  "term": "block grounds",
-  "conv": "1.0e-12/\u2014"
- },
  "sa-casscf|pinned@pur|(4,15)": {
   "method": "sa-casscf",
   "route": "pinned@pur",
@@ -271,32 +193,6 @@
   "e_tot": -50.76202082732027,
   "term": "draw-dependent partition",
   "conv": "1.0e-07/25"
- },
- "casci|pinned@pur|(6,13)": {
-  "method": "casci",
-  "route": "pinned@pur",
-  "cas": "(6,13)",
-  "l2": "12.0000..42.0000",
-  "s2": "12.0000",
-  "e_method": -49.30053739160674,
-  "e2_meh": -1081.0606894066148,
-  "e2_ev": -29.41715997479746,
-  "e_tot": -50.38159808101335,
-  "term": "block grounds",
-  "conv": "1.0e-12/\u2014"
- },
- "casci|pinned@pur|(6,13)@r1": {
-  "method": "casci",
-  "route": "pinned@pur",
-  "cas": "(6,13)@r1",
-  "l2": "72.0000",
-  "s2": "6.0000",
-  "e_method": -50.196048839410054,
-  "e2_meh": -536.200152510437,
-  "e2_ev": -14.590749455119171,
-  "e_tot": -50.73224899192049,
-  "term": "block grounds",
-  "conv": "1.0e-12/\u2014"
  },
  "casci|free|(4,12)@r1": {
   "method": "casci",
@@ -376,19 +272,6 @@
   "term": "draw-dependent",
   "conv": "1.9e-08/27"
  },
- "casci|pinned@pur|(4,12)@r1": {
-  "method": "casci",
-  "route": "pinned@pur",
-  "cas": "(4,12)@r1",
-  "l2": "72.0000",
-  "s2": "6.0000",
-  "e_method": -50.18705563935398,
-  "e2_meh": -541.973352018657,
-  "e2_ev": -14.747846216812496,
-  "e_tot": -50.72902899137264,
-  "term": "the certified class",
-  "conv": "1.0e-12/\u2014"
- },
  "sa-casscf|pinned@pur|(4,12)@r1": {
   "method": "sa-casscf",
   "route": "pinned@pur",
@@ -401,32 +284,6 @@
   "e_tot": -50.76554783124349,
   "term": "draw-dependent partition",
   "conv": "4.5e-09/7"
- },
- "casci|pinned@pur|(4,12)": {
-  "method": "casci",
-  "route": "pinned@pur",
-  "cas": "(4,12)",
-  "l2": "-0.0000..42.0000",
-  "s2": "6.0000",
-  "e_method": -49.45745740726916,
-  "e2_meh": -1053.3148178559277,
-  "e2_ev": -28.662156347300144,
-  "e_tot": -50.51077222512509,
-  "term": "block grounds",
-  "conv": "1.0e-12/\u2014"
- },
- "casci|pinned@pur|(4,15)@r1": {
-  "method": "casci",
-  "route": "pinned@pur",
-  "cas": "(4,15)@r1",
-  "l2": "72.0000",
-  "s2": "6.0000",
-  "e_method": -50.187110673789974,
-  "e2_meh": -459.31984905400583,
-  "e2_ev": -12.498729823057458,
-  "e_tot": -50.64643052284398,
-  "term": "block grounds",
-  "conv": "1.0e-12/\u2014"
  },
  "sa-casscf|pinned@pur|(4,15)@r1": {
   "method": "sa-casscf",

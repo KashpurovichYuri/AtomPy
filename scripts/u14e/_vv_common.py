@@ -598,29 +598,9 @@ _ORDER = (["rohf|-|-", "uhf|-|-"] +
            for m in ("casci", "casscf", "sa-casscf")
            for c in ("(4,12)", "(4,12)@r1", "(4,15)", "(4,15)@r1",
                      "(6,13)", "(6,13)@r1")] +
-          [f"casci|pinned|{c}"
-           for c in ("(4,12)", "(4,15)", "(6,13)")] +
-          [f"sa-casscf|pinned|{c}"
-           for c in ("(4,12)", "(6,13)")] +
-          [f"{m}|pinned@pur|{c}"
-           for m in ("casci", "sa-casscf")
+          [f"sa-casscf|pinned@pur|{c}"
            for c in ("(4,12)", "(4,12)@r1", "(4,15)", "(4,15)@r1",
                      "(6,13)", "(6,13)@r1")])
-
-# the rows that cannot run, rendered as dash rows at their _ORDER
-# positions (the user's directive: the matrix stays complete; the
-# reason lives in the footer legend).  The casscf (pinned)/(pinned@pur)
-# rows are ABSENT by the user's directive (2026-11-24: no single-root
-# pinned method is needed) -- they are not dashes, they do not exist.
-DASH_ROW_REASONS = {
-    "casci|pinned|(4,12)@r1": "the lane grammar carries no source tag",
-    "casci|pinned|(4,15)@r1": "the lane grammar carries no source tag",
-    "casci|pinned|(6,13)@r1": "the lane grammar carries no source tag",
-    "sa-casscf|pinned|(4,12)@r1": "the lane grammar carries no source tag",
-    "sa-casscf|pinned|(4,15)@r1": "the lane grammar carries no source tag",
-    "sa-casscf|pinned|(6,13)@r1": "the lane grammar carries no source tag",
-    "sa-casscf|pinned|(4,15)": "the certified refusal (no window)",
-}
 
 
 def fmt_range(vals, nd: int = 4) -> str:
@@ -650,9 +630,8 @@ def render_table() -> None:
     Every energy <= 4 decimals; deltas in the ``mEh / eV`` slash
     form."""
     rows = json.loads(ROWS.read_text()) if ROWS.exists() else {}
-    order = [k for k in _ORDER if k in rows or k in DASH_ROW_REASONS]
-    known = set(_ORDER)
-    order += [k for k in rows if k not in known]
+    order = [k for k in _ORDER if k in rows]
+    order += [k for k in rows if k not in order]
     e0 = rohf_energy()
     out = [
         "# U14e -- the V&V family",
@@ -668,17 +647,7 @@ def render_table() -> None:
     _group = {"rohf": "ref", "uhf": "ref"}
     prev = None
     for k in order:
-        r = rows.get(k)
-        if r is None:
-            if k not in DASH_ROW_REASONS:
-                continue
-            method, route, cas = k.split("|")
-            label = method if route == "-" else f"{method} ({route})"
-            if prev is not None and _group.get(method, method) != prev:
-                out.append("|" + " === |" * 10)
-            prev = _group.get(method, method)
-            out.append(f"| {label} | {cas} | " + " — |" * 8)
-            continue
+        r = rows[k]
         g = _group.get(r["method"], r["method"])
         if prev is not None and g != prev:
             out.append("|" + " === |" * 10)
@@ -741,15 +710,6 @@ def render_table() -> None:
         "`elements/U14e/perturbation.json` -- two independent "
         "sources, compared here.",
         "",
-        "The dash (—) rows -- the matrix stays complete, the runs do "
-        "not exist: the pinned (lane) route's address grammar carries "
-        "at most one @-tag (the core tag -- no @r1 source windows "
-        "there; the prior axis rides the pinned@pur route), and its "
-        "(4,15) SA is the certified refusal (the promoted columns "
-        "are core-span content -- no window exists at that "
-        "partition).  The pinned routes carry NO single-root method "
-        "and no casscf rows (the user's directive, 2026-11-24).",
-        "",
         "conv -- \"&lt;precision&gt;/&lt;n_iters&gt;\": the "
         "optimizer's achieved |dE| (the callback's final macro-step "
         "delta; the pinned SA's conv_dE) over its MACRO-cycle count "
@@ -765,90 +725,63 @@ def render_table() -> None:
         "flag lives in that run's log).",
         "",
     ]
-    if "casci|pinned|(4,15)" in rows:
-        out += ["The pinned (4,15) row is the RE-ATTEMPT under the "
-                "corrected symmetrizer, and it MEASURED the refusal: "
-                "the declared core span of @6s6p7s realizes 6p as "
-                "THREE bands (13p/14p/15p), and the pinned route's "
-                "frozen core (the C1 reference's m-mixed occupied 6p "
-                "projected onto that span) spans the 14p slots "
-                "ENTIRELY -- the promoted columns are core-span "
-                "content by construction, the pinned SA has no "
-                "window at this partition (purify_window refuses "
-                "every run -- the vanish or the tolerance miss, "
-                "draw-dependent in form), and "
-                "the pinned casci's block grounds come out NOT the "
-                "5L (L classes 0..42; at (4,12) the same route reads "
-                "17 components at 72.000000).  The pinned (4,15) is "
-                "the pinned (4,12) here.  The FREE route's core (the "
-                "pur substrate) does not contain the slots (survival "
-                "0.28) and hosts the promotion -- its measured cost "
-                "+3.09 mEh (fresh, twice) is the experiment's "
-                "answer; the lane_core promotion is declined, src "
-                "unchanged.", ""]
-    else:
-        out += ["The pinned (4,15) legs are measured out: the "
-                "declared core span of @6s6p7s realizes 6p as three "
-                "bands (13p/14p/15p), and the pinned route's frozen "
-                "core spans the 14p slots entirely -- the promoted "
-                "columns are core-span content by construction (the "
-                "typed VanishedColumnError).  The free route hosts "
-                "the promotion.", ""]
-    if "casci|pinned@pur|(4,12)" in rows:
-        out += ["THE UNIFICATION (the pin-on-pur route: the C1 "
-                "rung's AO integrals -- gauge-independent -- on a "
-                "D2h-tagged wrapper, NO D2h SCF anywhere; the "
-                "purified core): at (4,12) the frozen CI reads the "
-                "certified lane record 17 x 72.000000 (max dev "
-                "1.1e-13) and the SA the 5L ensemble (17/17 at "
-                "72.000000, 7 macro cycles) -- the lane construction "
-                "reproduced without the lane.  At (4,15) the pur "
-                "core hosts the promotion the lane core's span "
-                "swallowed: the frozen CI's block grounds read L "
-                "classes 0..42 (the p-promotion configurations "
-                "f3d1p1 are cheaper frozen than the 5L), and the "
-                "SA's optimization recovers it -- <L2> 71.79-71.96, "
-                "converged in 25 macro cycles.  The lane window's "
-                "own SA is REFUSED at the labeling seam (its "
-                "promoted columns are core-span content; the "
-                "internal re-projection cannot reach the labeling "
-                "tolerance) -- the certified no-window class, "
-                "witnessed at both seams.", ""]
-    if "casci|free|(6,13)" in rows:
-        out += ["The (6,13) rows carry the CORRECTED meters (the "
-                "2026-11-22 slice incident: the leg's meter slices "
-                "ran one column off the key's core-pair count; the "
-                "kernels were never affected).  The frozen ground is "
-                "the 7F -- L = 3, S = 3 definite (the d5 high-spin "
-                "class + one f; the 7s column UNOCCUPIED at 3e-03): "
-                "the as-built window's variational ground abandons "
-                "the intended 5f3 6d1 7s2 configuration, driven by "
-                "the weak distillation captures (10f 0.82, 13d 0.92, "
-                "7s 0.27-0.71).  The window "
-                "itself is healthy: assembled span = projected span "
-                "exactly, closure meters ~1e-13 (the campaign cell "
-                "agreed all along).", ""]
-    if "casci|pinned@pur|(6,13)@r1" in rows:
-        out += ["THE (6,13) FIX AND ITS CLASS RECORD: the "
-                "quasi-degenerate block's partition is window- and "
-                "core-sensitive -- the as-built window on the pur "
-                "core reads 12..42 (the low-L block grounds), the "
-                "lane's certified record reads 16 x ~90 + one x 72, "
-                "and the @r1 window (the @r f/d radials + the "
-                "reference's own pair MO, s-sector-projected) reads "
-                "17 x 72.000000 (max dev 3.3e-08): the declared 5L "
-                "is the exact ground of every irrep block on the "
-                "honest window.  The frozen free-CASCI ground on "
-                "that window is the 5L itself at +140.5 mEh (occ(7s) "
-                "0.53 -- the L=8 root mixes 7s2/7s1/7s0 "
-                "configurations; the column-usage jump from the "
-                "as-built's 3e-03 is the fix's deliverable).  The "
-                "pair MO is s-diffuse across >= 6 primitives (the "
-                "declared 3-band span's radial captures cos^2 0.71; "
-                "a single band ~0.27), so the s channel takes the "
-                "reference's own pair MO projected onto its pure-s "
-                "sector (the m-mixed C1 d tail 1.3% removed -- "
-                "closure restored to 3.3e-13).", ""]
+    # THE PINNED ROUTES' RECORD (the rows retired to the logs; the
+    # verdicts stand as the wave's documentation)
+    out += [
+        "THE PINNED ROUTES' RECORD (the rows retired; the logs and "
+        "the campaign payloads are the archive).  THE GATE: the "
+        "pin-on-pur route (the C1 rung's AO integrals -- "
+        "gauge-independent -- on a D2h-tagged wrapper, NO D2h SCF "
+        "anywhere; the purified core) reproduced the certified lane "
+        "record at (4,12) BOTH HALVES -- the frozen CI 17 x "
+        "72.000000 (max dev 1.1e-13) and the SA 17/17 at 72.000000 "
+        "(7 macro cycles).  THE CLASS TRILOGY at (6,13): the "
+        "as-built window on the pur core reads 12..42 (the low-L "
+        "block grounds), the lane's certified record reads 16 x ~90 "
+        "+ one x 72, and the @r1 window reads 17 x 72.000000 (max "
+        "dev 3.3e-08) frozen -- the declared 5L is the exact ground "
+        "of every irrep block on the honest window; the OPTIMIZED "
+        "pinned ensembles then descend to 1 x 5L + 16 x L=9 "
+        "(<S2> 6 / 12 -- the exchange-favored septet 5f3 6d2 7s1, "
+        "fingerprint-confirmed) on EVERY window -- the wfnsym anchors "
+        "hold the bookkeeping, not the class.  THE (4,15) PROMOTION: "
+        "the lane route refuses it entirely (the promoted columns "
+        "are core-span content -- no window; the certified refusal, "
+        "witnessed at the labeling seam too); the pin-on-pur route "
+        "hosts it -- the frozen CI's block grounds read L classes "
+        "0..42 (the p-promotion configurations f3d1p1 are cheaper "
+        "frozen than the 5L) and the SA recovers the 5L (71.79-71.97, "
+        "the closure-costed fractional <L2> -- the core-lean 14p "
+        "column's mixing through the free/irrep-block rotations).  "
+        "THE PT2 Sr DIAGNOSIS: the pinned-ensemble gauges on the "
+        "incumbent-style windows park an external orbital "
+        "near-degenerate with the CAS, and the strongly-contracted "
+        "Sr class (the 1-hole channel) diverges -- norm 14.9 / "
+        "E(2) -1.26 Eh on the (6,13) gauge, norm 6.4 / -0.94 Eh on "
+        "the (4,12) gauge, the other seven classes normal (~-0.32 Eh "
+        "summed), all four D2h blocks equal (0.6 mEh spread), the "
+        "free gauges clean (~-300 mEh) -- the two blown rows keep "
+        "their values as the witness.  THE D2h ASSIGNMENT is "
+        "certified numerically (64/64 op x irrep checks against the "
+        "textbook character table, probe_u14e_d2h_verify.py); the "
+        "shell conflation (s with dz2/dx2-y2 in Ag) is group theory.",
+        "",
+        "THE (6,13) FIX AND ITS FROZEN CLASS RECORD: the as-built "
+        "window (the incumbent distillation) abandons the intended "
+        "5f3 6d1 7s2 configuration -- the frozen ground is the 7F "
+        "(L = 3, S = 3; the 7s column unoccupied at 3e-03; the weak "
+        "captures 10f 0.82 / 13d 0.92 / 7s 0.27-0.71).  The @r1 "
+        "window fixes it: the pair MO is s-diffuse across >= 6 "
+        "primitives (the declared 3-band span's radial captures "
+        "cos^2 0.71; a single band ~0.27), so the s channel takes "
+        "the reference's own pair MO projected onto its pure-s "
+        "sector (the m-mixed C1 d tail 1.3% removed -- closure "
+        "restored to 3.3e-13) -- the frozen ground becomes the 5L "
+        "itself at +140.5 mEh (occ(7s) 0.53 -- the L=8 root mixes "
+        "7s2/7s1/7s0 configurations; the column-usage jump from the "
+        "as-built's 3e-03 is the fix's deliverable), and the frozen "
+        "pinned CI reads 17 x 72.000000.", "",
+    ]
     TABLE.write_text("\n".join(out))
 
 
