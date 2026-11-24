@@ -63,3 +63,12 @@
 
 ===== verdict =====
 0/0 assertions hold
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_unification.py:89: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc), act,
+  [(4,12) sa] ensemble -50.42381003, converged True (cycles 17, 87.0 s); <L2> [71.986172, 71.994280]
+  [(4,12)] the counts: 72.0 +- 0.01: 13; 90.0 +- 0.01: 0; other: 4
+done
