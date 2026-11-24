@@ -598,28 +598,21 @@ _ORDER = (["rohf|-|-", "uhf|-|-"] +
            for m in ("casci", "casscf", "sa-casscf")
            for c in ("(4,12)", "(4,12)@r1", "(4,15)", "(4,15)@r1",
                      "(6,13)", "(6,13)@r1")] +
-          [f"{m}|{r}|{c}"
-           for r in ("pinned", "pinned@pur")
-           for m in ("casci", "casscf", "sa-casscf")
+          [f"casci|pinned|{c}"
+           for c in ("(4,12)", "(4,15)", "(6,13)")] +
+          [f"sa-casscf|pinned|{c}"
+           for c in ("(4,12)", "(6,13)")] +
+          [f"{m}|pinned@pur|{c}"
+           for m in ("casci", "sa-casscf")
            for c in ("(4,12)", "(4,12)@r1", "(4,15)", "(4,15)@r1",
                      "(6,13)", "(6,13)@r1")])
 
 # the rows that cannot run, rendered as dash rows at their _ORDER
 # positions (the user's directive: the matrix stays complete; the
-# reason lives in the footer legend)
+# reason lives in the footer legend).  The casscf (pinned)/(pinned@pur)
+# rows are ABSENT by the user's directive (2026-11-24: no single-root
+# pinned method is needed) -- they are not dashes, they do not exist.
 DASH_ROW_REASONS = {
-    "casscf|pinned|(4,12)": "no single-root pinned method",
-    "casscf|pinned|(4,12)@r1": "no single-root pinned method",
-    "casscf|pinned|(4,15)": "no single-root pinned method",
-    "casscf|pinned|(4,15)@r1": "no single-root pinned method",
-    "casscf|pinned|(6,13)": "no single-root pinned method",
-    "casscf|pinned|(6,13)@r1": "no single-root pinned method",
-    "casscf|pinned@pur|(4,12)": "no single-root pinned method",
-    "casscf|pinned@pur|(4,12)@r1": "no single-root pinned method",
-    "casscf|pinned@pur|(4,15)": "no single-root pinned method",
-    "casscf|pinned@pur|(4,15)@r1": "no single-root pinned method",
-    "casscf|pinned@pur|(6,13)": "no single-root pinned method",
-    "casscf|pinned@pur|(6,13)@r1": "no single-root pinned method",
     "casci|pinned|(4,12)@r1": "the lane grammar carries no source tag",
     "casci|pinned|(4,15)@r1": "the lane grammar carries no source tag",
     "casci|pinned|(6,13)@r1": "the lane grammar carries no source tag",
@@ -749,14 +742,13 @@ def render_table() -> None:
         "sources, compared here.",
         "",
         "The dash (—) rows -- the matrix stays complete, the runs do "
-        "not exist: the pinned routes carry NO single-root method "
-        "(the term pin lives in the 2L+1-component ensemble; a "
-        "one-root run cannot carry it); the pinned (lane) route's "
-        "address grammar carries at most one @-tag (the core tag -- "
-        "no @r1 source windows there; the prior axis rides the "
-        "pinned@pur route); the lane (4,15) SA is the certified "
-        "refusal (the promoted columns are core-span content -- no "
-        "window exists at that partition).",
+        "not exist: the pinned (lane) route's address grammar carries "
+        "at most one @-tag (the core tag -- no @r1 source windows "
+        "there; the prior axis rides the pinned@pur route), and its "
+        "(4,15) SA is the certified refusal (the promoted columns "
+        "are core-span content -- no window exists at that "
+        "partition).  The pinned routes carry NO single-root method "
+        "and no casscf rows (the user's directive, 2026-11-24).",
         "",
         "conv -- \"&lt;precision&gt;/&lt;n_iters&gt;\": the "
         "optimizer's achieved |dE| (the callback's final macro-step "

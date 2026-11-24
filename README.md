@@ -385,6 +385,35 @@ pur core), 16×90 + one×72 (lane), **17×72.000000** (`@r1`+MOs, pur
 core) — the honest window makes the *declared* term the exact ground
 of every irrep block.
 
+**What the D2h irreps are for — and their measured limit.** The
+irrep machinery (PySCF's `symmetry=True`, the `irrep_nelec`
+occupation dict, the `wfnsym`-pinned solvers) serves four distinct
+jobs: (1) **configuration control at the SCF** — declaring the
+intended filling per irrep instead of trusting aufbau (the
+`41-for_state_average.py` example's `irrep_nelec` is our
+character-forced filling in irrep vocabulary; our vocabulary is the
+whole-momentum l-span because the uncontracted actinide basis's MOs
+conflate irreps); (2) **block-diagonal Fock** — symmetry-broken
+solutions are unrepresentable, which stabilizes the forced filling
+and keeps the pinned readouts exact; (3) **term→irrep branching** —
+the declared term's components obtained by construction, each
+guaranteed by its irrep (the pinned CI reads 1e-13 exact); (4)
+**state labeling** for per-state pricing.  The measured limit: irreps
+pin *bookkeeping*, not angular-momentum content — D2h blocks mix m's,
+so D2h purity is not rotation closure, and a `wfnsym` anchor holds
+the bookkeeping while the optimized roots' class descends (the
+(6,13) pinned SAs read 16 x L=9 + one x 5L on every window).  And on
+uranium's valence the irrep *occupation* dict is structurally
+under-specified: the Ag block conflates 6s + 7s + two d functions,
+and block-aufbau drops the diffuse 7s² pair in favor of the valence
+d columns (measured: the occupied characters read s 2.0 / d 3.0
+against the intended s 4 / d 1; +155 mEh above the trusted rung) —
+the l-span character-forced filling is the necessary reference.  The
+division of labor that survives the measurements: the free routes
+carry the physics; the window construction carries the rotation
+closure; the pinned CI carries the term-identity readout; the D2h
+wrapper carries the block bookkeeping.
+
 **Route (free vs pinned).** The *free* route is the native
 symmetry-blind driver: one Davidson CI over the whole sector;
 symmetry is *measured* afterwards (⟨L²⟩, the commutators, ptp). The

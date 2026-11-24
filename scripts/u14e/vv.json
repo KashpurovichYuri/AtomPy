@@ -466,5 +466,18 @@
   "e_tot": -50.92668325372143,
   "term": "draw-dependent partition",
   "conv": "3.7e-08/8"
+ },
+ "sa-casscf|pinned@pur|(4,12)": {
+  "method": "sa-casscf",
+  "route": "pinned@pur",
+  "cas": "(4,12)",
+  "l2": "71.9862..71.9943",
+  "s2": "6.0000",
+  "e_method": -50.42381002778944,
+  "e2_meh": -1269.8052915514047,
+  "e2_ev": -34.553162245604675,
+  "e_tot": -51.69361531934085,
+  "term": "draw-dependent partition",
+  "conv": "2.1e-09/17"
  }
 }

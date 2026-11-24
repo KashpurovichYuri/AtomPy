@@ -1,0 +1,36 @@
+  [mol] the D2h U atom: nao 177, spin 4, the irreps ['Ag', 'B1g', 'B2g', 'B3g', 'Au', 'B1u', 'B2u', 'B3u']
+  [stage1] the band -> irrep table:
+    Ag  : 6s, 8s, 9s, 7s, 15s, 13s, 10s, 11s, 19s, 20s, 18s, 12s, 14s, 17s, 16s, 8dz^2, 7dz^2, 9dz^2, 6dz^2, 11dz^2, 14dz^2, 12dz^2, 13dz^2, 10dz^2, 15dz^2, 6dx2-y2, 7dx2-y2, 9dx2-y2, 8dx2-y2, 15dx2-y2, 14dx2-y2, 13dx2-y2, 11dx2-y2, 12dx2-y2, 10dx2-y2
+    Au  : 5f-2, 8f-2, 9f-2, 7f-2, 6f-2, 11f-2, 14f-2, 13f-2, 10f-2, 12f-2
+    B1g : 8dxy, 7dxy, 9dxy, 6dxy, 11dxy, 10dxy, 14dxy, 13dxy, 15dxy, 12dxy
+    B1u : 6pz, 8pz, 7pz, 9pz, 11pz, 13pz, 14pz, 8f+0, 7f+2, 9f+0, 19pz, 9f+2, 7f+0, 10pz, 5f+0, 16pz, 6f+2, 8f+2, 17pz, 5f+2, 6f+0, 12pz, 15pz, 18pz, 13f+2, 14f+2, 12f+2, 10f+0, 11f+2, 11f+0, 10f+2, 12f+0, 14f+0, 13f+0
+    B2g : 9dxz, 8dxz, 7dxz, 6dxz, 14dxz, 10dxz, 12dxz, 11dxz, 13dxz, 15dxz
+    B2u : 6py, 8py, 9py, 7py, 10py, 15py, 13py, 9f-1, 16py, 6f-3, 12py, 8f-1, 8f-3, 7f-3, 14py, 19py, 9f-3, 5f-3, 18py, 6f-1, 11py, 17py, 7f-1, 5f-1, 14f-1, 10f-3, 11f-3, 13f-1, 14f-3, 10f-1, 11f-1, 12f-3, 12f-1, 13f-3
+    B3g : 7dyz, 8dyz, 9dyz, 6dyz, 10dyz, 14dyz, 15dyz, 11dyz, 13dyz, 12dyz
+    B3u : 6px, 7px, 9px, 8px, 16px, 17px, 18px, 5f+3, 8f+3, 7f+1, 6f+3, 8f+1, 7f+3, 5f+1, 13px, 11px, 19px, 9f+3, 14px, 12px, 9f+1, 10px, 15px, 6f+1, 11f+3, 14f+1, 10f+3, 14f+3, 12f+3, 11f+1, 10f+1, 13f+1, 13f+3, 12f+1
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+  [rung C1] the occupied l-characters: d: 1.013, f: 3.000, p: 6.000, s: 3.987  (electrons 14.0; intended {'s': 4, 'p': 6, 'd': 1, 'f': 3})
+===== (ii) the D2h irrep-nelec ROHF =====
+  [ii] E -50.22611463, converged False (1 s)
+  [ii] the occupations per irrep: {'Ag': 5.0, 'B1g': 0.0, 'B2g': 0.0, 'B3g': 0.0, 'Au': 1.0, 'B1u': 3.0, 'B2u': 3.0, 'B3u': 2.0} vs the dict {'Ag': 5, 'B1g': 0, 'B2g': 0, 'B3g': 0, 'Au': 1, 'B1u': 3, 'B2u': 3, 'B3u': 2}
+  [ii irrep] the occupied l-characters: d: 2.994, f: 2.997, p: 6.003, s: 2.006  (electrons 14.0; intended {'s': 4, 'p': 6, 'd': 1, 'f': 3})
+  [ii irrep] open column 5: 13dz^2 0.361, 12dz^2 0.288
+  [ii irrep] open column 6: 10f-3 0.333, 11f-3 0.277
+  [ii irrep] open column 7: 10f+0 0.398, 11f+0 0.332
+  [ii irrep] open column 8: 10f-2 0.418, 11f-2 0.340
+===== (iii) the D2h l-span-forced ROHF =====
+  [iii] E 2805.27785571, converged False (3 s); the character postcheck True
+  [iii d2f] the occupied l-characters: d: 4.000, f: 0.000, p: 8.000, s: 2.000  (electrons 14.0; intended {'s': 4, 'p': 6, 'd': 1, 'f': 3})
+  [iii d2f] open column 5: 9dxz 9.432, 10dxz 7.428
+  [iii d2f] open column 6: 9dyz 9.435, 10dyz 7.425
+  [iii d2f] open column 7: 8dxz 9.064, 9dxz 8.219
+  [iii d2f] open column 8: 8dyz 7.932, 7dyz 6.717
+  [rung vs irrep] the occupied-set gauge distance: SVD min 0.0532, mean 0.7727, max 1.0000
+  [rung vs d2f] the occupied-set gauge distance: SVD min 0.0000, mean 0.0003, max 0.0026
+  [d2f vs irrep] the occupied-set gauge distance: SVD min 0.0000, mean 0.0000, max 0.0000
+===== stage 3: the windows from the irrep reference =====
+  [(i) MO-direct] the selector's window columns: [np.int64(4), np.int64(5), np.int64(6), np.int64(7), np.int64(8), np.int64(56), np.int64(57), np.int64(120), np.int64(121), np.int64(130), np.int64(143), np.int64(162), np.int64(166)]
+  [(i) MO-direct] CASCI e_tot -50.22665998, dE +155.2 mEh, <L2> 0.005213, <S2> 6.000000; the window's closure ||[P,Lz]|| 5.75e+00, ||[P,Lperp]|| 8.04e+00
+  [(ii)] the irrep reference's s-dominated occupied columns: []
+  [(ii) @r1-from-irrep] CASCI e_tot -50.12000668, dE +261.8 mEh, <L2> 55.819380, <S2> 12.000000; the window's closure ||[P,Lz]|| 6.62e-02, ||[P,Lperp]|| 7.58e-02
+(60 s total)
