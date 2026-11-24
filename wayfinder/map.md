@@ -525,7 +525,7 @@ configuration-inert).
   independently at its own creation (its own post-check); the
   target's refusal does not impugn it, the cache convention applies.
 
-## Disposition candidates (the user's future call)
+### Disposition candidates (the user's future call)
 
 - **The CAS(4,16)/(4,18)/(4,21) correlation-channel ladder — MEASURED
   2026-11-24** (`u14e_vv_4_16_21.py` + log; the compositions as
