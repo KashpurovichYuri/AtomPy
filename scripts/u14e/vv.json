@@ -337,9 +337,9 @@
   "term": "draw-dependent partition",
   "conv": "2.1e-09/17"
  },
- "casci|free@pur|(4,16)": {
+ "casci|free|(4,16)": {
   "method": "casci",
-  "route": "free@pur",
+  "route": "free",
   "cas": "(4,16)",
   "l2": "42.0000",
   "s2": "6.0000",
@@ -350,9 +350,9 @@
   "term": "definite-L (the class is the disclosure)",
   "conv": "1.0e-08/\u2014"
  },
- "casscf|free@pur|(4,16)": {
+ "casscf|free|(4,16)": {
   "method": "casscf",
-  "route": "free@pur",
+  "route": "free",
   "cas": "(4,16)",
   "l2": "71.3071",
   "s2": "6.0000",
@@ -363,9 +363,9 @@
   "term": "escape draw",
   "conv": "4.6e-08/117"
  },
- "sa-casscf|free@pur|(4,16)": {
+ "sa-casscf|free|(4,16)": {
   "method": "sa-casscf",
-  "route": "free@pur",
+  "route": "free",
   "cas": "(4,16)",
   "l2": "71.7702..71.9068",
   "s2": "6.0000",
@@ -389,9 +389,9 @@
   "term": "draw-dependent partition",
   "conv": "8.4e-08/42"
  },
- "casci|free@pur|(4,16)@r1": {
+ "casci|free|(4,16)@r1": {
   "method": "casci",
-  "route": "free@pur",
+  "route": "free",
   "cas": "(4,16)@r1",
   "l2": "72.0000",
   "s2": "6.0000",
@@ -402,9 +402,9 @@
   "term": "definite-L (the class is the disclosure)",
   "conv": "1.0e-08/\u2014"
  },
- "casscf|free@pur|(4,16)@r1": {
+ "casscf|free|(4,16)@r1": {
   "method": "casscf",
-  "route": "free@pur",
+  "route": "free",
   "cas": "(4,16)@r1",
   "l2": "71.8158",
   "s2": "6.0000",
@@ -415,9 +415,9 @@
   "term": "escape draw",
   "conv": "3.5e-07/200*"
  },
- "sa-casscf|free@pur|(4,16)@r1": {
+ "sa-casscf|free|(4,16)@r1": {
   "method": "sa-casscf",
-  "route": "free@pur",
+  "route": "free",
   "cas": "(4,16)@r1",
   "l2": "71.7717..71.9062",
   "s2": "6.0000",

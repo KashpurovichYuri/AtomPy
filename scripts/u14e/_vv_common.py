@@ -593,16 +593,17 @@ def drop_row(row: dict) -> None:
     render_table()
 
 
+# the CAS ladder per method block: the PLAIN windows first (the
+# incumbent sources, size-ordered), then the @r1 versions (the
+# density-block source comparison)
+_LADDER_PLAIN = ("(4,12)", "(4,15)", "(4,16)", "(6,13)")
+_LADDER_R1 = ("(4,12)@r1", "(4,15)@r1", "(4,16)@r1", "(4,21)@r1",
+              "(6,13)@r1")
 _ORDER = (["rohf|-|-", "uhf|-|-"] +
           [f"{m}|free|{c}"
            for m in ("casci", "casscf", "sa-casscf")
-           for c in ("(4,12)", "(4,12)@r1", "(4,15)", "(4,15)@r1",
-                     "(4,16)", "(4,16)@r1", "(4,18)", "(4,18)@r1",
-                     "(4,21)@r1", "(6,13)", "(6,13)@r1")] +
-          [f"sa-casscf|pinned@pur|{c}"
-           for c in ("(4,12)", "(4,12)@r1", "(4,15)", "(4,15)@r1",
-                     "(4,16)", "(4,16)@r1", "(4,18)", "(4,18)@r1",
-                     "(4,21)@r1", "(6,13)", "(6,13)@r1")])
+           for c in _LADDER_PLAIN + _LADDER_R1] +
+          [f"sa-casscf|pinned@pur|{c}" for c in _LADDER_PLAIN + _LADDER_R1])
 
 
 def fmt_range(vals, nd: int = 4) -> str:
