@@ -525,8 +525,24 @@ configuration-inert).
   independently at its own creation (its own post-check); the
   target's refusal does not impugn it, the cache convention applies.
 
-### Disposition candidates (the user's future call)
+## Disposition candidates (the user's future call)
 
+- **The CAS(4,16)/(4,18)/(4,21) correlation-channel ladder — MEASURED
+  2026-11-24** (`u14e_vv_4_16_21.py` + log; the compositions as
+  addresses/declarations, never code): the (4,16) pair (5f+6d+14p+7s)
+  — the frozen classes unchanged (the raw window freezes the 5I at
+  +923, the @r1 freezes the 5L at +149), the CASSCF descends ~5 mEh
+  deeper than (4,12) (the p/s correlation channels pay), the SAs land
+  the (4,12) optima — 8 rows.  THE (4,18)/(4,21) COMPOSITIONS:
+  REFUSED BY THE TAIL CERTIFICATES — the 6p channel's radial signal
+  is RANK-1 in every available reference (the incumbent Gram's 2nd
+  eigenvalue 8.8e-7, the @r density's 2.2e-5 — both tail): the 6p⁶
+  trio's MOs are m-separated and the device's m-summing collapses
+  their density to rank-1 — a CLOSED-shell channel carries one radial
+  by construction; multi-radial 6p needs an OPEN-6p configuration in
+  the series (a different reference, not a window change).  The (4,21)
+  composition is certificate-measured-out.  16 rows -> 8 + the two
+  certificate disclosures.
 - **The irrep-occupation approach on uranium — MEASURED OUT
   2026-11-24** (`probe_u14e_irrep_scf.py` + log): PySCF honors
   `irrep_nelec` for ROHF (the per-irrep occupations match the dict

@@ -75,17 +75,22 @@ def wrapper_substrate(mol_c1, mf_c1, spec):
     return mol_d2h, mf_d2h
 
 
-def window_of(key_addr, mol_c1, mf_c1, spec, mf_d2h):
+def window_of(key_addr, mol_c1, mf_c1, spec, mf_d2h, radials_ext=None):
     """One key's window, built on the C1 rung (the construction's AO
     quantities are gauge-independent), assembled on the wrapper.  The
-    core: the key's own pur resolution (``key_core``).  Returns
-    (mo, ncas, c_pur, nf)."""
+    core: the key's own pur resolution (``key_core``).
+    ``radials_ext`` -- the leg's own k declarations for shells the
+    case's ``shell_radials`` does not carry (the new-window
+    compositions declare their additions here, never in src).
+    Returns (mo, ncas, c_pur, nf)."""
     from atomterm.cells import CellKey, key_core, window_columns
     from atomterm.windows import build_full_mo, occupied_core_idx
     key = CellKey.from_address(key_addr)
     nc, _c_core, c_pur = key_core(key, mol_c1, mf_c1, spec.shell_bands)
+    radials = ({**spec.shell_radials, **radials_ext}
+               if radials_ext else spec.shell_radials)
     act, ncas, _ = window_columns(key, mol_c1, mf_c1, spec.shell_bands,
-                                  spec.shell_radials, ncol=nc)
+                                  radials, ncol=nc)
     mo = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc), act,
                        c_core=c_pur)
     return mo, ncas, c_pur, nc

@@ -19,6 +19,9 @@ wiring; its green record: logs/u14e_vv.log at 6e2ab39..30808bd,
                       + PT2)
     u14e_vv_r1_ladder.py the @r1 CAS-ladder leg ((4,12)/(4,15) at the
                       matched prior-axis source, free routes + PT2)
+    u14e_vv_4_16_21.py the CAS(4,16)/CAS(4,21) leg (the correlation-
+                      channel ladder: the s/p channels at (4,0), the
+                      compositions as addresses, free + pinned@pur)
     u14e_vv_unification.py the pin-on-pur unification ladder (C0-C4)
     u14e_vv_uhf.py    the reference comparison + the two table
                       reference rows
@@ -52,6 +55,7 @@ def main(argv=None) -> int:
     legs = [("4_12", u14e_vv_4_12), ("4_15", u14e_vv_4_15),
             ("6_13", u14e_vv_6_13), ("6_13_r1", u14e_vv_6_13_r1),
             ("r1_ladder", u14e_vv_r1_ladder),
+            ("4_16_21", u14e_vv_4_16_21),
             ("unification", u14e_vv_unification),
             ("uhf", u14e_vv_uhf)]
     bad_rc = []
