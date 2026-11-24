@@ -1,0 +1,113 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+  [bands] 49 primitive bands
+
+===== the per-primitive map (sorted by the occupied population) =====
+  band       occ_e   min_virtual_Eh   declared?
+  14p       6.000            —   6p
+  10f       3.000            —   5f
+  18s       2.000            —   7s
+  12s       2.000            —   undeclared
+  13d       1.000            —   6d
+  11f       0.000            —   5f
+  11d       0.000            —   undeclared
+  10d       0.000       0.0151   undeclared
+  11s       0.000            —   undeclared
+  11p       0.000            —   undeclared
+  12f       0.000            —   undeclared
+  12d       0.000            —   6d
+  12p       0.000            —   undeclared
+  13f       0.000            —   undeclared
+  10p       0.000            —   undeclared
+  10s       0.000            —   undeclared
+  13s       0.000            —   undeclared
+  13p       0.000            —   6p
+  14f       0.000            —   undeclared
+  14d       0.000            —   6d
+  15d       0.000            —   undeclared
+  15p       0.000            —   6p
+  15s       0.000            —   undeclared
+  14s       0.000            —   undeclared
+  16p       0.000            —   undeclared
+  16s       0.000            —   undeclared
+  17s       0.000            —   undeclared
+  17p       0.000            —   undeclared
+  18p       0.000            —   undeclared
+  19p       0.000            —   undeclared
+  19s       0.000            —   7s
+  20s       0.000            —   7s
+  5f        0.000            —   undeclared
+  6d        0.000            —   undeclared
+  6f        0.000            —   undeclared
+  6p        0.000            —   undeclared
+  6s        0.000            —   undeclared
+  7d        0.000            —   undeclared
+  7f        0.000            —   undeclared
+  7p        0.000            —   undeclared
+  7s        0.000            —   undeclared
+  8d        0.000            —   undeclared
+  8f        0.000            —   undeclared
+  8p        0.000            —   undeclared
+  8s        0.000            —   undeclared
+  9d        0.000            —   undeclared
+  9f        0.000            —   5f
+  9p        0.000            —   undeclared
+  9s        0.000            —   undeclared
+
+===== the MO table (the occupied + the first 25 virtuals; the top-2 bands per MO) =====
+  MO  22 occ eps -2.2311: 12s 0.61  14s 0.43
+  MO  61 occ eps -1.0673: 14p 0.98  15p 0.38
+  MO  88 occ eps -1.0646: 14p 0.98  15p 0.39
+  MO 107 occ eps -0.0309: 13d 0.43  12d 0.30
+  MO 108 occ eps -0.0184: 10f 0.42  11f 0.29
+  MO 109 occ eps -0.0139: 10f 0.41  11f 0.29
+  MO 120 occ eps -1.0566: 14p 0.97  15p 0.39
+  MO 142 occ eps -0.0127: 10f 0.41  11f 0.29
+  MO 143 occ eps -0.1983: 18s 0.50  19s 0.47
+  MO   0 vir eps +0.0151: 10d 0.00  10f 0.00
+  MO   1 vir eps +0.0151: 10d 0.00  10f 0.00
+  MO   2 vir eps +0.0177: 10d 0.00  10f 0.00
+  MO   3 vir eps +0.0388: 10d 0.00  10f 0.00
+  MO   4 vir eps +0.0572: 10d 0.00  10f 0.00
+  MO   5 vir eps +0.0572: 10d 0.00  10f 0.00
+  MO   6 vir eps +0.0600: 10d 0.00  10f 0.00
+  MO   7 vir eps +0.0601: 10d 0.00  10f 0.00
+  MO   8 vir eps +0.0640: 10d 0.00  10f 0.00
+  MO   9 vir eps +0.0640: 10d 0.00  10f 0.00
+  MO  10 vir eps +0.0643: 10d 0.00  10f 0.00
+  MO  11 vir eps +0.1095: 10d 0.00  10f 0.00
+  MO  12 vir eps +0.1346: 10d 0.00  10f 0.00
+  MO  13 vir eps +0.1347: 10d 0.00  10f 0.00
+  MO  14 vir eps +0.1414: 10d 0.00  10f 0.00
+  MO  15 vir eps +0.1418: 10d 0.00  10f 0.00
+  MO  16 vir eps +0.1778: 10d 0.00  10f 0.00
+  MO  17 vir eps +0.1931: 10d 0.00  10f 0.00
+  MO  18 vir eps +0.1931: 10d 0.00  10f 0.00
+  MO  19 vir eps +0.1941: 10d 0.00  10f 0.00
+  MO  20 vir eps +0.1944: 10d 0.00  10f 0.00
+  MO  21 vir eps +0.1956: 10d 0.00  10f 0.00
+  MO  23 vir eps +0.1973: 10d 0.00  10f 0.00
+  MO  24 vir eps +0.2009: 10d 0.00  10f 0.00
+  MO  25 vir eps +0.2041: 10d 0.00  10f 0.00
+
+===== the family radial spectra (the occupied-signal Gram, m-summed; the per-band weights of each radial) =====
+  [s] the family slots' spectrum (leading 6): 6.1159, 0.9829, 0.0021, 0.0000, 0.0000, 0.0000  |  the bands: ['10s', '11s', '12s', '13s', '14s', '15s', '16s', '17s', '18s', '19s', '20s', '6s', '7s', '8s', '9s']
+    radial 1 (Eig 6.1159): 10s 0.07  11s 0.07  12s 0.07  13s 0.07
+    radial 2 (Eig 0.9829): 10s 0.07  11s 0.07  12s 0.07  13s 0.07
+    radial 3 (Eig 0.0021): 10s 0.07  11s 0.07  12s 0.07  13s 0.07
+  [p] the family slots' spectrum (leading 6): 3.7805, 0.0012, 0.0001, 0.0000, 0.0000, 0.0000  |  the bands: ['10p', '11p', '12p', '13p', '14p', '15p', '16p', '17p', '18p', '19p', '6p', '7p', '8p', '9p']
+    radial 1 (Eig 3.7805): 10p 0.07  11p 0.07  12p 0.07  13p 0.07
+    radial 2 (Eig 0.0012): 10p 0.07  11p 0.07  12p 0.07  13p 0.07
+    radial 3 (Eig 0.0001): 10p 0.07  11p 0.07  12p 0.07  13p 0.07
+  [d] the family slots' spectrum (leading 6): 0.4071, 0.0009, 0.0000, 0.0000, 0.0000, 0.0000  |  the bands: ['10d', '11d', '12d', '13d', '14d', '15d', '6d', '7d', '8d', '9d']
+    radial 1 (Eig 0.4071): 10d 0.10  11d 0.10  12d 0.10  13d 0.10
+    radial 2 (Eig 0.0009): 10d 0.10  11d 0.10  12d 0.10  13d 0.10
+    radial 3 (Eig 0.0000): 10d 0.10  11d 0.10  12d 0.10  13d 0.10
+  [f] the family slots' spectrum (leading 6): 1.2181, 0.0005, 0.0000, 0.0000, 0.0000, 0.0000  |  the bands: ['10f', '11f', '12f', '13f', '14f', '5f', '6f', '7f', '8f', '9f']
+    radial 1 (Eig 1.2181): 10f 0.10  11f 0.10  12f 0.10  13f 0.10
+    radial 2 (Eig 0.0005): 10f 0.10  11f 0.10  12f 0.10  13f 0.10
+    radial 3 (Eig 0.0000): 10f 0.10  11f 0.10  12f 0.10  13f 0.10
+
+===== the intruder screen (the channels hosting the lowest virtuals) =====
+  10d   : the min virtual +0.0151 Eh (the occupied pop 0.000; declared: undeclared)
+
+(0 s total)
