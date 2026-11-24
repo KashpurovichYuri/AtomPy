@@ -527,6 +527,46 @@ configuration-inert).
 
 ### Disposition candidates (the user's future call)
 
+- **The irrep-occupation approach on uranium — MEASURED OUT
+  2026-11-24** (`probe_u14e_irrep_scf.py` + log): PySCF honors
+  `irrep_nelec` for ROHF (the per-irrep occupations match the dict
+  exactly), but the filling comes out WRONG for uranium's valence —
+  the Ag block conflates 6s + 7s + two d functions, and
+  block-aufbau drops the diffuse 7s² pair in favor of the valence d
+  columns (the occupied characters read s 2.0 / d 3.0 against the
+  intended s 4 / d 1; +155 mEh above the trusted rung; converged
+  False; three runs reproducible).  The D2h l-span arm (our hook on
+  the D2h mol) ALSO fails — the C1-gauge hook mis-fills (p 8 / s 2 /
+  d 4) and diverges (E ~2400-2800).  Downstream: the irrep
+  reference's MO-direct window reads <L2> 0.005 (closure destroyed
+  5.75/8.04 — the distillation necessary, decisively) and its @r1
+  device has no 7s pair to distill (the s-dominated occupied list is
+  empty — the pair was never formed), reading 55.8 / +261.8 mEh with
+  broken closure.  VERDICT: the l-span character-forced C1 rung is
+  the necessary reference; the irrep vocabulary structurally cannot
+  declare "6s2 6p6 7s2 closed, 5f3 6d1 open" for this valence.  The
+  D2h framework keeps its value as the pinned routes' readout
+  wrapper only.  The irrep roles themselves (the four jobs + the
+  decoded PySCF example) are documented in README.
+- **The PT2 Sr-class blowup on the pinned@pur SA gauges — diagnosed
+  2026-11-24, the row handling is the user's call**
+  (`probe_u14e_pt2_blowup.py` + log): the pinned@pur SA rows on the
+  incumbent-style windows blow up in PT2 — (6,13) as-built: E(2)
+  -1580 mEh, (4,12) raw: -1270 mEh — against ~-285 (the lane) /
+  ~-282..-324 (the free).  The decomposition: ALL FOUR D2h blocks
+  read the same E(2) (a 0.6 mEh spread — the pathology is
+  gauge-level, not block-level), and the 8-class breakdown pins it
+  on the **Sr class (the 1-hole/ionized perturber class)**: norm
+  14.9 / E(2) -1.26 Eh on the (6,13) gauge, norm 6.4 / -0.94 Eh on
+  the (4,12) gauge — the other seven classes sum to a normal ~-0.32
+  Eh.  Mechanism: the pinned ensemble's optimized gauge on those
+  windows parks an external orbital near-degenerate with the CAS
+  (an intruder-like small gap), and the strongly-contracted Sr class
+  diverges on it; the free SA's gauge on the same windows is clean
+  (E(2) ~-300).  The @r1-window pinned SAs are mild ((6,13)@r1:
+  -475 mEh; (4,12)@r1: -342).  PROPOSAL: dash the E(2)/E_tot cells
+  of the two blown rows (the PT2-refusal class) + the footer
+  sentence; the variational side of the rows stands.
 - **The (6,13) occ control re-scoping — proposed 2026-11-23** (the
   user's call): the frozen ⁵L ground on the @r1+MOs window uses the
   pair column at **0.53** — the L=8 root mixes 7s²/7s¹/7s⁰

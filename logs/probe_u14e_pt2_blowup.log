@@ -1,0 +1,47 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+===== case 1: the (6,13) as-built window =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_pt2_blowup.py:88: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc), act,
+  [(6,13)] ensemble -50.45150714, converged True (cycles 15, 141 s)
+  [(6,13)] block Au   root 0: E(2) -1580.8827 mEh
+  [(6,13)] block B1u  root 0: E(2) -1580.3968 mEh
+  [(6,13)] block B2u  root 0: E(2) -1580.7570 mEh
+  [(6,13)] block B3u  root 0: E(2) -1580.2349 mEh
+  [(6,13)] the mean: -1580.5678 mEh
+  [(6,13)] the worst block's classes: Au
+    Sr       (Sr (-1)'    ): norm 1.486656e+01, E(2) -1.259168 Eh
+    Si       (Si (+1)'    ): norm 1.471576e-02, E(2) -0.006882 Eh
+    Sijrs    (Sijrs (0)   ): norm 3.573182e-01, E(2) -0.053862 Eh
+    Sijr     (Sijr (+1)   ): norm 1.675936e-01, E(2) -0.038385 Eh
+    Srsi     (Srsi (-1)   ): norm 4.549428e-01, E(2) -0.088253 Eh
+    Srs      (Srs (-2)    ): norm 1.496109e-01, E(2) -0.048141 Eh
+    Sij      (Sij (+2)    ): norm 6.453802e-02, E(2) -0.016204 Eh
+    Sir      (Sir (0)'    ): norm 1.784203e-01, E(2) -0.069989 Eh
+===== case 2: the (4,12) raw window =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_pt2_blowup.py:100: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo2 = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc2), act2,
+  [(4,12)] ensemble -50.42381003, converged True (cycles 24, 70 s)
+  [(4,12)] block Au   root 0: E(2) -1267.3764 mEh
+  [(4,12)] block B1u  root 0: E(2) -1268.0541 mEh
+  [(4,12)] block B2u  root 0: E(2) -1267.4588 mEh
+  [(4,12)] block B3u  root 0: E(2) -1267.5581 mEh
+  [(4,12)] the mean: -1267.6118 mEh
+  [(4,12)] the worst block's classes: B1u
+    Sr       (Sr (-1)'    ): norm 6.386269e+00, E(2) -0.935967 Eh
+    Si       (Si (+1)'    ): norm 1.522447e-02, E(2) -0.009586 Eh
+    Sijrs    (Sijrs (0)   ): norm 3.968517e-01, E(2) -0.076132 Eh
+    Sijr     (Sijr (+1)   ): norm 2.043644e-01, E(2) -0.057045 Eh
+    Srsi     (Srsi (-1)   ): norm 4.276191e-01, E(2) -0.088956 Eh
+    Srs      (Srs (-2)    ): norm 9.560506e-02, E(2) -0.024904 Eh
+    Sij      (Sij (+2)    ): norm 7.702726e-02, E(2) -0.021015 Eh
+    Sir      (Sir (0)'    ): norm 1.512102e-01, E(2) -0.054448 Eh
+===== the contrast: the free SA per-root E(2) =====
+  [(6,13)] the free SA: E(2) root 0 -304.3, root 16 -312.2 mEh
+  [(4,12)] the free SA: E(2) root 0 -323.7, root 16 -361.3 mEh
+(432 s total)
