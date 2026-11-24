@@ -625,10 +625,12 @@ def conv_of(precision, n_iters, converged=True) -> str:
 
 
 def render_table() -> None:
-    """The small committed table: the reference rows lead (ROHF is
-    the zero of every dE), then one row per method x route x CAS.
-    Every energy <= 4 decimals; deltas in the ``mEh / eV`` slash
-    form."""
+    """The small committed table: the references lead (ROHF is the
+    zero of every dE), then one row per method x route x CAS -- the
+    free routes (on the pur core, rendered ``free@pur``) and the
+    pinned@pur SA.  The reading keys live in README · Results; the
+    wave's verdict records live in wayfinder/map.md.  Every energy
+    <= 4 decimals; deltas in the ``mEh / eV`` slash form."""
     rows = json.loads(ROWS.read_text()) if ROWS.exists() else {}
     order = [k for k in _ORDER if k in rows]
     order += [k for k in rows if k not in order]
@@ -664,124 +666,15 @@ def render_table() -> None:
             raise ValueError(
                 f"render check: row {k} violates E_tot = E_method + "
                 f"E(2) by {r['e_method'] + r['e2_meh'] * 1e-3 - r['e_tot']:.2e} Eh")
+        route_disp = ("free@pur" if r["route"] == "free"
+                      else r["route"])
         method = (r["method"] if r["route"] == "-"
-                  else f"{r['method']} ({r['route']})")
+                  else f"{r['method']} ({route_disp})")
         out.append(
             f"| {method} | {r['cas']} "
             f"| {r['l2']} | {r['s2']} | {r.get('conv') or '—'} "
             f"| {r['e_method']:.4f} | {de_fmt(de_var)} | {e2} "
             f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} |")
-    out += [
-        "",
-        "E_method -- the method's own energy (the CASSCF/SA total; "
-        "the pinned casci value is the TERM energy, the components' "
-        "mean plus the core bookkeeping constant -- its dE is that "
-        "constant's projected-density form, not comparable to the "
-        "free rows).  E_tot = E_method + E(2) (SC-NEVPT2, pyscf.mrpt, "
-        "strongly contracted); dE against the ROHF row.",
-        "",
-        "The frozen casci rows are the PRICING class (what PT2 sees "
-        "as built, no optimizer).  The class flip across windows is "
-        "the window's economics: the raw-band windows freeze the 5I "
-        "((4,12)/(4,15), <L2> 42.0) and the 7F ((6,13), <L2> 12.0 -- "
-        "the 7s column unoccupied at 3e-03); the @r1 windows freeze "
-        "the declared 5L (<L2> 72.0 -- at (6,13) via the pair-MO s "
-        "channel).  All rotation-closed, so every reading is an "
-        "EXACT definite L (the closure certificate) -- the windows "
-        "differ in WHICH L wins.  The casscf single-root rows are "
-        "the escape-draw class (no assertion); the SA rows carry "
-        "the term average over the 17 M_L components.",
-        "",
-        "E(2) comparability -- within a row, E_tot = E_method + E(2); "
-        "across rows, compare E_tot at matched partitions.  The "
-        "frozen-window rows' large E(2) is the UNOPTIMIZED gauge: "
-        "the optimizer converts PT2-priced (dynamic) correlation "
-        "into variationally-absorbed (static) correlation -- read "
-        "that trade down the E_method/E(2) columns (at (4,12): "
-        "casci E(2) -1054 mEh -&gt; SA -342 mEh while E_var falls "
-        "+923 -&gt; -42 mEh; the net is the E_tot column).",
-        "",
-        "&lt;L²&gt;/&lt;S²&gt; -- the ground root for the single-root "
-        "methods; min..max over the ensemble's 17 roots (free SA) or "
-        "over the term's pinned components (pinned rows).  The spread "
-        "is the disclosure (draw-dependent partitions, closure costs, "
-        "block-ground classes); the per-root record lives in "
-        "`logs/u14e_vv_*.log`, the committed campaign payload in "
-        "`elements/U14e/perturbation.json` -- two independent "
-        "sources, compared here.",
-        "",
-        "conv -- \"&lt;precision&gt;/&lt;n_iters&gt;\": the "
-        "optimizer's achieved |dE| (the callback's final macro-step "
-        "delta; the pinned SA's conv_dE) over its MACRO-cycle count "
-        "(the store's callback-count records predating 2026-11-23 "
-        "inflate by the micro overhead -- the campaign cells' '200' "
-        "= 50 macro + ~150 micro); "
-        "the CI solves carry the REQUESTED CI tolerance with no "
-        "iteration structure (—): the free rows solve at 1e-8, the "
-        "pinned solvers at 1e-12 (why the pinned <L²> exactness "
-        "reads 1e-13).  ``*`` marks a cycle-cap draw "
-        "(not converged; the run's log discloses).  Cells read — "
-        "where a run's record predates the column (the convergence "
-        "flag lives in that run's log).",
-        "",
-    ]
-    # THE PINNED ROUTES' RECORD (the rows retired to the logs; the
-    # verdicts stand as the wave's documentation)
-    out += [
-        "THE PINNED ROUTES' RECORD (the rows retired; the logs and "
-        "the campaign payloads are the archive).  THE GATE: the "
-        "pin-on-pur route (the C1 rung's AO integrals -- "
-        "gauge-independent -- on a D2h-tagged wrapper, NO D2h SCF "
-        "anywhere; the purified core) reproduced the certified lane "
-        "record at (4,12) BOTH HALVES -- the frozen CI 17 x "
-        "72.000000 (max dev 1.1e-13) and the SA 17/17 at 72.000000 "
-        "(7 macro cycles).  THE CLASS TRILOGY at (6,13): the "
-        "as-built window on the pur core reads 12..42 (the low-L "
-        "block grounds), the lane's certified record reads 16 x ~90 "
-        "+ one x 72, and the @r1 window reads 17 x 72.000000 (max "
-        "dev 3.3e-08) frozen -- the declared 5L is the exact ground "
-        "of every irrep block on the honest window; the OPTIMIZED "
-        "pinned ensembles then descend to 1 x 5L + 16 x L=9 "
-        "(<S2> 6 / 12 -- the exchange-favored septet 5f3 6d2 7s1, "
-        "fingerprint-confirmed) on EVERY window -- the wfnsym anchors "
-        "hold the bookkeeping, not the class.  THE (4,15) PROMOTION: "
-        "the lane route refuses it entirely (the promoted columns "
-        "are core-span content -- no window; the certified refusal, "
-        "witnessed at the labeling seam too); the pin-on-pur route "
-        "hosts it -- the frozen CI's block grounds read L classes "
-        "0..42 (the p-promotion configurations f3d1p1 are cheaper "
-        "frozen than the 5L) and the SA recovers the 5L (71.79-71.97, "
-        "the closure-costed fractional <L2> -- the core-lean 14p "
-        "column's mixing through the free/irrep-block rotations).  "
-        "THE PT2 Sr DIAGNOSIS: the pinned-ensemble gauges on the "
-        "incumbent-style windows park an external orbital "
-        "near-degenerate with the CAS, and the strongly-contracted "
-        "Sr class (the 1-hole channel) diverges -- norm 14.9 / "
-        "E(2) -1.26 Eh on the (6,13) gauge, norm 6.4 / -0.94 Eh on "
-        "the (4,12) gauge, the other seven classes normal (~-0.32 Eh "
-        "summed), all four D2h blocks equal (0.6 mEh spread), the "
-        "free gauges clean (~-300 mEh) -- the two blown rows keep "
-        "their values as the witness.  THE D2h ASSIGNMENT is "
-        "certified numerically (64/64 op x irrep checks against the "
-        "textbook character table, probe_u14e_d2h_verify.py); the "
-        "shell conflation (s with dz2/dx2-y2 in Ag) is group theory.",
-        "",
-        "THE (6,13) FIX AND ITS FROZEN CLASS RECORD: the as-built "
-        "window (the incumbent distillation) abandons the intended "
-        "5f3 6d1 7s2 configuration -- the frozen ground is the 7F "
-        "(L = 3, S = 3; the 7s column unoccupied at 3e-03; the weak "
-        "captures 10f 0.82 / 13d 0.92 / 7s 0.27-0.71).  The @r1 "
-        "window fixes it: the pair MO is s-diffuse across >= 6 "
-        "primitives (the declared 3-band span's radial captures "
-        "cos^2 0.71; a single band ~0.27), so the s channel takes "
-        "the reference's own pair MO projected onto its pure-s "
-        "sector (the m-mixed C1 d tail 1.3% removed -- closure "
-        "restored to 3.3e-13) -- the frozen ground becomes the 5L "
-        "itself at +140.5 mEh (occ(7s) 0.53 -- the L=8 root mixes "
-        "7s2/7s1/7s0 configurations; the column-usage jump from the "
-        "as-built's 3e-03 is the fix's deliverable), and the frozen "
-        "pinned CI reads 17 x 72.000000.", "",
-    ]
     TABLE.write_text("\n".join(out))
 
 
