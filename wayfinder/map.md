@@ -527,6 +527,24 @@ configuration-inert).
 
 ### Disposition candidates (the user's future call)
 
+- **The static/dynamic correlation trade across the (4,0) ladder —
+  MEASURED 2026-11-25** (the V&V table's rows; the frozen dE / the
+  SA dE / the static gain / the E(2) / the NET E_tot move): (4,12)
+  +923/-42/+965/-342/-253; (4,12)@r1 +149/-42/+191/-342/-88; (4,15)
+  +923/-45/+968/-336/-247; (4,16) +923/-45/+968/-334/-247; (6,13)
+  +1065/-71/+1136/-282/-337; (6,13)@r1 +140/-71/+211/-282/-56.  THE
+  READINGS: (i) the E(2) remainder is gauge-stable (~-282..-342
+  across ALL the windows) — the trade's dynamic leg barely moves;
+  (ii) the STATIC gain carries the window economics (the @r1
+  windows pre-capture it frozen: +149 vs +923); (iii) the NET E_tot
+  move = the window's missing correlation — the SMALLEST for the
+  @r1 windows ((6,13)@r1: -56 vs the (6,13) as-built: -337) — the
+  @r1 windows are the most complete; (iv) the ANTICORRELATION (the
+  static up => the dynamic down) does NOT hold across windows (the
+  E(2) is stable while the static moves) — the trade is a
+  within-window conversion (the frozen -> the optimized), not an
+  across-window law.
+
 - **The CAS(4,16)/(4,18)/(4,21) correlation-channel ladder — MEASURED
   2026-11-24** (`u14e_vv_4_16_21.py` + log; the compositions as
   addresses/declarations, never code): the (4,16) pair (5f+6d+14p+7s)
@@ -575,14 +593,19 @@ configuration-inert).
   on the **Sr class (the 1-hole/ionized perturber class)**: norm
   14.9 / E(2) -1.26 Eh on the (6,13) gauge, norm 6.4 / -0.94 Eh on
   the (4,12) gauge — the other seven classes sum to a normal ~-0.32
-  Eh.  Mechanism: the pinned ensemble's optimized gauge on those
-  windows parks an external orbital near-degenerate with the CAS
-  (an intruder-like small gap), and the strongly-contracted Sr class
-  diverges on it; the free SA's gauge on the same windows is clean
-  (E(2) ~-300).  The @r1-window pinned SAs are mild ((6,13)@r1:
-  -475 mEh; (4,12)@r1: -342).  PROPOSAL: dash the E(2)/E_tot cells
-  of the two blown rows (the PT2-refusal class) + the footer
-  sentence; the variational side of the rows stands.
+  Eh.  MECHANISM (refined 2026-11-25 — NOT an NEVPT intruder: the
+  strongly contracted NEVPT is sign-intruder-free, E(2) finite and
+  negative throughout): the Sr class (the 1-hole ionized channel)
+  carries the misplaced valence orbital's weight — the pinned
+  ensemble's gauge rotated a valence-quality orbital outside the CAS
+  (the per-unit-norm E(2) deepens 1.7x: -0.085 Eh/unit (the free
+  gauge) vs -0.147 (the pinned)), and the 1-hole channel's norm
+  absorbs it (14.9 / 6.4 across the two gauges).  The class
+  decomposition is gauge-visible; the class norms are the gauge's
+  honesty meters.  The free gauge on the same windows is clean
+  (E(2) ~-300).  PROPOSAL: dash the E(2)/E_tot cells of the two
+  blown rows (the PT2-refusal class) + the footer sentence; the
+  variational side of the rows stands.
 - **The (6,13) occ control re-scoping — proposed 2026-11-23** (the
   user's call): the frozen ⁵L ground on the @r1+MOs window uses the
   pair column at **0.53** — the L=8 root mixes 7s²/7s¹/7s⁰

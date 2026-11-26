@@ -137,14 +137,14 @@ def _cycle_trace(mc) -> list:
     |delta e_tot| (the convergence precision; NaN before the second
     cycle), and the previous cycle's energy.
 
-    The count is the number of DISTINCT ``imacro`` values seen: PySCF
-    fires the callback once per MICRO iteration AND once per macro
-    cycle (the macro-level ``locals()`` carry the leftover ``imicro``),
-    so an invocation count inflates by the micro overhead -- measured
-    200 invocations on a 50-macro capped draw.  ``imacro`` is 1-based
-    (incremented at the loop top), so distinct values == the cycle
-    count; the last callback is always the final macro-cycle-end call,
-    so ``dE`` is the last macro step's true delta.
+    THE RULE: the count = the number of DISTINCT ``imacro`` values
+    seen.  PySCF fires the callback once per MICRO iteration AND once
+    per macro cycle (the macro-level ``locals()`` carry the leftover
+    ``imicro``), and ``imacro`` is 1-based (incremented at the loop
+    top) -- so the distinct values equal the cycle count, an
+    invocation count overcounts by the micro overhead, and the last
+    callback is always the final macro-cycle-end call (so ``dE`` is
+    the last macro step's true delta).
     """
     out = [0, float("nan"), None]
     imacros = set()

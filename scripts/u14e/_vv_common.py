@@ -32,6 +32,11 @@ from atomterm.operators import (  # noqa: E402
 EH_EV = 27.211386245988
 L_L2 = 72.0  # the 5L parent term: L = 8 -> L(L+1)
 S_S2 = 6.0   # spin 4 -> S = 2 -> S(S+1)
+BUDGET_200 = {"max_cycle_macro": 200}  # the optimizer budget: the
+# user's directive ("enable even 200 iters") — 4x PySCF's default
+# 50-macro cap; the campaign's effective cap (the stored callback
+# counts' '200' = 50 macro + ~150 micro) never converged the deep
+# draws ((6,13): 192 macro needed)
 
 ROWS = Path(__file__).resolve().parent / "vv.json"
 TABLE = Path(__file__).resolve().parent / "VV.md"
@@ -584,11 +589,14 @@ def family_spectrum(mol, mf, shell, all_bands, ncol, families_types):
     """The occupied-signal Gram spectrum over ONE shell family's full
     primitive set (the device's own m-summed valence density --
     ``valence_block`` through the family's type chains), plus the
-    per-band S-metric weight of each radial eigenvector (the same
-    gauge the capture reads -- the raw |c|^2 attribution would read
-    the tight primitives whose raw coefficients are large while their
-    S-population vanishes).  Returns (eigenvalues descending, the
-    per-band weights per eigenvector: (n_eig, n_bands))."""
+    per-band attribution of each radial eigenvector: the radial's OWN
+    coordinates expanded to the slots (the raw |c|^2 per band,
+    normalized).  The attribution is deliberately NOT the S-metric:
+    the strongly-overlapping same-l primitives spread the S-metric
+    weight uniformly (~1/n each -- uninformative), while the raw
+    coordinates resolve the radial's primitive composition.  Returns
+    (eigenvalues descending, the per-band weights per eigenvector:
+    (n_eig, n_bands))."""
     from atomterm.basis import valence_block
     # the chains: ONE group per harmonic type, across ALL the family
     # bands' slots of that type (the valence_block sums the type

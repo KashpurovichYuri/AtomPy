@@ -46,7 +46,7 @@ import time
 import numpy as np
 from pyscf import gto, mcscf, scf
 
-from _vv_common import (Verdict, conv_of, drop_row, fmt_range,
+from _vv_common import (BUDGET_200, Verdict, conv_of, drop_row, fmt_range,
                         lane_route, load_reference, make_blocks,
                         meters_all, nevpt_rows, pinned_ci_run,
                         pinned_sa_run, std_row)
@@ -58,7 +58,7 @@ ADDR_415_LANE = "u14e_10f13d14p@6s6p7s_4-0_sa-casscf_ao_-_pur_avg"
 L, PARITY = 8, "u"
 BAND_GATE = 1e-5   # the lane record's certified band (observed dev
                    # 1.9e-07 there; the wrapper's fresh read 1.1e-13)
-BUDGET = {"max_cycle_macro": 200}  # the optimizer-budget directive
+BUDGET = BUDGET_200  # the optimizer-budget directive (from _vv_common)
 
 
 def wrapper_substrate(mol_c1, mf_c1, spec):

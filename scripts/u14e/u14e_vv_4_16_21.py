@@ -43,7 +43,7 @@ from pyscf import mcscf
 
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 
-from _vv_common import (Verdict, conv_of, core_part_of, drop_row,  # noqa: E402
+from _vv_common import (BUDGET_200, Verdict, conv_of, core_part_of, drop_row,  # noqa: E402
                         fmt_range, free_kernel, load_reference,
                         make_blocks, meters, meters_all, nevpt_rows,
                         pinned_sa_run, price, std_row)
@@ -52,7 +52,7 @@ SECTOR = (4, 0)
 NCORE = 5
 ROOTS = 17
 L, PARITY = 8, "u"
-BUDGET = {"max_cycle_macro": 200}
+BUDGET = BUDGET_200  # the optimizer-budget directive (from _vv_common)
 SHELL_BANDS = {"5f": ("9f", "10f", "11f"), "6d": ("12d", "13d", "14d"),
                "6p": ("13p", "14p", "15p")}
 K_18_R1 = {"5f": 1, "6d": 1, "6p": 2}

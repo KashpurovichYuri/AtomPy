@@ -124,6 +124,11 @@ the pipeline **certifies** the atomic ground term, not just labels it.
   decides the optimized one.
 - The optimizer's gauge can inflate PT2's one-hole class (a
   near-degenerate external orbital) — the class norms are the meter.
+- The static/dynamic correlation trade converts *within* a window
+  (the frozen → the optimized): the static gain rises while the E(2)
+  remainder falls; across windows the E(2) is gauge-stable while the
+  static gain carries the window economics — the trade is not an
+  across-window law. See the V&V record (`scripts/u14e/VV.md`).
 - A band-named shell is its dominant radial, not the whole shell; the
   core column names the core's shells when the noble guess would lie.
 

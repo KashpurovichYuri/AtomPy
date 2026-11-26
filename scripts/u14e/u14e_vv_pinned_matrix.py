@@ -37,7 +37,7 @@ import numpy as np
 
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 
-from _vv_common import (Verdict, conv_of, drop_row, fmt_range,  # noqa: E402
+from _vv_common import (BUDGET_200, Verdict, conv_of, drop_row, fmt_range,  # noqa: E402
                         load_reference, make_blocks, meters_all,
                         nevpt_rows, pinned_ci_run, pinned_sa_run,
                         std_row)
@@ -47,7 +47,7 @@ ADDR_415_R1 = "u14e_5f6d14p@r1_4-0_casci_ao_-_pur_avg"
 ADDR_613 = "u14e_10f13d7s_5-1_sa-casscf_ao_-_pur_avg"
 ADDR_412_R1 = "u14e_5f6d@r1_4-0_casci_ao_-_pur_avg"
 L, PARITY = 8, "u"
-BUDGET = {"max_cycle_macro": 200}
+BUDGET = BUDGET_200  # the optimizer-budget directive (from _vv_common)
 
 
 def _counts(tag, l2s):

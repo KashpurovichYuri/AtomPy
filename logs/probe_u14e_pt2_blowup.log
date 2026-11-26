@@ -1,47 +1,58 @@
   ROHF (trusted rung, loaded): E = -50.38185233, nao 177
-===== case 1: the (6,13) as-built window =====
 /home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
   mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
   [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
-/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_pt2_blowup.py:88: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_pt2_blowup.py:60: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
   mo = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc), act,
-  [(6,13)] ensemble -50.45150714, converged True (cycles 15, 141 s)
-  [(6,13)] block Au   root 0: E(2) -1580.8827 mEh
-  [(6,13)] block B1u  root 0: E(2) -1580.3968 mEh
-  [(6,13)] block B2u  root 0: E(2) -1580.7570 mEh
-  [(6,13)] block B3u  root 0: E(2) -1580.2349 mEh
-  [(6,13)] the mean: -1580.5678 mEh
-  [(6,13)] the worst block's classes: Au
-    Sr       (Sr (-1)'    ): norm 1.486656e+01, E(2) -1.259168 Eh
-    Si       (Si (+1)'    ): norm 1.471576e-02, E(2) -0.006882 Eh
-    Sijrs    (Sijrs (0)   ): norm 3.573182e-01, E(2) -0.053862 Eh
-    Sijr     (Sijr (+1)   ): norm 1.675936e-01, E(2) -0.038385 Eh
-    Srsi     (Srsi (-1)   ): norm 4.549428e-01, E(2) -0.088253 Eh
-    Srs      (Srs (-2)    ): norm 1.496109e-01, E(2) -0.048141 Eh
-    Sij      (Sij (+2)    ): norm 6.453802e-02, E(2) -0.016204 Eh
-    Sir      (Sir (0)'    ): norm 1.784203e-01, E(2) -0.069989 Eh
-===== case 2: the (4,12) raw window =====
-/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
-  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
-  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157
-/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_pt2_blowup.py:100: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
-  mo2 = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, nc2), act2,
-  [(4,12)] ensemble -50.42381003, converged True (cycles 24, 70 s)
-  [(4,12)] block Au   root 0: E(2) -1267.3764 mEh
-  [(4,12)] block B1u  root 0: E(2) -1268.0541 mEh
-  [(4,12)] block B2u  root 0: E(2) -1267.4588 mEh
-  [(4,12)] block B3u  root 0: E(2) -1267.5581 mEh
-  [(4,12)] the mean: -1267.6118 mEh
-  [(4,12)] the worst block's classes: B1u
-    Sr       (Sr (-1)'    ): norm 6.386269e+00, E(2) -0.935967 Eh
-    Si       (Si (+1)'    ): norm 1.522447e-02, E(2) -0.009586 Eh
-    Sijrs    (Sijrs (0)   ): norm 3.968517e-01, E(2) -0.076132 Eh
-    Sijr     (Sijr (+1)   ): norm 2.043644e-01, E(2) -0.057045 Eh
-    Srsi     (Srsi (-1)   ): norm 4.276191e-01, E(2) -0.088956 Eh
-    Srs      (Srs (-2)    ): norm 9.560506e-02, E(2) -0.024904 Eh
-    Sij      (Sij (+2)    ): norm 7.702726e-02, E(2) -0.021015 Eh
-    Sir      (Sir (0)'    ): norm 1.512102e-01, E(2) -0.054448 Eh
-===== the contrast: the free SA per-root E(2) =====
-  [(6,13)] the free SA: E(2) root 0 -304.3, root 16 -312.2 mEh
-  [(4,12)] the free SA: E(2) root 0 -323.7, root 16 -361.3 mEh
-(432 s total)
+===== 1. the pinned SA (as-built window), per-block E(2) =====
+  ensemble -50.45150714, converged True (cycles 15, 141 s)
+  block Au   root 0: E(2) -1580.6985 mEh (the mean class norm 2.0299)
+  block B1u  root 0: E(2) -1580.8858 mEh (the mean class norm 2.0299)
+  block B2u  root 0: E(2) -1580.4952 mEh (the mean class norm 2.0298)
+  block B3u  root 0: E(2) -1580.0554 mEh (the mean class norm 2.0299)
+  the mean: -1580.5337 mEh; the mean class norm 2.0299; the PER-UNIT-NORM E(2): -0.7786 Eh
+===== 2. the worst block's class breakdown: B1u (|E(2)| 1.5809 Eh) =====
+    Sr       (Sr (-1)'    ): norm 1.485193e+01, E(2) -1.259182 Eh
+    Si       (Si (+1)'    ): norm 1.472177e-02, E(2) -0.006885 Eh
+    Sijrs    (Sijrs (0)   ): norm 3.573195e-01, E(2) -0.053863 Eh
+    Sijr     (Sijr (+1)   ): norm 1.675817e-01, E(2) -0.038382 Eh
+    Srsi     (Srsi (-1)   ): norm 4.549351e-01, E(2) -0.088249 Eh
+    Srs      (Srs (-2)    ): norm 1.496024e-01, E(2) -0.048135 Eh
+    Sij      (Sij (+2)    ): norm 6.452687e-02, E(2) -0.016200 Eh
+    Sir      (Sir (0)'    ): norm 1.784251e-01, E(2) -0.069991 Eh
+===== 3. the free SA x17 on the C1 route (the control) =====
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_pt2_blowup.py:108: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_c1 = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
+  ensemble -50.45274219, converged True (124 s)
+  root 0: e_ref -50.45285582, E(2) -282.0784 mEh, <L2> 89.9987, <S2> 12.0000
+  root 1: e_ref -50.45285151, E(2) -282.0704 mEh, <L2> 89.9987, <S2> 12.0000
+  root 2: e_ref -50.45284540, E(2) -282.0787 mEh, <L2> 89.9987, <S2> 12.0000
+  root 3: e_ref -50.45282897, E(2) -282.1041 mEh, <L2> 89.9988, <S2> 12.0000
+  root 4: e_ref -50.45282841, E(2) -282.1030 mEh, <L2> 89.9988, <S2> 12.0000
+  root 5: e_ref -50.45280029, E(2) -282.1332 mEh, <L2> 89.9989, <S2> 12.0000
+  root 6: e_ref -50.45280022, E(2) -282.1332 mEh, <L2> 89.9989, <S2> 12.0000
+  root 7: e_ref -50.45276692, E(2) -282.1672 mEh, <L2> 89.9991, <S2> 12.0000
+  root 8: e_ref -50.45276692, E(2) -282.1672 mEh, <L2> 89.9991, <S2> 12.0000
+  root 9: e_ref -50.45273227, E(2) -282.2115 mEh, <L2> 89.9993, <S2> 12.0000
+  root 10: e_ref -50.45273227, E(2) -282.2115 mEh, <L2> 89.9993, <S2> 12.0000
+  root 11: e_ref -50.45269549, E(2) -282.2468 mEh, <L2> 89.9995, <S2> 12.0000
+  root 12: e_ref -50.45269547, E(2) -282.2466 mEh, <L2> 89.9995, <S2> 12.0000
+  root 13: e_ref -50.45264643, E(2) -282.2947 mEh, <L2> 89.9996, <S2> 12.0000
+  root 14: e_ref -50.45264608, E(2) -282.2949 mEh, <L2> 89.9996, <S2> 12.0000
+  root 15: e_ref -50.45256235, E(2) -282.3521 mEh, <L2> 89.9999, <S2> 12.0000
+  root 16: e_ref -50.45256234, E(2) -282.3521 mEh, <L2> 89.9999, <S2> 12.0000
+  the free-SA E(2) range: [-282.4, -282.1] mEh
+===== 4. the weight-vs-depth attribution =====
+  the pinned gauge: the mean class norm 2.0299, the per-unit E(2) -0.7786 Eh
+  the free gauge (the same window, root 0): E(2) -282.0784 mEh, the mean class norm 0.1534, the per-unit E(2) -1.8389 Eh -- THE ATTRIBUTION: the depth-vs-weight split is the measurement
+===== 5. the near-edge orbital structure =====
+  the highest occupied: -0.0127, -0.0139, -0.0184
+  the lowest virtual:  +0.0151, +0.0151, +0.0177, +0.0388, +0.0572
+  the edge gap: +0.0278 Eh -- the Sr denominators ride this edge (sign-definite; a small gap = the norm's enhancement)
+===== 6. the gauge redraw on the anomaly's block =====
+  [redraw 1] E(2) -788.1247 mEh (the controls: E_tot -49.30431123, <L2> 12.0142)
+  [redraw 2] E(2) -792.8108 mEh (the controls: E_tot -49.30407123, <L2> 12.0067)
+  [redraw 3] E(2) -787.4022 mEh (the controls: E_tot -49.30481918, <L2> 12.0110)
+  [redraw] the E(2) spread: [-792.8, -787.4] mEh vs the unpinned gauge's -1580.9 -- the E(2) gauge-visibility measured on the Sr block itself; the controls (E_tot/<L2>) hold
+
+(660 s total)

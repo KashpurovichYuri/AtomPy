@@ -41,3 +41,26 @@ def test_empty_weights_refused(carbon_mf, tmp_path):
     with pytest.raises(ValueError, match="empty weights"):
         constrained_casscf(carbon_mf, 5, (1, 1), str(tmp_path / "c.chk"),
                            weights=[])
+
+
+@pytest.mark.fast
+def test_cycle_trace_counts_distinct_imacro():
+    """The macro-cycle count = the DISTINCT imacro values.  PySCF
+    fires the callback once per micro iteration AND once per macro
+    cycle (both carry the 1-based imacro), so an invocation count
+    overcounts by the micro overhead; the last callback is the final
+    macro-cycle-end call, so dE is the last macro step's true delta."""
+    from types import SimpleNamespace
+
+    from atomterm.casscf import _cycle_trace
+
+    mc = SimpleNamespace(callback=None)
+    cell = _cycle_trace(mc)
+    for env in ({"imacro": 1, "e_tot": -1.0},
+                {"imacro": 1, "e_tot": -1.0001},
+                {"imacro": 2, "e_tot": -2.0},
+                {"imacro": 2, "e_tot": -2.0001},
+                {"imacro": 3, "e_tot": -3.0}):
+        mc.callback(env)
+    assert cell[0] == 3                       # 3 macro cycles, not 5 calls
+    assert cell[1] == pytest.approx(0.9999)   # the last macro step's |dE|
