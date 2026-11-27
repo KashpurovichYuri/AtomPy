@@ -206,6 +206,54 @@ configuration-inert).
 
 ### Open
 
+- **The u14e V&V instrument rebuilt and reviewed — 2026-11-27** (the
+  code-review skill over 396ddd0..7ff6e47 + the codebase-design
+  vocabulary; commits 330b807, 92c5aac, 7274ba5, b64e359, 1f71ee9).
+  WHAT CHANGED: the table repaired (one route token `free@pur`, one
+  block per method, undeclared keys refused); `_vv_common.py` -> the
+  library `scripts/u14e/vv` (a pure move, AST-certified) and then
+  restructured around ONE rule -- a State (orbitals + CI of one
+  solve) is born only in `vv.routes` and certified at birth
+  (`assert_consistent`); the legs became `u14e_vv_ladder.py` (the
+  table's one writer over `vv.cases.CASES`), `u14e_vv_uhf.py` and
+  the driver; 61 pins in `tests/unit/test_u14e_vv_*.py` (fast tier
+  345).  The eight per-CAS legs named in the entries below are
+  deleted -- their logs are the records, their code is in git
+  history.  For the (4,16) family the table carries the RECORDED run
+  (`logs/u14e_vv_4_16.log`): the later duplicate rows had no
+  committed log.  FINDINGS, measured, FOR THE USER'S CALL:
+  F1 PySCF's CASSCF does not freeze the core (frozen=None rotates
+     it with the active and virtual space); the V&V free routes and
+     src's `run_irrep_sa` rely on the default.  Core leak of the
+     pinned SA: 1.0e-2 ((4,12) class) .. 1.7e-2 ((6,13)); the src
+     runner's internal readout (the frozen-core fold with the
+     returned active block) sits 1.6e-2..4.1e-2 Eh from the
+     consistent one.  "@pur" names the START core.  Freezing is a
+     physics decision; for `run_irrep_sa` a src edit.  NOT checked
+     whether the production cells' default mask freezes the core.
+  F2 A polarized core makes the raw and the averaged core folds
+     differ (2.9e-5 Eh on the frozen carbon reference's canonical
+     core): compare folds only on the same core columns.
+  F3 The (6,13)@r1 "s pair forms" gate reads RED (occupation 0.53 vs
+     >= 1.5); the re-scoping proposal stays parked.
+  F4 (4,21)@r1 as declared (6p at k=3) is refused structurally: its
+     four table keys can never fill -- remove, or keep as a refused
+     class.
+  F5 E(2) conventions differ: a free row is root 0, a pinned row the
+     component mean (3.4 mEh apart at (6,13) for that reason alone).
+  F6 (FIXED) The free routes exist only on C1: on a symmetry-tagged
+     substrate PySCF's symmetry-adapted classes pin a plain CASCI to
+     one irrep (2e-2 Eh on the (4,12) window).  The free routes
+     refuse it; the wrapper gate compares the ERIs.
+  F7 (FIXED) PySCF's symmetry-adapted CASSCF returns orbitals
+     orthonormal only to ~4e-5 (the virtual block; draw-dependent);
+     every old pinned row was priced on them unchecked.
+     `windows.orthonormalize` runs before the readout.
+  DECLINED (review): the lane-core route's pinned rows (outside the
+  keep-set) are print-only; the "unification" leg's C4 lane-window
+  disclosure is dropped (record: logs/u14e_vv_unification.log).
+  NEXT: the HF-virtual channel screen on the (4,12)@r1 base, then
+  the rungs -- the handoff (message.txt) carries the plan.
 - **The u14e V&V wave continued — the (6,13) fix + the unification
   ladder — COMPLETE (2026-11-23)** (the lx4 plan: the optimizer
   budgets, the (6,13) @r1 fix, the pin-on-pur unification, the
@@ -551,17 +599,20 @@ configuration-inert).
   boundary; the counts lines' 'other' buckets are the 1e-3 snap
   tolerance losing the 90.000x draw noise, not physics).  THE
   LANE-RETIREMENT INPUT: the routes differ in GAUGE only — the span
-  is the invariant and the PT2 gauge-visibility lives in the column
-  gauge; the lane's remaining value is the frozen-class readout,
-  not a different optimized space.
+  is the invariant; the lane's remaining value is the frozen-class
+  readout, not a different optimized space.  (The clause that made
+  PT2 gauge-visible in the column gauge is retracted, 2026-11-27:
+  the large pinned E(2) was a readout defect -- the autopsy entry.)
 - **The static/dynamic correlation trade across the (4,0) ladder —
   MEASURED 2026-11-25** (the V&V table's rows; the frozen dE / the
   SA dE / the static gain / the E(2) / the NET E_tot move): (4,12)
   +923/-42/+965/-342/-253; (4,12)@r1 +149/-42/+191/-342/-88; (4,15)
   +923/-45/+968/-336/-247; (4,16) +923/-45/+968/-334/-247; (6,13)
   +1065/-71/+1136/-282/-337; (6,13)@r1 +140/-71/+211/-282/-56.  THE
-  READINGS: (i) the E(2) remainder is gauge-stable (~-282..-342
-  across ALL the windows) — the trade's dynamic leg barely moves;
+  READINGS: (i) the E(2) remainder is nearly constant (~-282..-342
+  across ALL the windows) — the trade's dynamic leg barely moves
+  (free-route rows; the pinned twins now agree to <= 0.7 mEh where
+  the term is closed, 2026-11-27);
   (ii) the STATIC gain carries the window economics (the @r1
   windows pre-capture it frozen: +149 vs +923); (iii) the NET E_tot
   move = the window's missing correlation — the SMALLEST for the
@@ -609,30 +660,36 @@ configuration-inert).
   D2h framework keeps its value as the pinned routes' readout
   wrapper only.  The irrep roles themselves (the four jobs + the
   decoded PySCF example) are documented in README.
-- **The PT2 Sr-class blowup on the pinned@pur SA gauges — diagnosed
-  2026-11-24, the row handling is the user's call**
-  (`probe_u14e_pt2_blowup.py` + log): the pinned@pur SA rows on the
-  incumbent-style windows blow up in PT2 — (6,13) as-built: E(2)
-  -1580 mEh, (4,12) raw: -1270 mEh — against ~-285 (the lane) /
-  ~-282..-324 (the free).  The decomposition: ALL FOUR D2h blocks
-  read the same E(2) (a 0.6 mEh spread — the pathology is
-  gauge-level, not block-level), and the 8-class breakdown pins it
-  on the **Sr class (the 1-hole/ionized perturber class)**: norm
-  14.9 / E(2) -1.26 Eh on the (6,13) gauge, norm 6.4 / -0.94 Eh on
-  the (4,12) gauge — the other seven classes sum to a normal ~-0.32
-  Eh.  MECHANISM (refined 2026-11-25 — NOT an NEVPT intruder: the
-  strongly contracted NEVPT is sign-intruder-free, E(2) finite and
-  negative throughout): the Sr class (the 1-hole ionized channel)
-  carries the misplaced valence orbital's weight — the pinned
-  ensemble's gauge rotated a valence-quality orbital outside the CAS
-  (the per-unit-norm E(2) deepens 1.7x: -0.085 Eh/unit (the free
-  gauge) vs -0.147 (the pinned)), and the 1-hole channel's norm
-  absorbs it (14.9 / 6.4 across the two gauges).  The class
-  decomposition is gauge-visible; the class norms are the gauge's
-  honesty meters.  The free gauge on the same windows is clean
-  (E(2) ~-300).  PROPOSAL: dash the E(2)/E_tot cells of the two
-  blown rows (the PT2-refusal class) + the footer sentence; the
-  variational side of the rows stands.
+- **The pinned@pur E(2) "blow-up" — RESOLVED 2026-11-27: an instrument
+  defect, not physics** (`probe_u14e_pt2_autopsy.py` + log;
+  `logs/u14e_vv_ladder_pinned.log`).  Six pinned@pur SA rows once
+  read E(2) -1270..-1580 mEh where the free route reads -282..-342
+  ((4,12), (4,15)@r1, (4,16), (4,16)@r1, (6,13), (6,13)@r1).  CAUSE:
+  their readout paired the CI vectors of the CONVERGED window with
+  the START window's columns (`make_blocks(c_read=)`); the <L2> meter
+  was built on the same wrong columns.  THE AUTOPSY (one pinned SA at
+  (6,13); E(2) per component, mEh): as the defect built it -1580 (Sr
+  norm 15.2, its one-body term 14.3, effective denominator 12 Eh --
+  not small denominators); the SAME foreign CI on an ORTHONORMAL set
+  -1939 (Sr 15.4) -- orthonormality is not the driver, the foreign CI
+  vector is; the same orbitals with the CI re-solved in them -1098
+  (Sr 3.2, two virtuals at denominators 1.0 Eh) -- the
+  frozen-wrong-term class, i.e. the plain-window frozen casci rows
+  (-1054..-1081) are real numbers for a bad active space; the
+  corrected object -282.5 per component (certificate 1e-14) = the
+  free route.  THE FIX (7274ba5): a state carries the orbitals and
+  the CI of ONE solve and is certified at birth; `c_read` no longer
+  exists.  THE RE-PRICE (1f71ee9; 8/8 assertions): -341.73, -336.72,
+  -334.30, -334.29, -285.50, -285.52 -- each at its free twin ((6,13):
+  the pinned row is the component mean incl. the one 5L component at
+  -333; its sixteen L=9 components read -282.5).  The two rows the
+  old code priced consistently were re-priced on the certified path
+  (`logs/u14e_vv_ladder_pinned2.log`; 5/5): (4,12)@r1 -341.74
+  (unchanged at the table's precision), (4,15) -336.72 (-336.71
+  before).  RETRACTED: the
+  earlier mechanism texts ("the Sr class carries a misplaced valence
+  orbital"; "gauge-visible at the Eh scale"; "~790 mEh pure gauge").
+  The retired probe's log stays as the record of the defect.
 - **The (6,13) occ control re-scoping — proposed 2026-11-23** (the
   user's call): the frozen ⁵L ground on the @r1+MOs window uses the
   pair column at **0.53** — the L=8 root mixes 7s²/7s¹/7s⁰

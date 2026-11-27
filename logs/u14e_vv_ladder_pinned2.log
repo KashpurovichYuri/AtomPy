@@ -1,0 +1,113 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+===== (4,12)@r1 =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/vv/windows.py:279: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo = build_full_mo(sub.mf, occupied_core_idx(sub.mf, nc), act,
+  window 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420
+  window 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+  window: the distilled columns' S-norm after removing the pur core span: all at 1.0
+  [PASS] (4,12)@r1: the window is S-orthonormal and rotation-closed (the definite-L certificate): 12 active columns on 5 core pairs, sector (4, 0); max|C^T S C - I| 2.2e-11; ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.30e-13 (band 1e-10)
+  [PASS] the D2h wrapper is the C1 molecule: the window's two-electron integrals coincide: 17 orbitals, max|<pq|rs>_C1 - <pq|rs>_wrapper| 0.0e+00 (band 1e-09)
+  [note] (4,12)@r1: the window's irrep purity on the wrapper: max impurity 2.22e-16 (the labeling seam's band 1e-06); labels [6, 4, 6, 5, 7, 5, 7, 1, 3, 0, 2, 0]
+  [pinned-casci (print-only)] 143.9 s | conv 1.0e-12/— | certificate: orbitals 2.2e-11, eigenpairs 3.6e-15, core leak 4.5e-16
+    root 0 Au: e_ref -50.18705564, E(2) -541.9331 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 Au: e_ref -50.18705564, E(2) -541.9725 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 Au: e_ref -50.18705564, E(2) -542.1078 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 Au: e_ref -50.18705564, E(2) -542.0109 mEh, <L2> 72.000000, <S2> 6.000000
+    root 4 Au: e_ref -50.18705564, E(2) -542.0392 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B1u: e_ref -50.18705564, E(2) -542.0506 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B1u: e_ref -50.18705564, E(2) -542.0681 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B1u: e_ref -50.18705564, E(2) -541.9831 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B1u: e_ref -50.18705564, E(2) -542.0881 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B2u: e_ref -50.18705564, E(2) -542.0814 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B2u: e_ref -50.18705564, E(2) -541.9671 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B2u: e_ref -50.18705564, E(2) -542.0461 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B2u: e_ref -50.18705564, E(2) -541.9895 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B3u: e_ref -50.18705564, E(2) -541.9498 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B3u: e_ref -50.18705564, E(2) -542.0761 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B3u: e_ref -50.18705564, E(2) -542.0220 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B3u: e_ref -50.18705564, E(2) -541.9680 mEh, <L2> 72.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -542.0208 mEh, spread 0.1747 mEh
+  [pinned-sa] 197.2 s | conv 4.5e-09/7 | certificate: orbitals 9.6e-12, eigenpairs 4.4e-15, core leak 1.0e-02, readout shift 1.7e-02, orbitals as returned 4.0e-05, component mean vs ensemble 5.0e-12
+    root 0 Au: e_ref -50.42381022, E(2) -341.7556 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 Au: e_ref -50.42381009, E(2) -341.7586 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 Au: e_ref -50.42380997, E(2) -341.7518 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 Au: e_ref -50.42380987, E(2) -341.7120 mEh, <L2> 72.000000, <S2> 6.000000
+    root 4 Au: e_ref -50.42380981, E(2) -341.6874 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B1u: e_ref -50.42381023, E(2) -341.7418 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B1u: e_ref -50.42381011, E(2) -341.7592 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B1u: e_ref -50.42380991, E(2) -341.7398 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B1u: e_ref -50.42380982, E(2) -341.6749 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B2u: e_ref -50.42381023, E(2) -341.7444 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B2u: e_ref -50.42381014, E(2) -341.7627 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B2u: e_ref -50.42380999, E(2) -341.7586 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B2u: e_ref -50.42380987, E(2) -341.7044 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B3u: e_ref -50.42381021, E(2) -341.7534 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B3u: e_ref -50.42381009, E(2) -341.7577 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B3u: e_ref -50.42380999, E(2) -341.7558 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B3u: e_ref -50.42380990, E(2) -341.7488 mEh, <L2> 72.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -341.7392 mEh, spread 0.0879 mEh
+    ensemble -50.42381003
+  [PASS] (4,12)@r1: the pinned frozen CI reads the certified term (the gate): 17 components, max dev 1.42e-13 (band 1e-05)
+  [PASS] (4,12)@r1: the pinned SA reads the term's ensemble (the gate): 17 components, max dev 1.02e-07
+  ledger (static/dynamic/total, mEh vs ROHF): casci +149.34/-445.00/-295.66  casscf -48.83/-312.83/-361.66  sa-casscf -41.96/-341.67/-383.63  sa-casscf pinned -41.96/-341.74/-383.70
+===== (4,15) =====
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/vv/windows.py:238: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, ncore), sel,
+  window: 15 AO columns ('10f', '13d', '14p'), visible construction == production build_full_mo (block dev 2.2e-16, complement span dev 1.9e-08)
+  [PASS] (4,15): the window is S-orthonormal and rotation-closed (the definite-L certificate): 15 active columns on 5 core pairs, sector (4, 0); max|C^T S C - I| 6.6e-12; ||[P,Lz]|| 3.13e-13, ||[P,Lperp]|| 4.84e-13 (band 1e-10)
+  [note] (4,15): the window's irrep purity on the wrapper: max impurity 4.44e-16 (the labeling seam's band 1e-06); labels [7, 6, 5, 1, 3, 0, 2, 0, 6, 4, 6, 5, 7, 5, 7]
+  [pinned-casci (print-only)] 515.4 s | conv 1.0e-12/— | certificate: orbitals 6.6e-12, eigenpairs 4.4e-15, core leak 4.5e-16
+    root 0 Au: e_ref -49.45874073, E(2) -1055.6365 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 Au: e_ref -49.45874073, E(2) -1055.9241 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 Au: e_ref -49.45874073, E(2) -1055.9417 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 Au: e_ref -49.45874073, E(2) -1056.2067 mEh, <L2> 42.000000, <S2> 6.000000
+    root 4 Au: e_ref -49.45727672, E(2) -1054.7458 mEh, <L2> 0.000000, <S2> 6.000000
+    root 0 B1u: e_ref -49.45874073, E(2) -1056.1136 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 B1u: e_ref -49.45874073, E(2) -1056.0147 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 B1u: e_ref -49.45874073, E(2) -1056.1968 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 B1u: e_ref -49.45236705, E(2) -1058.1010 mEh, <L2> 20.000000, <S2> 6.000000
+    root 0 B2u: e_ref -49.45874073, E(2) -1055.5938 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 B2u: e_ref -49.45874073, E(2) -1056.0994 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 B2u: e_ref -49.45874073, E(2) -1056.1411 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 B2u: e_ref -49.45236705, E(2) -1058.1108 mEh, <L2> 20.000000, <S2> 6.000000
+    root 0 B3u: e_ref -49.45874073, E(2) -1055.9187 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 B3u: e_ref -49.45874073, E(2) -1056.1754 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 B3u: e_ref -49.45874073, E(2) -1056.1589 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 B3u: e_ref -49.45236705, E(2) -1058.1051 mEh, <L2> 20.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -1056.3049 mEh, spread 3.3650 mEh
+  [pinned-sa] 783.1 s | conv 8.7e-08/30 | certificate: orbitals 1.8e-11, eigenpairs 4.4e-15, core leak 1.0e-02, readout shift 1.6e-02, orbitals as returned 1.8e-11, component mean vs ensemble 2.8e-10
+    root 0 Au: e_ref -50.42637764, E(2) -336.0379 mEh, <L2> 71.789334, <S2> 6.000000
+    root 1 Au: e_ref -50.42637108, E(2) -336.0696 mEh, <L2> 71.790780, <S2> 6.000000
+    root 2 Au: e_ref -50.42505778, E(2) -336.9798 mEh, <L2> 71.945466, <S2> 6.000000
+    root 3 Au: e_ref -50.42464716, E(2) -337.0253 mEh, <L2> 71.964588, <S2> 6.000000
+    root 4 Au: e_ref -50.42464027, E(2) -337.0543 mEh, <L2> 71.964864, <S2> 6.000000
+    root 0 B1u: e_ref -50.42637925, E(2) -336.0524 mEh, <L2> 71.785165, <S2> 6.000000
+    root 1 B1u: e_ref -50.42506022, E(2) -336.9576 mEh, <L2> 71.943827, <S2> 6.000000
+    root 2 B1u: e_ref -50.42497722, E(2) -336.9664 mEh, <L2> 71.937684, <S2> 6.000000
+    root 3 B1u: e_ref -50.42462840, E(2) -337.0444 mEh, <L2> 71.965291, <S2> 6.000000
+    root 0 B2u: e_ref -50.42637452, E(2) -336.0645 mEh, <L2> 71.786015, <S2> 6.000000
+    root 1 B2u: e_ref -50.42506378, E(2) -336.9467 mEh, <L2> 71.944030, <S2> 6.000000
+    root 2 B2u: e_ref -50.42497662, E(2) -336.9713 mEh, <L2> 71.937747, <S2> 6.000000
+    root 3 B2u: e_ref -50.42462470, E(2) -337.0556 mEh, <L2> 71.965470, <S2> 6.000000
+    root 0 B3u: e_ref -50.42637996, E(2) -336.0513 mEh, <L2> 71.786331, <S2> 6.000000
+    root 1 B3u: e_ref -50.42506135, E(2) -336.9515 mEh, <L2> 71.944023, <S2> 6.000000
+    root 2 B3u: e_ref -50.42497826, E(2) -336.9755 mEh, <L2> 71.937731, <S2> 6.000000
+    root 3 B3u: e_ref -50.42462862, E(2) -337.0455 mEh, <L2> 71.965297, <S2> 6.000000
+    E(2) over 17 roots: mean -336.7206 mEh, spread 1.0176 mEh
+    ensemble -50.42530746
+  ledger (static/dynamic/total, mEh vs ROHF): casci +923.11/-1056.25/-133.14  casscf -52.60/-309.91/-362.52  sa-casscf -44.53/-336.01/-380.54  sa-casscf pinned -43.46/-336.72/-380.18
+
+===== the ledger =====
+
+===== verdict =====
+  PASS  (4,12)@r1: the window is S-orthonormal and rotation-closed (the definite-L certificate)
+  PASS  the D2h wrapper is the C1 molecule: the window's two-electron integrals coincide
+  REPORT  (4,12)@r1: the window's irrep purity on the wrapper
+  PASS  (4,12)@r1: the pinned frozen CI reads the certified term (the gate)
+  PASS  (4,12)@r1: the pinned SA reads the term's ensemble (the gate)
+  PASS  (4,15): the window is S-orthonormal and rotation-closed (the definite-L certificate)
+  REPORT  (4,15): the window's irrep purity on the wrapper
+5/5 assertions hold

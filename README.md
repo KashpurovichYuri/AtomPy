@@ -97,11 +97,15 @@ m-replicated (a raw-ROHF MO span never rotation-closes).
   the component spread (ptp).
 - **Spin honesty** (UHF) — ⟨S²⟩ by the overlap formula + the
   corresponding-orbital pairing spectrum.
-- **PT2** — per root, per Koopmans class (norm, energy); the norms are
-  the gauge's honesty meters.
+- **PT2** — per root, per Koopmans class (norm, energy), on
+  certified solutions only; a class norm far from its peers is the
+  meter of a mispriced object.
 - **The invariance structure** — E and ⟨L̂²⟩ are orbital-gauge
-  invariant (span/Casimir); ⟨L̂z⟩ and E(2) are gauge-visible. Compare
-  energies at matched partitions; read E(2) as the gauge reporter.
+  invariant (span/Casimir); ⟨L̂z⟩ is not, and E(2) is state-specific
+  rather than an eigenvalue: compare it only between certified
+  solutions of the same term (redraws of a closed term agree to
+  ≤ 0.003 mEh; a quasi-degenerate manifold's root partition moves it
+  far more). Compare energies at matched partitions.
 
 The worked example (Ti, the 3d4s window; the full table:
 `elements/Ti/TABLE.md`): the free CASSCF escapes the declared window
@@ -122,11 +126,12 @@ the pipeline **certifies** the atomic ground term, not just labels it.
 - On quasi-degenerate manifolds the class partition is window- and
   core-sensitive — the window decides the frozen class; the ensemble
   decides the optimized one.
-- The optimizer's gauge can inflate PT2's one-hole class (a
-  near-degenerate external orbital) — the class norms are the meter.
+- An E(2) that dwarfs its neighbours is first an instrument suspect:
+  price only a certified object — the orbitals and the CI vectors of
+  one solve.  The class norms are the meter that catches it.
 - The static/dynamic correlation trade converts *within* a window
   (the frozen → the optimized): the static gain rises while the E(2)
-  remainder falls; across windows the E(2) is gauge-stable while the
+  remainder falls; across windows the E(2) is nearly constant while the
   static gain carries the window economics — the trade is not an
   across-window law. See the V&V record (`scripts/u14e/VV.md`).
 - A band-named shell is its dominant radial, not the whole shell; the
@@ -157,23 +162,27 @@ a key outside the declared table is refused):
 
 ## Analysis (PT2)
 
-**Why E(2) is gauge-visible.** The variational energy is an eigenvalue
-— identical for every gauge. E(2) is state-specific: a functional of
-the root's own density matrices, and inside an exactly degenerate term
-block the root IS a gauge. The correction's invariance is a measured
-property, never an assumption.
+**Why E(2) is state-specific.** The variational energy is an
+eigenvalue — identical for every gauge. E(2) is a functional of one
+state's density matrices, and inside a degenerate term block which
+state a root IS depends on the partition. Its invariance is a
+measured property, never an assumption: redraws of a closed term
+agree to ≤ 0.003 mEh.
 
-**The gauge ledger.** Invariant: the block projector, E_CAS, ⟨L²⟩,
-⟨S²⟩. Gauge-visible: ⟨Lz⟩, the density matrices, E(2). Spin is safe by
-construction (the Dyall partition is spin-free).
+**The invariance ledger.** Invariant: the block projector, E_CAS,
+⟨L²⟩, ⟨S²⟩. Not invariant: ⟨Lz⟩, the density matrices, and E(2) per
+root. Spin is safe by construction (the Dyall partition is
+spin-free).
 
 **Reading the ladder.** *R* = E(2) priced on a window against the
 dynamic correction the optimized solution of the same span carries: a
 window whose R dwarfs its neighbors is *fueling*; a ladder whose
 corrected totals are flat has SATURATED. The class norms are the
-gauge's honesty meters — an inflated one-hole class means the gauge
-parked an external orbital near-degenerate with the CAS. Absolute
-eV values are basis-bound; ladder *differences* are the usable signal.
+honesty meter of the OBJECT, not of a gauge: a one-hole (Sr) norm far
+above its peers means the CI vector was not solved in the orbitals it
+is priced on — a certified solution reads ~0.004 there, a mispaired
+one 14–15. Absolute eV values are basis-bound; ladder *differences*
+are the usable signal.
 
 ## Files and regeneration
 
