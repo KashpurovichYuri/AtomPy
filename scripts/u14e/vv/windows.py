@@ -169,6 +169,50 @@ def orthonormalize(mo, s, ncore: int, ncas: int) -> np.ndarray:
     return out
 
 
+def orthogonalize(cols, base, s) -> np.ndarray:
+    """Columns made S-orthonormal on top of an S-orthonormal
+    ``base``: projected against it (two passes), then
+    Loewdin-orthonormalized among themselves.  Different (l, member)
+    sectors never overlap, so a column only ever mixes with the
+    base's columns of its own sector.
+
+    Raises
+    ------
+    ValueError : nearly linearly dependent (via ``lowdin``).
+    """
+    out = np.array(cols, dtype=float)
+    if base.shape[1]:
+        for _ in range(2):
+            out = out - base @ (base.T @ s @ out)
+    return lowdin(out, s)
+
+
+def window_with_channels(sub: Substrate, base: Built, blocks=()) -> Built:
+    """A base window with correlation channels set beside it.
+
+    Parameters
+    ----------
+    sub : the reference substrate.
+    base : any constructed window (``Built``).
+    blocks : ``(columns, report lines)`` per channel, in order --
+        :func:`vv.channels.channel_block`'s output.
+
+    Returns
+    -------
+    The base's active columns followed by the channels', each made
+    S-orthonormal on top of what precedes it (:func:`orthogonalize`),
+    assembled on the base's core.
+    """
+    space = base.space
+    act, report = space.active, list(base.report)
+    s = sub.mf.get_ovlp()
+    for cols, lines in blocks:
+        act = np.hstack([act, orthogonalize(cols, act, s)])
+        report += lines
+    return _assemble(sub, space.ncore, act, space.core, space.sector,
+                     report)
+
+
 def dominant_labels(act, mol) -> list[str]:
     """Each column's dominant AO label (its largest raw coefficient)."""
     labels = mol.ao_labels()
