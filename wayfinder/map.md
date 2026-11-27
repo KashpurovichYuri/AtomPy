@@ -249,6 +249,41 @@ configuration-inert).
      orthonormal only to ~4e-5 (the virtual block; draw-dependent);
      every old pinned row was priced on them unchecked.
      `windows.orthonormalize` runs before the readout.
+  F8 (VISIBLE in the V&V library; the src side is the user's call)
+     The NEVPT2 prelude -- PySCF's canonicalize(cas_natorb=True),
+     which src/atomterm/perturb.py and the V&V library both run --
+     RE-PARTITIONS empty active orbitals: a natural orbital occupied
+     below 1e-06 is canonicalized together with the virtuals, sorted
+     by orbital energy, and the lowest virtuals take its active slots;
+     E(2) then depends on the number of empty slots, not on the
+     window.  Measured on the frozen carbon 3P ground (p_z empty): a
+     non-coupling s orbital moves E(2) by 100 mEh (-265.8 -> -165.1);
+     with the window priced as solved, 0.57 mEh.  On U14e 0.17 mEh
+     per three slots -- it is what the table's frozen "14p"/"7s" rows
+     measure ((4,15) and (4,16) frozen CASCI both read -1056.2x;
+     (4,15)@r1/(4,16)@r1 -445.17/-445.13 against (4,12)@r1's
+     -445.00).  The V&V library counts it (resorted) and can price
+     the window as solved (partition_as_solved); its default stays
+     PySCF's convention (the production twin).
+  THE HF-VIRTUAL CHANNEL SCREEN -- MEASURED 2026-11-27
+  (`u14e_vv_screen.py` + logs/u14e_vv_screen.log,
+  logs/u14e_vv_screen_spectrum.log; the inventory `vv.channels`):
+  frozen CASCI + NEVPT2 per channel beside the (4,12)@r1 base, mEh
+  dE_CAS / dE(2) / dE_tot: 5f (the compact 5f radial partner)
+  -43.09 / +20.70 / -22.40; 6f -4.58 / +2.04 / -2.54; 7d
+  -0.29 / -0.44 / -0.72; 8d -0.12 / +0.71 / +0.58; the p and s
+  shells (7p, 8p, 8s, 9s) are SPECTATORS at the frozen level
+  (dE_CAS = 0; their E(2) shifts are F8's re-partition).  THE
+  READINGS: (i) the p/s channels carry nothing at the frozen level
+  -- the proposed p/s rungs are void; (ii) a coupling channel's
+  frozen gain is orbital RELAXATION of the occupied orbitals toward
+  it (the channel's natural occupations stay ~1e-04), which the
+  optimizer recovers on its own -- the screen ranks channels, it
+  does not size the rungs; (iii) the base's 5f block already holds
+  ~70% of the compact 5f virtuals and its 6d block ~55-60% of four
+  "7d" virtuals.  The basis has no g functions (l = s, p, d, f).
+  PROPOSED NEXT (the user's call): the rung "(4,19)@r1" = (4,12)@r1
+  + the 5f' radial, then + 6f.
   DECLINED (review): the lane-core route's pinned rows (outside the
   keep-set) are print-only; the "unification" leg's C4 lane-window
   disclosure is dropped (record: logs/u14e_vv_unification.log).
