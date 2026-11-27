@@ -131,7 +131,7 @@ def main() -> int:
     from atomterm.cases import campaign_spec
     from atomterm.reference import (_forced_rohf_occ,  # noqa: E402
                                     occupation_postcheck)
-    from _vv_common import load_reference
+    from vv.reference import load_reference
 
     spec = campaign_spec("U14e")
     mol_d2h = gto.M(atom=f"{spec.symbol} 0 0 0", basis=spec.basis,
@@ -192,7 +192,7 @@ def main() -> int:
     # ---- stage 3: the windows from the irrep reference -----------------
     from atomterm.windows import build_full_mo, occupied_core_idx
     from atomterm.operators import window_closure
-    from _vv_common import meters
+    from vv.meters import meters
     from pyscf import mcscf
 
     key = None   # the windows are built directly; no key needed here

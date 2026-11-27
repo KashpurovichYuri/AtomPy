@@ -37,9 +37,11 @@ import time
 import numpy as np
 from pyscf import mcscf
 
-from _vv_common import (Verdict, conv_of, core_part_of, drop_row,
-                        fmt_range, free_kernel, load_reference, meters,
-                        price, std_row)
+from vv.meters import meters
+from vv.reference import load_reference
+from vv.routes import core_part_of, free_kernel, price
+from vv.table import conv_of, drop_row, fmt_range, std_row
+from vv.verdict import Verdict
 
 ADDR_412_R1 = "u14e_5f6d@r1_4-0_casci_ao_-_pur_avg"
 ADDR_415_R1 = "u14e_5f6d14p@r1_4-0_casci_ao_-_pur_avg"

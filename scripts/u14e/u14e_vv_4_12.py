@@ -38,12 +38,12 @@ import time
 import numpy as np
 from pyscf import mcscf
 
-from _vv_common import (BAND_E2_MEH, BAND_L2, BAND_ROUTE, L_L2, S_S2,
-                        Verdict, anchor, conv_of, core_part_of, drop_row,
-                        fmt_range, free_kernel, lane_route,
-                        load_reference, make_blocks, meters, meters_all,
-                        nevpt_rows, pinned_ci_run, pinned_sa_run, price,
-                        std_row)
+from vv.bands import BAND_E2_MEH, BAND_L2, BAND_ROUTE, L_L2, S_S2
+from vv.meters import meters, meters_all
+from vv.reference import anchor, load_reference
+from vv.routes import core_part_of, free_kernel, lane_route, make_blocks, nevpt_rows, pinned_ci_run, pinned_sa_run, price
+from vv.table import conv_of, drop_row, fmt_range, std_row
+from vv.verdict import Verdict
 
 ADDR_412 = "u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg"
 ADDR_412_LANE = "u14e_5f6d@6s6p7s_4-0_sa-casscf_ao_-_pur_avg"

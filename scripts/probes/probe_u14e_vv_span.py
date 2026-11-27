@@ -34,9 +34,10 @@ from pyscf import mcscf
 from pyscf.fci import direct_spin1
 
 sys.path.insert(0, "scripts/u14e")
-from _vv_common import (_irrep_projectors, dominant_irreps,  # noqa: E402
-                        lane_route, load_reference, meters, purify_window,
-                        symmetrize_columns)
+from vv.meters import meters  # noqa: E402
+from vv.reference import load_reference  # noqa: E402
+from vv.routes import lane_route  # noqa: E402
+from vv.symmetry import _irrep_projectors, dominant_irreps, purify_window, symmetrize_columns  # noqa: E402
 from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.cells import CellKey, key_core, window_columns  # noqa: E402
 from atomterm.windows import (build_full_mo, lowdin,  # noqa: E402

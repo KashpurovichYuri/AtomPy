@@ -43,16 +43,17 @@ from pyscf import mcscf
 
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 
-from _vv_common import (BUDGET_200, Verdict, conv_of, core_part_of, drop_row,  # noqa: E402
-                        fmt_range, free_kernel, load_reference,
-                        make_blocks, meters, meters_all, nevpt_rows,
-                        pinned_sa_run, price, std_row)
+from vv.meters import meters, meters_all  # noqa: E402
+from vv.reference import load_reference  # noqa: E402
+from vv.routes import BUDGET_200, core_part_of, free_kernel, make_blocks, nevpt_rows, pinned_sa_run, price  # noqa: E402
+from vv.table import conv_of, drop_row, fmt_range, std_row  # noqa: E402
+from vv.verdict import Verdict  # noqa: E402
 
 SECTOR = (4, 0)
 NCORE = 5
 ROOTS = 17
 L, PARITY = 8, "u"
-BUDGET = BUDGET_200  # the optimizer-budget directive (from _vv_common)
+BUDGET = BUDGET_200  # the optimizer-budget directive (from vv.routes)
 SHELL_BANDS = {"5f": ("9f", "10f", "11f"), "6d": ("12d", "13d", "14d"),
                "6p": ("13p", "14p", "15p")}
 K_18_R1 = {"5f": 1, "6d": 1, "6p": 2}

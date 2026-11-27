@@ -46,8 +46,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "u14e"))
 import numpy as np  # noqa: E402
 from pyscf.mcscf import addons as _mcaddons  # noqa: E402
 
-from _vv_common import (core_part_of, free_kernel, load_reference,  # noqa: E402
-                        make_blocks, meters, meters_all, pinned_sa_run)
+from vv.meters import meters, meters_all  # noqa: E402
+from vv.reference import load_reference  # noqa: E402
+from vv.routes import core_part_of, free_kernel, make_blocks, pinned_sa_run  # noqa: E402
 
 from atomterm.operators import window_closure  # noqa: E402
 

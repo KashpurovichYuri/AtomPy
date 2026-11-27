@@ -28,8 +28,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "u14e"))
 
 import numpy as np  # noqa: E402
 
-from _vv_common import (band_chains_by_suffix, band_population,  # noqa: E402
-                        family_spectrum, load_reference)
+from vv.channel_map import band_chains_by_suffix, band_population, family_spectrum  # noqa: E402
+from vv.reference import load_reference  # noqa: E402
 
 DECLARED = {"5f": ("9f", "10f", "11f"), "6d": ("12d", "13d", "14d"),
             "6p": ("13p", "14p", "15p"), "7s": ("18s", "19s", "20s")}

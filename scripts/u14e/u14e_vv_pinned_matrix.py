@@ -37,17 +37,18 @@ import numpy as np
 
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 
-from _vv_common import (BUDGET_200, Verdict, conv_of, drop_row, fmt_range,  # noqa: E402
-                        load_reference, make_blocks, meters_all,
-                        nevpt_rows, pinned_ci_run, pinned_sa_run,
-                        std_row)
+from vv.meters import meters_all  # noqa: E402
+from vv.reference import load_reference  # noqa: E402
+from vv.routes import BUDGET_200, make_blocks, nevpt_rows, pinned_ci_run, pinned_sa_run  # noqa: E402
+from vv.table import conv_of, drop_row, fmt_range, std_row  # noqa: E402
+from vv.verdict import Verdict  # noqa: E402
 
 ADDR_412_RAW = "u14e_10f13d_4-0_casci_ao_-_pur_avg"
 ADDR_415_R1 = "u14e_5f6d14p@r1_4-0_casci_ao_-_pur_avg"
 ADDR_613 = "u14e_10f13d7s_5-1_sa-casscf_ao_-_pur_avg"
 ADDR_412_R1 = "u14e_5f6d@r1_4-0_casci_ao_-_pur_avg"
 L, PARITY = 8, "u"
-BUDGET = BUDGET_200  # the optimizer-budget directive (from _vv_common)
+BUDGET = BUDGET_200  # the optimizer-budget directive (from vv.routes)
 
 
 def _counts(tag, l2s):

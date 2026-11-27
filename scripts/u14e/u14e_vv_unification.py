@@ -46,10 +46,11 @@ import time
 import numpy as np
 from pyscf import gto, mcscf, scf
 
-from _vv_common import (BUDGET_200, Verdict, conv_of, drop_row, fmt_range,
-                        lane_route, load_reference, make_blocks,
-                        meters_all, nevpt_rows, pinned_ci_run,
-                        pinned_sa_run, std_row)
+from vv.meters import meters_all
+from vv.reference import load_reference
+from vv.routes import BUDGET_200, lane_route, make_blocks, nevpt_rows, pinned_ci_run, pinned_sa_run
+from vv.table import conv_of, drop_row, fmt_range, std_row
+from vv.verdict import Verdict
 
 ADDR_412_R1 = "u14e_5f6d@r1_4-0_casci_ao_-_pur_avg"
 ADDR_415 = "u14e_10f13d14p_4-0_casci_ao_-_pur_avg"
@@ -58,7 +59,7 @@ ADDR_415_LANE = "u14e_10f13d14p@6s6p7s_4-0_sa-casscf_ao_-_pur_avg"
 L, PARITY = 8, "u"
 BAND_GATE = 1e-5   # the lane record's certified band (observed dev
                    # 1.9e-07 there; the wrapper's fresh read 1.1e-13)
-BUDGET = BUDGET_200  # the optimizer-budget directive (from _vv_common)
+BUDGET = BUDGET_200  # the optimizer-budget directive (from vv.routes)
 
 
 def wrapper_substrate(mol_c1, mf_c1, spec):
@@ -111,7 +112,7 @@ def act_s_mo_of(mol_c1, mf_c1, mol_d2h, spec):
     labeling consumes.  Returns (act, ncas, purity_loss)."""
     import re as _re
     import u14e_vv_6_13_r1 as r1
-    from _vv_common import orthonormal_per_irrep
+    from vv.symmetry import orthonormal_per_irrep
     from atomterm.cells import CellKey, window_columns
     key = CellKey.from_address(r1.KEY_613_R1)
     act, ncas, _ = window_columns(key, mol_c1, mf_c1, spec.shell_bands,
@@ -219,7 +220,7 @@ def main(argv=None) -> int:
     from atomterm.cells import CellKey, key_core, window_columns
     from atomterm.windows import build_full_mo, occupied_core_idx
     from atomterm.irreps import orb_irreps
-    from _vv_common import symmetrize_columns
+    from vv.symmetry import symmetrize_columns
     mo412, ncas412, c_pur412, nf412 = window_of(
         ADDR_412_R1, mol_c1, mf_c1, spec, mf_d2h)
     key = CellKey.from_address(ADDR_412_R1)
@@ -329,7 +330,7 @@ def main(argv=None) -> int:
     lmol, lmf, c_core_l, nf_l, mo_l, ncas_l, _act_l = lane_route(
         spec, ADDR_415_LANE, (4, 0))
     c_read_l = np.asarray(mo_l)[:, nf_l:nf_l + ncas_l]
-    from _vv_common import symmetrize_columns as _sym
+    from vv.symmetry import symmetrize_columns as _sym
     _clean_l, imp_l = _sym(lmol, lmf.get_ovlp(), c_read_l, tol=1.0)
     print(f"  [C4] the assembled lane window's irrep impurities: max "
           f"{max(imp_l):.2e} (the labeling seam's dirt scale)",

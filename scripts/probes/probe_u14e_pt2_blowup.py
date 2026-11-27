@@ -34,8 +34,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "u14e"))
 import numpy as np  # noqa: E402
 from pyscf import mcscf  # noqa: E402
 
-from _vv_common import (core_part_of, free_kernel, load_reference,  # noqa: E402
-                        make_blocks, meters_all, nevpt_rows)
+from vv.meters import meters_all  # noqa: E402
+from vv.reference import load_reference  # noqa: E402
+from vv.routes import core_part_of, free_kernel, make_blocks, nevpt_rows  # noqa: E402
 
 SECTOR = (5, 1)
 NCORE = 4
@@ -65,7 +66,7 @@ def main() -> int:
     print("===== 1. the pinned SA (as-built window), per-block E(2) "
           "=====", flush=True)
     t0 = time.time()
-    from _vv_common import pinned_sa_run
+    from vv.routes import pinned_sa_run
     out, _ = pinned_sa_run(mol_d2h, mf_d2h, mo, nc, ncas, SECTOR, 8,
                            "u", c_pur, c_read=c_read, mc_opts=BUDGET)
     blocks, expect, _ = make_blocks(mol_d2h, mf_d2h,
@@ -104,7 +105,8 @@ def main() -> int:
     print("===== 3. the free SA x17 on the C1 route (the control) =====",
           flush=True)
     t0 = time.time()
-    from _vv_common import meters, price
+    from vv.meters import meters
+    from vv.routes import price
     mo_c1 = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
                           c_core=c_pur)
     _mc, cas = free_kernel(mf, ncas, SECTOR, mo_c1, weights=[1 / 17] * 17,

@@ -46,10 +46,12 @@ import numpy as np
 from pyscf import mcscf
 from pyscf.mcscf import addons as _mcaddons
 
-from _vv_common import (BAND_CLASS, L_L2, Verdict, conv_of, core_part_of,
-                        drop_row, fmt_range, free_kernel, load_reference,
-                        make_blocks, meters, meters_all, nevpt_rows,
-                        pinned_ci_run, pinned_sa_run, price, std_row)
+from vv.bands import BAND_CLASS, L_L2
+from vv.meters import meters, meters_all
+from vv.reference import load_reference
+from vv.routes import core_part_of, free_kernel, make_blocks, nevpt_rows, pinned_ci_run, pinned_sa_run, price
+from vv.table import conv_of, drop_row, fmt_range, std_row
+from vv.verdict import Verdict
 
 KEY_613 = "u14e_10f13d7s_5-1_sa-casscf_ao_-_pur_avg"
 KEY_613_LANE = "u14e_5f6d7s@6s6p_5-1_sa-casscf_ao_-_pur_avg"
@@ -239,7 +241,7 @@ def main(argv=None) -> int:
             f"RIGHT")
 
     # ---- the pinned route (re-derives the certified class) ------------
-    from _vv_common import lane_route
+    from vv.routes import lane_route
     lmol, lmf, c_core_l, nf, mo_l, ncas_l, _act_l = lane_route(
         spec, KEY_613_LANE, SECTOR)
 

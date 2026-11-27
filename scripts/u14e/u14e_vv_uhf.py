@@ -28,8 +28,11 @@ from pathlib import Path
 
 import numpy as np
 
-from _vv_common import (EH_EV, L_L2, RUNGS, S_S2, Verdict, drop_row,
-                        load_reference, load_rung, meters, std_row)
+from vv.bands import L_L2, S_S2
+from vv.meters import meters
+from vv.reference import RUNGS, load_reference, load_rung
+from vv.table import EH_EV, drop_row, std_row
+from vv.verdict import Verdict
 
 SECTOR = (4, 0)
 NCORE = 5
@@ -134,7 +137,7 @@ def main(argv=None) -> int:
     # (the readout seeded from the SA kernel's own vectors) + the conv
     # capture (track_iters)
     from atomterm.core import purified_core_orbitals
-    from _vv_common import free_kernel
+    from vv.routes import free_kernel
     c_core = purified_core_orbitals(mol, mf_rohf, NCORE)[0]
     mo_full = visible_window(mol, mf_rohf, c_core)
     t0 = time.time()
