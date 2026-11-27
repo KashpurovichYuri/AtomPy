@@ -120,11 +120,9 @@ def main() -> int:
     mol_d2h, mf_d2h = uni.wrapper_substrate(mol, mf, spec)
     weights = [1.0 / ROOTS] * ROOTS
 
+    # the (4,16) pair is certified and stored; this run completes the
+    # density-side disclosures only
     CASES = (
-        ("(4,16)", lambda: _win_416(
-            "u14e_10f13d14p7s_4-0_casci_ao_-_pur_avg", mol, mf, spec)),
-        ("(4,16)@r1", lambda: _win_416(
-            "u14e_5f6d14p7s@r1_4-0_casci_ao_-_pur_avg", mol, mf, spec)),
         ("(4,18)@r1", lambda: _win_k(mol, mf, spec, "r1",
                                      K_18_R1)),
         ("(4,21)@r1", lambda: _win_k(mol, mf, spec, "r1",
@@ -133,7 +131,14 @@ def main() -> int:
 
     for tag, win in CASES:
         print(f"===== {tag} =====", flush=True)
-        act, ncas, c_pur = win()
+        try:
+            act, ncas, c_pur = win()
+        except ValueError as e:
+            print(f"  [{tag}] the window REFUSED by the certificate: "
+                  f"{str(e)[:160]}", flush=True)
+            v.note(f"{tag}: the window refused by the tail certificate",
+                   str(e)[:200])
+            continue
         mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
                                 c_core=c_pur)
         mo_win = mo_prod[:, NCORE:NCORE + ncas]

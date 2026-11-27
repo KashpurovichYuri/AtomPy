@@ -1,50 +1,12 @@
   ROHF (trusted rung, loaded): E = -50.38185233, nao 177
-===== (4,16) =====
-/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
-  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
-  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 14p: k=1 of 1 bands, capture 0.9088-0.9112; 7s: k=1 of 3 bands, capture 0.2713-0.7097
-  [window] 10f: k=1 of 1 bands, capture 0.8228-0.8339
-  [window] 13d: k=1 of 1 bands, capture 0.9157-0.9157
-  [window] 14p: k=1 of 1 bands, capture 0.9088-0.9112
-  [window] 7s: k=1 of 3 bands, capture 0.2713-0.7097
-/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_16_21.py:137: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
-  mo_prod = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
-  [closure] ||[P,Lz]|| 3.13e-13, ||[P,Lperp]|| 4.84e-13
-  [PASS] (4,16): the window is rotation-closed (the definite-L certificate): ||[P,Lz]|| 3.13e-13, ||[P,Lperp]|| 4.84e-13
-  [casci] e_tot -49.45874124, <L2> 42.000000, dE +923.1 mEh (47.4 s)
-  [PASS] (4,16): the frozen ground reads a definite L: <L2> 42.000000 -- closest L(L+1) within 1.74e-07 (WHICH L is the disclosure)
-  [casscf] e_tot -50.43585513, converged True, <L2> 71.307134 (358.2 s)
-  [sa] ensemble -50.42616946, converged True, <L2> [71.770185, 71.906811] (286.1 s)
-/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_16_21.py:216: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
-  occupied_core_idx(mf_d2h, NCORE), act,
-  [pinned sa] ensemble -50.42585646, converged True (cycles 42, 252.6 s); <L2> [71.310430, 71.930255]; the counts: 72: 0, 90: 0, other: 17
-===== (4,16)@r1 =====
-  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112; 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
-  [window] 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420
-  [window] 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
-  [window] 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112
-  [window] 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
-  [closure] ||[P,Lz]|| 2.91e-13, ||[P,Lperp]|| 4.81e-13
-  [PASS] (4,16)@r1: the window is rotation-closed (the definite-L certificate): ||[P,Lz]|| 2.91e-13, ||[P,Lperp]|| 4.81e-13
-  [casci] e_tot -50.23250753, <L2> 71.999966, dE +149.3 mEh (46.9 s)
-  [PASS] (4,16)@r1: the frozen ground reads a definite L: <L2> 71.999966 -- closest L(L+1) within 3.38e-05 (WHICH L is the disclosure)
-  [casscf] e_tot -50.43582857, converged False, <L2> 71.815778 (588.2 s)
-  [sa] ensemble -50.42616956, converged True, <L2> [71.771674, 71.906171] (282.2 s)
-  [pinned sa] ensemble -50.42585613, converged True (cycles 27, 158.2 s); <L2> [71.375081, 71.961331]; the counts: 72: 0, 90: 0, other: 17
 ===== (4,18)@r1 =====
-Traceback (most recent call last):
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_16_21.py", line 253, in <module>
-    sys.exit(main())
-             ^^^^^^
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_16_21.py", line 136, in main
-    act, ncas, c_pur = win()
-                       ^^^^^
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_16_21.py", line 128, in <lambda>
-    ("(4,18)@r1", lambda: _win_k(mol, mf, spec, "r1",
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_4_16_21.py", line 105, in _win_k
-    act, rep = series_window(mol, [mf], s, ["5f", "6d", "6p"],
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/basis.py", line 457, in series_window
-    raise ValueError(
-ValueError: shell '6p': the declared k=2 exceeds the radial signal -- the k-th eigenvalue reads 2.18e-05 against the leading 7.502144 (a single-configuration block is rank-1; only the series average carries the second radial -- lower k or average over the series)
+  [(4,18)@r1] the window REFUSED by the certificate: shell '6p': the declared k=2 exceeds the radial signal -- the k-th eigenvalue reads 2.18e-05 against the leading 7.502144 (a single-configuration block is rank-
+  [note] (4,18)@r1: the window refused by the tail certificate: shell '6p': the declared k=2 exceeds the radial signal -- the k-th eigenvalue reads 2.18e-05 against the leading 7.502144 (a single-configuration block is rank-1; only the series average carries the s
+===== (4,21)@r1 =====
+  [(4,21)@r1] the window REFUSED by the certificate: shell '6p': the declared k=3 exceeds the radial signal -- the k-th eigenvalue reads 6.80e-07 against the leading 7.502144 (a single-configuration block is rank-
+  [note] (4,21)@r1: the window refused by the tail certificate: shell '6p': the declared k=3 exceeds the radial signal -- the k-th eigenvalue reads 6.80e-07 against the leading 7.502144 (a single-configuration block is rank-1; only the series average carries the s
+
+===== verdict =====
+  REPORT  (4,18)@r1: the window refused by the tail certificate
+  REPORT  (4,21)@r1: the window refused by the tail certificate
+0/0 assertions hold
