@@ -17,8 +17,9 @@ from atomterm.core import purified_core_orbitals
 from atomterm.windows import build_full_mo, select_shell_ao
 
 from vv.cases import core_pairs, visible_window
-from vv.windows import (ActiveSpace, dominant_labels, pair_mo, s_column,
-                        survival_norms, window_from_shells)
+from vv.windows import (ActiveSpace, dominant_labels, orthonormalize,
+                        pair_mo, s_column, survival_norms,
+                        window_from_shells)
 
 pytestmark = pytest.mark.fast
 
@@ -89,11 +90,48 @@ def test_a_broken_matrix_or_partition_is_refused(vv_substrate, core):
 def test_on_keeps_the_partition_on_another_orbital_set(vv_substrate, core):
     space = window_from_shells(vv_substrate.mol, vv_substrate.mf, (("2p", 3),),
                                core, SECTOR).space
-    other = space.on(space.mo * np.array([1.0, -1.0] + [1.0] * 12))
+    other = space.on(space.mo * np.array([1.0, -1.0] + [1.0] * 12),
+                     vv_substrate.mf)
     assert (other.ncore, other.ncas, other.sector) == (2, 3, SECTOR)
     assert other.certify(vv_substrate.mf) < 1e-13
     with pytest.raises(ValueError, match="read-only"):
         other.mo[0, 0] = 1.0
+
+
+def test_orthonormalize_repairs_a_noisy_block_and_keeps_the_core(vv_substrate,
+                                                                 core):
+    # the symmetry-adapted optimizer's defect, reproduced: one block
+    # (the virtual one) returns orthonormal only to ~1e-3 here
+    mol, mf = vv_substrate.mol, vv_substrate.mf
+    s = mf.get_ovlp()
+    space = window_from_shells(mol, mf, (("2p", 3),), core, SECTOR).space
+    rng = np.random.default_rng(3)
+    noisy = np.array(space.mo)
+    virt = noisy[:, 5:]
+    noise = rng.standard_normal((virt.shape[1],) * 2)
+    noisy[:, 5:] = virt @ (np.eye(virt.shape[1]) + 1e-3 * (noise + noise.T))
+    assert np.abs(noisy.T @ s @ noisy - np.eye(14)).max() > 1e-4
+    fixed = orthonormalize(noisy, s, space.ncore, space.ncas)
+    assert np.abs(fixed.T @ s @ fixed - np.eye(14)).max() < 1e-13
+    # the clean earlier blocks are untouched, bitwise
+    assert np.array_equal(fixed[:, :5], noisy[:, :5])
+    # the virtual span is kept (the noise is a within-block rotation)
+    p_in = noisy[:, 5:] @ np.linalg.inv(noisy[:, 5:].T @ s @ noisy[:, 5:]) @ noisy[:, 5:].T @ s
+    p_out = fixed[:, 5:] @ fixed[:, 5:].T @ s
+    assert np.abs(p_in - p_out).max() < 1e-12
+
+
+def test_orthonormalize_projects_a_later_block_against_the_earlier_ones(
+        vv_substrate, core):
+    mol, mf = vv_substrate.mol, vv_substrate.mf
+    s = mf.get_ovlp()
+    space = window_from_shells(mol, mf, (("2p", 3),), core, SECTOR).space
+    leaky = np.array(space.mo)
+    leaky[:, 5] += 1e-3 * leaky[:, 0]            # an active column leans on the core
+    fixed = orthonormalize(leaky, s, space.ncore, space.ncas)
+    assert np.array_equal(fixed[:, :2], leaky[:, :2])             # the core first
+    assert np.abs(fixed[:, :2].T @ s @ fixed[:, 5:]).max() < 1e-13
+    assert np.abs(fixed.T @ s @ fixed - np.eye(14)).max() < 1e-13
 
 
 # ---------------------------------------------------------- the diagnostics

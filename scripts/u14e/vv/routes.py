@@ -10,9 +10,12 @@ birth every solution takes its certificate (:func:`assert_consistent`).
 
 Two route families, deliberately different instruments.  The FREE
 routes are PySCF-direct -- plain CASCI / CASSCF / state average on
-the C1 reference: the independent anchor.  The PINNED routes are the
-production wiring (marked: under test) -- one ``wfnsym``-pinned
-solver per D2h component of the term, on the D2h-tagged wrapper.  The
+the C1 reference, and ONLY there: on a symmetry-tagged substrate
+PySCF's symmetry-adapted classes pin the FCI to one irrep, a
+different calculation (the free routes refuse it).  They are the
+independent anchor.  The PINNED routes are the production wiring
+(marked: under test) -- one ``wfnsym``-pinned solver per D2h
+component of the term, on the D2h-tagged wrapper.  The
 free readout has the shape of PySCF's own recommendation for a
 state-averaged wavefunction (``examples/mrpt/41-for_state_average.py``):
 optimize, then a multi-root CASCI on the converged orbitals.
@@ -39,6 +42,7 @@ from atomterm.operators import active_space_integrals
 
 from vv.meters import Meters
 from vv.pricing import price_classes, price_pyscf
+from vv.windows import orthonormalize
 from vv.table import Route, Row, conv_of, fmt_range
 
 # the optimizer budget (the user's directive: "enable even 200 iters")
@@ -130,7 +134,9 @@ class Solution:
     the single, or the lowest, root is the table's); ``conv`` -- the
     conv cell; ``ensemble`` -- the optimizer's ensemble energy on the
     state-averaged routes, else None; ``certificate`` -- the birth
-    certificate's readings (:func:`assert_consistent`).
+    certificate's readings (:func:`assert_consistent`, plus the
+    route's own: ``core_leak``; on the pinned SA also ``ortho_in``,
+    ``readout_shift``, ``ensemble_dev``).
     """
 
     route: Route
@@ -406,11 +412,32 @@ def _readout(mf, space, mo_coeff, nroots, ci0=None):
     return cas
 
 
+def _certify_free(sub, space) -> None:
+    """The free routes' substrate is the C1 reference.  On a
+    symmetry-tagged molecule PySCF hands a plain CASCI/CASSCF its
+    symmetry-adapted classes, and the FCI is pinned to one irrep --
+    a different calculation (observed 2e-02 Eh above the sector
+    ground on one window); the symmetry-tagged substrate belongs to
+    the pinned routes.
+
+    Raises
+    ------
+    ValueError : the substrate's molecule is symmetry-tagged; or the
+        active space fails its certificate.
+    """
+    if getattr(sub.mol, "symmetry", False):
+        raise ValueError(
+            "a free route on a symmetry-tagged substrate: PySCF pins "
+            "the FCI to one irrep there (a different calculation) -- "
+            "the free routes run on the C1 reference")
+    space.certify(sub.mf)
+
+
 def free_casci(sub, space) -> Solution:
     """The free route at the CI level: PySCF's CASCI in the window as
     built -- the frozen pricing class (what the perturbation sees
     before any relaxation)."""
-    space.certify(sub.mf)
+    _certify_free(sub, space)
     cas = mcscf.CASCI(sub.mf, space.ncas, space.sector)
     cas.canonicalization = False
     cas.kernel(space.mo)
@@ -422,7 +449,7 @@ def free_casscf(sub, space, budget=BUDGET) -> Solution:
     """The free route, single root: PySCF's plain CASSCF from the
     window, then the readout of its lowest root in the converged
     orbitals."""
-    space.certify(sub.mf)
+    _certify_free(sub, space)
     mc, conv = _optimize(sub.mf, space, budget)
     cas = _readout(sub.mf, space, mc.mo_coeff, nroots=1)
     return _born(Route.FREE, "casscf", space, [State(cas, 0)], conv)
@@ -434,7 +461,7 @@ def free_sa(sub, space, nroots, budget=BUDGET) -> Solution:
     readout in the converged orbitals, seeded from the optimizer's
     own vectors (unseeded, the davidson tails mix a quasi-degenerate
     block at the 1e-5 level)."""
-    space.certify(sub.mf)
+    _certify_free(sub, space)
     mc, conv = _optimize(sub.mf, space, budget,
                          weights=[1.0 / nroots] * nroots)
     nsa = cistring.num_strings(space.ncas, space.sector[0])
@@ -484,14 +511,23 @@ def pinned_sa(sub, space, term, budget=BUDGET, conv_tol: float = 1e-12) -> Solut
     consistent-to-1e-6 object (:func:`core_leak`).  The states here
     are consistent exactly: their readout folds the returned core
     block.  The shift between the two readouts is the certificate's
-    ``readout_shift`` reading.
+    ``readout_shift`` reading; ``ortho_in`` is the deviation of the
+    optimizer's orbitals as returned; ``ensemble_dev`` is the distance
+    from the readout's component mean to the optimizer's ensemble
+    energy (the two readouts describe one solution).
     """
     space.certify(sub.mf)
     mol, mf = sub.d2h
     out = run_irrep_sa(mol, mf, space.active, space.ncore,
                        *space.sector, *term, conv_tol=conv_tol,
                        c_core=space.core, mc_opts=budget)
-    mo = np.asarray(out["mo"])
+    # the optimizer's orbitals, made exactly S-orthonormal block by
+    # block (its symmetry-adapted optimizer returns the virtual block
+    # orthonormal only to ~4e-05; the C1 one: 5e-12)
+    returned = np.asarray(out["mo"])
+    ortho_in = float(np.abs(returned.T @ mf.get_ovlp() @ returned
+                            - np.eye(returned.shape[1])).max())
+    mo = orthonormalize(returned, mf.get_ovlp(), space.ncore, space.ncas)
     active = slice(space.ncore, space.ncore + space.ncas)
     roots = run_irrep_casci(mol, mf, mo[:, active], space.ncore,
                             *space.sector, *term, conv_tol=conv_tol,
@@ -499,6 +535,10 @@ def pinned_sa(sub, space, term, budget=BUDGET, conv_tol: float = 1e-12) -> Solut
     conv = conv_of(out["conv_dE"], out["cycles"], bool(out["converged"]))
     states = _pinned_states(sub, space, mo, term, roots, conv_tol)
     sol = _born(Route.PINNED, "sa-casscf", space, states, conv)
+    sol.certificate["ortho_in"] = ortho_in
+    # the readout's component mean against the optimizer's own ensemble
+    sol.certificate["ensemble_dev"] = abs(float(np.mean(
+        [s.e_ref for s in states])) - float(out["e_tot"]))
     sol.certificate["readout_shift"] = max(
         float(np.max(np.abs(np.asarray(e) - np.asarray(out["roots"][irrep][0]))))
         for irrep, (e, _ci) in roots.items())
@@ -514,7 +554,9 @@ def _pinned_states(sub, space, mo, term, roots, conv_tol) -> list:
     mol, mf = sub.d2h
     mo = np.asarray(mo, dtype=float)
     orbsyms = orb_irreps(mol, mo[:, space.ncore:space.ncore + space.ncas])
-    core_part = closed_shell_core_energy(mf, space.core)
+    # the core bookkeeping of the core the readout folded: the states'
+    # own core block
+    core_part = closed_shell_core_energy(mf, mo[:, :space.ncore])
     states = []
     for irrep, solver, mult in irrep_solvers(mol, orbsyms, *term, conv_tol):
         e_arr, ci = roots[irrep]

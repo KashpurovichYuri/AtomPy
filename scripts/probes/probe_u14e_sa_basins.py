@@ -121,12 +121,12 @@ def main() -> int:
           f"d block sum {occ_b[7:12].sum():.2f}", flush=True)
 
     print("===== C: free SA x17, started from A's orbitals =====", flush=True)
-    c = _run("C", lambda: free_sa(sub, space.on(a.states[0].mo_coeff), NROOTS),
+    c = _run("C", lambda: free_sa(sub, space.on(a.states[0].mo_coeff, sub.mf), NROOTS),
              "A's seed")
     _ground_report("C", c)
 
     print("===== D: CASSCF, started from B's orbitals =====", flush=True)
-    d = _run("D", lambda: free_casscf(sub, space.on(b.states[0].mo_coeff)),
+    d = _run("D", lambda: free_casscf(sub, space.on(b.states[0].mo_coeff, sub.mf)),
              "B's seed")
     _ground_report("D", d)
 
@@ -139,7 +139,7 @@ def main() -> int:
           f"{max(s2 for _, s2 in l2_e1):.6f}", flush=True)
 
     print("===== E2: free SA x17, started from E1's orbitals =====", flush=True)
-    e2 = _run("E2", lambda: free_sa(sub, space.on(e1.states[0].mo_coeff), NROOTS),
+    e2 = _run("E2", lambda: free_sa(sub, space.on(e1.states[0].mo_coeff, sub.mf), NROOTS),
               "E1's seed")
     _ground_report("E2", e2)
     _occ_print("E2", e2)

@@ -223,7 +223,7 @@ cold-start warning surface.
 
 ## Tests
 
-`pytest` runs 436 tests. The fast tier: `pytest -m fast` = 342
+`pytest` runs 439 tests. The fast tier: `pytest -m fast` = 345
 tests in seconds (machine-light selection). The heavy tail is
 HOURS-class — the per-commit gate is the fast tier plus the diff's
 targeted files (see Running things); the full-suite run is RETIRED. A

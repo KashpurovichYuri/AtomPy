@@ -1,12 +1,15 @@
 """The reference substrate of the V&V library (scripts/u14e/vv/
 reference.py) on the frozen carbon reference: the D2h-tagged wrapper
-IS the C1 molecule (certified where it is built), a declaration that
-does not describe the reference is refused, the wrapper is built
-once, a rung without an SCF record is refused, and a frozen CASCI
-does not depend on the symmetry tag (no SCF; tests/carbon_reference.py)."""
+IS the C1 molecule (overlap and one-electron integrals certified
+where it is built, the two-electron ones compared here), a
+declaration that does not describe the reference is refused, the
+wrapper is built once, a rung without an SCF record is refused, and
+the free routes refuse the symmetry-tagged substrate -- there PySCF
+pins the FCI to one irrep (no SCF; tests/carbon_reference.py)."""
 
+import numpy as np
 import pytest
-from pyscf import gto
+from pyscf import ao2mo, gto
 from pyscf.lib import chkfile
 
 from atomterm.system import AtomConfig
@@ -14,7 +17,7 @@ from atomterm.system import AtomConfig
 from vv.cases import visible_window
 from vv.reference import (Substrate, wrapper_certificate,
                           wrapper_substrate)
-from vv.routes import free_casci
+from vv.routes import free_casci, free_casscf, free_sa
 
 pytestmark = pytest.mark.fast
 
@@ -66,12 +69,28 @@ def test_a_rung_without_an_scf_record_is_refused(tmp_path):
         load_rung(chk)
 
 
-def test_a_frozen_casci_does_not_depend_on_the_symmetry_tag(vv_substrate):
-    # the leg's wrapper check: the same window through the C1
-    # substrate and through the D2h-tagged one (observed 1.1e-13)
+def test_the_wrapper_carries_the_c1_two_electron_integrals(vv_substrate):
+    # the overlap and the one-electron integrals are certified where
+    # the wrapper is built; the two-electron ones over the core +
+    # window block are compared directly (observed 0.0)
     space = visible_window(vv_substrate, (("2p", 3),), SECTOR).space
-    a = free_casci(vv_substrate, space).states[0].e_ref
+    c = space.mo[:, :space.ncore + space.ncas]
+    mol_d2h, _mf = vv_substrate.d2h
+    a = ao2mo.restore(1, ao2mo.kernel(vv_substrate.mol, c), c.shape[1])
+    b = ao2mo.restore(1, ao2mo.kernel(mol_d2h, c), c.shape[1])
+    assert np.abs(a - b).max() == 0.0
+
+
+def test_a_free_route_refuses_a_symmetry_tagged_substrate(vv_substrate):
+    # on the tagged substrate PySCF's symmetry-adapted SCF makes a
+    # plain CASCI use its symmetry FCI solver, pinned to one irrep --
+    # another calculation (2e-02 Eh above the sector ground on a U14e
+    # window; on carbon the 3P ground happens to sit in that block)
     mol, mf = vv_substrate.d2h
     twin = Substrate(mol, mf, vv_substrate.spec, d2h=(mol, mf))
-    b = free_casci(twin, space).states[0].e_ref
-    assert abs(a - b) < 1e-10
+    space = visible_window(vv_substrate, (("2p", 3),), SECTOR).space
+    assert free_casci(vv_substrate, space).certificate["residual"] < 1e-12
+    for route in (free_casci, free_casscf,
+                  lambda s, w: free_sa(s, w, nroots=3)):
+        with pytest.raises(ValueError, match="symmetry-tagged substrate"):
+            route(twin, space)

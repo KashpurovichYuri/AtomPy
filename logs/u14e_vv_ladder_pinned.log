@@ -1,0 +1,320 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+===== (4,12) =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/vv/windows.py:238: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo_prod = build_full_mo(mf, occupied_core_idx(mf, ncore), sel,
+  window: 12 AO columns ('10f', '13d'), visible construction == production build_full_mo (block dev 2.2e-16, complement span dev 1.9e-08)
+  [PASS] (4,12): the window is S-orthonormal and rotation-closed (the definite-L certificate): 12 active columns on 5 core pairs, sector (4, 0); max|C^T S C - I| 6.0e-12; ||[P,Lz]|| 2.01e-13, ||[P,Lperp]|| 3.34e-13 (band 1e-10)
+  [PASS] the D2h wrapper is the C1 molecule: the window's two-electron integrals coincide: 17 orbitals, max|<pq|rs>_C1 - <pq|rs>_wrapper| 0.0e+00 (band 1e-09)
+  [note] (4,12): the window's irrep purity on the wrapper: max impurity 2.22e-16 (the labeling seam's band 1e-06); labels [1, 3, 0, 2, 0, 6, 4, 6, 5, 7, 5, 7]
+  [pinned-casci (print-only)] 144.1 s | conv 1.0e-12/— | certificate: orbitals 6.0e-12, eigenpairs 3.6e-15, core leak 4.5e-16
+    root 0 Au: e_ref -49.45872776, E(2) -1053.5304 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 Au: e_ref -49.45872776, E(2) -1053.3927 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 Au: e_ref -49.45872776, E(2) -1053.0330 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 Au: e_ref -49.45872776, E(2) -1053.8104 mEh, <L2> 42.000000, <S2> 6.000000
+    root 4 Au: e_ref -49.45724901, E(2) -1052.5195 mEh, <L2> -0.000000, <S2> 6.000000
+    root 0 B1u: e_ref -49.45872776, E(2) -1053.2421 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 B1u: e_ref -49.45872776, E(2) -1053.5979 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 B1u: e_ref -49.45872776, E(2) -1053.7132 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 B1u: e_ref -49.45234688, E(2) -1055.7656 mEh, <L2> 20.000000, <S2> 6.000000
+    root 0 B2u: e_ref -49.45872776, E(2) -1053.0042 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 B2u: e_ref -49.45872776, E(2) -1053.7707 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 B2u: e_ref -49.45872776, E(2) -1053.6014 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 B2u: e_ref -49.45234688, E(2) -1055.7692 mEh, <L2> 20.000000, <S2> 6.000000
+    root 0 B3u: e_ref -49.45872776, E(2) -1053.7231 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 B3u: e_ref -49.45872776, E(2) -1053.6952 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 B3u: e_ref -49.45872776, E(2) -1053.7077 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 B3u: e_ref -49.45234688, E(2) -1055.7710 mEh, <L2> 20.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -1053.8616 mEh, spread 3.2515 mEh
+  [pinned-sa] 225.1 s | conv 2.1e-08/11 | certificate: orbitals 9.5e-12, eigenpairs 4.4e-15, core leak 1.0e-02, readout shift 1.7e-02, orbitals as returned 4.0e-05
+    root 0 Au: e_ref -50.44056942, E(2) -341.6725 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 Au: e_ref -50.44056908, E(2) -341.7297 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 Au: e_ref -50.44056898, E(2) -341.7160 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 Au: e_ref -50.44056877, E(2) -341.7561 mEh, <L2> 72.000000, <S2> 6.000000
+    root 4 Au: e_ref -50.44056843, E(2) -341.6972 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B1u: e_ref -50.44056942, E(2) -341.6720 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B1u: e_ref -50.44056908, E(2) -341.7337 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B1u: e_ref -50.44056893, E(2) -341.7610 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B1u: e_ref -50.44056852, E(2) -341.7335 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B2u: e_ref -50.44056914, E(2) -341.7321 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B2u: e_ref -50.44056907, E(2) -341.7390 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B2u: e_ref -50.44056877, E(2) -341.7568 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B2u: e_ref -50.44056843, E(2) -341.6973 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B3u: e_ref -50.44056915, E(2) -341.7450 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B3u: e_ref -50.44056905, E(2) -341.7154 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B3u: e_ref -50.44056891, E(2) -341.7616 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B3u: e_ref -50.44056852, E(2) -341.7337 mEh, <L2> 72.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -341.7266 mEh, spread 0.0896 mEh
+    ensemble -50.42381003
+  ledger (static/dynamic/total, mEh vs ROHF): casci +923.12/-1053.83/-130.70  casscf -48.83/-312.66/-361.50  sa-casscf -41.96/-341.67/-383.63  sa-casscf pinned -41.96/-341.73/-383.68
+===== (4,15)@r1 =====
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/vv/windows.py:279: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo = build_full_mo(sub.mf, occupied_core_idx(sub.mf, nc), act,
+  window 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420
+  window 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+  window 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112
+  window: the distilled columns' S-norm after removing the pur core span: 14px 0.2989; 14py 0.2989; 14pz 0.2989
+  [PASS] (4,15)@r1: the window is S-orthonormal and rotation-closed (the definite-L certificate): 15 active columns on 5 core pairs, sector (4, 0); max|C^T S C - I| 2.2e-11; ||[P,Lz]|| 2.91e-13, ||[P,Lperp]|| 4.81e-13 (band 1e-10)
+  [note] (4,15)@r1: the window's irrep purity on the wrapper: max impurity 1.11e-16 (the labeling seam's band 1e-06); labels [6, 4, 6, 5, 7, 5, 7, 1, 3, 0, 2, 0, 7, 6, 5]
+  [pinned-casci (print-only)] 513.9 s | conv 1.0e-12/— | certificate: orbitals 2.2e-11, eigenpairs 4.4e-15, core leak 4.5e-16
+    root 0 Au: e_ref -50.18711067, E(2) -450.1312 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 Au: e_ref -50.18711067, E(2) -416.4716 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 Au: e_ref -50.18711067, E(2) -541.1189 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 Au: e_ref -50.18711067, E(2) -416.6217 mEh, <L2> 72.000000, <S2> 6.000000
+    root 4 Au: e_ref -50.18711067, E(2) -416.3822 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B1u: e_ref -50.18711067, E(2) -450.2237 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B1u: e_ref -50.18711067, E(2) -450.3557 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B1u: e_ref -50.18711067, E(2) -450.1203 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B1u: e_ref -50.18711067, E(2) -450.3746 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B2u: e_ref -50.18711067, E(2) -450.4792 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B2u: e_ref -50.18711067, E(2) -450.3740 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B2u: e_ref -50.18711067, E(2) -450.5269 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B2u: e_ref -50.18711067, E(2) -450.4899 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B3u: e_ref -50.18711067, E(2) -450.0310 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B3u: e_ref -50.18711067, E(2) -450.1448 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B3u: e_ref -50.18711067, E(2) -450.0972 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B3u: e_ref -50.18711067, E(2) -450.2742 mEh, <L2> 72.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -449.6598 mEh, spread 124.7367 mEh
+  [pinned-sa] 713.7 s | conv 1.9e-08/23 | certificate: orbitals 1.7e-11, eigenpairs 3.6e-15, core leak 1.0e-02, readout shift 1.6e-02, orbitals as returned 1.7e-11
+    root 0 Au: e_ref -50.44262541, E(2) -336.0380 mEh, <L2> 71.788172, <S2> 6.000000
+    root 1 Au: e_ref -50.44262231, E(2) -336.0555 mEh, <L2> 71.789007, <S2> 6.000000
+    root 2 Au: e_ref -50.44130567, E(2) -336.9725 mEh, <L2> 71.944932, <S2> 6.000000
+    root 3 Au: e_ref -50.44088741, E(2) -337.0282 mEh, <L2> 71.964888, <S2> 6.000000
+    root 4 Au: e_ref -50.44088404, E(2) -337.0402 mEh, <L2> 71.965042, <S2> 6.000000
+    root 0 B1u: e_ref -50.44262693, E(2) -336.0536 mEh, <L2> 71.786821, <S2> 6.000000
+    root 1 B1u: e_ref -50.44130808, E(2) -336.9537 mEh, <L2> 71.944188, <S2> 6.000000
+    root 2 B1u: e_ref -50.44122461, E(2) -336.9814 mEh, <L2> 71.937684, <S2> 6.000000
+    root 3 B1u: e_ref -50.44087818, E(2) -337.0468 mEh, <L2> 71.965272, <S2> 6.000000
+    root 0 B2u: e_ref -50.44262596, E(2) -336.0543 mEh, <L2> 71.786167, <S2> 6.000000
+    root 1 B2u: e_ref -50.44130639, E(2) -336.9559 mEh, <L2> 71.944110, <S2> 6.000000
+    root 2 B2u: e_ref -50.44122435, E(2) -336.9721 mEh, <L2> 71.937682, <S2> 6.000000
+    root 3 B2u: e_ref -50.44087848, E(2) -337.0458 mEh, <L2> 71.965251, <S2> 6.000000
+    root 0 B3u: e_ref -50.44262429, E(2) -336.0599 mEh, <L2> 71.786577, <S2> 6.000000
+    root 1 B3u: e_ref -50.44130822, E(2) -336.9520 mEh, <L2> 71.944235, <S2> 6.000000
+    root 2 B3u: e_ref -50.44122499, E(2) -336.9792 mEh, <L2> 71.937664, <S2> 6.000000
+    root 3 B3u: e_ref -50.44087607, E(2) -337.0521 mEh, <L2> 71.965360, <S2> 6.000000
+    E(2) over 17 roots: mean -336.7201 mEh, spread 1.0141 mEh
+    ensemble -50.42530758
+  ledger (static/dynamic/total, mEh vs ROHF): casci +149.34/-445.17/-295.83  casscf -52.60/-310.76/-363.36  sa-casscf -44.53/-336.02/-380.55  sa-casscf pinned -43.46/-336.72/-380.18
+===== (4,16) =====
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 14p: k=1 of 1 bands, capture 0.9088-0.9112; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+  window 10f: k=1 of 1 bands, capture 0.8228-0.8339
+  window 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  window 14p: k=1 of 1 bands, capture 0.9088-0.9112
+  window 7s: k=1 of 3 bands, capture 0.2713-0.7097
+  window: the distilled columns' S-norm after removing the pur core span: 14px 0.2989; 14py 0.2989; 14pz 0.2989; 18s 0.0957
+  [PASS] (4,16): the window is S-orthonormal and rotation-closed (the definite-L certificate): 16 active columns on 5 core pairs, sector (4, 0); max|C^T S C - I| 2.1e-11; ||[P,Lz]|| 3.13e-13, ||[P,Lperp]|| 4.84e-13 (band 1e-10)
+  [note] (4,16): the window's irrep purity on the wrapper: max impurity 2.22e-16 (the labeling seam's band 1e-06); labels [6, 4, 6, 5, 7, 5, 7, 1, 3, 0, 2, 0, 7, 6, 5, 0]
+  [pinned-casci (print-only)] 775.1 s | conv 1.0e-12/— | certificate: orbitals 2.1e-11, eigenpairs 5.8e-15, core leak 4.5e-16
+    root 0 Au: e_ref -49.45874124, E(2) -1055.9828 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 Au: e_ref -49.45874124, E(2) -1055.7563 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 Au: e_ref -49.45874124, E(2) -1056.1136 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 Au: e_ref -49.45874124, E(2) -1056.1378 mEh, <L2> 42.000000, <S2> 6.000000
+    root 4 Au: e_ref -49.45727978, E(2) -1054.4634 mEh, <L2> 0.000000, <S2> 6.000000
+    root 0 B1u: e_ref -49.45874124, E(2) -1055.5146 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 B1u: e_ref -49.45874124, E(2) -1056.2081 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 B1u: e_ref -49.45874124, E(2) -1056.0713 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 B1u: e_ref -49.45236873, E(2) -1058.0244 mEh, <L2> 20.000000, <S2> 6.000000
+    root 0 B2u: e_ref -49.45874124, E(2) -1055.4558 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 B2u: e_ref -49.45874124, E(2) -1056.0055 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 B2u: e_ref -49.45874124, E(2) -1056.0050 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 B2u: e_ref -49.45236873, E(2) -1058.0379 mEh, <L2> 20.000000, <S2> 6.000000
+    root 0 B3u: e_ref -49.45874124, E(2) -1056.0491 mEh, <L2> 42.000000, <S2> 6.000000
+    root 1 B3u: e_ref -49.45874124, E(2) -1055.4425 mEh, <L2> 42.000000, <S2> 6.000000
+    root 2 B3u: e_ref -49.45874124, E(2) -1056.0182 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 B3u: e_ref -49.45236873, E(2) -1058.0437 mEh, <L2> 20.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -1056.1959 mEh, spread 3.5803 mEh
+  [pinned-sa] 1169.6 s | conv 7.7e-08/40 | certificate: orbitals 1.8e-11, eigenpairs 4.4e-15, core leak 1.1e-02, readout shift 1.6e-02, orbitals as returned 1.8e-11
+    root 0 Au: e_ref -50.44369794, E(2) -332.7880 mEh, <L2> 71.373173, <S2> 6.000000
+    root 1 Au: e_ref -50.44240499, E(2) -334.0339 mEh, <L2> 71.841827, <S2> 6.000000
+    root 2 Au: e_ref -50.44173476, E(2) -334.0326 mEh, <L2> 71.848489, <S2> 6.000000
+    root 3 Au: e_ref -50.44130463, E(2) -334.4698 mEh, <L2> 71.885306, <S2> 6.000000
+    root 4 Au: e_ref -50.44047961, E(2) -335.1273 mEh, <L2> 71.961283, <S2> 6.000000
+    root 0 B1u: e_ref -50.44297394, E(2) -333.6440 mEh, <L2> 71.578584, <S2> 6.000000
+    root 1 B1u: e_ref -50.44156053, E(2) -334.2589 mEh, <L2> 71.896608, <S2> 6.000000
+    root 2 B1u: e_ref -50.44154766, E(2) -334.5964 mEh, <L2> 71.835540, <S2> 6.000000
+    root 3 B1u: e_ref -50.44076382, E(2) -335.0746 mEh, <L2> 71.945116, <S2> 6.000000
+    root 0 B2u: e_ref -50.44240787, E(2) -334.0217 mEh, <L2> 71.829335, <S2> 6.000000
+    root 1 B2u: e_ref -50.44186483, E(2) -334.3509 mEh, <L2> 71.741188, <S2> 6.000000
+    root 2 B2u: e_ref -50.44165087, E(2) -334.3438 mEh, <L2> 71.829502, <S2> 6.000000
+    root 3 B2u: e_ref -50.44048552, E(2) -335.1399 mEh, <L2> 71.961250, <S2> 6.000000
+    root 0 B3u: e_ref -50.44334694, E(2) -333.0973 mEh, <L2> 71.717674, <S2> 6.000000
+    root 1 B3u: e_ref -50.44182000, E(2) -334.3074 mEh, <L2> 71.848975, <S2> 6.000000
+    root 2 B3u: e_ref -50.44139100, E(2) -334.7695 mEh, <L2> 71.873220, <S2> 6.000000
+    root 3 B3u: e_ref -50.44076885, E(2) -335.0977 mEh, <L2> 71.942250, <S2> 6.000000
+    E(2) over 17 roots: mean -334.3031 mEh, spread 2.3519 mEh
+    ensemble -50.42585664
+  ledger (static/dynamic/total, mEh vs ROHF): casci +923.11/-1056.24/-133.13  casscf -54.00/-309.26/-363.26  sa-casscf -45.20/-334.44/-379.64  sa-casscf pinned -44.00/-334.30/-378.31
+===== (4,16)@r1 =====
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112; 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+  window 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420
+  window 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+  window 14p: k=1 of 1 bands, discarded 0.0000, capture 0.9088-0.9112
+  window 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+  window: the distilled columns' S-norm after removing the pur core span: 14px 0.2989; 14py 0.2989; 14pz 0.2989; 18s 0.0956
+  [PASS] (4,16)@r1: the window is S-orthonormal and rotation-closed (the definite-L certificate): 16 active columns on 5 core pairs, sector (4, 0); max|C^T S C - I| 1.9e-11; ||[P,Lz]|| 2.91e-13, ||[P,Lperp]|| 4.81e-13 (band 1e-10)
+  [note] (4,16)@r1: the window's irrep purity on the wrapper: max impurity 1.11e-16 (the labeling seam's band 1e-06); labels [6, 4, 6, 5, 7, 5, 7, 1, 3, 0, 2, 0, 7, 6, 5, 0]
+  [pinned-casci (print-only)] 773.8 s | conv 1.0e-12/— | certificate: orbitals 1.9e-11, eigenpairs 5.8e-15, core leak 4.5e-16
+    root 0 Au: e_ref -50.18711067, E(2) -449.9329 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 Au: e_ref -50.18711067, E(2) -450.5291 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 Au: e_ref -50.18711067, E(2) -450.2280 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 Au: e_ref -50.18711067, E(2) -540.8891 mEh, <L2> 72.000000, <S2> 6.000000
+    root 4 Au: e_ref -50.18711067, E(2) -486.7142 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B1u: e_ref -50.18711067, E(2) -416.2540 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B1u: e_ref -50.18711067, E(2) -416.2527 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B1u: e_ref -50.18711067, E(2) -416.3017 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B1u: e_ref -50.18711067, E(2) -450.2640 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B2u: e_ref -50.18711067, E(2) -450.3464 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B2u: e_ref -50.18711067, E(2) -450.1481 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B2u: e_ref -50.18711067, E(2) -416.3228 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B2u: e_ref -50.18711067, E(2) -450.2424 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B3u: e_ref -50.18711067, E(2) -449.8602 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B3u: e_ref -50.18711067, E(2) -416.4286 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B3u: e_ref -50.18711067, E(2) -450.2192 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B3u: e_ref -50.18711067, E(2) -416.2959 mEh, <L2> 72.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -445.7194 mEh, spread 124.6365 mEh
+  [pinned-sa] 1031.5 s | conv 5.0e-08/27 | certificate: orbitals 1.9e-11, eigenpairs 3.6e-15, core leak 1.1e-02, readout shift 1.6e-02, orbitals as returned 1.9e-11
+    root 0 Au: e_ref -50.44369948, E(2) -332.8032 mEh, <L2> 71.380709, <S2> 6.000000
+    root 1 Au: e_ref -50.44238337, E(2) -334.0466 mEh, <L2> 71.839226, <S2> 6.000000
+    root 2 Au: e_ref -50.44175061, E(2) -334.0141 mEh, <L2> 71.832881, <S2> 6.000000
+    root 3 Au: e_ref -50.44129244, E(2) -334.3863 mEh, <L2> 71.896613, <S2> 6.000000
+    root 4 Au: e_ref -50.44049850, E(2) -335.1080 mEh, <L2> 71.960513, <S2> 6.000000
+    root 0 B1u: e_ref -50.44244851, E(2) -333.9491 mEh, <L2> 71.816350, <S2> 6.000000
+    root 1 B1u: e_ref -50.44180608, E(2) -334.4419 mEh, <L2> 71.713230, <S2> 6.000000
+    root 2 B1u: e_ref -50.44170643, E(2) -334.2072 mEh, <L2> 71.881529, <S2> 6.000000
+    root 3 B1u: e_ref -50.44050379, E(2) -335.1233 mEh, <L2> 71.961587, <S2> 6.000000
+    root 0 B2u: e_ref -50.44291172, E(2) -333.6769 mEh, <L2> 71.595540, <S2> 6.000000
+    root 1 B2u: e_ref -50.44159816, E(2) -334.7192 mEh, <L2> 71.842428, <S2> 6.000000
+    root 2 B2u: e_ref -50.44148374, E(2) -334.0840 mEh, <L2> 71.883575, <S2> 6.000000
+    root 3 B2u: e_ref -50.44077440, E(2) -335.0590 mEh, <L2> 71.941964, <S2> 6.000000
+    root 0 B3u: e_ref -50.44337203, E(2) -333.1237 mEh, <L2> 71.711118, <S2> 6.000000
+    root 1 B3u: e_ref -50.44175111, E(2) -334.3194 mEh, <L2> 71.852314, <S2> 6.000000
+    root 2 B3u: e_ref -50.44143034, E(2) -334.7036 mEh, <L2> 71.874933, <S2> 6.000000
+    root 3 B3u: e_ref -50.44078131, E(2) -335.0864 mEh, <L2> 71.939042, <S2> 6.000000
+    E(2) over 17 roots: mean -334.2854 mEh, spread 2.3200 mEh
+    ensemble -50.42585613
+  ledger (static/dynamic/total, mEh vs ROHF): casci +149.34/-445.13/-295.79  casscf -53.98/-316.94/-370.91  sa-casscf -45.19/-334.44/-379.63  sa-casscf pinned -44.00/-334.29/-378.29
+===== (6,13) =====
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/vv/windows.py:279: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo = build_full_mo(sub.mf, occupied_core_idx(sub.mf, nc), act,
+  window 10f: k=1 of 1 bands, capture 0.8228-0.8339
+  window 13d: k=1 of 1 bands, capture 0.9157-0.9157
+  window 7s: k=1 of 3 bands, capture 0.2713-0.7097
+  window: the distilled columns' S-norm after removing the pur core span: 18s 0.8536
+  [PASS] (6,13): the window is S-orthonormal and rotation-closed (the definite-L certificate): 13 active columns on 4 core pairs, sector (5, 1); max|C^T S C - I| 1.5e-11; ||[P,Lz]|| 2.01e-13, ||[P,Lperp]|| 3.35e-13 (band 1e-10)
+  [note] (6,13): the window's irrep purity on the wrapper: max impurity 2.22e-16 (the labeling seam's band 1e-06); labels [6, 4, 6, 5, 7, 5, 7, 1, 3, 0, 2, 0, 0]
+  [pinned-casci (print-only)] 271.8 s | conv 1.0e-12/— | certificate: orbitals 1.5e-11, eigenpairs 8.0e-15, core leak 4.2e-16
+    root 0 Au: e_ref -49.31677250, E(2) -1081.8822 mEh, <L2> 12.000000, <S2> 12.000000
+    root 1 Au: e_ref -49.30037483, E(2) -1071.9378 mEh, <L2> 12.000000, <S2> 6.000000
+    root 2 Au: e_ref -49.25499850, E(2) -1115.5691 mEh, <L2> 42.000000, <S2> 6.000000
+    root 3 Au: e_ref -49.25499850, E(2) -1115.5900 mEh, <L2> 42.000000, <S2> 6.000000
+    root 4 Au: e_ref -49.25499850, E(2) -1115.5648 mEh, <L2> 42.000000, <S2> 6.000000
+    root 0 B1u: e_ref -49.31677250, E(2) -1081.0345 mEh, <L2> 12.000000, <S2> 12.000000
+    root 1 B1u: e_ref -49.31677250, E(2) -1081.8804 mEh, <L2> 12.000000, <S2> 12.000000
+    root 2 B1u: e_ref -49.30037483, E(2) -1071.2384 mEh, <L2> 12.000000, <S2> 6.000000
+    root 3 B1u: e_ref -49.30037483, E(2) -1071.9371 mEh, <L2> 12.000000, <S2> 6.000000
+    root 0 B2u: e_ref -49.31677250, E(2) -1080.5451 mEh, <L2> 12.000000, <S2> 12.000000
+    root 1 B2u: e_ref -49.31677250, E(2) -1080.7062 mEh, <L2> 12.000000, <S2> 12.000000
+    root 2 B2u: e_ref -49.30037483, E(2) -1070.9005 mEh, <L2> 12.000000, <S2> 6.000000
+    root 3 B2u: e_ref -49.30037483, E(2) -1071.2959 mEh, <L2> 12.000000, <S2> 6.000000
+    root 0 B3u: e_ref -49.31677250, E(2) -1080.5448 mEh, <L2> 12.000000, <S2> 12.000000
+    root 1 B3u: e_ref -49.31677250, E(2) -1080.7108 mEh, <L2> 12.000000, <S2> 12.000000
+    root 2 B3u: e_ref -49.30037483, E(2) -1070.8997 mEh, <L2> 12.000000, <S2> 6.000000
+    root 3 B3u: e_ref -49.30037483, E(2) -1071.2940 mEh, <L2> 12.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -1083.1489 mEh, spread 44.6903 mEh
+  [pinned-sa] 431.2 s | conv 3.3e-08/10 | certificate: orbitals 1.7e-11, eigenpairs 7.1e-15, core leak 1.7e-02, readout shift 4.1e-02, orbitals as returned 1.7e-11
+    root 0 Au: e_ref -50.49287566, E(2) -282.7073 mEh, <L2> 89.998239, <S2> 12.000000
+    root 1 Au: e_ref -50.49282344, E(2) -282.6548 mEh, <L2> 89.997412, <S2> 12.000000
+    root 2 Au: e_ref -50.49279367, E(2) -282.4724 mEh, <L2> 89.996671, <S2> 12.000000
+    root 3 Au: e_ref -50.49276847, E(2) -282.2465 mEh, <L2> 89.998058, <S2> 12.000000
+    root 4 Au: e_ref -50.47186519, E(2) -333.2297 mEh, <L2> 71.998888, <S2> 6.000000
+    root 0 B1u: e_ref -50.49286310, E(2) -282.7012 mEh, <L2> 89.998228, <S2> 11.999999
+    root 1 B1u: e_ref -50.49281381, E(2) -282.6632 mEh, <L2> 89.997756, <S2> 12.000000
+    root 2 B1u: e_ref -50.49278354, E(2) -282.5290 mEh, <L2> 89.997103, <S2> 12.000000
+    root 3 B1u: e_ref -50.49276753, E(2) -282.3673 mEh, <L2> 89.996914, <S2> 12.000000
+    root 0 B2u: e_ref -50.49287197, E(2) -282.6438 mEh, <L2> 89.998083, <S2> 11.999998
+    root 1 B2u: e_ref -50.49281449, E(2) -282.1889 mEh, <L2> 89.998601, <S2> 12.000000
+    root 2 B2u: e_ref -50.49280130, E(2) -282.4195 mEh, <L2> 89.998270, <S2> 11.999998
+    root 3 B2u: e_ref -50.49279022, E(2) -282.9224 mEh, <L2> 89.997372, <S2> 12.000000
+    root 0 B3u: e_ref -50.49282483, E(2) -282.6591 mEh, <L2> 89.997322, <S2> 12.000000
+    root 1 B3u: e_ref -50.49281812, E(2) -282.2059 mEh, <L2> 89.998667, <S2> 11.999998
+    root 2 B3u: e_ref -50.49279106, E(2) -282.3841 mEh, <L2> 89.998215, <S2> 11.999997
+    root 3 B3u: e_ref -50.49277458, E(2) -282.4920 mEh, <L2> 89.995514, <S2> 11.999999
+    E(2) over 17 roots: mean -285.4992 mEh, spread 51.0408 mEh
+    ensemble -50.45150713
+  [PASS] (6,13): the pinned components read the certified class (the L=9 block ground, the 5L present once): 17 components: 16 at 90 +- 0.01, 1 at 72 +- 0.01, other 0
+  ledger (static/dynamic/total, mEh vs ROHF): casci +1065.08/-1081.03/-15.95  casscf -73.00/-305.78/-378.78  sa-casscf -71.00/-282.08/-353.08  sa-casscf pinned -69.65/-285.50/-355.15
+===== (6,13)@r1 =====
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/vv/windows.py:353: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  core = set(occupied_core_idx(mf, ncore))
+  window 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420
+  window 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+  window 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+  s channel: the reference's closed s pair (occupied column 143, occ 2.0) replaces the distilled radial at 12; the pair's l-sector weights s 0.987327 / d 0.012673 (the m-mixed C1 tail, projected out); the s-pure column keeps cos^2 0.987327 of the pair, whose cos^2 against the distilled radial was 0.7094; the per-irrep orthonormalization's worst dominant-block weight loss 2.22e-16
+  [PASS] (6,13)@r1: the window is S-orthonormal and rotation-closed (the definite-L certificate): 13 active columns on 4 core pairs, sector (5, 1); max|C^T S C - I| 2.6e-11; ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.30e-13 (band 1e-10)
+  [note] (6,13)@r1: the window's irrep purity on the wrapper: max impurity 2.22e-16 (the labeling seam's band 1e-06); labels [6, 4, 6, 5, 7, 5, 7, 1, 3, 0, 2, 0, 0]
+  [pinned-casci (print-only)] 274.3 s | conv 1.0e-12/— | certificate: orbitals 2.6e-11, eigenpairs 3.6e-15, core leak 4.2e-16
+    root 0 Au: e_ref -50.19604884, E(2) -536.0563 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 Au: e_ref -50.19604884, E(2) -536.2278 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 Au: e_ref -50.19604884, E(2) -536.2792 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 Au: e_ref -50.19604884, E(2) -536.1972 mEh, <L2> 72.000000, <S2> 6.000000
+    root 4 Au: e_ref -50.19604884, E(2) -536.2541 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B1u: e_ref -50.19604884, E(2) -536.2139 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B1u: e_ref -50.19604884, E(2) -536.2848 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B1u: e_ref -50.19604884, E(2) -536.2349 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B1u: e_ref -50.19604884, E(2) -536.2888 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B2u: e_ref -50.19604884, E(2) -536.2697 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B2u: e_ref -50.19604884, E(2) -536.2580 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B2u: e_ref -50.19604884, E(2) -536.2367 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B2u: e_ref -50.19604884, E(2) -536.2362 mEh, <L2> 72.000000, <S2> 6.000000
+    root 0 B3u: e_ref -50.19604884, E(2) -536.2536 mEh, <L2> 72.000000, <S2> 6.000000
+    root 1 B3u: e_ref -50.19604884, E(2) -536.1941 mEh, <L2> 72.000000, <S2> 6.000000
+    root 2 B3u: e_ref -50.19604884, E(2) -536.2217 mEh, <L2> 72.000000, <S2> 6.000000
+    root 3 B3u: e_ref -50.19604884, E(2) -536.2252 mEh, <L2> 72.000000, <S2> 6.000000
+    E(2) over 17 roots: mean -536.2313 mEh, spread 0.2324 mEh
+  [pinned-sa] 435.3 s | conv 4.8e-09/10 | certificate: orbitals 1.6e-11, eigenpairs 8.9e-15, core leak 1.7e-02, readout shift 4.1e-02, orbitals as returned 1.6e-11
+    root 0 Au: e_ref -50.49287638, E(2) -282.7067 mEh, <L2> 89.998224, <S2> 12.000000
+    root 1 Au: e_ref -50.49282453, E(2) -282.6544 mEh, <L2> 89.997412, <S2> 12.000000
+    root 2 Au: e_ref -50.49279541, E(2) -282.4748 mEh, <L2> 89.996667, <S2> 12.000000
+    root 3 Au: e_ref -50.49276944, E(2) -282.2464 mEh, <L2> 89.998061, <S2> 12.000000
+    root 4 Au: e_ref -50.47186802, E(2) -333.2282 mEh, <L2> 71.998931, <S2> 6.000000
+    root 0 B1u: e_ref -50.49285794, E(2) -282.7232 mEh, <L2> 89.997973, <S2> 11.999997
+    root 1 B1u: e_ref -50.49281483, E(2) -282.1664 mEh, <L2> 89.998816, <S2> 12.000000
+    root 2 B1u: e_ref -50.49280771, E(2) -282.4795 mEh, <L2> 89.996637, <S2> 11.999999
+    root 3 B1u: e_ref -50.49279191, E(2) -282.8393 mEh, <L2> 89.997530, <S2> 12.000000
+    root 0 B2u: e_ref -50.49287197, E(2) -282.6641 mEh, <L2> 89.998329, <S2> 11.999998
+    root 1 B2u: e_ref -50.49282550, E(2) -282.6675 mEh, <L2> 89.997267, <S2> 12.000000
+    root 2 B2u: e_ref -50.49279884, E(2) -282.2659 mEh, <L2> 89.998614, <S2> 11.999999
+    root 3 B2u: e_ref -50.49277353, E(2) -282.4864 mEh, <L2> 89.995536, <S2> 12.000000
+    root 0 B3u: e_ref -50.49287556, E(2) -282.7072 mEh, <L2> 89.998231, <S2> 12.000000
+    root 1 B3u: e_ref -50.49281467, E(2) -282.5104 mEh, <L2> 89.997513, <S2> 12.000000
+    root 2 B3u: e_ref -50.49277898, E(2) -282.5202 mEh, <L2> 89.997489, <S2> 11.999999
+    root 3 B3u: e_ref -50.49277333, E(2) -282.4924 mEh, <L2> 89.995856, <S2> 12.000000
+    E(2) over 17 roots: mean -285.5196 mEh, spread 51.0618 mEh
+    ensemble -50.45150714
+  ledger (static/dynamic/total, mEh vs ROHF): casci +140.53/-437.16/-296.63  casscf -80.49/-295.35/-375.83  sa-casscf -71.00/-282.08/-353.08  sa-casscf pinned -69.65/-285.52/-355.17
+
+===== the ledger =====
+
+===== verdict =====
+  PASS  (4,12): the window is S-orthonormal and rotation-closed (the definite-L certificate)
+  PASS  the D2h wrapper is the C1 molecule: the window's two-electron integrals coincide
+  REPORT  (4,12): the window's irrep purity on the wrapper
+  PASS  (4,15)@r1: the window is S-orthonormal and rotation-closed (the definite-L certificate)
+  REPORT  (4,15)@r1: the window's irrep purity on the wrapper
+  PASS  (4,16): the window is S-orthonormal and rotation-closed (the definite-L certificate)
+  REPORT  (4,16): the window's irrep purity on the wrapper
+  PASS  (4,16)@r1: the window is S-orthonormal and rotation-closed (the definite-L certificate)
+  REPORT  (4,16)@r1: the window's irrep purity on the wrapper
+  PASS  (6,13): the window is S-orthonormal and rotation-closed (the definite-L certificate)
+  REPORT  (6,13): the window's irrep purity on the wrapper
+  PASS  (6,13): the pinned components read the certified class (the L=9 block ground, the 5L present once)
+  PASS  (6,13)@r1: the window is S-orthonormal and rotation-closed (the definite-L certificate)
+  REPORT  (6,13)@r1: the window's irrep purity on the wrapper
+8/8 assertions hold

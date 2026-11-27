@@ -39,6 +39,7 @@ import time
 from pathlib import Path
 
 import numpy as np
+from pyscf import ao2mo
 from pyscf.mcscf import addons as mcaddons
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
@@ -74,8 +75,8 @@ BAND = dict(
                     # (the pair forms at ~1.99; the as-built read 3e-03)
     spin=1e-6,      # Eh-free: PySCF's spin_square against the meters
                     # (observed <= 1e-8)
-    wrapper=1e-9,   # Eh: the frozen CASCI on the D2h wrapper against
-                    # the C1 molecule's (observed 1.1e-13)
+    wrapper=1e-9,   # Eh: the window's ERIs on the D2h wrapper against
+                    # the C1 molecule's (observed 0.0)
     pure=1e-6,      # the active columns' irrep impurity on the wrapper
                     # (the labeling seam refuses past it)
 )
@@ -110,7 +111,11 @@ def _print_solution(name, sol, priced, seconds) -> None:
           f"orbitals {c['ortho']:.1e}, eigenpairs {c['residual']:.1e}, "
           f"core leak {c['core_leak']:.1e}"
           + (f", readout shift {c['readout_shift']:.1e}"
-             if "readout_shift" in c else ""), flush=True)
+             if "readout_shift" in c else "")
+          + (f", orbitals as returned {c['ortho_in']:.1e}"
+             if "ortho_in" in c else "")
+          + (f", component mean vs ensemble {c['ensemble_dev']:.1e}"
+             if "ensemble_dev" in c else ""), flush=True)
     for s in priced.states:
         block = f" {s.state.irrep}" if s.state.irrep else ""
         print(f"    root {s.state.root}{block}: e_ref {s.state.e_ref:.8f}, "
@@ -125,18 +130,20 @@ def _print_solution(name, sol, priced, seconds) -> None:
 
 
 def _wrapper(v, sub, space) -> None:
-    """The pinned route's substrate IS the C1 molecule: a frozen CASCI
-    on the D2h wrapper reproduces the C1 value (the AO integrals are
-    gauge-independent; a CASCI compares the two-electron ones through
-    the real path)."""
-    mol, mf = sub.d2h
-    twin = Substrate(mol, mf, sub.spec, d2h=(mol, mf))
-    a = free_casci(sub, space).states[0].e_ref
-    b = free_casci(twin, space).states[0].e_ref
-    v.check("the D2h wrapper is the C1 molecule: the frozen CASCI "
-            "reproduces the C1 value", abs(a - b) <= BAND["wrapper"],
-            f"C1 {a:.10f} | wrapper {b:.10f} | dev {abs(a - b):.2e} "
-            f"(band {BAND['wrapper']:g})")
+    """The pinned route's substrate IS the C1 molecule: the two-electron
+    integrals over its core + window block are the C1 molecule's (the
+    overlap and the one-electron integrals are certified where the
+    wrapper is built).  No free route can test this -- on the
+    symmetry-tagged substrate PySCF pins the FCI to one irrep."""
+    mol, _mf = sub.d2h
+    c = space.mo[:, :space.ncore + space.ncas]
+    a = ao2mo.restore(1, ao2mo.kernel(sub.mol, c, verbose=0), c.shape[1])
+    b = ao2mo.restore(1, ao2mo.kernel(mol, c, verbose=0), c.shape[1])
+    dev = float(np.abs(a - b).max())
+    v.check("the D2h wrapper is the C1 molecule: the window's "
+            "two-electron integrals coincide", dev <= BAND["wrapper"],
+            f"{c.shape[1]} orbitals, max|<pq|rs>_C1 - <pq|rs>_wrapper| "
+            f"{dev:.1e} (band {BAND['wrapper']:g})")
 
 
 def _purity(v, sub, space, tag) -> None:

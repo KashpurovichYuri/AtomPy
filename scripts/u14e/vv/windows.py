@@ -32,12 +32,14 @@ import numpy as np
 from atomterm.cells import CellKey, key_core, lane_core, window_columns
 from atomterm.cases import lane_substrate
 from atomterm.operators import window_closure
-from atomterm.windows import build_full_mo, occupied_core_idx
+from atomterm.windows import build_full_mo, lowdin, occupied_core_idx
 
 from vv.reference import Substrate
 from vv.symmetry import orthonormal_per_irrep
 
 ORTHO_TOL = 1e-8     # max|C^T S C - I| of the matrix CASCI/CASSCF consume
+CLEAN = 1e-10        # a block orthonormal (and orthogonal to the earlier
+                    # ones) within this is left untouched by orthonormalize
 
 
 @dataclass(frozen=True, eq=False)
@@ -74,10 +76,13 @@ class ActiveSpace:
     def virtual(self) -> np.ndarray:
         return self.mo[:, self.ncore + self.ncas:]
 
-    def on(self, mo) -> "ActiveSpace":
-        """The same partition on another S-orthonormal orbital set --
-        a route restarted from a converged solution's orbitals."""
-        return ActiveSpace(np.array(mo), self.ncore, self.ncas, self.sector)
+    def on(self, mo, mf) -> "ActiveSpace":
+        """The same partition on another orbital set, made exactly
+        S-orthonormal (:func:`orthonormalize`) -- a route restarted
+        from a converged solution's orbitals."""
+        return ActiveSpace(orthonormalize(mo, mf.get_ovlp(), self.ncore,
+                                          self.ncas),
+                           self.ncore, self.ncas, self.sector)
 
     def certify(self, mf, tol: float = ORTHO_TOL) -> float:
         """Refuse unless the matrix is S-orthonormal and the partition
@@ -117,6 +122,51 @@ class Built:
 
     space: ActiveSpace
     report: tuple[str, ...]
+
+
+def orthonormalize(mo, s, ncore: int, ncas: int) -> np.ndarray:
+    """An MO matrix in the partition layout made exactly S-orthonormal,
+    block by block in the partition's order [core | active |
+    virtual]: each block has the earlier blocks projected out and is
+    Loewdin-orthonormalized within its own span.
+
+    The optimizer of a symmetry-tagged substrate returns orbitals that
+    are orthonormal only to ~4e-05 (observed in the virtual block of
+    a pinned state average; the C1 optimizer returns 5e-12).  The
+    core's span is kept exactly; a later block's span changes by its
+    overlap with the earlier blocks.  A block that is already
+    orthonormal within ``CLEAN`` is returned untouched, bitwise.
+
+    Parameters
+    ----------
+    mo : (nao, nmo) the orbitals, in the partition layout.
+    s : (nao, nao) the overlap.
+    ncore, ncas : the partition.
+
+    Returns
+    -------
+    (nao, nmo) with ``C^T S C = I`` to roundoff.
+
+    Raises
+    ------
+    ValueError : a block is nearly linearly dependent (via ``lowdin``).
+    """
+    out = np.array(mo, dtype=float)
+    for a, b in ((0, ncore), (ncore, ncore + ncas),
+                 (ncore + ncas, out.shape[1])):
+        if a == b:
+            continue
+        block = out[:, a:b]
+        earlier = out[:, :a]
+        cross = earlier.T @ s @ block
+        within = block.T @ s @ block - np.eye(b - a)
+        if max(np.abs(cross).max(initial=0.0),
+               np.abs(within).max(initial=0.0)) <= CLEAN:
+            continue          # already orthonormal: returned untouched
+        for _ in range(2):    # the projection's roundoff
+            block = block - earlier @ (earlier.T @ s @ block)
+        out[:, a:b] = lowdin(block, s)
+    return out
 
 
 def dominant_labels(act, mol) -> list[str]:

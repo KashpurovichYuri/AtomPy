@@ -187,6 +187,10 @@ def test_the_optimizer_leaks_its_core_and_it_is_measured(vv_substrate, space):
     pinned = pinned_sa(vv_substrate, space, TERM)
     assert 0.0 <= pinned.certificate["core_leak"] < 1e-4
     assert 0.0 <= pinned.certificate["readout_shift"] < 1e-5
+    # the readout describes the optimizer's solution: its component
+    # mean is the ensemble (each state's core bookkeeping is the core
+    # its readout folded -- a purified-core constant sits 1e-06 off)
+    assert pinned.certificate["ensemble_dev"] < 1e-8
 
 
 # ------------------------------------------------------------ the row conventions
