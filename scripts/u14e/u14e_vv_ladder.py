@@ -190,6 +190,11 @@ def _expectations(v, case, sub, space, sols) -> None:
                     dev <= BAND["l2"],
                     f"<L2> {s.l2:.6f}, <S2> {s.s2:.6f} vs "
                     f"{case.frozen} (dev {dev:.2e})")
+        if case.frozen_below is not None:
+            de = (s.state.e_ref - rohf_energy()) * 1e3
+            v.check(f"{case.tag}: the frozen total sits near the reference",
+                    de < case.frozen_below,
+                    f"dE {de:+.1f} mEh (band < {case.frozen_below:g})")
         if case.s_pair:
             occ = float(np.diag(s.state.mc.make_rdm1())[
                 s_column(space.active, sub.mol)])

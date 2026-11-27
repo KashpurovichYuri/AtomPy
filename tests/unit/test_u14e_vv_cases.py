@@ -44,6 +44,7 @@ def test_the_declared_terms_and_gates():
     six = cases.CASES["(6,13)"]
     assert six.frozen == (12.0, cases.S2_SEPTET) and six.pinned_class == (16, 1)
     assert cases.CASES["(6,13)@r1"].s_pair
+    assert cases.CASES["(6,13)@r1"].frozen_below == 400.0
     assert cases.CASES["(4,12)"].anchor == "u14e_10f13d_4-0_sa-casscf_ao_-_pur_avg"
     # the pin-on-pur gate is declared for exactly one case
     assert [t for t, c in cases.CASES.items() if c.pinned_sa is not None] == ["(4,12)@r1"]

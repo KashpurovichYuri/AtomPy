@@ -63,6 +63,9 @@ class Case:
         within 0.01 of L2_TERM).
     ``s_pair`` -- the frozen ground must doubly occupy the s channel
         (the (6,13)@r1 acceptance control).
+    ``frozen_below`` -- the frozen ground's dE against the reference
+        must stay below this many mEh (a window that freezes far
+        above its reference has abandoned the intended term).
     """
 
     tag: str
@@ -74,6 +77,7 @@ class Case:
     pinned_sa: float | None = None
     pinned_class: tuple[int, int] | None = None
     s_pair: bool = False
+    frozen_below: float | None = None
 
 
 # ------------------------------------------------------------ the windows
@@ -154,7 +158,7 @@ CASES: dict[str, Case] = {c.tag: c for c in (
          frozen=(L2_TERM, S2_QUINTET)),
     Case("(4,21)@r1", partial(window_6p_r1, k=3)),
     Case("(6,13)@r1", partial(window_6_13_r1, address=ADDR["(6,13)@r1"]),
-         frozen=(L2_TERM, S2_QUINTET), s_pair=True),
+         frozen=(L2_TERM, S2_QUINTET), s_pair=True, frozen_below=400.0),
 )}
 
 
