@@ -107,6 +107,11 @@ def _parse(argv) -> argparse.Namespace:
 
 def _print_solution(name, sol, priced, seconds) -> None:
     c = sol.certificate
+    if priced.resorted:
+        print(f"  [{name}] NOTE: {priced.resorted} empty active orbital(s) "
+              f"re-partitioned with the virtuals before pricing (the "
+              f"lowest virtuals take their slots) -- the priced partition "
+              f"is not the solved window", flush=True)
     print(f"  [{name}] {seconds:.1f} s | conv {sol.conv} | certificate: "
           f"orbitals {c['ortho']:.1e}, eigenpairs {c['residual']:.1e}, "
           f"core leak {c['core_leak']:.1e}"

@@ -1,0 +1,67 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/vv/windows.py:323: UserWarning: core block is not the first 5 MOs (closed at [22, 61, 88, 120, 143]); folding the occupied block
+  mo = build_full_mo(sub.mf, occupied_core_idx(sub.mf, nc), act,
+
+===== the base (4,12)@r1: 12 active columns; frozen E_CAS -50.23250753, E(2) -445.0011 mEh, <L2> 72.0000, <S2> 6.0000 (11 s) =====
+
+===== channel 7p =====
+  channel 7p: 3 l-pure signal column(s) [0, 1, 2]
+  channel: one m-averaged radial on 4 bands; the Gram's ratio 2nd/1st 1.2e-03 (declared tail 0.01); capture 0.99 0.99 0.99
+  window: 15 active columns; max|C^T S C - I| 2.2e-11; ||[P,Lz]|| 2.09e-13, ||[P,Lperp]|| 3.79e-13
+  frozen: E_CAS -50.23250753, E(2) -445.1709 mEh, <L2> 72.0000, <S2> 6.0000 (33 s) | dE_CAS +0.000, dE(2) -0.170, dE_tot -0.170 mEh
+
+===== channel 8s =====
+  channel 8s: 1 l-pure signal column(s) [3]
+  channel: the virtuals' s sector (a single-member shell is its own radial; the C1 gauge's d tail is projected out -- keeps cos^2 0.99966)
+  window: 13 active columns; max|C^T S C - I| 2.2e-11; ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.30e-13
+  frozen: E_CAS -50.23250753, E(2) -445.0216 mEh, <L2> 72.0000, <S2> 6.0000 (16 s) | dE_CAS +0.000, dE(2) -0.020, dE_tot -0.020 mEh
+
+===== channel 7d =====
+  channel 7d: 5 l-pure signal column(s) [4, 5, 9, 10, 11]
+  channel: one m-averaged radial on 4 bands; the Gram's ratio 2nd/1st 1.4e-01 (declared tail 0.2); capture 0.96 0.96 0.98 0.99 0.52
+  window: 17 active columns; max|C^T S C - I| 2.2e-11; ||[P,Lz]|| 1.93e-13, ||[P,Lperp]|| 3.94e-13
+  frozen: E_CAS -50.23279362, E(2) -445.4359 mEh, <L2> 72.0000, <S2> 6.0000 (73 s) | dE_CAS -0.286, dE(2) -0.435, dE_tot -0.721 mEh
+
+===== channel 8p =====
+  channel 8p: 3 l-pure signal column(s) [6, 7, 8]
+  channel: one m-averaged radial on 4 bands; the Gram's ratio 2nd/1st 7.3e-04 (declared tail 0.01); capture 0.81 0.81 0.80
+  window: 15 active columns; max|C^T S C - I| 2.2e-11; ||[P,Lz]|| 3.57e-13, ||[P,Lperp]|| 5.03e-13
+  frozen: E_CAS -50.23250752, E(2) -445.1709 mEh, <L2> 72.0000, <S2> 6.0000 (33 s) | dE_CAS +0.000, dE(2) -0.170, dE_tot -0.170 mEh
+
+===== channel 8d =====
+  channel 8d: 4 l-pure signal column(s) [12, 13, 14, 15]
+  channel: one m-averaged radial on 4 bands; the Gram's ratio 2nd/1st 1.5e-03 (declared tail 0.01); capture 1.00 1.00 1.00 1.00
+  window: 17 active columns; max|C^T S C - I| 2.2e-11; ||[P,Lz]|| 2.42e-13, ||[P,Lperp]|| 4.95e-13
+  frozen: E_CAS -50.23263193, E(2) -444.2940 mEh, <L2> 72.0000, <S2> 6.0000 (73 s) | dE_CAS -0.124, dE(2) +0.707, dE_tot +0.583 mEh
+
+===== channel 9s =====
+  channel 9s: 1 l-pure signal column(s) [16]
+  channel: the virtuals' s sector (a single-member shell is its own radial; the C1 gauge's d tail is projected out -- keeps cos^2 0.99953)
+  window: 13 active columns; max|C^T S C - I| 2.8e-11; ||[P,Lz]|| 1.64e-13, ||[P,Lperp]|| 3.31e-13
+  frozen: E_CAS -50.23250753, E(2) -445.0216 mEh, <L2> 72.0000, <S2> 6.0000 (16 s) | dE_CAS -0.000, dE(2) -0.020, dE_tot -0.020 mEh
+
+===== channel 6f =====
+  channel 6f: 6 l-pure signal column(s) [17, 19, 20, 25, 26, 27]; left out as f-mixed: [18, 23]
+  channel: one m-averaged radial on 6 bands; the Gram's ratio 2nd/1st 4.2e-02 (declared tail 0.05); capture 0.96 0.95 0.96 0.96 0.94 0.94
+  window: 19 active columns; max|C^T S C - I| 2.2e-11; ||[P,Lz]|| 4.20e-13, ||[P,Lperp]|| 8.05e-13
+  frozen: E_CAS -50.23708977, E(2) -442.9614 mEh, <L2> 72.0000, <S2> 6.0000 (167 s) | dE_CAS -4.582, dE(2) +2.040, dE_tot -2.543 mEh
+
+===== channel 5f =====
+  channel 5f: 4 l-pure signal column(s) [28, 29, 30, 31]
+  channel: one m-averaged radial on 6 bands; the Gram's ratio 2nd/1st 2.4e-04 (declared tail 0.01); capture 1.00 1.00 1.00 1.00
+  window: 19 active columns; max|C^T S C - I| 2.2e-11; ||[P,Lz]|| 4.35e-13, ||[P,Lperp]|| 9.04e-13
+  frozen: E_CAS -50.27559819, E(2) -424.3061 mEh, <L2> 72.0000, <S2> 6.0000 (171 s) | dE_CAS -43.091, dE(2) +20.695, dE_tot -22.396 mEh
+
+===== the screen (mEh against the frozen base) =====
+  channel  ncas    dE_CAS     dE(2)    dE_tot
+  7p         15    +0.000    -0.170    -0.170
+  8s         13    +0.000    -0.020    -0.020
+  7d         17    -0.286    -0.435    -0.721
+  8p         15    +0.000    -0.170    -0.170
+  8d         17    -0.124    +0.707    +0.583
+  9s         13    -0.000    -0.020    -0.020
+  6f         19    -4.582    +2.040    -2.543
+  5f         19   -43.091   +20.695   -22.396

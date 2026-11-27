@@ -7,15 +7,26 @@ no optimizer) with NEVPT2 on the ground root.  Read per channel
 against the base built the same way without channels:
 
   the extended window's orthonormality and rotation closure; the
-  frozen ground's term (<L²>, <S²> -- the base's);
+  frozen ground's term (<L²>, <S²> -- the base's) and the channel's
+  natural occupations;
   dE_CAS   the frozen variational energy's change;
   dE(2)    the perturbative correction's change;
   dE_tot   their sum.
 
-A channel that converts PT2 into the CAS reads dE_CAS < 0 with dE(2)
-> 0 and dE_tot ~ 0; a channel where PT2 was deficient reads
-dE_tot < 0.  The existing (4,15)@r1 and (4,16)@r1 rows of the table
-are the controls for the band-named 14p and 7s channels.
+WHAT THE READING MEANS.  A channel is a SPECTATOR when dE_CAS ~ 0: it
+does not couple at the frozen level and its row says nothing about
+correlation.  A coupling channel's frozen gain is orbital relaxation
+of the occupied active orbitals toward the channel (the wavefunction's
+rank does not change), which an optimizer recovers on its own: the
+screen ranks channels, it does not size the optimized rungs.  A
+channel that converts PT2 into the CAS reads dE_CAS < 0, dE(2) > 0,
+dE_tot ~ 0; one where PT2 was deficient reads dE_tot < 0.
+
+THE PARTITION.  E(2) is read with the window priced AS SOLVED
+(``vv.pricing.partition_as_solved``): PySCF's default prelude
+re-partitions empty active orbitals with the virtuals, which would
+make every spectator row the same re-partition number (the last
+column shows that default reading's shift for comparison).
 
 Run from the repo root:
     OMP_NUM_THREADS=64 python scripts/u14e/u14e_vv_screen.py \\
@@ -34,6 +45,7 @@ import numpy as np  # noqa: E402
 
 from vv import cases as ladder  # noqa: E402
 from vv.channels import CHANNELS, channel_block, virtual_spectrum  # noqa: E402
+from vv.pricing import occupations, partition_as_solved, price_pyscf  # noqa: E402
 from vv.reference import Substrate  # noqa: E402
 from vv.routes import free_casci  # noqa: E402
 from vv.windows import window_with_channels  # noqa: E402
@@ -65,11 +77,18 @@ def print_spectrum(sub) -> None:
 
 
 def frozen(sub, space) -> dict:
-    """The frozen reading of one window: the ground root priced."""
+    """The frozen reading of one window: the ground root's natural
+    occupations and its E(2) in both partitions."""
     t0 = time.time()
-    priced = free_casci(sub, space).price().states[0]
-    return {"ecas": priced.state.e_ref, "e2": priced.e2,
-            "l2": priced.l2, "s2": priced.s2, "seconds": time.time() - t0}
+    solved_casci = free_casci(sub, space)
+    state = solved_casci.states[0]
+    meters = solved_casci.meters()[0]
+    default = price_pyscf(state)
+    with partition_as_solved():
+        solved = price_pyscf(state)
+    return {"ecas": state.e_ref, "e2": solved, "e2_default": default,
+            "l2": meters[0], "s2": meters[1], "occ": occupations(state),
+            "seconds": time.time() - t0}
 
 
 def main(argv=None) -> int:
@@ -83,11 +102,15 @@ def main(argv=None) -> int:
     if unknown:
         sys.exit(f"unknown channel(s) {unknown}; declared: {list(CHANNELS)}")
     base = ladder.CASES[args.base].window(sub)
+    n0 = base.space.ncas
     b = frozen(sub, base.space)
-    print(f"\n===== the base {args.base}: {base.space.ncas} active columns; "
-          f"frozen E_CAS {b['ecas']:.8f}, E(2) {b['e2'] * 1e3:+.4f} mEh, "
-          f"<L2> {b['l2']:.4f}, <S2> {b['s2']:.4f} ({b['seconds']:.0f} s) =====",
-          flush=True)
+    print(f"\n===== the base {args.base}: {n0} active columns; frozen E_CAS "
+          f"{b['ecas']:.8f}, E(2) as solved {b['e2'] * 1e3:+.4f} mEh "
+          f"(PySCF's default partition: {b['e2_default'] * 1e3:+.4f}); "
+          f"<L2> {b['l2']:.4f}, <S2> {b['s2']:.4f} ({b['seconds']:.0f} s) "
+          f"=====", flush=True)
+    print("  natural occupations: "
+          + " ".join(f"{o:.4f}" for o in b["occ"]), flush=True)
     rows = []
     for name in names:
         ch = CHANNELS[name]
@@ -108,22 +131,34 @@ def main(argv=None) -> int:
               f"{ortho:.1e}; ||[P,Lz]|| {cl['lz']:.2e}, ||[P,Lperp]|| "
               f"{cl['lperp']:.2e}", flush=True)
         r = frozen(sub, space)
-        d = {"ecas": r["ecas"] - b["ecas"], "e2": r["e2"] - b["e2"]}
+        d = {"ecas": r["ecas"] - b["ecas"], "e2": r["e2"] - b["e2"],
+             "default": r["e2_default"] - b["e2_default"]}
         d["tot"] = d["ecas"] + d["e2"]
-        print(f"  frozen: E_CAS {r['ecas']:.8f}, E(2) {r['e2'] * 1e3:+.4f} mEh, "
-              f"<L2> {r['l2']:.4f}, <S2> {r['s2']:.4f} ({r['seconds']:.0f} s) | "
-              f"dE_CAS {d['ecas'] * 1e3:+.3f}, dE(2) {d['e2'] * 1e3:+.3f}, "
-              f"dE_tot {d['tot'] * 1e3:+.3f} mEh", flush=True)
+        d["note"] = ""
+        if d["ecas"] > -5e-7:
+            d["note"] = "SPECTATOR: no coupling at the frozen level"
+        d["occ"] = r["occ"][-(space.ncas - n0):]
+        print(f"  frozen: E_CAS {r['ecas']:.8f}, <L2> {r['l2']:.4f}, "
+              f"<S2> {r['s2']:.4f} ({r['seconds']:.0f} s) | dE_CAS "
+              f"{d['ecas'] * 1e3:+.3f}, dE(2) {d['e2'] * 1e3:+.3f}, dE_tot "
+              f"{d['tot'] * 1e3:+.3f} mEh (as solved) | E(2) shift under "
+              f"PySCF's default partition {d['default'] * 1e3:+.3f} mEh | "
+              f"the channel's natural occupations "
+              f"{d['occ'].min():.1e}..{d['occ'].max():.1e}"
+              + (f" | {d['note']}" if d["note"] else ""), flush=True)
         rows.append((name, d))
-    print("\n===== the screen (mEh against the frozen base) =====", flush=True)
-    print(f"  {'channel':8s} {'ncas':>4} {'dE_CAS':>9} {'dE(2)':>9} {'dE_tot':>9}")
+    print("\n===== the screen (mEh against the frozen base; E(2) with the "
+          "window priced as solved) =====", flush=True)
+    print(f"  {'channel':8s} {'ncas':>4} {'dE_CAS':>9} {'dE(2)':>9} "
+          f"{'dE_tot':>9} {'chan. occ max':>13}")
     for name, d in rows:
         if d is None:
             print(f"  {name:8s}   refused", flush=True)
         else:
-            print(f"  {name:8s} {base.space.ncas + CHANNELS[name].l * 2 + 1:4d} "
+            print(f"  {name:8s} {n0 + CHANNELS[name].l * 2 + 1:4d} "
                   f"{d['ecas'] * 1e3:+9.3f} {d['e2'] * 1e3:+9.3f} "
-                  f"{d['tot'] * 1e3:+9.3f}", flush=True)
+                  f"{d['tot'] * 1e3:+9.3f} {d['occ'].max():13.1e}   "
+                  f"{d['note']}", flush=True)
     return 0
 
 

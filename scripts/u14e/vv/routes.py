@@ -41,7 +41,7 @@ from atomterm.irreps import orb_irreps
 from atomterm.operators import active_space_integrals
 
 from vv.meters import Meters
-from vv.pricing import price_classes, price_pyscf
+from vv.pricing import price_classes, price_pyscf, resorted
 from vv.windows import orthonormalize
 from vv.table import Route, Row, conv_of, fmt_range
 
@@ -170,9 +170,9 @@ class Solution:
 
         def one(st, m):
             if pricer is price_pyscf:
-                return price_pyscf(st), None, *m.of(st.ci)
+                return price_pyscf(st), None, *m.of(st.ci), resorted(st)
             row = pricer(st)
-            return row.e_corr, tuple(row.classes), *m.of(st.ci)
+            return row.e_corr, tuple(row.classes), *m.of(st.ci), resorted(st)
 
         return Priced(self, tuple(PricedState(st, *val)
                                   for st, val in zip(self._selected(roots),
@@ -195,13 +195,17 @@ class Solution:
 @dataclass(frozen=True)
 class PricedState:
     """One priced, metered root: E(2) in Eh, the Koopmans class rows
-    (None through PySCF's kernel), <<L^2>>, <<S^2>>."""
+    (None through PySCF's kernel), <<L^2>>, <<S^2>>, and ``resorted``
+    -- how many empty active orbitals the pricing prelude re-partitions
+    with the virtuals (:func:`vv.pricing.resorted`; 0 when the priced
+    partition is the solved window)."""
 
     state: State
     e2: float
     classes: tuple | None
     l2: float
     s2: float
+    resorted: int = 0
 
     @property
     def e_total(self) -> float:
@@ -226,6 +230,12 @@ class Priced:
     @property
     def s2(self) -> list[float]:
         return [s.s2 for s in self.states]
+
+    @property
+    def resorted(self) -> int:
+        """The largest :attr:`PricedState.resorted` over the states (0:
+        every priced partition is the solved window)."""
+        return max((s.resorted for s in self.states), default=0)
 
     def row(self, cas: str) -> Row:
         """The table row, in the route's own convention: a free row

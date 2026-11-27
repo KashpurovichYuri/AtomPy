@@ -214,6 +214,51 @@ def test_a_free_row_carries_its_first_root_and_a_pinned_row_the_component_mean(
     assert pinned.e_total == pytest.approx(pinned.e_method + pinned.e2)
 
 
+def test_occupations_and_the_empty_active_orbitals(vv_substrate, space):
+    # the frozen 3P ground of the 2p^2 window (px^1 py^1, Ms = 1) has
+    # its p_z empty: one active orbital below PySCF's threshold
+    from vv.channels import Channel, channel_block, virtual_spectrum
+    from vv.pricing import (FRAC_OCC_THRESHOLD, occupations, partition_as_solved,
+                            resorted)
+    from vv.windows import window_with_channels
+
+    st = free_casci(vv_substrate, space).states[0]
+    occ = occupations(st)
+    assert occ.shape == (3,) and np.all(np.diff(occ) <= 1e-12)
+    assert occ.sum() == pytest.approx(2.0)                     # the active electrons
+    assert occ[:2] == pytest.approx([1.0, 1.0]) and occ[2] < FRAC_OCC_THRESHOLD
+    assert resorted(st) == 1                                  # observed: p_z at 0.0
+
+
+def test_an_empty_active_orbital_is_repartitioned_by_the_prelude(vv_substrate,
+                                                                space):
+    # THE PARTITION hazard, measured: a non-coupling s orbital beside
+    # the window leaves the frozen energy and the term unchanged, yet
+    # PySCF's default prelude moves E(2) by ~100 mEh (a second empty
+    # slot, filled by the next-lowest virtual); with the window priced
+    # as solved the two readings differ by < 1 mEh (observed 0.57)
+    from vv.channels import Channel, channel_block, virtual_spectrum
+    from vv.pricing import partition_as_solved, resorted
+    from vv.windows import window_with_channels
+
+    j = next(r["index"] for r in virtual_spectrum(vv_substrate) if r["l"] == "s")
+    built = ladder.visible_window(vv_substrate, (("2p", 3),), SECTOR)
+    extended = window_with_channels(
+        vv_substrate, built, [channel_block(vv_substrate, Channel("4s", (j,), ("3s",)))])
+    a = free_casci(vv_substrate, space).states[0]
+    b = free_casci(vv_substrate, extended.space).states[0]
+    assert abs(b.e_ref - a.e_ref) < 1e-10                 # a spectator
+    assert resorted(a) == 1 and resorted(b) == 2
+    default = price_pyscf(b) - price_pyscf(a)
+    assert default > 0.05                                  # observed +0.1007 Eh
+    with partition_as_solved():
+        solved = price_pyscf(b) - price_pyscf(a)
+        assert abs(price_pyscf(a) - price_classes(a).e_corr) < 1e-9
+    assert abs(solved) < 1e-3                              # observed -0.00057 Eh
+    # the context restores PySCF's convention
+    assert resorted(b) == 2
+
+
 def test_meters_without_pricing(vv_substrate, space):
     sol = free_sa(vv_substrate, space, nroots=3)
     meters = sol.meters()
