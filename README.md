@@ -136,6 +136,23 @@ The uranium record carrying all of this measured and classified:
 `scripts/u14e/VV.md` (the V&V family) and
 `elements/U14e/TABLE.md` (the campaign methods table).
 
+Reading `scripts/u14e/VV.md` (its row store is `scripts/u14e/vv.json`;
+a key outside the declared table is refused):
+
+- **Method column** — `free@pur`: PySCF-direct on the purified core;
+  `pinned@pur`: the wfnsym-pinned state average on the purified core.
+  One optimizer class per block; inside a block the plain windows
+  come first, then the `@r1` windows.
+- **Rows** — every dE is against the ROHF row. A free row carries
+  root 0; a pinned SA row carries the mean over the term's component
+  blocks.
+- **conv** — `<achieved |dE|>/<macro-cycle count>`; a trailing `*`
+  marks a cycle-cap draw; `…/—` a CI solve (no iteration structure).
+- **E(2)** — strongly contracted NEVPT2 on the row's own solution:
+  the orbitals and the CI vectors of one solve.
+- **Dashes** in ⟨L²⟩, E(2) or E_tot — a cell withdrawn pending
+  re-measurement; the row's other cells stand.
+
 ## Analysis (PT2)
 
 **Why E(2) is gauge-visible.** The variational energy is an eigenvalue

@@ -164,7 +164,7 @@ def main(argv=None) -> int:
            f"the certified INPUT-window ground class (the 5I, L = 6, "
            f"the same reading as the (4,12) leg) -- the SA promotes "
            f"it to the 5L; E(2) {r_f['e2'] * 1e3:+.4f} mEh")
-    drop_row(std_row("casci", "free", "(4,15)", float(cas_f.e_tot),
+    drop_row(std_row("casci", "free@pur", "(4,15)", float(cas_f.e_tot),
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
                      f"{l_f:.4f}", f"{r_f['s2']:.4f}",
@@ -180,7 +180,7 @@ def main(argv=None) -> int:
           f"({time.time() - t0:.1f} s)", flush=True)
     v.note("free CASSCF (the single-root draw class)",
            f"<L2> {r_c['l2']:.6f}, E(2) {r_c['e2'] * 1e3:+.4f} mEh")
-    drop_row(std_row("casscf", "free", "(4,15)", float(mc_c.e_tot),
+    drop_row(std_row("casscf", "free@pur", "(4,15)", float(mc_c.e_tot),
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
                      f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
@@ -218,7 +218,7 @@ def main(argv=None) -> int:
            f"on root 0 -- printed, not asserted)")
     print(f"  [sa] ensemble {mc_sa.e_tot:.8f}, converged "
           f"{mc_sa.converged} ({time.time() - t0:.1f} s)", flush=True)
-    drop_row(std_row("sa-casscf", "free", "(4,15)",
+    drop_row(std_row("sa-casscf", "free@pur", "(4,15)",
                      float(e_cas[0] + core_e), r0["e2"] * 1e3,
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range([r['l2'] for r in rows]),
@@ -231,7 +231,7 @@ def main(argv=None) -> int:
     fresh_412 = None
     if ROWS.exists():
         fresh_412 = json.loads(ROWS.read_text()).get(
-            "sa-casscf|free|(4,12)")
+            "sa-casscf|free@pur|(4,12)")
     s412 = anchor(ADDR_412)["roots"][0]["e_total"]
     s415 = a0["e_total"]
     tot_fresh = r0["e_ref"] + r0["e2"]
@@ -306,14 +306,10 @@ def main(argv=None) -> int:
            f"{max(s2s):.4f}; E(2) mean {np.mean(e2s) * 1e3:+.4f} mEh "
            f"(the block grounds' L classes ARE the finding: the "
            f"clean-5L reading is 17 components at 72)")
-    drop_row(std_row("casci", "pinned", "(4,15)", e_m_ci,
-                     float(np.mean(e2s) * 1e3),
-                     float(e_m_ci + np.mean(e2s)),
-                     fmt_range(l2s), f"{max(s2s):.4f}",
-                     "grounds not the 5L (5S/5I)",
-                     # pinned_ci_run's conv_tol default (1e-12; a CI
-                     # solve has no iteration structure)
-                     conv=conv_of(1e-12, None)))
+    # the lane-core route is outside the table's keep-set (the
+    # pinned@pur rows are the table's pinned route): disclosed only
+    v.note("the lane-pinned casci (print-only)",
+           f"E_method {e_m_ci:.8f}, E(2) mean {np.mean(e2s) * 1e3:+.4f} mEh")
 
     # ---- pinned SA: the intersection window (the user's (a)) ----------
     # the pinned casci's block grounds are NOT the 5L (L classes
@@ -396,12 +392,9 @@ def main(argv=None) -> int:
            f"classes, NOT the 5L (the SA mix kernel has no "
            f"root-selection knob: its ensemble IS the block grounds); "
            f"the row is stored with this disclosure")
-    drop_row(std_row("sa-casscf", "pinned", "(4,15)",
-                     float(out_sa["e_tot"]),
-                     float(np.mean(e2s_s) * 1e3),
-                     float(out_sa["e_tot"] + np.mean(e2s_s)),
-                     fmt_range(l2s_s), f"{max(s2s_s):.4f}",
-                     "ground ensemble, not the 5L"))
+    v.note("the lane-pinned SA (print-only)",
+           f"ensemble {out_sa['e_tot']:.8f}, E(2) mean "
+           f"{np.mean(e2s_s) * 1e3:+.4f} mEh")
     ok = v.report()
     return 0 if ok else 1
 

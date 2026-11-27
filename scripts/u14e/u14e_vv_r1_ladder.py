@@ -120,7 +120,7 @@ def main(argv=None) -> int:
                 f"{l_def:.2e} (WHICH L is the disclosure)")
         v.note(f"{tag} casci", f"dE {de_meh:+.1f} mEh, E(2) "
                f"{r_f['e2'] * 1e3:+.4f} mEh, <S2> {r_f['s2']:.4f}")
-        drop_row(std_row("casci", "free", tag, float(cas_f.e_tot),
+        drop_row(std_row("casci", "free@pur", tag, float(cas_f.e_tot),
                          r_f["e2"] * 1e3,
                          float(cas_f.e_tot) + r_f["e2"],
                          f"{l_f:.4f}", f"{r_f['s2']:.4f}",
@@ -137,7 +137,7 @@ def main(argv=None) -> int:
               f"({time.time() - t0:.1f} s)", flush=True)
         v.note(f"{tag} casscf", f"<L2> {r_c['l2']:.6f}, E(2) "
                f"{r_c['e2'] * 1e3:+.4f} mEh")
-        drop_row(std_row("casscf", "free", tag, float(mc_c.e_tot),
+        drop_row(std_row("casscf", "free@pur", tag, float(mc_c.e_tot),
                          r_c["e2"] * 1e3,
                          float(mc_c.e_tot) + r_c["e2"],
                          f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
@@ -167,7 +167,7 @@ def main(argv=None) -> int:
         v.note(f"{tag} sa", f"<L2> max dev from 72 {dev_m:.2e}; E(2) "
                f"root 0 {r0['e2'] * 1e3:+.4f} mEh, total "
                f"{r0['e_ref'] + r0['e2']:.4f}")
-        drop_row(std_row("sa-casscf", "free", tag,
+        drop_row(std_row("sa-casscf", "free@pur", tag,
                          float(e_cas[0] + core_e), r0["e2"] * 1e3,
                          float(r0["e_ref"] + r0["e2"]),
                          fmt_range(l2s_sa),

@@ -151,7 +151,7 @@ def main(argv=None) -> int:
            f"(the window is rotation-closed, so the ground has a "
            f"definite L; WHICH L is the disclosure), E(2) "
            f"{r_f['e2'] * 1e3:+.4f} mEh")
-    drop_row(std_row("casci", "free", "(6,13)", float(cas_f.e_tot),
+    drop_row(std_row("casci", "free@pur", "(6,13)", float(cas_f.e_tot),
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
                      f"{l_f:.4f}", f"{r_f['s2']:.4f}",
@@ -168,7 +168,7 @@ def main(argv=None) -> int:
           f"({time.time() - t0:.1f} s)", flush=True)
     v.note("free CASSCF (the single-root draw class)",
            f"<L2> {r_c['l2']:.6f}, E(2) {r_c['e2'] * 1e3:+.4f} mEh")
-    drop_row(std_row("casscf", "free", "(6,13)", float(mc_c.e_tot),
+    drop_row(std_row("casscf", "free@pur", "(6,13)", float(mc_c.e_tot),
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
                      f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
@@ -205,7 +205,7 @@ def main(argv=None) -> int:
            f"run's rows read -50.732 -- git history)")
     print(f"  [sa] ensemble {mc_sa.e_tot:.8f}, converged "
           f"{mc_sa.converged} ({time.time() - t0:.1f} s)", flush=True)
-    drop_row(std_row("sa-casscf", "free", "(6,13)",
+    drop_row(std_row("sa-casscf", "free@pur", "(6,13)",
                      float(e_cas[0] + core_e), r0["e2"] * 1e3,
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range(l2s_sa),
@@ -265,15 +265,11 @@ def main(argv=None) -> int:
     v.note("pinned casci", f"<L2> in [{min(l2s):.4f}, {max(l2s):.4f}], "
            f"<S2> max {max(s2s):.4f}; E(2) mean "
            f"{np.mean(e2s) * 1e3:+.4f} mEh")
-    drop_row(std_row("casci", "pinned", "(6,13)", e_var_ci,
-                     float(np.mean(e2s) * 1e3),
-                     float(e_var_ci + np.mean(e2s)),
-                     fmt_range(l2s),
-                     f"{max(s2s):.4f}", "L=9 ground + the 5L present",
-                     # the pinned CI's tolerance: pinned_ci_run's
-                     # conv_tol default (1e-12; CI solves have no
-                     # iteration structure)
-                     conv=conv_of(1e-12, None)))
+    # the lane-core route is outside the table's keep-set (the
+    # pinned@pur rows are the table's pinned route): disclosed only
+    v.note("the lane-pinned casci (print-only)",
+           f"E_method {e_var_ci:.8f}, E(2) mean "
+           f"{np.mean(e2s) * 1e3:+.4f} mEh")
 
     # pinned SA + THE CERTIFIED-CLASS CHECK
     t0 = time.time()
@@ -313,14 +309,9 @@ def main(argv=None) -> int:
     v.note("the pinned block ground's spin class (PySCF spin_square)",
            f"max-<S2> component: (S^2, 2S+1) = ({ss_p:.8f}, "
            f"{mult_p:.4f}) vs atomterm's meters {max(s2s_s):.8f}")
-    drop_row(std_row("sa-casscf", "pinned", "(6,13)",
-                     float(out_sa["e_tot"]),
-                     float(np.mean(e2s_s) * 1e3),
-                     float(out_sa["e_tot"] + np.mean(e2s_s)),
-                     fmt_range(l2s_s),
-                     f"{max(s2s_s):.4f}", "the 72-component ok",
-                     conv=conv_of(out_sa["conv_dE"], out_sa["cycles"],
-                                  bool(out_sa["converged"]))))
+    v.note("the lane-pinned SA (print-only)",
+           f"ensemble {out_sa['e_tot']:.8f}, E(2) mean "
+           f"{np.mean(e2s_s) * 1e3:+.4f} mEh")
 
     ok = v.report()
     return 0 if ok else 1

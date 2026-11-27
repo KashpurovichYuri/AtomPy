@@ -355,15 +355,8 @@ def main(argv=None) -> int:
         v.note("C4: the lean lane window's pinned SA (4,15)",
                f"{len(l2s_l)} components, {at72} at 72 +- 0.01; E(2) "
                f"mean {np.mean(e2s_l) * 1e3:+.4f} mEh")
-        drop_row(std_row("sa-casscf", "pinned", "(4,15)",
-                         float(out_sa_l["e_tot"]),
-                         float(np.mean(e2s_l) * 1e3),
-                         float(out_sa_l["e_tot"] + np.mean(e2s_l)),
-                         fmt_range(l2s_l), f"{max(s2s_l):.4f}",
-                         "the lane window's class",
-                         conv=conv_of(out_sa_l["conv_dE"],
-                                      out_sa_l["cycles"],
-                                      bool(out_sa_l["converged"]))))
+        # the lane-core route is outside the table's keep-set: the
+        # disclosure is the note above, never a row
     except ValueError as e:
         v.note("C4: the lean lane window's pinned SA is REFUSED (the "
                "certified no-window class at this partition)",

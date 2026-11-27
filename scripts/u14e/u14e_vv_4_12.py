@@ -141,7 +141,7 @@ def main(argv=None) -> int:
             "Eh gain IS the 5L relaxation')",
             abs(r_f["l2"] - L2_5I) <= BAND_L2,
             f"<L2> {r_f['l2']:.6f} vs 42 (band {BAND_L2:g})")
-    drop_row(std_row("casci", "free", "(4,12)", float(cas_f.e_tot),
+    drop_row(std_row("casci", "free@pur", "(4,12)", float(cas_f.e_tot),
                      r_f["e2"] * 1e3,
                      float(cas_f.e_tot) + r_f["e2"],
                      f"{r_f['l2']:.4f}", f"{r_f['s2']:.4f}",
@@ -161,7 +161,7 @@ def main(argv=None) -> int:
            f"(the committed draw priced {a_c['e_corr'] * 1e3:+.4f}; "
            f"the single-root endpoints differ by draw -- the meters "
            f"are the disclosure)")
-    drop_row(std_row("casscf", "free", "(4,12)", float(mc_c.e_tot),
+    drop_row(std_row("casscf", "free@pur", "(4,12)", float(mc_c.e_tot),
                      r_c["e2"] * 1e3,
                      float(mc_c.e_tot) + r_c["e2"],
                      f"{r_c['l2']:.4f}", f"{r_c['s2']:.4f}",
@@ -198,7 +198,7 @@ def main(argv=None) -> int:
             max(dev_m, dev_s) <= BAND_L2,
             f"{len(rows)} roots, max dev {max(dev_m, dev_s):.2e} "
             f"(band {BAND_L2:g})")
-    drop_row(std_row("sa-casscf", "free", "(4,12)",
+    drop_row(std_row("sa-casscf", "free@pur", "(4,12)",
                      float(e_cas[0] + core_e), r0["e2"] * 1e3,
                      float(r0["e_ref"] + r0["e2"]),
                      fmt_range([r['l2'] for r in rows]),
@@ -237,15 +237,11 @@ def main(argv=None) -> int:
     v.note("pinned casci (the pinned analog of the unoptimized row)",
            f"<L2> in [{min(l2s):.4f}, {max(l2s):.4f}], <S2> max "
            f"{max(s2s):.4f}; E(2) mean {np.mean(e2s) * 1e3:+.4f} mEh")
-    drop_row(std_row("casci", "pinned", "(4,12)", e_var_ci,
-                     float(np.mean(e2s) * 1e3),
-                     float(e_var_ci + np.mean(e2s)),
-                     fmt_range(l2s),
-                     f"{max(s2s):.4f}", "5L (term energy)",
-                     # the pinned CI's tolerance: pinned_ci_run's
-                     # conv_tol default (1e-12; CI solves have no
-                     # iteration structure)
-                     conv=conv_of(1e-12, None)))
+    # the lane-core route is outside the table's keep-set (the
+    # pinned@pur rows are the table's pinned route): disclosed only
+    v.note("the lane-pinned casci (print-only)",
+           f"E_method {e_var_ci:.8f}, E(2) mean "
+           f"{np.mean(e2s) * 1e3:+.4f} mEh")
 
     # ---- pinned SA ----------------------------------------------------
     t0 = time.time()
@@ -268,14 +264,9 @@ def main(argv=None) -> int:
             abs(delta) <= BAND_ROUTE,
             f"pinned {out_sa['e_tot']:.8f} vs free {mc_sa.e_tot:.8f} "
             f"(delta {delta:+.2e} Eh, band {BAND_ROUTE:g})")
-    drop_row(std_row("sa-casscf", "pinned", "(4,12)",
-                     float(out_sa["e_tot"]),
-                     float(np.mean(e2s_s) * 1e3),
-                     float(out_sa["e_tot"] + np.mean(e2s_s)),
-                     fmt_range(l2s_s),
-                     f"{max(s2s_s):.4f}", "5L",
-                     conv=conv_of(out_sa["conv_dE"], out_sa["cycles"],
-                                  bool(out_sa["converged"]))))
+    v.note("the lane-pinned SA (print-only)",
+           f"ensemble {out_sa['e_tot']:.8f}, E(2) mean "
+           f"{np.mean(e2s_s) * 1e3:+.4f} mEh")
 
     ok = v.report()
     return 0 if ok else 1

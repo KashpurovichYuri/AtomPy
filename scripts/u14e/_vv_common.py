@@ -685,11 +685,31 @@ def de_fmt(de_eh: float) -> str:
     return f"{de_eh * 1e3:+.4f} / {de_eh * EH_EV:+.4f}"
 
 
+def row_key(row: dict) -> str:
+    """The store key of one row: ``method|route|cas``."""
+    return f"{row['method']}|{row['route']}|{row['cas']}"
+
+
+def _refuse_unknown(keys) -> None:
+    """Fail fast on any key outside the declared table (the keep-set:
+    the references, the free routes' CAS ladder, the pinned SA's) --
+    an undeclared key used to be appended as a block of its own."""
+    bad = [k for k in keys if k not in _ORDER]
+    if bad:
+        raise ValueError(
+            f"row key(s) outside the declared table: {bad} -- the "
+            f"grammar is method|route|cas with route in {{'-', "
+            f"'free@pur', 'pinned@pur'}} and cas on the ladder "
+            f"(_ORDER); print-only disclosures never enter the store")
+
+
 def drop_row(row: dict) -> None:
     """One leg's result row, merged into the family's store
-    (``method`` + ``route`` + ``cas`` is the key)."""
+    (``method`` + ``route`` + ``cas`` is the key; a key outside the
+    declared table is refused)."""
+    _refuse_unknown([row_key(row)])
     rows = json.loads(ROWS.read_text()) if ROWS.exists() else {}
-    rows[f"{row['method']}|{row['route']}|{row['cas']}"] = row
+    rows[row_key(row)] = row
     ROWS.write_text(json.dumps(rows, indent=1) + "\n")
     render_table()
 
@@ -700,11 +720,12 @@ def drop_row(row: dict) -> None:
 _LADDER_PLAIN = ("(4,12)", "(4,15)", "(4,16)", "(6,13)")
 _LADDER_R1 = ("(4,12)@r1", "(4,15)@r1", "(4,16)@r1", "(4,21)@r1",
               "(6,13)@r1")
-_ORDER = (["rohf|-|-", "uhf|-|-"] +
-          [f"{m}|free|{c}"
-           for m in ("casci", "casscf", "sa-casscf")
-           for c in _LADDER_PLAIN + _LADDER_R1] +
-          [f"sa-casscf|pinned@pur|{c}" for c in _LADDER_PLAIN + _LADDER_R1])
+_ORDER = tuple(
+    ["rohf|-|-", "uhf|-|-"] +
+    [f"{m}|free@pur|{c}"
+     for m in ("casci", "casscf", "sa-casscf")
+     for c in _LADDER_PLAIN + _LADDER_R1] +
+    [f"sa-casscf|pinned@pur|{c}" for c in _LADDER_PLAIN + _LADDER_R1])
 
 
 def fmt_range(vals, nd: int = 4) -> str:
@@ -730,15 +751,20 @@ def conv_of(precision, n_iters, converged=True) -> str:
 
 def render_table() -> None:
     """The small committed table: the references lead (ROHF is the
-    zero of every dE), then one row per method x route x CAS -- the
-    free routes (on the pur core, rendered ``free@pur``) and the
-    pinned@pur SA.  The reading keys live in README · Results; the
-    wave's verdict records live in wayfinder/map.md.  Every energy
-    <= 4 decimals; deltas in the ``mEh / eV`` slash form."""
+    zero of every dE), then one row per declared key in table order
+    -- the free routes and the pinned SA, both on the pur core.  The
+    reading keys live in README · Results; the wave's verdict records
+    live in wayfinder/map.md.  Every energy <= 4 decimals; deltas in
+    the ``mEh / eV`` slash form.  A RETRACTED row (a cell withdrawn
+    pending a re-measurement) renders dashes in the withdrawn cells;
+    a key outside the declared table is refused."""
     rows = json.loads(ROWS.read_text()) if ROWS.exists() else {}
+    _refuse_unknown(rows)
     order = [k for k in _ORDER if k in rows]
-    order += [k for k in rows if k not in order]
     e0 = rohf_energy()
+
+    def cell(x, fmt=None):
+        return "—" if x is None else (x if fmt is None else fmt(x))
     out = [
         "# U14e -- the V&V family",
         "",
@@ -759,7 +785,7 @@ def render_table() -> None:
             out.append("|" + " === |" * 10)
         prev = g
         de_var = r["e_method"] - e0
-        de_tot = r["e_tot"] - e0
+        de_tot = None if r["e_tot"] is None else r["e_tot"] - e0
         e2 = (f"{r['e2_meh']:+.4f} / {r['e2_ev']:+.4f}"
               if r.get("e2_meh") is not None else "—")
         # the render-time consistency check: the store's own bookkeeping
@@ -770,15 +796,14 @@ def render_table() -> None:
             raise ValueError(
                 f"render check: row {k} violates E_tot = E_method + "
                 f"E(2) by {r['e_method'] + r['e2_meh'] * 1e-3 - r['e_tot']:.2e} Eh")
-        route_disp = ("free@pur" if r["route"] == "free"
-                      else r["route"])
         method = (r["method"] if r["route"] == "-"
-                  else f"{r['method']} ({route_disp})")
+                  else f"{r['method']} ({r['route']})")
         out.append(
             f"| {method} | {r['cas']} "
-            f"| {r['l2']} | {r['s2']} | {r.get('conv') or '—'} "
+            f"| {cell(r['l2'])} | {r['s2']} | {r.get('conv') or '—'} "
             f"| {r['e_method']:.4f} | {de_fmt(de_var)} | {e2} "
-            f"| {r['e_tot']:.4f} | {de_fmt(de_tot)} |")
+            f"| {cell(r['e_tot'], lambda x: f'{x:.4f}')} "
+            f"| {cell(de_tot, de_fmt)} |")
     TABLE.write_text("\n".join(out))
 
 
