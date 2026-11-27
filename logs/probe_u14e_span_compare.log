@@ -1,0 +1,56 @@
+  ROHF (trusted rung, loaded): E = -50.38185233, nao 177
+[overlap] |S_c1 - S_d2h|_max 0.00e+00 (the cross-Gram precondition)
+/home/kashpur/pylibgrpp/test/AtomTerm/src/atomterm/core.py:114: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mf.mo_coeff[:, occupied_core_idx(mf, ncore)])
+  [window] distilled 10f: k=1 of 1 bands, capture 0.8228-0.8339; 13d: k=1 of 1 bands, capture 0.9157-0.9157; 7s: k=1 of 3 bands, capture 0.2713-0.7097
+===== 1. the free SA (C1, the as-built window) =====
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_span_compare.py:113: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_f = build_full_mo(mf, occupied_core_idx(mf, NCORE), act,
+  E -50.45274167, converged True (71 s)
+===== 2. the pinned SA (pinned@pur, the as-built window) =====
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_span_compare.py:128: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_d2h = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, NCORE),
+  ensemble -50.45150714, converged True (cycles 17, 162 s)
+===== 3. the pinned SA (pinned@pur, the @r1 window) =====
+  [window] prior 5f: k=1 of 3 bands, discarded 0.0000, capture 0.9328-0.9420; 6d: k=1 of 3 bands, discarded 0.0004, capture 0.9828-0.9828; 7s: k=1 of 3 bands, discarded 0.0001, capture 0.2716-0.7094
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/u14e/u14e_vv_6_13_r1.py:80: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  core = set(occupied_core_idx(mf, NCORE))
+/home/kashpur/pylibgrpp/test/AtomTerm/scripts/probes/probe_u14e_span_compare.py:144: UserWarning: core block is not the first 4 MOs (closed at [22, 61, 88, 120]); folding the occupied block
+  mo_s = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, NCORE),
+  ensemble -50.45150713, converged True (cycles 8, 88 s)
+
+===== A. the span principal angles (the cosines; 1.0 = the shared direction) =====
+  free-C1          vs pinned-asbuilt  : cosines [min 1.0000 / mean 1.0000 / max 1.0000], the shared directions 13/13
+  free-C1          vs pinned-r1       : cosines [min 1.0000 / mean 1.0000 / max 1.0000], the shared directions 13/13
+  pinned-asbuilt   vs pinned-r1       : cosines [min 1.0000 / mean 1.0000 / max 1.0000], the shared directions 13/13
+
+===== B. the occupation fingerprints (the ensemble 1-RDM diagonals, equal root weights) =====
+  free-C1         : 0.44  0.44  0.42  0.43  0.43  0.42  0.43  0.43  0.39  0.40  0.40  0.39  1.00
+  pinned-asbuilt  : 0.44  0.41  0.45  0.38  0.45  0.41  0.46  0.41  0.36  0.40  0.36  0.43  1.04
+  pinned-r1       : 0.45  0.42  0.43  0.43  0.42  0.45  0.41  0.37  0.41  0.39  0.38  0.41  1.05
+  -- the sorted-profile deviations (the gauge-free comparison) --
+  free-C1          vs pinned-asbuilt  : max |d occ| (sorted profiles) 0.038
+  free-C1          vs pinned-r1       : max |d occ| (sorted profiles) 0.046
+  pinned-asbuilt   vs pinned-r1       : max |d occ| (sorted profiles) 0.018
+
+===== C. the <L2> partition walks =====
+  free-C1: 90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0  90.0
+  free-C1 the counts: {'other': 7, '90': 10}
+  pinned-asbuilt [Au]: 90.0  90.0  90.0  90.0  72.0
+  pinned-asbuilt [B1u]: 90.0  90.0  90.0  90.0
+  pinned-asbuilt [B2u]: 90.0  90.0  90.0  90.0
+  pinned-asbuilt [B3u]: 90.0  90.0  90.0  90.0
+  pinned-asbuilt the counts: {'other': 16, '72': 1}
+  pinned-r1 [Au]: 90.0  90.0  90.0  90.0  72.0
+  pinned-r1 [B1u]: 90.0  90.0  90.0  90.0
+  pinned-r1 [B2u]: 90.0  90.0  90.0  90.0
+  pinned-r1 [B3u]: 90.0  90.0  90.0  90.0
+  pinned-r1 the counts: {'other': 17}
+
+===== D. the INPUT windows vs the converged spans (did the optimizer move the span?) =====
+  input as-built act vs converged free-C1 span: [min 0.8458 / max 0.9607]
+  input as-built act vs converged pinned-asbuilt span: [min 0.8459 / max 0.9608]
+  input @r1 act_s vs converged pinned-r1 span: [min 0.9555 / max 1.0000], the shared directions 6/13
+  (the INPUT windows themselves: act_s vs act: [min 0.8478 / max 0.9764], the shared directions 0/13)
+
+(366 s total)

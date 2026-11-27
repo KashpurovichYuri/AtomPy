@@ -527,6 +527,33 @@ configuration-inert).
 
 ### Disposition candidates (the user's future call)
 
+- **The (6,13) active-space identity — MEASURED 2026-11-25**
+  (`probe_u14e_span_compare.py` + log): the three optimized runs —
+  the free SA (C1), the pinned@pur on the as-built window, the
+  pinned@pur on the @r1 window — converge to the SAME active
+  subspace: the span principal cosines 13/13 at 1.0000 across ALL
+  three pairs; the pinned ensemble energies equal to 1e-8
+  (-50.45150714/3); the ensemble densities agree (the sorted
+  profiles <=0.046).  THE READINGS: (i) the optimized SA is window-
+  and route-INDEPENDENT — the attractor is the ensemble density's
+  dominant 13-NO span (the complete-multiplet ensemble has a unique
+  eigenbasis — the SA-anchors-the-gauge fact, now measured at the
+  span level); (ii) the window economics are a FROZEN-window story
+  — the trilogy's frozen classes rank the windows' CAPTURE, while
+  the optimized rows all land the same space and (pinned) the same
+  e_tot; (iii) the optimizer MOVES the span massively from the
+  as-built input (all 13 principal cosines 0.85-0.96 — no direction
+  shared at >0.99), while the @r1 input starts 6/13-in (the
+  prior-axis device captures the attractor better — the +140.5
+  frozen vs +1065 reading, confirmed); (iv) the optimized partition
+  = the L=9 class dominates: the free 17x90, the pinned 16x90+72
+  (the Au block's 5th root exactly 72.0 — the block multiplicity's
+  boundary; the counts lines' 'other' buckets are the 1e-3 snap
+  tolerance losing the 90.000x draw noise, not physics).  THE
+  LANE-RETIREMENT INPUT: the routes differ in GAUGE only — the span
+  is the invariant and the PT2 gauge-visibility lives in the column
+  gauge; the lane's remaining value is the frozen-class readout,
+  not a different optimized space.
 - **The static/dynamic correlation trade across the (4,0) ladder —
   MEASURED 2026-11-25** (the V&V table's rows; the frozen dE / the
   SA dE / the static gain / the E(2) / the NET E_tot move): (4,12)
