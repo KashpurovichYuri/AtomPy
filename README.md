@@ -139,10 +139,12 @@ The uranium record carrying all of this measured and classified:
 Reading `scripts/u14e/VV.md` (its row store is `scripts/u14e/vv.json`;
 a key outside the declared table is refused):
 
-- **Method column** — `free@pur`: PySCF-direct on the purified core;
-  `pinned@pur`: the wfnsym-pinned state average on the purified core.
-  One optimizer class per block; inside a block the plain windows
-  come first, then the `@r1` windows.
+- **Method column** — `free@pur`: PySCF-direct, started on the
+  purified core; `pinned@pur`: the wfnsym-pinned state average, started
+  on the same core (PySCF's optimizer lets the core relax; every
+  solution's certificate reads how far it moved). One optimizer class
+  per block; inside a block the plain windows come first, then the
+  `@r1` windows.
 - **Rows** — every dE is against the ROHF row. A free row carries
   root 0; a pinned SA row carries the mean over the term's component
   blocks.
@@ -195,9 +197,14 @@ treatment grid), plus frozen one-shot artifacts. New atom = new element
 file, not README growth. Regeneration: term tables — `scripts/run.py`;
 cells — `scripts/regen_cells.py`; the methods table —
 `scripts/build_methods_tables.py`; scans — `scripts/radial_scan.py`.
-The U14e V&V family — `scripts/u14e/u14e_vv_*.py` (per-CAS legs, the
-driver), its table `scripts/u14e/VV.md`. The test suite is the
-executable documentation.
+The U14e V&V family — the library `scripts/u14e/vv` (the reference
+substrate, the active spaces, the routes, the pricing, the table; each
+module's docstring owns its contract), its legs
+`scripts/u14e/u14e_vv_ladder.py` (the table's one writer: every case
+of the CAS ladder through the free trio and the pinned SA) and
+`u14e_vv_uhf.py` (the reference rows), the driver
+`u14e_vv_orchestration.py`; its table `scripts/u14e/VV.md`. The test
+suite is the executable documentation.
 
 ## Status and directions
 

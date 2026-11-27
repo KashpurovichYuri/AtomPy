@@ -54,6 +54,20 @@ def carbon_d2h():
     return cfg, mol, _frozen_mf(mol, ref), select_shell_ao(mol, "2p")
 
 
+@pytest.fixture(scope="session")
+def vv_substrate(carbon):
+    """The U14e V&V library's reference substrate (``scripts/u14e/vv``)
+    on the frozen carbon reference: the C1 molecule and its SCF
+    record, carrying the atom's declaration for the D2h wrapper."""
+    import types
+
+    from vv.reference import Substrate
+
+    cfg, mol, mf, _act_idx = carbon
+    return Substrate(mol, mf,
+                     spec=types.SimpleNamespace(atom_config=lambda: cfg))
+
+
 @pytest.fixture(scope="module")
 def shell_ops(carbon):
     """Operators in the pure 2p-shell determinant spaces (Ms=1 and Ms=0)."""

@@ -1,43 +1,43 @@
-"""The analysis meters: atomterm's angular operators through the
-matrix-free application; the many-body meters read per root through
-the CI-order bridge."""
+"""The analysis meters: <<L^2>> and <<S^2>> of CI roots in one orbital
+set.
 
-import numpy as np  # noqa: E402
+atomterm's angular operators through the matrix-free application;
+a CI vector enters in PySCF's order and leaves through the CI-order
+bridge.  The one piece of atomterm analysis the routes keep -- the
+construction is double-certified in ``angular.py``; the meters are
+the terms' identity, not part of what is under test.
+"""
 
-from atomterm.detbasis import determinant_basis, operator_apply  # noqa: E402
-from atomterm.operators import (  # noqa: E402
-    ci_in_detbasis_order, l2_operator_parts, s2_operator_parts)
+import numpy as np
 
-# the analysis meters --------------------------------------------------
-
-def meters(mol, c_act, na: int, nb: int):
-    """The analysis meters as their ACTION (atomterm's angular
-    operators through the matrix-free application; the many-body
-    meters read per root through the CI-order bridge).  The one piece
-    of atomterm analysis the legs keep -- the construction is
-    double-certified in angular.py; the meters are the terms'
-    identity, not part of the derivation under test."""
-    norb = c_act.shape[1]
-    dets = determinant_basis(norb, na, nb)
-    apply_l2 = operator_apply(dets, *l2_operator_parts(mol, c_act))
-    apply_s2 = operator_apply(dets, *s2_operator_parts(norb))
-    apply = {"l2": apply_l2, "s2": apply_s2}
-
-    def expect(kind: str, ci_pyscf) -> float:
-        w = ci_in_detbasis_order(np.asarray(ci_pyscf).ravel(),
-                                 norb, na, nb)
-        return float(np.real(w @ apply[kind](w)))
-
-    return expect
+from atomterm.detbasis import determinant_basis, operator_apply
+from atomterm.operators import (ci_in_detbasis_order, l2_operator_parts,
+                                s2_operator_parts)
 
 
-def meters_all(blocks, expect):
-    """The meters over EVERY block component (in branch order) --
-    independent of any PT2 root cut."""
-    l2s, s2s = [], []
-    for _, mc in blocks:
-        for k in range(len(np.atleast_1d(mc.e_cas))):
-            ci = np.asarray(mc.ci[k]).ravel()
-            l2s.append(expect("l2", ci))
-            s2s.append(expect("s2", ci))
-    return l2s, s2s
+class Meters:
+    """The meters on ONE active block: <<L^2>> reads the block's AO
+    columns, <<S^2>> is orbital-free.
+
+    Parameters
+    ----------
+    mol : the molecule (the L^2 AO matrices read its basis).
+    active : (nao, ncas) the block's S-orthonormal columns -- the
+        orbitals the CI vectors were solved in.
+    sector : (na, nb) the active electrons.
+    """
+
+    def __init__(self, mol, active, sector):
+        norb = active.shape[1]
+        dets = determinant_basis(norb, *sector)
+        self._apply = {
+            "l2": operator_apply(dets, *l2_operator_parts(mol, active)),
+            "s2": operator_apply(dets, *s2_operator_parts(norb)),
+        }
+        self._order = (norb, *sector)
+
+    def of(self, ci) -> tuple[float, float]:
+        """(<<L^2>>, <<S^2>>) of one CI root (PySCF order, any shape)."""
+        w = ci_in_detbasis_order(np.asarray(ci).ravel(), *self._order)
+        return (float(np.real(w @ self._apply["l2"](w))),
+                float(np.real(w @ self._apply["s2"](w))))

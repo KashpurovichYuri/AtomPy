@@ -47,6 +47,8 @@ python scripts/regen_cells.py <atom> \
     [--method casci|casscf|sa-casscf] [--window W] [--mask M] \
     [--start ao|mo|moc|no] [--core raw|avg|frac] [--sector NA-NB] [--full]
 python scripts/build_methods_tables.py <atom>    # re-render TABLE.md + TABLE.csv
+python scripts/u14e/u14e_vv_ladder.py [--cases TAG ...] [--routes casci,casscf,sa,pinned] [--ground-only]
+                                                  # the U14e V&V table's one writer (scripts/u14e/VV.md)
 ```
 
 - **The per-commit gate** (user-directed): the fast tier plus the diff's
@@ -221,7 +223,7 @@ cold-start warning surface.
 
 ## Tests
 
-`pytest` runs 376 tests. The fast tier: `pytest -m fast` = 282
+`pytest` runs 436 tests. The fast tier: `pytest -m fast` = 342
 tests in seconds (machine-light selection). The heavy tail is
 HOURS-class — the per-commit gate is the fast tier plus the diff's
 targeted files (see Running things); the full-suite run is RETIRED. A
@@ -241,6 +243,12 @@ Layout and tiers:
   substrates, and the FROZEN carbon ROHF (`tests/carbon_reference.py`,
   loaded by the root `carbon` fixture — NO SCF runs in the unit tier)
   plus its D2h twin (the `carbon_d2h` fixture).
+- `tests/unit/test_u14e_vv_*.py` pin the U14e V&V library
+  (`scripts/u14e/vv`: the D2h column algebra, the reference substrate,
+  the active spaces, the routes and their birth certificate, the
+  pricing adapters, the table, the case table) on that frozen carbon
+  reference — the library's contract is its modules' docstrings, and
+  the pins are the only tests outside `src/`.
 - `tests/integration/` = the campaign chemistry (TM references,
   CASSCF/SA, term tables).
 - The fast/slow MARKS are the machine axis; the directories the human

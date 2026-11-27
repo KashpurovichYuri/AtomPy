@@ -25,14 +25,16 @@ wins -- the ensemble OBJECTIVE or the SEED?  Five runs:
                                        block when started from the
                                        term's orbitals?
 
-Every optimized run prints: E, <L2>/<S2> of the ground root, the
+Every run is a certified solution of ``vv.routes`` (a restart rides
+``ActiveSpace.on``: the same partition on a converged solution's
+orbitals) and prints: E, <L2>/<S2> of the ground root, the
 converged-window CLOSURE meters (the (a) measurement: the input
 windows close at 1e-13; the defect is created by the optimization --
-here measured, not inferred), the macro-cycle budget, and the active
-OCCUPATIONS (the class fingerprint).
+here measured, not inferred), and the active OCCUPATIONS (the class
+fingerprint).
 
 Run from the repo root:
-    OMP_NUM_THREADS=64 python scripts/probes/probe_u14e_sa_basins.py \
+    OMP_NUM_THREADS=64 python scripts/probes/probe_u14e_sa_basins.py \\
         | tee logs/probe_u14e_sa_basins.log
 """
 
@@ -44,43 +46,37 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "u14e"))
 
 import numpy as np  # noqa: E402
-from pyscf.mcscf import addons as _mcaddons  # noqa: E402
-
-from vv.meters import meters, meters_all  # noqa: E402
-from vv.reference import load_reference  # noqa: E402
-from vv.routes import core_part_of, free_kernel, make_blocks, pinned_sa_run  # noqa: E402
+from pyscf.fci import direct_spin1  # noqa: E402
+from pyscf.mcscf import addons as mcaddons  # noqa: E402
 
 from atomterm.operators import window_closure  # noqa: E402
 
-SECTOR = (5, 1)
-NCORE = 4
-ROOTS = 17
-BUDGET = {"max_cycle_macro": 200}
+from vv.cases import ADDR, NROOTS, TERM  # noqa: E402
+from vv.reference import Substrate  # noqa: E402
+from vv.routes import free_casscf, free_sa, pinned_sa  # noqa: E402
+from vv.windows import s_column, window_6_13_r1  # noqa: E402
 
 
-def _occ_print(tag, cas, ncas, root=0):
+def _occupations(sol, root=0):
     """The active occupations of one root -- the class fingerprint."""
-    ci = np.asarray(cas.ci[root] if isinstance(cas.ci, list)
-                    else cas.ci).ravel()
-    rdm = cas.fcisolver.make_rdm1(ci, ncas, SECTOR)
-    occ = np.diag(rdm).real
+    st = sol.states[root].state
+    return np.diag(direct_spin1.make_rdm1(st.ci, st.ncas, st.nelecas)).real
+
+
+def _occ_print(tag, sol, root=0):
+    occ = _occupations(sol, root)
     print(f"  [{tag}] occupations:", flush=True)
     print("    " + "  ".join(f"{i}:{o:.2f}" for i, o in enumerate(occ)),
           flush=True)
     return occ
 
 
-def _ground_report(tag, mol, mo_win, ncas, cas, root=0):
+def _ground_report(tag, sol, root=0):
     """<L2>/<S2> of one root + the converged-window closure."""
-    expect = meters(mol, mo_win, *SECTOR)
-    ci = np.asarray(cas.ci[root] if isinstance(cas.ci, list)
-                    else cas.ci).ravel()
-    l2 = expect("l2", ci)
-    s2 = expect("s2", ci)
-    cl = window_closure(mol, mo_win)
-    ss, mult = _mcaddons.spin_square(cas, ci=cas.ci[root]
-                                     if isinstance(cas.ci, list)
-                                     else cas.ci)
+    st = sol.states[root].state
+    (l2, s2) = sol.meters()[root]
+    cl = window_closure(st.mol, st.active)
+    ss, mult = mcaddons.spin_square(st.mc, ci=st.ci)
     print(f"  [{tag}] ground root: <L2> {l2:.6f}, <S2> {s2:.6f} "
           f"(spin_square: {ss:.6f}, {mult:.1f}); the converged "
           f"window's closure: ||[P,Lz]|| {cl['lz']:.2e}, "
@@ -88,129 +84,74 @@ def _ground_report(tag, mol, mo_win, ncas, cas, root=0):
     return l2, s2, cl
 
 
+def _run(tag, go, what):
+    t0 = time.time()
+    sol = go()
+    energy = (f"E {sol.states[0].e_ref:.8f}" if sol.ensemble is None
+              else f"ensemble {sol.ensemble:.8f}")
+    print(f"  [{tag}] {energy}, conv {sol.conv} ({time.time() - t0:.0f} s); "
+          f"certificate {sol.certificate} -- {what}", flush=True)
+    return sol
+
+
 def main() -> int:
     t00 = time.time()
-    mol, mf = load_reference()
-    from atomterm.cases import campaign_spec
-    spec = campaign_spec("U14e")
-    import u14e_vv_6_13_r1 as r1
-    mo_full, ncas, cl_in, j_s = r1.production_window_r1(mol, mf, spec)
+    sub = Substrate.load()
+    built = window_6_13_r1(sub, ADDR["(6,13)@r1"])
+    space = built.space
+    for line in built.report:
+        print(f"  {line}", flush=True)
+    cl_in = space.closure(sub.mol)
+    j_s = s_column(space.active, sub.mol)
     print(f"  [window] the input closure ||[P,Lz]|| {cl_in['lz']:.2e}, "
-          f"||[P,Lperp]|| {cl_in['lperp']:.2e}; the s column at "
-          f"{j_s}", flush=True)
-    weights = [1.0 / ROOTS] * ROOTS
+          f"||[P,Lperp]|| {cl_in['lperp']:.2e}; the s column at {j_s}",
+          flush=True)
 
-    # ---- A: CASSCF from the input window ------------------------------
     print("===== A: CASSCF, input window =====", flush=True)
-    t0 = time.time()
-    mc_a, cas_a = free_kernel(mf, ncas, SECTOR, mo_full,
-                              track_iters=True)
-    print(f"  [A] E {mc_a.e_tot:.8f}, converged {mc_a.converged} "
-          f"({mc_a.n_macro} macro, |dE| {mc_a.final_de:.1e}, "
-          f"{time.time() - t0:.0f} s)", flush=True)
-    _ground_report("A", mol, mc_a.mo_coeff[:, NCORE:NCORE + ncas],
-                   ncas, cas_a)
-    _occ_print("A", cas_a, ncas)
+    a = _run("A", lambda: free_casscf(sub, space), "the input seed")
+    _ground_report("A", a)
+    _occ_print("A", a)
 
-    # ---- B: free SA x17 from the input window -------------------------
     print("===== B: free SA x17, input window =====", flush=True)
-    t0 = time.time()
-    mc_b, cas_b = free_kernel(mf, ncas, SECTOR, mo_full,
-                              weights=weights, nroots=ROOTS,
-                              track_iters=True)
-    core_e, e_cas = core_part_of(cas_b)
-    print(f"  [B] ensemble {mc_b.e_tot:.8f}, converged "
-          f"{mc_b.converged} ({mc_b.n_macro} macro, |dE| "
-          f"{mc_b.final_de:.1e}, {time.time() - t0:.0f} s); root 0 "
-          f"e_ref {e_cas[0] + core_e:.8f}", flush=True)
-    _ground_report("B", mol, mc_b.mo_coeff[:, NCORE:NCORE + ncas],
-                   ncas, cas_b)
-    occ_b = _occ_print("B", cas_b, ncas)
+    b = _run("B", lambda: free_sa(sub, space, NROOTS), "the input seed")
+    _ground_report("B", b)
+    occ_b = _occ_print("B", b)
     print(f"  [B] the fingerprint read: s column occ "
           f"{occ_b[j_s]:.3f}; f block sum {occ_b[:7].sum():.2f}; "
           f"d block sum {occ_b[7:12].sum():.2f}", flush=True)
 
-    # ---- C: free SA from A's orbitals ---------------------------------
-    print("===== C: free SA x17, started from A's orbitals =====",
-          flush=True)
-    t0 = time.time()
-    mc_c, cas_c = free_kernel(mf, ncas, SECTOR, mc_a.mo_coeff,
-                              weights=weights, nroots=ROOTS,
-                              track_iters=True)
-    print(f"  [C] ensemble {mc_c.e_tot:.8f}, converged "
-          f"{mc_c.converged} ({mc_c.n_macro} macro, "
-          f"{time.time() - t0:.0f} s)", flush=True)
-    _ground_report("C", mol, mc_c.mo_coeff[:, NCORE:NCORE + ncas],
-                   ncas, cas_c)
+    print("===== C: free SA x17, started from A's orbitals =====", flush=True)
+    c = _run("C", lambda: free_sa(sub, space.on(a.states[0].mo_coeff), NROOTS),
+             "A's seed")
+    _ground_report("C", c)
 
-    # ---- D: CASSCF from B's orbitals ----------------------------------
     print("===== D: CASSCF, started from B's orbitals =====", flush=True)
-    t0 = time.time()
-    mc_d, cas_d = free_kernel(mf, ncas, SECTOR, mc_b.mo_coeff,
-                              track_iters=True)
-    print(f"  [D] E {mc_d.e_tot:.8f}, converged {mc_d.converged} "
-          f"({mc_d.n_macro} macro, {time.time() - t0:.0f} s)", flush=True)
-    _ground_report("D", mol, mc_d.mo_coeff[:, NCORE:NCORE + ncas],
-                   ncas, cas_d)
+    d = _run("D", lambda: free_casscf(sub, space.on(b.states[0].mo_coeff)),
+             "B's seed")
+    _ground_report("D", d)
 
-    # ---- E1: the pinned SA (the term's own ensemble) -------------------
     print("===== E1: the pinned SA on the @r1 window =====", flush=True)
-    import u14e_vv_unification as uni
-    mol_d2h, mf_d2h = uni.wrapper_substrate(mol, mf, spec)
-    act_s, ncas_s, purity = uni.act_s_mo_of(mol, mf, mol_d2h, spec)
-    from atomterm.windows import build_full_mo, occupied_core_idx
-    from atomterm.cells import CellKey, key_core
-    key = CellKey.from_address(r1.KEY_613_R1)
-    _nc, _cc, c_pur = key_core(key, mol, mf, spec.shell_bands)
-    mo_d2h = build_full_mo(mf_d2h, occupied_core_idx(mf_d2h, _nc),
-                           act_s, c_core=c_pur)
-    t0 = time.time()
-    out_e1, _ = pinned_sa_run(mol_d2h, mf_d2h, mo_d2h, _nc, ncas_s,
-                              SECTOR, 8, "u", c_pur,
-                              c_read=np.asarray(
-                                  mo_d2h)[:, _nc:_nc + ncas_s],
-                              mc_opts=BUDGET)
-    blocks_e1, expect_e1, _ = make_blocks(mol_d2h, mf_d2h,
-                                          np.asarray(out_e1["mo"]),
-                                          _nc, ncas_s, SECTOR, 8, "u",
-                                          c_pur, out_e1["roots"],
-                                          c_read=np.asarray(
-                                              out_e1["mo"])[:,
-                                                            _nc:_nc + ncas_s])
-    l2_e1, s2_e1 = meters_all(blocks_e1, expect_e1)
-    print(f"  [E1] ensemble {out_e1['e_tot']:.8f}, converged "
-          f"{out_e1['converged']} (cycles {out_e1['cycles']}, "
-          f"{time.time() - t0:.0f} s); <L2> [{min(l2_e1):.6f}, "
-          f"{max(l2_e1):.6f}], <S2> max {max(s2_e1):.6f}", flush=True)
+    e1 = _run("E1", lambda: pinned_sa(sub, space, TERM),
+              "the term's own wfnsym-anchored ensemble")
+    l2_e1 = e1.meters()
+    print(f"  [E1] <L2> [{min(l2 for l2, _ in l2_e1):.6f}, "
+          f"{max(l2 for l2, _ in l2_e1):.6f}], <S2> max "
+          f"{max(s2 for _, s2 in l2_e1):.6f}", flush=True)
 
-    # ---- E2: free SA from the pinned SA's orbitals ---------------------
-    print("===== E2: free SA x17, started from E1's orbitals =====",
-          flush=True)
-    t0 = time.time()
-    mc_e2, cas_e2 = free_kernel(mf, ncas, SECTOR, out_e1["mo"],
-                                weights=weights, nroots=ROOTS,
-                                track_iters=True)
-    print(f"  [E2] ensemble {mc_e2.e_tot:.8f}, converged "
-          f"{mc_e2.converged} ({mc_e2.n_macro} macro, "
-          f"{time.time() - t0:.0f} s)", flush=True)
-    _ground_report("E2", mol, mc_e2.mo_coeff[:, NCORE:NCORE + ncas],
-                   ncas, cas_e2)
-    _occ_print("E2", cas_e2, ncas)
+    print("===== E2: free SA x17, started from E1's orbitals =====", flush=True)
+    e2 = _run("E2", lambda: free_sa(sub, space.on(e1.states[0].mo_coeff), NROOTS),
+              "E1's seed")
+    _ground_report("E2", e2)
+    _occ_print("E2", e2)
 
     # ---- the summary ---------------------------------------------------
     print("\n===== the valley map =====", flush=True)
-    print(f"  A  casscf   (input seed)      E {mc_a.e_tot:.8f}",
-          flush=True)
-    print(f"  D  casscf   (B's seed)        E {mc_d.e_tot:.8f}",
-          flush=True)
-    print(f"  B  sa x17   (input seed)      ensemble {mc_b.e_tot:.8f}",
-          flush=True)
-    print(f"  C  sa x17   (A's seed)        ensemble {mc_c.e_tot:.8f}",
-          flush=True)
-    print(f"  E1 pinned sa                  ensemble "
-          f"{out_e1['e_tot']:.8f}", flush=True)
-    print(f"  E2 sa x17   (E1's seed)       ensemble "
-          f"{mc_e2.e_tot:.8f}", flush=True)
+    print(f"  A  casscf   (input seed)      E {a.states[0].e_ref:.8f}", flush=True)
+    print(f"  D  casscf   (B's seed)        E {d.states[0].e_ref:.8f}", flush=True)
+    print(f"  B  sa x17   (input seed)      ensemble {b.ensemble:.8f}", flush=True)
+    print(f"  C  sa x17   (A's seed)        ensemble {c.ensemble:.8f}", flush=True)
+    print(f"  E1 pinned sa                  ensemble {e1.ensemble:.8f}", flush=True)
+    print(f"  E2 sa x17   (E1's seed)       ensemble {e2.ensemble:.8f}", flush=True)
     print(f"({time.time() - t00:.0f} s total)", flush=True)
     return 0
 

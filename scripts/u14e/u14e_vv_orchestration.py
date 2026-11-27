@@ -1,74 +1,48 @@
-"""The u14e V&V driver: runs the family legs in order, aggregates
-the verdicts, and leaves the rendered table behind.  The derivations
-live in the legs -- each one standalone and readable top-to-bottom
-(PySCF-direct; the store-free form of the wave's V&V instrument).
+"""The u14e V&V driver: the family's legs in order, each standalone
+and readable top-to-bottom, the verdicts aggregated.
 
-This file began as the single-run orchestrator (the production-seam
-wiring; its green record: logs/u14e_vv.log at 6e2ab39..30808bd,
-2026-11-20) and is now the driver for the per-CAS family:
-    u14e_vv_4_12.py   the CAS(4,12) leg, five routes
-    u14e_vv_4_15.py   the CAS(4,15) leg (the pinned route measured:
-                      the block grounds are not the 5L; the pinned
-                      SA prices that ground ensemble, disclosed;
-                      src unchanged)
-    u14e_vv_6_13.py   the CAS(6,13) disclosure leg, five routes +
-                      the PySCF spin_square cross-check
-    u14e_vv_6_13_r1.py the CAS(6,13) @r1 leg (the prior-axis 7s fix:
-                      the density-block window + the pair-MO s
-                      channel, the acceptance controls, free routes
-                      + PT2)
-    u14e_vv_r1_ladder.py the @r1 CAS-ladder leg ((4,12)/(4,15) at the
-                      matched prior-axis source, free routes + PT2)
-    u14e_vv_4_16_21.py the CAS(4,16)/CAS(4,21) leg (the correlation-
-                      channel ladder: the s/p channels at (4,0), the
-                      compositions as addresses, free + pinned@pur)
-    u14e_vv_unification.py the pin-on-pur unification ladder (C0-C4)
-    u14e_vv_uhf.py    the reference comparison + the two table
-                      reference rows
+    u14e_vv_ladder.py   THE WRITER of the table's method rows: every
+                        case of the CAS ladder through the free trio
+                        and the pinned SA
+    u14e_vv_uhf.py      the two reference rows + the UHF sibling's
+                        spin honesty (notes only)
+
+The library the legs read is ``scripts/u14e/vv``; the table is
+``scripts/u14e/VV.md``.  This driver forwards its flags to the
+ladder leg.
 
 Run from the repo root:
-    OMP_NUM_THREADS=64 python scripts/u14e/u14e_vv_orchestration.py \
-        [--ground-only]  |  tee logs/u14e_vv_family.log
+    OMP_NUM_THREADS=64 python scripts/u14e/u14e_vv_orchestration.py \\
+        [--cases TAG ...] [--routes ...] [--ground-only] [--base TAG] \\
+        |  tee logs/u14e_vv_family.log
 """
 
 import sys
 import time
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-import u14e_vv_4_12   # noqa: E402
-import u14e_vv_4_15   # noqa: E402
-import u14e_vv_6_13   # noqa: E402
-import u14e_vv_6_13_r1  # noqa: E402
-import u14e_vv_r1_ladder  # noqa: E402
-import u14e_vv_unification  # noqa: E402
-import u14e_vv_uhf    # noqa: E402
+import u14e_vv_ladder  # noqa: E402
+import u14e_vv_uhf  # noqa: E402
+
+LEGS = (("ladder", u14e_vv_ladder), ("uhf", u14e_vv_uhf))
 
 
 def main(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else argv
-    bad = [a for a in argv if a not in ("--ground-only",)]
-    if bad:
-        sys.exit(f"unknown flags: {bad}")
-    extra = ["--ground-only"] if "--ground-only" in argv else []
-    legs = [("4_12", u14e_vv_4_12), ("4_15", u14e_vv_4_15),
-            ("6_13", u14e_vv_6_13), ("6_13_r1", u14e_vv_6_13_r1),
-            ("r1_ladder", u14e_vv_r1_ladder),
-            ("4_16_21", u14e_vv_4_16_21),
-            ("unification", u14e_vv_unification),
-            ("uhf", u14e_vv_uhf)]
-    bad_rc = []
-    for name, leg in legs:
+    red = []
+    for name, leg in LEGS:
         print(f"\n===== leg {name} =====", flush=True)
         t0 = time.time()
-        rc = leg.main(extra)
+        # only the ladder leg takes flags
+        rc = leg.main(argv if name == "ladder" else [])
         print(f"===== leg {name}: {'GREEN' if rc == 0 else 'RED'} "
               f"({time.time() - t0:.0f} s) =====", flush=True)
         if rc != 0:
-            bad_rc.append(name)
-    if bad_rc:
-        print(f"\nRED legs: {bad_rc}", flush=True)
+            red.append(name)
+    if red:
+        print(f"\nRED legs: {red}", flush=True)
         return 1
     print("\nall legs green", flush=True)
     return 0

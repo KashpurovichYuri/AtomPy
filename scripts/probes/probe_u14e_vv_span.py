@@ -34,9 +34,9 @@ from pyscf import mcscf
 from pyscf.fci import direct_spin1
 
 sys.path.insert(0, "scripts/u14e")
-from vv.meters import meters  # noqa: E402
 from vv.reference import load_reference  # noqa: E402
-from vv.routes import lane_route  # noqa: E402
+from vv.meters import Meters  # noqa: E402
+from vv.windows import lane_window  # noqa: E402
 from vv.symmetry import _irrep_projectors, dominant_irreps, purify_window, symmetrize_columns  # noqa: E402
 from atomterm.cases import campaign_spec  # noqa: E402
 from atomterm.cells import CellKey, key_core, window_columns  # noqa: E402
@@ -90,15 +90,15 @@ def probe_b():
     cas = mcscf.CASCI(mf, ncas, (5, 1))
     cas.canonicalization = False
     cas.kernel(mo_prod)
-    ok = meters(mol, mo_prod[:, nc:nc + ncas], 5, 1)
-    bad = meters(mol, mo_prod[:, 5:5 + ncas], 5, 1)
+    ok = Meters(mol, mo_prod[:, nc:nc + ncas], (5, 1))
+    bad = Meters(mol, mo_prod[:, 5:5 + ncas], (5, 1))
     ci = np.asarray(cas.ci).ravel()          # nroots=1: the vector itself
-    l_ok = ok("l2", ci)
-    l_bad = bad("l2", ci)
+    l_ok, s2_ok = ok.of(ci)
+    l_bad, _ = bad.of(ci)
     l_def = min(abs(l_ok - lx * (lx + 1)) for lx in range(16))
     print(f"[B] frozen CASCI e_tot {cas.e_tot:.8f}")
     print(f"[B] correct slice: <L2> {l_ok:.6f} (closest L(L+1) off "
-          f"{l_def:.2e}), <S2> {ok('s2', ci):.6f}")
+          f"{l_def:.2e}), <S2> {s2_ok:.6f}")
     print(f"[B] shifted slice (+1 column): <L2> {l_bad:.6f} -- the "
           f"incident's artifact")
     dm1 = np.asarray(direct_spin1.make_rdm1(ci, ncas, (5, 1)))
@@ -112,7 +112,10 @@ def probe_b():
 def probe_c():
     spec = campaign_spec("U14e")
     addr = "u14e_10f13d14p@6s6p7s_4-0_sa-casscf_ao_-_pur_avg"
-    lmol, lmf, c_core, nf, mo, ncas, act = lane_route(spec, addr, (4, 0))
+    lane_sub, built, act = lane_window(spec, addr)
+    lmol, lmf, c_core, nf, ncas = (lane_sub.mol, lane_sub.mf,
+                                   built.space.core, built.space.ncore,
+                                   built.space.ncas)
     S = lmf.get_ovlp()
     labels = [l.split()[-1] for l in lmol.ao_labels()]
     print("[C] act's dominant AO per column:",

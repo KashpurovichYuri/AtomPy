@@ -1,15 +1,18 @@
 """The V&V table module (scripts/u14e/vv/table.py) on a temporary store
 (the committed one is never touched): the store accepts only the
-declared keys, the table renders one block per method class with a rule
-row between blocks and the plain ladder before the @r1 rows, a
-withdrawn row renders dashes in the withdrawn cells only, and the
-bookkeeping E_tot = E_method + E(2) is checked at render."""
+declared keys and only records in the schema, the table renders one
+block per method class with a rule row between blocks and the plain
+ladder before the @r1 rows, a row's total is COMPUTED (never
+supplied), the withdrawn cells travel together, a withdrawn row
+renders dashes in the withdrawn cells only, and the cells' forms are
+the table's conventions."""
 
 import json
 
 import pytest
 
 from vv import table
+from vv.table import Route, Row
 
 pytestmark = pytest.mark.fast
 
@@ -24,11 +27,8 @@ def store(tmp_path, monkeypatch):
     return tmp_path
 
 
-def _row(method, route, cas, e_method=-50.4, e2_meh=-300.0, l2="72.0000"):
-    # a reference row (no PT2 by definition) totals to its own energy
-    e_tot = (e_method if route == "-"
-             else None if e2_meh is None else e_method + e2_meh * 1e-3)
-    return table.std_row(method, route, cas, e_method, e2_meh, e_tot, l2, "6.0000")
+def _row(method, route, cas, e_method=-50.4, e2=-0.3, l2="72.0000"):
+    return Row(method, route, cas, e_method, e2, l2, "6.0000")
 
 
 def _body(tmp_path):
@@ -41,65 +41,143 @@ def _cells(line):
     return [c.strip() for c in line.split("|")[1:-1]]
 
 
+# ------------------------------------------------------------- the vocabulary
+
+def test_the_keys_are_the_keep_set_in_display_order():
+    keys = table.table_keys()
+    assert keys[:2] == ("rohf|-|-", "uhf|-|-")
+    assert len(keys) == len(set(keys)) == 38
+    assert "sa-casscf|free@pur|(4,12)" in keys
+    assert "sa-casscf|pinned@pur|(4,12)@r1" in keys
+    assert "casci|pinned@pur|(4,12)" not in keys       # not a kept route
+    assert keys.index("sa-casscf|free@pur|(6,13)@r1") < \
+        keys.index("sa-casscf|pinned@pur|(4,12)")       # free rows first
+    assert [r.value for r in Route] == ["-", "free@pur", "pinned@pur"]
+
+
+# ------------------------------------------------------------------ the row
+
+def test_the_total_is_computed_never_supplied():
+    row = _row("casci", Route.FREE, "(4,12)", e_method=-50.25, e2=-0.44)
+    assert row.e_total == pytest.approx(-50.69)
+    assert row.key == "casci|free@pur|(4,12)"
+    assert "e_tot" not in row.to_json() and set(row.to_json()) == {
+        "method", "route", "cas", "e_method", "e2", "l2", "s2", "conv"}
+    assert Row.from_json(row.to_json()) == row
+
+
+def test_a_reference_row_totals_to_its_own_energy_and_never_prices():
+    row = Row("uhf", Route.REFERENCE, "-", -50.0069, None, "-", "6.2289 (det)")
+    assert row.e_total == -50.0069 and row.reference and not row.withdrawn
+    with pytest.raises(ValueError, match="reference row .* carries an E"):
+        Row("rohf", Route.REFERENCE, "-", -50.0, -0.3, "-", "-")
+
+
+def test_the_withdrawn_cells_travel_together():
+    row = Row("sa-casscf", Route.PINNED, "(6,13)", -50.45, None, None, "12.0000",
+              "7.6e-10/13")
+    assert row.withdrawn and row.e_total is None
+    for e2, l2 in ((None, "72.0000"), (-0.3, None)):
+        with pytest.raises(ValueError, match="withdrawn together"):
+            Row("sa-casscf", Route.PINNED, "(6,13)", -50.45, e2, l2, "12.0000")
+
+
+def test_a_record_outside_the_schema_is_refused():
+    good = _row("casci", Route.FREE, "(4,12)").to_json()
+    with pytest.raises(ValueError, match="carries fields \\['e_tot'\\]"):
+        Row.from_json({**good, "e_tot": -50.7})
+    with pytest.raises(ValueError, match="carries fields \\['conv'\\]"):
+        Row.from_json({k: v for k, v in good.items() if k != "conv"})
+    with pytest.raises(ValueError):
+        Row.from_json({**good, "route": "free"})       # the old spelling
+
+
+# ----------------------------------------------------------- the store + table
+
 def test_drop_row_refuses_an_undeclared_key(store):
-    for row in (_row("casci", "free", "(4,12)"),          # the old spelling
-                _row("casci", "free@pur", "(4,99)"),      # off the ladder
-                _row("sa-casscf", "pinned@pur", "(4,18)"),
-                _row("casci", "pinned@pur", "(4,12)")):   # not a kept route
+    for row in (_row("casci", Route.FREE, "(4,99)"),            # off the ladder
+                _row("casci", Route.PINNED, "(4,12)"),         # not a kept route
+                _row("sa-casscf", Route.PINNED, "(4,18)")):
         with pytest.raises(ValueError, match="outside the declared table"):
             table.drop_row(row)
     assert not (store / "rows.json").exists()             # nothing was written
 
 
-def test_render_refuses_an_undeclared_key_in_the_store(store):
-    key = "casci|free|(4,12)"
-    (store / "rows.json").write_text(json.dumps({key: _row("casci", "free@pur", "(4,12)")}))
+def test_render_refuses_an_undeclared_key_or_a_mismatched_record(store):
+    rec = _row("casci", Route.FREE, "(4,12)").to_json()
+    (store / "rows.json").write_text(json.dumps({"casci|free|(4,12)": rec}))
     with pytest.raises(ValueError, match=r"casci\|free\|\(4,12\)"):
+        table.render_table()
+    (store / "rows.json").write_text(json.dumps({"casci|free@pur|(4,15)": rec}))
+    with pytest.raises(ValueError, match="disagrees with"):
         table.render_table()
 
 
 def test_one_block_per_method_class_with_a_rule_between(store):
-    for m in ("sa-casscf", "casci", "casscf"):             # dropped out of order
-        table.drop_row(_row(m, "free@pur", "(4,12)"))
-    table.drop_row(_row("sa-casscf", "pinned@pur", "(4,12)"))
-    table.drop_row(_row("rohf", "-", "-", e2_meh=None))
+    for m in ("sa-casscf", "casscf", "casci"):             # dropped out of order
+        table.drop_row(_row(m, Route.FREE, "(4,12)"))
+    table.drop_row(_row("sa-casscf", Route.PINNED, "(4,12)"))
+    table.drop_row(Row("rohf", Route.REFERENCE, "-", -50.0, None, "-", "-"))
     body = _body(store)
-    methods = [_cells(r)[0] for r in body if "===" not in r]
-    assert methods == ["rohf", "casci (free@pur)", "casscf (free@pur)",
-                       "sa-casscf (free@pur)", "sa-casscf (pinned@pur)"]
+    assert [_cells(r)[0] for r in body if "===" not in r] == [
+        "rohf", "casci (free@pur)", "casscf (free@pur)",
+        "sa-casscf (free@pur)", "sa-casscf (pinned@pur)"]
     assert [i for i, r in enumerate(body) if "===" in r] == [1, 3, 5]
 
 
 def test_within_a_block_the_plain_ladder_precedes_the_r1_rows(store):
     for cas in ("(6,13)@r1", "(4,16)", "(4,12)@r1", "(4,15)"):
-        table.drop_row(_row("casci", "free@pur", cas))
+        table.drop_row(_row("casci", Route.FREE, cas))
     assert [_cells(r)[1] for r in _body(store)] == [
         "(4,15)", "(4,16)", "(4,12)@r1", "(6,13)@r1"]   # size-ordered
+    # the store file keeps the table's order, whatever the drop order
+    assert [r.key for r in table.load_rows().values()] == [
+        f"casci|free@pur|{c}" for c in ("(4,15)", "(4,16)", "(4,12)@r1", "(6,13)@r1")]
 
 
 def test_a_withdrawn_row_renders_dashes_in_the_withdrawn_cells_only(store):
-    row = _row("sa-casscf", "pinned@pur", "(6,13)")
-    for field in ("l2", "e2_meh", "e2_ev", "e_tot"):
-        row[field] = None
-    table.drop_row(row)
+    table.drop_row(Row("sa-casscf", Route.PINNED, "(6,13)", -50.45, None, None,
+                       "12.0000", "7.6e-10/13"))
     c = _cells(_body(store)[0])
     assert (c[2], c[7], c[8], c[9]) == ("—", "—", "—", "—")
-    assert (c[3], c[5], c[6]) == ("6.0000", "-50.4000", "-400.0000 / -10.8846")
+    assert (c[3], c[4], c[5], c[6]) == ("12.0000", "7.6e-10/13", "-50.4500",
+                                        "-450.0000 / -12.2451")
 
 
-def test_a_reference_row_totals_to_its_own_energy(store):
-    table.drop_row(_row("uhf", "-", "-", e_method=-50.0069, e2_meh=None))
+def test_a_reference_row_renders_its_own_total(store):
+    table.drop_row(Row("uhf", Route.REFERENCE, "-", -50.0069, None, "-",
+                       "6.2289 (det)"))
     c = _cells(_body(store)[0])
-    assert (c[7], c[8], c[9]) == ("—", "-50.0069", "-6.9000 / -0.1878")
+    assert (c[0], c[1], c[2], c[3], c[7], c[8], c[9]) == (
+        "uhf", "-", "-", "6.2289 (det)", "—", "-50.0069", "-6.9000 / -0.1878")
 
 
-def test_render_refuses_broken_bookkeeping(store):
-    bad = _row("casci", "free@pur", "(4,12)")
-    bad["e_tot"] += 1e-3
-    (store / "rows.json").write_text(json.dumps({table.row_key(bad): bad}))
-    with pytest.raises(ValueError, match="violates E_tot = E_method"):
-        table.render_table()
+def test_an_empty_store_renders_the_header_only(store):
+    table.render_table()
+    assert len((store / "table.md").read_text().splitlines()) == 4
 
+
+def test_drop_row_merges_into_the_existing_records(store):
+    table.drop_row(_row("casci", Route.FREE, "(4,15)"))
+    table.drop_row(_row("casscf", Route.FREE, "(4,12)", e_method=-50.43))
+    table.drop_row(_row("casci", Route.FREE, "(4,15)", e_method=-49.45))
+    rows = table.load_rows()
+    assert list(rows) == ["casci|free@pur|(4,15)", "casscf|free@pur|(4,12)"]
+    assert rows["casci|free@pur|(4,15)"].e_method == -49.45   # replaced
+
+
+def test_store_and_table_live_beside_the_legs():
+    # the committed store and table are the family's records: anchored
+    # on the package's parent (the legs' directory), wherever the
+    # process runs from
+    home = table.ROWS.parent
+    assert table.TABLE.parent == home
+    assert home.name == "u14e" and (home / "vv").is_dir()
+    assert table.ROWS.name == "vv.json" and table.TABLE.name == "VV.md"
+    assert table.ROWS.exists()
+
+
+# ------------------------------------------------------------------ the cells
 
 def test_conv_cell_forms():
     assert table.conv_of(3.2e-09, 11) == "3.2e-09/11"
@@ -113,12 +191,5 @@ def test_fmt_range_collapses_to_one_value_when_the_set_agrees():
     assert table.fmt_range([71.7847, 71.9654]) == "71.7847..71.9654"
 
 
-def test_store_and_table_live_beside_the_legs():
-    # the committed store and table are the family's records: anchored
-    # on the package's parent (the legs' directory), wherever the
-    # process runs from
-    home = table.ROWS.parent
-    assert table.TABLE.parent == home
-    assert home.name == "u14e" and (home / "vv").is_dir()
-    assert table.ROWS.name == "vv.json" and table.TABLE.name == "VV.md"
-    assert table.ROWS.exists()
+def test_de_fmt_shows_both_units():
+    assert table.de_fmt(-0.0069) == "-6.9000 / -0.1878"

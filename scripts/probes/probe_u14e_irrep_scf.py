@@ -31,6 +31,7 @@ Run from the repo root:
 """
 
 import sys
+import re as _re
 import time
 from pathlib import Path
 
@@ -192,7 +193,7 @@ def main() -> int:
     # ---- stage 3: the windows from the irrep reference -----------------
     from atomterm.windows import build_full_mo, occupied_core_idx
     from atomterm.operators import window_closure
-    from vv.meters import meters
+    from vv.meters import Meters
     from pyscf import mcscf
 
     key = None   # the windows are built directly; no key needed here
@@ -205,11 +206,10 @@ def main() -> int:
         cas = mcscf.CASCI(mf_ref, 13, SECTOR)
         cas.canonicalization = False
         cas.kernel(mo_prod)
-        expect = meters(mol_d2h, mo_win, *SECTOR)
+        expect = Meters(mol_d2h, mo_win, SECTOR)
         ci = np.asarray(cas.ci[0] if isinstance(cas.ci, list)
                         else cas.ci).ravel()
-        l2 = expect("l2", ci)
-        s2 = expect("s2", ci)
+        l2, s2 = expect.of(ci)
         de_meh = (float(cas.e_tot) - mf_c1.e_tot) * 1e3
         print(f"  [{tag}] CASCI e_tot {cas.e_tot:.8f}, dE {de_meh:+.1f} "
               f"mEh, <L2> {l2:.6f}, <S2> {s2:.6f}; the window's closure "
