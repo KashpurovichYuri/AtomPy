@@ -32,13 +32,18 @@ class Route(Enum):
 
     ``FREE`` (``free@pur``): PySCF-direct on the purified core.
     ``PINNED`` (``pinned@pur``): the wfnsym-pinned state average on
-    the purified core.  ``REFERENCE`` (``-``): the reference rows,
-    which no route produced.
+    the purified core.  ``RADIAL`` (``radial@pur``): the state
+    average constrained to the window's composition (the core stays
+    frozen on the purified one) -- declared in the vocabulary, in no
+    table block: its rows are refused by the store until a block
+    carries them.  ``REFERENCE`` (``-``): the reference rows, which
+    no route produced.
     """
 
     REFERENCE = "-"
     FREE = "free@pur"
     PINNED = "pinned@pur"
+    RADIAL = "radial@pur"
 
 
 # the CAS ladder: the PLAIN windows first (the incumbent sources,

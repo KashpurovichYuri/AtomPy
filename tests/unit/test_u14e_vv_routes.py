@@ -6,22 +6,31 @@ mispriced six table rows cannot pass the certificate, the free and
 the pinned routes agree on the frozen window and on the state average,
 the two pricing adapters agree, the Hamiltonian of the certificate
 matches the determinant-basis construction, and the row conventions
-follow the route (no SCF; tests/carbon_reference.py)."""
+follow the route.  The RADIAL route -- the state average constrained
+to the window's composition -- lands the free ensemble on a closed
+window in an exactly closed window of its own, keeps a channel's
+composition, and its seed and its trap check refuse what they should
+(no SCF; tests/carbon_reference.py)."""
+
+import copy
 
 import numpy as np
 import pytest
 
 from atomterm.operators import build_operators
 from atomterm.operators import ci_in_detbasis_order
-from atomterm.windows import lowdin
+from atomterm.windows import lowdin, shell_weights
 
 from vv import cases as ladder
+from vv.channels import Channel, channel_block, virtual_spectrum
 from vv.pricing import price_classes, price_pyscf
 from vv.routes import (State, assert_consistent, energy_expectation,
                        free_casci, free_casscf, free_sa, pinned_casci,
-                       pinned_sa)
+                       pinned_sa, radial_sa, term_seed)
 from vv.table import Route
-from vv.windows import window_from_shells
+from vv.windows import window_from_shells, window_with_channels
+
+import vv.routes as routes
 
 pytestmark = pytest.mark.fast
 
@@ -230,6 +239,23 @@ def test_occupations_and_the_empty_active_orbitals(vv_substrate, space):
     assert resorted(st) == 1                                  # observed: p_z at 0.0
 
 
+def test_the_ensemble_occupations_are_the_terms(vv_substrate, space):
+    # one state: the ensemble IS that state.  The term's three 3P
+    # components each leave THEIR OWN p member empty ([1, 1, 0] in
+    # three different gauges); their ensemble reads the shell,
+    # 2/3 each -- the rotation-invariant reading a single component
+    # cannot give
+    from vv.pricing import ensemble_occupations, occupations
+
+    st = free_casci(vv_substrate, space).states[0]
+    assert np.array_equal(ensemble_occupations([st]), occupations(st))
+    sol = free_sa(vv_substrate, space, nroots=3)
+    occ = ensemble_occupations(sol.states)
+    assert occ.shape == (3,) and occ.sum() == pytest.approx(2.0)
+    assert np.ptp(occ) < 1e-6                                  # observed: 2/3 each
+    assert all(np.ptp(occupations(s)) > 0.9 for s in sol.states)
+
+
 def test_an_empty_active_orbital_is_repartitioned_by_the_prelude(vv_substrate,
                                                                 space):
     # THE PARTITION hazard, measured: a non-coupling s orbital beside
@@ -265,3 +291,125 @@ def test_meters_without_pricing(vv_substrate, space):
     assert len(meters) == 3
     assert all(abs(l2 - 2.0) < 1e-9 and abs(s2 - 2.0) < 1e-9 for l2, s2 in meters)
     assert len(sol.meters(roots=[1])) == 1
+
+
+# ------------------------------------------------------------ the radial route
+
+EXPECT = (2.0, 2.0)   # the 3P term's (<L^2>, <S^2>)
+
+
+@pytest.fixture(scope="module")
+def d_window(vv_substrate):
+    """The 2p window with a d channel beside it (the reference's five
+    d virtuals, found by character)."""
+    cols = tuple(r["index"] for r in virtual_spectrum(vv_substrate, below=3.0)
+                 if r["l"] == "d")
+    built = ladder.visible_window(vv_substrate, SHELLS, SECTOR)
+    return window_with_channels(
+        vv_substrate, built,
+        [channel_block(vv_substrate, Channel("3d", cols, ("3d",),
+                                             tail=0.5))]).space
+
+
+def test_the_radial_state_average_is_the_free_one_in_a_closed_window(
+        vv_substrate, space):
+    # constrained to the composition, the state average lands the free
+    # route's ensemble (observed 2e-11 Eh apart) in an EXACTLY closed
+    # window (observed 1.2e-15; the free route leaves 2.1e-05), the
+    # core untouched (observed 3e-16); the 3-dim sector holds no
+    # level above the term
+    free = free_sa(vv_substrate, space, nroots=3)
+    radial = radial_sa(vv_substrate, space, EXPECT, nroots=3)
+    assert radial.route is Route.RADIAL and radial.method == "sa-casscf"
+    assert abs(radial.ensemble - free.ensemble) < 1e-9
+    assert abs(radial.ensemble
+               - np.mean([s.e_ref for s in radial.states])) < 1e-12
+    assert all(abs(l2 - 2.0) < 1e-9 and abs(s2 - 2.0) < 1e-9
+               for l2, s2 in radial.meters())
+    assert radial.certificate["closure"] < 1e-12
+    assert radial.certificate["core_leak"] < 1e-12
+    assert np.isnan(radial.certificate["level_gap"])
+
+
+def test_the_radial_route_keeps_a_channel_s_composition(vv_substrate,
+                                                        d_window):
+    # beside a d channel both routes land one ensemble (observed
+    # 2.4e-08 Eh apart); the radial window's added columns stay d
+    # (l-weight 1.000) and the window closes under rotations; the next
+    # level of the window sits far above the term (observed 1268 mEh)
+    mol, s = vv_substrate.mol, vv_substrate.mf.get_ovlp()
+    free = free_sa(vv_substrate, d_window, nroots=3)
+    radial = radial_sa(vv_substrate, d_window, EXPECT, nroots=3)
+    assert abs(radial.ensemble - free.ensemble) < 1e-7
+    _, w = shell_weights(mol, radial.states[0].active, s)
+    assert np.abs(w[3:, 2] - 1.0).max() < 1e-10
+    assert np.abs(w[3:, :2]).max() < 1e-10
+    assert radial.certificate["closure"] < 1e-9
+    assert radial.certificate["level_gap"] > 1.0
+    assert radial.price().states[0].e2 < 0.0          # a priced radial state
+
+
+def test_the_term_seed_reads_the_components_and_refuses_a_larger_count(
+        vv_substrate, space):
+    seed = term_seed(vv_substrate, space, EXPECT, nroots=3)
+    assert len(seed) == 3 and all(c.shape == (3, 1) for c in seed)
+    with pytest.raises(ValueError, match="holds 3 of the term's 4 components"):
+        term_seed(vv_substrate, space, EXPECT, nroots=4, margin=0)
+    with pytest.raises(ValueError, match="holds 0 of the term's 2 components"):
+        term_seed(vv_substrate, space, (6.0, 0.0), nroots=2, margin=0)
+
+
+def test_the_trap_check_refuses_a_tracked_set_that_is_not_the_lowest(
+        vv_substrate, space, d_window):
+    # the tracked ensemble must be the fresh solve's lowest level AND
+    # the declared term
+    low = free_sa(vv_substrate, d_window, nroots=3)
+    high = free_sa(vv_substrate, space, nroots=3)
+    mo = np.asarray(low.states[0].mo_coeff)
+    e_high = float(np.mean([s.e_ref for s in high.states]))
+    e_low = float(np.mean([s.e_ref for s in low.states]))
+    with pytest.raises(ValueError, match="Eh from the tracked ensemble"):
+        routes._lowest_level(vv_substrate, d_window, mo, EXPECT, 3, e_high)
+    with pytest.raises(ValueError, match="max term deviation"):
+        routes._lowest_level(vv_substrate, d_window, mo, (6.0, 0.0), 3, e_low)
+    assert routes._lowest_level(vv_substrate, d_window, mo, EXPECT, 3,
+                                e_low) > 1.0
+
+
+def test_the_cold_solve_is_an_outright_diagonalization_where_the_sector_allows(
+        vv_substrate, space, monkeypatch):
+    # up to FULL_DIM determinants the cold solve asks PySCF for its
+    # outright diagonalization (every determinant in the P-space): no
+    # Davidson guess can then miss a component of a degenerate term
+    # (observed in a closed U14e window: 14 of 17 with a Davidson).
+    # Beyond it the solve is a Davidson again -- the branch forced here
+    seen = {}
+    real = routes._readout
+
+    def spy(mf, sp, mo, nroots, ci0=None, exact=False):
+        seen["exact"] = exact
+        return real(mf, sp, mo, nroots, ci0=ci0, exact=exact)
+
+    monkeypatch.setattr(routes, "_readout", spy)
+    states, meters = routes._cold(vv_substrate, space, space.mo, 3)
+    assert seen["exact"] is True                      # 3 determinants
+    assert [round(x[0], 6) for x in meters] == [2.0, 2.0, 2.0]
+    monkeypatch.setattr(routes, "FULL_DIM", 2)
+    states, meters = routes._cold(vv_substrate, space, space.mo, 3)
+    assert seen["exact"] is False
+    assert [round(x[0], 6) for x in meters] == [2.0, 2.0, 2.0]
+
+
+def test_the_trap_check_refuses_a_split_level(vv_substrate, space,
+                                              monkeypatch):
+    # a lowest level that is not one degenerate term -- a forced
+    # reading (no window of this reference splits it): one root
+    # lifted by 1e-05 Eh
+    states, meters = routes._cold(vv_substrate, space, space.mo, 3)
+    split = copy.copy(states[0].mc)
+    split.e_cas = np.asarray(states[0].mc.e_cas) + np.array([0.0, 0.0, 1e-05])
+    lifted = [State(split, k) for k in range(3)]
+    monkeypatch.setattr(routes, "_cold", lambda *a, **k: (lifted, meters))
+    tracked = float(np.mean([s.e_ref for s in states]))
+    with pytest.raises(ValueError, match="spread 0.0100 mEh"):
+        routes._lowest_level(vv_substrate, space, space.mo, EXPECT, 3, tracked)

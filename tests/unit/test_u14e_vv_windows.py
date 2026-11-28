@@ -6,19 +6,22 @@ window (no complement at all), a wrong declared width is refused, the
 matrix a space carries cannot be written to, a broken matrix or a
 partition that misses electrons is refused, and the diagnostic
 readings (survival norms, dominant labels, the s column, the core
-pair count) are exact on constructed inputs (no SCF;
-tests/carbon_reference.py)."""
+pair count) are exact on constructed inputs, and the lm labels name a
+column's (l, member) sector while the lm-pure basis is the same span
+in sector-pure form -- refusing a sector-mixed window column and a
+core off a closed span (no SCF; tests/carbon_reference.py)."""
 
 
 import numpy as np
 import pytest
 
 from atomterm.core import purified_core_orbitals
-from atomterm.windows import build_full_mo, select_shell_ao
+from atomterm.windows import (build_full_mo, lm_sectors, lowdin,
+                              select_shell_ao)
 
 from vv.cases import core_pairs, visible_window
-from vv.windows import (ActiveSpace, dominant_labels, orthonormalize,
-                        pair_mo, s_column, survival_norms,
+from vv.windows import (ActiveSpace, dominant_labels, lm_basis, lm_labels,
+                        orthonormalize, pair_mo, s_column, survival_norms,
                         window_from_shells)
 
 pytestmark = pytest.mark.fast
@@ -182,3 +185,67 @@ def test_visible_window_builds_on_the_purified_core(vv_substrate):
     built = visible_window(vv_substrate, (("2p", 3),), SECTOR)
     assert built.space.ncore == 2 and len(built.report) == 1
     assert built.space.certify(vv_substrate.mf) < 1e-13
+
+
+# ------------------------------------------------------------ the lm sectors
+
+def test_lm_labels_name_each_column_s_sector(vv_substrate, core):
+    mol, mf = vv_substrate.mol, vv_substrate.mf
+    s = mf.get_ovlp()
+    space = window_from_shells(mol, mf, (("2p", 3),), core, SECTOR).space
+    assert lm_labels(mol, s, space.active) == [(1, 0), (1, 1), (1, 2)]
+    assert lm_labels(mol, s, core) == [(0, 0), (0, 0)]
+    # two members in one column: no single sector carries it
+    mixed = (space.active[:, :2] @ np.array([0.6, 0.8]))[:, None]
+    assert lm_labels(mol, s, mixed) == [None]
+
+
+def test_lm_basis_is_the_same_span_in_sector_pure_form(vv_substrate, core):
+    mol, mf = vv_substrate.mol, vv_substrate.mf
+    s = mf.get_ovlp()
+    space = window_from_shells(mol, mf, (("2p", 3),), core, SECTOR).space
+    mo, labels = lm_basis(vv_substrate, space)
+    n = mol.nao_nr()
+    assert mo.shape == (n, n)
+    assert np.abs(mo.T @ s @ mo - np.eye(n)).max() < 1e-12   # observed 4e-16
+    assert labels[:space.ncore] == [None] * space.ncore
+    # the window, then the complement sector by sector: cc-pVDZ has one
+    # band per l, so each sector keeps exactly one column outside
+    # [core | window]
+    assert labels[space.ncore:] == (
+        [(1, 0), (1, 1), (1, 2)] + [(0, 0)]
+        + [(1, m) for m in range(3)] + [(2, m) for m in range(5)])
+    # the same span as the window's own matrix
+    assert np.abs(mo @ mo.T @ s - space.mo @ space.mo.T @ s).max() < 1e-12
+    # every complement column lies wholly in its sector
+    sectors = lm_sectors(mol)
+    for j in range(space.ncore + space.ncas, n):
+        rows = sectors[labels[j]]
+        assert abs(mo[rows, j] @ s[np.ix_(rows, rows)] @ mo[rows, j]
+                   - 1.0) < 1e-12
+
+
+def test_lm_basis_refuses_a_sector_mixed_active_column(vv_substrate, core):
+    mol, mf = vv_substrate.mol, vv_substrate.mf
+    space = window_from_shells(mol, mf, (("2p", 3),), core, SECTOR).space
+    mixed = np.array(space.mo)
+    mixed[:, space.ncore] = ((mixed[:, space.ncore]
+                              + mixed[:, space.ncore + 1]) / np.sqrt(2.0))
+    with pytest.raises(ValueError, match=r"column\(s\) \[0\] are not"):
+        lm_basis(vv_substrate,
+                 ActiveSpace(mixed, space.ncore, space.ncas, SECTOR))
+
+
+def test_lm_basis_refuses_a_core_off_a_closed_span(vv_substrate, core):
+    # the basis freezes the core: a core whose span is not
+    # rotation-closed would split the term (a 2s column given a d
+    # component)
+    mol, mf = vv_substrate.mol, vv_substrate.mf
+    d = next(i for i, lab in enumerate(mol.ao_labels())
+             if lab.split()[-1].startswith("3d"))
+    leaky = np.array(core)
+    leaky[:, 1] += 0.05 * np.eye(mol.nao_nr())[:, d]
+    leaky = lowdin(leaky, mf.get_ovlp())
+    space = window_from_shells(mol, mf, (("2p", 3),), leaky, SECTOR).space
+    with pytest.raises(ValueError, match="core block is not rotation-closed"):
+        lm_basis(vv_substrate, space)

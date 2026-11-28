@@ -52,7 +52,16 @@ def test_the_keys_are_the_keep_set_in_display_order():
     assert "casci|pinned@pur|(4,12)" not in keys       # not a kept route
     assert keys.index("sa-casscf|free@pur|(6,13)@r1") < \
         keys.index("sa-casscf|pinned@pur|(4,12)")       # free rows first
-    assert [r.value for r in Route] == ["-", "free@pur", "pinned@pur"]
+    assert [r.value for r in Route] == ["-", "free@pur", "pinned@pur",
+                                        "radial@pur"]
+
+
+def test_a_radial_row_is_refused_until_a_block_declares_it(store):
+    # the vocabulary carries the composition-preserving route; no
+    # table block does, so its rows never enter the store
+    with pytest.raises(ValueError, match="outside the declared table"):
+        table.drop_row(_row("sa-casscf", Route.RADIAL, "(4,12)@r1"))
+    assert not (store / "rows.json").exists()
 
 
 # ------------------------------------------------------------------ the row

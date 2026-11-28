@@ -20,6 +20,9 @@ Layering
 :class:`ActiveSpace` -- the assembled space; :class:`Built` -- the
 space and its disclosure; ``window_from_shells`` / ``window_from_key``
 (``_key_parts`` / ``_assemble``) -- the two constructions;
+``orthogonalize`` / ``window_with_channels`` -- channels beside a
+base; ``lm_labels`` / ``lm_basis`` -- the lm-pure sector basis the
+radial-constrained route optimizes on;
 ``window_6_13_r1`` -- the mixed-source composition; ``lane_window`` --
 the lane-core route's substrate and window (the probes' instrument).
 """
@@ -32,7 +35,8 @@ import numpy as np
 from atomterm.cells import CellKey, key_core, lane_core, window_columns
 from atomterm.cases import lane_substrate
 from atomterm.operators import window_closure
-from atomterm.windows import build_full_mo, lowdin, occupied_core_idx
+from atomterm.windows import (build_full_mo, lm_sectors, lowdin,
+                              occupied_core_idx)
 
 from vv.reference import Substrate
 from vv.symmetry import orthonormal_per_irrep
@@ -40,6 +44,19 @@ from vv.symmetry import orthonormal_per_irrep
 ORTHO_TOL = 1e-8     # max|C^T S C - I| of the matrix CASCI/CASSCF consume
 CLEAN = 1e-10        # a block orthonormal (and orthogonal to the earlier
                     # ones) within this is left untouched by orthonormalize
+PURE_SECTOR = 0.99   # an active column's S-weight in its own (l, member)
+                    # sector, for the lm-pure basis to take it
+ADMIT = 1e-4         # the squared S-norm a sector's remainder direction must
+                    # have to be a LABELLED rotation partner (the production
+                    # builder's admission; below it a direction is a
+                    # near-linearly-dependent needle -- the U14e s sector
+                    # leaves three between 1e-06 and 1e-04 -- carried
+                    # unlabelled); at EXISTS the direction is roundoff
+EXISTS = 1e-12
+HEAD = 1e-10         # the squared S-norm a head column's component in a
+                    # sector must have to belong to that sector's head
+CORE_CLOSED = 1e-8  # a core block's rotation-closure meters (a core frozen
+                    # off a closed span would split the term)
 
 
 @dataclass(frozen=True, eq=False)
@@ -211,6 +228,161 @@ def window_with_channels(sub: Substrate, base: Built, blocks=()) -> Built:
         report += lines
     return _assemble(sub, space.ncore, act, space.core, space.sector,
                      report)
+
+
+def lm_labels(mol, s, cols, pure=PURE_SECTOR) -> list:
+    """Each column's ``(l, member)`` sector: the S-orthogonal lm
+    sector of the one-center basis (:func:`atomterm.windows.lm_sectors`)
+    carrying at least ``pure`` of the column's S-norm -- None for a
+    sector-mixed column.  The sectors partition the AO space, so a
+    column that lies in one sector has its whole norm there."""
+    cols = np.asarray(cols, dtype=float)
+    sectors = sorted(lm_sectors(mol).items())
+    out = []
+    for k in range(cols.shape[1]):
+        c = cols[:, k]
+        norm = float(c @ s @ c)
+        best, weight = None, 0.0
+        for key, rows in sectors:
+            w = float(c[rows] @ s[np.ix_(rows, rows)] @ c[rows]) / norm
+            if w > weight:
+                best, weight = key, w
+        out.append(best if weight >= pure else None)
+    return out
+
+
+def _gs(v, taken, s_rr, floor):
+    """One Gram–Schmidt step in the ``s_rr`` metric: ``v`` with the
+    S-orthonormal ``taken`` row vectors projected out (twice) and
+    normalized; None when less than ``floor`` of its squared norm
+    survives."""
+    for _ in range(2):
+        for t in taken:
+            v = v - t * float(t @ s_rr @ v)
+    kept = float(v @ s_rr @ v)
+    return None if kept <= floor else v / np.sqrt(kept)
+
+
+def lm_basis(sub: Substrate, space: ActiveSpace,
+             pure=PURE_SECTOR, admit=ADMIT) -> tuple[np.ndarray, list]:
+    """The window's lm-PURE form on an lm-SECTOR basis -- the labeled
+    substrate the radial mask reads
+    (:func:`atomterm.windows.mask_radial_rotations`): ``[core | active
+    | complement]``, every column inside ONE ``(l, member)`` sector.
+
+    Built sector by sector, never leaving a sector's rows: the head's
+    ([core | active]) own components there, Gram–Schmidt in that order
+    -- which carries a ROTATION-CLOSED core in sector-pure columns of
+    the same span, and projects each active column onto its sector (a
+    residual admixture of the order of an optimizer's closure defect
+    goes) -- then the sector's complement, its remainder eigenvectors
+    in descending order.  A complement direction is kept when a
+    direction survives there at all (``EXISTS``) and LABELED with the
+    sector when its remainder is well-conditioned (``admit``); an
+    ill-conditioned remainder is carried unlabelled (never a rotation
+    partner).  The core carries no label: the mask leaves it frozen.
+    The active block keeps its column order.
+
+    Parameters
+    ----------
+    sub : the reference substrate (the C1 molecule and its overlap).
+    space : the active space in the partition layout.
+    pure : the least sector weight an active column must carry.
+    admit : the least squared remainder of a labeled direction.
+
+    Returns
+    -------
+    ``(mo, labels)`` -- the full S-orthonormal MO matrix and, per
+    column, None (core, unlabelled remainders) or ``(l, member)``.
+
+    Raises
+    ------
+    ValueError : the core is not rotation-closed; an active column is
+        not sector-pure; the sectors do not complete the space; the
+        result is not the head's span, S-orthonormal.
+
+    Notes
+    -----
+    A sector's remainder is not uniformly conditioned: normalizing its
+    Gram eigenvectors without an admission amplifies roundoff by the
+    conditioning (observed: the U14e s sector's near-null direction
+    left a basis built outside the sectors orthonormal only to
+    2.4e-04), and admitting by an AO row's own surviving norm is
+    order-dependent (observed on carbon: the 1s row's 9e-07 slice of
+    the one remaining s direction consumed it before the 3s row).
+    """
+    mol, mf = sub.mol, sub.mf
+    s = mf.get_ovlp()
+    n = mol.nao_nr()
+    ncore, ncas = space.ncore, space.ncas
+    core, active = np.array(space.core), np.array(space.active)
+    leak = max(window_closure(mol, core).values())
+    if leak > CORE_CLOSED:
+        raise ValueError(
+            f"the core block is not rotation-closed (max meter "
+            f"{leak:.1e} > {CORE_CLOSED:g}): the lm-pure basis freezes "
+            f"the core, and a core off a closed span splits the term")
+    sectors = dict(lm_sectors(mol))
+    labels = lm_labels(mol, s, active, pure)
+    mixed = [k for k, lab in enumerate(labels) if lab is None]
+    if mixed:
+        raise ValueError(
+            f"active column(s) {mixed} are not (l, member)-pure within "
+            f"{pure:g}: the lm-pure basis needs every window column "
+            f"inside one sector")
+    core_cols = np.zeros((n, ncore))       # in the sector-pure gauge
+    act_cols = np.zeros((n, ncas))         # in the window's column order
+    tail, tail_labels = [], []
+    for key in sorted(sectors):
+        rows = np.asarray(sectors[key])
+        s_rr = s[np.ix_(rows, rows)]
+        taken = []                         # this sector's head, as row vectors
+        for k in range(ncore):
+            got = _gs(np.array(core[rows, k]), taken, s_rr, HEAD)
+            if got is not None:
+                taken.append(got)
+                core_cols[rows, k] = got
+        for j in np.flatnonzero(np.array(labels) == key) if False else                 [j for j, lab in enumerate(labels) if lab == key]:
+            got = _gs(np.array(active[rows, j]), taken, s_rr, HEAD)
+            if got is None:
+                raise ValueError(f"active column {j} lies inside the core's "
+                                 f"span within sector {key}")
+            taken.append(got)
+            act_cols[rows, j] = got
+        rest = np.eye(len(rows))
+        for _ in range(2):
+            for t in taken:
+                rest = rest - np.outer(t, t @ s_rr @ rest)
+        ev, u = np.linalg.eigh(rest.T @ s_rr @ rest)
+        kept = []
+        for j in np.argsort(-ev):          # best-conditioned first
+            if ev[j] <= EXISTS:
+                break
+            v = _gs(rest @ u[:, j], kept, s_rr, EXISTS)
+            if v is None:
+                continue
+            kept.append(v)
+            col = np.zeros(n)
+            col[rows] = v
+            tail.append(col)
+            tail_labels.append(key if ev[j] > admit else None)
+    mo = np.hstack([core_cols, act_cols] + [c[:, None] for c in tail])
+    if mo.shape[1] != n:
+        raise ValueError(f"the lm sectors complete {mo.shape[1]} of "
+                         f"{n} orbitals")
+    dev = float(np.abs(mo.T @ s @ mo - np.eye(n)).max())
+    # the head may move only by the asymmetry the projection removes:
+    # its own closure defect (observed 6.8e-05 of a 6.8e-04 defect on
+    # a free-optimizer's converged block; 1e-16 on a constructed window)
+    head = np.hstack([core, active])
+    defect = max(window_closure(mol, head).values())
+    span = float(np.abs(mo[:, :ncore + ncas] @ mo[:, :ncore + ncas].T @ s
+                        - head @ head.T @ s).max())
+    if dev > 1e-9 or span > max(defect, 1e-9):
+        raise ValueError(f"the lm-pure basis failed its certificate "
+                         f"(orthonormality {dev:.1e}, head span {span:.1e} "
+                         f"against a closure defect {defect:.1e})")
+    return mo, ([None] * ncore + list(labels) + tail_labels)
 
 
 def dominant_labels(act, mol) -> list[str]:

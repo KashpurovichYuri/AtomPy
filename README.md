@@ -213,8 +213,9 @@ module's docstring owns its contract), its legs
 of the CAS ladder through the free trio and the pinned SA) and
 `u14e_vv_uhf.py` (the reference rows), the driver
 `u14e_vv_orchestration.py`, the HF-virtual channel screen
-`u14e_vv_screen.py` (print-only); its table `scripts/u14e/VV.md`. The
-test suite is the executable documentation.
+`u14e_vv_screen.py` and the window-variant sweep
+`u14e_vv_variants.py` (print-only); its table `scripts/u14e/VV.md`.
+The test suite is the executable documentation.
 
 ## Status and directions
 

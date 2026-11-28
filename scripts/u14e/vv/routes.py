@@ -20,13 +20,36 @@ free readout has the shape of PySCF's own recommendation for a
 state-averaged wavefunction (``examples/mrpt/41-for_state_average.py``):
 optimize, then a multi-root CASCI on the converged orbitals.
 
+THE RADIAL ROUTE (:func:`radial_sa`) is the state average CONSTRAINED
+to the window's composition: the production driver
+(``atomterm.casscf.constrained_casscf``) on the window's lm-pure
+sector basis, under the radial mask -- a rotation only within an
+(l, member) sector, the core frozen.  The free state average does not
+keep a composition: given empty non-f orbitals it rotates them into f
+(observed: an s and a p channel of the U14e base converge with
+f-weight 0.999..1.000, the term's roots splitting by 0.4..1.3 mEh).
+The route is seeded and checked, because a state average of ``nroots``
+LOWEST roots can track the wrong set:
+  - a cold Davidson solve can MISS components of an exactly
+    degenerate term -- its P-space guess does not cover every M_L
+    block (observed in closed U14e windows: 14 of 17 with 17 roots,
+    16 of 17 with 30); the cold solves here are outright
+    diagonalizations up to ``FULL_DIM`` determinants, and the seed is
+    read wider than the term (:func:`term_seed`);
+  - a warm-started solve keeps tracking a set it is given even when
+    the window holds lower states (observed: a 5f^2 6d^2 term tracked
+    30 mEh above lower states of its own window); at convergence a
+    fresh wider solve must show the tracked roots as the window's
+    lowest level, one degenerate term.
+
 Layering
 --------
 :class:`State` / :class:`Solution` / :class:`PricedState` /
 :class:`Priced` -- the vocabulary; :func:`assert_consistent` -- the
-birth certificate; ``free_*`` / ``pinned_*`` -- the routes;
-``_optimize`` / ``_readout`` / ``_born`` / ``_pinned_states`` -- the
-two births.
+birth certificate; ``free_*`` / ``pinned_*`` / :func:`radial_sa` --
+the routes; ``_optimize`` / ``_readout`` / ``_born`` /
+``_pinned_states`` / ``_cold`` -- the births and the seeds'
+instrument; ``_lowest_level`` -- the trap check.
 """
 
 from dataclasses import dataclass, replace
@@ -35,14 +58,17 @@ import numpy as np
 from pyscf import ao2mo, fci, mcscf
 from pyscf.fci import cistring
 
-from atomterm.casscf import irrep_solvers, run_irrep_casci, run_irrep_sa
+from atomterm.casscf import (constrained_casscf, irrep_solvers,
+                             run_irrep_casci, run_irrep_sa)
 from atomterm.core import closed_shell_core_energy
+from atomterm.detbasis import sector_dimension
 from atomterm.irreps import orb_irreps
-from atomterm.operators import active_space_integrals
+from atomterm.operators import active_space_integrals, window_closure
+from atomterm.windows import mask_radial_rotations
 
 from vv.meters import Meters
 from vv.pricing import price_classes, price_pyscf, resorted
-from vv.windows import orthonormalize
+from vv.windows import ActiveSpace, lm_basis, orthonormalize
 from vv.table import Route, Row, conv_of, fmt_range
 
 # the optimizer budget (the user's directive: "enable even 200 iters")
@@ -52,6 +78,19 @@ BUDGET = {"max_cycle_macro": 200}
 ORTHO_TOL = 1e-8     # max|C^T S C - I| of the orbitals a solution carries
 EIGENPAIR_TOL = 1e-7  # Eh; |<Psi|H|Psi> - e_cas| of a consistent state
                     # (observed on consistent states: ~1e-12)
+SEED_MARGIN = 13     # the extra roots of the cold solve a state average
+                     # is seeded from -- enough to see the window's next
+                     # levels beside the term
+SEED_DEV = 1e-4      # a seed root's distance to the term's (<L^2>, <S^2>)
+LEVEL_TOL = 1e-3     # mEh: the spread of the tracked term's roots in the
+                     # fresh solve (a closed window's term: <= 2e-4)
+TRAP_TOL = 1e-6      # Eh: the tracked ensemble against the fresh solve's
+                     # lowest level (observed <= 2e-9 when they agree)
+FULL_DIM = 20000    # determinants: up to this sector size a cold solve is
+                     # PySCF's outright diagonalization (every determinant
+                     # in its P-space; ncas 27 in the (4, 0) sector) --
+                     # above it a Davidson again, which may miss a
+                     # component of an exactly degenerate term
 
 
 # ------------------------------------------------------------ the vocabulary
@@ -244,7 +283,7 @@ class Priced:
         ensemble energy)."""
         sol = self.solution
         cells = (fmt_range(self.l2), f"{max(self.s2):.4f}")
-        if sol.route is Route.FREE:
+        if sol.route is not Route.PINNED:
             first = self.states[0]
             return Row(sol.method, sol.route, cas, first.state.e_ref,
                        first.e2, *cells, sol.conv)
@@ -255,6 +294,7 @@ class Priced:
 
 
 _PRICERS = {Route.FREE: price_pyscf, Route.PINNED: price_classes,
+            Route.RADIAL: price_pyscf,
             "pyscf": price_pyscf, "classes": price_classes}
 
 
@@ -376,7 +416,7 @@ def assert_consistent(states, space=None, fold: str = "raw",
 
 def _born(route, method, space, states, conv, ensemble=None) -> Solution:
     # each route's states are certified in its own solvers' core fold
-    fold = "raw" if route is Route.FREE else "averaged"
+    fold = "averaged" if route is Route.PINNED else "raw"
     cert = assert_consistent(states, space, fold)
     cert["core_leak"] = core_leak(space, states)
     return Solution(route, method, tuple(states), conv, ensemble, cert)
@@ -408,23 +448,30 @@ def _optimize(mf, space, budget, weights=None) -> tuple:
     return mc, conv_of(trace["de"], trace["imacro"], bool(mc.converged))
 
 
-def _readout(mf, space, mo_coeff, nroots, ci0=None):
+def _readout(mf, space, mo_coeff, nroots, ci0=None, exact=False):
     """PySCF's multi-root CASCI on the given orbitals -- the
     readout of an optimized state-averaged wavefunction
     (``examples/mrpt/41-for_state_average.py``), optionally seeded
     from the optimizer's own vectors.  ``canonicalization`` off: the
-    window exactly as converged."""
+    window exactly as converged.
+
+    ``exact`` -- an outright diagonalization instead of the Davidson:
+    PySCF diagonalizes its P-space Hamiltonian when the P-space holds
+    every determinant of the sector, so the solver's ``pspace_size``
+    is set to the sector's dimension (no guess, no missed root)."""
     cas = mcscf.CASCI(mf, space.ncas, space.sector)
     cas.mo_coeff = mo_coeff
     cas.canonicalization = False
     cas.fcisolver.nroots = nroots
+    if exact:
+        cas.fcisolver.pspace_size = sector_dimension(space.ncas, *space.sector)
     cas.kernel(ci0=ci0)
     return cas
 
 
 def _certify_free(sub, space) -> None:
-    """The free routes' substrate is the C1 reference.  On a
-    symmetry-tagged molecule PySCF hands a plain CASCI/CASSCF its
+    """The free and the radial routes' substrate is the C1 reference.
+    On a symmetry-tagged molecule PySCF hands a plain CASCI/CASSCF its
     symmetry-adapted classes, and the FCI is pinned to one irrep --
     a different calculation (observed 2e-02 Eh above the sector
     ground on one window); the symmetry-tagged substrate belongs to
@@ -463,6 +510,124 @@ def free_casscf(sub, space, budget=BUDGET) -> Solution:
     mc, conv = _optimize(sub.mf, space, budget)
     cas = _readout(sub.mf, space, mc.mo_coeff, nroots=1)
     return _born(Route.FREE, "casscf", space, [State(cas, 0)], conv)
+
+
+def _cold(sub, space, mo, nroots) -> tuple[list, list]:
+    """A cold multi-root readout of ``min(nroots, the sector's
+    dimension)`` roots in the window whose [core | active] is
+    ``mo``'s: (the roots as uncategorized states, their (<L^2>,
+    <S^2>)) -- the seeds' and the trap check's instrument.  Exact up
+    to ``FULL_DIM`` determinants (the module docstring's first
+    warning)."""
+    dim = sector_dimension(space.ncas, *space.sector)
+    nroots = min(nroots, dim)
+    mo = orthonormalize(mo, sub.mf.get_ovlp(), space.ncore, space.ncas)
+    win = ActiveSpace(mo, space.ncore, space.ncas, space.sector)
+    cas = _readout(sub.mf, win, mo, nroots, exact=dim <= FULL_DIM)
+    states = [State(cas, k) for k in range(nroots)]
+    m = Meters(sub.mol, win.active, win.sector)
+    return states, [m.of(st.ci) for st in states]
+
+
+def term_seed(sub, space, term, nroots, margin=SEED_MARGIN) -> list:
+    """The term's components in the window as built: from a cold
+    solve of ``nroots + margin`` roots, the ``nroots`` lowest that
+    carry the term (within ``SEED_DEV``) -- the starting vectors of a
+    state average that must describe the term.
+
+    Raises
+    ------
+    ValueError : fewer than ``nroots`` of the solved roots carry the
+        term.
+    """
+    states, meters = _cold(sub, space, space.mo, nroots + margin)
+    hit = [k for k, (l2, s2) in enumerate(meters)
+           if max(abs(l2 - term[0]), abs(s2 - term[1])) <= SEED_DEV]
+    if len(hit) < nroots:
+        raise ValueError(
+            f"the frozen window holds {len(hit)} of the term's "
+            f"{nroots} components among its lowest {len(states)} "
+            f"roots (<L^2> {[round(x[0], 4) for x in meters]})")
+    return [states[k].ci for k in hit[:nroots]]
+
+
+def _lowest_level(sub, space, mo, term, nroots, tracked) -> float:
+    """The TRAP CHECK of a state average: in a fresh, wider cold solve
+    of the window whose [core | active] is ``mo``'s, the lowest
+    ``nroots`` roots must be ONE degenerate term (``LEVEL_TOL``,
+    ``SEED_DEV``) lying at the tracked ensemble energy (``TRAP_TOL``).
+
+    Returns
+    -------
+    The gap (mEh) between that level and the window's next one; NaN
+    when the sector holds no level above it.
+
+    Raises
+    ------
+    ValueError : any clause fails.
+    """
+    states, meters = _cold(sub, space, mo, nroots + SEED_MARGIN)
+    e = [st.e_ref for st in states[:nroots]]
+    spread = (max(e) - min(e)) * 1e3
+    dev = max(max(abs(l2 - term[0]), abs(s2 - term[1]))
+              for l2, s2 in meters[:nroots])
+    if (spread > LEVEL_TOL or dev > SEED_DEV
+            or abs(float(np.mean(e)) - tracked) > TRAP_TOL):
+        raise ValueError(
+            "the state average's tracked roots are not the converged "
+            f"window's lowest {nroots}: a fresh solve reads a lowest "
+            f"level of spread {spread:.4f} mEh (band {LEVEL_TOL:g}) at "
+            f"max term deviation {dev:.1e} (band {SEED_DEV:g}), "
+            f"{float(np.mean(e)) - tracked:+.2e} Eh from the tracked "
+            f"ensemble (band {TRAP_TOL:g})")
+    if len(states) <= nroots:
+        return float("nan")
+    return (states[nroots].e_ref - max(e)) * 1e3
+
+
+def radial_sa(sub, space, term, nroots, budget=BUDGET) -> Solution:
+    """The state average CONSTRAINED to the window's composition (the
+    module docstring's radial route): the production driver on the
+    lm-pure sector basis under the radial mask, seeded with the term's
+    components, its readout seeded from the optimizer's own vectors.
+
+    Parameters
+    ----------
+    term : (L(L+1), S(S+1)) -- the expectations every root carries.
+
+    Returns
+    -------
+    The solution (``Route.RADIAL``); its certificate carries the
+    birth readings, ``level_gap`` (:func:`_lowest_level`) and
+    ``closure`` (the converged window's largest closure meter).
+
+    Raises
+    ------
+    ValueError : the window is not lm-pure; the seed is refused; or
+        the trap check (:func:`_lowest_level`) fails -- in a fresh
+        solve of the converged window the tracked roots are not its
+        lowest ``nroots``, one degenerate term.
+    """
+    _certify_free(sub, space)
+    mol, mf = sub.mol, sub.mf
+    mo, labels = lm_basis(sub, space)
+    mask = mask_radial_rotations(labels, space.ncore, space.ncas)
+    seed = term_seed(sub, space, term, nroots)
+    out = constrained_casscf(mf, space.ncas, space.sector, None, mo_full=mo,
+                             mask=mask, weights=[1.0 / nroots] * nroots,
+                             mc_opts={**budget, "ci": seed})
+    cas = _readout(mf, space, np.asarray(out.mo_coeff), nroots,
+                   ci0=list(out.ci))
+    conv = conv_of(out.conv_dE, out.cycles, bool(out.mc.converged))
+    sol = replace(_born(Route.RADIAL, "sa-casscf", space,
+                        [State(cas, k) for k in range(nroots)], conv),
+                  ensemble=float(out.mc.e_tot))
+    sol.certificate["level_gap"] = _lowest_level(
+        sub, space, np.asarray(out.mo_coeff), term, nroots,
+        float(np.mean([st.e_ref for st in sol.states])))
+    sol.certificate["closure"] = max(window_closure(
+        mol, sol.states[0].active).values())
+    return sol
 
 
 def free_sa(sub, space, nroots, budget=BUDGET) -> Solution:
@@ -591,4 +756,4 @@ def _pinned_states(sub, space, mo, term, roots, conv_tol) -> list:
 __all__ = ["BUDGET", "Priced", "PricedState", "Solution", "State",
            "assert_consistent", "cas_hamiltonian", "energy_expectation",
            "free_casci", "free_casscf", "free_sa", "pinned_casci",
-           "pinned_sa"]
+           "pinned_sa", "radial_sa", "term_seed"]

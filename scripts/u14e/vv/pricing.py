@@ -7,6 +7,9 @@ breakdown (``atomterm.perturb.nevpt2_rows_on``): the pinned route's
 pricer, and the instrument that reads a class anomaly (a norm or an
 energy per class).
 
+Beside the adapters: the natural occupations -- of one state
+(:func:`occupations`) and of a term's ensemble (:func:`ensemble_occupations`).
+
 Both consume the same :class:`~vv.routes.State`.  Their sums agree to
 the kernel's own wobble (pinned in ``tests/unit/test_perturb.py`` and
 here on a priced state).
@@ -74,11 +77,26 @@ def price_pyscf(state) -> float:
     return float(pt.kernel())
 
 
+def _natural(dm1) -> np.ndarray:
+    """The eigenvalues of a spin-summed active 1-RDM, descending."""
+    return np.sort(np.linalg.eigvalsh(np.asarray(dm1).real))[::-1]
+
+
 def occupations(state) -> np.ndarray:
     """The state's natural occupations (the active 1-RDM's
     eigenvalues, descending; their sum is the active electron count)."""
-    dm1 = fci.direct_spin1.make_rdm1(state.ci, state.ncas, state.nelecas)
-    return np.sort(np.linalg.eigvalsh(np.asarray(dm1).real))[::-1]
+    return _natural(fci.direct_spin1.make_rdm1(state.ci, state.ncas,
+                                               state.nelecas))
+
+
+def ensemble_occupations(states) -> np.ndarray:
+    """The natural occupations of the states' ENSEMBLE-AVERAGED 1-RDM
+    -- the term's occupations: rotation-invariant, where a single
+    component's are not (their sum is the active electron count)."""
+    states = list(states)
+    dm = sum(fci.direct_spin1.make_rdm1(st.ci, st.ncas, st.nelecas)
+             for st in states) / len(states)
+    return _natural(dm)
 
 
 def resorted(state) -> int:
