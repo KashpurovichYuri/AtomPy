@@ -265,6 +265,45 @@ configuration-inert).
      -445.00).  The V&V library counts it (resorted) and can price
      the window as solved (partition_as_solved); its default stays
      PySCF's convention (the production twin).
+  F9 (MEASURED 2026-11-28; what follows is the user's call) The
+     FREE state average does not keep a window's composition: in C1
+     the optimizer rotates empty non-f orbitals into f.  An s and a p
+     channel beside the (4,12)@r1 base converge with f-weight
+     0.999..1.000, the term's roots splitting by 0.4..1.3 mEh (<L2>
+     71.97 / 71.79); the table's "(4,15)@r1" window (5f6d14p@r1)
+     likewise -- its three p columns end at f-weight 1.000.  Those SA
+     rows are m-incomplete pieces of a second f shell, not p/s
+     windows, and are not comparable at their nominal size.  On
+     carbon the free route keeps compositions.
+  F10 (MEASURED 2026-11-28) The frozen (4,12)@r1 window's lowest 17
+     roots are the 5L term of 5f^2 6d^2 (2.0 electrons in f, 2.0 in
+     d), 10.83 mEh below a 5I level: the table's frozen casci row of
+     that window -- and the channel screen below -- read a different
+     configuration of the same (L, S).  The free state average's
+     CONVERGED window holds the ground term (5f^3 6d^1: 3.0 / 1.0;
+     its next level is 5K at +9.8 mEh).
+  F11 (MEASURED 2026-11-28) F1 priced on the base: with the core
+     frozen on the purified span the free state average reads
+     -50.4237465 (core leak 5e-16, E(2) -342.686 mEh) against the
+     table's -50.4238100 (leak 1.0e-02, -341.670 mEh).  The core
+     relaxation buys 0.064 mEh of static energy and costs 1.02 mEh of
+     dynamic correlation: 0.95 mEh worse in the total.
+  THE INSTRUMENT (4daecb6): `routes.radial_sa` -- the state average
+     CONSTRAINED to the window's composition (the production driver
+     `constrained_casscf` under the production radial mask, on an
+     lm-pure sector basis `windows.lm_basis`; the core frozen on a
+     rotation-closed span), seeded with the term's components
+     (`term_seed`: a cold Davidson misses components of an exactly
+     degenerate term -- 14 of 17 here; its P-space guess does not
+     cover every M_L block -- and the cold solves are outright
+     diagonalizations up to 20000 determinants), and checked at
+     convergence by a fresh exact solve (`_lowest_level`: a
+     warm-started solve keeps tracking the set it is given while the
+     window holds lower states -- a 5f^2 6d^2 term was tracked 30 mEh
+     above lower states of its own window).  Route token
+     `radial@pur`: declared in the vocabulary, refused by the store
+     until a table block carries it.  11 pins on the frozen carbon
+     reference.
   THE HF-VIRTUAL CHANNEL SCREEN -- MEASURED 2026-11-27
   (`u14e_vv_screen.py` + logs/u14e_vv_screen.log,
   logs/u14e_vv_screen_spectrum.log; the inventory `vv.channels`):
@@ -282,13 +321,18 @@ configuration-inert).
   does not size the rungs; (iii) the base's 5f block already holds
   ~70% of the compact 5f virtuals and its 6d block ~55-60% of four
   "7d" virtuals.  The basis has no g functions (l = s, p, d, f).
-  PROPOSED NEXT (the user's call): the rung "(4,19)@r1" = (4,12)@r1
-  + the 5f' radial, then + 6f.
+  CAVEAT (2026-11-28, F10): the screen's frozen readings are those
+  of the 5f^2 6d^2 term of the frozen window, not of the ground
+  configuration; its ranking of channels is a frozen-level ranking
+  only.  The "(4,19)@r1" rung proposal is superseded by the sweep.
   DECLINED (review): the lane-core route's pinned rows (outside the
   keep-set) are print-only; the "unification" leg's C4 lane-window
   disclosure is dropped (record: logs/u14e_vv_unification.log).
-  NEXT: the HF-virtual channel screen on the (4,12)@r1 base, then
-  the rungs -- the handoff (message.txt) carries the plan.
+  NEXT: the window-variant sweep (`u14e_vv_variants.py`; the user's
+  ask: per size, the minimal window across channel variants, by a
+  small brute force) -- every subset of the declared channels beside
+  the base, ranked by `radial_sa`; the handoff (message.txt) carries
+  the state.
 - **The u14e V&V wave continued — the (6,13) fix + the unification
   ladder — COMPLETE (2026-11-23)** (the lx4 plan: the optimizer
   budgets, the (6,13) @r1 fix, the pin-on-pur unification, the
