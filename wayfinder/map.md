@@ -304,25 +304,40 @@ configuration-inert).
      `radial@pur`: declared in the vocabulary, refused by the store
      until a table block carries it.  11 pins on the frozen carbon
      reference.
-  THE WINDOW-VARIANT SWEEP, sizes 12-19 -- MEASURED 2026-11-28
-  (`u14e_vv_variants.py` + logs/u14e_vv_variants.log; every subset of
-  the declared channels beside the base, by `radial_sa`; core frozen
-  on the purified span; mEh against ROHF; E_SA = the state average's
-  ensemble energy):
-       size  minimal window (by E_SA)      static    E(2) as solved
-        12   base [5f, 6d]                 -41.89    -342.72
-       13   base + s  (8s = 9s: +0.000)    -41.89    -342.69
-       14   base + 8s + 9s (+0.000)        -41.89    -342.68
-       15   base + a p radial              -42.54    -343.85
-       16   base + p + s (s: +0.000)       -42.54    -343.8
-       17   base + a second d radial       -43.83    -317.50
-       18   base + second d + s (+0.000)   -43.83    -317.5
-       19   base + a second f radial       -47.83    -330.36
+  THE WINDOW-VARIANT SWEEP, sizes 12-26 -- MEASURED 2026-11-28
+  (`u14e_vv_variants.py` + logs/u14e_vv_variants.log: 105 variants =
+  every subset of the declared channels beside the base, all
+  converged, all checks passed; by `radial_sa`; core frozen on the
+  purified span; mEh against ROHF; E_SA = the state average's
+  ensemble energy; sizes 20-26 carry no E(2) -- by F12 it does not
+  rank).  The minimal window of each size, by E_SA:
+       size  minimal window                 static   gain vs base   E(2) as solved
+        12   base [5f, 6d]                  -41.894        --        -342.72
+        13   base + s                       -41.894     0.000        -342.69
+        14   base + 2s                      -41.894     0.000        -342.68
+        15   base + a p radial              -42.543    -0.648        -343.85
+        16   base + p + s                   -42.543    -0.648        -343.8
+        17   base + a second d radial       -43.827    -1.932        -317.50
+        18   base + second d + s            -43.827    -1.932        -317.5
+        19   base + a second f radial       -47.827    -5.933        -330.36
+        20   base + second f + s            -47.829    -5.935        (not priced)
+        21   base + second f + 2s           -47.829    -5.935
+        22   base + second f + p            -48.555    -6.661
+        23   base + second f + p + s        -48.556    -6.662
+        24   base + second f + second d     -52.979   -11.085
+        25   base + second f + second d + s -52.981   -11.087
+        26   base + second f + second d + 2s -52.981  -11.087
   Every variant of a size converges to ONE window (7p = 8p, 7d = 8d,
   5f = 6f in E_SA to 1e-08; an s channel never moves E_SA): the
   construction of the channel does not matter, only its l.  The added
   span holds 0.002..0.005 electrons: the gains are a static radial /
-  angular correlation of the valence shell, small.
+  angular correlation of the valence shell, small.  ADDITIVITY
+  (mEh): p -0.648 alone, -0.728 beside the second f radial (additive);
+  the second d radial -1.932 alone but -5.152 beside the second f
+  radial (2.7x: synergy -3.2); a THIRD f radial -0.432, a third d
+  radial -0.174.  Runners-up: size 22, two second d radials -2.107
+  (vs second f + p -6.661); size 26, three f radials -6.365 (vs
+  second f + second d + 2s -11.087).
   F12 (MEASURED 2026-11-28; probe_u14e_e2_radials + log) E(2) of the
      (4,N) family is 98% the FROZEN 6s^2 6p^6 7s^2 shell's
      correlation: six of the eight Koopmans classes carry a core hole
@@ -368,11 +383,12 @@ configuration-inert).
   DECLINED (review): the lane-core route's pinned rows (outside the
   keep-set) are print-only; the "unification" leg's C4 lane-window
   disclosure is dropped (record: logs/u14e_vv_unification.log).
-  NEXT: the sweep's extension to sizes 20-26 (E_SA only; by F12 the
-  pricing does not rank) -- RUNNING 2026-11-28; then the per-size
-  report and the user's decisions: the table's rows for the minimal
-  windows (a `radial@pur` block), the converted (4,15)/(4,16) rows,
-  the frozen 7s^2 pair (F12).
+  NEXT (the user's decisions, 2026-11-28): (a) table rows for the
+  minimal windows need a `radial@pur` block (vv/table.py BLOCKS,
+  GROUPS) + cases in vv/cases.py; (b) the converted (4,15)/(4,16)
+  free rows; (c) the frozen 7s^2 pair and the 98%-frozen-core E(2)
+  (F12) -- a (6,N) family or an unfrozen-core treatment is a physics
+  decision.  Pricing the sizes >= 20 waits on (c).
 - **The u14e V&V wave continued — the (6,13) fix + the unification
   ladder — COMPLETE (2026-11-23)** (the lx4 plan: the optimizer
   budgets, the (6,13) @r1 fix, the pin-on-pur unification, the
