@@ -304,6 +304,46 @@ configuration-inert).
      `radial@pur`: declared in the vocabulary, refused by the store
      until a table block carries it.  11 pins on the frozen carbon
      reference.
+  THE WINDOW-VARIANT SWEEP, sizes 12-19 -- MEASURED 2026-11-28
+  (`u14e_vv_variants.py` + logs/u14e_vv_variants.log; every subset of
+  the declared channels beside the base, by `radial_sa`; core frozen
+  on the purified span; mEh against ROHF; E_SA = the state average's
+  ensemble energy):
+       size  minimal window (by E_SA)      static    E(2) as solved
+        12   base [5f, 6d]                 -41.89    -342.72
+       13   base + s  (8s = 9s: +0.000)    -41.89    -342.69
+       14   base + 8s + 9s (+0.000)        -41.89    -342.68
+       15   base + a p radial              -42.54    -343.85
+       16   base + p + s (s: +0.000)       -42.54    -343.8
+       17   base + a second d radial       -43.83    -317.50
+       18   base + second d + s (+0.000)   -43.83    -317.5
+       19   base + a second f radial       -47.83    -330.36
+  Every variant of a size converges to ONE window (7p = 8p, 7d = 8d,
+  5f = 6f in E_SA to 1e-08; an s channel never moves E_SA): the
+  construction of the channel does not matter, only its l.  The added
+  span holds 0.002..0.005 electrons: the gains are a static radial /
+  angular correlation of the valence shell, small.
+  F12 (MEASURED 2026-11-28; probe_u14e_e2_radials + log) E(2) of the
+     (4,N) family is 98% the FROZEN 6s^2 6p^6 7s^2 shell's
+     correlation: six of the eight Koopmans classes carry a core hole
+     (-336.4 of -342.7 mEh); the valence shell's own correlation into
+     virtuals (Sr, Srs) is -8.4 mEh.  It is PARTITION-DEPENDENT: with
+     an EMPTY active orbital the core's coupling to that orbital moves
+     from the virtual-target classes to the active-target ones (the
+     total perturber norm conserved, 1.32 -> 1.31; -95 mEh out, +73
+     mEh in), and the net (+25 mEh for a second d radial, +12 for a
+     second f radial) is what makes those totals look worse although
+     the state is 99.8% the same.  The valence part is consistent: the
+     base's PT2 attributes -5.0 mEh to valence -> f'-type and -3.0 to
+     valence -> d'-type excitations, which become the static gains
+     (-5.93, -1.93 mEh).  CONSEQUENCES (the user's call): NEVPT2
+     totals cannot rank windows that differ by an empty active orbital
+     -- the state-averaged energy can; the table's "static/dynamic
+     trade" across windows (incl. "the corrected ladder prefers
+     (4,12)" over the f-enriched (4,15)/(4,16)) is this redistribution
+     of the frozen core's correlation; an E(2) column that is 98%
+     frozen core says little about the valence shell's dynamical
+     correlation.
   THE HF-VIRTUAL CHANNEL SCREEN -- MEASURED 2026-11-27
   (`u14e_vv_screen.py` + logs/u14e_vv_screen.log,
   logs/u14e_vv_screen_spectrum.log; the inventory `vv.channels`):
@@ -328,11 +368,11 @@ configuration-inert).
   DECLINED (review): the lane-core route's pinned rows (outside the
   keep-set) are print-only; the "unification" leg's C4 lane-window
   disclosure is dropped (record: logs/u14e_vv_unification.log).
-  NEXT: the window-variant sweep (`u14e_vv_variants.py`; the user's
-  ask: per size, the minimal window across channel variants, by a
-  small brute force) -- every subset of the declared channels beside
-  the base, ranked by `radial_sa`; the handoff (message.txt) carries
-  the state.
+  NEXT: the sweep's extension to sizes 20-26 (E_SA only; by F12 the
+  pricing does not rank) -- RUNNING 2026-11-28; then the per-size
+  report and the user's decisions: the table's rows for the minimal
+  windows (a `radial@pur` block), the converted (4,15)/(4,16) rows,
+  the frozen 7s^2 pair (F12).
 - **The u14e V&V wave continued — the (6,13) fix + the unification
   ladder — COMPLETE (2026-11-23)** (the lx4 plan: the optimizer
   budgets, the (6,13) @r1 fix, the pin-on-pur unification, the
