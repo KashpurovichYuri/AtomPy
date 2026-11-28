@@ -26,6 +26,11 @@ class Verdict:
         self.rows.append((name, True, "note"))
         print(f"  [note] {name}: {detail}", flush=True)
 
+    def adopt(self, rows) -> None:
+        """Take another ledger's rows as they are -- a worker's, whose
+        lines were printed with its case; nothing is printed here."""
+        self.rows.extend(tuple(r) for r in rows)
+
     def _print(self, empty_ok: bool) -> list:
         checks = [(n, ok) for n, ok, kind in self.rows if kind == "check"]
         if not checks and not empty_ok:

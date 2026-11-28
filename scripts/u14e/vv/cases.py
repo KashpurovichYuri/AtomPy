@@ -15,25 +15,48 @@ own AO columns); every other tag takes a KEY window (the production
 recipe on a cell address), except the ``@r1`` (6,13) composition,
 whose s channel is replaced by the reference's own closed pair.
 
+THE MINIMAL FAMILY (``vv.table.LADDER_MIN``, the window-variant
+sweep) is built otherwise: its base is the free state average's
+CONVERGED ``(4,12)@r1`` active block, assembled on the key window's
+purified core -- the ground term's basin.  The frozen key window
+cannot be that base: its lowest 17 roots are the 5L term of
+5f^2 6d^2 (2.0 electrons in f, 2.0 in d; the ``@r1`` radial is the
+mean over the configuration series), and a state average seeded there
+tracks that term.  A tag ``(4,N)m+<channels>`` names the channels set
+beside the base (``channels_of``): ``s`` an s virtual (8s; 9s lands
+the same window), ``p`` a p radial, ``d`` a second d radial, ``f`` a
+second f radial -- the window of each size with the lowest
+state-averaged energy in the sweep.  The family's start carries the
+free optimizer's residual asymmetry (rotation-closed to ~7e-04); the
+constrained route's lm-pure basis projects it out.
+
 Layering
 --------
 ``TERM`` -- the declared term; :class:`Case`; ``CASES`` (the ladder)
-and ``select_cases``; the constructors ``visible_window`` and
-``window_6p_r1`` (``window_from_key`` and ``window_6_13_r1`` are
-``vv.windows``').
+and ``select_cases``; the constructors ``visible_window``,
+``window_6p_r1`` and the minimal family's ``channels_of`` /
+``minimal_window`` / ``converged_base`` (``window_from_key`` and
+``window_6_13_r1`` are ``vv.windows``').
 """
 
+import re
 from dataclasses import dataclass
 from functools import partial
 from typing import Callable
+
+import numpy as np
 
 from atomterm.basis import series_window
 from atomterm.core import purified_core_orbitals
 from atomterm.windows import build_full_mo, occupied_core_idx
 
+from vv.channels import CHANNELS, channel_block
 from vv.reference import Substrate
+from vv.routes import free_sa
+from vv.table import LADDER_MIN
 from vv.windows import (ActiveSpace, Built, composition_lines,
-                        window_6_13_r1, window_from_key, window_from_shells)
+                        window_6_13_r1, window_from_key, window_from_shells,
+                        window_with_channels)
 
 TERM = (8, "u")               # the declared term: L = 8, ungerade
 NROOTS = 2 * TERM[0] + 1      # its M_L components: the state average's roots
@@ -66,6 +89,19 @@ class Case:
     ``frozen_below`` -- the frozen ground's dE against the reference
         must stay below this many mEh (a window that freezes far
         above its reference has abandoned the intended term).
+    ``ground_config`` -- (electrons in the base's f block, in its d
+        block) the ensemble must hold: the configuration is the
+        ground one (5f^3 6d^1), which (<L^2>, <S^2>) cannot tell from
+        another of the same term.
+    ``radial`` -- the constrained state average runs on the window
+        (``radial_term``: the expectations every one of its roots
+        carries); ``pinned`` -- the pinned routes run on it.
+    ``start_closed`` -- the start window is a constructed,
+        rotation-closed one (the closure gate); False where the start
+        carries an optimizer's residual.
+    ``casscf_cycles`` -- the single-root free CASSCF's macro-cycle
+        budget (None: the library's); a case whose single-root run
+        goes to the cap declares a shorter one.
     """
 
     tag: str
@@ -78,6 +114,12 @@ class Case:
     pinned_class: tuple[int, int] | None = None
     s_pair: bool = False
     frozen_below: float | None = None
+    ground_config: tuple[float, float] | None = None
+    radial: bool = False
+    radial_term: tuple[float, float] | None = None
+    pinned: bool = True
+    start_closed: bool = True
+    casscf_cycles: int | None = None
 
 
 # ------------------------------------------------------------ the windows
@@ -113,6 +155,74 @@ def visible_window(sub: Substrate, shells, sector) -> Built:
     ncore = core_pairs(sub, sector)
     core = purified_core_orbitals(sub.mol, sub.mf, ncore)[0]
     return window_from_shells(sub.mol, sub.mf, shells, core, sector)
+
+
+# ------------------------------------------------- the minimal family
+
+F_BLOCK, D_BLOCK = 7, 5     # the base's columns: one 5f radial, one 6d radial
+# a tag's channel tokens -> the declared channels they name
+MIN_TOKENS = {"s": ("8s",), "2s": ("8s", "9s"), "p": ("7p",),
+              "d": ("7d",), "f": ("5f",)}
+_BASE_TAG = "(4,12)@r1"
+_BASE: dict = {}            # the converged base, per substrate (in-process)
+
+
+def channels_of(tag: str) -> tuple[str, ...]:
+    """The channels a minimal-family tag names beside the base.
+
+    Raises
+    ------
+    ValueError : not a minimal-family tag; an unknown token; the
+        tag's size disagrees with its channels' widths.
+    """
+    m = re.fullmatch(r"\(4,(\d+)\)m(?:\+(.*))?", tag)
+    if not m:
+        raise ValueError(f"{tag!r} is not a minimal-family tag "
+                         f"(the form is (4,N)m+<channels>)")
+    tokens = m.group(2).split("+") if m.group(2) else []
+    unknown = [t for t in tokens if t not in MIN_TOKENS]
+    if unknown:
+        raise ValueError(f"unknown channel token(s) {unknown} in {tag!r}; "
+                         f"declared: {sorted(MIN_TOKENS)}")
+    channels = tuple(c for t in tokens for c in MIN_TOKENS[t])
+    width = F_BLOCK + D_BLOCK + sum(CHANNELS[c].l * 2 + 1 for c in channels)
+    if width != int(m.group(1)):
+        raise ValueError(f"{tag!r}: its channels make {width} active "
+                         f"orbitals, not the tag's {m.group(1)}")
+    return channels
+
+
+def converged_base(sub: Substrate) -> Built:
+    """The minimal family's base: the free state average's CONVERGED
+    ``(4,12)@r1`` active block, assembled on the key window's
+    purified core (the module docstring) -- computed once per
+    substrate.
+
+    Raises
+    ------
+    ValueError : the free state average's certificate refuses.
+    """
+    key = id(sub)
+    if key not in _BASE:
+        frozen = CASES[_BASE_TAG].window(sub)
+        sol = free_sa(sub, frozen.space, NROOTS)
+        st = sol.states[0]
+        mo = build_full_mo(sub.mf, occupied_core_idx(sub.mf, st.ncore),
+                           np.array(st.active), c_core=frozen.space.core)
+        _BASE[key] = Built(
+            ActiveSpace(mo, st.ncore, st.ncas, st.nelecas),
+            (f"base: the free state average's converged {_BASE_TAG} active "
+             f"block on its purified core (ensemble {sol.ensemble:.8f}, "
+             f"{sol.conv})",))
+    return _BASE[key]
+
+
+def minimal_window(sub: Substrate, channels) -> Built:
+    """A minimal-family window: the channels beside the converged
+    base (:func:`vv.windows.window_with_channels`)."""
+    base = converged_base(sub)
+    return window_with_channels(
+        sub, base, [channel_block(sub, CHANNELS[c]) for c in channels])
 
 
 def window_6p_r1(sub: Substrate, k: int) -> Built:
@@ -159,6 +269,15 @@ CASES: dict[str, Case] = {c.tag: c for c in (
     Case("(4,21)@r1", partial(window_6p_r1, k=3)),
     Case("(6,13)@r1", partial(window_6_13_r1, address=ADDR["(6,13)@r1"]),
          frozen=(L2_TERM, S2_QUINTET), s_pair=True, frozen_below=400.0),
+    # the minimal family: the ground term is the frozen ground, the
+    # constrained state average keeps it, the ensemble is 5f^3 6d^1;
+    # its single-root free CASSCF runs to the cap (observed 200 cycles
+    # at <L^2> 64.7 -- the root leaves the term), on a 50-cycle budget
+    *(Case(tag, partial(minimal_window, channels=channels_of(tag)),
+           frozen=(L2_TERM, S2_QUINTET), ground_config=(3.0, 1.0),
+           radial=True, radial_term=(L2_TERM, S2_QUINTET), pinned=False,
+           start_closed=False, casscf_cycles=50)
+      for tag in LADDER_MIN),
 )}
 
 
@@ -175,7 +294,8 @@ def select_cases(tags=()) -> list[Case]:
     return [CASES[t] for t in dict.fromkeys(wanted) if t in CASES]
 
 
-__all__ = ["ADDR", "CASES", "Case", "L2_L9", "L2_TERM", "NROOTS",
-           "SECTOR_4", "S2_QUINTET", "S2_SEPTET", "SHELLS_412",
-           "SHELLS_415", "TERM", "core_pairs", "select_cases",
-           "visible_window", "window_6p_r1"]
+__all__ = ["ADDR", "CASES", "Case", "D_BLOCK", "F_BLOCK", "L2_L9",
+           "L2_TERM", "MIN_TOKENS", "NROOTS", "SECTOR_4", "S2_QUINTET",
+           "S2_SEPTET", "SHELLS_412", "SHELLS_415", "TERM", "channels_of",
+           "converged_base", "core_pairs", "minimal_window",
+           "select_cases", "visible_window", "window_6p_r1"]

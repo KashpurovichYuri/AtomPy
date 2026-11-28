@@ -46,7 +46,7 @@ def _cells(line):
 def test_the_keys_are_the_keep_set_in_display_order():
     keys = table.table_keys()
     assert keys[:2] == ("rohf|-|-", "uhf|-|-")
-    assert len(keys) == len(set(keys)) == 38
+    assert len(keys) == len(set(keys)) == 98
     assert "sa-casscf|free@pur|(4,12)" in keys
     assert "sa-casscf|pinned@pur|(4,12)@r1" in keys
     assert "casci|pinned@pur|(4,12)" not in keys       # not a kept route
@@ -54,14 +54,26 @@ def test_the_keys_are_the_keep_set_in_display_order():
         keys.index("sa-casscf|pinned@pur|(4,12)")       # free rows first
     assert [r.value for r in Route] == ["-", "free@pur", "pinned@pur",
                                         "radial@pur"]
+    # each route's column covers its ladder groups: the free routes every
+    # window, the pinned SA the key windows, the constrained SA the
+    # minimal family -- and the constrained block comes last
+    count = {r.value: sum(f"|{r.value}|" in k for k in keys)
+             for r in Route if r is not Route.REFERENCE}
+    assert count == {"free@pur": 72, "pinned@pur": 9, "radial@pur": 15}
+    assert keys.index("sa-casscf|pinned@pur|(6,13)@r1") < \
+        keys.index("sa-casscf|radial@pur|(4,12)m")
 
 
-def test_a_radial_row_is_refused_until_a_block_declares_it(store):
-    # the vocabulary carries the composition-preserving route; no
-    # table block does, so its rows never enter the store
-    with pytest.raises(ValueError, match="outside the declared table"):
-        table.drop_row(_row("sa-casscf", Route.RADIAL, "(4,12)@r1"))
-    assert not (store / "rows.json").exists()
+def test_each_route_column_carries_only_its_ladder_groups(store):
+    # the constrained route on the minimal family, the pinned one on the
+    # key windows: a row outside its column's groups is refused
+    table.drop_row(_row("sa-casscf", Route.RADIAL, "(4,12)m"))
+    assert (store / "rows.json").exists()
+    for row in (_row("sa-casscf", Route.RADIAL, "(4,12)@r1"),
+                _row("sa-casscf", Route.PINNED, "(4,12)m"),
+                _row("casci", Route.RADIAL, "(4,12)m")):
+        with pytest.raises(ValueError, match="outside the declared table"):
+            table.drop_row(row)
 
 
 # ------------------------------------------------------------------ the row
@@ -126,22 +138,26 @@ def test_one_block_per_method_class_with_a_rule_between(store):
     for m in ("sa-casscf", "casscf", "casci"):             # dropped out of order
         table.drop_row(_row(m, Route.FREE, "(4,12)"))
     table.drop_row(_row("sa-casscf", Route.PINNED, "(4,12)"))
+    table.drop_row(_row("sa-casscf", Route.RADIAL, "(4,12)m"))
     table.drop_row(Row("rohf", Route.REFERENCE, "-", -50.0, None, "-", "-"))
     body = _body(store)
     assert [_cells(r)[0] for r in body if "===" not in r] == [
         "rohf", "casci (free@pur)", "casscf (free@pur)",
-        "sa-casscf (free@pur)", "sa-casscf (pinned@pur)"]
-    assert [i for i, r in enumerate(body) if "===" in r] == [1, 3, 5]
+        "sa-casscf (free@pur)", "sa-casscf (pinned@pur)",
+        "sa-casscf (radial@pur)"]
+    assert [i for i, r in enumerate(body) if "===" in r] == [1, 3, 5, 8]
 
 
 def test_within_a_block_the_plain_ladder_precedes_the_r1_rows(store):
-    for cas in ("(6,13)@r1", "(4,16)", "(4,12)@r1", "(4,15)"):
+    for cas in ("(4,26)m+f+d+2s", "(6,13)@r1", "(4,16)", "(4,13)m+s",
+                "(4,12)@r1", "(4,15)"):
         table.drop_row(_row("casci", Route.FREE, cas))
-    assert [_cells(r)[1] for r in _body(store)] == [
-        "(4,15)", "(4,16)", "(4,12)@r1", "(6,13)@r1"]   # size-ordered
+    order = ["(4,15)", "(4,16)", "(4,12)@r1", "(6,13)@r1", "(4,13)m+s",
+             "(4,26)m+f+d+2s"]                        # plain, @r1, minimal
+    assert [_cells(r)[1] for r in _body(store)] == order
     # the store file keeps the table's order, whatever the drop order
     assert [r.key for r in table.load_rows().values()] == [
-        f"casci|free@pur|{c}" for c in ("(4,15)", "(4,16)", "(4,12)@r1", "(6,13)@r1")]
+        f"casci|free@pur|{c}" for c in order]
 
 
 def test_a_withdrawn_row_renders_dashes_in_the_withdrawn_cells_only(store):

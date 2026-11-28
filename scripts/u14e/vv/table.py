@@ -34,10 +34,9 @@ class Route(Enum):
     ``PINNED`` (``pinned@pur``): the wfnsym-pinned state average on
     the purified core.  ``RADIAL`` (``radial@pur``): the state
     average constrained to the window's composition (the core stays
-    frozen on the purified one) -- declared in the vocabulary, in no
-    table block: its rows are refused by the store until a block
-    carries them.  ``REFERENCE`` (``-``): the reference rows, which
-    no route produced.
+    frozen on a rotation-closed span) -- the table's last block, for
+    the minimal-window family only.  ``REFERENCE`` (``-``): the
+    reference rows, which no route produced.
     """
 
     REFERENCE = "-"
@@ -52,7 +51,22 @@ class Route(Enum):
 LADDER_PLAIN = ("(4,12)", "(4,15)", "(4,16)", "(6,13)")
 LADDER_R1 = ("(4,12)@r1", "(4,15)@r1", "(4,16)@r1", "(4,21)@r1",
              "(6,13)@r1")
-GROUPS = (LADDER_PLAIN, LADDER_R1)
+# the minimal-window family (the window-variant sweep,
+# logs/u14e_vv_variants.log): the free state average's converged
+# (4,12)@r1 active block on the key window's purified core, plus the
+# channels the suffix names -- one window per active-space size
+LADDER_MIN = ("(4,12)m", "(4,13)m+s", "(4,14)m+2s", "(4,15)m+p",
+              "(4,16)m+p+s", "(4,17)m+d", "(4,18)m+d+s", "(4,19)m+f",
+              "(4,20)m+f+s", "(4,21)m+f+2s", "(4,22)m+f+p",
+              "(4,23)m+f+p+s", "(4,24)m+f+d", "(4,25)m+f+d+s",
+              "(4,26)m+f+d+2s")
+GROUPS = (LADDER_PLAIN, LADDER_R1, LADDER_MIN)
+# which ladder groups each route's columns carry: the free routes run
+# on every window, the pinned state average on the key windows, the
+# constrained one on the minimal family -- every declared key fills
+COVERS = {Route.FREE: GROUPS,
+          Route.PINNED: (LADDER_PLAIN, LADDER_R1),
+          Route.RADIAL: (LADDER_MIN,)}
 # the method classes in display order, each with its (method, route)
 # columns in display order; a rule row stands between two classes
 BLOCKS = (
@@ -61,13 +75,14 @@ BLOCKS = (
     ("casscf", (("casscf", Route.FREE),)),
     ("sa-casscf", (("sa-casscf", Route.FREE),
                    ("sa-casscf", Route.PINNED))),
+    ("sa-casscf-radial", (("sa-casscf", Route.RADIAL),)),
 )
 
 
 def table_keys() -> tuple[str, ...]:
     """Every key the table may carry, in display order: the
-    references, then each method class -- its free rows, then its
-    pinned rows -- the plain ladder before the @r1 rows."""
+    references, then each method class column by column -- for each,
+    the plain ladder, the @r1 rows, the minimal family."""
     keys = []
     for _cls, columns in BLOCKS:
         for method, route in columns:
@@ -75,7 +90,7 @@ def table_keys() -> tuple[str, ...]:
                 keys.append(f"{method}|-|-")
             else:
                 keys += [f"{method}|{route.value}|{cas}"
-                         for group in GROUPS for cas in group]
+                         for group in COVERS[route] for cas in group]
     return tuple(keys)
 
 
@@ -221,8 +236,8 @@ def load_rows() -> dict[str, Row]:
 
 def drop_row(row: Row) -> None:
     """Merge one measured row into the store and re-render the table
-    (a key outside the declared table is refused; nothing is
-    written)."""
+    (a key outside the declared table is refused -- a route's column
+    carries only the ladder groups it covers; nothing is written)."""
     _refuse_unknown([row.key])
     records = {k: r.to_json() for k, r in load_rows().items()}
     records[row.key] = row.to_json()
