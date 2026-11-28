@@ -160,7 +160,7 @@ def _parse(argv) -> argparse.Namespace:
     p.add_argument("--from", dest="resume", nargs="*", default=[],
                    metavar="LOG", help="logs whose recorded variants "
                         "are skipped")
-    p.add_argument("--summary", nargs="*", default=[], metavar="LOG",
+    p.add_argument("--summary", nargs="*", default=None, metavar="LOG",
                    help="rank the records of these logs (plus --from) "
                         "and exit")
     p.add_argument("--list", action="store_true",
@@ -450,7 +450,7 @@ def _l2_cell(r) -> str:
 
 def _from_row(r) -> dict:
     """A table row (the free SA's, root 0) as a listing entry."""
-    n = int(re.fullmatch(r"\(4,(\d+)\)", r.cas).group(1))
+    n = int(re.match(r"\(4,(\d+)\)", r.cas).group(1))
     lo, _, hi = r.l2.partition("..")
     l2_lo, l2_hi = float(lo), float(hi or lo)
     return {"name": f"table {r.cas}", "ncas": n, "seq": -1, "conv": r.conv,
@@ -478,13 +478,12 @@ def _note(r, best) -> tuple[str, bool]:
     if abs(r["nf"] - 3.0) > CFG_DEV or abs(r["nd"] - 1.0) > CFG_DEV:
         return (f"NOT the ground configuration (f {r['nf']:.2f}, "
                 f"d {r['nd']:.2f})"), False
-    if np.isnan(r.get("e2", np.nan)):
-        return "not priced", False
     if r["conv"].endswith("*"):
         return "cycle cap: not converged", False
+    unpriced = "" if not np.isnan(r.get("e2", np.nan)) else " (not priced)"
     if r["e_sa"] - best <= TIE * 1e-3:
-        return "MINIMAL", True
-    return f"+{(r['e_sa'] - best) * 1e3:.3f} mEh", False
+        return "MINIMAL" + unpriced, True
+    return f"+{(r['e_sa'] - best) * 1e3:.3f} mEh" + unpriced, False
 
 
 def summary(logs, sizes=()) -> None:
@@ -503,7 +502,7 @@ def summary(logs, sizes=()) -> None:
     for r in latest.values():
         by_size.setdefault(r["ncas"], []).append(r)
     for key, r in load_rows().items():
-        if (re.fullmatch(r"\(4,\d+\)", r.cas) and r.method == "sa-casscf"
+        if (re.match(r"\(4,\d+\)", r.cas) and r.method == "sa-casscf"
                 and r.route is Route.FREE and not r.withdrawn):
             by_size.setdefault(_from_row(r)["ncas"], []).append(_from_row(r))
     print("\n===== the variants by size =====", flush=True)
@@ -546,7 +545,8 @@ def summary(logs, sizes=()) -> None:
             gap = "-" if np.isnan(r.get("gap", np.nan)) else f"{r['gap']:7.2f}"
             free = ("-" * 14 + " " + "-" * 8 + " " + "-" * 5
                     if np.isnan(r.get("fe", np.nan))
-                    else f"{r['fe']:14.8f} {r['fdev']:8.1e} {r['fkept']:5.2f}")
+                    else f"{r['fe']:14.8f} {r['fdev']:8.1e} "
+                         f"{r.get('fkept', np.nan):5.2f}")
             print(f"  {r['name']:16s} {r['conv']:>12s} {r['e_sa']:14.8f} "
                   f"{static:+9.3f} {e2:+9.3f} {tot:+9.3f} {solved} "
                   f"{cells:>19s} {gap} | {free}  {note}", flush=True)
@@ -564,9 +564,12 @@ def summary(logs, sizes=()) -> None:
     prev = None
     for n, r, static, e2, tot in ladder_rows:
         inc = "" if prev is None else (f"| {static - prev[0]:+9.3f} "
-                                       f"{e2 - prev[1]:+9.3f} {tot - prev[2]:+9.3f}")
+                                       f"{cell(e2 - prev[1], '+9.3f')} "
+                                       f"{cell(tot - prev[2], '+9.3f')}")
+        def cell(x, fmt):
+            return "-" * 9 if np.isnan(x) else format(x, fmt)
         print(f"  {n:4d} {r['name']:16s} {r['conv']:>12s} {static:+9.3f} "
-              f"{e2:+9.3f} {tot:+9.3f} {inc}", flush=True)
+              f"{cell(e2, '+9.3f')} {cell(tot, '+9.3f')} {inc}", flush=True)
         prev = (static, e2, tot)
 
 
@@ -574,7 +577,7 @@ def summary(logs, sizes=()) -> None:
 
 def main(argv=None) -> int:
     args = _parse(sys.argv[1:] if argv is None else argv)
-    if args.summary:
+    if args.summary is not None:            # present (maybe with no log)
         summary(list(args.summary) + list(args.resume), args.sizes)
         return 0
     base_width = ladder.CASES[args.base].window(Substrate.load()).space.ncas
